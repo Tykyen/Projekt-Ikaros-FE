@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ChatUser } from '../lib/types';
 import s from './UserList.module.css';
 
-/** Režim zobrazení přítomných — účet (Hospoda) vs. postava (Rozcestí). */
+/** Režim zobrazení přítomných — účet (Hospoda) vs. postava (Camp). */
 export type UserListMode = 'account' | 'character';
 
 interface UserListProps {
@@ -16,7 +16,7 @@ interface UserListProps {
 
 const initials = (name: string) => name.trim().slice(0, 2).toUpperCase();
 
-/** Jméno + avatar dle režimu — Rozcestí ukazuje postavu, Hospoda účet. */
+/** Jméno + avatar dle režimu — Camp ukazuje postavu, Hospoda účet. */
 function displayUser(
   u: ChatUser,
   mode: UserListMode,

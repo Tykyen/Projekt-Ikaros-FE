@@ -1,6 +1,6 @@
 ---
 name: hospoda
-aliases: [Hospoda, global chat, globální chat, platformový chat, Rozcestí]
+aliases: [Hospoda, global chat, globální chat, platformový chat, Camp]
 category: chat
 related: [[kanal], [konverzace], [vlastni-emote]]
 status: draft
@@ -12,7 +12,7 @@ status: draft
 
 ## Detail
 
-Hospoda je globální (platformový) chat dostupný všem uživatelům, nezávisle na světě. Doplňují ji atmosférické roleplay místnosti „Rozcestí I.–III." se sdíleným prostředím. Podporuje textové emotikony (`:)` → 🙂) a [[vlastni-emote|globální emoty]].
+Hospoda je globální (platformový) chat dostupný všem uživatelům, nezávisle na světě. Doplňují ji atmosférické roleplay místnosti „Camp I.–III." se sdíleným prostředím. Podporuje textové emotikony (`:)` → 🙂) a [[vlastni-emote|globální emoty]].
 
 ## Kde se objevuje
 

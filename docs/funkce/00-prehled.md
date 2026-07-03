@@ -90,7 +90,7 @@ Každá funkce má jednotnou strukturu:
 | [02](02-profil-uzivatele-pratelstvi.md) | Profil, uživatelé & přátelství | `/ikaros/profil`, `/ikaros/uzivatel/:id`, `/ikaros/uzivatele` |
 | [03](03-uvodnik-objevovani-svetu.md) | Úvodník & objevování světů | `/`, `/ikaros/vesmiry`, `/ikaros/vytvorit-svet` |
 | [04](04-komunitni-obsah.md) | Komunitní obsah | `/ikaros/clanky`, `/galerie`, `/diskuze`, `/novinky` |
-| [05](05-komunikace-platformy.md) | Komunikace platformy | `/chat`, `/chat/rozcesti`, `/ikaros/posta`, push |
+| [05](05-komunikace-platformy.md) | Komunikace platformy | `/chat`, `/chat/camp`, `/ikaros/posta`, push |
 | [06](06-akce-oblibene.md) | Akce & oblíbené | `/ikaros/akce`, `/ikaros/oblibene` |
 | [07](07-napoveda-podminky.md) | Nápověda & podmínky | `/ikaros/napoveda`, `/podminky` |
 | [08](08-platformova-administrace.md) | Platformová administrace | `/admin`, `/admin/dungeon-builder`, `/ikaros/admin/emotes` |

@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * Detail postavy po kliknutí na osobu v `PŘÍTOMNÍ` (Rozcestí).
+ * Detail postavy po kliknutí na osobu v `PŘÍTOMNÍ` (Camp).
  * Ukazuje jen kartu postavy (avatar, jméno, popis) — žádné údaje o účtu,
  * aby zůstal zachován roleplay. Data on-demand z veřejného profilu.
  */

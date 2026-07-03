@@ -49,7 +49,7 @@ Cílem je ukázat **uživateli i partnerům, co dnes platforma reálně nabízí
 | S03-2fa | Nastavení 2FA (QR + záložní kódy) | profil → bezpečnost | desktop |
 | S04-profil | Veřejný profil uživatele (vyplněný) | `/ikaros/uzivatel/:id` | desktop |
 | S14-hospoda | Globální chat „Hospoda" | `/chat` | desktop |
-| S15-rozcesti | Rozcestí (atmosférická místnost) | `/chat/rozcesti` | desktop |
+| S15-camp | Camp (atmosférická místnost) | `/chat/camp` | desktop |
 | S10-clanky | Články (přehled nebo detail) | `/ikaros/clanky` | desktop |
 | S11-galerie | Galerie | `/ikaros/galerie` | desktop |
 | S12-diskuze | Diskuze (vlákno) | `/ikaros/diskuze` | desktop |

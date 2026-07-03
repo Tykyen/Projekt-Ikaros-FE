@@ -1,19 +1,19 @@
 import type { RoomKey } from './types';
 
 /**
- * Mapování URL segmentu (`/chat/<segment>`) na místnost Rozcestí.
- * `rozcesti` → I., `rozcesti2` → II., `rozcesti3` → III.
+ * Mapování URL segmentu (`/chat/<segment>`) na místnost Camp.
+ * `camp` → I., `camp2` → II., `camp3` → III.
  */
-export const ROZCESTI_ROUTES: Record<string, { room: RoomKey; name: string }> =
+export const CAMP_ROUTES: Record<string, { room: RoomKey; name: string }> =
   {
-    rozcesti: { room: 'rozcesti-1', name: 'Rozcestí I.' },
-    rozcesti2: { room: 'rozcesti-2', name: 'Rozcestí II.' },
-    rozcesti3: { room: 'rozcesti-3', name: 'Rozcestí III.' },
+    camp: { room: 'camp-1', name: 'Camp I.' },
+    camp2: { room: 'camp-2', name: 'Camp II.' },
+    camp3: { room: 'camp-3', name: 'Camp III.' },
   };
 
 /** Místnost dle URL segmentu; `undefined` pro neznámý segment. */
-export function resolveRozcestiRoom(
+export function resolveCampRoom(
   segment: string | undefined,
 ): { room: RoomKey; name: string } | undefined {
-  return segment ? ROZCESTI_ROUTES[segment] : undefined;
+  return segment ? CAMP_ROUTES[segment] : undefined;
 }

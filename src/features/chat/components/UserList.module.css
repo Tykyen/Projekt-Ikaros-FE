@@ -16,7 +16,7 @@
   color: var(--theme-text, var(--text-primary));
 }
 
-/* Klikatelný řádek (Rozcestí) — reset button stylů + interaktivní stav. */
+/* Klikatelný řádek (Camp) — reset button stylů + interaktivní stav. */
 .rowButton {
   width: 100%;
   min-height: 44px;

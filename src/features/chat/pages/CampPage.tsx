@@ -6,16 +6,16 @@ import { Signpost } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { ChatRoom } from '../components/ChatRoom';
-import { RozcestiHeader } from '../components/RozcestiHeader';
-import { RozcestiDescription } from '../components/RozcestiDescription';
+import { CampHeader } from '../components/CampHeader';
+import { CampDescription } from '../components/CampDescription';
 import { useSocketEvent } from '../api/useSocket';
 import {
   chatQueryKeys,
   useRoomEnvironment,
   useSetRoomEnvironment,
 } from '../api/useGlobalChat';
-import { resolveRozcestiRoom } from '../lib/rozcestiRooms';
-import { findPlace, placeImageUrl } from '../lib/rozcestiPlaces';
+import { resolveCampRoom } from '../lib/campRooms';
+import { findPlace, placeImageUrl } from '../lib/campPlaces';
 import type { EnvironmentEvent, RoomEnvironment, RoomKey } from '../lib/types';
 
 /** Role s platformovou funkcí — smí měnit prostředí scény (spec 4.2a §4.3). */
@@ -29,8 +29,8 @@ const STAFF_ROLES: UserRole[] = [
 
 const DEFAULT_ENV: RoomEnvironment = { style: 'fantasy', placeId: '1' };
 
-/** Jedna místnost Rozcestí — drží sdílené prostředí (styl + lokace). */
-function RozcestiRoom({ room, name }: { room: RoomKey; name: string }) {
+/** Jedna místnost Camp — drží sdílené prostředí (styl + lokace). */
+function CampRoom({ room, name }: { room: RoomKey; name: string }) {
   const user = useAtomValue(currentUserAtom);
   const canEdit = !!user && STAFF_ROLES.includes(user.role);
   const qc = useQueryClient();
@@ -77,14 +77,14 @@ function RozcestiRoom({ room, name }: { room: RoomKey; name: string }) {
         backgroundUrl,
         node: (
           <>
-            <RozcestiHeader
+            <CampHeader
               environment={env}
               canEdit={canEdit}
               onChange={handleChange}
               descOpen={descOpen}
               onToggleDesc={() => setDescOpen((v) => !v)}
             />
-            <RozcestiDescription
+            <CampDescription
               style={env.style}
               placeId={env.placeId}
               open={descOpen}
@@ -96,16 +96,16 @@ function RozcestiRoom({ room, name }: { room: RoomKey; name: string }) {
   );
 }
 
-/** Stránka `/chat/rozcesti*` — atmosférická roleplay místnost (krok 4.2a). */
-export default function RozcestiPage() {
+/** Stránka `/chat/camp*` — atmosférická roleplay místnost (krok 4.2a). */
+export default function CampPage() {
   const location = useLocation();
   const segment = location.pathname.split('/').filter(Boolean).pop();
-  const resolved = resolveRozcestiRoom(segment);
+  const resolved = resolveCampRoom(segment);
 
   if (!resolved) return <Navigate to="/chat" replace />;
 
-  // `key` → čistý remount při přepnutí mezi Rozcestími I.–III.
+  // `key` → čistý remount při přepnutí mezi Campy I.–III.
   return (
-    <RozcestiRoom key={resolved.room} room={resolved.room} name={resolved.name} />
+    <CampRoom key={resolved.room} room={resolved.room} name={resolved.name} />
   );
 }

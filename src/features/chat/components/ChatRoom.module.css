@@ -4,7 +4,7 @@
    sedět s `.mainChat`, jinak chat přeteče / nedosáhne spodku viewportu.
    Výška se počítá z viewportu (dvh), ne z `%` — rodič nemá explicitní
    výšku, takže `height: 100%` by selhalo a chat by spadl na `min-height`.
-   Chat tak vyplní výšku od headeru ke spodku viewportu (Hospoda i Rozcestí). */
+   Chat tak vyplní výšku od headeru ke spodku viewportu (Hospoda i Camp). */
 .room {
   --chat-reserve: var(--sp-2);
   position: relative;
@@ -185,7 +185,7 @@
   flex-shrink: 0;
 }
 
-/* ── Scéna Rozcestí — pozadí z ilustrace lokace ── */
+/* ── Scéna Campu — pozadí z ilustrace lokace ── */
 .scene > *:not(.sceneBg) {
   position: relative;
   z-index: 1;

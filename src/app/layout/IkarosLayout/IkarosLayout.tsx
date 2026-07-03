@@ -109,7 +109,7 @@ const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} />,    anonHidden: true },
 ];
 
-// Krok 4.1 — Hospoda žije na `/chat`. Krok 4.2a — Rozcestí I.–III. na `/chat/rozcesti*`.
+// Krok 4.1 — Hospoda žije na `/chat`. Krok 4.2a — Camp I.–III. na `/chat/camp*`.
 // `roomKey` = BE RoomKey (pro odznak počtu přítomných, 4.2c §4) — pozor, liší se
 // od `key` (URL segment bez pomlčky).
 const CHAT_ROOMS: {
@@ -118,14 +118,14 @@ const CHAT_ROOMS: {
   label: string;
   to: string;
   disabled?: boolean;
-  /** Spec 15.7 — Rozcestí jsou login-only roleplay; anonimovi se skryjí.
+  /** Spec 15.7 — Camp jsou login-only roleplay; anonimovi se skryjí.
    *  Hospoda zůstává (budoucí anon-chat, zatím klik → login). */
   anonHidden?: boolean;
 }[] = [
   { key: 'hospoda',   roomKey: 'hospoda',    label: 'Hospoda',       to: '/chat' },
-  { key: 'rozcesti1', roomKey: 'rozcesti-1', label: 'Rozcestí I.',   to: '/chat/rozcesti',  anonHidden: true },
-  { key: 'rozcesti2', roomKey: 'rozcesti-2', label: 'Rozcestí II.',  to: '/chat/rozcesti2', anonHidden: true },
-  { key: 'rozcesti3', roomKey: 'rozcesti-3', label: 'Rozcestí III.', to: '/chat/rozcesti3', anonHidden: true },
+  { key: 'camp1', roomKey: 'camp-1', label: 'Camp I.',   to: '/chat/camp',  anonHidden: true },
+  { key: 'camp2', roomKey: 'camp-2', label: 'Camp II.',  to: '/chat/camp2', anonHidden: true },
+  { key: 'camp3', roomKey: 'camp-3', label: 'Camp III.', to: '/chat/camp3', anonHidden: true },
 ];
 
 function SectionTitle({ children }: { children: ReactNode }) {

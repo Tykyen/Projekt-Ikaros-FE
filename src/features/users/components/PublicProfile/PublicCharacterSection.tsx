@@ -9,8 +9,8 @@ interface Props {
 export function PublicCharacterSection({ profile }: Props) {
   if (!profile.characterName && !profile.characterBio) return null;
   return (
-    <section className={s.section} aria-label="Postava v Rozcestí">
-      <h3 className={s.sectionTitle}>Postava v Rozcestí</h3>
+    <section className={s.section} aria-label="Postava v Campu">
+      <h3 className={s.sectionTitle}>Postava v Campu</h3>
       <div className={s.character}>
         {(profile.characterAvatarUrl || profile.defaultAvatarType) && (
           <UserAvatar

@@ -29,7 +29,7 @@ const GLOBAL_CARDS: GlobalCard[] = [
     title: 'Ikaros',
     badge: 'Základní uživatel',
     desc:
-      'Každý registrovaný uživatel. Vlastní profil, postava v Rozcestí, ' +
+      'Každý registrovaný uživatel. Vlastní profil, postava v Campu, ' +
       'účast v komunitě. Sám o sobě nemá moderační oprávnění — ta nastavuje Superadmin.',
     icon: <Star size={24} strokeWidth={1.5} aria-hidden="true" />,
   },

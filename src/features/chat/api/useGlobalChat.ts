@@ -136,7 +136,7 @@ export function useDeleteMessage(room: RoomKey) {
   });
 }
 
-/** Aktuální prostředí Rozcestí (styl + lokace). Pro Hospodu se nevolá. */
+/** Aktuální prostředí Campu (styl + lokace). Pro Hospodu se nevolá. */
 export function useRoomEnvironment(room: RoomKey) {
   return useQuery({
     queryKey: chatQueryKeys(room).environment,
@@ -147,7 +147,7 @@ export function useRoomEnvironment(room: RoomKey) {
 }
 
 /**
- * Změna prostředí Rozcestí — REST endpoint za role guardem (jen platformová
+ * Změna prostředí Campu — REST endpoint za role guardem (jen platformová
  * funkce). BE po uložení odbroadcastne WS `chat:room:environment`.
  */
 export function useSetRoomEnvironment(room: RoomKey) {

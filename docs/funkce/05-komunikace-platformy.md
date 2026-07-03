@@ -1,6 +1,6 @@
 # 05 — Komunikace platformy
 
-Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Hospoda + Rozcestí I.–III.), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
+Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Hospoda + Camp I.–III.), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
 
 > Pozn.: **Chat uvnitř světa** (`/svet/:slug/chat`) je samostatná funkce a patří do kapitoly o světech. Custom obrázkové emoty jsou tam (viz sekce „Emoty" níže).
 
@@ -11,11 +11,11 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Kde:** route `/chat` (`ChatPage` → `ChatRoom room="hospoda"`). Levý panel: sekce „Chat", položka „Hospoda" (viditelná i anonimovi z 15.7).
 - **Kdo:**
   - **FE:** `/chat` je **veřejné** (15.8 — zrušen `requireAuth`). Nepřihlášený bez host session vidí captcha bránu `AnonChatGate`; po ověření má guest session a vejde v „host módu".
-  - **BE:** `GlobalChatController` za `GuestOrMemberGuard` (`global-chat.controller.ts`) — pustí člena (plný member gate) i hosta (guest JWT, role `Guest`). **Host smí jen Hospodu** (`assertGuestScope` → Rozcestí 403), **jen text** (upload → 403). Mazání = `AdminGuard`. Ban hosta = `POST /global-chat/anon-ban` (Admin, váže na anon-id).
+  - **BE:** `GlobalChatController` za `GuestOrMemberGuard` (`global-chat.controller.ts`) — pustí člena (plný member gate) i hosta (guest JWT, role `Guest`). **Host smí jen Hospodu** (`assertGuestScope` → Camp 403), **jen text** (upload → 403). Mazání = `AdminGuard`. Ban hosta = `POST /global-chat/anon-ban` (Admin, váže na anon-id).
 - **Host (anonym) — 15.8:**
   - **Vstup:** captcha (Turnstile) → `POST /auth/anon-session` → guest JWT (role `Guest`, TTL `ANON_SESSION_TTL` = 14 d) + náhodné jméno `anonym{1000–9999}`. Session v `localStorage: ikaros.anonToken` (oddělená od členské), drží přes reload/reconnect. Po registraci/přihlášení se zahodí.
   - **Smí:** číst Hospodu + psát **text**, vidět přítomné. Zpráva nese odznak „host" (`isAnonymous`), bez avataru.
-  - **Nesmí:** upload příloh, šepot, mazání, Rozcestí, cokoli mimo Hospodu (guest token scope + sentinel `UserRole.Guest = 99` nikdy neprojde gating).
+  - **Nesmí:** upload příloh, šepot, mazání, Camp, cokoli mimo Hospodu (guest token scope + sentinel `UserRole.Guest = 99` nikdy neprojde gating).
   - **Moderace:** Admin zabanuje `anon-id` (kolekce `anon_bans`) → 403 při psaní; **rate-limit 10 zpráv/min** per anon-id (in-memory, jen host).
 - **Co jde dělat:**
   - Psát zprávy (text + barva `chatColor` z profilu), **odpovídat** na zprávu (reply preview), **reagovat** emoji reakcí, **nahrávat přílohy** (max **10 MB**).
@@ -27,29 +27,29 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - Žádné trvalé vlákno/archiv, žádné kategorie. Mazání jen Admin+ (uživatel nesmaže ani vlastní).
 - **Zvláštnosti:**
   - **Identita autora zprávy = účet** (`username` + `avatarUrl`). Od **4.2e** se ukládá jako **snapshot** při odeslání (`resolveSenderIdentity` → `senderName`/`senderAvatarUrl`, `global-chat.service.ts`) — zpráva si jméno+avatar pamatuje natrvalo. FE má navíc fallback resolver z presence pro zprávy bez snapshotu (`roomAvatarFor`). Dřív zprávy ukazovaly jen iniciálu (avatar se neplnil).
-  - **15.9 — push jen z Hospody a opt-in:** odeslaná zpráva spustí web push **jen v Hospodě** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda')` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Hospodu výslovně zapnul v profilu. Rozcestí push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Rozcestí — opraveno). Payload bez `url` → bublina otevře jen `/`. (`global-chat.service.ts` `sendMessage`.)
+  - **15.9 — push jen z Hospody a opt-in:** odeslaná zpráva spustí web push **jen v Hospodě** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda')` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Hospodu výslovně zapnul v profilu. Camp push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Campu — opraveno). Payload bez `url` → bublina otevře jen `/`. (`global-chat.service.ts` `sendMessage`.)
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
 
-### Globální chat — Rozcestí I.–III.
+### Globální chat — Camp I.–III.
 - **Co to je:** Tři atmosférické roleplay místnosti se **sdíleným prostředím** (vizuální styl + lokace) a ilustračním pozadím scény. Technicky tři další kanály téhož globálního chatu.
-- **Kde:** routy `/chat/rozcesti`, `/chat/rozcesti2`, `/chat/rozcesti3` (`RozcestiPage` → `RozcestiRoom`). Levý panel: „Rozcestí I./II./III." s počty přítomných.
+- **Kde:** routy `/chat/camp`, `/chat/camp2`, `/chat/camp3` (`CampPage` → `CampRoom`). Levý panel: „Camp I./II./III." s počty přítomných.
 - **Kdo:**
   - **FE:** `requireAuth` (router `:169`–`:171`).
-  - **BE:** stejný controller; `RoomKey` = `hospoda | rozcesti-1 | rozcesti-2 | rozcesti-3` (`global-chat.service.ts:24`).
-  - **Změna prostředí** scény = jen role s platformovou funkcí: `Superadmin`, `Admin`, `SpravceClanku`, `SpravceGalerie`, `SpravceDiskuzi` (`ROOM_STAFF_ROLES` / `RolesGuard`, `global-chat.controller.ts:46`; FE `STAFF_ROLES` v `RozcestiPage.tsx:22`).
+  - **BE:** stejný controller; `RoomKey` = `hospoda | camp-1 | camp-2 | camp-3` (`global-chat.service.ts:24`).
+  - **Změna prostředí** scény = jen role s platformovou funkcí: `Superadmin`, `Admin`, `SpravceClanku`, `SpravceGalerie`, `SpravceDiskuzi` (`ROOM_STAFF_ROLES` / `RolesGuard`, `global-chat.controller.ts:46`; FE `STAFF_ROLES` v `CampPage.tsx:22`).
 - **Co jde dělat:**
   - Vše jako v Hospodě (psát, reply, reakce, přílohy, šepty, presence).
-  - **Vystupovat za postavu** — na rozdíl od Hospody nese zpráva i panel přítomných **jméno + avatar postavy** z profilu („Postava v Rozcestí": `characterName`/`characterAvatarUrl`), ne účet. Kdo postavu nevyplnil → fallback na účet.
-  - Staff: vybrat **styl** (např. `fantasy`) + **lokaci** (place) — `PUT /global-chat/rooms/:room/environment`; změna se přes WS `chat:room:environment` rozešle všem v místnosti a nastaví pozadí + popis scény (`RozcestiHeader`/`RozcestiDescription`).
-- **Hranice / co neumí:** prostředí je **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných stylů/míst (`rozcestiPlaces` na FE). Postava je **globální** (jedna napříč všemi Rozcestími, z profilu) — ne per-místnost. **Jméno** ve zprávě se opraví až novým snapshotem; staré zprávy (před 4.2e) ukazují `username` do vypršení 1h TTL (FE řeší jen avatar, ne jméno). Stejné 1h TTL zpráv.
+  - **Vystupovat za postavu** — na rozdíl od Hospody nese zpráva i panel přítomných **jméno + avatar postavy** z profilu („Postava v Campu": `characterName`/`characterAvatarUrl`), ne účet. Kdo postavu nevyplnil → fallback na účet.
+  - Staff: vybrat **styl** (např. `fantasy`) + **lokaci** (place) — `PUT /global-chat/rooms/:room/environment`; změna se přes WS `chat:room:environment` rozešle všem v místnosti a nastaví pozadí + popis scény (`CampHeader`/`CampDescription`).
+- **Hranice / co neumí:** prostředí je **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných stylů/míst (`campPlaces` na FE). Postava je **globální** (jedna napříč všemi Campy, z profilu) — ne per-místnost. **Jméno** ve zprávě se opraví až novým snapshotem; staré zprávy (před 4.2e) ukazují `username` do vypršení 1h TTL (FE řeší jen avatar, ne jméno). Stejné 1h TTL zpráv.
 - **Zvláštnosti:**
   - **Identita postavy = snapshot při odeslání** (4.2e): zpráva si pamatuje, za kterou postavu byla psána, i když hráč postavu/avatar později změní (záměr pro roleplay — opak render-time PJ persony ve světovém chatu). `resolveSenderIdentity(room≠hospoda)` v `global-chat.service.ts`; FE pravidlo `roomAvatarFor` + panel `UserList` mode `character`.
-  - Přepnutí mezi Rozcestími dělá čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická lokální změna), aby se neduplikovalo do useState.
-  - **15.9 — Rozcestí negeneruje web push.** Sdílený `sendMessage` posílá push jen pro `room === 'hospoda'`; zprávy z Rozcestí push nespouští (záměr — atmosférický roleplay, ne notifikační kanál).
+  - Přepnutí mezi Campy dělá čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická lokální změna), aby se neduplikovalo do useState.
+  - **15.9 — Camp negeneruje web push.** Sdílený `sendMessage` posílá push jen pro `room === 'hospoda'`; zprávy z Campu push nespouští (záměr — atmosférický roleplay, ne notifikační kanál).
 - **Stav:** ✅
-- **Kód:** FE `src/features/chat/pages/RozcestiPage.tsx`, `components/ChatRoom.tsx`, `lib/roomAvatar.ts`, `components/RozcestiHeader.tsx`, `RozcestiDescription.tsx`, `lib/rozcestiRooms.ts`, `lib/rozcestiPlaces.ts`. BE `global-chat.service.ts` (`resolveSenderIdentity`/`sendMessage`/`sendWhisper`), `global-chat.controller.ts:179`, `global-chat.gateway.ts:175`. Spec `docs/arch/phase-4/spec-4.2e.md`.
+- **Kód:** FE `src/features/chat/pages/CampPage.tsx`, `components/ChatRoom.tsx`, `lib/roomAvatar.ts`, `components/CampHeader.tsx`, `CampDescription.tsx`, `lib/campRooms.ts`, `lib/campPlaces.ts`. BE `global-chat.service.ts` (`resolveSenderIdentity`/`sendMessage`/`sendWhisper`), `global-chat.controller.ts:179`, `global-chat.gateway.ts:175`. Spec `docs/arch/phase-4/spec-4.2e.md`.
 
 ---
 
@@ -163,7 +163,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 ### Emoty — použití v chatu a zprávách
 - **Co to je:** Dva oddělené systémy „emotů". (1) **Textové emotikony** v globálním chatu — `:)` → 🙂, `:shortcode:` → unicode emoji. (2) **Custom obrázkové emoty** (modul `emotes`) — vlastní obrázek + zkratka, dostupné **v chatu uvnitř světa**.
 - **Kde:**
-  - Globální chat (`/chat`, Rozcestí): textová konverze v `MessageItem` (fallback `parseEmotes`) + emoji picker (`EmojiPickerPopover`, knihovna `frimousse`).
+  - Globální chat (`/chat`, Camp): textová konverze v `MessageItem` (fallback `parseEmotes`) + emoji picker (`EmojiPickerPopover`, knihovna `frimousse`).
   - Custom obrázkové emoty: `features/world/chat` (autocomplete `EmoteAutocomplete`, render `renderChatContent`, API `useGlobalEmotes`/`useWorldEmotes`).
 - **Kdo (použití):** každý člen příslušného chatu může emoty/emoji vkládat a vidět. Custom emoty čte člen světa (`emotes/:worldId` za `assertIsMember`); globální custom emoty (`emotes/global`) čte každý přihlášený.
 - **Co jde dělat:**
@@ -189,4 +189,4 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 5. **VAPID fail-fast.** Bez env klíčů push modul spadne na non-null assertu při startu (`push.service.ts:31`) — provozní závislost; ověřit, že produkce má klíče (dle MEMORY 3/3 OK).
 6. **Push granularita jen per-typ, ne per-svět** (15.9) — uživatel nemůže ztlumit konkrétní svět, jen celou kategorii. Plánováno jako pozdější rozšíření.
 
-> **Vyřešeno 15.9 (smazáno z výše):** globální chat už nepushuje každou zprávu všem (Hospoda opt-in, Rozcestí push zrušen, exclude přes preference); per-typ předvolby existují (sekce „Nastavení notifikací").
+> **Vyřešeno 15.9 (smazáno z výše):** globální chat už nepushuje každou zprávu všem (Hospoda opt-in, Camp push zrušen, exclude přes preference); per-typ předvolby existují (sekce „Nastavení notifikací").

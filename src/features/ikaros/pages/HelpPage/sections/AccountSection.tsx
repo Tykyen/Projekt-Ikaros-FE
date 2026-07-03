@@ -33,12 +33,12 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Drama size={20} />} title="Postava v Rozcestí" accent="player">
+      <HelpAccordion icon={<Drama size={20} />} title="Postava v Campu" accent="player">
         <p>
           Jméno, krátké bio a <strong>samostatný avatar</strong> pro tvoji
           platformovou „postavu" — personu, pod kterou se objevíš v chatech a
           komunitě Ikaru. Je nezávislá na herních postavách uvnitř světů.
-          V <strong>Rozcestí</strong> pod ní vystupuješ přímo u zpráv (tvé jméno
+          V <strong>Camp</strong> pod ní vystupuješ přímo u zpráv (tvé jméno
           a obrázek postavy); v Hospodě se ukazuje účet.
         </p>
       </HelpAccordion>

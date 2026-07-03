@@ -14,7 +14,7 @@ const HEX_RE = /^#[0-9A-Fa-f]{6}$/;
 const HEX_PARTIAL_RE = /^#[0-9A-Fa-f]{0,6}$/;
 
 /**
- * 1.3a — Color picker pro „barvu chatu" (Hospoda + Rozcestí).
+ * 1.3a — Color picker pro „barvu chatu" (Hospoda + Camp).
  * react-colorful HexColorPicker + ruční hex input (sync v obou směrech).
  * Náhled = větička v dané barvě (přibližná simulace zprávy v chatu).
  */

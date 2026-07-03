@@ -37,7 +37,7 @@ export function StartSection() {
             <>
               <strong>Vyplň profil a postavu.</strong> V profilu (po přihlášení)
               přidej avatar, něco o sobě a svou platformovou <strong>postavu</strong>{' '}
-              v Rozcestí — pod tou pak vystupuješ v komunitě a chatech.
+              v Campu — pod tou pak vystupuješ v komunitě a chatech.
             </>,
             <>
               <strong>Vstup do světa.</strong> V <Link to="/ikaros/vesmiry">Přehledu
@@ -72,7 +72,7 @@ export function StartSection() {
         <TermGrid
           items={[
             { term: 'Hlavička', desc: 'Logo (na úvodník), přepínač motivů, zvonek (notifikace), Pošta, Profil, Odhlásit. U anonyma Přihlásit / Registrace.' },
-            { term: 'Levý sidebar', desc: 'Navigace, seznam vesmírů a chat. Po přihlášení i Diskuze, Vytvořit svět a Rozcestí; nepřihlášenému se tyhle skryjí (zůstává Úvodník, Nápověda, Články, Galerie, vesmíry a Hospoda).' },
+            { term: 'Levý sidebar', desc: 'Navigace, seznam vesmírů a chat. Po přihlášení i Diskuze, Vytvořit svět a Camp; nepřihlášenému se tyhle skryjí (zůstává Úvodník, Nápověda, Články, Galerie, vesmíry a Hospoda).' },
             { term: 'Hlavní panel', desc: 'Obsah aktuální stránky. Nepřihlášenému se na úvodníku navíc ukáže pás ukázek z aplikace.' },
             { term: 'Pravý panel', desc: 'Po přihlášení administrace, moje světy a oblíbené. Bez přihlášení tu najdeš „Začni tady" — tři kroky, jak se zapojit.' },
             { term: 'Zvonek', desc: 'Souhrn zpráv ze všech tvých světů + záložky Události a Ke zpracování.' },
@@ -89,13 +89,13 @@ export function StartSection() {
           items={[
             { term: 'Svět (vesmír)', desc: 'Samostatná hra se svými členy, mapami, postavami a vlastním vzhledem. Žiješ ve více světech zároveň.' },
             { term: 'PJ (Pán jeskyně)', desc: 'Vypravěč a vlastník světa — řídí hru, obsah a členy. Jinde též „GM".' },
-            { term: 'Postava', desc: 'Tvoje herní identita ve světě (statistiky, deník, výbava). Platformová „postava v Rozcestí" je samostatná persona pro komunitu.' },
+            { term: 'Postava', desc: 'Tvoje herní identita ve světě (statistiky, deník, výbava). Platformová „postava v Campu" je samostatná persona pro komunitu.' },
             { term: 'NPC', desc: 'Postava řízená PJ (vedlejší charakter), ne hráčem.' },
             { term: 'Bestie', desc: 'Statblok nepřítele/tvora pro taktickou mapu (HP, zbroj, schopnosti) — bez deníku.' },
             { term: 'Token', desc: 'Figurka postavy nebo bestie na taktické mapě, se kterou se pohybuje.' },
             { term: 'AKJ', desc: 'Stupeň utajení stránky/záložky. Bez přístupu uvidíš jen zamčenou záložku, ne její obsah.' },
             { term: 'Motiv (theme)', desc: 'Vizuální styl — platforma má vlastní, každý svět taky svůj.' },
-            { term: 'Rozcestí', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik.' },
+            { term: 'Camp', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik.' },
             { term: 'Hospoda', desc: 'Globální chat pro celou platformu napříč světy. Nakouknout a popovídat si jako host (anonym) můžeš i bez registrace — jen text.' },
             { term: 'Pavučina', desc: 'Vztahový graf kampaně — kdo koho má rád, frakce, příběhové linky.' },
             { term: 'Taktická mapa', desc: 'Hex-grid plocha pro boj a scény s tokeny, iniciativou a mlhou války.' },

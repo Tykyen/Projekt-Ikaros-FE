@@ -49,7 +49,7 @@ import { CharacterDetailModal } from './CharacterDetailModal';
 import { TypingIndicator } from './TypingIndicator';
 import s from './ChatRoom.module.css';
 
-/** Volitelné prostředí Rozcestí — záhlaví scény + pozadí z ilustrace lokace. */
+/** Volitelné prostředí Campu — záhlaví scény + pozadí z ilustrace lokace. */
 export interface RoomScene {
   /** Obsah pod hlavičkou (výběr stylu/lokace + 📖 panel). */
   node: ReactNode;
@@ -61,11 +61,11 @@ export interface ChatRoomProps {
   room: RoomKey;
   roomName: string;
   icon: ReactNode;
-  /** Vyplněno → místnost běží v „divadelním" režimu Rozcestí. */
+  /** Vyplněno → místnost běží v „divadelním" režimu Camp. */
   scene?: RoomScene;
 }
 
-/** Globální chat — drží socket lifecycle a stav místnosti (Hospoda i Rozcestí). */
+/** Globální chat — drží socket lifecycle a stav místnosti (Hospoda i Camp). */
 export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   const member = useAtomValue(currentUserAtom);
   // 15.8 — host (guest): pseudo-identita z anonSession (currentUser je null).
@@ -98,7 +98,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   // Zpráva, na kterou se právě odpovídá (4.3a); `null` = běžná zpráva.
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [usersOpen, setUsersOpen] = useState(false);
-  // Detail postavy v Rozcestí — ID kliknuté osoby z `PŘÍTOMNÍ`, `null` = zavřeno.
+  // Detail postavy v Campu — ID kliknuté osoby z `PŘÍTOMNÍ`, `null` = zavřeno.
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   // Auto-odhlášení pro neaktivitu (4.2c §5) — BE odebral z presence.
   const [kicked, setKicked] = useState(false);
@@ -126,7 +126,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
     [users],
   );
 
-  // 4.2e §2 — avatar zprávy dle místnosti: Hospoda účet, Rozcestí postava
+  // 4.2e §2 — avatar zprávy dle místnosti: Hospoda účet, Camp postava
   // (fallback účet). Zdroj = živá presence. Je to fallback pro zprávy BEZ
   // snapshotu `senderAvatarUrl` (odeslané před BE deployem) od přítomných
   // autorů; v `MessageItem` má snapshot přednost (`senderAvatarUrl ?? …`).
@@ -144,7 +144,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
     [avatarByUserId],
   );
 
-  // Pozn.: ChatRoom se při přepnutí místnosti vždy remountuje (`RozcestiRoom`
+  // Pozn.: ChatRoom se při přepnutí místnosti vždy remountuje (`CampRoom`
   // má `key={room}`, Hospoda je statická) → lokální stav se resetuje sám.
 
   // Výpis chatu — běžné i systémové zprávy z jedné cache (4.2d §5).
@@ -298,7 +298,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
 
   // Vstup do místnosti — vyčleněno z effectu, ať ho lze zavolat i ručně
   // po auto-odhlášení („Vrátit se"). Hospoda jede na `chat:hospoda:*` (4.1),
-  // Rozcestí na `chat:room:*`.
+  // Camp na `chat:room:*`.
   const joinRoom = useCallback(() => {
     if (!channelId || !user) return;
     // Už v místnosti jsem (překlik mezi stránkami) → žádný nový join ani

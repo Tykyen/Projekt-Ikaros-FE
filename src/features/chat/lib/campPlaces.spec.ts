@@ -1,26 +1,26 @@
 import { describe, it, expect } from 'vitest';
 import {
-  ROZCESTI_PLACES,
+  CAMP_PLACES,
   ROOM_STYLES,
   placeImageUrl,
   findPlace,
   type RoomStyle,
-} from './rozcestiPlaces';
-import { ROZCESTI_DESCRIPTIONS, placeDescription } from './rozcestiDescriptions';
+} from './campPlaces';
+import { CAMP_DESCRIPTIONS, placeDescription } from './campDescriptions';
 
 const STYLES: RoomStyle[] = ['fantasy', 'scifi', 'mystic'];
 
-describe('rozcestiPlaces', () => {
+describe('campPlaces', () => {
   it('má 3 styly po 20 lokacích', () => {
     expect(ROOM_STYLES).toHaveLength(3);
     for (const style of STYLES) {
-      expect(ROZCESTI_PLACES[style]).toHaveLength(20);
+      expect(CAMP_PLACES[style]).toHaveLength(20);
     }
   });
 
   it('lokace mají id 1–20 bez duplicit', () => {
     for (const style of STYLES) {
-      const ids = ROZCESTI_PLACES[style].map((p) => p.id);
+      const ids = CAMP_PLACES[style].map((p) => p.id);
       expect(ids).toEqual(
         Array.from({ length: 20 }, (_, i) => String(i + 1)),
       );
@@ -29,7 +29,7 @@ describe('rozcestiPlaces', () => {
 
   it('každá lokace má obrázek (.webp) i neprázdný popis — 60/60', () => {
     for (const style of STYLES) {
-      for (const place of ROZCESTI_PLACES[style]) {
+      for (const place of CAMP_PLACES[style]) {
         expect(place.image).toMatch(/\.webp$/);
         expect(place.name.length).toBeGreaterThan(0);
         expect(placeDescription(style, place.id).length).toBeGreaterThan(50);
@@ -39,13 +39,13 @@ describe('rozcestiPlaces', () => {
 
   it('placeImageUrl — fantasy v rootu, scifi/mystic v podsložkách', () => {
     expect(placeImageUrl('fantasy', 'pohadkovy_les.webp')).toBe(
-      '/images/rozcesti/pohadkovy_les.webp',
+      '/images/camp/pohadkovy_les.webp',
     );
     expect(placeImageUrl('scifi', 'scifi_slum.webp')).toBe(
-      '/images/rozcesti/scifi/scifi_slum.webp',
+      '/images/camp/scifi/scifi_slum.webp',
     );
     expect(placeImageUrl('mystic', 'mystic_muzeum.webp')).toBe(
-      '/images/rozcesti/mystic/mystic_muzeum.webp',
+      '/images/camp/mystic/mystic_muzeum.webp',
     );
   });
 
@@ -56,7 +56,7 @@ describe('rozcestiPlaces', () => {
 
   it('descriptions mají klíče pro všech 20 lokací každého stylu', () => {
     for (const style of STYLES) {
-      expect(Object.keys(ROZCESTI_DESCRIPTIONS[style])).toHaveLength(20);
+      expect(Object.keys(CAMP_DESCRIPTIONS[style])).toHaveLength(20);
     }
   });
 

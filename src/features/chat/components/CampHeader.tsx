@@ -1,10 +1,10 @@
 import { BookOpen, Lock } from 'lucide-react';
 import clsx from 'clsx';
-import { ROOM_STYLES, ROZCESTI_PLACES } from '../lib/rozcestiPlaces';
+import { ROOM_STYLES, CAMP_PLACES } from '../lib/campPlaces';
 import type { RoomEnvironment, RoomStyle } from '../lib/types';
-import s from './RozcestiHeader.module.css';
+import s from './CampHeader.module.css';
 
-export interface RozcestiHeaderProps {
+export interface CampHeaderProps {
   environment: RoomEnvironment;
   /** Smí měnit prostředí — role s platformovou funkcí (spec 4.2a §4.3). */
   canEdit: boolean;
@@ -14,20 +14,20 @@ export interface RozcestiHeaderProps {
 }
 
 /**
- * Záhlaví scény Rozcestí — výběr stylu a lokace + přepínač popisu (📖).
+ * Záhlaví scény Campu — výběr stylu a lokace + přepínač popisu (📖).
  * Bez oprávnění jsou selecty „zamčená cedule" (read-only).
  *
  * Stylizovaný nativní `<select>` (ne custom dropdown) — drží přístupnost
  * a nativní mobilní picker.
  */
-export function RozcestiHeader({
+export function CampHeader({
   environment,
   canEdit,
   onChange,
   descOpen,
   onToggleDesc,
-}: RozcestiHeaderProps) {
-  const places = ROZCESTI_PLACES[environment.style];
+}: CampHeaderProps) {
+  const places = CAMP_PLACES[environment.style];
 
   const handleStyle = (style: RoomStyle) => {
     // Nový styl má jiné lokace → reset na první.

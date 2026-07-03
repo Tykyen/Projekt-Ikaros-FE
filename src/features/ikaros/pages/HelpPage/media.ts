@@ -39,7 +39,7 @@ export const HELP_MEDIA = {
   'platforma.profil': {
     src: undefined,
     alt: 'Stránka Profil',
-    caption: 'Profil — hlavička, postava v Rozcestí a bezpečnost',
+    caption: 'Profil — hlavička, postava v Campu a bezpečnost',
   },
 
   // ── Svět ────────────────────────────────────────────────────────────

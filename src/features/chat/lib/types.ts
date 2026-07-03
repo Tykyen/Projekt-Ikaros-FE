@@ -1,15 +1,15 @@
 /**
- * FE typy globálního chatu (Hospoda 4.1, Rozcestí 4.2a).
+ * FE typy globálního chatu (Hospoda 4.1, Camp 4.2a).
  * Zrcadlí BE `ChatMessage` — Date pole přicházejí přes JSON jako string.
  */
-import type { RoomStyle } from './rozcestiPlaces';
+import type { RoomStyle } from './campPlaces';
 
 export type { RoomStyle };
 
 /** Klíč globální chat místnosti — zrcadlí BE `RoomKey`. */
-export type RoomKey = 'hospoda' | 'rozcesti-1' | 'rozcesti-2' | 'rozcesti-3';
+export type RoomKey = 'hospoda' | 'camp-1' | 'camp-2' | 'camp-3';
 
-/** Sdílené prostředí Rozcestí — styl + lokace (z `GET .../environment`). */
+/** Sdílené prostředí Campu — styl + lokace (z `GET .../environment`). */
 export interface RoomEnvironment {
   style: RoomStyle;
   placeId: string;
@@ -99,7 +99,7 @@ export interface ChatUser {
   userId: string;
   username: string;
   avatarUrl?: string;
-  /** Postava z profilu — zobrazuje se v Rozcestí místo účtu (4.2d §8). */
+  /** Postava z profilu — zobrazuje se v Campu místo účtu (4.2d §8). */
   characterName?: string;
   characterAvatarUrl?: string;
 }

@@ -278,7 +278,7 @@
 }
 .navItemActive { composes: btn3dActive from '../../../themes/_shared/btn3d.module.css'; }
 
-/* Krok 4.1 — disabled nav položka (Rozcestí I.–III. do kroku 4.2). */
+/* Krok 4.1 — disabled nav položka (Camp I.–III. do kroku 4.2). */
 .navItemDisabled {
   display: flex;
   align-items: center;

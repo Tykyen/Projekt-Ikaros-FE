@@ -238,12 +238,12 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 
 ### - [x] 15.8 Hospoda pro hosty (anonymní chat) — [H1 navazuje na 15.7 · dopad střední · náklad velký]
 > ✅ **Implementováno 2026-06-22** (viz [spec-15.8](arch/phase-15/spec-15.8-hospoda-anon.md)) — nepřihlášený „host" může v **Hospodě** (globální chat) **číst i psát** pod přezdívkou `anonym{N}` (jen text), bez registrace. Akviziční navázání na „Pozvi přátele" z 15.7.
-**Co se postavilo:** captcha brána (Turnstile) → **guest JWT** (role `Guest`, TTL 14 d) → host mód Hospody. Host: jen text, žádný upload/šepot/Rozcestí. Moderace: Admin ban per anon‑id + rate‑limit 10/min. BE (A1‑A8: token, guard, scope, identita, ban, WS) + FE (B1‑B7: anonSession, brána, host mód). **Bezpečnost:** guest token scope jen Hospoda + sentinel `UserRole.Guest=99` (2. pojistka), captcha fail‑closed, identita z ověřeného tokenu.
+**Co se postavilo:** captcha brána (Turnstile) → **guest JWT** (role `Guest`, TTL 14 d) → host mód Hospody. Host: jen text, žádný upload/šepot/Camp. Moderace: Admin ban per anon‑id + rate‑limit 10/min. BE (A1‑A8: token, guard, scope, identita, ban, WS) + FE (B1‑B7: anonSession, brána, host mód). **Bezpečnost:** guest token scope jen Hospoda + sentinel `UserRole.Guest=99` (2. pojistka), captcha fail‑closed, identita z ověřeného tokenu.
 **Ops:** ČEKÁ BE restart + env `ANON_SESSION_TTL=14d`.
 
 ### - [x] 15.9 Notifikační preference + rozšíření push — [H1 · dopad střední · náklad střední]
 > ✅ **Implementováno 2026-06-22** (viz [spec-15.9](arch/phase-15/spec-15.9-notifikace-preferences.md)) — hráč si v profilu (sekce **Notifikace**) vybere, na co mu chodí web push: master vypínač + **7 kategorií** ve 4 skupinách. BE filtruje každý push dle preferencí.
-**Co se postavilo:** `notificationPreferences` na User + `PATCH /users/me/notification-preferences` (delta merge); filtr v `PushService` (`notifyUsers/notifyAll` s kategorií, jednosměrná závislost push→users). **3 nové push triggery:** novinky světa (členům), vlastní diskuse (autorovi), hodnocení/schválení článku i galerie (autorovi). **Hospoda push = opt‑in** (default VYP), **Rozcestí push zrušen** (dřív spamoval všechny). **Plánovaná hra: připomínka 24h i 1h** (cron à 15 min, druhý flag `reminder1hSent`). FE sekce + dual‑source defaulty. Ověřeno: BE jest 440/440 + push 21/21, FE build + HelpPage 25/25.
+**Co se postavilo:** `notificationPreferences` na User + `PATCH /users/me/notification-preferences` (delta merge); filtr v `PushService` (`notifyUsers/notifyAll` s kategorií, jednosměrná závislost push→users). **3 nové push triggery:** novinky světa (členům), vlastní diskuse (autorovi), hodnocení/schválení článku i galerie (autorovi). **Hospoda push = opt‑in** (default VYP), **Camp push zrušen** (dřív spamoval všechny). **Plánovaná hra: připomínka 24h i 1h** (cron à 15 min, druhý flag `reminder1hSent`). FE sekce + dual‑source defaulty. Ověřeno: BE jest 440/440 + push 21/21, FE build + HelpPage 25/25.
 **Ops:** ČEKÁ BE restart (nové env netřeba).
 
 ---
@@ -328,7 +328,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 > ⚖️ **Trade-off, který bereme vědomě:** rušíme **asynchronní play-by-post** jako samostatný differentiator. Async (psát po dnech, řazení striktně po tazích, vlákno jako dokument) je to, co Discord dělá špatně a co analýzy označovaly za hlavní příkop. Světový **realtime** chat s kanály je blíž tomu, co Discord umí — zprávy sice zůstávají, ale není to plnohodnotná „fórovka 2.0". Vědomá volba: nižší náklad a žádné riziko místo nového systému. Pokud se časem ukáže poptávka po pravém async, dá se 16.1 znovu otevřít.
 **✅ Rozhodnuto (2026-06-15c) — žádný nový typ chatu:**
 - **Dlouhé / oddělené příběhy → světový chat** (je k tomu uzpůsoben): kanály = příběhové linky / místa, hraní za postavu už máme. Samostatný async play-by-post systém **se nestaví** (viz trade-off výše).
-- **One-shoty / večerní oddychovka → globální Rozcestí** (16.6): večerní hra s kamarády, uložit/načíst scénu.
+- **One-shoty / večerní oddychovka → globální Camp** (16.6): večerní hra s kamarády, uložit/načíst scénu.
 - Tím se ruší dřívější plán „fórovka = nový systém vláken" (2026-06-15a/b). 16.1 je teď jen **doladění existujícího chatu**, ne nová entita.
 
 **Otevřené otázky:** Co konkrétně chatu chybí pro pohodlné dlouhé vyprávění (odběr kanálu? archiv? mobilní čtení dlouhých příspěvků?) — zjistit průchodem reálným chatem (vyžádám si screen). Kdo zakládá příběhové kanály a kdo do nich smí psát (role/skupiny — máme)?
@@ -552,12 +552,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** umístění/editace pinů (PJ), klik → stránka; mobilní ovládání.
 **Otevřené otázky:** Piny i na 3D vesmírné mapě, nebo jen 2D atlas? Viditelnost per AKJ úroveň? Vnořené mapy (klik na město → mapa města)?
 
-### - [ ] 16.6 One-shot v Rozcestí — hra na jeden večer + uložení/načtení scény — [dopad střední · náklad střední] 🔁
-**Cíl:** Rozcestí (globální chat) jako místo pro **krátké hry na jeden večer**: hráči se sejdou, dají dohromady příběh. Klíčové: **uložit scénu** (taktickou mapu + rozestavení) a **načíst** ji, aby se dala znovu zahrát.
-**Proč:** Tvoje zadání (2026-06-15): one-shoty patří do Rozcestí, dlouhé kampaně do světového chatu (viz 16.1). One-shot bez setupu = nízká bariéra, „start in seconds" — přivádí i lidi, co nechtějí zakládat celý svět.
-**Návrh přípravy:** rozhodnout, co „scéna" v Rozcestí je (taktická scéna mimo svět? lehčí varianta?); 🔁 sdílení/klonování scén (17.5) + knihovna map (`project_takticka_mapa_library`, full snapshot kromě PC tokenů).
-**BE/FE:** uložení scény do (osobní/sdílené) knihovny + načtení do Rozcestí; provázat s taktickou mapou.
-**Otevřené otázky:** Scéna v Rozcestí = plná taktická mapa, nebo zjednodušená? Kdo smí scénu uložit/sdílet? Patří k tomu i one-shot kostky/postavy bez světa?
+### - [ ] 16.6 One-shot v Campu — hra na jeden večer + uložení/načtení scény — [dopad střední · náklad střední] 🔁
+**Cíl:** Camp (globální chat) jako místo pro **krátké hry na jeden večer**: hráči se sejdou, dají dohromady příběh. Klíčové: **uložit scénu** (taktickou mapu + rozestavení) a **načíst** ji, aby se dala znovu zahrát.
+**Proč:** Tvoje zadání (2026-06-15): one-shoty patří do Campu, dlouhé kampaně do světového chatu (viz 16.1). One-shot bez setupu = nízká bariéra, „start in seconds" — přivádí i lidi, co nechtějí zakládat celý svět.
+**Návrh přípravy:** rozhodnout, co „scéna" v Campu je (taktická scéna mimo svět? lehčí varianta?); 🔁 sdílení/klonování scén (17.5) + knihovna map (`project_takticka_mapa_library`, full snapshot kromě PC tokenů).
+**BE/FE:** uložení scény do (osobní/sdílené) knihovny + načtení do Campu; provázat s taktickou mapou.
+**Otevřené otázky:** Scéna v Campu = plná taktická mapa, nebo zjednodušená? Kdo smí scénu uložit/sdílet? Patří k tomu i one-shot kostky/postavy bez světa?
 
 ---
 
@@ -647,7 +647,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Proč:** Spojuje příběh s geografií živě — hráč neztrácí orientaci v ságe; posiluje imerzi. Tvůj nápad (2026-06-15) — „zajímavá varianta". Staví na interaktivní mapě s piny (16.5) a propojuje ji se stavem hry (aktivní scéna / chat kanál → pin na mapě).
 **Návrh přípravy:** rozhodnout, co je „aktuální poloha v příběhu" (aktivní scéna? kanál světového chatu? ručně PJ?); navázání pin (16.5) ↔ scéna/kanál; 🔁 taktická mapa + per-player scene assignment (`project_takticka_mapa_assignment`), world-room WS signál (`project_map_world_room_join`).
 **BE/FE:** vazba aktivní scény/kanálu na pin mapy; živý ukazatel „tady jste" (push/WS); read-only pohled pro hráče.
-**Otevřené otázky:** Polohu nastavuje PJ ručně, nebo se odvozuje z aktivní scény/kanálu automaticky? Per hráč (každý jinde), nebo sdílená pozice družiny? Napojit na fórovku/Rozcestí (16.1/16.6) i na světový chat?
+**Otevřené otázky:** Polohu nastavuje PJ ručně, nebo se odvozuje z aktivní scény/kanálu automaticky? Per hráč (každý jinde), nebo sdílená pozice družiny? Napojit na fórovku/Camp (16.1/16.6) i na světový chat?
 
 ---
 
@@ -826,7 +826,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **✅ Rozhodnuto (2026-06-15):**
 1. **Pořadí** — interleave OK (14.4 zálohy + 16.1 fórovka spec hned, zbytek postupně).
-2. **Fórovka vs. chat (definitivně 2026-06-15c)** — **žádný nový typ chatu.** Dlouhé/oddělené příběhy = světový chat (kanály = příběhové linky, je k tomu uzpůsoben); one-shoty = Rozcestí (16.6). Samostatný async play-by-post se **nestaví** (16.1 = jen doladění chatu). Trade-off (ztráta čistě async differentiatoru) vědomě přijat.
+2. **Fórovka vs. chat (definitivně 2026-06-15c)** — **žádný nový typ chatu.** Dlouhé/oddělené příběhy = světový chat (kanály = příběhové linky, je k tomu uzpůsoben); one-shoty = Camp (16.6). Samostatný async play-by-post se **nestaví** (16.1 = jen doladění chatu). Trade-off (ztráta čistě async differentiatoru) vědomě přijat.
 3. **AI vs. generátory** — character/detail generátory dělat **procedurálně (zdarma, Fáze 21.2)**; AI (Fáze 18) jen jako volitelná chytřejší vrstva, proveditelné a levné, hlídané limity (19.2).
 4. **Ambice** — míříme až na **C**; A+B je začátek, pak doháníme stůl. „Trumfnout všechny."
 5. **Obsah = komunita** — platforma dává generátory a knihovny, komunita plní (Fáze 21).
@@ -867,13 +867,13 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 | Retence | D7 / D30 / W4 | po registraci i po prvním vytvoření světa |
 | Komunita | invite-to-join rate | poměr pozvaných, kteří se přidají |
 | Showcase | showcase → signup CTR | kolik lidí chytne read-only svět (17.3) |
-| Příběhové hraní | první příběhový kanál / příspěvek za postavu / návrat do kanálu | světový chat (16.1) + Rozcestí one-shot (16.6) |
+| Příběhové hraní | první příběhový kanál / příspěvek za postavu / návrat do kanálu | světový chat (16.1) + Camp one-shot (16.6) |
 | Trust | 2FA adoption, restore-drill success, moderation SLA | provozní zdraví (14.1, 14.4) |
 | SEO | index coverage, organic landing mix, CZ-system traffic | růst bez placené akvizice (15B) |
 
 **Jedna metrika, která stačí:** *„Kolik lidí se příští týden vrátí?"* (týdenní návratnost). Roste → děláme správné věci. Neroste → problém je v trychtýři výš.
 
-**Event taxonomie (minimum):** `view_homepage` · `select_role` · `view_showcase_world` · `sign_up_completed` · `open_demo_world` · `create_world_completed` · `first_page_created` · `first_map_opened` · `first_invite_sent` · `first_player_joined` · `pwa_install` · `push_opt_in` · `create_story_channel` · `post_in_story_channel` · `start_oneshot_rozcesti` · `return_after_7_days`
+**Event taxonomie (minimum):** `view_homepage` · `select_role` · `view_showcase_world` · `sign_up_completed` · `open_demo_world` · `create_world_completed` · `first_page_created` · `first_map_opened` · `first_invite_sent` · `first_player_joined` · `pwa_install` · `push_opt_in` · `create_story_channel` · `post_in_story_channel` · `start_oneshot_camp` · `return_after_7_days`
 
 ---
 

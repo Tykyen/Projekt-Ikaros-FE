@@ -19,7 +19,7 @@ import styles from './ProfilePage.module.css';
 
 /**
  * 1.3a — Profil uživatele (`/ikaros/profil`).
- * Self-edit: hlavička (avatar, displayName, město…), bio, postava v Rozcestí,
+ * Self-edit: hlavička (avatar, displayName, město…), bio, postava v Campu,
  * světy, komunita placeholders, vzhled, bezpečnost, účet.
  *
  * Username change a smazání účtu jsou disabled (přijdou v 1.3b/c).

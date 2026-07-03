@@ -5,7 +5,7 @@ import type { PublicUserProfile } from '@/shared/types';
 /**
  * Spec 1.4 — public profil (`GET /api/users/profile/v14/:id`). Dostupný
  * každému přihlášenému; vrací plný `PublicUserProfile` tvar (bio, postava
- * v Rozcestí, defaultAvatarType, worldsCount, lastSeenAt). 404 pro
+ * v Campu, defaultAvatarType, worldsCount, lastSeenAt). 404 pro
  * tombstone/pending-deletion běžnému uživateli, admin výjimka 200 + flag.
  */
 export function usePublicUserProfile(id: string | undefined) {

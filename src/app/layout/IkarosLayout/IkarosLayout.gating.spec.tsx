@@ -4,7 +4,7 @@ import { Provider as JotaiProvider, createStore } from 'jotai';
 import { MemoryRouter } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 
-// Spec 15.7 — anon nevidí slepé odkazy (Vytvořit svět / Diskuze / Rozcestí),
+// Spec 15.7 — anon nevidí slepé odkazy (Vytvořit svět / Diskuze / Camp),
 // ale vidí veřejné položky + Hospodu. Mockujeme jen hooky, které SidebarContent
 // volá při renderu (data nejsou předmětem testu, jen gating položek).
 vi.mock('@/features/world/api/useWorlds', () => ({
@@ -33,21 +33,21 @@ function renderSidebar(isAuthenticated: boolean) {
 }
 
 describe('SidebarContent — anon gating (15.7)', () => {
-  it('anon nevidí Vytvořit svět / Diskuze / Rozcestí, vidí veřejné + Hospodu', () => {
+  it('anon nevidí Vytvořit svět / Diskuze / Camp, vidí veřejné + Hospodu', () => {
     renderSidebar(false);
     expect(screen.queryByText('Vytvořit svět')).toBeNull();
     expect(screen.queryByText('Diskuze')).toBeNull();
-    expect(screen.queryByText('Rozcestí I.')).toBeNull();
+    expect(screen.queryByText('Camp I.')).toBeNull();
     expect(screen.getByText('Úvodník')).toBeInTheDocument();
     expect(screen.getByText('Články')).toBeInTheDocument();
     expect(screen.getByText('Galerie')).toBeInTheDocument();
     expect(screen.getByText('Hospoda')).toBeInTheDocument();
   });
 
-  it('přihlášený vidí Vytvořit svět, Diskuze i Rozcestí I.', () => {
+  it('přihlášený vidí Vytvořit svět, Diskuze i Camp I.', () => {
     renderSidebar(true);
     expect(screen.getByText('Vytvořit svět')).toBeInTheDocument();
     expect(screen.getByText('Diskuze')).toBeInTheDocument();
-    expect(screen.getByText('Rozcestí I.')).toBeInTheDocument();
+    expect(screen.getByText('Camp I.')).toBeInTheDocument();
   });
 });

@@ -21,7 +21,7 @@ describe('UserList — účet vs. postava (4.2d §8)', () => {
     expect(screen.queryByText('Aragorn')).not.toBeInTheDocument();
   });
 
-  it('režim character (Rozcestí) zobrazí postavu', () => {
+  it('režim character (Camp) zobrazí postavu', () => {
     render(
       <UserList users={[withCharacter]} currentUserId="x" mode="character" />,
     );

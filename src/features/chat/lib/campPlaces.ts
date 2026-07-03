@@ -1,13 +1,13 @@
 /**
- * Lokace Rozcestí — 3 styly × 20 lokací. Mapování id → název → soubor ilustrace
+ * Lokace Camp — 3 styly × 20 lokací. Mapování id → název → soubor ilustrace
  * migrováno ze starého Matrixu (`pages/Ikaros/IkarosChat.tsx`), přípony `.png` → `.webp`.
- * Ilustrace: `public/images/rozcesti/` (fantasy v rootu, scifi/mystic v podsložkách).
+ * Ilustrace: `public/images/camp/` (fantasy v rootu, scifi/mystic v podsložkách).
  */
 
 export type RoomStyle = 'fantasy' | 'scifi' | 'mystic';
 
 export interface Place {
-  /** ID lokace '1'–'20' — klíč i do `ROZCESTI_DESCRIPTIONS`. */
+  /** ID lokace '1'–'20' — klíč i do `CAMP_DESCRIPTIONS`. */
   id: string;
   name: string;
   /** Název souboru ilustrace (.webp). */
@@ -20,7 +20,7 @@ export const ROOM_STYLES: { value: RoomStyle; label: string }[] = [
   { value: 'mystic', label: 'Mystika' },
 ];
 
-export const ROZCESTI_PLACES: Record<RoomStyle, Place[]> = {
+export const CAMP_PLACES: Record<RoomStyle, Place[]> = {
   fantasy: [
     { id: '1', name: 'Pohádkový les', image: 'pohadkovy_les.webp' },
     { id: '2', name: 'Rozvaliny horské strážnice', image: 'rozvaliny_straznice.webp' },
@@ -92,11 +92,11 @@ export const ROZCESTI_PLACES: Record<RoomStyle, Place[]> = {
 /** Absolutní cesta k ilustraci lokace. Fantasy v rootu, scifi/mystic v podsložkách. */
 export function placeImageUrl(style: RoomStyle, image: string): string {
   return style === 'fantasy'
-    ? `/images/rozcesti/${image}`
-    : `/images/rozcesti/${style}/${image}`;
+    ? `/images/camp/${image}`
+    : `/images/camp/${style}/${image}`;
 }
 
 /** Lokace dle id; `undefined` pro neznámé id. */
 export function findPlace(style: RoomStyle, placeId: string): Place | undefined {
-  return ROZCESTI_PLACES[style].find((p) => p.id === placeId);
+  return CAMP_PLACES[style].find((p) => p.id === placeId);
 }

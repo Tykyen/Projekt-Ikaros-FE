@@ -8,18 +8,18 @@ describe('roomAvatarFor (4.2e §2)', () => {
     expect(roomAvatarFor('hospoda', u)).toBe('acc.webp');
   });
 
-  it('Rozcestí → avatar postavy', () => {
-    expect(roomAvatarFor('rozcesti-1', u)).toBe('char.webp');
+  it('Camp → avatar postavy', () => {
+    expect(roomAvatarFor('camp-1', u)).toBe('char.webp');
   });
 
-  it('Rozcestí bez postavy → fallback účet', () => {
-    expect(roomAvatarFor('rozcesti-2', { avatarUrl: 'acc.webp' })).toBe(
+  it('Camp bez postavy → fallback účet', () => {
+    expect(roomAvatarFor('camp-2', { avatarUrl: 'acc.webp' })).toBe(
       'acc.webp',
     );
   });
 
   it('žádný obrázek → undefined (iniciála)', () => {
-    expect(roomAvatarFor('rozcesti-3', {})).toBeUndefined();
+    expect(roomAvatarFor('camp-3', {})).toBeUndefined();
     expect(roomAvatarFor('hospoda', {})).toBeUndefined();
   });
 });

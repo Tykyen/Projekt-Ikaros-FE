@@ -78,7 +78,7 @@ export function useDeleteAvatar() {
 }
 
 /**
- * 1.3a — Upload avataru postavy v Rozcestí.
+ * 1.3a — Upload avataru postavy v Campu.
  */
 export function useUploadCharacterAvatar() {
   const qc = useQueryClient();

@@ -19,8 +19,8 @@ interface Props {
 }
 
 /**
- * 1.3a — Postava v Rozcestí (Ikaros chat).
- * Globální postava napříč Ikaros chaty (Hospoda + Rozcestí).
+ * 1.3a — Postava v Campu (Ikaros chat).
+ * Globální postava napříč Ikaros chaty (Hospoda + Camp).
  * 3 pole: jméno, bio (1000), avatar (samostatný slot — 256×256 WebP).
  */
 export function CharacterSection({
@@ -61,7 +61,7 @@ export function CharacterSection({
 
   return (
     <EditCard
-      title="Postava v Rozcestí"
+      title="Postava v Campu"
       isEditing={editing}
       setEditing={setEditing}
       onSave={onSave}
@@ -99,7 +99,7 @@ export function CharacterSection({
               maxLength={1000}
               rows={6}
               className={styles.textarea}
-              placeholder="Jak postava vypadá, co umí, co dělá v Rozcestí…"
+              placeholder="Jak postava vypadá, co umí, co dělá v Campu…"
             />
             <div className={styles.counter}>{bioLen} / 1000</div>
             {form.formState.errors.characterBio && (

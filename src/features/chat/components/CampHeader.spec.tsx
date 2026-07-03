@@ -1,15 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { RozcestiHeader } from './RozcestiHeader';
+import { CampHeader } from './CampHeader';
 import type { RoomEnvironment } from '../lib/types';
 
 const env: RoomEnvironment = { style: 'fantasy', placeId: '5' };
 
-function setup(over: Partial<Parameters<typeof RozcestiHeader>[0]> = {}) {
+function setup(over: Partial<Parameters<typeof CampHeader>[0]> = {}) {
   const onChange = vi.fn();
   const onToggleDesc = vi.fn();
   render(
-    <RozcestiHeader
+    <CampHeader
       environment={env}
       canEdit
       onChange={onChange}
@@ -21,7 +21,7 @@ function setup(over: Partial<Parameters<typeof RozcestiHeader>[0]> = {}) {
   return { onChange, onToggleDesc };
 }
 
-describe('RozcestiHeader', () => {
+describe('CampHeader', () => {
   it('vykreslí výběr stylu i lokace', () => {
     setup();
     expect(screen.getByDisplayValue('Fantasy')).toBeInTheDocument();

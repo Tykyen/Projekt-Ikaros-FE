@@ -101,13 +101,13 @@ export function PlatformSection() {
           </p>
           <ScreenshotSlot media="platforma.hospoda" />
         </Tool>
-        <Tool icon={<Globe2 size={16} />} title="Rozcestí I.–III." audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
+        <Tool icon={<Globe2 size={16} />} title="Camp I.–III." audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             Tři atmosférické roleplay místnosti — hra na jeden večer bez kostek.
             Každá má prostředí (styl + jedna z 20 lokací s ilustrací na pozadí).
             Stejné chatovací funkce jako Hospoda, ale <strong>u zpráv i v seznamu
             přítomných</strong> vystupuješ jako svoje <strong>postava</strong>{' '}
-            (jméno a obrázek z profilu „Postava v Rozcestí"), ne jako účet. Kdo
+            (jméno a obrázek z profilu „Postava v Campu"), ne jako účet. Kdo
             postavu nevyplnil, zobrazí se účtem. Klik na osobu otevře kartu její
             postavy.
           </p>
@@ -210,7 +210,7 @@ export function PlatformSection() {
         <Tool icon={<User size={16} />} title="Profil" audience={{ kind: 'vse', label: 'Vlastník účtu' }} accent="player">
           <p>
             Tvoje nastavení účtu (po přihlášení): hlavička, něco o mně, postava v
-            Rozcestí, moje světy, moje akce ve světech, komunitní stopa, soukromí,
+            Camp, moje světy, moje akce ve světech, komunitní stopa, soukromí,
             bezpečnost (heslo, žádost o přezdívku) a účet (smazání). Detaily v tabu{' '}
             <strong>Účet &amp; profil</strong>.
           </p>

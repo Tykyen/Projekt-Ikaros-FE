@@ -1,20 +1,20 @@
-import { findPlace } from '../lib/rozcestiPlaces';
-import { placeDescription } from '../lib/rozcestiDescriptions';
+import { findPlace } from '../lib/campPlaces';
+import { placeDescription } from '../lib/campDescriptions';
 import type { RoomStyle } from '../lib/types';
-import s from './RozcestiDescription.module.css';
+import s from './CampDescription.module.css';
 
-export interface RozcestiDescriptionProps {
+export interface CampDescriptionProps {
   style: RoomStyle;
   placeId: string;
   open: boolean;
 }
 
 /** Rozbalovací panel (📖) se slovním popisem aktuální lokace. */
-export function RozcestiDescription({
+export function CampDescription({
   style,
   placeId,
   open,
-}: RozcestiDescriptionProps) {
+}: CampDescriptionProps) {
   const place = findPlace(style, placeId);
   const text = placeDescription(style, placeId);
 

@@ -38,15 +38,15 @@ function makeWrapper() {
 }
 
 describe('chatQueryKeys', () => {
-  it('klíče nesou room — Hospoda a Rozcestí se nekříží', () => {
+  it('klíče nesou room — Hospoda a Camp se nekříží', () => {
     expect(chatQueryKeys('hospoda').messages).toEqual([
       'global-chat',
       'hospoda',
       'messages',
     ]);
-    expect(chatQueryKeys('rozcesti-1').messages).toEqual([
+    expect(chatQueryKeys('camp-1').messages).toEqual([
       'global-chat',
-      'rozcesti-1',
+      'camp-1',
       'messages',
     ]);
   });
@@ -58,14 +58,14 @@ describe('useGlobalChat', () => {
   it('useRoomInfo načte info o místnosti s parametrem room', async () => {
     vi.mocked(api.get).mockResolvedValue({ channelId: 'ch1', users: [] });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useRoomInfo('rozcesti-1'), {
+    const { result } = renderHook(() => useRoomInfo('camp-1'), {
       wrapper: Wrapper,
     });
     await waitFor(() =>
       expect(result.current.data).toEqual({ channelId: 'ch1', users: [] }),
     );
     expect(api.get).toHaveBeenCalledWith('/global-chat/room-info', {
-      room: 'rozcesti-1',
+      room: 'camp-1',
     });
   });
 
@@ -85,12 +85,12 @@ describe('useGlobalChat', () => {
   it('useSendMessage pošle content + color na POST endpoint s room v query', async () => {
     vi.mocked(api.post).mockResolvedValue({ id: 'm1' });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useSendMessage('rozcesti-2'), {
+    const { result } = renderHook(() => useSendMessage('camp-2'), {
       wrapper: Wrapper,
     });
     await result.current.mutateAsync({ content: 'ahoj', color: '#ff8800' });
     expect(api.post).toHaveBeenCalledWith(
-      '/global-chat/messages?room=rozcesti-2',
+      '/global-chat/messages?room=camp-2',
       { content: 'ahoj', color: '#ff8800' },
     );
   });
@@ -133,16 +133,16 @@ describe('useGlobalChat', () => {
 
   it('useUploadAttachment pošle multipart na upload endpoint s room (4.3b)', async () => {
     vi.mocked(apiClient.post).mockResolvedValue({
-      data: { publicId: 'global-chat/rozcesti-1/a' },
+      data: { publicId: 'global-chat/camp-1/a' },
     });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useUploadAttachment('rozcesti-1'), {
+    const { result } = renderHook(() => useUploadAttachment('camp-1'), {
       wrapper: Wrapper,
     });
     const file = new File(['x'], 'a.png', { type: 'image/png' });
     await result.current.mutateAsync(file);
     expect(apiClient.post).toHaveBeenCalledWith(
-      '/global-chat/upload?room=rozcesti-1',
+      '/global-chat/upload?room=camp-1',
       expect.any(FormData),
       { headers: { 'Content-Type': 'multipart/form-data' } },
     );
@@ -150,12 +150,12 @@ describe('useGlobalChat', () => {
 
   it('useToggleReaction emitne chat:reaction:toggle se room (4.3a)', () => {
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useToggleReaction('rozcesti-1'), {
+    const { result } = renderHook(() => useToggleReaction('camp-1'), {
       wrapper: Wrapper,
     });
     result.current('m1', '👍');
     expect(mockEmit).toHaveBeenCalledWith('chat:reaction:toggle', {
-      room: 'rozcesti-1',
+      room: 'camp-1',
       messageId: 'm1',
       emoji: '👍',
     });
@@ -173,15 +173,15 @@ describe('useGlobalChat', () => {
     );
   });
 
-  it('useRoomEnvironment načte prostředí Rozcestí', async () => {
+  it('useRoomEnvironment načte prostředí Campu', async () => {
     vi.mocked(api.get).mockResolvedValue({ style: 'fantasy', placeId: '1' });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useRoomEnvironment('rozcesti-1'), {
+    const { result } = renderHook(() => useRoomEnvironment('camp-1'), {
       wrapper: Wrapper,
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith(
-      '/global-chat/rooms/rozcesti-1/environment',
+      '/global-chat/rooms/camp-1/environment',
     );
   });
 
@@ -194,12 +194,12 @@ describe('useGlobalChat', () => {
   it('useSetRoomEnvironment pošle PUT se stylem + lokací', async () => {
     vi.mocked(api.put).mockResolvedValue({ style: 'scifi', placeId: '7' });
     const { Wrapper } = makeWrapper();
-    const { result } = renderHook(() => useSetRoomEnvironment('rozcesti-3'), {
+    const { result } = renderHook(() => useSetRoomEnvironment('camp-3'), {
       wrapper: Wrapper,
     });
     await result.current.mutateAsync({ style: 'scifi', placeId: '7' });
     expect(api.put).toHaveBeenCalledWith(
-      '/global-chat/rooms/rozcesti-3/environment',
+      '/global-chat/rooms/camp-3/environment',
       { style: 'scifi', placeId: '7' },
     );
   });
@@ -215,9 +215,9 @@ describe('useRoomPresenceCounts (4.2c §4)', () => {
 
   const zero: RoomPresenceCounts = {
     hospoda: 0,
-    'rozcesti-1': 0,
-    'rozcesti-2': 0,
-    'rozcesti-3': 0,
+    'camp-1': 0,
+    'camp-2': 0,
+    'camp-3': 0,
   };
 
   it('načte počty přítomných z REST endpointu', async () => {
@@ -246,7 +246,7 @@ describe('useRoomPresenceCounts (4.2c §4)', () => {
     });
     await waitFor(() => expect(result.current).toEqual(zero));
 
-    act(() => wsHandler!({ ...zero, 'rozcesti-1': 5 }));
-    await waitFor(() => expect(result.current?.['rozcesti-1']).toBe(5));
+    act(() => wsHandler!({ ...zero, 'camp-1': 5 }));
+    await waitFor(() => expect(result.current?.['camp-1']).toBe(5));
   });
 });

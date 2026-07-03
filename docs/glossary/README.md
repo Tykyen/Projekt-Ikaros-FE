@@ -86,7 +86,7 @@ Chatový subsystém — kanály, konverzace, zprávy, presence.
 - [neviditelny-mod.md](neviditelny-mod.md) — skrytí vlastního online stavu
 - [pj-persona.md](pj-persona.md) — podpis vedení v chatu (unified „PJ" / individual)
 - [npc-mod.md](npc-mod.md) — psaní zpráv „za NPC" (override jméno/avatar)
-- [hospoda.md](hospoda.md) — platformový veřejný chat (Rozcestí)
+- [hospoda.md](hospoda.md) — platformový veřejný chat (Camp)
 - [vlastni-emote.md](vlastni-emote.md) — per-svět / globální obrázkové emoji
 
 ### tema-a-skin
