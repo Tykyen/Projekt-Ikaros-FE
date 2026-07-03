@@ -1,0 +1,200 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Právní forma, financování · startupová větev</div>
+    <h2>Startupová varianta a ochrana partner packu</h2>
+  </div>
+
+  <p class="lead">Startupový režim je zvláštní tím, že investor ani technologický partner neposuzují nadšení komunity. Chtějí vidět vlastnictví IP, přístup ke kódu, cap table, smlouvy s autory, ochrannou známku, účetnictví, právní formu, data protection, tržní příležitost a návratnost. Právě zde ale vzniká riziko, že firma použije partner pack k vývoji komerčního klonu. Startupový balík proto nesmí být jen prezentace — musí být svázán s <strong>důvěrnostním a non-use režimem</strong>.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Kapitola je právní rešerše, nikoli právní stanovisko. Vzorové klauzule a částky pokuty musí před použitím posoudit a nastavit advokát. Otázky k dořešení jsou shrnuty v části <strong>Otázky pro odborníky</strong>; vzorové znění NDA viz <strong>Dodatek — Vzor NDA</strong>.</p>
+  </div>
+
+  <h3>Minimální startupový právní balík</h3>
+  <p>Dokumenty seřazené podle priority. Bez nich investor „neví, co kupuje/podporuje" a projekt nemá čím ohlídat, kam partner pack poputuje.</p>
+
+  <table>
+    <thead>
+      <tr><th>Dokument</th><th>Účel</th><th>Priorita</th><th>Poznámka</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Founders agreement</strong> (zakladatelská dohoda)</td><td>Práva a povinnosti zakladatelů, podíly, vesting, odchod, zákaz zneužití IP.</td><td><span class="pill">velmi vysoká</span></td><td>Nutná před přijetím investice nebo větší spoluprací.</td></tr>
+      <tr><td><strong>IP assignment / licenční smlouvy</strong></td><td>Převod nebo licence kódu, textu, designu, dokumentace a databáze do entity.</td><td><span class="pill">velmi vysoká</span></td><td>Bez toho investor neví, co kupuje/podporuje.</td></tr>
+      <tr><td><strong>NDA + non-use</strong></td><td>Ochrana partner packu před použitím pro klon.</td><td><span class="pill">velmi vysoká</span></td><td>NDA bez zákazu použití je slabé.</td></tr>
+      <tr><td><strong>LOI / term sheet</strong></td><td>Rámec jednání s partnerem nebo investorem.</td><td><span class="pill">vysoká</span></td><td>Má vymezit účel jednání a důvěrnost.</td></tr>
+      <tr><td><strong>Data room rules</strong></td><td>Kdo vidí jaký dokument, logování přístupu, watermark.</td><td><span class="pill">vysoká</span></td><td>Partner pack se nesmí posílat jako volná příloha.</td></tr>
+      <tr><td><strong>Ochranná známka</strong></td><td>Ochrana názvu Ikaros a loga.</td><td><span class="pill">vysoká</span></td><td>Ideálně před veřejným partner packem.</td></tr>
+      <tr><td><strong>TOS / obchodní podmínky</strong></td><td>Uživatelé, platby, data, obsah, moderace.</td><td><span class="pill">vysoká</span></td><td>Nutné před placeným provozem.</td></tr>
+      <tr><td><strong>DPIA / GDPR mapa</strong></td><td>Zpracování osobních údajů, bezpečnost, správce/zpracovatel.</td><td><span class="pill">střední–vysoká</span></td><td>Zvlášť u dětí, komunikace a komunitního obsahu.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Vazba na GDPR mapu</div>
+    <p>DPIA pravděpodobně <strong>povinná</strong> — kombinace dětských účtů, moderace zpráv a AI naplňuje kritéria WP248 (min. pro AI modul a dětské účty). Nejde tedy jen o „nice to have" v balíku, ale o samostatný závazek popsaný v části o ochraně osobních údajů.</p>
+  </div>
+
+  <h3>Zakladatelská dohoda</h3>
+  <p>Zakladatelská dohoda musí řešit situace, které se v hobby projektech často podcení: kdo je zakladatel, kdo vložil nápad, kdo napsal kód, kdo dělal design, kdo vlastní doménu, kdo může jednat s firmou, co se stane při odchodu, kdo může vzít kód a udělat fork, kdo drží hesla a zda smí někdo prodat podíl bez souhlasu ostatních.</p>
+
+  <div class="feat">
+    <h4>Co musí zakladatelská dohoda pokrýt</h4>
+    <ul>
+      <li><strong>Rozdělení rolí:</strong> produkt, vývoj, komunita, finance, právo, partnerství.</li>
+      <li><strong>Převod existujících výstupů</strong> do entity, nebo jasná licence entitě.</li>
+      <li><strong>Vesting:</strong> zakladatel získává nárok postupně, ne celý podíl ihned.</li>
+      <li><strong>Bad leaver / good leaver:</strong> rozdíl mezi korektním odchodem a porušením povinností.</li>
+      <li><strong>Zákaz využití neveřejného know-how</strong> Ikarosu pro konkurenční službu.</li>
+      <li><strong>Pravidla pro schvalování investorů,</strong> prodej značky, změnu mise a uzavření platformy.</li>
+    </ul>
+  </div>
+
+  <h3>Investor a mise — mission lock</h3>
+  <p>Vstoupí-li Ikaros do startupové logiky, musí se předem rozhodnout, <strong>co je neprodejní jádro.</strong> Může jít o bezplatný základ, české zaměření, komunitní knihovny, ochranu dat, zákaz pay-to-win funkcí a transparentní AI. Bez smluvního zakotvení může investor legálně tlačit na změnu modelu, jakmile získá dostatečnou kontrolu.</p>
+
+  <p>Mission lock je praktické označení pro smluvní a korporátní pojistky bránící tomu, aby se Ikaros změnil na čistě komerční projekt proti původnímu účelu. V českém právu se musí <strong>převést do konkrétních dokumentů:</strong> stanovy, zakladatelská listina, společenská smlouva, shareholders agreement, licence ke značce, pravidla převodu podílů.</p>
+
+  <div class="callout gold">
+    <div class="t">Nejsilnější mission lock = právní forma, ne smlouva</div>
+    <p>Podle ledgeru je nejsilnějším zámkem samotná <strong>forma spolku nebo ústavu</strong> — <span class="mono">§217</span> a <span class="mono">§402–403 OZ</span> zakazují rozdělení zisku mezi členy/zakladatele, což mission drží <em>in rem</em> (věcně, vůči každému). Naopak stanovy vážou silněji než shareholders agreement (ten působí jen <em>in personam</em> — mezi stranami). <strong>Vesting je pouze smluvní konstrukce</strong>, ne strukturální pojistka. Volba nezisk vs. s.r.o. s licenčním lockem je otázka pro advokáta (viz Otázky pro odborníky).</p>
+  </div>
+
+  <h3>Přístup k partner packu po fázích</h3>
+  <p>Partner pack je pro startup citlivější než běžná prezentace. Obsahuje tržní analýzu, produktovou strategii, roadmapu, právní uvažování, podporu systémů, komunitní model a často i know-how, proč by český trh mohl přijmout právě Ikaros. Firma s vývojovým týmem nepotřebuje text ukrást doslova — stačí jí pochopit strukturu a priority. Proto je nutné chránit nejen kopírování, ale i <strong>použití informací</strong> k vlastnímu konkurenčnímu projektu.</p>
+
+  <table>
+    <thead>
+      <tr><th>Fáze jednání</th><th>Co ukázat</th><th>Co NEukazovat</th><th>Ochrana</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>První kontakt</strong></td><td>Veřejný pitch, obecná mise, demo bez interních dat.</td><td>Roadmapa, datový model, ekonomika, právní strategie.</td><td>Bez NDA, jen veřejné informace.</td></tr>
+      <tr><td><strong>Seriózní zájem</strong></td><td>Zkrácený partner pack, trh, problém, ukázka funkcí.</td><td>Kód, detailní architektura, neveřejné moduly.</td><td>NDA + non-use.</td></tr>
+      <tr><td><strong>Due diligence</strong></td><td>Data room s dokumenty, IP inventář, účetnictví, smlouvy.</td><td>Produkční přístupy, tajné klíče, kompletní export DB.</td><td>Data room, watermark, logy, omezený přístup.</td></tr>
+      <tr><td><strong>Smlouva / investice</strong></td><td>Plný právní a technický audit v rozsahu smlouvy.</td><td>Nic mimo účel transakce.</td><td>Term sheet, investiční smlouva, sankce, jurisdikce.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Demo účet ve startupovém režimu</div>
+    <p>Demo pro partnera drž <strong>bez exportu, bez administrace, bez produkčních dat a bez kódu.</strong> Cíl: partner vidí funkce, ne to, jak fungují uvnitř. Scraping dema, obcházení limitů a analýza neveřejné logiky musí NDA výslovně zakázat (viz níže).</p>
+  </div>
+
+  <hr style="display:none" />
+
+  <h3>Ochrana partner packu před komerčním klonem</h3>
+  <p>Partner pack je právně nutné chápat jako kombinaci <strong>autorského díla, databázového know-how, obchodního tajemství, produktové strategie a důvěrných informací.</strong> Samotný nápad „česká RPG platforma" nelze monopolizovat, ale lze chránit konkrétní dokumenty, texty, struktury, roadmapu, neveřejné technické a obchodní poznatky, databázové modely a obchodní tajemství.</p>
+
+  <div class="callout gold">
+    <div class="t">Autorské právo samo nestačí</div>
+    <p>Autorský zákon chrání konkrétní <em>vyjádření</em>, ale <strong>ne námět, princip, postup ani metodu jako takovou.</strong> Firma nepotřebuje text zkopírovat — stačí jí pochopit strukturu a priority. Proto se autorské právo musí <strong>doplnit smlouvami a režimem důvěrnosti</strong> (NDA + non-use + obchodní tajemství).</p>
+  </div>
+
+  <h4>Co musí NDA obsahovat</h4>
+  <table>
+    <thead>
+      <tr><th>Klauzule</th><th>Proč je nutná</th><th>Doporučení pro Ikaros</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Definice důvěrných informací</strong></td><td>Bez široké definice se příjemce může hájit, že materiál nebyl důvěrný.</td><td>Zahrnout dokumenty, prezentace, kód, architekturu, UX, roadmapu, datový model, ekonomiku, právní plán, komunitní strategii.</td></tr>
+      <tr><td><strong>Účel použití</strong></td><td>Příjemce smí informace použít jen k posouzení spolupráce.</td><td>Vymezit výslovně: „výlučně za účelem posouzení možné spolupráce s Projektem Ikaros".</td></tr>
+      <tr><td><strong>Non-use</strong></td><td>Pouhá mlčenlivost nestačí; firma může mlčet a přesto informace použít.</td><td>Výslovně zakázat použití k vývoji vlastní nebo cizí konkurenční služby (viz níže).</td></tr>
+      <tr><td><strong>Non-disclosure</strong></td><td>Zákaz předání třetím osobám.</td><td>Povolit jen zaměstnancům/subdodavatelům s <span class="mono">need-to-know</span> a stejnou mlčenlivostí.</td></tr>
+      <tr><td><strong>No reverse engineering / no scraping</strong></td><td>Chrání demo a prototyp.</td><td>Zakázat technickou analýzu nad rámec běžného posouzení, scraping dema, export DB.</td></tr>
+      <tr><td><strong>Vrácení / smazání</strong></td><td>Po skončení jednání musí materiály zmizet.</td><td>Požadovat potvrzení o smazání a vrácení.</td></tr>
+      <tr><td><strong>Smluvní pokuta</strong></td><td>Bez pokuty je vymáhání nákladné a nejisté.</td><td>Nechat advokátovi stanovit přiměřenou částku podle hodnoty dokumentů.</td></tr>
+      <tr><td><strong>Předběžné opatření</strong></td><td>Peníze nemusí stačit, pokud klon už vyšel.</td><td>Výslovně připustit nárok na zákaz užití a odstranění následků.</td></tr>
+      <tr><td><strong>Volba práva a soudu</strong></td><td>U zahraniční firmy hrozí nejistota.</td><td>Preferovat české právo a české soudy, pokud partner přijme.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Pozor na volbu práva u spotřebitele i IP</div>
+    <p>Volba cizího práva nepřebije českou spotřebitelskou ochranu (<span class="mono">Řím I čl. 6</span>) a IP delikty se posuzují dle <em>lex loci protectionis</em> (<span class="mono">Řím II čl. 8</span>) — volbou práva je nelze obejít. To se týká i UGC, který je chráněn automaticky (Bernská úmluva) — nepředpokládat public domain.</p>
+  </div>
+
+  <h3>Non-use je důležitější než běžné NDA</h3>
+  <p>Běžné NDA často říká jen: „neprozradíte informace třetí osobě." To ale neřeší největší strach Ikarosu — <strong>že firma informace použije sama.</strong> Proto musí být ve smlouvě samostatná povinnost <strong>nepoužít</strong> důvěrné informace k vývoji, financování, zadání, provozu, analýze nebo marketingu konkurenční platformy. Jinak firma tvrdí, že nic neprozradila, jen se „inspirovala".</p>
+
+  <div class="feat">
+    <h4>Vzorový princip non-use</h4>
+    <ul>
+      <li><em>„Příjemce je oprávněn použít důvěrné informace výlučně za účelem posouzení možné spolupráce s Projektem Ikaros. Příjemce nesmí důvěrné informace použít přímo ani nepřímo k vývoji, zadání, financování, provozování, marketingu nebo podpoře služby, která je s Projektem Ikaros konkurenční nebo zaměnitelná."</em></li>
+    </ul>
+  </div>
+
+  <h3>Obchodní tajemství</h3>
+  <p>Obchodní tajemství funguje jen tehdy, pokud se s ním <strong>jako s tajemstvím zachází.</strong> Nestačí zpětně tvrdit, že partner pack byl citlivý — materiál musí být označen, přístup omezen, předání evidováno, sdílení jen po NDA, verze s vodoznaky, žádné volné e-mailové řetězce, zákaz interního šíření mimo need-to-know.</p>
+
+  <div class="callout gold">
+    <div class="t">§504 OZ — obchodní tajemství má šest znaků (kumulativně)</div>
+    <p>Podle ledgeru (oprava proti podkladu, který uvádí pět) musí být splněno <strong>všech šest</strong> znaků současně: (1) konkurenční významnost, (2) určitelnost, (3) ocenitelnost, (4) v příslušných kruzích běžně nedostupné, (5) <strong>souvislost se závodem</strong>, (6) vlastník je odpovídajícím způsobem utajuje. Chybí-li jediný, ochrana nevznikne — proto jsou opatření z tabulky níže podmínkou, ne kosmetikou.</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Opatření</th><th>Konkrétní provedení</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Označení dokumentu</td><td>Na každé straně: <span class="mono">DŮVĚRNÉ — Projekt Ikaros — neveřejné know-how — zákaz použití mimo jednání.</span></td></tr>
+      <tr><td>Verzování</td><td>Každému partnerovi vlastní PDF s datem, verzí a identifikací příjemce.</td></tr>
+      <tr><td>Data room</td><td>Sdílet přes řízený přístup, ne jako volnou přílohu bez kontroly.</td></tr>
+      <tr><td>Logování</td><td>Evidence, kdo dokument dostal, kdy, za jakým účelem a pod jakou smlouvou.</td></tr>
+      <tr><td>Redakce verzí</td><td>Veřejná, partnerská, due-diligence a interní verze — každá s jiným detailem.</td></tr>
+      <tr><td>Přístup k demu</td><td>Demo účet bez exportu, bez administrace, bez produkčních dat a bez kódu.</td></tr>
+      <tr><td>Interní poučení týmu</td><td>Nikdo neposílá roadmapu, partner pack ani finanční model bez schválení.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Co v partner packu NEslibovat</h3>
+  <p>Partner pack nesmí vyvolat dojem, že Ikaros má vyřešená práva ke všem RPG systémům, pokud to není pravda. U podpory cizích systémů je nutné jasně označit, co je plán, co vlastní modul, co veřejně licencovaný obsah, co vyžaduje souhlas vydavatele a co je jen obecná kompatibilita. Přehnané tvrzení vůči investorovi nebo partnerovi může být obchodně i právně nebezpečné.</p>
+
+  <div class="callout gold">
+    <div class="t">§2358 OZ — výhradní licence jen písemně</div>
+    <p>Slibujete-li investorovi „exkluzivní práva" k systému nebo obsahu, platí: <strong>výhradní licence vyžaduje písemnou formu.</strong> Sankce podle ledgeru je zásadní — <strong>bez písemného souhlasu nabyvatele výhradní licence NEVZNIKNE licence třetí osobě vůbec.</strong> Ústní ani konkludentní ujednání výhradní licenci nezaloží. Nikdy tedy neprezentovat jako „hotová exkluziva", co není písemně podchyceno; pro tolerance-only systémy (viz Systémová matice) exkluzivitu neslibovat vůbec.</p>
+  </div>
+
+  <div class="feat">
+    <h4>Poctivé rozlišení stavů systémů v partner packu</h4>
+    <ul>
+      <li><strong>Vlastní IP:</strong> matrix (pravidla Ikaros), vlastní generický engine — plná kontrola.</li>
+      <li><strong>Čisté (CC):</strong> dnd5e (CC BY 4.0), fate a fae (CC BY 3.0 Unported) — legální adaptace i komerce při dodržení atribuce.</li>
+      <li><strong>Podmíněné:</strong> jad, drd2, call-of-cthulhu, drd16, pi — tolerance / oficiální SRD / fan policy s omezeními; před nasazením do nástroje dotaz vydavateli.</li>
+      <li><strong>Vyhnout se (bez přímé licence):</strong> drd-plus, draci-hlidka, shadowrun, gurps — automatizovaný engine mimo fan policy, nutná přímá licence.</li>
+    </ul>
+  </div>
+
+  <p>Detailní režim každého systému viz část <strong>Systémová matice a licenční režimy</strong>. V partner packu vždy odkázat na tuto matici, ne slibovat plošná práva.</p>
+
+  <h3>Ochranná známka jako součást balíku</h3>
+  <p>Název Projekt Ikaros, případně zkrácený název Ikaros a logo, by měly projít rešerší a přihláškou ochranné známky. ÚPV uvádí, že přihlášku může podat fyzická i právnická osoba (spolek je plnohodnotný přihlašovatel), smí obsahovat jedno označení, musí mít seznam výrobků a služeb a přihlašovatel má <strong>právo přednosti</strong> proti pozdější shodné nebo zaměnitelné přihlášce pro stejný či podobný druh výrobků/služeb. Zapsaná známka platí <strong>deset let</strong> a lze ji obnovovat.</p>
+
+  <div class="callout cyan">
+    <div class="t">Před volbou názvu — rešerše</div>
+    <p>Jádro tříd dle ledgeru: <strong>9 + 41 + 42</strong> (software, zábava/vzdělávání, IT služby), dle potřeby +38, +35, +45; merch 25/16/28. Před volbou názvu/loga provést rešerši v <span class="mono">ÚPV</span> / <span class="mono">EUIPO</span> / <span class="mono">TMview</span>. Rozhodnutí národní OZ vs. EUTM patří do Otázek pro odborníky.</p>
+  </div>
+
+  <h3>Vrstvy partner packu — veřejná a důvěrná</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Veřejná verze</h4>
+      <p>Kdo jsme, co umíme, hodnoty, základní funkce, ukázky, kontakty, obecný směr. Bez NDA, sdílitelné volně.</p>
+    </div>
+    <div class="card">
+      <h4>Důvěrná verze</h4>
+      <p>Konkrétní roadmapa, priorita funkcí, architektura, datové modely, partner strategy, právní rizika, finanční plán, neveřejné screenshoty, exporty, informace o komunitě. Jen po NDA + non-use, přes data room.</p>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Shrnutí — nejsilnější ochrana není autorské právo</div>
+    <p>Nejsilnější ochrana proti „ukradení nápadu" je <strong>kombinace</strong>: NDA + non-use, obchodní tajemství (šest znaků, aktivně utajované), omezené sdílení přes data room, důkazní archiv (verze, logy, datace), ochranná známka a rychlé obsazení komunity. Firma může udělat vlastní RPG platformu — nesmí ale bez souhlasu použít chráněné materiály, značku, kód, databázi, důvěrnou roadmapu a svěřené know-how.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Zdroj: Projekt Ikaros — právní forma, startup, financování a účetnictví (v0.9), kap. 5–6.</li>
+    <li>Zdroj: Projekt Ikaros — právní ochranný rámec (v0.1), kap. 7 (partner pack, NDA, ochranná známka).</li>
+    <li>Ledger: <span class="mono">§2358 OZ</span> (písemná forma výhradní licence + sankce), <span class="mono">§504 OZ</span> (obchodní tajemství — 6 znaků), <span class="mono">§217 / §402–403 OZ</span> (mission lock — zákaz rozdělení zisku u spolku/ústavu), Nice třídy 9/41/42, systémová matice.</li>
+    <li>Vzorové znění: <strong>Dodatek — Vzor NDA</strong>.</li>
+  </ul>
+</section>

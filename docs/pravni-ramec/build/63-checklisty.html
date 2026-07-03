@@ -1,0 +1,281 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Kontrolní nástroje · Provozní checklisty</div>
+    <h2>Checklisty pro vývojáře a právníka · datové štítky obsahu</h2>
+  </div>
+
+  <p class="lead">Předchozí kapitoly popsaly, <em>co</em> platí. Tato je operační: převádí právní pravidla do <strong>zaškrtávacích seznamů</strong>, které se dají použít při vývoji, moderaci a před spuštěním modulu, a do <strong>datových štítků</strong>, jimiž se právní režim ukládá u každé položky. Je to rešeršní pomůcka, ne právní stanovisko — finální kontrolní body a povinné hodnoty odsouhlasí advokát.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Rešeršní pracovní návrh (v0.6). Checklisty a enumerace štítků slouží jako startovní bod pro provozní směrnice a datový model, ne jako závazný text. Před ostrým nasazením je posoudí právník se znalostí autorského práva, GDPR, DSA a AI Actu. Přesná pole a stavy licenční karty žijí v kapitole <span class="mono">Datový model licenčních karet</span>; tato kapitola je jejich provozní projekce.</p>
+  </div>
+
+  <h3>Jak checklisty používat</h3>
+  <p>Rešerše opakovaně naráží na jedno riziko: právní pravidlo, které existuje jen v textu podmínek, se v provozu neuplatní. Checklist je most mezi právem a kódem — každá položka je otázka s jasnou odpovědí <span class="pill">ano</span> / <span class="pill">ne</span> a s definovanou reakcí, když odpověď blokuje. Tři adresáti, tři sady:</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">5</div><div class="l">datových štítků jako gate</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">vývojářských checklistů</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">kontrolní tabulky pro právníka</div></div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Zásada</div>
+    <p>Checklist není alibi. Zaškrtnutí polí <strong>nenahrazuje</strong> lidské posouzení u citlivých případů — jen zaručuje, že se posouzení nezapomene a že rozhodnutí zůstane doložitelné. U rizikových kategorií (cizí systém, AI podoba osoby, oficiální knihovna) je vždy poslední krok „eskalovat právníkovi".</p>
+  </div>
+
+  <h3>Datové štítky obsahu — pět gate polí</h3>
+  <p>Pět polí licenční karty rozhoduje o osudu položky ještě dřív, než se objeví v knihovně. Nejsou to metadata pro pořádek — jsou to <strong>brány</strong>: podle jejich hodnoty UI ukáže nebo skryje tlačítko klonování, moderace přiřadí prioritu a export doplní správný štítek. Zbývajících dvanáct polí karty (identifikátory, atribuce, audit) viz kapitola <span class="mono">Datový model licenčních karet</span>.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Štítek</th><th>Typ / hodnoty</th><th>Právní význam · co gatuje</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="mono">source_type</span><br>(<span class="mono">third_party_status</span>)</td>
+        <td><span class="mono">own / original / third_party_licensed / fan_policy / unknown / prohibited</span></td>
+        <td>Odkud obsah pochází a jaký právní titul k němu je. <span class="mono">unknown</span>/<span class="mono">prohibited</span> = <strong>blok</strong> veřejné knihovny. Řídí, zda je nutná systémová licenční kontrola.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">license_code</span><br>(<span class="mono">license_mode</span>)</td>
+        <td><span class="mono">private / read / clone / remix / open / official / withdrawn / disputed</span></td>
+        <td>V jakém režimu smí obsah užít ostatní. Určuje, zda se vůbec zobrazí tlačítko <em>Klonovat</em> a zda smí klon publikovat. <span class="mono">disputed</span> zastaví nové klony.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">visibility</span></td>
+        <td><span class="mono">private / world / read / cloneable / remixable / official</span></td>
+        <td>Kdo položku vidí. Výchozí hodnota při nahrání musí být <strong>bezpečná</strong> (soukromé / veřejné ke čtení), nikdy ne automaticky klonovatelné.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">review_state</span><br>(<span class="mono">review_status</span>)</td>
+        <td><span class="mono">unreviewed / community_checked / curated / legal_checked / disputed / removed</span></td>
+        <td>Stav kontroly. Do oficiální knihovny smí jen <span class="mono">curated</span>/<span class="mono">legal_checked</span>. <span class="mono">disputed</span>/<span class="mono">removed</span> = mimo knihovnu, audit zachován.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">export_allowed</span></td>
+        <td><span class="mono">none / own_use / platform_license / open_license</span></td>
+        <td>Zda a v jakém rozsahu smí obsah ven z platformy. Řídí strukturovaný export (Data Act) i to, zda export nese jen atribuci, nebo plnou veřejnou licenci.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Doplňkové štítky, které nejsou gate, ale musí být</div>
+    <p>Vedle pěti gate polí nese karta i <span class="mono">ai_origin</span> (<span class="mono">none / assistive / substantial / generated_image / generated_text / unknown</span>) a <span class="mono">rpg_system_id</span>. Obě jsou právně nabité: <span class="mono">ai_origin</span> je opora povinného AI značení podle <strong>čl. 50 AI Act</strong> (vymahatelný od 2.8.2026, strojové značení grace do 2.12.2026) a zároveň připomíná, že čistě AI výstup <strong>není autorské dílo</strong> (MS Praha <span class="mono">10 C 13/2023</span>) — nesmí zakládat autorství uživatele. <span class="mono">rpg_system_id</span> spolu se <span class="mono">source_type</span> rozhoduje o systémové bráně (viz níže).</p>
+  </div>
+
+  <h3>Checklist A — vývojář: datová pole a licenční karta</h3>
+  <p>Před tím, než modul knihovny půjde do provozu, musí datový model unést právní režim. Bez těchto polí nelze později prokázat, proč se položka směla klonovat.</p>
+
+  <div class="feat">
+    <h4>Licenční karta a genealogie</h4>
+    <ul>
+      <li>Každá knihovní položka má <strong>vlastní licenční kartu</strong> (17 polí), ne jen sdílený příznak „veřejné".</li>
+      <li><span class="mono">content_id</span> je neměnné; každá editace klíčového obsahu vytvoří novou <span class="mono">version_id</span> = novou právní verzi.</li>
+      <li>Klon nese <span class="mono">parent_content_id</span> a kopii licenčních metadat rodiče — genealogie je dohledatelná pro spory.</li>
+      <li>Ukládá se <span class="mono">accepted_terms_version</span> a časové razítko technického souhlasu (audit).</li>
+      <li>Pět gate štítků (<span class="mono">source_type · license_code · visibility · review_state · export_allowed</span>) je povinných a validovaných, ne volný text.</li>
+    </ul>
+  </div>
+
+  <h3>Checklist B — vývojář: klonovací gate</h3>
+  <p>Tlačítko <em>Klonovat</em> se nesmí ukázat jen proto, že je položka technicky viditelná. Zobrazení není licence k rozmnožení.</p>
+
+  <div class="feat">
+    <h4>Podmínky před vznikem klonu</h4>
+    <ul>
+      <li>Tlačítko klonování se ukáže <strong>jen když</strong> <span class="mono">clone_allowed = true</span> a <span class="mono">license_code</span> to dovolí.</li>
+      <li>Před klonem se zobrazí <strong>shrnutí licence</strong>: co smí, co nesmí, jak se uvádí autor, zda smí klon publikovat.</li>
+      <li>Klon je <strong>výchoze soukromý</strong>, ledaže rodičovská licence výslovně povolí okamžité veřejné sdílení klonů.</li>
+      <li>Úprava klonu uloží autora a čas; při veřejné publikaci upraveného klonu se znovu potvrdí <strong>kompatibilní licence</strong> (pozor na copyleft „nákazu" u <span class="mono">BY-SA</span>).</li>
+      <li>Když rodič přejde do <span class="mono">disputed</span>/<span class="mono">withdrawn</span>: <strong>zastavit nové klony</strong>, existující ponechat dle licence; u <span class="mono">removed (legal)</span> dohledat a skrýt i veřejné klony.</li>
+    </ul>
+  </div>
+
+  <h3>Checklist C — vývojář / moderátor: moderace a notice-and-action</h3>
+  <p>DSA nevyžaduje, aby platforma na obsah nesahala — vyžaduje, aby existoval mechanismus nahlášení, potvrzení a odůvodnění. Rizikové je spíš chaotické, selektivní a nezdokumentované rozhodování než moderace sama.</p>
+
+  <div class="feat">
+    <h4>Nahlášení, rozhodnutí, evidence</h4>
+    <ul>
+      <li>U každého příspěvku/položky je <strong>tlačítko nahlásit</strong> s poli: kategorie · URL/ID · popis · e-mail oznamovatele · prohlášení o dobré víře.</li>
+      <li>Systém <strong>potvrdí přijetí</strong>, vyhodnotí a uloží rozhodnutí; oznamovatel se informuje, je-li kontakt.</li>
+      <li>Každé rozhodnutí moderátora nese: ID obsahu · datum · kdo rozhodl · právní/smluvní důvod · vysvětlení · typ zásahu · dobu trvání · možnost odvolání (odůvodnění dle DSA).</li>
+      <li>Existuje <strong>interní manuál</strong> moderátora: co skrýt okamžitě, co posoudit, co eskalovat právníkovi, co odmítnout jako nedostatečné hlášení.</li>
+      <li>Identita oznamovatele se <strong>nepředává</strong> nahlášenému automaticky (výjimky u copyright claimu, kde je nositel práv potřebný).</li>
+      <li>Retenční režim: co se po smazání uchová pro právní důkaz a jak dlouho.</li>
+      <li>Zásahy jsou <strong>konzistentní</strong> — stejná pravidla pro běžné uživatele, správce světů i známé členy komunity.</li>
+    </ul>
+  </div>
+
+  <h3>Checklist D — vývojář: AI původ a značení</h3>
+  <p>AI štítek je transparentnostní nástroj, ne omluva pro porušení práv. Uživatel nesmí legalizovat cizí obsah tím, že napíše „vygenerováno AI".</p>
+
+  <div class="feat">
+    <h4>AI obsah v systému</h4>
+    <ul>
+      <li>Pole <span class="mono">ai_origin</span> se vyplňuje v licenčním průvodci; hodnoty <span class="mono">generated_image</span>/<span class="mono">generated_text</span> spouští AI štítek v UI i v exportu.</li>
+      <li>AI chatbot / „chat za postavu": uživatel <strong>jasně ví, že komunikuje s AI</strong> (čl. 50 AI Act).</li>
+      <li>Podmínky <strong>zakazují</strong> prompty na přesnou kopii cizí ilustrace, chráněnou postavu/značku a podobu reálné osoby bez souhlasu.</li>
+      <li>Podmínky zakazují vkládat neveřejné osobní údaje jiných hráčů do promptů bez právního základu.</li>
+      <li>AI výstup <strong>nezakládá autorství uživatele</strong> (MS Praha <span class="mono">10 C 13/2023</span>) — podmínky klonování to reflektují.</li>
+      <li>Před zařazením AI obsahu do oficiální / doporučené knihovny je <strong>lidská kontrola</strong>; AI štítek nelze odstranit u obsahu vzniklého převážně AI.</li>
+    </ul>
+  </div>
+
+  <h3>Checklist E — vývojář: audit a export</h3>
+  <p>Bez auditní stopy nelze prokázat, že provozovatel jednal předvídatelně a přiměřeně; bez strukturovaného exportu naráží platforma na Data Act.</p>
+
+  <div class="feat">
+    <h4>Auditní stopa a přenositelnost</h4>
+    <ul>
+      <li>Přístup administrátorů k soukromým zprávám a citlivým hlášením je <strong>logovaný a omezený</strong>.</li>
+      <li>Změna licenčního režimu se ukládá jako <strong>nová právní událost</strong>, ne tichý přepis.</li>
+      <li>Anti-scraping: hromadný export veřejných knihoven a scraping botem jsou zakázané (rate-limit, technická ochrana), přitom běžné vyhledávání a klon jednotlivé položky zůstávají povolené.</li>
+      <li>Výchozí default: komunitní obsah <strong>není</strong> automaticky dostupný pro trénink generativních modelů třetích stran (opt-in licence).</li>
+      <li>Strukturovaný export vlastních dat (deníky, postavy, světy) nese atribuci, licenci a zdrojovou genealogii — nad rámec prostého ZIP (Data Act 2023/2854).</li>
+    </ul>
+  </div>
+
+  <h3>Checklist F — vývojář: interní gate před zveřejněním modulu systému</h3>
+  <p>Žádná podpora cizího RPG systému nejde do provozu bez licenční karty modulu. Bez ní se právní riziko rozleze do kódu, databáze, UI i marketingu.</p>
+
+  <div class="feat">
+    <h4>Před zveřejněním modulu (stav A–F/X)</h4>
+    <ul>
+      <li>Existuje <strong>licenční karta modulu</strong> a schválil ji odpovědný člověk?</li>
+      <li>Je uveden <strong>přesný zdroj</strong> všech převzatých dat a je jasné, zda jde o vlastní obsah / SRD / fan policy / přímou licenci / uživatelskou tvorbu?</li>
+      <li>Je zkontrolováno užití <strong>názvu systému a ochranných známek</strong>?</li>
+      <li>Nepoužíváme <strong>logo, trade dress, ilustrace, mapy ani oficiální character sheet</strong> bez povolení?</li>
+      <li>Neobsahuje modul <strong>texty pravidel mimo povolený rozsah</strong>?</li>
+      <li>Je doplněn <strong>disclaimer a atribuce</strong> (česky, případně anglicky)?</li>
+      <li>Je zajištěn <strong>takedown kontakt</strong> a možnost rychle skrýt obsah?</li>
+      <li>Je modul označen ve správném <strong>stavu A–F/X</strong>?</li>
+      <li>Má právnická osoba práva ke <strong>kódu, textu, designu a databázi</strong> modulu?</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Stavy modulu A–F/X — rychlý klíč</div>
+    <p><span class="mono">A</span> vlastní/obecné · <span class="mono">B</span> reference only (jen zmínka názvu) · <span class="mono">C</span> blank sheet (prázdný deník) · <span class="mono">D</span> open license (CC/ORC/SRD) · <span class="mono">E</span> fan policy · <span class="mono">F</span> direct license (písemná smlouva) · <span class="mono">X</span> blocked (nevydávat). Přiřazení systémů do těchto stavů a rozhodovací stromy „smíme deník / bestiář / landing page?" viz kapitola <span class="mono">Deníky, bestiáře a licenční model modulů</span> a <span class="mono">Systémová matice</span>.</p>
+  </div>
+
+  <h3>Kontrolní tabulka pro právníka I — IP inventář</h3>
+  <p>První kontrolní bod je jednoduchý: co Ikaros vlastní, kdo je autor, čím to doložíme a kde chybí smlouva. Prázdný sloupec „smlouva existuje?" je nález.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Aktivum</th><th>Autor / vlastník</th><th>Důkaz</th><th>Smlouva / co chybí</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Kód frontend / backend</td><td>Vývojáři</td><td>Git, commity</td><td><span class="partial">Převod/úplná licence na entitu?</span></td></tr>
+      <tr><td>Databázové schéma</td><td>Vývojáři</td><td>Repo / DB export</td><td><span class="partial">Pořizovatel databáze?</span></td></tr>
+      <tr><td>Logo · UI design</td><td>Grafik</td><td>Zdrojový soubor · Figma</td><td><span class="no">Grafika často zůstává autorovi</span></td></tr>
+      <tr><td>Texty webu · nápověda · manuály</td><td>Autoři textů</td><td>DOCX/PDF · screenshoty</td><td><span class="partial">Licence k úpravám?</span></td></tr>
+      <tr><td>Strategie · roadmapa · partner pack</td><td>Zakladatel</td><td>Datované PDF/DOCX</td><td><span class="partial">NDA / převod?</span></td></tr>
+      <tr><td>Komunitní obsah (světy, bestiáře, knihovny)</td><td>Uživatelé</td><td>Datovaný export</td><td><span class="partial">Platformní + komunitní licence?</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Kontrolní tabulka pro právníka II — moduly Modul → požadavek → priorita</h3>
+  <p>Druhý kontrolní bod mapuje, co který modul potřebuje k bezpečnému spuštění a jak je to naléhavé. Priorita odráží rešeršní systémovou matici.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Modul</th><th>Požadavek na doložení</th><th>Priorita</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Podmínky užití + komunitní licence</td><td>Platformní i komunitní licence, přiměřenost vůči spotřebiteli, ztráta práva odstoupit u digi obsahu (§ 1837 l OZ)</td><td><span class="no">nejvyšší</span></td></tr>
+      <tr><td>Notice-and-action + moderace</td><td>Formulář, potvrzení, odůvodnění, retence, interní manuál (DSA)</td><td><span class="no">nejvyšší</span></td></tr>
+      <tr><td>Zásady ochrany OÚ + AI DPA</td><td>Právní tituly, RoPA (čl. 30), DPIA pro AI a dětské účty, DPA čl. 28 + transfer USA (SCC)</td><td><span class="no">vysoká</span></td></tr>
+      <tr><td>AI modul (chat / portréty / bestiáře)</td><td>Značení čl. 50, zákaz NCII/CSAM, netrénovat na komunitním obsahu bez opt-in</td><td><span class="no">vysoká</span></td></tr>
+      <tr><td>Čisté piloty <span class="mono">dnd5e · fate · fae</span></td><td>Verbatim atribuce (CC BY 4.0 / CC BY 3.0), vynechat Product Identity a známky</td><td><span class="partial">střední</span></td></tr>
+      <tr><td>Podmíněné <span class="mono">jad · drd2 · coc · drd16 · pi</span></td><td>Disclaimer + referenční název; systémová licenční karta; u COC vyloučit VTT/apps</td><td><span class="partial">střední</span></td></tr>
+      <tr><td>Vyhnout se <span class="mono">drd-plus · draci-hlidka · shadowrun · gurps</span></td><td>Bez přímé licence jen engine + prázdné šablony + referenční název s ®; automatizovaný engine u GURPS = „computer game" mimo policy</td><td><span class="no">blok bez dohody</span></td></tr>
+      <tr><td>Ochranná známka „Ikaros"</td><td>Rešerše ÚPV/EUIPO/TMview, třídy 9/41/42, přihlašovatel = právnická osoba</td><td><span class="partial">střední</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Kontrolní tabulka pro právníka III — Pole → příklad → právní význam</h3>
+  <p>Třetí kontrolní bod ověřuje, že datové štítky nesou skutečný právní obsah, ne jen kosmetiku. U každého pole: konkrétní příklad hodnoty a co z ní právně plyne.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Pole</th><th>Příklad hodnoty</th><th>Právní význam</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="mono">source_type</span></td><td><span class="mono">fan_policy</span> (Chaosium Fan Material Policy 2023-10-13)</td><td>Určuje rozsah povoleného užití a zda je nutná systémová kontrola; <span class="mono">prohibited</span> = do knihovny nesmí.</td></tr>
+      <tr><td><span class="mono">license_code</span></td><td><span class="mono">remix</span></td><td>Ostatní smí vytvořit kopii i upravit ji; zakládá copyleft kompatibilní kontrolu při publikaci.</td></tr>
+      <tr><td><span class="mono">visibility</span></td><td><span class="mono">cloneable</span></td><td>Veřejné v knihovně s tlačítkem klonování; výchozí hodnota při nahrání musí být bezpečnější.</td></tr>
+      <tr><td><span class="mono">review_state</span></td><td><span class="mono">legal_checked</span></td><td>Podmínka pro oficiální knihovnu; <span class="mono">disputed</span> zastaví klony a spustí notice-and-action.</td></tr>
+      <tr><td><span class="mono">export_allowed</span></td><td><span class="mono">open_license</span></td><td>Obsah smí ven i mimo Ikaros pod zvolenou veřejnou licencí (neodvolatelnost CC nutno vysvětlit uživateli).</td></tr>
+      <tr><td><span class="mono">ai_origin</span></td><td><span class="mono">generated_image</span></td><td>Spouští AI štítek (čl. 50 AI Act); výstup není autorské dílo — nezakládá autorství uživatele.</td></tr>
+      <tr><td><span class="mono">rpg_system_id</span></td><td><span class="mono">shadowrun</span></td><td>Vazba na systém „vyhnout se" → bez přímé licence blok; jen prázdná šablona bez pravidlových dat.</td></tr>
+      <tr><td><span class="mono">attribution_required</span></td><td><span class="mono">true</span></td><td>Klon i export musí nést atribuci původního autora; u odvozenin i autora úprav.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Systémová vazba je gate, ne štítek</div>
+    <p>Kombinace <span class="mono">source_type</span> + <span class="mono">rpg_system_id</span> rozhoduje, zda položka <strong>vůbec smí</strong> do knihovny — nejen jak se zobrazí. Tři čisté piloty (<span class="mono">dnd5e</span>, <span class="mono">fate</span>, <span class="mono">fae</span> pod CC) jdou volně; podmíněné (<span class="mono">jad</span>, <span class="mono">drd2</span>, <span class="mono">call-of-cthulhu</span>, <span class="mono">drd16</span>, <span class="mono">pi</span>) vyžadují disclaimer, referenční název a systémovou kartu; systémům „vyhnout se" (<span class="mono">drd-plus</span>, <span class="mono">draci-hlidka</span>, <span class="mono">shadowrun</span>, <span class="mono">gurps</span>) bez přímé licence patří jen prázdná šablona. Detaily v kapitolách <span class="mono">Systémy — čisté piloty</span> a <span class="mono">Systémy — vyhnout se</span>.</p>
+  </div>
+
+  <h3>Vzorové bloky pro rychlé nasazení</h3>
+  <p>Rešerše dodává pracovní formulace, které právník převede do závazného textu. Nejsou to hotové právní texty — jsou to vzory rozhraní a štítků.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Vzor — AI štítek</h4>
+      <p>„Tento obsah byl vytvořen nebo podstatně upraven pomocí AI. Autor/nahrávající uživatel odpovídá za to, že neporušuje práva třetích osob, neobsahuje neoprávněnou podobu reálné osoby, chráněné značky, cizí ilustrace ani neveřejné osobní údaje."</p>
+    </div>
+    <div class="card">
+      <h4>Vzor — upozornění před zařazením do knihovny</h4>
+      <p>„Zařazením této položky do komunitní knihovny souhlasíš, že ji ostatní podle zvoleného režimu mohou zobrazit, klonovat do svého světa a případně upravovat. Tvoje autorství zůstane zachováno. Nezařazuj obsah, ke kterému nemáš práva."</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Vzor — obecný disclaimer neoficiálního modulu</h4>
+      <p>„Neoficiální komunitní pomůcka. Není spojena s vydavatelem systému ani jím schválena. Nenahrazuje koupi originálních pravidel. Názvy a značky patří jejich vlastníkům." Referenční užití názvu s ® / ™, žádné logo ani trade dress.</p>
+    </div>
+    <div class="card">
+      <h4>Vzor — disclaimer SRD/CC modulu</h4>
+      <p>Verbatim atribuce dle licence (CC BY 4.0 pro D&D 5.2/5.2.1, CC BY 3.0 Unported pro Fate/FAE). Nekombinovat atribuci verzí 5.1 a 5.2. Vynechat Product Identity monstra a značky (dragon ampersand).</p>
+    </div>
+  </div>
+
+  <h3>Rozhodovací strom — smí položka do komunitní knihovny?</h3>
+  <p>Sedm otázek, kterými projde každá kandidátní položka. Kterákoli „ne" bez doložitelného řešení znamená zastavení.</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Vlastní tvorba?</b> Pokud ne — existuje doložitelná licence nebo povolení?</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Konkrétní cizí texty / ilustrace / mapy / statblocky / názvy?</b> Pokud ano — systémová licenční kontrola.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Osobní údaje nebo podoba reálné osoby?</b> Pokud ano — souhlas nebo anonymizace (§ 84–85 OZ, GDPR).</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Vytvořeno AI?</b> Pokud ano — označit <span class="mono">ai_origin</span>, posoudit riziko cizích práv a deepfake.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Jaký režim chce autor?</b> Čtení / klonování / remix → zvolit odpovídající <span class="mono">license_code</span>.</div></div>
+  <div class="phase"><div class="num">6</div><div class="body"><b>Do oficiální knihovny?</b> Pokud ano — kurátorská a právní kontrola (<span class="mono">review_state = curated/legal_checked</span>).</div></div>
+  <div class="phase"><div class="num">7</div><div class="body"><b>Nahlášena nebo sporná?</b> Pokud ano — nezařazovat, dokud není vyřešena (<span class="mono">disputed</span> → mimo knihovnu).</div></div>
+
+  <div class="callout cyan">
+    <div class="t">Kam dál</div>
+    <p>Přesné enumerace polí a stavů: <span class="mono">Datový model licenčních karet</span>. Právní tituly a povinnosti moderace: <span class="mono">Databáze, scraping a AI trénink</span> a <span class="mono">AI generovaný obsah a AI Act</span>. Systémové stavy A–F/X a rozhodovací stromy modulů: <span class="mono">Deníky, bestiáře a licenční model modulů</span>. Inventář aktiv a otázky pro advokáta: <span class="mono">IP inventář a důkazní archiv</span>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Interní rešerše „Projekt Ikaros — právně-informační rešerše v0.6" (3. část), kap. 3.3 (licenční karta), 11.1 (datový model), 13 (vzorové formulace), 13.5 a 18.1–18.2 (rozhodovací strom a workflow).</li>
+    <li>Interní rešerše „Projekt Ikaros — RPG licence v0.4" (2. část), kap. 9.1–9.2 (stavy modulu A–F/X, povinná pole licenční karty), 14.1–14.5 (rozhodovací stromy a interní checklist před zveřejněním).</li>
+    <li>Interní rešerše „Projekt Ikaros — právní rešerše v0.1" (1. část), kap. 11.1 (IP inventář) a kontrolní otázky pro právníka.</li>
+    <li>Fact-check ledger v1.0: AI Act čl. 50 (vymahatelnost 2.8.2026, značení grace do 2.12.2026), autorství AI (MS Praha <span class="mono">10 C 13/2023</span>), systémová matice 14 systémů (čisté / podmíněné / vyhnout se), CC verze (D&D CC BY 4.0, Fate/FAE CC BY 3.0 Unported), Chaosium Fan Policy vylučuje VTT/apps, GURPS engine = „computer game", Data Act 2023/2854, GDPR RoPA/DPIA/DPA čl. 28.</li>
+    <li>Zákon č. 121/2000 Sb. (autorský zákon), § 5, § 84–85 zák. č. 89/2012 Sb. (OZ); § 1837 l OZ; nařízení EU 2022/2065 (DSA); 2016/679 (GDPR); 2024/1689 (AI Act) čl. 50; 2023/2854 (Data Act).</li>
+  </ul>
+</section>

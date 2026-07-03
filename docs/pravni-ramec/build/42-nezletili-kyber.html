@@ -1,0 +1,179 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část IV — Diskuse, moderace, DSA a GDPR</div>
+    <h2>Nezletilí a kyberbezpečnost (NIS2 / ZoKB)</h2>
+  </div>
+
+  <p class="lead">Tři témata, která se v neziskové RPG platformě prolínají: <strong>účty nezletilých</strong> (věková hranice, souhlas rodiče, bezpečná výchozí konfigurace), <strong>kyberbezpečnost</strong> (nový zákon o kybernetické bezpečnosti — ZoKB č. 264/2025 Sb., účinný od <span class="mono">1. 11. 2025</span>, transponuje NIS2) a <strong>exportovatelnost dat</strong> podle <strong>Data Act</strong> (použitelný od <span class="mono">12. 9. 2025</span>). Klíčový závěr: malý neziskový spolek s vysokou pravděpodobností <strong>nespadá</strong> do regulovaného režimu ZoKB, ale bezpečnostní minimum musí provozovat tak jako tak — a u nezletilých je laťka nejvyšší.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Tato kapitola je právně-informační rešerše, ne právní stanovisko. Věkovou hranici, znění rodičovského souhlasu, moderaci a zařazení / nezařazení do regulovaného režimu ZoKB musí posoudit specialista (advokát, u kyberbezpečnosti expert dle velikosti a typu služby). Formulace níže jsou pracovní.</p>
+  </div>
+
+  <h3>Nezletilí — nejvyšší laťka platformy</h3>
+
+  <p>RPG komunita přitahuje mladší hráče, takže účty nezletilých jsou reálné riziko, ne teorie. U dětí se sčítá <strong>několik vrstev</strong> práva a bezpečnosti najednou: GDPR (věk souhlasu), bezpečnost komunikace, nevhodný obsah a možné zneužití soukromých zpráv. Pokud Ikaros umožní účty nezletilým, právník musí <strong>samostatně</strong> nastavit věkovou hranici, souhlas zákonného zástupce, pravidla kontaktování, profilovou viditelnost, moderaci zpráv, zákazy obsahu a reakce na rizikové chování.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">15</div><div class="l">věk digitálního souhlasu v ČR (§ 7 zák. 110/2019 Sb.)</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">vrstvy rizika: GDPR · bezpečnost · obsah · soukromé zprávy</div></div>
+    <div class="stat"><div class="n">DPIA</div><div class="l">pro dětské účty pravděpodobně povinná (kritéria WP248)</div></div>
+  </div>
+
+  <h4>Věk souhlasu — 15 let (odchylka od GDPR baseline)</h4>
+
+  <p>GDPR umožňuje členským státům snížit obecnou hranici 16 let až na 13; <strong>Česká republika ji stanovila na 15 let</strong> (<span class="mono">§ 7 zák. č. 110/2019 Sb.</span>). Pod touto hranicí musí zpracování osobních údajů dítěte v souvislosti se službou informační společnosti <strong>schválit nebo autorizovat zákonný zástupce</strong>. Provozovatel musí vyvinout <strong>přiměřené úsilí</strong> ověřit, že souhlas dal skutečně nositel rodičovské odpovědnosti, s ohledem na dostupné technologie — nikoli slepě věřit zaškrtnutému políčku.</p>
+
+  <table>
+    <thead>
+      <tr><th>Věk uživatele</th><th>Právní režim účtu</th><th>Co Ikaros musí zajistit</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>15 let a více</strong></td>
+        <td>Digitální souhlas dítě dává samo</td>
+        <td>Standardní režim + bezpečná konfigurace jako doporučený default</td>
+      </tr>
+      <tr>
+        <td><strong>Pod 15 let</strong></td>
+        <td>Nutný souhlas / autorizace zákonného zástupce (<span class="mono">§ 7 z. 110/2019</span>)</td>
+        <td>Ověřovací tok pro rodiče + přiměřené úsilí ověřit rodičovství + bezpečná konfigurace <strong>povinně</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Neurčený / neověřený věk</strong></td>
+        <td>Rizikové — nelze mlčky předpokládat dospělost</td>
+        <td>Zákaz sběru přesného věku veřejně; při pochybnosti přísnější režim</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Bezpečná konfigurace pro nezletilé — výchozí nastavení</div>
+    <p>Doporučená bezpečná konfigurace, kterou pro účty nezletilých nastavit <strong>jako výchozí</strong> (privacy by default):</p>
+    <ul>
+      <li><strong>Výchozí profil neveřejný</strong> — dítě není dohledatelné ani indexovatelné bez aktivní volby.</li>
+      <li><strong>Omezené soukromé zprávy</strong> — restrikce, kdo smí nezletilého kontaktovat (např. jen členové sdíleného světa / skupiny).</li>
+      <li><strong>Zákaz veřejného zveřejnění věku, školy, adresy a fotografií</strong> — tato pole se u nezletilého veřejně neukazují.</li>
+      <li><strong>Zvýšená moderace nahlášení</strong> — hlášení týkající se nezletilého má prioritu.</li>
+      <li><strong>Jasné nouzové kontakty</strong> — viditelná cesta, jak nahlásit ohrožení.</li>
+      <li><strong>Zvláštní pravidla pro správce komunit</strong> — kdo a za jakých podmínek smí nahlížet do komunikace s nezletilým.</li>
+    </ul>
+  </div>
+
+  <p>Tato nastavení nejsou volitelná kosmetika — jsou to praktická opatření, jimiž se snižuje riziko zneužití soukromých zpráv, kontaktování cizími osobami a úniku citlivých údajů dítěte. Vazba na moderaci a hlášení obsahu je v kapitole <strong>Diskuse, hosting a DSA</strong>; identita oznamovatele se u nezletilého nesmí automaticky předávat nahlášenému uživateli.</p>
+
+  <div class="callout cyan">
+    <div class="t">DPIA a RoPA — nepodcenit u dětských účtů</div>
+    <p>Kombinace <strong>děti + moderace / soukromé zprávy + AI</strong> naplňuje kritéria WP248, takže <strong>DPIA (posouzení vlivu na ochranu osobních údajů) je pro dětské účty a AI modul pravděpodobně povinná</strong>. Rovněž <strong>záznamy o činnostech zpracování (RoPA, čl. 30 GDPR) jsou povinné i pod 250 osob</strong>, jde-li o pravidelné, rizikové zpracování nebo zvláštní kategorie údajů. Právní tituly a soupis zpracování řeší kapitola <strong>GDPR inventář a právní základy</strong>.</p>
+  </div>
+
+  <h3>Kyberbezpečnost — ZoKB č. 264/2025 Sb. (transpozice NIS2)</h3>
+
+  <p>NÁKIB uvádí, že nový zákon o kybernetické bezpečnosti je <strong>účinný od 1. 11. 2025</strong> a přináší změny související se směrnicí NIS2. Pozor na časté zmatení: jde o <strong>nový</strong> zákon <span class="mono">č. 264/2025 Sb.</span>, který nahradil starší <span class="mono">zákon č. 181/2014 Sb.</span> — odkazovat na staré číslo je chyba.</p>
+
+  <div class="callout gold">
+    <div class="t">Oprava zdroje — správné číslo předpisu</div>
+    <p>NIS2 je v ČR transponována <strong>zákonem č. 264/2025 Sb.</strong> (ZoKB), účinným od <span class="mono">1. 11. 2025</span> — <strong>ne</strong> starým zákonem č. 181/2014 Sb. Kde podklady mluví o „zákoně o kybernetické bezpečnosti", je nutné vztáhnout to na aktuální předpis. <em>(Zdroj: LEDGER, oprava A.13.)</em></p>
+  </div>
+
+  <h4>Spadá malý neziskový spolek do regulovaného režimu?</h4>
+
+  <p>ZoKB / NIS2 cílí na provozovatele služeb podle velikosti, typu služby a postavení v sektoru. Malý neziskový spolek jako <strong>mikro- nebo malý subjekt</strong> s <strong>vysokou pravděpodobností nepodléhá</strong> registraci ani povinnostem regulovaných subjektů. Definitivní zařazení / nezařazení ale musí <strong>posoudit specialista</strong> podle velikosti, typu poskytované služby a postavení v sektoru — potvrzení mikro / malého statusu je zároveň jedna z otázek pro advokáta (týká se i výjimky z části povinností DSA dle čl. 19, viz kapitola <strong>Diskuse, hosting a DSA</strong>).</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Proč spolek pravděpodobně mimo režim</h4>
+      <ul>
+        <li><span class="pill green">plus</span> Mikro / malý subjekt — pod prahovými hodnotami NIS2</li>
+        <li><span class="pill green">plus</span> Není provozovatel kritické / důležité služby v regulovaném sektoru</li>
+        <li><span class="pill green">plus</span> Neposkytuje službu, u níž NIS2 dopadá bez ohledu na velikost</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Co přesto ověřit u specialisty</h4>
+      <ul>
+        <li><span class="pill">?</span> Typ služby — nespadá výjimečně pod povinný sektor bez ohledu na velikost?</li>
+        <li><span class="pill">?</span> Vazby a postavení v dodavatelském řetězci</li>
+        <li><span class="pill">?</span> Budoucí růst — přechod z mikro na malý / střední subjekt</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Bezpečnost je nutná bez ohledu na regulaci</div>
+    <p>I když Ikaros pravděpodobně <strong>nespadne</strong> do regulovaného režimu ZoKB, bezpečnost je prakticky nutná tak jako tak — a u dětských účtů dvojnásob. Vize správně staví na <strong>zálohách</strong>, <strong>2FA</strong>, <strong>ochraně proti útokům</strong> a <strong>exportu dat</strong>. Toto minimum plňte proto, že chrání uživatele a data, ne kvůli formální povinnosti.</p>
+  </div>
+
+  <div class="feat">
+    <h4>Bezpečnostní minimum před veřejným spuštěním</h4>
+    <ul>
+      <li><b>Zálohy</b> — pravidelné, testované obnovení, oddělené úložiště</li>
+      <li><b>2FA / TOTP</b> — pro citlivé role (správci, PJ), volitelně pro hráče; challenge-flow, šifrovaný secret</li>
+      <li><b>Ochrana proti útokům</b> — rate-limiting, ochrana session (httpOnly cookies), hardening přihlášení</li>
+      <li><b>Export dat</b> — strukturovaný export deníků, postav, světů (viz Data Act níže)</li>
+      <li><b>Incident response</b> — postup a kontakt pro bezpečnostní incident, logovaný a omezený administrátorský přístup</li>
+      <li><b>Ochrana soukromých zpráv</b> — provozovatel je hostuje, ale běžně do nich nenahlíží; přístup správce logovaný a omezený</li>
+    </ul>
+  </div>
+
+  <h3>Data Act a exportovatelnost — od 12. 9. 2025</h3>
+
+  <p>Data Act (nařízení EU <span class="mono">2023/2854</span>) je podle Evropské komise <strong>použitelný od 12. 9. 2025</strong> a míří na férový přístup k datům a větší kontrolu uživatelů nad daty v datové ekonomice. Pro Ikaros je hlavní praktická hodnota obecná: i když se Data Act nemusí přímo dotýkat všech funkcí platformy, <strong>exportovatelnost dat, jasné podmínky a minimalizace lock-inu</strong> jsou dobrá právní i komunitní strategie.</p>
+
+  <div class="feat">
+    <h4>Co Data Act prakticky přináší</h4>
+    <ul>
+      <li><b>Právo na strukturovaný export</b> — deníky, postavy, světy ve strojově čitelném a použitelném formátu (nad rámec pouhého ZIP archivu)</li>
+      <li><b>Cloud switching</b> — právo přejít k jiné službě bez umělých překážek (relevantní, spadne-li nezisková SaaS pod „data processing service")</li>
+      <li><b>Zrušení egress poplatků</b> — poplatky za přenos dat pryč od poskytovatele se ruší od <span class="mono">12. 1. 2027</span></li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení — posílit strukturovaný export</div>
+    <p>Ikaros má <strong>posílit strukturovaný export nad rámec ZIP</strong>: nejen stažení souborů, ale strojově čitelná, znovupoužitelná data. Souběh s právem na přenositelnost dle GDPR (kapitola <strong>GDPR inventář a právní základy</strong>) a s licenční kartou u komunitního obsahu (kapitola <strong>Licence uživatelů</strong>) — export komunitního obsahu jen v rozsahu licenční karty a s atribucí. Otázka, zda nezisková SaaS spadá pod „data processing service", patří advokátovi.</p>
+  </div>
+
+  <h3>Shrnutí — co udělat</h3>
+
+  <table>
+    <thead>
+      <tr><th>Oblast</th><th>Praktický krok</th><th>Kdo posoudí</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Nezletilí</strong></td>
+        <td>Věk 15 jako hranice samostatného souhlasu; pod 15 tok rodičovského souhlasu; bezpečná konfigurace jako default</td>
+        <td>Advokát (GDPR)</td>
+      </tr>
+      <tr>
+        <td><strong>DPIA / RoPA</strong></td>
+        <td>DPIA pro dětské účty a AI modul; RoPA i pod 250 osob</td>
+        <td>Advokát / DPO</td>
+      </tr>
+      <tr>
+        <td><strong>Kyberbezpečnost (ZoKB)</strong></td>
+        <td>Potvrdit mikro / malý status a nezařazení do regulovaného režimu; bezpečnostní minimum plnit tak jako tak</td>
+        <td>Specialista na kyberbezpečnost</td>
+      </tr>
+      <tr>
+        <td><strong>Data Act</strong></td>
+        <td>Strukturovaný export nad rámec ZIP; minimalizace lock-inu; posoudit status „data processing service"</td>
+        <td>Advokát</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Kyberbezpečnostní a GDPR minimum před veřejným spuštěním je součástí akčního plánu (fáze <span class="mono">60–90 dní</span>) — konsolidovaně v kapitole <strong>Master akční plán 0-30-90-90+</strong>. Otázky pro advokáta k velikosti podniku, DPIA / DPO a transferu do USA u AI jsou shrnuty v kapitole <strong>Otázky pro advokáta, účetního, vydavatele</strong>.</p>
+
+  <ul class="sources">
+    <li>Zákon č. 110/2019 Sb., o zpracování osobních údajů — § 7 (věk digitálního souhlasu 15 let)</li>
+    <li>GDPR (nařízení EU 2016/679) — čl. 8 (souhlas dítěte), čl. 30 (RoPA), čl. 35 (DPIA)</li>
+    <li>Zákon č. 264/2025 Sb., o kybernetické bezpečnosti (ZoKB) — účinný 1. 11. 2025, transpozice směrnice NIS2 (nahrazuje z. č. 181/2014 Sb.)</li>
+    <li>Data Act — nařízení EU 2023/2854, použitelné od 12. 9. 2025 (egress poplatky zrušeny od 12. 1. 2027)</li>
+    <li>NÚKIB — informace k účinnosti nového zákona o kybernetické bezpečnosti</li>
+    <li>Projekt Ikaros — právně-informační rešerše (pracovní dokument, kap. 8.5, 9.5, 9.6, 10)</li>
+    <li>Fact-check ledger v1.0 — opravy A.13 (ZoKB 264/2025), doplnění B (Data Act, DPIA, RoPA, věk 15)</li>
+  </ul>
+</section>

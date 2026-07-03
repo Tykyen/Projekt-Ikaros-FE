@@ -1,0 +1,180 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Komunitní knihovny · technická opora práva</div>
+    <h2>Datový model licenčních karet, stavy obsahu a role</h2>
+  </div>
+
+  <p class="lead">Právní režim, který žije jen v textu podmínek, v provozu neplatí. Aby klonování, remix, atribuce a stažení fungovaly, musí mít každá položka strojově čitelnou <strong>licenční kartu</strong>, definované <strong>stavy</strong> a jasně vymezené <strong>role</strong>. Tato kapitola popisuje minimální datový model a workflow nahrání i klonování. Jde o rešeršní návrh, ne o právní stanovisko — finální schéma odsouhlasí advokát.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Rešeršní pracovní návrh (v0.6). Konkrétní enumerace polí, defaulty a povinné kroky průvodce jsou návrh k připomínkování, ne závazný právní model. Vazba na jednotlivé RPG systémy se řídí kapitolou <span class="mono">Systémová matice</span> a licenčními kapitolami jednotlivých systémů.</p>
+  </div>
+
+  <h3>Proč karta, a ne jen podmínky</h3>
+  <p>Podmínky užití stanoví obecná pravidla. Provozní rozhodnutí — jestli se u konkrétní položky ukáže tlačítko klonování, jestli smí do veřejné knihovny, jestli nese AI štítek — musí padnout <strong>za běhu</strong> a nad daty té položky. Proto každá knihovní položka nese vlastní licenční kartu: soubor polí, který kóduje původ, povolený režim a stav kontroly. Karta je zdroj pravdy, podle kterého se řídí UI i moderace.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">17</div><div class="l">datových polí licenční karty</div></div>
+    <div class="stat"><div class="n">11</div><div class="l">stavů obsahu</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">rolí s právy a omezeními</div></div>
+  </div>
+
+  <h3>Datový model licenční karty</h3>
+  <p>Následující pole jsou minimum. Klíčová jsou <span class="mono">content_id</span> (neměnné ID položky), <span class="mono">version_id</span> (nová právní verze při každé editaci klíčového obsahu) a <span class="mono">parent_content_id</span> (genealogie klonu).</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Datové pole</th><th>Typ</th><th>Význam</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="mono">content_id</span></td><td><span class="mono">UUID</span></td><td>Neměnné ID položky.</td></tr>
+      <tr><td><span class="mono">version_id</span></td><td><span class="mono">UUID</span>/číslo</td><td>Každá editace klíčového obsahu vytvoří novou právní verzi.</td></tr>
+      <tr><td><span class="mono">owner_user_id</span></td><td><span class="mono">UUID</span></td><td>Interní vlastník účtu.</td></tr>
+      <tr><td><span class="mono">public_author_name</span></td><td>Text</td><td>Atribuce viditelná uživatelům; může být přezdívka.</td></tr>
+      <tr><td><span class="mono">license_mode</span></td><td>Enum</td><td><span class="mono">private / read / clone / remix / open / official / withdrawn / disputed</span>.</td></tr>
+      <tr><td><span class="mono">clone_allowed</span></td><td>Boolean</td><td>Samostatný přepínač klonování.</td></tr>
+      <tr><td><span class="mono">derivatives_allowed</span></td><td>Boolean</td><td>Povolení úprav klonu.</td></tr>
+      <tr><td><span class="mono">export_allowed</span></td><td>Enum</td><td><span class="mono">none / own_use / platform_license / open_license</span>.</td></tr>
+      <tr><td><span class="mono">ai_origin</span></td><td>Enum</td><td><span class="mono">none / assistive / substantial / generated_image / generated_text / unknown</span>.</td></tr>
+      <tr><td><span class="mono">third_party_status</span></td><td>Enum</td><td><span class="mono">own / original / third_party_licensed / fan_policy / unknown / prohibited</span>.</td></tr>
+      <tr><td><span class="mono">rpg_system_id</span></td><td>Enum</td><td>Vazba na konkrétní systém — důležité pro moduly a systémové licence.</td></tr>
+      <tr><td><span class="mono">attribution_required</span></td><td>Boolean</td><td>Atribuční povinnost.</td></tr>
+      <tr><td><span class="mono">source_url_or_note</span></td><td>Text</td><td>Zdroj nebo interní poznámka.</td></tr>
+      <tr><td><span class="mono">review_status</span></td><td>Enum</td><td><span class="mono">unreviewed / community_checked / curated / legal_checked / disputed / removed</span>.</td></tr>
+      <tr><td><span class="mono">accepted_terms_version</span></td><td>Text</td><td>Verze podmínek v okamžiku publikace (audit).</td></tr>
+      <tr><td><span class="mono">created_at / updated_at</span></td><td>Timestamp</td><td>Audit časů.</td></tr>
+      <tr><td><span class="mono">parent_content_id</span></td><td>Nullable</td><td>Genealogie klonu — odkaz na původní položku.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Klíčová invarianta</div>
+    <p>Změna licenčního režimu = <strong>nová právní událost</strong>, ne tichý přepis. Ukládá se nová <span class="mono">version_id</span> a nová <span class="mono">accepted_terms_version</span>. Historie musí zůstat dohledatelná kvůli auditu i sporům.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">AI původ nezakládá autorství uživatele</div>
+    <p>Pole <span class="mono">ai_origin</span> není kosmetika. Podle rozhodnutí Městského soudu v Praze (<span class="mono">10 C 13/2023</span>) čistě AI vygenerovaný obrázek <strong>není autorské dílo</strong> — autorem může být jen fyzická osoba (§ 5 AZ), prompt je pouhý námět (§ 2/6 AZ). Takový výstup je fakticky volný. Podmínky klonování proto <strong>nesmí</strong> uživateli přiznávat autorství čistě AI výstupu; hodnota <span class="mono">generated_image</span>/<span class="mono">generated_text</span> to musí v kartě odrážet a moderace k ní přistupovat jinak než k lidskému dílu.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">AI Act čl. 50 — strojové značení</div>
+    <p>U AI obsahu (portréty, bestiáře, generovaný text) plyne z čl. 50 AI Act povinnost <strong>označit výstup jako umělý</strong>; čl. 50 je vymahatelný od 2.8.2026 (Digital Omnibus jej neodkládá), strojové značení má grace period do 2.12.2026 pro systémy na trhu před 2.8.2026. Pole <span class="mono">ai_origin</span> je technická opora tohoto značení — z jeho hodnoty se odvozuje AI štítek v UI i metadata v exportu. Sankce až 15 M€/3 % obratu.</p>
+  </div>
+
+  <h3>Stavy obsahu → viditelnost → práva</h3>
+  <p>Stav řídí, kdo položku vidí a co s ní lze dělat. Stavy nejsou volný text — jsou to definované hodnoty, na které se váže chování knihovny i moderace.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Stav</th><th>Co znamená</th><th>Viditelnost</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="pill">Draft</span></td><td>Pracovní návrh.</td><td>Jen autor a oprávnění členové. <strong>Bez komunitní licence, nelze klonovat.</strong></td></tr>
+      <tr><td><span class="pill">Private</span></td><td>Soukromý obsah.</td><td>Podle oprávnění světa.</td></tr>
+      <tr><td><span class="pill">Published (read-only)</span></td><td>Veřejné ke čtení.</td><td>Veřejné, bez klonování.</td></tr>
+      <tr><td><span class="pill green">Cloneable</span></td><td>Klonování povoleno.</td><td>Veřejné v knihovně.</td></tr>
+      <tr><td><span class="pill green">Remixable</span></td><td>Klonování a úpravy povoleny.</td><td>Veřejné v knihovně.</td></tr>
+      <tr><td><span class="pill cyan">Official (curated)</span></td><td>Kurátorovaný obsah Ikarosu.</td><td>Veřejné, vyšší důvěra.</td></tr>
+      <tr><td><span class="pill">Reported</span></td><td>Nahlášeno; probíhá kontrola.</td><td>Podle rizika viditelné/skryté.</td></tr>
+      <tr><td><span class="pill">Quarantined</span></td><td>Dočasně skryto.</td><td>Jen moderátoři a autor.</td></tr>
+      <tr><td><span class="pill">Removed (legal)</span></td><td>Odstraněno kvůli právnímu problému.</td><td>Neveřejné, <strong>audit zachován</strong>.</td></tr>
+      <tr><td><span class="pill">Withdrawn by author</span></td><td>Staženo autorem.</td><td>Nové klony nepovoleny; staré dle licence.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Stažení ≠ vymazání klonů</div>
+    <p>Když autor položku stáhne (<span class="pill">Withdrawn</span>) nebo vznikne spor (<span class="mono">disputed</span>), systém <strong>zastaví nové klony</strong>, ale existující klony ponechá podle licence, za níž vznikly — pokud nejde o právní závadu. To je záměrné: klonující uživatel jednal v dobré víře podle tehdejšího režimu. Naopak u <span class="pill">Removed (legal)</span> se skryje původní položka i veřejné klony a dotčení uživatelé se informují.</p>
+  </div>
+
+  <h3>Role → práva → omezení</h3>
+  <p>Šest rolí. Každá má vymezená práva a — což je právně důležitější — vymezená omezení.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Role</th><th>Práva</th><th>Omezení</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Autor položky</strong></td><td>Vytvořit, upravit, zvolit režim, stáhnout budoucí klonování.</td><td>Nesmí porušit práva třetích osob; u klonů platí licence rodiče.</td></tr>
+      <tr><td><strong>Klonující uživatel</strong></td><td>Klonovat a užívat podle licence.</td><td>Musí zachovat atribuci a nesmí překročit režim.</td></tr>
+      <tr><td><strong>Správce světa</strong></td><td>Řídí obsah v rámci světa.</td><td>Nemůže přelicencovat cizí obsah bez oprávnění.</td></tr>
+      <tr><td><strong>Kurátor knihovny</strong></td><td>Doporučit, kontrolovat metadata, označit stav.</td><td>Neměl by právně schvalovat sporné položky bez právníka.</td></tr>
+      <tr><td><strong>Moderátor</strong></td><td>Skrýt, omezit, řešit nahlášení.</td><td>Musí zásah odůvodnit a dodržet proces.</td></tr>
+      <tr><td><strong>Právní správce / admin</strong></td><td>Řeší právní stížnosti, exporty, zásahy orgánů.</td><td>Přístup logován a omezen.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Workflow nahrání položky</h3>
+  <p>Nahrání není jeden krok — je to průvodce, který sesbírá metadata potřebná pro licenční kartu dřív, než se položka smí objevit ve veřejné knihovně.</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Uložení jako Draft.</b> Položka nemá komunitní licenci a nesmí se klonovat.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Volba viditelnosti.</b> Výchozí stav je <strong>soukromý</strong>. Při volbě veřejné/klonovatelné položky se spustí licenční průvodce.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Licenční průvodce — původ.</b> Ptá se: vlastní tvorba · společná tvorba · AI asistence · AI převážný výstup · import z jiné služby · obsah podle cizí licence · obsah navázaný na konkrétní RPG systém.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Cizí zdroj → povinný titul.</b> Při označení cizího zdroje musí uživatel doplnit <span class="mono">source_url_or_note</span> a právní titul. Bez nich položka <strong>nesmí do veřejné knihovny</strong>.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>AI → potvrzení.</b> Při označení AI systém vyžádá potvrzení, že výstup neobsahuje reálnou osobu bez souhlasu, chráněnou značku ani přepis cizího díla.</div></div>
+  <div class="phase"><div class="num">6</div><div class="body"><b>Uložení karty + verze podmínek.</b> Následná změna licenčního režimu se uloží jako <strong>nová právní událost</strong>.</div></div>
+  <div class="phase"><div class="num">7</div><div class="body"><b>Zveřejnění po splnění metadat.</b> Položka se v knihovně zobrazí až po splnění povinných polí; u vybraných kategorií může být nutná kurátorská kontrola.</div></div>
+
+  <h3>Workflow klonování</h3>
+  <p>Klon je nová položka odvozená od rodiče. Nese kopii licenčních metadat a odkaz <span class="mono">parent_content_id</span>, který drží genealogii.</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Tlačítko jen když licence dovolí.</b> Klonovat lze pouze tehdy, pokud licenční karta klonování povoluje (<span class="mono">clone_allowed</span>).</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Shrnutí licence před klonem.</b> Co smí, co nesmí, jak se uvádí autor, zda může klon publikovat.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Vznik klonu.</b> Nová položka s odkazem na <span class="mono">parent_content_id</span> a kopií licenčních metadat rodiče.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Klon je výchoze soukromý</b>, ledaže původní licence výslovně povolí okamžité veřejné sdílení klonů.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Úprava → záznam autora úprav.</b> Uloží se autor a čas úpravy. Při veřejné publikaci upraveného klonu musí uživatel znovu potvrdit kompatibilní licenci.</div></div>
+  <div class="phase"><div class="num">6</div><div class="body"><b>Rodič sporný/stažený → dohledání klonů.</b> Systém umí najít klony a nastavit jim <span class="mono">review_required</span> nebo <span class="mono">quarantined</span>.</div></div>
+  <div class="phase"><div class="num">7</div><div class="body"><b>Export mimo Ikaros → povinné metadata.</b> Export musí obsahovat atribuci, licenci a zdrojovou genealogii.</div></div>
+
+  <div class="callout cyan">
+    <div class="t">Copyleft „nákaza" u remixu</div>
+    <p>Pozor na kompatibilitu licencí při remixu. Copyleftové režimy (typicky <span class="mono">BY-SA</span>) se „šíří" na odvozeniny — potvrzení kompatibilní licence v kroku publikace upraveného klonu proto není formalita, ale ochrana proti nekompatibilnímu smíchání. Kromě toho CC licencuje jen majetková práva; osobnostní práva (§ 11 AZ) jsou nepřevoditelná — od uživatelů je nutné brát vlastní licenční ujednání. Detaily viz kapitola <span class="mono">Licence komunitního obsahu</span>.</p>
+  </div>
+
+  <h3>Jak model potkává reálné scénáře</h3>
+  <p>Model není samoúčelný — mapuje se na situace, které na platformě reálně nastanou. Ukázka, jak scénář určuje hodnoty karty a doporučený režim:</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Scénář</th><th>Riziko</th><th>Doporučený režim</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Vlastní bestie bez vazby na systém</td><td><span class="yes">nízké</span></td><td>Do komunitní knihovny po potvrzení autorství a volbě licence.</td></tr>
+      <tr><td>Bestie inspirovaná konkrétním RPG (převzatý statblock)</td><td><span class="partial">střední–vysoké</span></td><td>Systémová licence, nebo přepis na obecný kompatibilní formát.</td></tr>
+      <tr><td>Mapa z online generátoru</td><td><span class="partial">dle podmínek</span></td><td>Uvést zdroj a potvrdit licenci k dalšímu sdílení.</td></tr>
+      <tr><td>Převzatá ilustrace z Pinterestu</td><td><span class="no">vysoké</span></td><td>Nepovolit do knihovny; nanejvýš soukromě, i tam s varováním.</td></tr>
+      <tr><td>AI portrét postavy (nepodobný reálné osobě)</td><td><span class="partial">střední</span></td><td>Povolit s AI štítkem; bez kurátorské kontroly ne pro oficiální použití.</td></tr>
+      <tr><td>AI portrét podle fotografie spoluhráče</td><td><span class="no">vysoké</span></td><td>Vyžadovat souhlas zobrazené osoby; bez něj skrýt.</td></tr>
+      <tr><td>Klon šablony s remixem</td><td><span class="partial">střední</span></td><td>Zachovat genealogii, atribuci původního autora i autora úprav.</td></tr>
+      <tr><td>Autor stáhne původní šablonu</td><td><span class="partial">konflikt důvěry vs. stabilita</span></td><td>Zastavit nové klony; stávající ponechat dle licence, není-li závada.</td></tr>
+      <tr><td>Právní stížnost na položku</td><td><span class="no">vysoké</span></td><td>Dočasně skrýt položku i veřejné klony, posoudit důkaz, informovat uživatele.</td></tr>
+      <tr><td>Komunitní překlad cizího modulu</td><td><span class="no">vysoké</span></td><td>Překlad = zpracování cizího díla; nepovolit bez licence/povolení.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Vazba na strukturovaný export</div>
+    <p>Genealogie (<span class="mono">parent_content_id</span>), atribuce a licence nejsou jen interní metadata — patří i do exportu uživatelských dat. Data Act (2023/2854, účinný od 12.9.2025) posiluje právo na strukturovaný, přenositelný export deníků, postav a světů; export klonu proto musí nést atribuci, licenci a zdrojovou genealogii i mimo platformu. Viz kapitola <span class="mono">Přenositelnost dat a export</span>.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Systémová vazba je gate, ne štítek</div>
+    <p>Pole <span class="mono">rpg_system_id</span> spolu s <span class="mono">third_party_status</span> rozhoduje, zda položka vůbec smí do knihovny. Systémy se dělí na čisté (<span class="mono">dnd5e</span>, <span class="mono">fate</span>, <span class="mono">fae</span> pod CC), podmíněné (<span class="mono">jad</span>, <span class="mono">drd2</span>, <span class="mono">call-of-cthulhu</span>, <span class="mono">drd16</span>, <span class="mono">pi</span>) a ty, kterým se bez přímé licence vyhnout (<span class="mono">drd-plus</span>, <span class="mono">draci-hlidka</span>, <span class="mono">shadowrun</span>, <span class="mono">gurps</span>). Průvodce nahrání musí tento režim vynutit — detaily v kapitole <span class="mono">Systémová matice</span> a v licenčních kapitolách jednotlivých systémů.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Interní rešerše „Projekt Ikaros — právně-informační rešerše v0.6", kap. 11 (Doporučená architektura pravidel, datový model licenčních karet, stavy obsahu, role) a kap. 18 (Detailní scénáře komunitních knihoven, workflow nahrání a klonování).</li>
+    <li>Fact-check ledger v1.0: autorství AI výstupů (MS Praha <span class="mono">10 C 13/2023</span>), AI Act čl. 50 (vymahatelnost 2.8.2026, značení grace do 2.12.2026), CC vs. osobnostní práva (§ 11 AZ), Data Act 2023/2854, systémová matice 14 systémů.</li>
+    <li>Zákon č. 121/2000 Sb. (autorský zákon), § 2, § 5, § 6, § 11; nařízení EU 2024/1689 (AI Act), čl. 50; nařízení EU 2023/2854 (Data Act).</li>
+  </ul>
+</section>

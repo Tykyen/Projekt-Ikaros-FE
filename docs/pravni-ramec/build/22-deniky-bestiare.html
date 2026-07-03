@@ -1,0 +1,295 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část II · RPG systémy a licence</div>
+    <h2>Deníky, bestiáře a licenční model modulů</h2>
+  </div>
+
+  <p class="lead">Deníkový list a bestiář jsou dvě nejcitlivější místa celé platformy. Nejde o abstraktní „obsah systému", ale o konkrétní funkce, které mohou tiše nahradit část pravidlové knihy — a tím překlopit legální podporu systému do neautorizovaného kompendia. Tato kapitola drží jednu linku: <strong>engine je volný, vyjádření není</strong>. Herní mechaniky (postupy, výpočty, hodnoty) autorské právo nechrání; opsané pravidlové texty, tabulky, statbloky, ilustrace a trade dress ano. Z toho plyne architektura modulů a sedmistavový licenční model <span class="mono">A–F/X</span>.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Pracovní rešerše, ne právní stanovisko. Zařazení systémů a stavů je vstup pro právní kontrolu, ne finální audit registrů. U <strong>rozporu mezi tímto textem a podklady rozhoduje fact-check ledger</strong> — proto níže některé závěry opravují původní pracovní verzi (zejména hranice VTT/software u CoC, GURPS a DrD).</p>
+  </div>
+
+  <h3>Deníkový list: spektrum od prázdného formuláře po character builder</h3>
+
+  <p>Deníkový list může být zároveň nejbezpečnější i nejrizikovější část podpory systému. Bezpečný je prázdný obecný formulář, kde si uživatel sám pojmenuje pole a doplní hodnoty. Rizikový je digitální <strong>character builder</strong>, který nahrazuje pravidlovou knihu: nabízí povolání, rasy, schopnosti, kouzla, výpočty, validace, pravidlové texty a exporty jako hotový produkt. Mezi těmito póly leží několik odstupňovaných stavů. Riziko roste s tím, kolik pravidlového obsahu deník <strong>reprodukuje</strong> a nakolik umožňuje vytvořit postavu <strong>bez vlastnictví pravidel</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Typ deníku</th><th>Co obsahuje</th><th>Riziko</th><th>Doporučení</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Obecný prázdný deník</strong></td>
+        <td>Pole: jméno, poznámky, hodnoty, inventář, vlastní tabulky.</td>
+        <td><span class="yes">nízké</span></td>
+        <td>Základní šablona Ikarosu bez cizích názvů.</td>
+      </tr>
+      <tr>
+        <td><strong>Uživatelsky vytvořený deník</strong></td>
+        <td>Uživatel si sám pojmenuje pole podle systému, jen pro vlastní hru.</td>
+        <td><span class="partial">nízké–střední</span></td>
+        <td>Soukromě OK; u veřejného sdílení šablon roste. Právní kontrola názvů polí.</td>
+      </tr>
+      <tr>
+        <td><strong>Komunitní šablona bez textů pravidel</strong></td>
+        <td>Pole odpovídají systému, ale bez popisů a pravidlových textů.</td>
+        <td><span class="partial">střední</span></td>
+        <td>Jasný disclaimer, bez loga, mechaniky vlastními slovy; opatrně u closed systémů, licence vhodná.</td>
+      </tr>
+      <tr>
+        <td><strong>Automatický (chytrý) deník</strong></td>
+        <td>Výpočty, bonusy, úrovně, validace, přepočty.</td>
+        <td><span class="no">střední–vysoké</span></td>
+        <td>Výpočetní logika je volná, ale hlídat, ať netáhne opsané tabulky/texty. U closed systémů opatrně.</td>
+      </tr>
+      <tr>
+        <td><strong>Character builder / compendium</strong></td>
+        <td>Volby z databáze ras, povolání, schopností, kouzel.</td>
+        <td><span class="no">vysoké</span></td>
+        <td>Jen SRD / otevřená licence / přímá licence; bez toho veřejně nespouštět.</td>
+      </tr>
+      <tr>
+        <td><strong>Kopie oficiálního listu / PDF</strong></td>
+        <td>Převzatý layout, grafika, logo, texty.</td>
+        <td><span class="no">vysoké</span></td>
+        <td>Nepoužívat bez povolení. Zakázat veřejné sdílení kopií, mít takedown.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Interní test rizika</div>
+    <p>Pokud uživatel dokáže díky Ikarosu <strong>vytvořit postavu bez vlastnictví pravidel a bez otevřeného SRD</strong>, je riziko vysoké. Pokud Ikaros poskytuje jen prázdný formulář, do kterého si vlastník pravidel přepíše vlastní hodnoty pro soukromou hru, je riziko nízké. Veřejné sdílení šablon riziko vždy zvyšuje — proto ho odděl od soukromého použití.</p>
+  </div>
+
+  <h4>Právní rozdíl mezi polem a pravidlovým obsahem</h4>
+  <p>Pole s názvem „Síla" nebo „Obratnost" je v mnoha fantasy systémech samo o sobě obecné. Problém nastává, když deník obsahuje <strong>přesnou tabulku bonusů, popis schopností, text rasových vlastností, výčet kouzel a pravidlové vysvětlení převzaté z knihy</strong>. Ikaros proto musí rozlišovat pět vrstev, každou v jiném režimu:</p>
+  <ol>
+    <li><strong>Struktura formuláře</strong> — sekce, pole, vztahy. Typicky volná.</li>
+    <li><strong>Výpočetní logika</strong> — bonusy, přepočty, validace. Mechanika, nechráněná.</li>
+    <li><strong>Slovní popis</strong> — pravidlové texty, popisy schopností. <strong>Chráněný</strong>, pokud opsaný.</li>
+    <li><strong>Datová položka</strong> — konkrétní hodnota. Sama o sobě zpravidla nechráněná.</li>
+    <li><strong>Zdroj dat</strong> — odkud pole čerpá (SRD verze, kniha, vlastní tvorba). Rozhoduje o režimu celku.</li>
+  </ol>
+
+  <h3>Bezpečnější deníková architektura</h3>
+  <p>Z těchto vrstev plyne šest konstrukčních zásad, které drží riziko dole a zároveň zachovávají plnou funkci pro vlastní i otevřené systémy:</p>
+  <div class="feat">
+    <h4>Šest zásad návrhu deníku</h4>
+    <ul>
+      <li><b>Neutrální jádro:</b> systémově neutrální pole, sekce, vztahy, hodnoty, zdroje, poznámky, inventář — bez cizí značky.</li>
+      <li><b>Oddělené moduly:</b> každý systémový modul = vlastní karta se zdrojem dat, licencí, autorem a stavem schválení (viz stavy <span class="mono">A–F/X</span>).</li>
+      <li><b>Žádné cizí značky v UI:</b> oficiální názvy a loga se nesmí objevit tak, jako by Ikaros byl autorizovaný produkt, dokud k tomu není smlouva.</li>
+      <li><b>Strojová atribuce:</b> u otevřených licencí uchovávat co je převzato, z jaké verze SRD, pod jakou licencí a kdy aktualizováno.</li>
+      <li><b>Closed = jen prázdné/komunitní:</b> u closed systémů povolit nejdřív jen prázdnou nebo komunitní šablonu bez pravidlových textů a bez hromadné databáze.</li>
+      <li><b>Moderace importů:</b> uživatelský import a sdílení šablon musí mít moderaci, hlášení porušení, dočasné skrytí a auditní log.</li>
+    </ul>
+  </div>
+
+  <h3>Bestiáře a statbloky</h3>
+  <p>Bestiář je citlivější než deník, protože ještě snáz nahrazuje část knihy. Cizí bestie nejsou jen čísla — často nesou <strong>unikátní jméno, settingový význam, popis, ikonickou podobu, ilustraci, schopnosti, tabulkový formát a vyvážení</strong>. I když jednotlivé číselné hodnoty samy o sobě nemusí být autorským dílem, veřejné shromáždění statblocků může fungovat jako neautorizované kompendium (a při rozsahu i jako neoprávněné vytěžení databáze — viz část <em>Databáze, anti-scraping a AI trénink</em>).</p>
+
+  <table>
+    <thead>
+      <tr><th>Scénář</th><th>Příklad</th><th>Riziko</th><th>Doporučení</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Vlastní bestie bez cizí značky</strong></td>
+        <td>Nový tvor pro vlastní svět Ikarosu.</td>
+        <td><span class="yes">nízké</span></td>
+        <td>Bezpečný základ; vlastní terminologie a ilustrace.</td>
+      </tr>
+      <tr>
+        <td><strong>Vlastní bestie s kompatibilním statblockem</strong></td>
+        <td>Nový tvor se statistikami pro systém s otevřenou licencí.</td>
+        <td><span class="partial">střední</span></td>
+        <td>Jen v rozsahu licence, s atribucí.</td>
+      </tr>
+      <tr>
+        <td><strong>Převod obecné mytologické bytosti</strong></td>
+        <td>Vlkodlak, upír, goblin, drak.</td>
+        <td><span class="partial">střední</span></td>
+        <td>Nepřebírat konkrétní cizí text, schopnosti a trade dress.</td>
+      </tr>
+      <tr>
+        <td><strong>Převod cizí ikonické bestie</strong></td>
+        <td>Beholder, mind flayer, pojmenovaná entita ze Shadowrunu/CoC.</td>
+        <td><span class="no">vysoké</span></td>
+        <td>Typicky nepoužívat bez licence, zvlášť není-li v SRD (Product Identity).</td>
+      </tr>
+      <tr>
+        <td><strong>Kopie statblocku z pravidel</strong></td>
+        <td>Čísla + text + schopnosti přímo z knihy.</td>
+        <td><span class="no">vysoké</span></td>
+        <td>Nepoužívat bez licence.</td>
+      </tr>
+      <tr>
+        <td><strong>Veřejná databáze všech monster systému</strong></td>
+        <td>Kompletní kompendium bestiáře.</td>
+        <td><span class="no">velmi vysoké</span></td>
+        <td>Pouze SRD / open license nebo přímá dohoda.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Model „statblock adaptér" a převody mezi systémy</h4>
+  <p>Ikaros může mít vlastní autorský bestiář, právně oddělený od cizích systémů. Doporučený vzor je <strong>statblock adaptér</strong>: jádro bestie je vlastní text Ikarosu, systémový modul jen mapuje obecné parametry na daný systém. U otevřených systémů modul unese víc dat; u closed systémů zůstává export minimalistický a hodnoty si podle vlastní zakoupené příručky doplní uživatel.</p>
+  <p>Převod cizí nestvůry do jiného systému je citlivý i mechanicky: nepřevádí se jen čísla, ale <strong>settingová identita, jméno, popis, schopnosti a výrazné prvky cizího světa</strong>. Interní proces proto musí rozlišit čtyři situace — a jen ta poslední je zakázaná pro veřejné sdílení:</p>
+  <ul>
+    <li><strong>(a) vlastní tvorba</strong> inspirovaná žánrem — volné;</li>
+    <li><strong>(b) převod veřejně licencovaného SRD obsahu</strong> — v rozsahu licence + atribuce;</li>
+    <li><strong>(c) převod obsahu z fan policy</strong> — jen v přesném rozsahu policy, typicky nekomerčně;</li>
+    <li><strong>(d) převod closed obsahu bez licence</strong> — <span class="pill">nesdílet veřejně</span> ani když uživatel napsal hodnoty „vlastními slovy".</li>
+  </ul>
+
+  <h3>Hranice VTT a softwaru: kde deník/bestiář naráží na policy</h3>
+  <p>U tolerovaných systémů (fan policy, bez SRD) nerozhoduje jen <em>co</em> modul obsahuje, ale i <em>jakou formou</em> to Ikaros dělá. Právě zde ledger opravuje původní pracovní verzi — hranice mezi „web character generator" a „VTT/software" je u některých vydavatelů výslovná a rozhoduje o tom, zda modul vůbec může běžet ve stavu <span class="mono">E — fan policy</span>, nebo spadá do <span class="mono">X</span>:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Call of Cthulhu (Chaosium)</h4>
+      <ul>
+        <li>Fan Material Policy (13. 10. 2023) <strong>výslovně vylučuje VTT, software a apps</strong>.</li>
+        <li><strong>Web-based automatický deník je výjimka</strong> — povolen zdarma; soukromé CoC deníky bez veřejného kompendia OK.</li>
+        <li>Alternativa: d100 engine pod <strong>ORC / BRP</strong> bez CoC brandingu.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>GURPS (Steve Jackson Games)</h4>
+      <ul>
+        <li><strong>Automatizovaný engine = „computer game"</strong> mimo fan policy → nutná licence.</li>
+        <li>Mobilní apps se značkami zakázány; responzivní web = šedá zóna.</li>
+        <li>„Powered by GURPS" = <strong>profesionální licence</strong>, ne fan policy.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Dračí doupě / DrD 1.6 / DrD+ (ALTAR)</h4>
+      <ul>
+        <li><strong>Engine ano</strong> (mechaniky nechráněné) + prázdné šablony + referenční název s ® (Dračí doupě®, DrD™, ALTAR®).</li>
+        <li><strong>Obsah ne:</strong> žádné verbatim texty, statbloky, tabulky ani ilustrace.</li>
+        <li>DrD+ nemá SRD — jen tolerance; pilot běží „naprázdno" (bez obsahu). Povinný disclaimer.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Shadowrun (Topps / Catalyst / Microsoft)</h4>
+      <ul>
+        <li>Žádný OGL/SRD; komunitní publikace jen přes <strong>Holostreets</strong> na DriveThruRPG (ne web/VTT/software).</li>
+        <li>Digitální/videoherní práva drží <strong>Microsoft</strong> → web app v šedé zóně, VTT jen přes přímé partnerství.</li>
+        <li>Bez licence: jen soukromé prázdné šablony, žádný bestiář/gear databáze.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Provozní pravidlo</div>
+    <p>„Automatizace" (validace, přepočty, generování postavy) je právě to, co u fan-policy systémů překlápí web-nástroj do kategorie <strong>software/computer game mimo policy</strong>. U těchto systémů drž modul co nejblíž k <strong>prázdné šabloně</strong> (stav <span class="mono">C</span>) a chytré funkce zapínej jen tam, kde je kryje SRD/open licence (<span class="mono">D</span>) nebo přímá smlouva (<span class="mono">F</span>).</p>
+  </div>
+
+  <h3>Licenční model modulů: stavy A–F/X</h3>
+  <p class="lead">Základní provozní pravidlo: <strong>žádná podpora cizího systému bez licenční karty</strong>. Licenční karta je krátký interní dokument, který říká, odkud modul čerpá, kdo ho schválil, co smí a nesmí obsahovat, jak se označuje, jak se aktualizuje a kdo odpovídá za takedown. Bez tohoto procesu se riziko rozleze do kódu, databáze, UI, marketingu i komunitních příspěvků.</p>
+
+  <table>
+    <thead>
+      <tr><th>Stav</th><th>Význam</th><th>Co je povoleno</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>A</strong> — vlastní / obecný</td>
+        <td>Bez cizí značky a cizích dat.</td>
+        <td>Plná funkce Ikarosu, vlastní texty a data.</td>
+      </tr>
+      <tr>
+        <td><strong>B</strong> — reference only</td>
+        <td>Cizí systém je jen zmíněn jako možný účel.</td>
+        <td>Žádné logo, žádný obsah pravidel, disclaimer.</td>
+      </tr>
+      <tr>
+        <td><strong>C</strong> — blank sheet</td>
+        <td>Prázdný deník pro uživatele.</td>
+        <td>Pole bez pravidlových textů; uživatel doplňuje.</td>
+      </tr>
+      <tr>
+        <td><strong>D</strong> — open license</td>
+        <td>Modul vychází z CC / ORC / SRD / licence.</td>
+        <td>Jen licencovaný obsah, atribuce, evidence verzí.</td>
+      </tr>
+      <tr>
+        <td><strong>E</strong> — fan policy</td>
+        <td>Modul vychází z fan policy.</td>
+        <td>Jen v přesném rozsahu policy, typicky nekomerčně, bez VTT/app pokud je policy vylučuje.</td>
+      </tr>
+      <tr>
+        <td><strong>F</strong> — direct license</td>
+        <td>Písemná smlouva s držitelem práv.</td>
+        <td>Podle smlouvy; evidovat reporting a limity.</td>
+      </tr>
+      <tr>
+        <td><strong>X</strong> — blocked</td>
+        <td>Neověřený nebo zakázaný obsah.</td>
+        <td>Nevydávat; případně jen soukromé poznámky bez sdílení.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Mapování na 14 systémů</div>
+    <p>Tři <strong>čisté piloty</strong> (CC licence) běží ve stavu <span class="mono">D</span>: <span class="pill green">dnd5e</span> <span class="pill green">fate</span> <span class="pill green">fae</span>. Podmíněné systémy kombinují <span class="mono">C/D/E</span> podle rozsahu: <span class="pill">jad</span> (F/E), <span class="pill">drd2</span> (posvěcený SRD), <span class="pill">coc</span> (E — web-deník ano, VTT/app <span class="mono">X</span>), <span class="pill">drd16</span> a <span class="pill">pi</span> (C + referenční název). Systémy bez přímé licence drž v <span class="mono">C</span> nebo <span class="mono">X</span>: <span class="pill">drd-plus</span>, <span class="pill">draci-hlidka</span>, <span class="pill">shadowrun</span>, <span class="pill">gurps</span>. Detail per systém viz kapitola <em>Karty 14 systémů</em>.</p>
+  </div>
+
+  <h4>Povinná pole licenční karty</h4>
+  <div class="feat">
+    <h4>Co musí karta modulu vždy obsahovat</h4>
+    <ul>
+      <li><b>Název systému a verze</b> — např. <span class="mono">SRD 5.2.1</span>, <span class="mono">JaD komunitní licence 2025-12-02</span>, <span class="mono">Chaosium Fan Material Policy 2023-10-13</span>.</li>
+      <li><b>Držitel práv</b>, vydavatel a kontaktní osoba.</li>
+      <li><b>Zdroj práv</b> — open licence / fan policy / smlouva / vlastní tvorba / uživatelská šablona.</li>
+      <li><b>Povolený rozsah</b> — název, terminologie, pravidla, obrázky, loga, statbloky, deníky, exporty, API, AI, VTT.</li>
+      <li><b>Zakázaný rozsah</b> — kopie textů, trade dress, loga, kompletní kompendium, monetizace, retail distribuce, app/VTT.</li>
+      <li><b>Disclaimer a atribuce</b> — povinně v češtině, případně i anglicky.</li>
+      <li><b>Stav schválení</b> — autor modulu, právní kontrola, technická kontrola, datum vydání, datum revize.</li>
+      <li><b>Takedown</b> — kontakt a postup odstranění obsahu.</li>
+    </ul>
+  </div>
+
+  <h3>Uživatelský obsah: co platforma umožní hromadně publikovat</h3>
+  <p>Právně nejrizikovější není jen to, co vytvoří tým Ikarosu, ale co platforma <strong>umožní hromadně publikovat</strong> uživatelům — šablony, postavy, bestie, překlady, převody, homebrew. Podmínky užití proto musí uživatelům zakázat nahrávat cizí chráněný obsah bez práv, umožnit Ikarosu obsah skrýt, řešit opakované porušování a uchovávat auditní stopu. Každý typ obsahu má doporučený moderační stav:</p>
+
+  <table>
+    <thead>
+      <tr><th>Typ uživatelského obsahu</th><th>Doporučený stav</th><th>Moderace</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Soukromá poznámka k vlastní hře</td><td><span class="yes">tolerovat</span></td><td>Bez veřejného sdílení; řešit až po hlášení.</td></tr>
+      <tr><td>Veřejná šablona deníku</td><td><span class="partial">schvalovat</span></td><td>Kontrola cizích textů, log, názvů a rozsahu.</td></tr>
+      <tr><td>Veřejný bestiář</td><td><span class="partial">schvalovat přísně</span></td><td>Kontrola originality a licencí.</td></tr>
+      <tr><td>Překlad pravidel</td><td><span class="no">blokovat bez licence</span></td><td>Překlady jsou odvozená díla — potřebují souhlas autora.</td></tr>
+      <tr><td>Export oficiálního PDF/listu</td><td><span class="no">blokovat</span></td><td>Vysoké riziko kopií; obcházení paywallu / pirátské kopie.</td></tr>
+      <tr><td>Odkaz na oficiální zdroj</td><td><span class="yes">povolit</span></td><td>Bez obcházení paywallu nebo pirátských kopií.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Pozor: UGC není public domain</div>
+    <p>Uživatelský obsah je chráněn <strong>automaticky</strong> (Bernská úmluva) — nepředpokládat, že je volný. IP delikty se řídí <em>lex loci protectionis</em> (Řím II čl. 8) a nelze je změnit volbou práva. Od uživatelů proto brát vlastní licenční ujednání; CC licencuje jen majetková práva, osobnostní práva (<span class="mono">§ 11 AZ</span>) jsou nepřevoditelná. Detail viz část <em>Komunitní obsah, klonování a AI</em>.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">7</div><div class="l">stavů modulu (A–F + X) — každý cizí systém má právě jeden</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">vrstev deníku (struktura · logika · popis · data · zdroj), každá v jiném režimu</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">čisté CC piloty (dnd5e · fate · fae) běží ve stavu D</div></div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení do implementace</div>
+    <p>Datový model deníku i bestiáře postav tak, aby <strong>zdroj dat a licenční stav byly first-class atribut</strong> každé položky (ne dodatečná poznámka). Modul bez platné licenční karty nesmí jít veřejně publikovat — gate vynucený v aplikaci, ne jen v pravidlech. Návaznost na role a workflow viz kapitola <em>Datový model · stavy · role · workflow</em>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Fact-check ledger v1.0 (červenec 2026) — sekce D (systémová matice 14 systémů) a B (VTT hranice CoC/GURPS/DrD, UGC/Bernská, CC vs. osobnostní práva).</li>
+    <li>Projekt Ikaros — RPG licence v0.4, pracovní rešerše: kap. 5 (deníkové listy), 6 (bestiáře a statbloky), 9 (licenční karty, stavy modulu, uživatelský obsah).</li>
+    <li>Chaosium Fan Material Policy (13. 10. 2023); Steve Jackson Games online policy; ALTAR referenční užití ® ochranných známek; Holostreets guidelines (Topps / Catalyst / InMediaRes).</li>
+  </ul>
+</section>

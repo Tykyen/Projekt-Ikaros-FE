@@ -1,0 +1,294 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Duševní vlastnictví · Ochrana obsahu a katalogů</div>
+    <h2>Autorské a databázové právo Ikara</h2>
+  </div>
+
+  <p class="lead">Ikaros stojí na třech vrstvách chráněného obsahu: vlastním díle platformy (texty, kód, grafika), uživatelském obsahu (UGC) a systematicky uspořádaných knihovnách. Každá vrstva má jiný právní režim, jinou dobu ochrany i jiného nositele práv. Tato kapitola rozebírá, co je chráněno automaticky, co vzniká až smluvně a jak databázové právo brání hromadnému vytěžení komunitních katalogů. Jde o rešeršní přehled, nikoli o právní stanovisko.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Text shrnuje zdrojovou rešerši a fact-check ledger. Neurčuje závazně nositele práv v konkrétních smlouvách Ikara — to vyžaduje individuální posouzení advokátem. Uvedené paragrafy odkazují na autorský zákon (č. 121/2000 Sb., dále <span class="mono">AZ</span>) a občanský zákoník (č. 89/2012 Sb., dále <span class="mono">OZ</span>) v konsolidovaném znění.</p>
+  </div>
+
+  <h3>Co autorské právo nechrání</h3>
+
+  <p>Autorský zákon výslovně vyjímá z ochrany samotný <strong>námět, myšlenku, postup, princip, metodu, objev, vědeckou teorii, matematický a obdobný vzorec, statistický graf</strong> a podobný předmět sám o sobě. Pro Ikaros je to klíčové: právo neuzamkne obecnou ideu „české RPG platformy", ale může chránit konkrétní podobu, v jaké byla vytvořena.</p>
+
+  <table>
+    <thead>
+      <tr><th>Nechráněný / slabě chráněný prvek</th><th>Co to znamená prakticky</th><th>Jak snížit riziko</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Obecný nápad „české RPG web"</td>
+        <td>Jiný subjekt může vytvořit českou RPG platformu, pokud nepřevezme chráněné prvky a nezneužije důvěrné informace.</td>
+        <td>Budovat značku, komunitu, dokumentovanou historii a ochrannou známku.</td>
+      </tr>
+      <tr>
+        <td>Kombinace funkcí (stůl, wiki, postavy, mapy, chat)</td>
+        <td>Samotné složení funkcí je spíše produktová strategie než dílo. Konkurence může vytvořit vlastní kombinaci.</td>
+        <td>Chránit konkrétní UX, texty, UI, datové modely, kód, workflow a neveřejnou roadmapu.</td>
+      </tr>
+      <tr>
+        <td>Herní mechaniky a obecné principy pravidel</td>
+        <td>Hod kostkou, iniciativa, statblock, životy, úroveň nebo povolání bývají obecný princip. Chráněny mohou být konkrétní texty, grafika, názvy, setting a originální vyjádření.</td>
+        <td>Nepřebírat texty pravidel. U cizích systémů řešit licence/fan policy. Vlastní mechaniky popsat vlastním jazykem.</td>
+      </tr>
+      <tr>
+        <td>Veřejně publikovaná roadmapa</td>
+        <td>Jakmile je roadmapa bez omezení veřejná, obtížně se bude tvrdit, že jde o obchodní tajemství.</td>
+        <td>Dělit veřejnou a důvěrnou verzi; interní verzi předávat jen pod NDA.</td>
+      </tr>
+      <tr>
+        <td>Běžné webové prvky, fakta o trhu, nezisková filozofie</td>
+        <td>Registrace, profil, notifikace, komentáře, štítky, vyhledávání, role — i existence Roll20, Foundry, World Anvil — nejsou autorským dílem. Hodnota „od fanoušků pro fanoušky" není právní monopol.</td>
+        <td>Chránit vlastní provedení (design, architektura, kód) a značku; hlídat parazitování a záměnu.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Klíčové rozlišení</div>
+    <p>Inspirace není automaticky porušení práva. Cílem není zabránit existenci konkurence, ale tomu, aby někdo po přístupu k materiálům Ikara použil neveřejné informace, konkrétní dokumentaci, kód, grafiku, texty, databázi nebo značku k vlastnímu komerčnímu produktu. Kopírování konkrétního vyjádření, neoprávněné převzetí databáze, použití důvěrného know-how, parazitování na značce nebo porušení NDA už problém být může.</p>
+  </div>
+
+  <h3>Co je chráněno automaticky ze zákona</h3>
+
+  <p>Autorské právo vzniká <strong>okamžikem, kdy je dílo vyjádřeno v objektivně vnímatelné podobě</strong> — bez registrace. Registrace se hodí u ochranné známky; datovaný důkazní archiv je zásadní pro případ sporu (verzované PDF/DOCX, exporty, commity, historie úprav).</p>
+
+  <div class="feat">
+    <h4>3.1 · Texty, manuály, dokumentace</h4>
+    <ul>
+      <li>Vize platformy, manuály, nápovědy, onboarding, popisy funkcí, interní metodiky a strategické dokumenty — pokud jsou původním tvůrčím vyjádřením.</li>
+      <li>Chráněn je i konkrétní text a jeho tvůrčí uspořádání (identita, DNA, čtyři pilíře, fáze vývoje, governance), ne obecná informace, že platforma má účty nebo mapy.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>3.2 · Kód, frontend, backend, koncepční materiály</h4>
+    <ul>
+      <li>Počítačový program je chráněn jako dílo literární, včetně přípravných koncepčních materiálů, bez ohledu na formu vyjádření.</li>
+      <li>Zákon však výslovně říká, že <strong>myšlenky a principy, na nichž je prvek programu založen, chráněny nejsou.</strong> Chráníme zdrojový kód, strukturu komponent, migrace, skripty a specifikace — ne obecný princip „uživatel si vytvoří svět a v něm postavy".</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>3.3 · Grafika, logo, UI, vizuální styl</h4>
+    <ul>
+      <li>Logo, ikony, ilustrace, screenshoty a originální UI návrhy mohou být autorská díla.</li>
+      <li>Pozor na rozdíl: autorské právo k logu jako grafickému dílu <strong>neznamená automaticky silnou ochranu názvu</strong> v obchodním styku — k tomu slouží ochranná známka (viz část o právech k označení).</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>3.4 · Obchodní tajemství a know-how</h4>
+    <ul>
+      <li>Neveřejná roadmapa, technická architektura, datový model, partner strategy, interní analytika, donation/pricing model, know-how kolem „českého příkopu".</li>
+      <li>Obchodní tajemství (§ 504 OZ) nevzniká samo tím, že něco považuješ za důležité — je nutné prokázat, že šlo o informace neveřejné, hodnotné, identifikovatelné a <strong>aktivně chráněné</strong> (režim označování, omezení přístupu, NDA, log přístupů, oddělení veřejné a důvěrné verze). Znaky obchodního tajemství rozebírá samostatná kapitola.</li>
+    </ul>
+  </div>
+
+  <h3>Databáze a knihovny — dvojí ochrana</h3>
+
+  <p>Ikaros plánuje mnoho databázových vrstev: světy, postavy, bestiáře, předměty, kouzla, šablony, mapy, kalendáře, vztahové sítě, komunitní knihovny a generátorové tabulky. Zákon definuje databázi jako <strong>soubor nezávislých děl, údajů nebo jiných prvků systematicky nebo metodicky uspořádaných a individuálně přístupných</strong>. Databáze může být chráněna dvojím způsobem:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Jako autorské dílo</h4>
+      <p>Pokud je <strong>výběr nebo uspořádání</strong> obsahu výsledkem vlastní tvůrčí činnosti pořizovatele. Chrání kreativní strukturu katalogu.</p>
+    </div>
+    <div class="card">
+      <h4>Zvláštním právem pořizovatele</h4>
+      <p>Pokud pořízení, ověření nebo předvedení obsahu představuje <strong>kvalitativně nebo kvantitativně podstatný vklad</strong>. Chrání investici — nezávisle na tvůrčí originalitě.</p>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Doba ochrany zvláštního práva</div>
+    <p>Právo pořizovatele databáze trvá <strong>15 let</strong> od pořízení, resp. od prvního zpřístupnění podle situace. Každý podstatný nový vklad (doplnění, ověření) může běh lhůty pro danou část obnovit. Toto právo je pro Ikaros významné hlavně proti hromadnému scrapingu, exportu veřejných knihoven a systematickému vytěžování obsahu.</p>
+  </div>
+
+  <p>Zásadní rozlišení: databázové právo Ikara chrání investici do katalogu a struktury, ale <strong>Ikaros tím automaticky nezískává autorská práva k jednotlivým položkám uživatelů.</strong> Databázové právo a autorské právo k položce jsou dvě různé věci.</p>
+
+  <table>
+    <thead>
+      <tr><th>Zvláštní právo chrání</th><th>Zvláštní právo NEchrání</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Investici do pořízení, ověření a předvedení databáze.</td>
+        <td>Samotné nápady uživatelů.</td>
+      </tr>
+      <tr>
+        <td>Systematické uspořádání katalogů, metadat, vazeb, tagů a přístupů.</td>
+        <td>Autorská práva k jednotlivým položkám, je-li jejich autorem uživatel.</td>
+      </tr>
+      <tr>
+        <td>Zákaz užití celé databáze nebo podstatné části bez oprávnění.</td>
+        <td>Zákaz běžného přiměřeného užití <strong>nepodstatných</strong> částí oprávněným uživatelem.</td>
+      </tr>
+      <tr>
+        <td>Ochranu proti opakovanému systematickému vytěžování nepodstatných částí, pokud poškozuje oprávněné zájmy pořizovatele.</td>
+        <td>Právo ignorovat GDPR nebo licenční sliby dané uživatelům.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Anti-scraping režim</h3>
+
+  <p>Podmínky Ikara by měly výslovně zakázat automatizované vytěžování veřejných knihoven mimo běžné uživatelské funkce — scraping, crawling nad rámec běžných vyhledávačů, hromadné exporty, tvorbu konkurenčních databází, trénink modelů z komunitního obsahu bez souhlasu a obcházení technických limitů. Zároveň musí zůstat povolené legitimní užití: běžné vyhledávání, klonování jednotlivých položek dle licence a export vlastního obsahu.</p>
+
+  <table>
+    <thead>
+      <tr><th>Činnost</th><th>Doporučený režim</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Klon jedné položky podle licence</td><td><span class="yes">povolit</span> přes oficiální funkci</td></tr>
+      <tr><td>Export vlastního světa</td><td><span class="yes">povolit</span> vlastníkovi v rozsahu vlastních práv a práv členů</td></tr>
+      <tr><td>Hromadný export veřejné knihovny</td><td><span class="no">zakázat</span> bez zvláštního souhlasu</td></tr>
+      <tr><td>Scraping katalogu botem</td><td><span class="no">zakázat</span>; rate-limit; technická ochrana</td></tr>
+      <tr><td>Použití knihovny k tréninku AI</td><td><span class="partial">defaultně zakázat</span>; povolit jen u obsahu s výslovně zvolenou AI/TDM licencí</td></tr>
+      <tr><td>Archivace pro právní důkaz</td><td><span class="yes">povolit</span> provozovateli v retenčním režimu</td></tr>
+    </tbody>
+  </table>
+
+  <h3>TDM výjimka a výhrada práv</h3>
+
+  <p>Autorský zákon obsahuje zákonnou licenci k rozmnožování díla pro účely <strong>automatizované analýzy textů nebo dat</strong> (text and data mining, TDM). Obecně umožňuje zhotovit rozmnoženinu za účelem TDM v digitální podobě a uchovat ji jen po dobu nezbytnou pro analýzu. U obecné (nevědecké) TDM výjimky přitom existuje možnost <strong>výhrady práv</strong> — nositel práv může strojově čitelně vyloučit své dílo z tohoto užití.</p>
+
+  <div class="callout gold">
+    <div class="t">Doporučený default do podmínek</div>
+    <p>Nahráním obsahu do Ikara uživatel <strong>nedává</strong> automaticky souhlas k použití svého obsahu pro trénink generativních modelů třetích stran. Pro interní vyhledávání, bezpečnost a provozní indexaci musí existovat samostatná platformní licence a odpovídající GDPR právní základ. Ikaros by měl u komunitního obsahu uplatnit výhradu práv vůči obecné TDM výjimce a odlišit jednotlivé účely.</p>
+  </div>
+
+  <p>Praktický závěr: komunitní obsah by neměl být automaticky dostupný pro trénink AI. Před jakýmkoli užitím pro trénink, ladění, embeddingy nebo analytiku je nutné rozlišit, zda jde o interní vyhledávací index, bezpečnostní detekci, doporučování, nebo skutečné učení modelu — každý účel má jiná rizika a jiný právní základ.</p>
+
+  <h3>Co samo o sobě nestačí — smluvní vrstva</h3>
+
+  <p>Právní chyba u komunitních projektů často nevzniká u konkurence, ale <strong>uvnitř projektu</strong>: není jasné, komu patří kód, grafika, texty, databáze, doména, účty a práva k budoucímu použití platformy jako šablony. To je nutné vyřešit dřív, než do projektu vstoupí firma, investor nebo právnická osoba.</p>
+
+  <div class="callout gold">
+    <div class="t">Oprava vůči zdroji — dílo na objednávku</div>
+    <p>Zdrojová rešerše zjednodušuje režim děl na objednávku. Správné rozlišení dle ledgeru:</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>§ 58 odst. 7 AZ — fikce zaměstnaneckého díla</h4>
+      <p>Platí <strong>jen</strong> pro <strong>počítačový program, databázi a kartografické dílo</strong> vytvořené na objednávku. Objednatel se považuje za zaměstnavatele a vykonává majetková práva. I tak je prakticky nutná písemná smlouva — musí být jasné, co bylo objednáno, komu patří zdrojové soubory, zda lze dílo upravovat, převést na právnickou osobu, licencovat a použít jako šablonu.</p>
+    </div>
+    <div class="card">
+      <h4>§ 61 AZ — ostatní díla na objednávku</h4>
+      <p>U <strong>ostatních</strong> děl (logo, ilustrace, texty od copywritera) platí: autor poskytl licenci jen <strong>k účelu vyplývajícímu ze smlouvy</strong>, není-li sjednáno jinak. Užití nad tento účel vyžaduje samostatnou licenční smlouvu. Logo dodané „pro web" tak nemusí pokrývat ochrannou známku, merch, partnerské prezentace ani vklad do budoucí právnické osoby.</p>
+    </div>
+  </div>
+
+  <div class="feat">
+    <h4>Spoluautoři a dobrovolníci</h4>
+    <ul>
+      <li>Dobrovolník, moderátor nebo člen komunity může vytvořit chráněný příspěvek (text, ilustrace, šablona, kód, překlad, bestie, mapa, generátorová tabulka). <strong>Bez jasné licence zůstává autorem</strong> a Ikaros má jen nejasné oprávnění k použití.</li>
+      <li>To je zásadní zejména pro globální knihovny, které mají být klonovatelné a opakovaně použitelné stovkami hráčů — proto je nutné brát od uživatelů vlastní licenční ujednání k vloženému obsahu (volby soukromé/veřejné/globální knihovny, uvedení autora, mazání, klonování, sublicence).</li>
+    </ul>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Smluvní oblast</th><th>Co musí být ve smlouvě</th><th>Riziko bez smlouvy</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Vývojář</td>
+        <td>Specifikace díla, předání zdrojů, právo úprav, licence/převod (§ 58/7), použití v právnické osobě, mlčenlivost.</td>
+        <td>Dodavatel zpochybní rozsah užití, nepředá zdroje nebo použije know-how jinde.</td>
+      </tr>
+      <tr>
+        <td>Grafik / ilustrátor</td>
+        <td>Výhradní/nevýhradní licence, použití v ochranné známce, webu, marketingu, PDF, šablonách a úpravách (§ 61 — nad účel jen s licencí).</td>
+        <td>Logo/UI nepůjde bezpečně registrovat, měnit ani převést.</td>
+      </tr>
+      <tr>
+        <td>Copywriter / editor</td>
+        <td>Licence k textům, úpravám, překladům, publikaci, exportu a začlenění do dokumentace.</td>
+        <td>Nejasné užití manuálů, podmínek, nápovědy a prezentací.</td>
+      </tr>
+      <tr>
+        <td>Komunitní autor</td>
+        <td>Licence k vloženému obsahu, volby soukromé/veřejné/globální knihovny, uvedení autora, mazání, klonování.</td>
+        <td>Nelze bezpečně sdílet, klonovat ani kurátorovat obsah.</td>
+      </tr>
+      <tr>
+        <td>Partner / investor</td>
+        <td>NDA, non-use, účel předání, zákaz konkurenčního použití důvěrných informací, smluvní pokuta, vrácení/smazání materiálů.</td>
+        <td>Partner získá know-how a tvrdí, že šlo o volně předanou inspiraci.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Výhradní licence vyžaduje písemnou formu</div>
+    <p>Sjednání výhradní licence vyžaduje písemnou formu; bez písemného souhlasu nabyvatele nevznikne třetí osobě platná (pod)licence. U klíčových děl (logo, kód, jádro platformy) proto trvat na písemné, výslovné a rozsahem vymezené licenci — ústní dohoda u výhradních práv neobstojí.</p>
+  </div>
+
+  <h3>Uživatelský obsah (UGC) — chráněn automaticky</h3>
+
+  <p>Obsah, který na platformu nahrají uživatelé (deníky, postavy, bestie, mapy, prompty), je <strong>autorské dílo od okamžiku vytvoření</strong> — bez registrace. Dle Bernské úmluvy vzniká ochrana automaticky ve všech členských státech; Ikaros proto <strong>nesmí předpokládat, že jde o volné dílo (public domain)</strong> jen proto, že je bez uvedeného autora.</p>
+
+  <div class="callout cyan">
+    <div class="t">Kolizní pravidlo — právo použitelné na porušení IP</div>
+    <p>Podle nařízení Řím II (čl. 8) se právo použitelné na porušení práv duševního vlastnictví řídí zásadou <span class="mono">lex loci protectionis</span> (právem státu, pro který se ochrana uplatňuje) — toto pravidlo <strong>nelze změnit volbou práva</strong> v podmínkách. U českých uživatelů se tak porušení IP posuzuje podle českého práva bez ohledu na doložku o rozhodném právu.</p>
+  </div>
+
+  <h3>Creative Commons a hranice převoditelnosti</h3>
+
+  <p>Umožňuje-li Ikaros uživatelům publikovat obsah pod licencemi Creative Commons (CC), je nutné znát meze CC v českém právu:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>CC licencuje jen majetková práva</h4>
+      <p>Creative Commons pracuje výhradně s <strong>majetkovými</strong> autorskými právy (rozmnožování, sdělování veřejnosti, úpravy). Uděluje k nim veřejnou licenci — nepřevádí je.</p>
+    </div>
+    <div class="card">
+      <h4>Osobnostní práva zůstávají</h4>
+      <p>Osobnostní práva autora (§ 11 AZ — právo na autorství, nedotknutelnost díla) jsou v ČR <strong>nepřevoditelná a nelze se jich vzdát</strong>. CC je nemůže licencovat. I u CC obsahu tak přetrvává právo na uvedení autora a ochrana proti znehodnocujícím zásahům.</p>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Copyleft „nákaza" u BY-SA</div>
+    <p>U licencí typu <span class="mono">CC BY-SA</span> platí copyleft: odvozená díla musí být šířena pod stejnou (kompatibilní) licencí. Ikaros musí u komunitních knihoven hlídat kompatibilitu licencí — smíchání nekompatibilních CC licencí v jednom odvozeném díle je porušením. Od uživatelů proto brát vlastní, jasně vymezené licenční ujednání a u klonovatelných položek evidovat zvolenou licenci.</p>
+  </div>
+
+  <h3>Autorství čistě AI výstupů</h3>
+
+  <p>Ikaros generuje část obsahu pomocí AI (bestiáře, portréty, „chat za postavu"). U čistě AI výstupu je nutné vzít v úvahu jeho autorskoprávní status.</p>
+
+  <div class="callout gold">
+    <div class="t">MS Praha 10 C 13/2023 — čistě AI výstup není dílo</div>
+    <p>Městský soud v Praze (sp. zn. 10 C 13/2023) posoudil čistě AI generovaný obrázek: <strong>nejde o autorské dílo</strong>, protože autorem může být jen fyzická osoba (§ 5 AZ) a samotný prompt je pouze námětem/podnětem, nikoli tvůrčím vyjádřením ve smyslu § 2 AZ. Takový výstup je <strong>volný</strong> — nemá autora ani majetkové ochrany plynoucí z autorství.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Důsledky pro Ikaros</div>
+    <p><strong>Nepřiřazovat autorství</strong> čistě AI výstupu uživateli ani platformě — v podmínkách klonování a sdílení to ošetřit tak, aby platforma nenárokovala autorská práva k obsahu, který jimi chráněn není. Zároveň dodržet <strong>AI Act čl. 50</strong>: strojově značit AI generovaný obsah (bestiáře, portréty) a informovat, že chat za postavu řídí AI. Databázová a smluvní vrstva (uspořádání katalogu, podmínky užití) chrání knihovnu jako celek i tehdy, když jednotlivá AI položka autorskoprávně chráněná není.</p>
+  </div>
+
+  <h3>Souhrn — vrstvy ochrany Ikara</h3>
+
+  <div class="stats">
+    <div class="stat"><div class="n">0</div><div class="l">registrací nutných — autorské právo vzniká vznikem díla</div></div>
+    <div class="stat"><div class="n">15</div><div class="l">let ochrany zvláštního práva pořizovatele databáze</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">režimy díla na objednávku: § 58/7 vs. § 61</div></div>
+    <div class="stat"><div class="n">§ 11</div><div class="l">osobnostní práva — nepřevoditelná, mimo dosah CC</div></div>
+  </div>
+
+  <ul class="sources">
+    <li>Autorský zákon č. 121/2000 Sb. — § 2, § 5, § 11 (osobnostní práva), § 58 odst. 7 (program/databáze/kartografie na objednávku), § 61 (ostatní díla na objednávku), § 88–94 (zvláštní právo pořizovatele databáze, 15 let), zákonná licence pro TDM.</li>
+    <li>Občanský zákoník č. 89/2012 Sb. — § 504 (obchodní tajemství), § 2981 (vyvolání nebezpečí záměny), ustanovení o písemné formě výhradní licence.</li>
+    <li>Bernská úmluva o ochraně literárních a uměleckých děl — automatická ochrana bez registrace.</li>
+    <li>Nařízení Řím II (č. 864/2007), čl. 8 — <span class="mono">lex loci protectionis</span> u porušení práv duševního vlastnictví.</li>
+    <li>MS Praha, sp. zn. 10 C 13/2023 — čistě AI generovaný výstup není autorským dílem (autor = fyzická osoba, prompt = námět).</li>
+    <li>Nařízení EU o AI (AI Act), čl. 50 — povinnost značení AI generovaného obsahu.</li>
+    <li>Projekt Ikaros — právní rešerše, 1. část (str. 3–5) a 3. část (str. 12–13); fact-check ledger v1.0.</li>
+  </ul>
+</section>

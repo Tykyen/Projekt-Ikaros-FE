@@ -1,0 +1,248 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část III — Komunitní obsah, klonování a AI</div>
+    <h2>Licenční karta položky a režimy viditelnosti</h2>
+  </div>
+
+  <p class="lead">Komunitní knihovna je silná funkce i právní riziko. Uživatelé do ní vloží postavy, bestie, předměty, šablony, mapy, lokace, organizace, dobrodružství a pravidlové pomůcky — někdy odvozené od cizích systémů. Knihovna proto musí být navržena jako <strong>licenční a moderátorský systém</strong>, ne jako pouhá sdílená databáze. Každá klonovatelná položka nese vlastní licenční kartu a jasně definovaný režim viditelnosti.</p>
+
+  <div class="callout gold">
+    <div class="t">Rešerše, ne stanovisko</div>
+    <p>Tato kapitola je pracovní podklad, ne právní rada. Konkrétní formulace licenční karty, znění souhlasu s klonováním, neodvolatelnost licence a její přiměřenost vůči spotřebiteli je nutné před nasazením ověřit u advokáta (viz <strong>Otázky pro advokáta, účetního, vydavatele</strong>).</p>
+  </div>
+
+  <h3>Co právně znamená „klonovat"</h3>
+  <p>Technicky je klon kopie záznamu v databázi. Právně ale jeden klik spouští několik samostatných jednání: <strong>rozmnožení díla</strong>, <strong>zpřístupnění díla dalšímu uživateli</strong>, případné <strong>vytvoření odvozené verze</strong>, <strong>zásah do integrity díla</strong>, <strong>převzetí databázové položky</strong>, převzetí metadat a další veřejné sdělování. Slovo „klonovat" proto musí být přesně definováno v podmínkách — jinak není zřejmé, k čemu přesně uživatel dává souhlas.</p>
+
+  <table>
+    <thead>
+      <tr><th>Technický krok</th><th>Právní význam</th><th>Potřebné ošetření</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Uživatel klikne na „Klonovat do svého světa"</td>
+        <td>Vzniká rozmnoženina obsahu v novém kontextu</td>
+        <td>Autor původní položky musí <strong>předem povolit</strong> klonování</td>
+      </tr>
+      <tr>
+        <td>Uživatel upraví klon</td>
+        <td>Může vzniknout zpracování / odvozená verze</td>
+        <td>Licence musí povolit úpravy a určit atribuci</td>
+      </tr>
+      <tr>
+        <td>Uživatel publikuje upravený klon</td>
+        <td>Nové zpřístupnění veřejnosti</td>
+        <td>Licence musí povolit další publikaci; systém zachová původ</td>
+      </tr>
+      <tr>
+        <td>Uživatel dá upravený klon dál ke klonování</td>
+        <td>Řetězení licence a sublicencování / remix</td>
+        <td>Kompatibilní licenční model a genealogie verzí</td>
+      </tr>
+      <tr>
+        <td>Původní autor smaže účet</td>
+        <td>Konflikt mezi smazáním účtu a trváním již poskytnuté licence</td>
+        <td>Podmínky oddělí osobní údaje od licence k již zveřejněnému obsahu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">AI výstup nemá lidského autora</div>
+    <p>Klonovaná položka může být zčásti i zcela vygenerovaná AI. Podle rozsudku <span class="mono">MS Praha 10 C 13/2023</span> není čistě AI generovaný obrázek autorským dílem — autorem je jen fyzická osoba (<span class="mono">§5 AZ</span>), prompt je nanejvýš námět (<span class="mono">§2/§6 AZ</span>). Takový výstup je <strong>volný</strong>. Karta proto <strong>nepřiřazuje autorství uživateli automaticky</strong>: pole „AI původ" musí odlišit vlastní tvorbu od AI výstupu, aby se nešířil falešný nárok na ochranu. Značení AI obsahu navíc řeší <strong>AI obsah a AI Act</strong>.</p>
+  </div>
+
+  <h3>Režimy viditelnosti a užití</h3>
+  <p>Uživatel při nahrání volí režim obsahu. Výchozí režim musí být <strong>bezpečný</strong>: soukromý nebo veřejný ke čtení — nikdy ne automaticky klonovatelný. Zobrazení není licence ke klonování; klonovatelnost je samostatné, aktivně udělené povolení.</p>
+
+  <table>
+    <thead>
+      <tr><th>Režim</th><th>Co smí ostatní</th><th>Typické použití</th><th>Právní poznámka</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill">Soukromé</span></td>
+        <td>Nic; obsah je dostupný jen vlastníkovi a oprávněným členům světa</td>
+        <td>Poznámky vypravěče, tajné frakce, pracovní texty</td>
+        <td>Nejde o komunitní knihovnu; pozor na interní sdílení v rámci světa</td>
+      </tr>
+      <tr>
+        <td><span class="pill">Veřejné ke čtení</span></td>
+        <td>Číst a případně komentovat; <span class="no">ne</span> kopírovat ani upravovat</td>
+        <td>Ukázkové světy, články, galerie</td>
+        <td>Zobrazení není licence ke klonování</td>
+      </tr>
+      <tr>
+        <td><span class="pill">Komunitní ke klonování</span></td>
+        <td>Vytvořit soukromou kopii do vlastního světa</td>
+        <td>Bestie, předměty, NPC, lokace</td>
+        <td>Nutný souhlas autora s rozmnožením a platformní distribucí</td>
+      </tr>
+      <tr>
+        <td><span class="pill">Komunitní k remixu</span></td>
+        <td>Klonovat, upravit a publikovat upravenou verzi</td>
+        <td>Šablony, generické moduly, procedurální tabulky</td>
+        <td>Nutný model atribuce a licenční kompatibility</td>
+      </tr>
+      <tr>
+        <td><span class="pill cyan">Otevřená licence</span></td>
+        <td>Užití i mimo Ikaros podle licence, např. CC BY / CC BY-SA</td>
+        <td>Texty určené širší komunitě</td>
+        <td>Vysvětlit, že otevřená licence může být <strong>neodvolatelná</strong></td>
+      </tr>
+      <tr>
+        <td><span class="pill green">Oficiální knihovna Ikarosu</span></td>
+        <td>Kurátorovaný obsah schválený provozovatelem</td>
+        <td>Základní šablony, doporučené generátory, systémové moduly</td>
+        <td>Vyšší odpovědnost a povinnost právní kontroly</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">CC licencuje jen majetková práva — a osobnostní zůstávají</div>
+    <p>Otevřená licence (CC) v ČR převádí jen <strong>majetková</strong> autorská práva; osobnostní práva (<span class="mono">§11 AZ</span>) jsou nepřevoditelná a licencí je nelze vyloučit. Copyleft <span class="mono">BY-SA</span> se navíc „nakazí" na odvozeniny — systém musí hlídat kompatibilitu licencí v řetězci remixů. Od uživatelů proto berte <strong>vlastní licenční ujednání</strong> platformy, nespoléhejte jen na štítek CC. Detail viz <strong>Licence uživatelů · platformní, komunitní, CC</strong>.</p>
+  </div>
+
+  <h3>Minimální licenční karta položky</h3>
+  <p>Karta není kosmetika — je to <strong>důkazní a provozní nástroj</strong>. Bez ní později nebude jasné, kdo položku vytvořil, zda se směla klonovat, zda obsahuje AI, zda vychází z cizího systému, zda ji lze exportovat a co se stane po nahlášení závadnosti. Následující pole tvoří minimum; u položek v knihovnách jsou prakticky všechna povinná.</p>
+
+  <table>
+    <thead>
+      <tr><th>Pole karty</th><th>Povinné?</th><th>Účel</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>ID položky a verze</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Jednoznačné určení, co přesně bylo licencováno a klonováno</td>
+      </tr>
+      <tr>
+        <td><strong>Autor / nahrávající uživatel</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Atribuce a kontaktní bod pro spor</td>
+      </tr>
+      <tr>
+        <td><strong>Právní režim</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Soukromé · čtení · klonování · remix · otevřená licence · oficiální</td>
+      </tr>
+      <tr>
+        <td><strong>Povolení klonování</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Ano/ne; rozsah kopie; zda lze kopii dále publikovat</td>
+      </tr>
+      <tr>
+        <td><strong>Povolení úprav</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Technické úpravy · uživatelské úpravy · veřejný remix</td>
+      </tr>
+      <tr>
+        <td><strong>Povolení exportu mimo Ikaros</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Zabrání nechtěnému vynesení obsahu ven</td>
+      </tr>
+      <tr>
+        <td><strong>Atribuční text</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Jak se má uvádět původní autor</td>
+      </tr>
+      <tr>
+        <td><strong>Zdroj a inspirace</strong></td>
+        <td><span class="partial">ano u knihoven</span></td>
+        <td>Vlastní tvorba / AI / import / cizí licence / fan content</td>
+      </tr>
+      <tr>
+        <td><strong>RPG systém</strong></td>
+        <td><span class="partial">ano, je-li relevantní</span></td>
+        <td>Kontrola cizích pravidel, názvů a statbloků</td>
+      </tr>
+      <tr>
+        <td><strong>AI původ</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Žádný / částečný / převážný / obrázek / text / překlad / asistovaná editace</td>
+      </tr>
+      <tr>
+        <td><strong>Stav kontroly</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Nekontrolováno · komunitně ověřeno · kurátorováno · právně schváleno · sporné · stažené</td>
+      </tr>
+      <tr>
+        <td><strong>Historie klonů</strong></td>
+        <td><span class="yes">ano</span></td>
+        <td>Genealogie položek pro řešení stížností</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Proč „RPG systém" a „Zdroj" nejsou vata</div>
+    <p>Většina 14 systémů v Ikarosu <strong>nemá plošnou licenci</strong> (jen tolerance nebo referenční-název režim). Pole „RPG systém" a „Zdroj a inspirace" jsou kontrolní bod, který zachytí zakázaný cizí obsah — verbatim statbloky, chráněná monstra (např. Product Identity u D&D), názvy a ilustrace — dřív, než se rozklonuje. Kontext k jednotlivým systémům viz <strong>Karty 14 systémů</strong>.</p>
+  </div>
+
+  <h3>Klonování jako licenční workflow</h3>
+  <p>Karta dává smysl jen tehdy, když ji vynucuje proces nahrání a klonování. Následující kroky drží řetězec souhlasů a genealogie auditovatelný:</p>
+
+  <div class="phase"><div class="num">1</div><div class="body"><b>Volba režimu při nahrání.</b> Výchozí režim je bezpečný — soukromý nebo veřejný ke čtení, nikdy automaticky klonovatelný.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Vysvětlení při přepnutí na knihovnu.</b> Zobrazí se jasné upozornění, že ostatní budou smět vytvářet kopie a případně úpravy.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>Potvrzení práv.</b> Uživatel potvrdí, že je autorem nebo má dostatečná práva, že položka neobsahuje zakázaný cizí obsah a že rozumí následkům licence.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Uložení důkazu.</b> Systém uloží verzi podmínek, datum, IP/log technického souhlasu a licenční kartu položky.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Licenční shrnutí při klonování.</b> Klonujícímu se zobrazí, co smí a nesmí s klonem dělat.</div></div>
+  <div class="phase"><div class="num">6</div><div class="body"><b>Nesení původu.</b> Každý klon si nese původního autora, zdroj, licenční režim a odkaz na původní položku.</div></div>
+  <div class="phase"><div class="num">7</div><div class="body"><b>Reakce na porušení.</b> Je-li původní položka odstraněna kvůli porušení práv, systém umí dohledat klony, <strong>zmrazit je, skrýt je, nebo vyvolat revizní proces</strong>.</div></div>
+
+  <h3>Smazání, odvolání a trvání licence</h3>
+  <p>Nejtěžší otázka komunitních knihoven: co když autor po roce smaže účet nebo chce stáhnout položku, kterou už zklonovalo sto lidí? Situace je nutné oddělit — <strong>licence k již zveřejněnému obsahu není totéž co osobní údaje autora</strong>, a autorská licence nepřebíjí GDPR.</p>
+
+  <table>
+    <thead>
+      <tr><th>Situace</th><th>Doporučené řešení</th><th>Poznámka pro právníka</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Autor smaže soukromý obsah</td>
+        <td>Smazat podle retenčních pravidel</td>
+        <td>Nejde o komunitní licenci</td>
+      </tr>
+      <tr>
+        <td>Autor stáhne veřejné zobrazení</td>
+        <td>Skrýt původní položku do budoucna</td>
+        <td>Zachovat auditní záznam a metadata pro spory</td>
+      </tr>
+      <tr>
+        <td>Autor stáhne klonovatelnou položku bez právního důvodu</td>
+        <td>Nepovolit nové klony; existující klony ponechat, byla-li licence pro existující užití neodvolatelná</td>
+        <td>Potvrdit formulaci neodvolatelnosti a její <strong>přiměřenost vůči spotřebiteli</strong></td>
+      </tr>
+      <tr>
+        <td>Položka porušuje cizí práva</td>
+        <td>Skrýt původní položku a podle závažnosti i její klony</td>
+        <td>Nutné <span class="mono">notice-and-action</span> a evidence</td>
+      </tr>
+      <tr>
+        <td>Položka obsahuje osobní údaje</td>
+        <td>Posoudit GDPR, anonymizovat, omezit, smazat</td>
+        <td>Licence k autorskému obsahu <strong>nepřebíjí GDPR</strong></td>
+      </tr>
+      <tr>
+        <td>Položka obsahuje AI deepfake reálné osoby</td>
+        <td>Skrýt, vyžádat souhlas, řešit oznámení a případně zákaz účtu</td>
+        <td>Riziko osobnostních práv, GDPR, DSA i AI Act</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Spotřebitelský háček u účtů „zdarma"</div>
+    <p>Neodvolatelnost licence a „stačí souhlas kliknutím" naráží na spotřebitelskou ochranu i u <strong>bezplatných účtů</strong>. Pokud se osobní data zpracovávají nad rámec provozu (cílení, analytika, trénink AI), spouští se režim <span class="mono">§2389a OZ</span> (data jako protiplnění) a plný GDPR titul. Formulaci souhlasu s klonováním a jeho následky proto nelze psát jako čistě technickou operaci — provazby na spotřebitele a GDPR viz <strong>GDPR inventář a právní základy</strong> a <strong>Dobrovolná podpora, DPH, spotřebitel</strong>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — právně-informační rešerše v0.6, část „Diskuse, AI, komunita", kap. 3.1–3.5 (režimy, licenční karta, workflow, stažení)</li>
+    <li>Zák. č. 121/2000 Sb., autorský zákon — <span class="mono">§2</span>, <span class="mono">§5</span>, <span class="mono">§6</span>, <span class="mono">§11</span> (osobnostní práva)</li>
+    <li>Zák. č. 89/2012 Sb., občanský zákoník — <span class="mono">§2389a</span> (data jako protiplnění)</li>
+    <li>Nařízení 2016/679 (GDPR); nařízení 2022/2065 (DSA) — <span class="mono">notice-and-action</span>; nařízení 2024/1689 (AI Act) — označení AI výstupů</li>
+    <li>MS Praha, sp. zn. <span class="mono">10 C 13/2023</span> — AI generovaný obrázek není autorské dílo</li>
+    <li>Fact-check ledger v1.0 (2026) — autorita nad podklady: AI autorství, neodvolatelnost vs. spotřebitel, data-as-payment, CC vs. osobnostní práva</li>
+  </ul>
+</section>

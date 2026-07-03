@@ -1,0 +1,156 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Konzultace — co se zeptat odborníků</div>
+    <h2>Otázky pro advokáta, účetního a vydavatele</h2>
+  </div>
+
+  <p class="lead">Tato kapitola konsoliduje <strong>otevřené otázky</strong>, které projekt nemá zodpovězené vlastní rešerší a musí je položit odborníkům. Rozdělené do tří skupin podle adresáta: <strong>advokát</strong> (právní forma, IP, značka, podmínky užití, GDPR/AI/DSA), <strong>účetní a daňový poradce</strong> (dary, příspěvky, DPH, registrace k dani, refundace) a <strong>vydavatel / držitel práv RPG systémů</strong> (rozsah svolení pro deníky a databáze). Seznamy jsou seřazené k přímému přeposlání — každý bod je konkrétní otázka, ne téma.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Jde o pracovní rešerši, ne o právní ani daňové stanovisko. Odpovědi na následující otázky je nutné získat od <strong>advokáta zapsaného v ČAK</strong>, resp. od <strong>daňového poradce / auditora</strong>. Kde tato kniha uvádí vlastní závěr (např. že spolek/ústav dává nejsilnější mission lock, že AI Act čl. 50 je vymahatelný od 2.8.2026, že prahy jednoduchého účetnictví 3 mil. Kč se novelou nemění), jde o rešeršní východisko k ověření, nikoli o hotovou jistotu.</p>
+  </div>
+
+  <h3>1. Otázky pro advokáta</h3>
+  <p>Seskupené po tématech, ať se dají zadat po částech. Priorita je na blocích <strong>A</strong> (forma a IP převod) a <strong>D</strong> (regulace AI/GDPR/DSA) — bez nich nelze bezpečně spustit placené funkce ani AI modul.</p>
+
+  <h4>A. Právní forma a převod práv</h4>
+  <ol>
+    <li>Je pro Ikaros vhodnější <strong>zapsaný spolek, ústav, s.r.o., nadační fond, nebo hybrid</strong> (nezisk + provozní s.r.o.)? Jaké konkrétní zakladatelské dokumenty tomu musí odpovídat?</li>
+    <li>Jak formulovat <strong>účel spolku/ústavu</strong> tak, aby zahrnoval provoz online RPG platformy, komunitu, vzdělávání, kulturu, digitální nástroje a vedlejší hospodářskou činnost?</li>
+    <li>Jak nastavit <strong>mission lock</strong>, aby chránil bezplatný základ a komunitní účel? (Rešerše míří na formu spolku/ústavu, <span class="mono">§ 217</span> a <span class="mono">§ 402–403 OZ</span> — zákaz rozdělení zisku; stanovy silnější než SHA <em>in personam</em>; vesting jen jako smluvní konstrukce — potvrdit.)</li>
+    <li>Kdo má <strong>vlastnit IP</strong> a kdo provozovat platformu? Jak smluvně převést nebo licencovat dosavadní kód (frontend/backend), texty webu, grafiku, logo, dokumentaci a databázové modely na právnickou osobu?</li>
+    <li>Jak ve stanovách / společenské smlouvě <strong>zabránit prodeji nebo privatizaci komunity</strong> v rozporu s účelem?</li>
+    <li>Jaká ustanovení musí mít <strong>founders agreement</strong>? Jaký model odpovědnosti orgánů a řešení střetu zájmů doporučujete?</li>
+    <li>Jak právně řešit vztah mezi <strong>spolkem/ústavem a případnou s.r.o.</strong> (kdo licencuje komu, tok peněz, exit)?</li>
+    <li>Jak smluvně ošetřit <strong>dobrovolníky a komunitní tvůrce</strong>? Jaké smlouvy musí podepsat vývojáři, autoři a správci obsahu před spuštěním RPG modulů?</li>
+  </ol>
+
+  <h4>B. Ochranná známka</h4>
+  <ol start="9">
+    <li>Přihlásit <span class="mono">„Projekt Ikaros"</span>, <span class="mono">„Ikaros"</span>, logo, nebo <strong>kombinaci</strong>? Je název dostatečně rozlišovací a bez kolize se starší známkou/firmou? (Před volbou názvu/loga rešerše v ÚPV / EUIPO / TMview.)</li>
+    <li>Kdo má být <strong>přihlašovatelem</strong> — fyzická osoba, budoucí spolek, s.r.o., nebo jiný subjekt? (Rešerše: spolek je plnohodnotný přihlašovatel.)</li>
+    <li>Jaké <strong>třídy výrobků a služeb</strong> pokrýt? (Rešerše míří na jádro <span class="mono">tř. 9 + 41 + 42</span>, dle potřeby <span class="mono">38, 35, 45</span>; merch <span class="mono">25/16/28</span> — potvrdit rozsah.)</li>
+    <li>Má smysl <strong>národní známka v ČR, známka EU (EUTM), nebo nejdřív ČR a později EU</strong>? Jak známku licencovat provozní entitě?</li>
+    <li>Jaký je bezpečný rámec <strong>referenčního užití cizí ochranné známky</strong> (názvy RPG systémů) v české landing page a UI, aby nešlo o parazitování ani o naznačení oficiálního partnerství? (Vazba na <span class="mono">§ 2981 OZ</span> — vyvolání nebezpečí záměny.)</li>
+  </ol>
+
+  <h4>C. NDA, partneři a podmínky užití</h4>
+  <ol start="14">
+    <li>Jak přesně definovat <strong>důvěrné informace</strong> Ikarosu? Jak formulovat <strong>non-use</strong>, aby partner nesměl použít informace pro konkurenční službu (i když v podobné oblasti už něco vyvíjel)? Jaká smluvní pokuta je přiměřená?</li>
+    <li>Jak vést <strong>předávací protokol</strong> k dokumentům a demu a jak omezit přístup zaměstnancům a subdodavatelům partnera? Jak nastavit <strong>partner pack a data room proces</strong>?</li>
+    <li>Jaká práva uděluje uživatel platformě k <strong>soukromému obsahu</strong> a jaká při zařazení obsahu do <strong>globální knihovny</strong>? Lze nastavit <strong>neodvolatelnou licenci</strong> pro obsah již naklonovaný ostatními? (Vazba na <span class="mono">§ 2358 OZ</span> — písemná forma výhradní licence; osobnostní práva <span class="mono">§ 11 AZ</span> nepřevoditelná.)</li>
+    <li>Jak řešit <strong>mazání účtu vs. zachování obsahu</strong> ve světech a knihovnách? Jak zakázat <strong>scraping</strong> a hromadné vytěžování databáze?</li>
+    <li>Jak nastavit <strong>odpovědnost za cizí autorská díla</strong> vložená uživateli a za obsah založený na cizích RPG systémech? Jak formulovat NDA + non-use tak, aby chránilo před firmou, která by vytvořila klon?</li>
+  </ol>
+
+  <h4>D. Regulace: AI Act, GDPR, DSA, spotřebitel</h4>
+  <ol start="19">
+    <li><strong>Velikost podniku</strong> pro <span class="mono">DSA čl. 19</span> a <span class="mono">NIS2 / ZoKB 264/2025 Sb.</span> — potvrdit <strong>mikro/malý status</strong> spolku (rešerše: malý neziskový spolek s vysokou pravděpodobností NIS2 nepodléhá a je vyňat z těžších povinností DSA).</li>
+    <li><strong>Per-feature „veřejné šíření"</strong> (platforma — veřejné knihovny) vs. <strong>skupinové/soukromé</strong> (jen hosting — soukromý chat, deníky): potvrdit rozdělení povinností dle DSA (které články dopadají na veřejné knihovny a které ne).</li>
+    <li><strong>Freemium / data model</strong>: pokud se u účtů zdarma data zpracovávají jen pro provoz vs. pro cílení / analytiku / trénink AI — potvrdit, kdy se spouští spotřebitelský režim <strong>data jako protiplnění</strong> (<span class="mono">§ 2389a OZ</span>) a plný GDPR titul i u účtů zdarma.</li>
+    <li>Je pro AI modul a dětské účty <strong>povinná DPIA</strong> (posouzení vlivu) a <strong>jmenování DPO</strong>? (Rešerše: DPIA pravděpodobně povinná — děti + moderace/zprávy + AI dle kritérií WP248.)</li>
+    <li><strong>Transfer do USA</strong> u AI/LLM API (LLM = zpracovatel): jaký mechanismus zajistit — <span class="mono">SCC</span> + smlouva o zpracování dle <span class="mono">čl. 28 GDPR</span> (DPA)? Jak ošetřit <strong>zvláštní kategorie</strong> (<span class="mono">čl. 9</span>) v UGC (chat, deníky, prompty)?</li>
+    <li><strong>AI Act čl. 50</strong> — jak korektně splnit <strong>značení AI</strong> u „chatu za postavu" a strojové značení AI výstupů (bestiáře, portréty) do <span class="mono">2.8.2026</span>, resp. grace period do <span class="mono">2.12.2026</span>? Jak nastavit moderaci <strong>NCII/CSAM</strong> u AI obrázků? (Rešerše: čl. 50 vymahatelný od 2.8.2026, Omnibus jej neodkládá; sankce až 15 M€ / 3 %.)</li>
+    <li><strong>Placené funkce</strong> — informační povinnosti před objednávkou, právo na <strong>odstoupení</strong> a jeho ztráta u digitálního obsahu (<span class="mono">§ 1829/2</span>, <span class="mono">§ 1837 písm. l OZ</span> — výslovný souhlas + poučení + potvrzení), reklamační řád, refundace. Jak nastavit, aby chybějící informace nespustily prodloužení lhůty na 1 rok / bezplatnost / sankci ČOI?</li>
+    <li><strong>Autorství AI výstupů</strong>: jak v podmínkách klonování ošetřit, že čistě AI generovaný obsah není autorské dílo (<span class="mono">MS Praha 10 C 13/2023</span>) — komu jej přiřadit a jak nakládat s jeho volným statusem?</li>
+    <li><strong>Data Act (2023/2854)</strong> — spadá neziskový SaaS pod „data processing service"? Jak posílit <strong>strukturovaný export</strong> (deníky, postavy, světy) nad rámec prostého ZIP a řešit cloud switching?</li>
+  </ol>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení: pilotní stanoviska</div>
+    <p>Nejcennější první výstupy od advokáta jsou tři: (1) <strong>volba formy + převod IP</strong> (bod A), (2) <strong>podmínky užití + licence uživatelů</strong> (bod C, klíčová je neodvolatelná licence na naklonovaný obsah), (3) <strong>AI/GDPR/spotřebitel balík</strong> pro placené funkce a AI modul (bod D). Systémové licence (skupina 3) lze řešit paralelně přes vydavatele — nejsou blokerem spuštění čistých pilotů.</p>
+  </div>
+
+  <h3>2. Otázky pro účetního a daňového poradce</h3>
+  <p>Cílem je nastavit <strong>účetní členění od začátku</strong> a vědět, kdy vznikají registrační a odvodové povinnosti. Rozděleno na účtování příjmů, daňové prahy a provozní procesy.</p>
+
+  <h4>A. Účtování příjmů a plateb</h4>
+  <ol>
+    <li>Jak účtovat <strong>čisté dary</strong> bez protiplnění?</li>
+    <li>Jak účtovat <strong>členské příspěvky</strong> u spolku?</li>
+    <li>Jak účtovat <strong>dobrovolnou podporu s kosmetickým odznakem</strong> (perk bez skutečného protiplnění)?</li>
+    <li>Jak účtovat <strong>měsíční a roční předplatné</strong>?</li>
+    <li>Jak účtovat platby přes <strong>Stripe / PayPal / Patreon / Ko-fi</strong> včetně poplatků?</li>
+  </ol>
+
+  <h4>B. Daňové prahy a registrace</h4>
+  <ol start="6">
+    <li>Kdy vzniká povinnost <strong>registrace k dani z příjmů právnických osob</strong>? (Rešerše: veřejně prospěšný poplatník má výjimku <span class="mono">§ 39a</span> — registrace netřeba, přijímá-li jen nezdaňované příjmy jako příspěvky/dary/dotace; registraci do 15 dnů spustí až první zdaňovaný příjem — placená služba, reklama. Potvrdit.)</li>
+    <li>Kdy může spolek vést <strong>jednoduché účetnictví</strong> a kdy už ne? (Rešerše: prahy jednoduchého účetnictví <span class="mono">3 mil. Kč</span> se novelou <span class="mono">316/2025 Sb.</span> nemění; limity kategorizace/auditu jsou pro malý spolek irelevantní. Potvrdit.)</li>
+    <li>Jak sledovat <strong>obrat pro DPH</strong> podle pravidel od roku 2025? (Rešerše: <span class="mono">&gt; 2 000 000 Kč</span> → plátce od 1.1. dalšího roku; <span class="mono">&gt; 2 536 500 Kč</span> ≈ 100 000 € → plátce hned následující den; přihláška do 10 pracovních dnů; obrat za kalendářní rok. Potvrdit.)</li>
+    <li>Jak řešit <strong>slovenské nebo jiné EU uživatele</strong> a případný režim <strong>OSS</strong> (One Stop Shop) u placených digitálních služeb?</li>
+  </ol>
+
+  <h4>C. Provozní procesy a členění</h4>
+  <ol start="10">
+    <li>Jaký <strong>účetní software a analytické členění</strong> nastavit od začátku (rozlišení darů, příspěvků, předplatného, reklamy)?</li>
+    <li>Jak <strong>oddělit sbírku od běžného provozního účtu</strong>? (Vazba na veřejné sbírky — novela <span class="mono">197/2024 Sb.</span> od 1.1.2025; rozlišit dar/crowdfunding vs. registrovaná sbírka.)</li>
+    <li>Jak řešit <strong>refundace, chargebacky a storna předplatného</strong> z účetního i daňového hlediska?</li>
+  </ol>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení: hranice příjmů</div>
+    <p>Klíčová otázka pro poradce je jednotné <strong>rozlišení „dar / členský příspěvek / veřejná sbírka / placená služba"</strong> — každá kategorie má jiný daňový a účetní režim a jiný dopad na registraci. Právní stránku téhož (kdy je „perk" ještě dar a kdy už protiplnění) řeší souběžně advokát (bod A skupiny 1). Nastavit členění před prvním příjmem, ne po něm.</p>
+  </div>
+
+  <h3>3. Otázky pro vydavatele / držitele práv</h3>
+  <p>Určeno držitelům práv RPG systémů (Mytago/JaD, ALTAR/DrD, Chaosium/CoC, Black Tower/Dračí Hlídka, Ferencovi/Příběhy Impéria, Steve Jackson Games/GURPS, Topps-Catalyst-Microsoft/Shadowrun). Cíl: zjistit <strong>přesný rozsah svolení</strong> pro deníky, databáze a nasazení do nástroje. Text se přizpůsobí konkrétnímu adresátovi — jde o rámec otázek.</p>
+
+  <ol>
+    <li>Smíme veřejně uvést, že Ikaros nabízí <strong>neoficiální šablony</strong> pro váš systém?</li>
+    <li>Smíme vytvořit <strong>webový deníkový list bez pravidlových textů a bez loga</strong>?</li>
+    <li>Smíme vytvořit <strong>chytrý deník s automatickými výpočty</strong>, pokud uživatel vlastní pravidla? (Klíčová hranice — automatizovaný engine bývá u části vydavatelů posuzován jako „computer game" mimo fan policy.)</li>
+    <li>Smíme vytvořit <strong>databázi povolání, schopností, kouzel, výbavy nebo bestiáře</strong>? V jakém rozsahu (prázdná šablona s názvy polí vs. plné statbloky/texty)?</li>
+    <li>Smíme používat <strong>název systému v názvu modulu a na landing page</strong>? Smíme použít kompatibilní logo, nebo pouze textový disclaimer?</li>
+    <li>Je pro vás rozdíl mezi <strong>nekomerčním provozem, dary, Patreonem, reklamou a placenou funkcí</strong>?</li>
+    <li>Smí být modul součástí <strong>VTT / online herního stolu</strong>? (Rešerše: CoC fan policy VTT/apps výslovně vylučuje; Shadowrun VTT jen přes přímé partnerství.)</li>
+    <li>Smí uživatelé <strong>sdílet komunitní homebrew</strong> kompatibilní s vaším systémem na Ikarosu?</li>
+    <li>Jaký <strong>kontaktní e-mail a proces</strong> preferujete pro schvalování nebo takedown?</li>
+  </ol>
+
+  <div class="callout gold">
+    <div class="t">Varování: co neposílat bez licence</div>
+    <p>U tolerančních systémů (DrD 1.6/+/II, Příběhy Impéria, Shadowrun, GURPS, CoC) drž do odpovědi režim <strong>engine + referenční název</strong> a neposílej žádost, která by implikovala víc, než smíš dělat i bez svolení. Konkrétně nepoužívat formulace <span class="mono">„oficiální podpora systému X"</span>, <span class="mono">„kompletní pravidla systému X zdarma"</span>, <span class="mono">„nahrazuje příručku"</span> ani parazitická srovnání typu <span class="mono">„D&amp;D Beyond pro Česko"</span> — poslední zakládá vysoké známkové riziko. Detailní matice, kdo je v jakém režimu, je v části <strong>RPG systémy a licence</strong>.</p>
+  </div>
+
+  <h4>Prioritní adresáti (piloti)</h4>
+  <p>Podle systémové matice se liší, oč se žádá. Nejdřív oslovit tři české / podmíněné držitele, u nichž je svolení blokerem nebo výrazným zlepšením režimu:</p>
+  <table>
+    <thead>
+      <tr><th>Systém / držitel</th><th>Klíčová otázka nad rámec obecného seznamu</th><th>Režim</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>JaD</strong> — Mytago (Jiří Reiter)</td>
+        <td>Pokrývá licence JaD pro třetí strany i <strong>software / nástroj</strong> (deník, bestiář)? Potvrdit povinný verbatim disclaimer + komunitní logo + morální dodatek.</td>
+        <td><span class="pill">conditional</span></td>
+      </tr>
+      <tr>
+        <td><strong>DrD II</strong> — ALTAR</td>
+        <td>Svolení k užití v rámci posvěceného SRD (<span class="mono">drd2srd.d20.cz</span>) — potvrdit rozsah pro digitální nástroj.</td>
+        <td><span class="pill">conditional</span></td>
+      </tr>
+      <tr>
+        <td><strong>Dračí Hlídka</strong> — Black Tower s.r.o.</td>
+        <td>Licenční jednání (vydavatel je licenci otevřený) — rozsah pro DH LITE; VTT přes partnerství.</td>
+        <td><span class="pill">avoid</span> bez licence</td>
+      </tr>
+      <tr>
+        <td><strong>Call of Cthulhu</strong> — Chaosium</td>
+        <td>Komerční / VTT licence — fan policy web-deník povoluje, VTT/apps vylučuje; alternativa d100 engine pod <span class="mono">ORC/BRP</span> bez CoC brandingu.</td>
+        <td><span class="pill">conditional</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Návaznost</h3>
+  <p>Hotové znění dopisů jednotlivým vydavatelům je v části <strong>Dodatek — Návrhy dopisů vydavatelům</strong>; strategie oslovení (co, komu, v jakém pořadí) v části <strong>Strategie oslovení vydavatelů</strong>. Právní režim jednotlivých systémů rozvádí část <strong>RPG systémy a licence</strong>, formu a převod práv část <strong>Právní forma a smluvní dokumentace</strong>, regulační bloky (AI Act, GDPR, DSA, spotřebitel) příslušné části <strong>Ochrana osobních údajů a AI</strong> a <strong>Provoz platformy a odpovědnost</strong>.</p>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — právní forma, startup, financování a účetnictví v0.9 (4. část), kap. 15 „Otázky pro advokáta", kap. 16 „Otázky pro účetního a daňového poradce".</li>
+    <li>Projekt Ikaros — RPG licence v0.4 (2. část), kap. 12.1 „Otázky pro právníka", 12.2 „Otázky pro držitele práv", 11.4 „Zakázané formulace bez licence".</li>
+    <li>Projekt Ikaros — právní rešerše v0.1 (1. část), kap. 11.2 (známka), 11.3 (NDA a partneři), 11.4 (podmínky užití), 11.5 (právnická osoba).</li>
+    <li>Fact-check ledger v1.0 — sekce C (konsolidované otázky pro advokáta/účetního/vydavatele), sekce A/B (opravy a doplnění: AI Act čl. 50 a Omnibus, § 2389a data jako protiplnění, DPIA/RoPA, § 39a veřejně prospěšný poplatník, DPH prahy, ZoKB 264/2025, novela účetnictví 316/2025, Data Act, MS Praha 10 C 13/2023) a systémová matice (skupina 3).</li>
+  </ul>
+</section>

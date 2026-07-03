@@ -1,0 +1,128 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">3. ČÁST — DISKUSE, AI, KOMUNITA</div>
+    <h2>Databáze, scraping a AI trénink</h2>
+  </div>
+
+  <p class="lead">Komunitní knihovny Ikarosu nejsou jen soubor textů — jsou to systematicky uspořádané databáze položek s metadaty, verzemi, vazbami, tagy, pravidlovou kompatibilitou, historií klonů a licencemi. Tato kapitola shrnuje, co takovou databázi chrání a co nikoli, jak nastavit anti-scraping pravidla a jaký režim volit u AI tréninku. Výklad je rešerše, ne právní stanovisko.</p>
+
+  <div class="callout gold">
+    <div class="t">DISCLAIMER</div>
+    <p>Text mapuje právní rizika a doporučené režimy pro platformu, nenahrazuje závazné právní posouzení. Ochrana databáze <strong>NEznamená</strong>, že Ikaros automaticky získává autorská práva k jednotlivým položkám uživatelů — databázové právo a autorské právo k položce jsou dvě různé věci. Před nasazením konkrétních podmínek konzultuj s advokátem.</p>
+  </div>
+
+  <h3>Databázové právo — co je databáze a komu svědčí</h3>
+
+  <p>Český autorský zákon definuje databázi jako soubor nezávislých děl, údajů nebo jiných prvků systematicky nebo metodicky uspořádaných a individuálně přístupných elektronicky nebo jinak. <strong>Zvláštní právo pořizovatele databáze</strong> (tzv. sui generis) vzniká pořizovateli tehdy, pokud pořízení, ověření nebo předvedení obsahu představuje kvalitativně nebo kvantitativně podstatný vklad.</p>
+
+  <p>Pro Ikaros je toto právo důležité, protože chrání investici do katalogu a struktury — nikoli obsah jednotlivých položek. Autorská práva k položce zůstávají tomu, kdo je vlastní (typicky uživatel-autor). Databázová ochrana je vrstva navíc, ne cesta k přisvojení uživatelského obsahu.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Chrání</h4>
+      <ul>
+        <li>Investici do pořízení, ověření a předvedení databáze.</li>
+        <li>Systematické uspořádání katalogů, metadat, vazeb, tagů a přístupů.</li>
+        <li>Zákaz užití celé databáze nebo její podstatné části bez oprávnění.</li>
+        <li>Ochranu proti opakovanému systematickému vytěžování nepodstatných částí, pokud poškozuje oprávněné zájmy pořizovatele.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Nechrání</h4>
+      <ul>
+        <li>Samotné nápady uživatelů.</li>
+        <li>Autorská práva k jednotlivým položkám, pokud je vlastní uživatel.</li>
+        <li>Nezakáže běžné přiměřené užití nepodstatných částí oprávněným uživatelem.</li>
+        <li>Nedává právo ignorovat GDPR ani licenční sliby dané uživatelům.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">DOPORUČENÍ</div>
+    <p>Databázové právo pojmi jako <strong>štít pro katalog a strukturu</strong>, ne jako titul k obsahu. K jednotlivým položkám ber od uživatelů vlastní licenční ujednání (viz část o licencích a klonování) — databázové právo je nenahrazuje.</p>
+  </div>
+
+  <h3>Anti-scraping pravidla</h3>
+
+  <p>Podmínky Ikarosu by měly <strong>výslovně zakázat</strong> automatizované vytěžování veřejných knihoven mimo běžné uživatelské funkce. Zákaz má pokrýt scraping, crawling nad rámec běžných vyhledávačů, hromadné exporty, vytváření konkurenčních databází, trénování modelů z komunitního obsahu bez souhlasu a obcházení technických limitů.</p>
+
+  <p>Zároveň musí zůstat povolené legitimní užití platformy: běžné vyhledávání, klonování jednotlivých položek podle licence a export vlastního obsahu. Rozhraní zákazu tak vede mezi <span class="pill">botem řízeným hromadným odsáváním</span> a <span class="pill cyan">běžnou uživatelskou prací s knihovnou</span>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Činnost</th><th>Doporučený režim</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Klon jedné položky podle licence</td><td><span class="yes">Povolit</span> přes oficiální funkci.</td></tr>
+      <tr><td>Export vlastního světa</td><td><span class="yes">Povolit</span> vlastníkovi v rozsahu vlastních práv a práv členů.</td></tr>
+      <tr><td>Hromadný export veřejné knihovny</td><td><span class="no">Zakázat</span> bez zvláštního souhlasu.</td></tr>
+      <tr><td>Scraping katalogu botem</td><td><span class="no">Zakázat</span>; rate-limit; technická ochrana.</td></tr>
+      <tr><td>Použití knihovny k tréninku AI</td><td><span class="no">Zakázat</span> defaultně; <span class="partial">povolit jen</span> u obsahu, kde autor výslovně zvolil AI/TDM kompatibilní licenci.</td></tr>
+      <tr><td>Archivace pro právní důkaz</td><td><span class="yes">Povolit</span> provozovateli v retenčním režimu.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="feat">
+    <h4>Anti-scraping — minimální výbava</h4>
+    <ul>
+      <li><strong>Smluvní vrstva:</strong> výslovný zákaz v podmínkách (scraping, crawling nad rámec vyhledávačů, hromadné exporty, konkurenční databáze, obcházení limitů).</li>
+      <li><strong>Technická vrstva:</strong> rate-limit, detekce botů, technická ochrana katalogu a hromadných endpointů.</li>
+      <li><strong>Funkční vrstva:</strong> ponechat oficiální cesty — vyhledávání, klon dle licence, strukturovaný export vlastního obsahu.</li>
+      <li><strong>Důkazní vrstva:</strong> retenční archivace pro provozovatele coby právní důkaz.</li>
+    </ul>
+  </div>
+
+  <h3>Text and data mining (TDM) a AI trénink</h3>
+
+  <p>Český autorský zákon obsahuje zákonnou licenci k rozmnožování díla pro účely automatizované analýzy textů nebo dat. Obecně umožňuje zhotovit rozmnoženinu díla za účelem automatizované analýzy textů nebo dat v digitální podobě a uchovat ji jen po dobu nezbytnou pro tuto analýzu; současně u obecné TDM výjimky existují <strong>možnosti výhrady práv</strong> (opt-out).</p>
+
+  <p>Praktický závěr pro Ikaros je jednoduchý: <strong>komunitní obsah nemá být automaticky dostupný pro trénink AI.</strong> Má-li být obsah někdy použit pro trénink, ladění, embeddingy nebo analytiku, musí být rozlišeno, zda jde o interní vyhledávací index, bezpečnostní detekci, doporučování, nebo skutečné učení modelu. Každý z těchto účelů má jiná rizika a jiný právní základ.</p>
+
+  <div class="callout gold">
+    <div class="t">DEFAULT: BEZ TRÉNINKU BEZ OPT-IN</div>
+    <p>Do podmínek vlož větu, že <strong>nahráním obsahu do Ikarosu uživatel nedává automaticky souhlas</strong> k použití svého obsahu pro trénink generativních modelů třetích stran. Pro interní vyhledávání, bezpečnost a provozní indexaci měj samostatnou platformní licenci a samostatný GDPR právní základ. Trénink je opt-in, ne opt-out.</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Účel zpracování</th><th>Právní základ / režim</th><th>Souhlas autora</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Interní vyhledávací index</td><td>Platformní licence + GDPR (provoz)</td><td><span class="no">netřeba</span> (v rámci provozu)</td></tr>
+      <tr><td>Bezpečnostní detekce / moderace</td><td>Oprávněný zájem (nutná LIA)</td><td><span class="no">netřeba</span></td></tr>
+      <tr><td>Doporučování obsahu</td><td>Oprávněný zájem / smlouva</td><td><span class="partial">dle nastavení</span></td></tr>
+      <tr><td>Trénink generativního modelu</td><td>Samostatný titul + AI/TDM licence</td><td><span class="yes">POVINNÝ opt-in</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>GDPR souvislosti (LLM jako zpracovatel, DPA dle čl. 28, transfer do USA přes SCC, LIA u oprávněného zájmu) rozvádí kapitola o ochraně osobních údajů a AI modulu — zde stačí zásada, že <strong>trénink potřebuje vlastní právní základ a nespoléhá se na provozní licenci</strong>.</p>
+
+  <h3>Data Act — právo na strukturovaný export a cloud switching</h3>
+
+  <p>Nad rámec podkladů je pro databázovou vrstvu klíčové <strong>nařízení EU 2023/2854 (Data Act)</strong>, použitelné od <span class="mono">12. 9. 2025</span>. Zavádí právo uživatele na <strong>strukturovaný, strojově čitelný export</strong> svých dat (v prostředí Ikarosu typicky deníky, postavy, světy), právo na přenositelnost mezi službami (cloud switching) a rušení egress poplatků za odchod dat od <span class="mono">12. 1. 2027</span>.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">12. 9. 2025</div><div class="l">Data Act použitelný</div></div>
+    <div class="stat"><div class="n">12. 1. 2027</div><div class="l">egress poplatky zrušeny</div></div>
+    <div class="stat"><div class="n">opt-in</div><div class="l">AI trénink z komunitního obsahu</div></div>
+  </div>
+
+  <p>Ikaros už má funkci <strong>export světa (ZIP)</strong>. Data Act směřuje k tomu, aby export nebyl jen archivní balík, ale <strong>strukturovaná, strojově čitelná data</strong> umožňující přenos k jiné službě. Doporučený krok je proto export posílit — nad rámec ZIP nabídnout strukturovaný formát (deníky, postavy, světy) s jasným schématem.</p>
+
+  <div class="callout cyan">
+    <div class="t">NÁVAZNOST NA KÓD</div>
+    <p>Existující „export světa" (ZIP) je dobrý základ, ale pro soulad s Data Act ho postav na <strong>strukturovaném, strojově čitelném exportu</strong> vlastního obsahu uživatele. Tento export je zároveň jedna z povolených legitimních funkcí v anti-scraping tabulce (export vlastního obsahu vlastníkem) — nezaměňovat s hromadným exportem cizí veřejné knihovny, který zůstává zakázán.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">POZOR NA HRANU</div>
+    <p>Právo na export vlastních dat (Data Act) a zákaz hromadného scrapingu cizí knihovny se nepletou: export je vázán na <strong>vlastní práva uživatele a práva členů jeho světa</strong>, kdežto hromadný odběr veřejné knihovny botem zůstává zakázán a technicky omezen (rate-limit). Rozhodující je vlastnictví dat, ne formát přenosu.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Autorský zákon (č. 121/2000 Sb.) — databáze, zvláštní právo pořizovatele, zákonná licence pro TDM a výhrada práv (opt-out).</li>
+    <li>Nařízení EU 2023/2854 (Data Act) — použitelnost od 12. 9. 2025; strukturovaný strojově čitelný export, cloud switching; egress poplatky zrušeny od 12. 1. 2027 <span class="mono">(zdroj: ledger)</span>.</li>
+    <li>Projekt Ikaros — právně-informační rešerše v0.6, 3. část (kap. 5: Databáze, knihovny, katalogy a ochrana proti vytěžení).</li>
+  </ul>
+</section>

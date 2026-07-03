@@ -1,0 +1,249 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Právní forma a governance</div>
+    <h2>Právní formy pro Ikaros a doporučené architektury</h2>
+  </div>
+
+  <p class="lead">Rešerše, ne stanovisko. Tato kapitola srovnává právní formy z pohledu konkrétní platformy — server, komunitní obsah, RPG moduly, knihovny, AI nástroje, partner pack — a shrnuje čtyři doporučené architektury (A–D). Cíl není učebnicový výčet, ale zjistit, která forma unese misi <span class="mono">Projekt Ikaros</span> a zároveň umožní její dlouhodobý provoz a financování. Právní forma je zároveň jedno z rozhodnutí, které musí projít právníkem.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Text je právní rešerše pro interní rozhodování, nikoli právní stanovisko. Finální volbu formy, znění stanov/společenské smlouvy i licenční strukturu mezi entitami musí posoudit advokát. Kde se rešeršní podklad rozchází s ověřeným právním stavem, platí ověřený stav (viz callouty a poznámky v této kapitole).</p>
+  </div>
+
+  <h3>Proč na volbě formy záleží</h3>
+  <p>Právnická osoba není jen „obal". U Ikarosu by měla být současně <strong>držitelem práv, provozovatelem platformy, správcem osobních údajů, smluvní stranou vůči dodavatelům, příjemcem darů a podpory a odpovědným subjektem vůči uživatelům</strong>. Pokud vznikne pozdě a bez převodu aktiv, hrozí chaos: entita provozuje web, ale kód, logo, doména a databáze stále patří fyzickým osobám nebo dodavatelům. Volba formy proto přímo souvisí s odpovědností, účetnictvím, dary, ochranou značky a převoditelností projektu.</p>
+
+  <p>Napříč všemi formami platí dva vznikové body: <strong>spolek i obchodní společnost vznikají až zápisem do veřejného rejstříku</strong> — teprve zápisem se stávají právnickou osobou schopnou nabývat práv a povinností. U <span class="mono">s.r.o.</span> je minimální základní kapitál <strong>1 Kč</strong> a lze ji založit i jedinou fyzickou nebo právnickou osobou.</p>
+
+  <h3>Srovnání forem</h3>
+  <p>Následující matice hodnotí každou formu z hlediska vhodnosti pro Ikaros, hlavních výhod a rizik. Fyzická osoba a OSVČ jsou zařazeny jako přechodné/dodavatelské, nikoli jako finální nositel platformy.</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Forma</th>
+        <th>Vhodnost pro Ikaros</th>
+        <th>Silné stránky</th>
+        <th>Rizika / limity</th>
+        <th>Kdy zvolit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Fyzická osoba</strong></td>
+        <td><span class="no">jen dočasně</span> před založením</td>
+        <td>Rychlost, žádný zakládací dokument, snadné testování prototypu.</td>
+        <td>Osobní odpovědnost za závazky, chaos IP, špatná převoditelnost, projekt stojí na jedné osobě (úmrtí/nemoc/konflikt ohrožuje vše), slabá pozice vůči partnerům a investorům.</td>
+        <td>Jen raný prototyp bez plateb, bez týmu a bez předávání partner packu.</td>
+      </tr>
+      <tr>
+        <td><strong>OSVČ</strong></td>
+        <td><span class="partial">dodavatel, ne platforma</span></td>
+        <td>Legální příjem z výdělečné činnosti, snadné fakturování vývoje, vhodné pro zakladatele jako dodavatele.</td>
+        <td>Osobní odpovědnost, žádné oddělení projektu od osoby, horší pro více zakladatelů, nevhodné pro komunitní governance.</td>
+        <td>Dílčí dodávky (vývoj, správa serveru, obsah), ne finální držitel značky a komunitních práv.</td>
+      </tr>
+      <tr>
+        <td><strong>Zapsaný spolek</strong></td>
+        <td><span class="yes">velmi vhodný</span> pro komunitní jádro</td>
+        <td>Komunitní legitimita, členské příspěvky, dobrovolníci a orgány, vedlejší hospodářská činnost na podporu účelu, nižší reputační odpor komunity.</td>
+        <td>Méně vhodný pro investory, nutnost stanov a členského režimu, riziko, že placená služba převáží hlavní účel, vnitřní demokracie může zpomalovat rozhodování.</td>
+        <td>Hobby/komunitní Ikaros s dobrovolnou podporou; když platforma slouží scéně a řídí ji zakladatelé.</td>
+      </tr>
+      <tr>
+        <td><strong>Ústav</strong></td>
+        <td><span class="yes">vhodný</span> pro veřejně prospěšnou službu</td>
+        <td>Stabilnější řízení než velký spolek, oddělení uživatelů od členů, dobrý pro granty a partnery, veřejně prospěšný signál.</td>
+        <td>Složitější orgány, méně komunitně demokratický, nutné jasně nastavit zakladatele a správní radu, méně známý než spolek/s.r.o.</td>
+        <td>Když má být Ikaros „instituce pro scénu", ne členský klub.</td>
+      </tr>
+      <tr>
+        <td><strong>s.r.o.</strong></td>
+        <td><span class="yes">vhodný</span> pro startup / prodej / služby</td>
+        <td>Investiční kompatibilita, jasné podíly a orgány, vhodné pro placené služby, snadnější B2B smlouvy, standardní účetnictví, odpovědnost oddělená od osoby.</td>
+        <td>Menší nezisková důvěryhodnost, možnost prodeje projektu bez komunitní kontroly, plná daňová a účetní agenda, nutnost obchodních podmínek a DPH režimu.</td>
+        <td>Startup, placené plány, investice, B2B; u komunitní vize spíše jako provozní dcera v hybridu.</td>
+      </tr>
+      <tr>
+        <td><strong>Hybrid spolek + s.r.o.</strong></td>
+        <td><span class="yes">nejsilnější</span>, ale složitější</td>
+        <td>Oddělí misi a byznys, investiční varianta bez ztráty komunitního jádra, snadnější ochrana značky, lze oddělit rizika provozu.</td>
+        <td>Vyšší režie, dvě účetnictví, nutné licenční a servisní smlouvy mezi subjekty, riziko konfliktu mezi komunitou a firmou.</td>
+        <td>Větší Ikaros s příjmy: nezisková entita drží misi a značku, s.r.o. provozuje placené vrstvy.</td>
+      </tr>
+      <tr>
+        <td><strong>Nadační fond</strong></td>
+        <td><span class="partial">jen doplňkově</span></td>
+        <td>Vhodný pro dary a veřejně prospěšné účely, symbolická důvěryhodnost, možnost podporovat projekty.</td>
+        <td>Nevhodný pro každodenní SaaS provoz, administrativa, nutnost jasného účelu a majetku.</td>
+        <td>Granty, stipendia, podpora komunitních akcí — doplněk, ne hlavní vozidlo.</td>
+      </tr>
+      <tr>
+        <td><strong>Družstvo</strong></td>
+        <td><span class="no">nízká priorita</span></td>
+        <td>Členská ekonomická participace, kolektivní vlastnictví.</td>
+        <td>Méně standardní pro digitální platformu, složitější než potřebná forma.</td>
+        <td>Jen pokud by komunita chtěla platformu vlastnit kolektivně.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Fyzická osoba a OSVČ — jen přechodně</h4>
+  <p>Pokud doména, hosting, platební brána, kód, značka i podmínky užití stojí na jedné fyzické osobě, projekt je snadno spustitelný, ale špatně převoditelný, špatně financovatelný a osobně rizikový. <strong>OSVČ může být dodavatelem Ikarosu, nikoli samotným Ikarosem.</strong> Obě varianty použít jen jako přechodnou fázi a hned připravit převod IP do právnické osoby.</p>
+
+  <h4>Spolek — mez podnikání jako hlavní činnosti</h4>
+  <p>Podle občanského zákoníku <strong>nemůže být hlavní činností spolku podnikání ani jiná výdělečná činnost</strong>; vedlejší hospodářská činnost je přípustná, pokud podporuje hlavní činnost nebo hospodárně využívá majetek. <strong>Zisk lze použít jen pro spolkovou činnost včetně její správy — nesmí být rozdělen členům.</strong> To přesně sedí na model „bezplatný základ + dobrovolná podpora + omezené placené rozšíření pro provoz".</p>
+
+  <h4>Ústav — služba místo členství</h4>
+  <p>Ústav je právnická osoba založená za účelem provozování společensky nebo hospodářsky užitečné činnosti s využitím osobní a majetkové složky. <strong>Zisk lze použít jen k podpoře činnosti a úhradě správy.</strong> Uživatelé jsou příjemci služby, ne členové — vhodné, pokud má být klíčová služba české RPG scéně, nikoli členské spolurozhodování.</p>
+
+  <div class="callout gold">
+    <div class="t">Mission lock — kde je nejsilnější</div>
+    <p>Nejsilnější pojistku mise nese <strong>forma spolku nebo ústavu</strong>: zákonný <strong>zákaz rozdělení zisku členům / zakladatelům</strong> je vestavěn přímo do právní formy, ne jen do smlouvy. Stanovy (spolek) a zakládací listina (ústav) působí <span class="mono">in personam</span> vůči orgánům a mají silnější lock než čistě smluvní ujednání typu shareholders' agreement (SHA). Konstrukce jako vesting podílů jsou <strong>jen smluvní</strong> — nezakládají žádnou vlastnost formy, a jsou proto slabší než formou vynucený zákaz rozdělení zisku. Detaily formulace §§ ověří advokát; princip je: <em>chceš-li tvrdý mission lock, drž misi v neziskové formě, ne v s.r.o.</em></p>
+  </div>
+
+  <h4>s.r.o. — investoři za cenu reputace</h4>
+  <p>Nejpraktičtější pro startupovou variantu: investoři, komerční předplatné, B2B partnerství, prodej licencí, placené funkce. Nevýhoda je vnímání — komunita může číst s.r.o. jako posun od mise k byznysu. Pokud Ikaros poběží v s.r.o., musí být hodnoty zajištěny <strong>zakladatelskými dokumenty, veřejnou komunikací a governance, nikoli jen prohlášením</strong>.</p>
+
+  <h4>Hybrid — nejrobustnější při růstu</h4>
+  <p>Spolek/ústav nese komunitní účel, značku, pravidla a veřejnou misi; s.r.o. provozuje infrastrukturu, platby, placené plány, B2B a vývoj. Mezi subjekty musí být <strong>licenční a servisní smlouvy</strong>, aby bylo jasné, kdo smí užívat značku, data, software a komunitní obsah.</p>
+
+  <h3>Doporučené architektury A–D</h3>
+  <p>Čtyři konkrétní modely, jak formy poskládat. Volba závisí na fázi projektu a na tom, zda hlavní motivací je komunita, nebo investice.</p>
+
+  <div class="feat">
+    <h4>Varianta A — čistý spolek</h4>
+    <ul>
+      <li>Právnickou osobou je <strong>zapsaný spolek</strong>. Vlastní značku, smluvně získá kód, dokumentaci a databázi, provozuje platformu, uzavírá podmínky užití, přijímá dary, členské příspěvky a příjmy z vedlejší hospodářské činnosti.</li>
+      <li><strong>Stanovy</strong> musí výslovně uvést účel: podpora hraní rolí, komunitní tvorby, vzdělávání, kultury, provoz online nástrojů pro RPG komunitu.</li>
+      <li><strong>Vedlejší hospodářská činnost</strong> popsána obecně: provoz doplňkových digitálních služeb, prodej kosmetických/podpůrných prvků, pořádání akcí, merchandising.</li>
+      <li><strong>Zisk se nerozděluje členům</strong> — použije se na provoz, vývoj, správu, bezpečnost, komunitu.</li>
+      <li><strong>Členství ≠ registrace hráče</strong> — nesmí se plést běžný uživatelský účet se spolkovým členstvím.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Varianta B — ústav</h4>
+    <ul>
+      <li>Vhodné, má-li být Ikaros spravován jako <strong>veřejně prospěšná služba bez masové členské demokracie</strong>. Zakladatelé určují účel, správu a orgány; uživatelé jsou příjemci služby, ne členové.</li>
+      <li><strong>Zakládací listina</strong> vymezí službu a principy: bezplatný základ, ochrana dat, komunita, české prostředí.</li>
+      <li><strong>Správní rada</strong> hlídá účel, <strong>ředitel</strong> řeší provoz.</li>
+      <li>Placené doplňky musí být v souladu s účelem; zisk se použije na činnost a správu.</li>
+      <li>Uživatelé se řídí podmínkami platformy, ne členským režimem — model „česká infrastruktura pro RPG", ne klub.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Varianta C — s.r.o. startup</h4>
+    <ul>
+      <li>Pro projekt, který potřebuje <strong>investici</strong>, placené plány, jednání s firmami a škálovatelný produkt. Právně jasnější pro investory, ale musí ustát reputační otázku komunitní důvěry.</li>
+      <li><strong>Společenská smlouva a zakladatelská dohoda</strong> musí chránit misi a zakladatelskou kontrolu.</li>
+      <li><strong>IP převedena do s.r.o. nebo dlouhodobě licencována.</strong></li>
+      <li>Investor nesmí získat možnost použít <strong>partner pack mimo Ikaros</strong>.</li>
+      <li>Značka a doména pod kontrolou entity, ne externího dodavatele.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Varianta D — hybrid (spolek/ústav + s.r.o.)</h4>
+    <ul>
+      <li>Dlouhodobě <strong>nejodolnější</strong>, pokud se projekt rozroste. Komunitní entita drží účel, komunitu, značku a zásadní kontrolu; provozní s.r.o. zajišťuje platební vrstvy, vývoj, B2B, infrastrukturu a komerční rizika.</li>
+      <li>Složitější na smlouvy, ale nejlépe řeší konflikt „fanouškovský projekt" vs. „server se musí uživit".</li>
+    </ul>
+  </div>
+
+  <p>Rozdělení rolí ve variantě D shrnuje následující tabulka — kdo co drží a jaká smlouva to mezi entitami zajišťuje:</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Otázka</th>
+        <th>Komunitní entita (spolek/ústav)</th>
+        <th>Provozní s.r.o.</th>
+        <th>Smlouva mezi nimi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Kdo vlastní značku?</td>
+        <td>Komunitní entita</td>
+        <td>Používá na základě licence</td>
+        <td>Licenční smlouva k ochranné známce</td>
+      </tr>
+      <tr>
+        <td>Kdo provozuje placené plány?</td>
+        <td>Může schvalovat pravidla</td>
+        <td>Doporučeně provozuje a inkasuje</td>
+        <td>Servisní / provozní smlouva</td>
+      </tr>
+      <tr>
+        <td>Kdo vlastní kód?</td>
+        <td>Možné vlastnictví nebo licence</td>
+        <td>Možné vlastnictví provozní části</td>
+        <td>IP licence / vývojová smlouva</td>
+      </tr>
+      <tr>
+        <td>Kdo odpovídá uživatelům?</td>
+        <td>Za komunitní pravidla</td>
+        <td>Za digitální službu a platby</td>
+        <td>Rozdělení odpovědnosti v podmínkách užití</td>
+      </tr>
+      <tr>
+        <td>Kdo rozhoduje o misi?</td>
+        <td>Stanovy / správní rada</td>
+        <td>Respektuje v licenčních podmínkách</td>
+        <td>Mission lock / smluvní podmínka</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení k prověření</div>
+    <p>Prověřit, zda má <strong>ochrannou známku a klíčové autorské materiály vlastnit komunitní entita</strong> a provozní s.r.o. je má pouze licencované. To zamezí scénáři, kdy komerční vozidlo prodá značku nebo změní směr projektu proti komunitnímu účelu. Volbu formy Ikarosu (nezisk s nejsilnějším mission lockem vs. s.r.o. s licenčním lockem) zařadit mezi první otázky pro advokáta.</p>
+  </div>
+
+  <h3>Co převést nebo licencovat do entity</h3>
+  <p>Při založení entity je třeba rozhodnout, zda zakladatel práva <strong>převede</strong>, nebo poskytne <strong>výhradní dlouhodobou licenci</strong>. Převod majetkových autorských práv má v českém právu omezení; často se pracuje s licencí, postoupením výkonu práv nebo smluvní strukturou podle typu díla — návrh patří právníkovi. Přehled aktiv a co s nimi:</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>Aktivum</th><th>Co se má stát při založení entity</th><th>Poznámka</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Doména</td><td>Přepsat držitele nebo smluvně zajistit užívání entitou.</td><td>Není autorské právo, ale kritická pro kontrolu projektu — brání ztrátě kontroly.</td></tr>
+      <tr><td>Hosting a infrastruktura</td><td>Smlouvy a účty vedené na entitu, ne na soukromý e-mail jednotlivce.</td><td>Zabrání zablokování při odchodu osoby.</td></tr>
+      <tr><td>Repozitáře</td><td>Entita jako vlastník organizace/repozitáře nebo smluvní právo správy.</td><td>Řešit přístupy, 2FA, recovery, odchod vývojáře.</td></tr>
+      <tr><td>Kód</td><td>Výslovná licence nebo režim práv od všech autorů a dodavatelů.</td><td>Zvlášť pro části napsané před vznikem entity.</td></tr>
+      <tr><td>Logo a grafika</td><td>Licence/převod tak, aby entita mohla podat OZ a používat assety.</td><td>Bez souhlasu grafika může být problém.</td></tr>
+      <tr><td>Texty a dokumentace</td><td>Licence/převod k manuálům, nápovědě, prezentacím, obchodním dokumentům.</td><td>Včetně práva upravovat a tvořit odvozeniny.</td></tr>
+      <tr><td>Databáze</td><td>Určit pořizovatele databáze a držitele práv; protokol o předání.</td><td>Důležité pro ochranu proti scrapingu.</td></tr>
+      <tr><td>Uživatelské účty a osobní údaje</td><td>Entita jako správce; aktualizované zásady ochrany OÚ a informování uživatelů.</td><td>Při změně správce řešit GDPR transparentnost.</td></tr>
+      <tr><td>Komunitní obsah</td><td>Převzít provozní licenci podle nových podmínek užití.</td><td>Starý obsah může vyžadovat nové odsouhlasení.</td></tr>
+      <tr><td>Ochranná známka</td><td>Rozhodnout, zda přihlašovatelem bude zakladatel, nebo entita.</td><td>Často dává smysl, aby vlastníkem byla cílová entita.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Governance a daňová poznámka</h3>
+  <p>Nejde jen o založení. Ikaros potřebuje pravidla, <strong>kdo rozhoduje o změně směřování, kdo podepisuje smlouvy, kdo mění podmínky užití, kdo schvaluje komunitní knihovny, kdo nakládá se značkou</strong> a co se stane při odchodu zakladatele nebo vývojáře. Doporučuje se výslovně popsat komunitní a neziskový/udržitelný účel entity a vyhradit nejdůležitější rozhodnutí (převod značky, prodej platformy, změna licence, exkluzivní partnerství) přísnějšímu režimu.</p>
+
+  <div class="callout cyan">
+    <div class="t">Registrace k dani u veřejně prospěšného poplatníka</div>
+    <p>Nezisková entita (spolek/ústav) je veřejně prospěšný poplatník. Registrace k dani z příjmů je jinak do 15 dnů, ale <strong>uplatní se výjimka</strong>: přijímá-li entita jen nezdaňované příjmy (členské příspěvky, dary, dotace), registrovat se nemusí. Registraci spustí až první <strong>zdaňovaný příjem</strong> — typicky placené služby nebo reklama. Detaily viz kapitola o účetnictví a daních.</p>
+  </div>
+
+  <p>Souhrnně: pro komunitní jádro s dobrovolnou podporou je nejpřirozenější <strong>varianta A (spolek)</strong> nebo <strong>B (ústav)</strong> s vestavěným mission lockem; při potřebě investic a placených plánů <strong>C (s.r.o.)</strong> s tvrdými zakladatelskými dokumenty; při růstu a příjmech <strong>D (hybrid)</strong>, kde nezisková entita drží misi a značku a s.r.o. provozuje placené vrstvy. Finální volba je otázka pro advokáta — provázaná s odpovědností, účetnictvím, dary a převodem práv.</p>
+
+  <ul class="sources">
+    <li>Občanský zákoník (89/2012 Sb.) — spolek: hlavní vs. vedlejší hospodářská činnost, zákaz rozdělení zisku členům; ústav: účel a nakládání se ziskem.</li>
+    <li>gov.cz — vznik spolku zápisem do veřejného rejstříku; ÚPV — přihláška ochranné známky (FO i PO, právo přednosti, platnost 10 let).</li>
+    <li>BusinessInfo — s.r.o.: minimální základní kapitál 1 Kč, založení jednou osobou; vznik zápisem do obchodního rejstříku.</li>
+    <li>Fact-check ledger v1.0 (autoritativní): mission lock nejsilnější u spolku/ústavu (zákaz rozdělení zisku), stanovy &gt; SHA (in personam), vesting = jen smluvní konstrukce; veřejně prospěšný poplatník — výjimka z registrace při jen nezdaňovaných příjmech.</li>
+  </ul>
+</section>

@@ -1,0 +1,373 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Kontrolní nástroje · Příprava pro právníka</div>
+    <h2>IP inventář a důkazní archiv</h2>
+  </div>
+
+  <p class="lead">Právní chyba u komunitních a technologických projektů obvykle nevzniká u konkurence, ale uvnitř projektu — protože není jasné, komu patří kód, grafika, texty, databáze, doména, účty, zdrojové soubory a práva k budoucímu použití platformy jako šablony. Tato kapitola dává jeden nástroj, který to řeší: úplný soupis aktiv (kdo je vlastník/autor · jaký je důkaz · zda existuje smlouva · co chybí) a k němu důkazní archiv, který inventář v případě sporu podepře. Cíl je jediný — přinést právníkovi <strong>inventář, ne dotaz</strong>. Neptej se „jak ochránit nápad"; přines seznam aktiv, seznam lidí, kteří na projektu pracovali, seznam cizích systémů a ukázku toho, co přesně se bude předávat partnerům. Teprve pak lze napsat smysluplné NDA, smlouvy a podmínky užití.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Rešerše, ne právní stanovisko. Tabulky slouží k přípravě podkladů; finální posouzení vlastnictví, licencí a důkazní hodnoty patří advokátovi (u ochranné známky advokátovi nebo patentovému zástupci). Odkazy na paragrafy jsou orientační a mají se ověřit proti konsolidovanému znění předpisů.</p>
+  </div>
+
+  <h3>1. Proč vůbec inventarizovat</h3>
+
+  <p>Právnická osoba není jen „obal". U Ikarosu má být <strong>držitelem práv, provozovatelem platformy, správcem dat, smluvní stranou vůči dodavatelům, příjemcem darů/podpory a odpovědným subjektem vůči uživatelům</strong>. Pokud vznikne pozdě a bez převodu aktiv, nastane rozpor: entita provozuje web, ale kód, logo, doména i databáze pořád patří fyzickým osobám nebo dodavatelům. Inventář je právě ta mapa, podle níž se aktiva při vzniku entity převádějí nebo licencují (viz část <em>Právnická osoba a převod aktiv</em>).</p>
+
+  <p>Druhý důvod je důkazní. Autorské právo ani obchodní tajemství se neregistrují jako známka — jejich existenci a rozsah v případě sporu <strong>dokazuje ten, kdo se práva dovolává</strong>. Bez datovaných stop (git historie, exporty, screenshoty) je tvrzení „to je moje, vytvořil jsem to tehdy a tehdy" těžko obhajitelné. Inventář a důkazní archiv jsou dvě strany téže mince: první říká, co vlastníš, druhý to umí prokázat.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">8</div><div class="l">tříd aktiv v inventáři (kód · DB · grafika · texty · doména · účty · značka · komunitní obsah)</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">smluvních oblastí (vývojář · grafik · copywriter · moderátor · komunita · partner)</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">pilíře důkazního archivu (git · datované PDF · screenshoty · DB schéma)</div></div>
+  </div>
+
+  <h3>2. Tabulka IP inventáře</h3>
+
+  <p class="lead">Toto je hlavní kontrolní tabulka. Vyplňuje se řádek po řádku; prázdné buňky u konkrétního aktiva jsou <strong>červená vlajka</strong> — buď chybí důkaz vlastnictví, nebo chybí smlouva, která by autorství/licenci potvrdila. Sloupec „Co chybí" je akční — plní se úkoly pro dopsání.</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Aktivum</th>
+        <th>Popis</th>
+        <th>Autor / vlastník</th>
+        <th>Důkaz</th>
+        <th>Smlouva existuje?</th>
+        <th>Co chybí</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Kód frontend</strong></td>
+        <td>Komponenty, UI, klientská logika</td>
+        <td>&nbsp;</td>
+        <td><span class="mono">git</span> historie repozitáře</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>Kód backend</strong></td>
+        <td>API, autentizace, logika světů</td>
+        <td>&nbsp;</td>
+        <td><span class="mono">git</span> historie repozitáře</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>Databázové schéma</strong></td>
+        <td>Tabulky, migrace, vztahy</td>
+        <td>&nbsp;</td>
+        <td>Repo / DB export</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>Logo</strong></td>
+        <td>Slovní / obrazové označení</td>
+        <td>&nbsp;</td>
+        <td>Zdrojový soubor</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>UI design</strong></td>
+        <td>Design systém, obrazovky</td>
+        <td>&nbsp;</td>
+        <td>Figma / screenshoty</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>Texty webu</strong></td>
+        <td>Nápověda, onboarding, manuály</td>
+        <td>&nbsp;</td>
+        <td><span class="mono">DOCX</span> / <span class="mono">PDF</span></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>Strategie</strong></td>
+        <td>Roadmapa, partner pack, právní plán</td>
+        <td>&nbsp;</td>
+        <td>Datovaný export</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>Komunitní obsah</strong></td>
+        <td>Články, světy, bestiáře, knihovny</td>
+        <td>Uživatelé</td>
+        <td><span class="mono">DB</span></td>
+        <td>Podmínky?</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Jak číst prázdné buňky</div>
+    <p>Prázdný sloupec <strong>Autor / vlastník</strong> = neví se, kdo je držitel práv → nelze převést na entitu. Prázdné <strong>Smlouva existuje?</strong> = existuje jen faktické vytvoření díla bez písemného ošetření rozsahu užití → riziko sporu o rozsah. U řádku <em>Komunitní obsah</em> je vlastníkem <strong>uživatel</strong> a smlouvou jsou <strong>Podmínky užití</strong> — proto tam u smlouvy stojí otazník: bez licenčního ujednání v podmínkách zůstává obsah uživatele a platforma má jen nejasné oprávnění (klíčové pro klonovatelné globální knihovny).</p>
+  </div>
+
+  <h4>Rozšiřující řádky, které v původní tabulce nebyly, ale patří tam</h4>
+
+  <p>Původní soupis vynechává tři aktiva, která bývají zdrojem sporů. Doplň je:</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Aktivum</th>
+        <th>Popis</th>
+        <th>Autor / vlastník</th>
+        <th>Důkaz</th>
+        <th>Smlouva existuje?</th>
+        <th>Co chybí</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Doména</strong></td>
+        <td>Registrace, DNS, e-mail na doméně</td>
+        <td>&nbsp;</td>
+        <td>Registrátor (whois, faktura, přístup do účtu)</td>
+        <td>&nbsp;</td>
+        <td>Převod držitele na entitu; kdo platí obnovu</td>
+      </tr>
+      <tr>
+        <td><strong>Účty a přístupy</strong></td>
+        <td>Registrátor, hosting, cloud, GitHub, e-mail, sociální sítě</td>
+        <td>&nbsp;</td>
+        <td>Vlastnictví účtu, faktura, 2FA recovery</td>
+        <td>&nbsp;</td>
+        <td>Vazba na FO vs. entitu; sdílené heslo = riziko</td>
+      </tr>
+      <tr>
+        <td><strong>Značka / OZ</strong></td>
+        <td>„Projekt Ikaros" / „Ikaros" — slovní + obrazová</td>
+        <td>&nbsp;</td>
+        <td>Přihláška ÚPV/EUIPO (zatím neexistuje)</td>
+        <td>&nbsp;</td>
+        <td>Rešerše kolizí; volba přihlašovatele a tříd</td>
+      </tr>
+      <tr>
+        <td><strong>Partner pack</strong></td>
+        <td>Prezentace, demo, obchodní materiály pro partnery/investory</td>
+        <td>&nbsp;</td>
+        <td>Datovaný export + log předání</td>
+        <td>NDA?</td>
+        <td>Označení důvěrnosti; komu se ukazuje a proč</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Autorství AI výstupů — nepřiřazovat automaticky</div>
+    <p>Podle rozhodnutí Městského soudu v Praze <span class="mono">10 C 13/2023</span> <strong>čistě AI vygenerovaný obrázek NENÍ autorské dílo</strong> — autorem může být jen fyzická osoba (§5 AZ), prompt je jen námět (§2/§6 AZ) a výstup zůstává právně volný. Pro inventář to znamená: AI portréty, AI bestiáře a AI ilustrace <strong>nezapisuj jako aktivum s autorem = uživatel ani = Ikaros</strong>. Ošetři to v podmínkách klonování a v podmínkách užití (uživatel negarantuje autorství AI výstupu). Souvisí s částí <em>AI Act a transparentnost</em> — AI obsah se navíc musí strojově značit dle čl. 50 AI Act.</p>
+  </div>
+
+  <h3>3. Právní režim jednotlivých aktiv</h3>
+
+  <p>Inventář má smysl jen tehdy, když u každého aktiva víš, <strong>jaký právní režim ho drží</strong> — jinak nelze poznat, zda „vytvoření díla" stačí, nebo je nutná smlouva. Čtyři režimy, které aktiva Ikarosu pokrývají:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Autorské právo</h4>
+      <p>Kód, grafika, UI, texty, DB struktura jako výsledek tvůrčí činnosti. Vzniká automaticky vytvořením, ale rozsah užití (úpravy, převod, komerce, šablona) musí být <strong>písemně</strong> — jinak platí jen zákonná domněnka nebo úzká licence k účelu.</p>
+    </div>
+    <div class="card">
+      <h4>Databázové právo</h4>
+      <p>Knihovny obsahu, šablony, bestiář, předměty, generátorové tabulky, vztahy, metadata. Chrání investici do pořízení/uspořádání dat. Důkazem je investovaný čas, metodika, historie doplňování a náklady. Proti scrapingu se opírá o podmínky užití + zákaz hromadného vytěžování.</p>
+    </div>
+    <div class="card">
+      <h4>Obchodní tajemství (§504 OZ)</h4>
+      <p>Neveřejná roadmapa, technické řešení, partner pack, tržní strategie, právní plán. <strong>Všech šest znaků kumulativně</strong>: konkurenční významnost · souvislost se závodem · určitost/určitelnost · není běžně dostupné · vůle vlastníka je utajovat · zajištění utajení. Důkaz = NDA, označení důvěrnosti, log předání, omezené přístupy.</p>
+    </div>
+    <div class="card">
+      <h4>Nekalá soutěž</h4>
+      <p>Ochrana proti záměně značky, parazitování na pověsti a využití svěřeného tajemství. Sem patří „vyvolání nebezpečí záměny" (§2981 OZ). Důkaz = doklad předání, veřejné porovnání konkurenčního produktu, komunikace, svědecké výpovědi.</p>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Oprava proti podkladu — 6 znaků obchodního tajemství</div>
+    <p>Podklad uvádí u §504 OZ jen pět znaků. Správně je jich <strong>šest</strong> — chybí „souvislost se závodem". Chybí-li byť jeden, o obchodní tajemství právně nejde a ochrana padá. Proto se u aktiv typu roadmapa/partner pack musí důsledně plnit sloupec „důkaz utajení" (NDA + označení + log).</p>
+  </div>
+
+  <h3>4. Co samo o sobě nestačí — smluvní ošetření aktiv</h3>
+
+  <p>U některých aktiv nestačí, že vznikla — musí být smluvně jasné, komu patří a co se s nimi smí. Následující matice mapuje aktiva na smluvní oblasti; je to zároveň kontrolní seznam, jaké smlouvy k inventáři musí vzniknout.</p>
+
+  <div class="feat">
+    <h4>4.1 Vztah s vývojářem (kód frontend/backend, DB schéma)</h4>
+    <ul>
+      <li>Počítačové programy a databáze vytvořené na objednávku se považují za <strong>zaměstnanecká díla</strong> a objednatel za zaměstnavatele — tzv. fikce dle <span class="mono">§58 odst. 7</span> AZ. Majetková práva tedy vykonává objednatel i bez výslovné licence.</li>
+      <li>Přesto je písemná smlouva prakticky nutná — musí být jasné, co bylo objednáno, v jakém rozsahu, komu patří <strong>zdrojové soubory</strong>, zda lze dílo upravovat, převést na entitu, licencovat, provozovat komerčně a použít jako šablonu.</li>
+      <li><span class="pill">riziko bez smlouvy</span> Autor/dodavatel zpochybní rozsah použití, nepředá zdroje nebo použije know-how jinde.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>4.2 Vztah s grafikem, ilustrátorem a copywriterem (logo, UI, texty)</h4>
+    <ul>
+      <li>U ostatních děl na objednávku (mimo program/databázi/kartografii) platí <span class="mono">§61</span> AZ: autor poskytl <strong>licenci jen k účelu vyplývajícímu ze smlouvy</strong>. K užití nad tento účel je objednatel oprávněn jen na základě další licenční smlouvy.</li>
+      <li>Prakticky: logo dodané „pro web" nemusí automaticky pokrývat zápis do ochranné známky, merch, partnerské prezentace nebo převod na budoucí entitu. Rozšíření užití je nutné explicitně nasmlouvat.</li>
+      <li>Výhradní licence navíc vyžaduje <strong>písemnou formu</strong> (§2358 OZ); bez písemného souhlasu licence třetí osobě nevznikne.</li>
+      <li><span class="pill">riziko bez smlouvy</span> Logo nebo UI nepůjde bezpečně registrovat, měnit ani převést.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Nepleť §58/7 a §61</div>
+    <p>Rozdíl je zásadní pro to, jestli vůbec potřebuješ licenci. <strong>§58 odst. 7</strong> (počítačový program, databáze, kartografické dílo na objednávku) = fikce zaměstnaneckého díla, majetková práva má objednatel. <strong>§61</strong> (všechna ostatní objednaná díla — logo, ilustrace, text) = jen licence k účelu smlouvy, nic víc. Podklad tyto dva režimy zaměňoval a odkazoval oba na §61. U grafiky a textů proto smlouva rozsah užití <em>musí</em> řešit; u kódu ji potřebuješ hlavně kvůli zdrojům a převodu.</p>
+  </div>
+
+  <div class="feat">
+    <h4>4.3 Spoluautoři, dobrovolníci a komunitní autoři (komunitní obsah)</h4>
+    <ul>
+      <li>Dobrovolník, moderátor nebo člen komunity může vytvořit chráněný příspěvek — text, ilustraci, šablonu, kód, překlad, bestii, mapu, generátorovou tabulku. Bez jasné licence <strong>zůstává autorem</strong> a Ikaros má jen nejasné oprávnění.</li>
+      <li>Kritické zejména pro globální knihovny, které mají být klonovatelné a opakovaně použitelné stovkami hráčů — u nich je nutná licence pokrývající klonování a případně neodvolatelnost pro obsah už naklonovaný ostatními.</li>
+      <li>CC licence licencuje jen <strong>majetková</strong> práva; osobnostní práva (§11 AZ) jsou nepřevoditelná — od uživatelů proto ber vlastní licenční ujednání v podmínkách, ne odkaz na CC.</li>
+    </ul>
+  </div>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Smluvní oblast</th>
+        <th>Co musí být ve smlouvě</th>
+        <th>Riziko bez smlouvy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Vývojář</strong></td>
+        <td>Specifikace díla, předání zdrojových kódů, právo úprav, licence/převod, použití v entitě, mlčenlivost, zákaz použití důvěrných informací.</td>
+        <td>Zpochybní rozsah, nepředá zdroje, použije know-how jinde.</td>
+      </tr>
+      <tr>
+        <td><strong>Grafik / ilustrátor</strong></td>
+        <td>Výhradní/nevýhradní licence, použití v ochranné známce, webu, marketingu, PDF, šabloně, komunitě, úpravách a sublicencích.</td>
+        <td>Logo/UI nepůjde bezpečně registrovat, měnit ani převést.</td>
+      </tr>
+      <tr>
+        <td><strong>Copywriter / editor</strong></td>
+        <td>Licence k textům, úpravám, překladům, publikaci, exportu a začlenění do dokumentace.</td>
+        <td>Nejasné užití manuálů, podmínek, nápovědy, prezentací.</td>
+      </tr>
+      <tr>
+        <td><strong>Moderátor / kurátor</strong></td>
+        <td>Práva a povinnosti, mlčenlivost, práce s uživatelským obsahem, zákaz exportu dat, střet zájmů.</td>
+        <td>Únik citlivých dat, zmatek ve správě obsahu, zneužití komunity.</td>
+      </tr>
+      <tr>
+        <td><strong>Komunitní autor</strong></td>
+        <td>Licence k vloženému obsahu, volby soukromá/veřejná/globální knihovna, uvedení autora, mazání, klonování.</td>
+        <td>Nelze bezpečně sdílet, klonovat ani kurátorovat obsah.</td>
+      </tr>
+      <tr>
+        <td><strong>Partner / firma / investor</strong></td>
+        <td>NDA, non-use, účel předání, zákaz konkurenčního použití důvěrných informací, smluvní pokuta, vrácení/smazání materiálů.</td>
+        <td>Partner získá know-how a tvrdí, že šlo o volně předanou inspiraci.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Účty zdarma nejsou mimo režim — data jako platba</div>
+    <p>Pozor u řádku <em>Komunitní obsah</em> a u datového auditu: podle <span class="mono">§2389a OZ</span> se spotřebitelský režim vztahuje i na účty <strong>zdarma</strong>, pokud se osobní data zpracovávají nad rámec pouhého provozu (cílení, analytika, trénink AI). V podmínkách proto odděl „free bez data-monetizace" od placených/datově monetizovaných účtů — jinak spadneš do plných spotřebitelských a GDPR povinností i u bezplatných účtů.</p>
+  </div>
+
+  <h3>5. Důkazní archiv</h3>
+
+  <p class="lead">Inventář říká, co vlastníš; důkazní archiv to umí v případě sporu doložit. Autorské právo, databázové právo ani obchodní tajemství se neregistrují — jejich existenci a datum vzniku nese ten, kdo se jich dovolává. Archiv stojí na čtyřech pilířích, které se navzájem podpírají.</p>
+
+  <div class="feat">
+    <h4>Pilíř 1 — Git historie</h4>
+    <ul>
+      <li>Nejsilnější důkaz autorství a časové posloupnosti u kódu i DB schématu — commit ID, autor, datum, obsah změny. Řetězec commitů dokládá kdo, co a kdy vytvořil.</li>
+      <li>Uchovej <strong>plnou historii</strong> (ne squash na jeden commit); zvaž podepsané commity a chráněný/zálohovaný remote mimo pracovní stroj.</li>
+      <li>Pokrývá řádky inventáře: kód frontend, kód backend, DB schéma.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Pilíř 2 — Datované PDF exporty</h4>
+    <ul>
+      <li>Texty webu, strategie, roadmapa, partner pack, právní plán — exportovat do PDF s datem. Datovaný export je důkaz obsahu i okamžiku, kdy dokument existoval.</li>
+      <li>Pro klíčové dokumenty zvaž prokazatelné časové razítko (např. odeslání sobě e-mailem, verzování, archivní kopie), aby datum nebylo jen v metadatech přepsatelného souboru.</li>
+      <li>Pokrývá: texty webu, strategie, partner pack.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Pilíř 3 — Screenshoty a zdrojové soubory</h4>
+    <ul>
+      <li>Logo, UI design — zdrojový soubor (Figma, vektor) plus datované screenshoty obrazovek. Zdroj prokazuje autorství a možnost úprav; screenshot prokazuje vzhled v čase.</li>
+      <li>Uchovej i vývojové verze — dokládají tvůrčí proces, ne jen výsledný stav.</li>
+      <li>Pokrývá: logo, UI design.</li>
+    </ul>
+  </div>
+
+  <div class="feat">
+    <h4>Pilíř 4 — DB schéma a exporty</h4>
+    <ul>
+      <li>Databázové schéma a datové exporty (repo/DB dump) dokládají strukturu, investici do pořízení dat a historii doplňování — základ databázového práva.</li>
+      <li>Uchovej metodiku a evidenci nákladů/času — u databázového práva jde právě o investici, ne o tvůrčí originalitu.</li>
+      <li>Pokrývá: DB schéma, komunitní obsah (jako datová sada).</li>
+    </ul>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Data Act — export nad rámec archivu</div>
+    <p>Nařízení <span class="mono">Data Act (2023/2854)</span>, použitelné od 12.9.2025, dává uživatelům právo na <strong>strukturovaný export</strong> vlastních dat (deníky, postavy, světy) a zavádí cloud switching (egress poplatky zrušeny od 12.1.2027). To se dotýká i důkazního archivu: strukturovaný, přenositelný formát exportu (nejen ZIP) je zároveň provozní povinnost i důkazní materiál. Posílit export nad rámec pouhého ZIP.</p>
+  </div>
+
+  <h3>6. Návaznost na přípravu pro právníka</h3>
+
+  <p>Inventář a archiv jsou vstupem pro soupis oblastí, které mají projít právníkem. K tabulce IP inventáře patří tři sady kontrolních otázek — ke značce, k NDA a partnerům, a k podmínkám užití. Zde v přehledu, plné znění a rozbor v části <em>Otázky pro právníka a checklist</em>.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>K ochranné známce</h4>
+      <ul>
+        <li>Přihlásit „Projekt Ikaros", „Ikaros", logo, nebo kombinaci?</li>
+        <li>Je název dostatečně rozlišovací a bez kolize se starší známkou/firmou?</li>
+        <li>Kdo je přihlašovatel — FO, budoucí spolek, s.r.o.?</li>
+        <li>Které třídy pokrýt (software, online platforma, komunita, zábava, vzdělávání, digitální obsah)?</li>
+        <li>Národní známka ČR, EU, nebo nejdřív ČR a později EU?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>K NDA a partnerům</h4>
+      <ul>
+        <li>Jak přesně definovat důvěrné informace Ikarosu?</li>
+        <li>Jak formulovat non-use, aby partner nesměl použít informace pro konkurenční službu?</li>
+        <li>Jaká smluvní pokuta je přiměřená?</li>
+        <li>Jak řešit, když partner už v oblasti něco vyvíjel?</li>
+        <li>Jak vést předávací protokol k dokumentům a demu; jak omezit přístup subdodavatelů partnera?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení — pořadí kroků</div>
+    <p>Nejdřív vyplň inventář (kdo/důkaz/smlouva/co chybí), pak založ důkazní archiv (git full history + datované PDF + screenshoty + DB export), teprve pak jdi za právníkem s hotovým balíkem. Sloupec „Co chybí" je zároveň seznam smluv, které je třeba dopsat, a seznam převodů aktiv na budoucí entitu — viz část <em>Právnická osoba a převod aktiv</em>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — právní ochranný rámec, 1. část, s. 5–6 (Co samo o sobě nestačí; smluvní matice; Co má projít právníkem; právnická osoba) a s. 12 (11.1 IP inventář; 11.2–11.5 otázky pro právníka).</li>
+    <li>Autorský zákon: §5 (autor = FO), §11 (osobnostní práva), §58 odst. 7 (fikce zaměstnaneckého díla u programu/databáze/kartografie), §61 (licence k účelu u ostatních děl na objednávku).</li>
+    <li>Občanský zákoník: §504 (obchodní tajemství — 6 znaků kumulativně), §2358 (písemná forma výhradní licence), §2389a (data jako platba), §2981 (vyvolání nebezpečí záměny).</li>
+    <li>MS Praha 10 C 13/2023 — čistě AI vygenerovaný obrázek není autorské dílo; prompt je jen námět.</li>
+    <li>Data Act (nařízení EU 2023/2854), použitelnost od 12.9.2025 — právo na strukturovaný export.</li>
+    <li>Fact-check ledger v1.0 (autorita nad podklady): §504 = 6 znaků; §58/7 vs §61; §2389a data-as-payment; autorství AI výstupů.</li>
+  </ul>
+</section>

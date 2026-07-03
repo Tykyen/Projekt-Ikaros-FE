@@ -1,0 +1,290 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část VI — Řízení rizik</div>
+    <h2>Master rizikový registr</h2>
+  </div>
+
+  <p class="lead">Tato kapitola slučuje čtyři dílčí rizikové registry z původních částí rešerše (IP/licence, komunita/AI, právní forma/účetnictví, ochranný rámec) do jednoho master seznamu s trvalými ID <span class="mono">R01…R28</span> a doplňuje nová rizika identifikovaná při fact-checku (viz kapitola <em>Opravy a doplnění z fact-checku</em>). Registr je rešeršní pomůcka pro přípravu jednání s advokátem, ne právní stanovisko — u každého rizika je uvedena orientační pravděpodobnost, dopad a mitigace, nikoli závazný závěr.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Hodnocení pravděpodobnosti a dopadu je expertní odhad autora rešerše, ne kvantifikovaná analýza. Právní kvalifikace jednotlivých rizik (např. zda konkrétní platba je „dar" nebo „služba", zda landing page „vyvolává dojem oficiální podpory") je věcí posouzení advokáta. Kde se odhad v podkladech a v LEDGERU liší, platí LEDGER.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">28</div><div class="l">rizik v master registru</div></div>
+    <div class="stat"><div class="n">7</div><div class="l">nová z fact-checku (R20–R28)</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">sloučené dílčí registry</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">tvrdé deadliny (2.8. a 2.12.2026)</div></div>
+  </div>
+
+  <h3>Jak registr číst</h3>
+  <p>Sloupce: <strong>ID</strong> (trvalý identifikátor pro křížový odkaz), <strong>riziko</strong> (co se může stát), <strong>oblast</strong> (právní doména), <strong>pravděpodobnost</strong> a <strong>dopad</strong> (odhad), <strong>mitigace</strong> (opatření, které riziko snižuje). ID se nepřečíslovávají — když riziko zanikne, zůstane v registru jako <em>uzavřené</em>, aby historické odkazy platily.</p>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení k údržbě</div>
+    <p>Registr veď jako živý dokument. Před každým milníkem (spuštění landing page, zapnutí placených funkcí, nasazení AI modulu, registrace právnické osoby) projdi relevantní řádky a přehodnoť pravděpodobnost/dopad. Nová rizika přidávej pod nejvyšším volným ID.</p>
+  </div>
+
+  <h3>Master registr rizik</h3>
+
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Riziko</th><th>Oblast</th><th>Pravd.</th><th>Dopad</th><th>Mitigace</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="mono">R01</span></td>
+        <td>Použití cizího loga / brandu bez licence (systémová loga, JaD, DrD®).</td>
+        <td>Známka / copyright</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Zakázat loga mimo výslovně povolený režim; jen referenční název s ® (<span class="mono">Dračí doupě®</span>, <span class="mono">DrD™</span>), u JaD verbatim disclaimer + komunitní logo.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R02</span></td>
+        <td>Landing page vyvolá dojem oficiální podpory / partnerství vydavatele.</td>
+        <td>Známka / nekalá soutěž</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Disclaimer, neutrální wording, právní kontrola textace; nikde neimplikovat souhlas vydavatele. Viz též <span class="mono">R25</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R03</span></td>
+        <td>Veřejné kompendium/bestiář closed systému (statbloky, tabulky, texty z knih).</td>
+        <td>Copyright / databáze</td>
+        <td>Vysoká</td>
+        <td>Velmi vysoký</td>
+        <td>Nespouštět bez licence. Jen engine + prázdné šablony + referenční název; obsah nahradit odkazy na oficiální zdroje. Viz <span class="mono">R21</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R04</span></td>
+        <td>Uživatel nahraje překlad pravidel / cizí chráněný text do knihovny.</td>
+        <td>Copyright</td>
+        <td>Vysoká</td>
+        <td>Vysoký</td>
+        <td>Takedown proces, zákaz v podmínkách užití, notice-and-action (DSA čl. 16). Viz <span class="mono">R14</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R05</span></td>
+        <td>Smíchání SRD a mimo-SRD dat (např. atribuce 5.1 vs. 5.2, Product Identity monstra).</td>
+        <td>Licence</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Source tags a audit importu; NEkombinovat atribuce 5.1/5.2; vynechat PI monstra (beholder, mind flayer…). Viz systémovou matici.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R06</span></td>
+        <td>Nejasné vlastnictví kódu modulu (dobrovolník bez smlouvy).</td>
+        <td>Vnitřní IP</td>
+        <td>Střední až vysoká</td>
+        <td>Vysoký</td>
+        <td>Vývojářské smlouvy / contributor agreement s postoupením (§2358 OZ — písemná forma výhradní licence) nebo assignment. Viz <span class="mono">R11</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R07</span></td>
+        <td>Dary / reklama poruší nekomerční klauzuli fan policy.</td>
+        <td>Licence</td>
+        <td>Střední</td>
+        <td>Střední až vysoký</td>
+        <td>Právní posouzení monetizace u tolerance-only systémů; oddělit provoz spolku od komerce; dotaz vydavateli.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R08</span></td>
+        <td>VTT / interaktivní sheet překročí rozsah povolený fan policy (CoC, GURPS, Shadowrun).</td>
+        <td>Licence</td>
+        <td>Vysoká</td>
+        <td>Vysoký</td>
+        <td>Oddělit sheet od stolu; CoC Fan Policy vylučuje VTT/apps (web-deník = výjimka); GURPS engine = „computer game" mimo policy; dotaz vydavateli / partnerství.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R09</span></td>
+        <td>AI generuje cizí settingový/chráněný obsah (postavy, světy, brandy).</td>
+        <td>Copyright / známka / policy</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>AI filtry, zákaz generování chráněných světů/postav, moderace, AI štítek. Viz <span class="mono">R23</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R10</span></td>
+        <td>Uživatel nahraje cizí ilustraci do klonovatelné knihovny.</td>
+        <td>Copyright</td>
+        <td>Vysoká</td>
+        <td>Vysoký</td>
+        <td>Povinné potvrzení práv při uploadu, nahlášení, rychlé skrytí, blokace klonů. Vlastní licenční ujednání od uživatele (CC nekryje osobnostní práva §11 AZ).</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R11</span></td>
+        <td>Klonovaný obsah se rozšíří do mnoha světů a pak se ukáže jako protiprávní.</td>
+        <td>Copyright</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Genealogie klonů, centrální právní stav obsahu, možnost plošného skrytí napříč deriváty.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R12</span></td>
+        <td>AI výstup napodobí cizí chráněnou postavu.</td>
+        <td>Copyright</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Zakázané prompty, AI štítek, moderace, nahlášení. AI obrázek NENÍ dílo (MS Praha 10 C 13/2023) → autorství nepřiřazovat uživateli.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R13</span></td>
+        <td>AI prompt obsahuje osobní údaje hráčů / zvláštní kategorie (§9 GDPR).</td>
+        <td>GDPR</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Varování, minimalizace, DPA s AI providerem, nepoužívat data k tréninku; zakázat citlivé údaje třetích osob v promptech. Viz <span class="mono">R28</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R14</span></td>
+        <td>Diskuse obsahuje pomluvu / doxxing.</td>
+        <td>Osobnostní práva / DSA</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Nahlášení, rychlá moderace, odůvodnění (DSA čl. 17), GDPR proces pro výmaz. Zákaz obecného monitoringu (DSA čl. 8), Good Samaritan (čl. 7).</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R15</span></td>
+        <td>Moderátor jedná svévolně a bez evidence.</td>
+        <td>Governance / DSA</td>
+        <td>Střední</td>
+        <td>Střední až vysoký</td>
+        <td>Moderační manuál, logy, odvolání, školení; odůvodnění rozhodnutí dle DSA čl. 17.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R16</span></td>
+        <td>Nejasné smazání účtu zničí klony/obsah ostatních uživatelů.</td>
+        <td>Copyright / provoz</td>
+        <td>Střední</td>
+        <td>Střední</td>
+        <td>Pravidlo přežití licence pro existující klony + anonymizace osobních údajů; soft-delete s retencí.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R17</span></td>
+        <td>Komunitní knihovna je hromadně scrapována.</td>
+        <td>Databázové právo</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Anti-scraping podmínky, rate-limit, zvláštní právo pořizovatele databáze (§88+ AZ), monitoring.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R18</span></td>
+        <td>Právnická osoba nemá práva k historickému obsahu (vzniklému před založením).</td>
+        <td>Vnitřní IP</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Přechodová ustanovení, reacceptance podmínek, převod/licence z FO na PO při vkladu.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R19</span></td>
+        <td>Platby označené jako dary, ale fakticky jde o službu.</td>
+        <td>Účetnictví / daně</td>
+        <td>Vysoká</td>
+        <td>Vysoký</td>
+        <td>Oddělit dary a placené plány, účetní metodika; veřejně prospěšný poplatník — registrace k dani až při zdaňovaném příjmu (§39a výjimka). Viz <span class="mono">R20</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R20</span></td>
+        <td>Spolek fakticky podniká jako hlavní činnost; překročení DPH limitu bez registrace; EU platby bez OSS; veřejná sbírka bez oznámení.</td>
+        <td>Právní forma / daně</td>
+        <td>Nízká až střední</td>
+        <td>Střední až vysoký</td>
+        <td>Stanovy s vedlejší hospodářskou činností, měsíční sledování obratu (>2 mil. Kč → plátce od 1.1.; >2 536 500 Kč → hned další den), daňová konzultace před EU prodejem, právník posoudí fundraising. Veřejné sbírky dle novely <span class="mono">197/2024 Sb.</span></td>
+      </tr>
+      <tr>
+        <td><span class="mono">R21</span></td>
+        <td><strong>Spoléhání na Wikipedii u licencí</strong> → falešný pocit „otevřenosti". DrD II NENÍ CC (© ALTAR, jen posvěcený SRD); DrD+ nemá SRD; PI NENÍ pod CC (Fate mechanika volná, český text chráněn).</td>
+        <td>Licence / due diligence</td>
+        <td>Vysoká</td>
+        <td>Velmi vysoký</td>
+        <td>Nikdy neopírat licenční režim o Wikipedii. Ověřovat u primárního zdroje (oficiální SRD / licenční text / vydavatel). Systémovou matici brát jako závaznou; podmíněné systémy jen v engine+referenční režim.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R22</span></td>
+        <td><strong>Nedodržení AI Act čl. 50 do 2.8.2026</strong> — chybějící transparentní značení, že „chat za postavu" řídí AI a že bestiáře/portréty jsou AI generované.</td>
+        <td>AI Act</td>
+        <td>Střední</td>
+        <td>Velmi vysoký</td>
+        <td>Do <span class="mono">2.8.2026</span> zavést transparentní disclosure AI interakce + strojové značení AI výstupů (grace do <span class="mono">2.12.2026</span> pro systémy na trhu před 2.8.2026). Sankce až <span class="mono">15 M€ / 3 %</span>. Code of Practice = dobrovolný důkaz souladu.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R23</span></td>
+        <td>AI generuje NCII / CSAM (zneužití obrázkového modulu).</td>
+        <td>AI Act / trestní</td>
+        <td>Nízká až střední</td>
+        <td>Velmi vysoký</td>
+        <td>Moderace AI obrázků, prohibice dle AI Act (Omnibus doplnil do čl. 5, grace do <span class="mono">2.12.2026</span>); oznámení trestného činu (DSA čl. 18).</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R24</span></td>
+        <td><strong>Chybějící DPIA</strong> pro AI modul a dětské účty (děti + moderace/zprávy + AI = kritéria WP248).</td>
+        <td>GDPR</td>
+        <td>Vysoká</td>
+        <td>Vysoký</td>
+        <td>Zpracovat DPIA min. pro AI modul a dětské účty; povinná RoPA (čl. 30) i pod 250 osob; věk souhlasu 15 let (§7 zák. 110/2019). Zvážit DPO.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R25</span></td>
+        <td><strong>Veřejná landing „systém online zdarma" bez disclaimeru</strong> u tolerance-only systémů (zejména <span class="mono">draci-hlidka</span>/Black Tower, <span class="mono">drd-plus</span>/ALTAR).</td>
+        <td>Nekalá soutěž / licence</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Nepropagovat „zdarma/online" u avoid systémů bez disclaimeru a bez svolení vydavatele; DrD+ pilot běží „naprázdno" (bez obsahu); Dračí hlídka jen DH LITE. Vyvolání nebezpečí záměny §2981 OZ. Viz <span class="mono">R02</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R26</span></td>
+        <td><strong>Transfer dat do USA bez SCC</strong> u AI/LLM API poskytovatele.</td>
+        <td>GDPR — přeshraniční přenos</td>
+        <td>Vysoká</td>
+        <td>Vysoký</td>
+        <td>LLM = zpracovatel → DPA dle čl. 28 + mechanismus přenosu do třetí země (SCC / Data Privacy Framework); vendor audit, nastavení retence, zákaz tréninku na datech uživatelů. Viz <span class="mono">R13</span>, <span class="mono">R27</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R27</span></td>
+        <td>Ikaros používá AI poskytovatele bez DPA.</td>
+        <td>GDPR</td>
+        <td>Střední</td>
+        <td>Vysoký</td>
+        <td>Vendor audit, zpracovatelská smlouva (čl. 28), nastavení retence; provázáno s <span class="mono">R26</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="mono">R28</span></td>
+        <td><strong>DSA bez českého adaptačního zákona</strong> — nejistota dozorových/sankčních pravomocí ČTÚ.</td>
+        <td>DSA</td>
+        <td>Vysoká</td>
+        <td>Střední</td>
+        <td>Nařízení DSA přímo použitelné od <span class="mono">17.2.2024</span>; adaptační zákon („o digitální ekonomice", sněm. tisk 69) zatím NEplatí → ČTÚ nemá plné pravomoci. Plnit hmotné povinnosti DSA nezávisle na adaptaci; sledovat legislativu. Neuvádět konkrétní platné číslo/datum zákona.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Rizika s tvrdým termínem</h3>
+  <p>Většina rizik nemá pevné datum, ale dvě mají regulatorní deadline, který nelze odsunout — patří na začátek harmonogramu.</p>
+
+  <div class="phase">
+    <div class="num">2.8.2026</div>
+    <div class="body"><b><span class="mono">R22</span> — AI Act čl. 50.</b> Transparentní značení AI interakce a AI výstupů se stává vymahatelným. Omnibus tento článek NEodkládá (na rozdíl od high-risk povinností).</div>
+  </div>
+  <div class="phase">
+    <div class="num">2.12.2026</div>
+    <div class="body"><b><span class="mono">R22</span>/<span class="mono">R23</span> — konec grace period.</b> Strojové značení výstupů u systémů uvedených na trh před 2.8.2026 a prohibice NCII/CSAM (Omnibus, čl. 5) musí být plně zavedeny.</div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Priorita nasazení</div>
+    <p>Před veřejným spuštěním jsou nejnaléhavější: <span class="mono">R21</span> (nespoléhat na Wikipedii — přepsat licenční tvrzení dle systémové matice), <span class="mono">R22</span>/<span class="mono">R23</span> (AI Act — tvrdé deadliny), <span class="mono">R24</span> (DPIA), <span class="mono">R25</span> (landing bez disclaimeru u tolerance-only systémů) a <span class="mono">R26</span> (SCC pro transfer do USA). Podrobná kvalifikace patří advokátovi/DPO — viz kapitola <em>Otázky pro advokáta, účetního a vydavatele</em>.</p>
+  </div>
+
+  <h3>Křížové odkazy</h3>
+  <p>Systémová práva a licenční režimy jednotlivých systémů detailně rozebírá kapitola <em>Systémová matice a licence</em>. Termíny a povinnosti AI Act rozvádí kapitola <em>AI a strojové výstupy</em>. GDPR tituly, DPIA a přenos do USA řeší kapitola <em>Ochrana osobních údajů</em>. Právní forma, DPH a veřejné sbírky patří do kapitoly <em>Právní forma, účetnictví a financování</em>.</p>
+
+  <ul class="sources">
+    <li>Fact-check LEDGER v1.0 (autorita nad podklady) — sekce A) Opravy, B) Doplnění, D) Systémová matice.</li>
+    <li>Projekt Ikaros — RPG licence v0.4, kap. 20 „Rizikový registr pro právníka" (R01–R09).</li>
+    <li>Projekt Ikaros — právně-informační rešerše v0.6, kap. 14 „Rizikový registr" (komunita/AI).</li>
+    <li>Projekt Ikaros — právní forma, startup, financování a účetnictví v0.9, kap. 13 „Rizikový registr".</li>
+    <li>Projekt Ikaros — právní rešerše v0.1, kap. 1 „Rychlé shrnutí a hlavní právní teze".</li>
+  </ul>
+</section>

@@ -1,0 +1,316 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Právnická osoba · řízení a kontrola</div>
+    <h2>Governance, převod IP a dokumenty před spuštěním plateb</h2>
+  </div>
+
+  <p class="lead">Právní forma bez governance je jen prázdná schránka. Governance je praktická odpověď na otázku, <strong>kdo má právo rozhodnout</strong>, že se Ikaros prodá, že se změní bezplatný základ, že se převede značka, uzavře partnerství, přijme investor nebo smaže velká část komunitního obsahu. U Ikarosu je řízení kritické, protože projekt míchá komunitu, uživatelská data, dobrovolníky, potenciální příjmy a značku v jedné entitě.</p>
+
+  <p>Tato kapitola pokrývá tři na sebe navazující vrstvy: (1) <strong>minimální orgány a rozhodovací pravidla</strong> — péče řádného hospodáře a střet zájmů; (2) <strong>IP inventář</strong> a jeho převod nebo licencování do provozní entity při jejím vzniku; (3) <strong>právní dokumenty</strong>, které musí existovat dřív, než se spustí placené plány. Volbu samotné formy (spolek / s.r.o. / ústav / hybrid) rozebírá část <em>Právní forma a založení entity</em>; daňový režim veřejně prospěšného poplatníka část <em>Účetnictví a daně</em>. Zde jde o to, jak se uvnitř zvolené formy rozhoduje a co jí patří.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Rešerše, ne právní stanovisko. Uvedené § a předpisy jsou orientační vodítko; převodní a licenční struktura autorských práv i konkrétní znění stanov musí navrhnout advokát. Kde tento text upřesňuje zdrojové podklady (paragrafy, mission lock, autorství AI výstupů), jde o zapracování fact-check ledgeru.</p>
+  </div>
+
+  <h3>Minimální orgány a rozhodovací pravidla</h3>
+
+  <p>Ne každé rozhodnutí smí padnout „provozně". Klíčová rozhodnutí — ta, která mění mocenskou strukturu, misi nebo důvěru komunity — musí projít vyšším orgánem s <strong>kvalifikovanou většinou</strong> a musí být zapsána. Následující matice mapuje typ rozhodnutí na orgán, který ho má schvalovat, a na důvod, proč tam patří.</p>
+
+  <table>
+    <thead>
+      <tr><th>Rozhodnutí</th><th>Kdo schvaluje</th><th>Proč</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Převod ochranné známky</strong></td>
+        <td>Nejvyšší orgán + kvalifikovaná většina / správní rada</td>
+        <td>Značka je jádro projektu.</td>
+      </tr>
+      <tr>
+        <td><strong>Přijetí investora</strong></td>
+        <td>Zakladatelé + kontrolní orgán / členové (dle modelu)</td>
+        <td>Může změnit mocenskou strukturu.</td>
+      </tr>
+      <tr>
+        <td><strong>Změna bezplatného základu</strong></td>
+        <td>Orgán chránící misi</td>
+        <td>Přímý dopad na komunitní důvěru.</td>
+      </tr>
+      <tr>
+        <td><strong>Zavedení placených plánů</strong></td>
+        <td>Statutární orgán + účetní / daňové posouzení</td>
+        <td>Daň, DPH, spotřebitel.</td>
+      </tr>
+      <tr>
+        <td><strong>Předání partner packu</strong></td>
+        <td>Pověřená osoba + NDA schválené právníkem</td>
+        <td>Ochrana know-how.</td>
+      </tr>
+      <tr>
+        <td><strong>Licencování značky třetí straně</strong></td>
+        <td>Kontrolní orgán</td>
+        <td>Riziko parazitování na značce.</td>
+      </tr>
+      <tr>
+        <td><strong>Mazání velké části obsahu</strong></td>
+        <td>Provozní orgán + transparentní proces</td>
+        <td>Důvěra uživatelů a povinnosti dle DSA/GDPR.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení — rozhodovací práh do stanov</div>
+    <p>Ve stanovách / společenské smlouvě výslovně vyhraďte nejdůležitější rozhodnutí (<span class="mono">převod značky · prodej platformy · změna licence · uzavření exkluzivního partnerství · zrušení komunitní knihovny</span>) nejvyššímu orgánu s kvalifikovanou většinou. Bez tohoto výčtu je vše „provozní" a rozhoduje statutár sám.</p>
+  </div>
+
+  <h3>Péče řádného hospodáře</h3>
+
+  <p>Členové orgánu právnické osoby mají povinnost jednat s <strong>péčí řádného hospodáře</strong>. Prakticky: u peněz, značky, partner packu, smluv, dat a sporů nestačí „myslel jsem to dobře". Musí existovat <strong>rozumný rozhodovací proces</strong> — podklady, zápisy, schválení, účetní evidence a oddělení střetu zájmů. U Ikarosu se to má projevit v zápisech z rozhodnutí o placených plánech, výběru právní formy, registraci známky, předání partner packu a ve smlouvách s vývojáři.</p>
+
+  <div class="feat">
+    <h4>Co doložit u každého významného rozhodnutí</h4>
+    <ul>
+      <li><strong>Podklad</strong> — proč, jaké varianty, jaké riziko.</li>
+      <li><strong>Zápis</strong> — kdo, kdy, jak hlasoval; datum a číslo usnesení.</li>
+      <li><strong>Schválení</strong> správným orgánem dle rozhodovací matice výše.</li>
+      <li><strong>Účetní / daňová stopa</strong> tam, kde vznikají peníze (placené plány, faktury).</li>
+      <li><strong>Ošetření střetu zájmů</strong> — viz níže.</li>
+    </ul>
+  </div>
+
+  <h3>Střet zájmů</h3>
+
+  <p>Typický střet u Ikarosu: zakladatel je zároveň jednatelem s.r.o., členem výboru spolku, vývojářem fakturujícím projektu a vlastníkem části kódu. To <strong>není automaticky zakázané</strong>, ale musí to být průhledné, schválené a smluvně ošetřené. Jinak hrozí spor, zda si někdo nepřivlastnil komunitní aktivum nebo nevyvádí hodnotu z neziskové entity.</p>
+
+  <div class="feat">
+    <h4>Mechanismy proti střetu zájmů</h4>
+    <ul>
+      <li><strong>Evidence smluv se spřízněnými osobami.</strong></li>
+      <li><strong>Schvalování odměn a faktur</strong> nezávislým orgánem nebo členskou schůzí.</li>
+      <li><strong>Zákaz hlasování ve vlastním střetu</strong> tam, kde to dává smysl.</li>
+      <li><strong>Pravidelné zveřejnění</strong> základního hospodaření komunitě.</li>
+    </ul>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Mission lock — nejsilnější je forma, ne dohoda</div>
+    <p>Nejsilnější pojistku proti „pay-to-win" pivotu a proti rozdělení hodnoty mezi zakladatele dává sama <strong>nezisková forma</strong> (spolek / ústav): zákon zakazuje rozdělení zisku mezi členy (<span class="mono">§ 217</span> OZ u spolku; <span class="mono">§ 402–403</span> OZ u ústavu — zisk jen na účel). Tento zámek působí <em>in rem</em> vůči každému. Naproti tomu dohoda společníků (SHA) váže jen strany (<em>in personam</em>) a vesting je pouze smluvní konstrukce — obojí lze porušit s rizikem sankce, ale bez automatické neplatnosti. Pořadí síly: <strong>forma &gt; stanovy &gt; SHA &gt; vesting</strong>.</p>
+  </div>
+
+  <h3>IP inventář: co vlastnit a co jen licencovat</h3>
+
+  <p>Právní forma nemá smysl, pokud entita nevlastní nebo nemá licencované to, co provozuje. Musí vzniknout <strong>IP inventář</strong>: kód, databázové schéma, UI, grafika, logo, texty, dokumentace, právní dokumenty, partner pack, mapové nástroje, šablony, komunitní knihovny, doména, účty u služeb, Git repozitáře a přístupové klíče. Autorský zákon u počítačového programu chrání i přípravné koncepční materiály, ale <strong>myšlenky a principy ochrany nepožívají</strong> (herní mechanika sama je volná — viz část <em>Systémy a licence</em>).</p>
+
+  <table>
+    <thead>
+      <tr><th>Aktivum</th><th>Komu má patřit</th><th>Nástroj / dokument</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Zdrojový kód</td>
+        <td>Provozní entita, nebo jasná výhradní licence</td>
+        <td>Vývojová smlouva / IP assignment</td>
+      </tr>
+      <tr>
+        <td>Logo</td>
+        <td>Entita vlastnící značku</td>
+        <td>Autorská smlouva + ochranná známka</td>
+      </tr>
+      <tr>
+        <td>Partner pack</td>
+        <td>Zakladatel / právnická osoba Ikarosu</td>
+        <td>Autorské právo + obchodní tajemství + NDA</td>
+      </tr>
+      <tr>
+        <td>Doména</td>
+        <td>Právnická osoba, ne osobní účet</td>
+        <td>Převod držitele domény</td>
+      </tr>
+      <tr>
+        <td>Git repozitář</td>
+        <td>Organizace pod kontrolou entity</td>
+        <td>Admin policy, přístupy, 2FA</td>
+      </tr>
+      <tr>
+        <td>Uživatelský obsah</td>
+        <td>Uživatel; Ikaros má licenci</td>
+        <td>TOS + komunitní licence</td>
+      </tr>
+      <tr>
+        <td>Komunitní knihovna</td>
+        <td>Kombinace práv uživatelů + databázové právo provozovatele</td>
+        <td>Licenční pravidla knihovny</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Převod vs. licence u autorských děl</div>
+    <p>Majetková autorská práva v ČR nelze „prodat" jako v angloamerickém copyright assignment. Pracuje se s <strong>licencí</strong>, případně s převodem výkonu práv či smluvní strukturou dle typu díla. Výhradní licence vyžaduje <strong>písemnou formu</strong> (<span class="mono">§ 2358</span> OZ) — bez písemného souhlasu licence třetí osobě vůbec nevznikne. Zaměstnanecké/objednané dílo: u <strong>počítačového programu, databáze a kartografického díla</strong> platí fikce zaměstnaneckého díla i u díla na objednávku (<span class="mono">§ 58 odst. 7</span> AZ) — práva vykonává objednatel; u <strong>ostatních děl na objednávku</strong> vzniká jen licence k účelu smlouvy (<span class="mono">§ 61</span> AZ), nikoli plný výkon práv. Zvolit správný režim musí právník.</p>
+  </div>
+
+  <h3>Co převést nebo licencovat při založení entity</h3>
+
+  <p>Před spuštěním nebo při vzniku právnické osoby je třeba u každého aktiva rozhodnout, zda zakladatel <strong>práva převede</strong>, nebo dá entitě <strong>výhradní dlouhodobou licenci</strong>. Následující tabulka je akční checklist „aktivum → co se má stát → proč".</p>
+
+  <table>
+    <thead>
+      <tr><th>Aktivum</th><th>Co se má stát při založení entity</th><th>Poznámka / riziko</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Doména</td>
+        <td>Přepsat držitele na entitu, nebo jí dát smluvně zajištěné užívání</td>
+        <td>Není autorské právo, ale kritická pro kontrolu projektu — bez ní hrozí zablokování/ztráta kontroly.</td>
+      </tr>
+      <tr>
+        <td>Hosting a infrastruktura</td>
+        <td>Smlouvy a účty vést na entitu, ne na soukromý e-mail jednotlivce</td>
+        <td>Zabrání ztrátě přístupu při odchodu osoby.</td>
+      </tr>
+      <tr>
+        <td>Repozitáře</td>
+        <td>Entita jako vlastník organizace/repozitáře, nebo smluvní právo správy</td>
+        <td>Řešit přístupy, 2FA, recovery, odchod vývojáře.</td>
+      </tr>
+      <tr>
+        <td>Kód</td>
+        <td>Výslovná licence nebo režim práv k dílu od všech autorů a dodavatelů</td>
+        <td>Zvlášť u částí napsaných před vznikem entity.</td>
+      </tr>
+      <tr>
+        <td>Logo a grafika</td>
+        <td>Licence/převod tak, aby entita mohla podat známku a užívat assety</td>
+        <td>Bez souhlasu grafika může být problém.</td>
+      </tr>
+      <tr>
+        <td>Texty a dokumentace</td>
+        <td>Licence/převod k manuálům, nápovědě, prezentacím, obchodním dokumentům</td>
+        <td>Včetně práva upravovat a tvořit odvozené dokumenty.</td>
+      </tr>
+      <tr>
+        <td>Databáze</td>
+        <td>Určit pořizovatele databáze a držitele práv; připravit předávací protokol</td>
+        <td>Databázové právo (sui generis) je důležité proti scrapingu.</td>
+      </tr>
+      <tr>
+        <td>Uživatelské účty a osobní údaje</td>
+        <td>Právnická osoba jako správce; aktualizovat zásady ochrany OÚ a informovat uživatele</td>
+        <td>Při změně správce řešit GDPR transparentnost.</td>
+      </tr>
+      <tr>
+        <td>Komunitní obsah</td>
+        <td>Převzít provozní licenci podle nových podmínek užití</td>
+        <td>Starý obsah může vyžadovat nové odsouhlasení.</td>
+      </tr>
+      <tr>
+        <td>Ochranná známka</td>
+        <td>Rozhodnout, zda přihlašovatelem bude zakladatel, nebo entita</td>
+        <td>Často dává smysl, aby vlastníkem byla cílová entita.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">AI výstupy — pozor na autorství při klonování knihoven</div>
+    <p>Podle rozsudku MS Praha (<span class="mono">10 C 13/2023</span>) čistě AI generovaný obrázek <strong>není autorské dílo</strong> (autorem je jen fyzická osoba dle <span class="mono">§ 5</span> AZ; prompt = pouhý námět dle <span class="mono">§ 2 / § 6</span>). AI výstup je tedy volný. Do IP inventáře a komunitní licence proto <strong>nepřiřazujte autorství uživateli</strong> u čistě AI generovaného obsahu (portréty, AI bestiář) a ošetřete to v podmínkách klonování knihoven. Souběžně: AI Act čl. 50 (vymahatelný od 2. 8. 2026) vyžaduje <strong>strojové značení</strong> AI výstupů a informování, že „chat za postavu" řídí AI.</p>
+  </div>
+
+  <h3>Právní dokumenty před spuštěním plateb</h3>
+
+  <p>Než se spustí placené plány (a z části i před veřejným provozem zdarma), musí existovat sada dokumentů. Každý má svůj spouštěč — okamžik, od kterého je potřeba.</p>
+
+  <table>
+    <thead>
+      <tr><th>Dokument</th><th>Kdy je potřeba</th><th>Obsah</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Stanovy / zakladatelská listina / společenská smlouva</td>
+        <td>Před vznikem entity</td>
+        <td>Účel, orgány, rozhodování, hospodaření, převody práv.</td>
+      </tr>
+      <tr>
+        <td>Uživatelské podmínky (TOS)</td>
+        <td>Před veřejným provozem</td>
+        <td>Účty, pravidla, obsah, odpovědnost, sankce, moderace.</td>
+      </tr>
+      <tr>
+        <td>Obchodní podmínky</td>
+        <td>Před placenými plány</td>
+        <td>Cena, doba, obnova, zrušení, reklamace, digitální obsah.</td>
+      </tr>
+      <tr>
+        <td>Zásady ochrany osobních údajů</td>
+        <td>Před sběrem osobních údajů</td>
+        <td>Správce, účely, právní základy, práva subjektů, zpracovatelé.</td>
+      </tr>
+      <tr>
+        <td>Cookies / local storage informace</td>
+        <td>Před analytikou a trackingem</td>
+        <td>Technické a netechnické cookies, souhlas.</td>
+      </tr>
+      <tr>
+        <td>Moderátorský řád</td>
+        <td>Před diskuzemi a veřejným obsahem</td>
+        <td>Zakázaný obsah, postupy, odvolání, sankce.</td>
+      </tr>
+      <tr>
+        <td>Komunitní licence</td>
+        <td>Před klonováním knihoven</td>
+        <td>Co smí ostatní kopírovat/forkovat, autorství, odvolání.</td>
+      </tr>
+      <tr>
+        <td>NDA pro partnery</td>
+        <td>Před partner packem</td>
+        <td>Důvěrnost, non-use, zákaz klonu, sankce.</td>
+      </tr>
+      <tr>
+        <td>Smlouvy s autory / vývojáři</td>
+        <td>Před přijetím výstupů</td>
+        <td>Převod práv/licence, odměna, úpravy, sublicence.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Ledger — co doplnit k dokumentům před platbami</div>
+    <p><strong>Obchodní podmínky u digitálního obsahu:</strong> chybí-li informace o právu na odstoupení, prodlužuje se lhůta ze 14 dnů na <strong>1 rok</strong> (<span class="mono">§ 1829 odst. 2</span> OZ); chybí-li informace o ceně, spotřebitel ji nehradí; sankce ČOI až 5 mil. Kč. Ztráta práva odstoupit u digitálního obsahu vyžaduje <strong>výslovný (aktivní) souhlas + poučení + potvrzení</strong> (<span class="mono">§ 1837 písm. l</span> OZ). <strong>Účty zdarma s data-monetizací:</strong> zpracovávají-li se data nad rámec provozu (cílení / analytika / trénink AI), spadá i „bezplatná" služba do spotřebitelského režimu dle <span class="mono">§ 2389a</span> OZ — oddělte „free bez data-monetizace" od placeného. <strong>GDPR:</strong> u dětských účtů a AI/moderačního modulu je DPIA pravděpodobně povinná a RoPA (<span class="mono">čl. 30</span>) je povinná i pod 250 osob; věk digitálního souhlasu je v ČR <strong>15 let</strong> (<span class="mono">§ 7</span> zák. 110/2019 Sb.).</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Registrace k dani spouští až zdaňovaný příjem</div>
+    <p>Veřejně prospěšný poplatník se má registrovat k dani z příjmů do 15 dnů, ale <strong>výjimka dle § 39a</strong> ZDP: registrace není třeba, přijímá-li entita jen nezdaňované příjmy (členské příspěvky, dary, dotace). Registrační povinnost spustí až první <strong>zdaňovaný příjem</strong> — tedy placené služby nebo reklama. Praktický důsledek: dokud běží čistě dobrovolnicky a z darů, registrace nehoří; okamžikem spuštění placených plánů (viz rozhodovací matice výše) se aktivuje daňová i případná DPH povinnost — detaily v části <em>Účetnictví a daně</em>.</p>
+  </div>
+
+  <h3>Shrnutí: pořadí kroků při zakládání entity</h3>
+
+  <div class="phase">
+    <div class="num">1</div>
+    <div class="body"><b>Zvol formu a napiš stanovy</b> — s výslovným účelem (komunitní, neziskový/udržitelný provoz české RPG platformy), rozhodovací maticí a mission lockem. Forma je nejsilnější zámek mise.</div>
+  </div>
+  <div class="phase">
+    <div class="num">2</div>
+    <div class="body"><b>Sestav IP inventář</b> a u každého aktiva rozhodni převod vs. výhradní licence; doménu a účty přepiš na entitu, ne na soukromý e-mail.</div>
+  </div>
+  <div class="phase">
+    <div class="num">3</div>
+    <div class="body"><b>Uzavři smlouvy s autory/vývojáři</b> (IP assignment / licence) dřív, než převezmeš jejich výstupy; u kódu/databáze využij fikci zaměstnaneckého díla (§ 58/7 AZ).</div>
+  </div>
+  <div class="phase">
+    <div class="num">4</div>
+    <div class="body"><b>Zapiš entitu do veřejného rejstříku</b> — právnická osoba vzniká až zápisem a teprve pak může nabývat práv a povinností.</div>
+  </div>
+  <div class="phase">
+    <div class="num">5</div>
+    <div class="body"><b>Nasaď dokumenty dle spouštěčů</b> — TOS a zásady OÚ před veřejným provozem, obchodní podmínky + spotřebitelské poučení před první platbou; teprve pak zapni placené plány.</div>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — právní forma, startup, financování a účetnictví (v0.9), kap. 10 Governance právnické osoby (10.1 minimální orgány, 10.2 péče řádného hospodáře, 10.3 střet zájmů), kap. 11 IP a převod práv, kap. 12 Právní dokumenty před spuštěním plateb.</li>
+    <li>Projekt Ikaros — právní ochranný rámec / rešerše v0.1, str. 7 (6.2 co převést/licencovat, 6.3 governance právnické osoby).</li>
+    <li>Fact-check ledger v1.0 (červenec 2026) — mission lock § 217 / § 402–403 OZ; výhradní licence písemně § 2358 OZ; dílo na objednávku § 58/7 vs. § 61 AZ; autorství AI výstupů (MS Praha 10 C 13/2023); § 1829/2 a § 1837 písm. l OZ; § 2389a OZ; GDPR DPIA/RoPA/věk 15 let; § 39a ZDP.</li>
+  </ul>
+</section>

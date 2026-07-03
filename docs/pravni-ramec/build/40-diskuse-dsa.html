@@ -1,0 +1,219 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část III · Diskuse, moderace a odpovědnost</div>
+    <h2>Diskuse, moderace a DSA</h2>
+  </div>
+
+  <p class="lead">Diskuse, komentáře a komunitní komunikace nejsou vedlejší funkce. Z pohledu práva z nich vzniká hosting uživatelského obsahu, zpracování osobních údajů a moderace projevů. Platforma se musí připravit na autorskoprávní stížnosti, osobnostní spory, pomluvy, doxxing, obtěžování, nenávistné projevy, spam, odkazy na protiprávní obsah, grooming, zveřejnění soukromé komunikace a konflikty mezi hráči. Tato kapitola shrnuje rešerši povinností plynoucích z <span class="mono">nařízení (EU) 2022/2065 (DSA)</span> a navrhuje moderační matici, manuál stupňů zásahu a lhůty (SLA).</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Právně-informační rešerše, nikoli právní stanovisko. Neřeší individuální případ a nenahrazuje konzultaci s advokátem. Otázky ke stavu právnické osoby (velikost podniku, výjimka podle <span class="mono">čl. 19 DSA</span>) a k retenčním lhůtám patří advokátovi.</p>
+  </div>
+
+  <h3>Stav českého adaptačního rámce k DSA</h3>
+  <p>Nařízení DSA je <strong>přímo použitelné od 17. 2. 2024</strong> — povinnosti platí bez ohledu na český prováděcí předpis. Český <strong>adaptační zákon však zatím NEplatí</strong>: „zákon o digitální ekonomice" (<span class="mono">sněmovní tisk 69</span>) byl k datu rešerše ve druhém čtení. Do jeho přijetí nemá <span class="mono">ČTÚ</span> plné dozorové a sankční pravomoci koordinátora digitálních služeb.</p>
+
+  <div class="callout gold">
+    <div class="t">Pozor na tvrzení o platném adaptačním zákoně</div>
+    <p>Neuvádět konkrétní číslo/datum účinnosti českého adaptačního zákona jako hotový fakt — k datu rešerše nebyl přijat. Přímá použitelnost samotného nařízení DSA tím dotčena není; mění se pouze to, kdo a jak vymáhá v ČR.</p>
+  </div>
+
+  <h3>Odpovědnost hostingu a bezpečný přístav</h3>
+  <p>Provozovatel diskuse typicky ukládá informace poskytnuté uživateli na jejich žádost — to je jádro hostingové služby. DSA stanoví, že poskytovatel hostingu <strong>není odpovědný</strong> za informace uložené na žádost příjemce, pokud nemá skutečnou vědomost o protiprávní činnosti či obsahu, případně po jejím získání jedná urychleně k odstranění nebo znepřístupnění obsahu.</p>
+  <p>Tato ochrana se ztrácí nebo oslabuje, pokud uživatel jedná pod autoritou nebo kontrolou provozovatele, pokud provozovatel obsah sám vytváří, nebo pokud po dostatečně určitém oznámení nejedná.</p>
+
+  <div class="callout cyan">
+    <div class="t">Moderovat se smí a má (Good Samaritan)</div>
+    <p>Podle <span class="mono">čl. 7 DSA</span> samotná dobrovolná a pečlivá moderace v dobré víře <strong>neznamená ztrátu bezpečného přístavu</strong>. Není pravda, že platforma nesmí na nic sahat, aby nepřevzala odpovědnost. Naopak musí mít pravidla a řešit konkrétní oznámení. Rizikové je chaotické, selektivní, nezdokumentované nebo svévolné rozhodování.</p>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Zákaz obecné monitorovací povinnosti (čl. 8 DSA)</div>
+    <p>Poskytovateli nelze uložit obecnou povinnost sledovat veškerý ukládaný/přenášený obsah ani aktivně vyhledávat protiprávní skutečnosti. Moderace stojí na <strong>notice-and-action</strong> a cílených reakcích, ne na plošném dozoru. Automatizovaná detekce je možná, ale nezakládá povinnost skenovat vše.</p>
+  </div>
+
+  <h3>Klasifikace služby: per-feature</h3>
+  <p>DSA rozlišuje zprostředkovatelské služby, hostingové služby a online platformy. <strong>Online platforma</strong> je hostingová služba, která informace nejen ukládá, ale na žádost uživatele je i <strong>šíří veřejnosti</strong>; výjimkou jsou případy, kdy je veřejné šíření jen drobnou a čistě vedlejší funkcí. Status se určuje <strong>pro každou funkci zvlášť</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Funkce Ikara</th><th>Veřejné šíření?</th><th>Kvalifikace</th><th>Dopad</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Veřejné komunitní knihovny, bestiáře, veřejné profily/obsah</td><td><span class="yes">ano</span></td><td>online platforma</td><td>Plný rozsah povinností platformy (v mezích výjimky mikro/malý)</td></tr>
+      <tr><td>Soukromý chat, deníky, skupinová komunikace</td><td><span class="no">ne</span></td><td>jen hosting</td><td>Hostingové povinnosti bez povinností platformy</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Otázka pro advokáta</div>
+    <p>Potvrdit per-feature hranici „veřejné šíření" (platforma) vs. skupinové/soukromé (hosting) a doložit <strong>mikro/malý</strong> status právnické osoby pro výjimku podle <span class="mono">čl. 19 DSA</span> (počet zaměstnanců, obrat).</p>
+  </div>
+
+  <h3>Které povinnosti DSA dopadají na mikro/malý ne-VLOP</h3>
+  <p>Rozhodné je, že Ikaros není velmi velká platforma (VLOP) a nárokuje výjimku pro mikro/malé podniky podle <span class="mono">čl. 19 DSA</span>. Ta osvobozuje od části dodatečných povinností platforem, <strong>NE od hostingové odpovědnosti ani notice-and-action</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Článek</th><th>Povinnost</th><th>Dopadá?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="mono">čl. 11 / 12</span></td><td>Kontaktní místo pro orgány / pro uživatele</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 14</span></td><td>Podmínky užití + pravidla moderace v jasném jazyce</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 16</span></td><td>Notice-and-action (mechanismus oznámení)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 17</span></td><td>Odůvodnění zásahu (statement of reasons)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 18</span></td><td>Oznámení podezření na trestný čin (ohrožení života/bezpečí)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 9 / 10</span></td><td>Reakce na příkazy orgánů (odstranění / poskytnutí informací)</td><td><span class="yes">ano</span></td></tr>
+      <tr><td><span class="mono">čl. 20</span></td><td>Interní systém vyřizování stížností</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 21</span></td><td>Mimosoudní řešení sporů</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 22</span></td><td>Důvěryhodní oznamovatelé (trusted flaggers)</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 15</span></td><td>Transparenční zprávy o moderaci</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 25</span></td><td>Zákaz dark patterns v designu rozhraní</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 26</span></td><td>Transparentnost reklamy</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 27</span></td><td>Transparentnost doporučovacích systémů</td><td><span class="no">ne</span></td></tr>
+      <tr><td><span class="mono">čl. 28</span></td><td>Ochrana nezletilých (platformové povinnosti)</td><td><span class="no">ne</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Výjimka čl. 19 neruší hostingovou odpovědnost</div>
+    <p>I malý Ikaros musí řešit notice-and-action (<span class="mono">čl. 16</span>), odůvodnění zásahů (<span class="mono">čl. 17</span>) a hostingovou odpovědnost. Osvobození se týká pouze dodatečných povinností online platforem (interní stížnosti, mimosoudní řešení, trusted flaggers, transparenční zprávy, dark patterns, reklama, doporučování, nezletilí). Výjimka <span class="mono">čl. 28</span> (nezletilí) na úrovni DSA neruší povinnosti podle GDPR ani obecnou péči.</p>
+  </div>
+
+  <h3>Notice-and-action (čl. 16)</h3>
+  <p>Poskytovatel hostingu musí mít mechanismus, jímž <strong>kdokoli</strong> oznámí konkrétní položky považované za protiprávní. Mechanismus musí být snadno přístupný, uživatelsky přívětivý a elektronický. Oznámení má umožnit uvést dostatečné vysvětlení důvodů, přesnou elektronickou lokalizaci obsahu (URL/ID), jméno a e-mail oznamovatele (s výjimkami u vybraných trestných činů týkajících se dětí) a prohlášení o dobré víře a správnosti.</p>
+
+  <div class="feat">
+    <h4>Pole formuláře nahlášení</h4>
+    <ul>
+      <li><strong>Kategorie</strong> — autorská práva / osobní údaj / obtěžování / nelegální obsah / spam / jiné (priorizace a přidělení týmu)</li>
+      <li><strong>URL nebo ID obsahu</strong> — DSA vyžaduje jasné určení elektronické polohy</li>
+      <li><strong>Popis problému</strong> — bez vysvětlení nelze rozhodnout bez detailního právního rozboru</li>
+      <li><strong>Jméno/název oznamovatele a e-mail</strong> — standardně potřebné, s výjimkami u citlivých trestných činů</li>
+      <li><strong>Prohlášení o dobré víře</strong> — omezuje zneužívání hlášení</li>
+      <li><strong>Důkazy nebo oprávnění jednat za vlastníka práv</strong> — nutné u copyright claimů</li>
+      <li><strong>Volba „chci být informován o výsledku"</strong> — systém stejně má potvrzovat a informovat, je-li kontakt</li>
+    </ul>
+  </div>
+
+  <p>Po oznámení musí systém potvrdit přijetí, vyhodnotit hlášení a uložit rozhodnutí. Každý příspěvek musí být nahlasitelný přímo u příspěvku s URL/ID, kategorií problému a volitelným vysvětlením.</p>
+
+  <h3>Rozhodnutí a odůvodnění zásahu (čl. 17)</h3>
+  <p>Omezí-li poskytovatel viditelnost obsahu, odstraní jej, znepřístupní, omezí monetizaci, pozastaví službu nebo účet z důvodu protiprávnosti či rozporu s podmínkami, DSA vyžaduje <strong>jasné a konkrétní odůvodnění</strong> dotčenému příjemci. To je důležité i u malého komunitního projektu: bez odůvodnění vzniká pocit svévole a vyšší riziko konfliktu.</p>
+
+  <div class="callout cyan">
+    <div class="t">Praktický standard rozhodnutí moderátora</div>
+    <p>Každé rozhodnutí má obsahovat: <strong>ID obsahu, datum, kdo rozhodl, právní nebo smluvní důvod, stručné vysvětlení, typ zásahu, dobu trvání, možnost opravy a možnost odvolání</strong>. U citlivých hlášení se nesmí zbytečně prozradit identita oznamovatele.</p>
+  </div>
+
+  <h3>Provozní pravidla diskusí</h3>
+  <ol>
+    <li>Veřejná pravidla komunity musí jasně zakazovat protiprávní obsah, porušení autorských práv, sdílení pirátských příruček, doxxing, obtěžování, nenávist, výhrůžky, zveřejňování soukromé komunikace bez oprávnění a obsah poškozující nezletilé.</li>
+    <li>Každý příspěvek musí být nahlasitelný přímo u příspěvku (URL/ID, kategorie, volitelné vysvětlení).</li>
+    <li>Po oznámení systém potvrdí přijetí, vyhodnotí hlášení a uloží rozhodnutí.</li>
+    <li>Rozhodnutí o omezení obsahu musí být odůvodněné; uživatel musí znát možnost nápravy nebo odvolání.</li>
+    <li>Moderátoři musí mít interní manuál: co skrýt okamžitě, co posoudit, co eskalovat právníkovi, co ignorovat jako nedostatečné hlášení.</li>
+    <li>Musí existovat retenční režim: co se po smazání uchová pro právní důkaz a jak dlouho.</li>
+    <li>Zásahy musí být konzistentní — pravidla platí stejně pro běžné uživatele, správce světů i známé členy komunity.</li>
+  </ol>
+
+  <div class="callout gold">
+    <div class="t">Nesli­bovat „za obsah odpovídají jen uživatelé"</div>
+    <p>Formulace, že za obsah odpovídají jen uživatelé, může být užitečná jako smluvní pravidlo vůči uživateli, ale <strong>nezbavuje provozovatele</strong> povinností podle DSA, GDPR, autorského práva ani soudního příkazu. Podmínky musí zakázat vkládání obsahu, k němuž uživatel nemá práva; krátká citace pro diskusi je jiná situace než nahrání celé tabulky kouzel, statblocku nebo ilustrace. Souvislost s autorským právem UGC a citací viz část <em>Autorské právo a UGC</em>.</p>
+  </div>
+
+  <h3>Diskuse a ochrana osobnosti</h3>
+  <p>Diskusní obsah může zasahovat do cti, důstojnosti, soukromí nebo podoby člověka. Občanský zákoník stanoví, že zachytit podobu člověka tak, aby bylo možné určit jeho totožnost, lze jen s jeho svolením, a rozšiřovat podobu člověka lze jen s jeho svolením. U AI obrázků a avatarů podobných reálné osobě je proto nutná opatrnost (souvislost s AI výstupy a deepfake viz část <em>AI a strojové výstupy</em>).</p>
+
+  <table>
+    <thead>
+      <tr><th>Rizikový jev</th><th>Právní problém</th><th>Moderátorská reakce</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Zveřejnění civilního jména hráče bez souhlasu</td><td>Soukromí, osobní údaje</td><td>Skrýt/anonymizovat, upozornit uživatele</td></tr>
+      <tr><td>Fotografie člena komunity bez svolení</td><td>Podoba člověka, GDPR</td><td>Skrýt do vyjasnění souhlasu</td></tr>
+      <tr><td>Obvinění z krádeže/podvodu/zneužívání bez důkazu</td><td>Ochrana osobnosti, pomluva</td><td>Dočasně skrýt/omezit, vyzvat k doložení, eskalovat</td></tr>
+      <tr><td>AI obrázek napodobující reálnou osobu v ponižující scéně</td><td>Podoba, důstojnost, AI Act / deepfake</td><td>Okamžité skrytí, zákaz opakování</td></tr>
+      <tr><td>Zveřejnění soukromých zpráv</td><td>Soukromí, tajemství komunikace</td><td>Skrýt a řešit individuálně dle okolností</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Detailní moderační manuál — stupně M0–M7</h3>
+  <p class="lead">Moderace musí být objektivní, opakovatelná a auditovatelná. Následující manuál je návrh pro interní proces. Veřejná pravidla mohou být kratší, ale interní manuál musí být přesnější.</p>
+
+  <table>
+    <thead>
+      <tr><th>Stupeň</th><th>Kdy</th><th>Zásah</th><th>Evidence</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="pill">M0</span> bez zásahu</td><td>Obsah je legální, ale může být subjektivně nevhodný</td><td>Bez zásahu; případně doporučit blokaci/ignorování</td><td>Žádný nebo minimální záznam</td></tr>
+      <tr><td><span class="pill">M1</span> měkké upozornění</td><td>Lehký off-topic, hraniční tón, první drobný incident</td><td>Soukromé upozornění nebo veřejné připomenutí pravidel</td><td>Záznam v moderátorském logu</td></tr>
+      <tr><td><span class="pill">M2</span> editace / skrytí části</td><td>Osobní údaj, spoiler mimo označení, nevhodný výrok</td><td>Skrýt část nebo požádat autora o úpravu</td><td>Odůvodnění uživateli</td></tr>
+      <tr><td><span class="pill">M3</span> dočasné skrytí</td><td>Autorská stížnost, pomluva, nejasné osobní údaje, AI deepfake</td><td>Dočasně skrýt do posouzení</td><td>Záznam, lhůta revize, oznámení autorovi</td></tr>
+      <tr><td><span class="pill">M4</span> odstranění</td><td>Zjevné porušení práv, doxxing, cizí příručka, pirátský odkaz</td><td>Odstranit nebo znepřístupnit</td><td>Statement of reasons, možnost odvolání dle režimu</td></tr>
+      <tr><td><span class="pill">M5</span> omezení účtu</td><td>Opakované porušování, spam, obtěžování</td><td>Dočasné omezení, zákaz publikace, zákaz zpráv</td><td>Důkazní záznam a délka opatření</td></tr>
+      <tr><td><span class="pill">M6</span> ukončení účtu</td><td>Vážné nebo opakované porušování, bezpečnostní hrozba</td><td>Ukončení účtu podle podmínek</td><td>Přezkum správcem, právní evidence</td></tr>
+      <tr><td><span class="pill">M7</span> eskalace mimo platformu</td><td>Hrozba života, bezpečí, závažná trestná činnost</td><td>Zajistit důkazy, informovat odpovědnou osobu; případně orgány</td><td>Striktní přístup, důvěrnost, právník</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Lhůty pro reakci (interní SLA)</h3>
+  <table>
+    <thead>
+      <tr><th>Kategorie hlášení</th><th>Doporučené interní SLA</th><th>Poznámka</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Hrozba života/bezpečí, obsah týkající se zneužití dětí</td><td><span class="pill green">Okamžitě / nejvyšší priorita</span></td><td>Eskalovat vedení a podle případu orgánům (<span class="mono">čl. 18 DSA</span>)</td></tr>
+      <tr><td>Doxxing, osobní údaje, deepfake reálné osoby</td><td>Do 24 hodin</td><td>Dočasné skrytí je často vhodnější než čekat</td></tr>
+      <tr><td>Autorská práva s doložením</td><td>Do 48 hodin</td><td>Skrýt do posouzení, kontaktovat nahrávajícího</td></tr>
+      <tr><td>Obtěžování a osobní útoky</td><td>Do 72 hodin</td><td>Záleží na intenzitě a opakování</td></tr>
+      <tr><td>Spam a reklama</td><td>Průběžně / automatizace</td><td>Pozor na možnost odvolání u falešně pozitivních zásahů</td></tr>
+      <tr><td>Obecná nespokojenost s názorem</td><td>Bez pevné lhůty</td><td>Není automaticky porušením pravidel</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Transparentní moderační matice</h3>
+  <table>
+    <thead>
+      <tr><th>Kategorie</th><th>Příklad</th><th>Výchozí zásah</th><th>Eskalace</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Autorská práva</td><td>Nahraná celá stránka pravidel, ilustrace z příručky</td><td>Skrýt do posouzení; vyžádat oprávnění</td><td>Právník / držitel práv</td></tr>
+      <tr><td>Osobní údaje</td><td>Civilní jméno, adresa, telefon, škola</td><td>Anonymizovat nebo skrýt</td><td>DPO / GDPR odpovědná osoba</td></tr>
+      <tr><td>Ochrana osobnosti</td><td>Pomluva, ponižující AI obrázek reálné osoby</td><td>Skrýt do posouzení</td><td>Právník</td></tr>
+      <tr><td>Bezpečnost</td><td>Výhrůžky, hrozba násilím</td><td>Okamžitě skrýt, zajistit důkazy</td><td>Vedení + případně orgány</td></tr>
+      <tr><td>Spam / bot</td><td>Hromadné odkazy, reklama</td><td>Skrýt, omezit účet</td><td>Technická ochrana</td></tr>
+      <tr><td>Nevhodné chování</td><td>Urážky, flame</td><td>Varování, dočasné omezení</td><td>Moderátorský tým</td></tr>
+      <tr><td>AI obsah</td><td>Neoznačený deepfake, napodobenina osoby</td><td>Skrýt, vyžádat označení/souhlas</td><td>AI / GDPR / právník dle případu</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Evidence moderace a retence</h3>
+  <p>Evidence moderace musí být dostatečná pro právní obranu, ale nesmí se stát nekonečným shromažďováním osobních údajů. Retenční dobu určí právník. Technicky by měl systém uložit alespoň:</p>
+  <ul>
+    <li><strong>ID obsahu</strong> a kategorii zásahu,</li>
+    <li><strong>odůvodnění</strong> a identitu moderátora,</li>
+    <li><strong>čas</strong> zásahu,</li>
+    <li><strong>oznámení uživateli</strong>, případné odvolání a jeho výsledek.</li>
+  </ul>
+
+  <div class="callout cyan">
+    <div class="t">Konzistence je právní argument</div>
+    <p>Bezpečný přístav i obrana proti žalobě z „cenzury" stojí na tom, že zásahy jsou <strong>doložitelné, odůvodněné a stejné pro všechny</strong>. Log moderace není administrativní zátěž, ale hlavní důkazní materiál.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">8</div><div class="l">stupňů moderace (M0–M7)</div></div>
+    <div class="stat"><div class="n">9/10/11/12/14/16/17/18</div><div class="l">články DSA, které dopadají</div></div>
+    <div class="stat"><div class="n">24 h</div><div class="l">SLA na doxxing a deepfake</div></div>
+  </div>
+
+  <ul class="sources">
+    <li>Nařízení Evropského parlamentu a Rady (EU) 2022/2065 (DSA) — přímo použitelné od 17. 2. 2024; zejména čl. 6–8 (odpovědnost, Good Samaritan, zákaz obecného monitoringu), čl. 9–12, 14, 16–18, 19 (výjimka mikro/malý).</li>
+    <li>Návrh českého adaptačního zákona — „zákon o digitální ekonomice", sněm. tisk 69 (k datu rešerše neschválen; ČTÚ bez plných dozorových/sankčních pravomocí).</li>
+    <li>Občanský zákoník (89/2012 Sb.) — ochrana osobnosti, podoba člověka (§ 84–90).</li>
+    <li>Fact-check ledger Právní rámec Ikaros v1.0, bod B (rozsah DSA per-feature, čl. 19).</li>
+    <li>Zdrojová rešerše: Projekt Ikaros — právní rámec, 3. část (Diskuse, AI, komunita), kap. 6–7 a 20.</li>
+  </ul>
+</section>

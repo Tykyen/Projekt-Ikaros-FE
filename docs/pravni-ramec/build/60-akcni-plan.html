@@ -1,0 +1,189 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část VI — Cesta k realizaci</div>
+    <h2>Master akční plán 0–30 / 30–90 / 90+ dní</h2>
+  </div>
+
+  <p class="lead">Sloučení akčních plánů ze všech čtyř dílů rešerše (právní forma a účetnictví, ochranný rámec, RPG systémy a licence, diskuse/AI/komunita) do jednoho harmonogramu. Duplicity odstraněny, priority srovnány podle fact-check ledgeru. Cíl fáze 0–30: neposlat nic firmám a nezačít vybírat peníze, dokud nestojí právní a IP základ. Toto je pracovní rešerše, nikoli právní stanovisko — každý krok označený jako otázka patří advokátovi, účetnímu nebo vydavateli.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Harmonogram je rešeršní vodítko, ne závazný právní ani daňový návod. Termíny odvozené z regulace (AI Act čl. 50, Data Act, účetní registrace) mají tvrdé datové kotvy — ty ověřte u odborníka. Kde se podklady rozcházejí, platí <span class="mono">_ledger.md</span> jako autorita.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">0–30</div><div class="l">právní a IP základ, dřív žádné peníze ani firmy</div></div>
+    <div class="stat"><div class="n">30–90</div><div class="l">entita, převod IP, podmínky, účetnictví, spuštění plateb</div></div>
+    <div class="stat"><div class="n">90+</div><div class="l">známka, růst, DPH/OSS, kvartální review</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">tvrdé AI Act deadliny (2.8. a 2.12.2026)</div></div>
+  </div>
+
+  <h3>Fáze 0–30 dní — než se začne jednat s firmami a vybírat peníze</h3>
+
+  <p class="lead">Cílem je zastavit únik IP a postavit důkazní a inventurní základ. Žádný partner pack ven bez NDA, žádná platební brána, žádné veřejné „podporujeme systém X" bez licenční karty.</p>
+
+  <div class="phase">
+    <div class="num">0–30</div>
+    <div class="body"><b>Zastavit únik IP a nesprávné komunikace.</b> Okamžitě přestat posílat plný partner pack bez NDA. Zastavit veřejné formulace typu „podporujeme systém X" bez ověřené licenční karty. Rozdělit dokumentaci na veřejnou (pitch deck) a důvěrnou verzi označenou jako důvěrné. Zkontrolovat, kdo má přístupy k doméně, hostingu, repozitáři, e-mailům a platebním nástrojům.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">0–30</div>
+    <div class="body"><b>IP inventář a důkazní archiv.</b> Sepsat tabulku aktiv: kód, grafika, texty, logo, domény, databáze, dokumentace, partner pack, autoři, smlouvy. Založit datovaný důkazní archiv — exporty PDF/DOCX, screenshoty, DB schéma, git tagy, changelog. Zkontrolovat smlouvy s vývojáři, grafiky a spoluautory (kdo drží práva k čemu — viz část <em>Ochrana IP a smlouvy s tvůrci</em>).</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">0–30</div>
+    <div class="body"><b>Rešerše a příprava podání ochranné známky.</b> Spustit rešerši názvu a loga v ÚPV, EUIPO a TMview. Určit, kdo známku podá (spolek je plnohodnotný přihlašovatel). Jádrové Nice třídy: <span class="pill">9</span> software, <span class="pill">41</span> zábava/vzdělávání, <span class="pill">42</span> SaaS/vývoj; dle potřeby doplnit 38, 35, 45 a pro merch 25/16/28. Rozhodnout národní OZ (ÚPV) vs. EUTM (EUIPO). Rešerše je předpoklad — bez ní hrozí kolize a náklad na rebranding.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">0–30</div>
+    <div class="body"><b>Předběžná volba právní formy (mission lock).</b> Rozhodnout mezi spolkem, ústavem, s.r.o. a hybridem. Podle ledgeru je nejsilnější mission lock forma spolku/ústavu — §217 (spolek) a §402–403 (ústav) zakazují rozdělení zisku mezi členy; stanovy působí <em>in personam</em> silněji než akcionářská dohoda. Zvážit i model „nezisková komunitní entita + oddělené provozní s.r.o.". Rozhodnout, zda běžný uživatel bude členem právnické osoby, nebo jen uživatelem platformy. (Detail v části <em>Právní forma a mission lock</em>.)</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">0–30</div>
+    <div class="body"><b>Systémová matice — rozdělit RPG systémy podle režimu.</b> Zařadit všech 14 systémů do kategorií clean / conditional / avoid a připravit vzor licenční karty modulu. Tři čisté piloty: <span class="pill green">dnd5e</span>, <span class="pill green">fate</span>, <span class="pill green">fae</span> (CC licence). Podmíněné: jad, drd2, call-of-cthulhu, drd16, pi. Vyhnout se bez přímé licence: drd-plus, draci-hlidka, shadowrun, gurps. (Plná matice v části <em>RPG systémy a licenční režimy</em>.)</div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Tvrdý deadline v této fázi — AI Act čl. 50</div>
+    <p>Ledger opravuje podklad: k <span class="mono">2.8.2026</span> NEnastává plná použitelnost AI Actu (Digital Omnibus odkládá high-risk na 2027–2028). Vymahatelný ale JE článek 50 — <strong>povinnost transparentnosti</strong>: informovat uživatele, že „chat za postavu" řídí AI, a strojově značit AI výstupy (bestiáře, portréty). Grace period pro strojové značení výstupů běží do <span class="mono">2.12.2026</span> pro systémy na trhu před 2.8.2026. Sankce až 15 M€ / 3 % obratu. Do 0–30 fáze patří rozhodnutí, jak značit — realizace nejpozději k datu.</p>
+  </div>
+
+  <div class="feat">
+    <h4>Výstupy fáze 0–30</h4>
+    <ul>
+      <li>Veřejný pitch deck + interní partner pack označený jako důvěrný; partner pack ven jen pod NDA.</li>
+      <li>Tabulka IP aktiv + datovaný důkazní archiv (PDF exporty, git tagy, DB schéma).</li>
+      <li>Seznam přístupů (doména, hosting, repozitář, e-maily, platby) a jejich držitelů.</li>
+      <li>Rešeršní report známky (ÚPV/EUIPO/TMview) + rozhodnutí národní OZ vs. EUTM + volba tříd 9/41/42.</li>
+      <li>Předběžné rozhodnutí právní formy s mission lock zdůvodněním.</li>
+      <li>Riziková mapa systémů (clean/conditional/avoid) + interní šablona licenční karty.</li>
+      <li>Rozhodnutí a plán značení AI obsahu dle čl. 50 (deadline 2.8.2026, grace 2.12.2026).</li>
+    </ul>
+  </div>
+
+  <h3>Fáze 30–90 dní — právní a účetní základ, spuštění plateb</h3>
+
+  <p class="lead">Založit entitu, převést do ní IP, postavit smluvní a compliance vrstvu a teprve pak zapnout platby. Platební brána se spouští až po jasném příjemci a nastaveném účetnictví.</p>
+
+  <div class="phase">
+    <div class="num">30–90</div>
+    <div class="body"><b>Založit právnickou osobu a převést IP.</b> S právníkem připravit stanovy nebo společenskou smlouvu podle zvolené formy a založit entitu. Následně převést nebo licencovat veškeré IP z fyzických osob do entity (kód, grafika, texty, logo, domény, databáze). Vlastníkem podané ochranné známky je entita.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">30–90</div>
+    <div class="body"><b>Smluvní balíček.</b> Připravit NDA + non-use + pravidla data roomu pro partnery. Uzavřít chybějící souhlasy a licence ke komunitnímu a autorskému obsahu (viz seznam chybějících souhlasů z IP inventáře). Připravit uživatelské podmínky, obchodní podmínky a privacy policy.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">30–90</div>
+    <div class="body"><b>Podmínky pro placené funkce a spotřebitelská ochrana.</b> Do obchodních podmínek zapracovat informační povinnosti podle ledgeru: chybí-li info o odstoupení, lhůta se z 14 dnů prodlužuje na <strong>1 rok</strong> (§1829/2 OZ); chybí-li info o ceně, spotřebitel nehradí (ČOI až 5 M Kč). Ztráta práva odstoupit u digitálního obsahu vyžaduje výslovný aktivní souhlas + poučení + potvrzení (§1837 l). Doplnit reklamační řád a pravidla refundace. (Detail v části <em>Placené funkce a spotřebitel</em>.)</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">30–90</div>
+    <div class="body"><b>GDPR a AI compliance minimum.</b> Zpracovat <strong>DPIA</strong> — podle ledgeru pravděpodobně povinná pro AI modul a dětské účty (děti + moderace/zprávy + AI splňují kritéria WP248). Vést <strong>RoPA (čl. 30)</strong> i pod 250 osob. Uzavřít <strong>DPA (čl. 28)</strong> s poskytovatelem AI/LLM a ošetřit <strong>transfer do USA</strong> přes SCC. Ošetřit zvláštní kategorie (čl. 9) v UGC — v podmínkách zakázat citlivé údaje třetích osob, minimalizace u AI. Věk digitálního souhlasu 15 let (§7 zák. 110/2019). Ošetřit klonování AI výstupů — čistě AI obrázek není autorské dílo (MS Praha 10 C 13/2023), nepřiřazovat autorství uživateli.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">30–90</div>
+    <div class="body"><b>Moderace a DSA minimum + strukturovaný export.</b> Navrhnout notice-and-action formulář a moderační workflow (per-feature: veřejné knihovny = platforma, soukromý chat/deníky = jen hosting). Doplnit kontakt provozovatele (čl. 11/12), podmínky a moderaci (čl. 14), odůvodnění rozhodnutí (čl. 17), oznámení trestného činu (čl. 18). Připravit moderaci AI obrázků proti NCII/CSAM (prohibice z Omnibusu, grace do <span class="mono">2.12.2026</span>). Posílit <strong>strukturovaný export</strong> deníků/postav/světů nad rámec ZIP — Data Act (2023/2854) od 12.9.2025 dává právo na strukturovaný export a cloud switching.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">30–90</div>
+    <div class="body"><b>Účetní základ a spuštění plateb.</b> S účetním nastavit příjmové kategorie a účtování. Rozhodnout model podpory: dary, členství, předplatné, perky, veřejná sbírka. Rozlišit dar/crowdfunding (transparentní účet) vs. registrovaná veřejná sbírka podle novely 197/2024 Sb. (od 1.1.2025). Veřejně prospěšný poplatník: registrace k dani do 15 dnů, ale výjimka §39a — netřeba, přijímá-li entita jen nezdaňované příjmy (příspěvky/dary/dotace); registraci spustí až první zdaňovaný příjem (placené služby/reklama). <strong>Platební bránu spustit až po jasném příjemci a nastaveném účetnictví.</strong></div>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Doporučení — pořadí platí</div>
+    <p>Sekvence je záměrná: entita → převod IP → smlouvy → účetnictví → teprve platby. Zapnout platební bránu dřív, než existuje právní příjemce a účtování, znamená přijímat peníze bez jasného vlastníka a s nevyřešeným daňovým režimem. Data-as-payment (§2389a OZ) navíc spouští spotřebitelský režim i u účtů zdarma, pokud se data zpracovávají nad rámec provozu (cílení/analytika/trénink AI).</p>
+  </div>
+
+  <div class="feat">
+    <h4>Výstupy fáze 30–90</h4>
+    <ul>
+      <li>Založená právnická osoba se stanovami/smlouvou; převedené nebo licencované IP.</li>
+      <li>Smluvní balíček: NDA, non-use, data room, uživatelské + obchodní podmínky, privacy policy.</li>
+      <li>DPIA (AI + dětské účty), RoPA, DPA s AI poskytovatelem, SCC pro transfer do USA.</li>
+      <li>Notice-and-action workflow, moderace NCII/CSAM, DSA minimum per-feature.</li>
+      <li>Strukturovaný export dat (Data Act) nad rámec ZIP.</li>
+      <li>Nastavené účetnictví, model podpory, spuštěná platební brána s jasným příjemcem.</li>
+    </ul>
+  </div>
+
+  <h3>Fáze 90+ dní — růstová a startupová připravenost</h3>
+
+  <p class="lead">Formalizovat ochranu značky, otevřít se investorům a nastavit průběžný compliance rytmus. Piloty licenčně čistých modulů běží, sledují se dopady škálování.</p>
+
+  <div class="phase">
+    <div class="num">90+</div>
+    <div class="body"><b>Podat ochrannou známku.</b> Na základě rešerše z fáze 0–30 podat OZ v ČR (ÚPV), případně EUTM (EUIPO) podle strategie, ve třídách 9/41/42 (+ doplňkové). Novela 286/2018 Sb. zrušila požadavek grafického ztvárnění. Přihlašovatelem je entita.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">90+</div>
+    <div class="body"><b>Investorský balík.</b> Doplnit founders agreement, cap table, IP warranties, term sheet. Vesting je jen smluvní konstrukce — mission lock drží forma entity a stanovy, ne akcionářská dohoda. Rozhodnout, zda vedle komunitní entity vznikne provozní s.r.o.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">90+</div>
+    <div class="body"><b>Licenční piloty a takedown proces.</b> Spustit první licenčně čisté moduly (dnd5e/fate/fae). U podmíněných systémů (jad, drd2, coc, drd16, pi) buď oslovit vydavatele o svolení, nebo držet režim engine + prázdné šablony + referenční název s ®/™. JaD: dotaz vydavateli Mytago, zda licence pokrývá i software. Nastavit monitoring a takedown proces. Rozšířit komunitní knihovny a AI až po vyhodnocení pilotu.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">90+</div>
+    <div class="body"><b>Reporting a transparentní hospodaření.</b> Nastavit reporting komunitě a transparentní hospodaření. Zavést notice/odvolání/transparentní pravidla a viditelný kontakt provozovatele.</div>
+  </div>
+
+  <div class="phase">
+    <div class="num">90+</div>
+    <div class="body"><b>DPH/OSS a kvartální review.</b> Prověřit DPH při růstu příjmů nebo zahraničních uživatelích: obrat &gt;2 000 000 Kč → plátce od 1.1. dalšího roku; &gt;2 536 500 Kč (100 000 EUR) → plátce hned následující den, přihláška do 10 pracovních dnů. Zvážit OSS u přeshraničních digitálních služeb. Zavést <strong>kvartální právní a účetní review</strong> jako průběžný compliance rytmus.</div>
+  </div>
+
+  <div class="feat">
+    <h4>Výstupy fáze 90+</h4>
+    <ul>
+      <li>Podaná ochranná známka (ÚPV / EUIPO) ve třídách 9/41/42.</li>
+      <li>Investorský balík: founders agreement, cap table, IP warranties, term sheet.</li>
+      <li>Běžící licenční piloty + monitoring + takedown proces.</li>
+      <li>Reporting komunitě, transparentní hospodaření, kontakt provozovatele.</li>
+      <li>Vyřešený DPH/OSS režim při růstu + zavedené kvartální review.</li>
+    </ul>
+  </div>
+
+  <h3>Shrnutí — co nesmí předběhnout co</h3>
+
+  <table>
+    <thead>
+      <tr><th>Aktivita</th><th>Smí až po</th><th>Fáze</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Poslat partner pack firmě</td><td>podpisu NDA</td><td>0–30</td></tr>
+      <tr><td>Veřejné „podporujeme systém X"</td><td>ověřené licenční kartě</td><td>0–30</td></tr>
+      <tr><td>Podat ochrannou známku</td><td>rešerši ÚPV/EUIPO/TMview</td><td>0–30 rešerše → 90+ podání</td></tr>
+      <tr><td>Převod IP do entity</td><td>založení entity</td><td>30–90</td></tr>
+      <tr><td>Spustit platební bránu</td><td>jasném příjemci + účetnictví</td><td>30–90</td></tr>
+      <tr><td>Značení AI obsahu (čl. 50)</td><td>nejpozději <span class="mono">2.8.2026</span> (grace <span class="mono">2.12.2026</span>)</td><td>0–30 rozhodnutí</td></tr>
+      <tr><td>Moderace NCII/CSAM</td><td>nejpozději <span class="mono">2.12.2026</span></td><td>30–90</td></tr>
+      <tr><td>DPH registrace</td><td>překročení obratu</td><td>90+</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="t">Otázky pro advokáta / účetního / vydavatele</div>
+    <p>Cílová forma (nezisk vs. s.r.o. s licenčním lockem); mikro/malý status pro DSA čl. 19 a NIS2/ZoKB; per-feature „veřejné šíření" vs. hosting; freemium/data model (§2389a); DPIA + DPO pro AI a dětské účty; SCC + DPA pro transfer do USA; rešerše známky „Ikaros" ve třídách 9/41/42; značení AI dle čl. 50 do 2.8.2026 a moderace NCII/CSAM do 2.12.2026; info povinnosti a odstoupení u placených funkcí; tolerance-only systémy — svolení vs. engine+referenční název; JaD pilot dotaz Mytago; Data Act a strukturovaný export.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Fact-check ledger v1.0 — <span class="mono">docs/pravni-ramec/_ledger.md</span> (autorita nad podklady).</li>
+    <li>Projekt Ikaros — právní forma, startup, financování a účetnictví, v0.9 (kap. 14, plán 0-30-90).</li>
+    <li>Projekt Ikaros — právní rešerše v0.1 (kap. 10, doporučený akční plán 0-30-90).</li>
+    <li>Projekt Ikaros — RPG licence v0.4 (kap. 13, akční plán 0-30-90).</li>
+    <li>Projekt Ikaros — právně-informační rešerše v0.6 (kap. 17, akční plán 0-30-90).</li>
+  </ul>
+</section>

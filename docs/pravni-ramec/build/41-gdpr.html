@@ -1,0 +1,243 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Část IV — Osobní údaje, děti a bezpečnost</div>
+    <h2>GDPR inventář a právní základy</h2>
+  </div>
+
+  <p class="lead">U Ikarosu se osobní údaje neomezují na e-mail a heslo. Jsou v profilech, přezdívkách, fotkách, IP adresách, logách, soukromých zprávách, diskusích, hlášeních, moderátorských poznámkách, AI promptech a v obsahu herních světů, pokud hráči používají reálné údaje. Tato kapitola mapuje osobní údaje napříč funkcemi, přiřazuje právní základy, řeší citlivá místa (soukromé zprávy, hlášení, děti, AI) a vede k inventáři zpracování podle <span class="mono">čl. 30</span> GDPR.</p>
+
+  <div class="callout gold">
+    <div class="t">Rešerše, ne stanovisko</div>
+    <p>Kapitola je pracovní podklad, ne právní rada. Volba konkrétního právního základu pro každý účel, znění informační povinnosti, retenční doby, formulace souhlasu a rozsah posouzení vlivu (DPIA) je nutné před spuštěním veřejného provozu ověřit u advokáta a případně pověřence (viz <strong>Otázky pro advokáta, účetního, vydavatele</strong>).</p>
+  </div>
+
+  <h3>Mapa osobních údajů</h3>
+  <p>Prvním krokem není politika, ale <strong>datová mapa</strong>. Bez ní nelze určit právní základy, retenci ani reagovat na práva subjektů. Následující přehled mapuje, kde v Ikarosu vznikají osobní údaje a jaké opatření k nim patří. Osobním údajem přitom může být i IP adresa, log přihlášení, push token nebo obsah světa, pokud identifikuje konkrétní osobu.</p>
+
+  <table>
+    <thead>
+      <tr><th>Oblast</th><th>Možné osobní údaje</th><th>Doporučené opatření</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Účet</strong></td>
+        <td>E-mail, přezdívka, hash hesla, 2FA, IP, zařízení, push token</td>
+        <td>Informační povinnost, bezpečnost, retence logů</td>
+      </tr>
+      <tr>
+        <td><strong>Profil</strong></td>
+        <td>Avatar, bio, odkazy, preference, přátelé</td>
+        <td>Nastavení viditelnosti, souhlas u veřejných údajů</td>
+      </tr>
+      <tr>
+        <td><strong>Diskuse</strong></td>
+        <td>Texty, zmínky, konflikty, osobní informace</td>
+        <td>Moderace, nahlášení, minimální indexace</td>
+      </tr>
+      <tr>
+        <td><strong>Soukromé zprávy</strong></td>
+        <td>Komunikace mezi uživateli</td>
+        <td>Jasná pravidla přístupu administrátorů a retence</td>
+      </tr>
+      <tr>
+        <td><strong>Hlášení obsahu</strong></td>
+        <td>Identita oznamovatele, důkazy, právní tvrzení</td>
+        <td>Omezený přístup, retenční doba, opatrné sdílení s dotčeným uživatelem</td>
+      </tr>
+      <tr>
+        <td><strong>AI prompty</strong></td>
+        <td>Texty s osobními údaji, příběhy hráčů, jména</td>
+        <td>Minimalizace, varování, zpracovatelská smlouva s AI poskytovatelem</td>
+      </tr>
+      <tr>
+        <td><strong>Komunitní knihovny</strong></td>
+        <td>Autoři, historie úprav, atribuce</td>
+        <td>Atribuce pod přezdívkou, interní audit oddělen</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Právní základy zpracování</h3>
+  <p>Každý účel zpracování musí mít <strong>právní základ</strong>. Provoz účtu a poskytování služby se opírá o plnění smlouvy. Bezpečnost, prevence zneužití a ochrana práv se typicky opírají o oprávněný zájem — ten ale vyžaduje doložené vyvážení zájmů (<strong>LIA — balanční test</strong>). Souhlas patří jen k volitelným funkcím (marketing, některé cookies, veřejné profilové prvky) a musí být svobodný, oddělitelný a odvolatelný. Souhlas nelze vynutit jako podmínku poskytnutí služby.</p>
+
+  <table>
+    <thead>
+      <tr><th>Účel</th><th>Možný právní základ</th><th>Poznámka</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Registrace a přihlášení</td>
+        <td>Plnění smlouvy</td>
+        <td>Bez účtu nelze službu poskytnout</td>
+      </tr>
+      <tr>
+        <td>Zálohy a bezpečnost</td>
+        <td>Oprávněný zájem / plnění smlouvy</td>
+        <td>Nastavit retenci a přístup; nutná <strong>LIA</strong></td>
+      </tr>
+      <tr>
+        <td>Moderace a řešení stížností</td>
+        <td>Oprávněný zájem / právní povinnost dle situace</td>
+        <td>Uchovat důkazy přiměřeně</td>
+      </tr>
+      <tr>
+        <td>Veřejný profil</td>
+        <td>Souhlas nebo plnění smlouvy dle povahy</td>
+        <td>Musí být jasná viditelnost</td>
+      </tr>
+      <tr>
+        <td>AI asistence</td>
+        <td>Souhlas / smlouva / oprávněný zájem dle funkce</td>
+        <td>Nutné posoudit s konkrétním poskytovatelem</td>
+      </tr>
+      <tr>
+        <td>Newsletter</td>
+        <td>Souhlas nebo zákaznická výjimka dle okolností</td>
+        <td>Oddělit od provozních e-mailů</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Oprávněný zájem = doložit, ne jen prohlásit</div>
+    <p>Oprávněný zájem (bezpečnost, moderace, analytika) je legitimní základ, ale ne automatický. Ke každému takovému účelu je nutné mít <strong>LIA</strong> — písemný balanční test, který doloží účel, nezbytnost a to, že zájem provozovatele nepřevažuje nad právy a rozumným očekáváním uživatele. Bez LIA je oprávněný zájem těžko obhajitelný při kontrole.</p>
+  </div>
+
+  <h3>Soukromé zprávy a administrátorský přístup</h3>
+  <p>Soukromé zprávy jsou citlivá oblast. I když je provozovatel technicky hostuje, <strong>neměl by do nich běžně nahlížet</strong>. Podmínky musí vysvětlit, kdy může být obsah zprávy zpracován: při nahlášení jedním z účastníků, při bezpečnostním incidentu, při podezření na vážné porušení pravidel nebo na základě příkazu orgánu. Přístup administrátorů musí být <strong>logovaný a omezený</strong> — jinak hrozí porušení důvěrnosti i právního základu.</p>
+
+  <div class="callout gold">
+    <div class="t">Zákaz obecného monitoringu</div>
+    <p>Plošné čtení soukromých zpráv naráží nejen na GDPR, ale i na zákaz obecné monitorovací povinnosti podle DSA (<span class="mono">čl. 8</span>). Moderace soukromých zpráv proto musí být reaktivní (na podnět), ne prediktivní. Vztah k moderaci a hostingovému režimu viz <strong>DSA — moderace a řešení stížností</strong>.</p>
+  </div>
+
+  <h3>Hlášení obsahu a GDPR</h3>
+  <p>Hlášení může obsahovat osobní údaje oznamovatele, nahlášeného uživatele, svědků i třetích osob. <strong>Identita oznamovatele by neměla být automaticky předána nahlášenému uživateli</strong> — zejména tam, kde by zveřejnění mohlo oznamovatele ohrozit nebo kde není nutné k identifikaci protiprávnosti. Výjimkou je uplatnění autorských práv, kde může být identita nositele práva potřebná pro posouzení nároku. Přístup k hlášením omezit, retenci nastavit, sdílení s dotčeným uživatelem vážit případ od případu.</p>
+
+  <h3>Nezletilí a věk digitálního souhlasu</h3>
+  <p>Český adaptační zákon (<span class="mono">§7 zák. 110/2019 Sb.</span>) stanoví věk dítěte pro udělení souhlasu se službou informační společnosti na <strong>15 let</strong>. Ikaros proto musí rozhodnout, zda registrace poběží od 15 let, nebo zda mladší povolí jen s rodičovským souhlasem. U RPG komunity je riziko nejen v GDPR, ale i v bezpečnosti komunikace, nevhodném obsahu a možném zneužití soukromých zpráv.</p>
+
+  <div class="feat">
+    <h4>Doporučená bezpečná konfigurace pro nezletilé</h4>
+    <ul>
+      <li>Výchozí profil <strong>neveřejný</strong></li>
+      <li>Omezené soukromé zprávy</li>
+      <li>Zákaz veřejného zveřejnění věku, školy, adresy a fotografií</li>
+      <li>Zvýšená moderace nahlášení</li>
+      <li>Jasné nouzové kontakty a zvláštní pravidla pro správce komunit</li>
+      <li>Omezené ukládání promptů a osobních údajů v AI funkcích</li>
+    </ul>
+  </div>
+
+  <h3>Zvláštní kategorie údajů v uživatelském obsahu</h3>
+  <p>V chatu, denících, diskusích a AI promptech mohou uživatelé sami odhalit <strong>zvláštní kategorie osobních údajů</strong> podle <span class="mono">čl. 9</span> GDPR — zdraví, sexuální orientaci, náboženství, politické názory, etnicitu. To je zásadní past: pro tyto údaje <strong>oprávněný zájem nestačí</strong>, čl. 9 vyžaduje samostatný titul (typicky výslovný souhlas, nebo údaje zjevně zveřejněné subjektem).</p>
+
+  <div class="callout gold">
+    <div class="t">Zvláštní kategorie nelze krýt oprávněným zájmem</div>
+    <p>Provozovatel nemůže citlivé údaje v uživatelském obsahu legalizovat oprávněným zájmem. Řešení je <strong>preventivní</strong>: podmínky musí zakázat vkládání citlivých údajů třetích osob, UI má varovat, AI funkce musí minimalizovat a nepředávat citlivá data do modelu. U dětských účtů platí zvýšená opatrnost dvojnásob.</p>
+  </div>
+
+  <h3>AI poskytovatel jako zpracovatel</h3>
+  <p>Pokud AI funkce posílá osobní údaje (prompty, jména, obsah světa) do externího LLM, je poskytovatel modelu <strong>zpracovatelem</strong> ve smyslu GDPR. To spouští dvě povinnosti: uzavřít <strong>zpracovatelskou smlouvu podle <span class="mono">čl. 28</span></strong> (DPA) a — je-li poskytovatel v USA — ošetřit <strong>předání do třetí země</strong> vhodným mechanismem (standardní smluvní doložky, <span class="mono">SCC</span>). Prompty a výstupy uchovávat jen nezbytně; soukromé prompty nesmí sloužit k tréninku modelu.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Zpracovatelská smlouva (čl. 28)</h4>
+      <ul>
+        <li>Poskytovatel jedná jen podle pokynů správce</li>
+        <li>Nastavení <strong>bez tréninku</strong> na datech Ikarosu</li>
+        <li>Retence, mazání, bezpečnost, sub-zpracovatelé</li>
+        <li>Součinnost při právech subjektů a incidentech</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Transfer do USA</h4>
+      <ul>
+        <li>Ověřit umístění zpracování a sub-zpracovatelů</li>
+        <li><span class="mono">SCC</span> jako mechanismus předání</li>
+        <li>Případné posouzení dopadu transferu</li>
+        <li>Minimalizovat, co vůbec do modelu odchází</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Kdy je povinná DPIA a RoPA</h3>
+  <p>Dva formální nástroje GDPR se u Ikarosu s vysokou pravděpodobností aktivují, i když je projekt malý: <strong>posouzení vlivu na ochranu osobních údajů (DPIA, <span class="mono">čl. 35</span>)</strong> a <strong>záznamy o činnostech zpracování (RoPA, <span class="mono">čl. 30</span>)</strong>.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">DPIA</div><div class="l">pravděpodobně povinná (děti + moderace/zprávy + AI)</div></div>
+    <div class="stat"><div class="n">RoPA</div><div class="l">povinná i pod 250 osob</div></div>
+    <div class="stat"><div class="n">15 let</div><div class="l">věk digitálního souhlasu (§7 zák. 110/2019)</div></div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">DPIA pravděpodobně POVINNÁ</div>
+    <p>Podle kritérií <span class="mono">WP248</span> (pracovní skupina WP29) stačí ke spuštění DPIA kombinace více rizikových faktorů — a Ikaros jich naplňuje několik zároveň: <strong>zpracování údajů dětí</strong>, <strong>rozsáhlá moderace a soukromá komunikace</strong> a <strong>použití AI</strong> na osobní/soukromá data. DPIA je proto nutné zpracovat minimálně pro <strong>AI modul a dětské účty</strong>, ještě před spuštěním veřejného provozu.</p>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">RoPA (čl. 30) povinná i pod 250 osob</div>
+    <p>Výjimka z vedení záznamů pro subjekty pod 250 osob <strong>neplatí</strong>, pokud je zpracování pravidelné, představuje riziko pro práva subjektů, nebo zahrnuje zvláštní kategorie údajů. Ikaros splňuje všechny tři: zpracování je nepřetržité, moderace/AI/děti jsou rizikové a v uživatelském obsahu vznikají údaje podle <span class="mono">čl. 9</span>. RoPA je tedy <strong>povinná</strong> bez ohledu na velikost.</p>
+  </div>
+
+  <h3>Inventář zpracování (RoPA)</h3>
+  <p>RoPA je živý dokument, ne jednorázová příloha podmínek. Následující kostra pokrývá minimum, které musí Ikaros vést a udržovat aktuální. Konkrétní právní základy a retenční doby doplní právník podle finální architektury.</p>
+
+  <table>
+    <thead>
+      <tr><th>Položka RoPA</th><th>Co připravit pro Ikaros</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Účely zpracování</strong></td>
+        <td>Registrace, přihlášení, bezpečnost, komunikace, správa světa, moderace, newsletter, dobrovolná podpora, AI asistence</td>
+      </tr>
+      <tr>
+        <td><strong>Právní základ</strong></td>
+        <td>Smlouva / oprávněný zájem (LIA) / souhlas / právní povinnost — rozhodne právník podle účelu</td>
+      </tr>
+      <tr>
+        <td><strong>Kategorie subjektů a údajů</strong></td>
+        <td>Uživatelé, hráči, nezletilí; identifikátory, obsah, logy, případně zvláštní kategorie (čl. 9) v UGC</td>
+      </tr>
+      <tr>
+        <td><strong>Doba uchování</strong></td>
+        <td>Účty, logy, zprávy, světy, zálohy, reporty, platební/darovací doklady — retenční doby per účel</td>
+      </tr>
+      <tr>
+        <td><strong>Práva uživatele</strong></td>
+        <td>Přístup, oprava, výmaz, omezení, přenositelnost, námitka; vize již počítá s exportem dat</td>
+      </tr>
+      <tr>
+        <td><strong>Zpracovatelé</strong></td>
+        <td>Hosting, e-mail, analytika, push, AI API, úložiště souborů — s každým smluvní základ (DPA)</td>
+      </tr>
+      <tr>
+        <td><strong>Předání do třetí země</strong></td>
+        <td>AI/LLM v USA → <span class="mono">SCC</span> + posouzení transferu</td>
+      </tr>
+      <tr>
+        <td><strong>Bezpečnost</strong></td>
+        <td>2FA, zálohy, rate limit, logování, šifrování tajných klíčů, incident response</td>
+      </tr>
+      <tr>
+        <td><strong>Porušení zabezpečení</strong></td>
+        <td>Proces posouzení rizika a případného ohlášení ÚOOÚ / subjektům údajů dle rizika</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Data jako protiplnění i u účtů zdarma</div>
+    <p>I bezplatný účet spadá do spotřebitelského režimu podle <span class="mono">§2389a OZ</span>, pokud se osobní data zpracovávají <strong>nad rámec provozu</strong> — cílení, analytika, trénink AI. Je proto nutné oddělit „free bez data-monetizace" (jen provoz) od funkcí, které data zpracovávají navíc: druhé spouští plný GDPR titul i spotřebitelskou ochranu. Provazba viz <strong>Dobrovolná podpora, DPH, spotřebitel</strong> a <strong>Licenční karta položky</strong>.</p>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — právně-informační rešerše, část „Diskuse, AI, komunita", kap. 8 (mapa údajů, právní základy, soukromé zprávy, hlášení, nezletilí)</li>
+    <li>Projekt Ikaros — rešerše v0.1, část „Právní ochranný rámec", kap. 9 (GDPR, nezletilí, DSA) — datová mapa, věk 15 let dle ÚOOÚ</li>
+    <li>Nařízení 2016/679 (GDPR) — <span class="mono">čl. 6</span> (právní základy), <span class="mono">čl. 9</span> (zvláštní kategorie), <span class="mono">čl. 28</span> (zpracovatel), <span class="mono">čl. 30</span> (RoPA), <span class="mono">čl. 35</span> (DPIA), <span class="mono">SCC</span> (transfer)</li>
+    <li>WP29 <span class="mono">WP248</span> — kritéria pro povinnost DPIA (děti, rozsáhlá moderace, AI)</li>
+    <li>Zák. č. 110/2019 Sb. — <span class="mono">§7</span> (věk digitálního souhlasu 15 let); zák. č. 89/2012 Sb. — <span class="mono">§2389a</span> (data jako protiplnění)</li>
+    <li>Fact-check ledger v1.0 (2026) — autorita nad podklady: DPIA pravděpodobně povinná, RoPA povinná i pod 250 osob, čl. 9 v UGC nestačí oprávněný zájem, LLM = zpracovatel + SCC, věk 15 let</li>
+  </ul>
+</section>

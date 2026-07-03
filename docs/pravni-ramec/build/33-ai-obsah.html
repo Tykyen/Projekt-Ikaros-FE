@@ -1,0 +1,268 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">AI · autorství · AI Act · governance</div>
+    <h2>AI generovaný obsah a AI Act</h2>
+  </div>
+
+  <p class="lead">AI funkce Ikarosu (chat za postavu, generátor portrétů, návrhy bestií, shrnutí kronik) je nutné ošetřit ve třech rovinách: <strong>autorskoprávní status výstupu</strong>, <strong>odpovědnost za vstupy i výstupy</strong> a <strong>transparentnost</strong> podle AI Actu. Nestačí napsat, že „AI výstupy patří uživateli" — poskytovatel může smluvně přenechat jen práva, která má, ale nemůže garantovat vznik autorského práva tam, kde chybí lidská tvůrčí činnost. Klíčové časování: <strong>2. 8. 2026 NENÍ plná použitelnost AI Actu</strong>; vymahatelná je od toho data transparentnost podle čl. 50, high-risk pravidla se odkládají.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer</div>
+    <p>Tato kapitola je právně-informační rešerše k autorství AI výstupů a k AI Actu, nikoli právní stanovisko. Hranice autorství, konkrétní režim čl. 50 i statut zpracovatele u LLM patří advokátovi. Kde se rešeršní podklady rozcházejí s interním ledgerem projektu, platí <strong>ledger</strong> — zejména u dat účinnosti AI Actu a u statutu Code of Practice.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">50</div><div class="l">článek AI Actu — transparentnost, vymahatelná od 2. 8. 2026</div></div>
+    <div class="stat"><div class="n">15 M€</div><div class="l">strop sankce / 3 % celosvětového obratu</div></div>
+    <div class="stat"><div class="n">A0–A6</div><div class="l">třídy AI governance (ai_origin)</div></div>
+  </div>
+
+  <h3>Autorství čistě AI výstupu — MS Praha, 10 C 13/2023</h3>
+
+  <p>Základ českého autorského práva je <strong>lidská tvůrčí činnost</strong>; autorem je jen fyzická osoba (<span class="mono">§ 5 AZ</span>). Rozsudek Městského soudu v Praze <span class="mono">10 C 13/2023</span> potvrdil, že <strong>čistě AI generovaný výstup není autorské dílo</strong> — samotný prompt je jen námět/podnět (<span class="mono">§ 2</span>, <span class="mono">§ 6 AZ</span>), nikoli tvůrčí ztvárnění. Praktický důsledek pro Ikaros: <strong>čistě AI výstup je volný</strong>, autorství se automaticky nepřiřazuje uživateli, který prompt zadal. To je nutné ošetřit v podmínkách klonování — klon AI obsahu nelze prezentovat jako chráněné dílo uživatele.</p>
+
+  <div class="callout cyan">
+    <div class="t">Kdy vzniká lidská ochrana</div>
+    <p>Pokud uživatel AI výstup <strong>zásadně upraví, vybere, uspořádá, zkombinuje s vlastní tvorbou nebo kreativně dotvoří</strong>, mohou být chránitelné lidské části nebo výsledné lidské zpracování. Hranice je právně citlivá; v podmínkách proto odlišit „čistý AI výstup" (volný) od „AI + podstatná lidská editace" (možná chráněné lidské zpracování). Evidovat autora lidských úprav.</p>
+  </div>
+
+  <h3>AI výstup může porušovat cizí práva</h3>
+
+  <p>I když AI výstup sám není klasickým autorským dílem, může <strong>porušovat cizí práva</strong> — být příliš podobný chráněné ilustraci, postavě, mapě, logu, značce, chráněnému světu, textu pravidel nebo reálné osobě. Uživatelé nesmí mít možnost legalizovat výstup tím, že napíší „vygenerováno AI". <strong>AI štítek je transparentnostní nástroj, ne omluva pro porušení práv.</strong></p>
+
+  <ul>
+    <li>Zakázat prompty typu „vytvoř přesnou kopii ilustrace z příručky X" nebo „udělej postavu jako [chráněná filmová/RPG postava]".</li>
+    <li>Zakázat AI obrázky obsahující logo, znak nebo chráněný design cizího vydavatele bez licence.</li>
+    <li>Zakázat AI obsah napodobující reálnou osobu bez souhlasu — zejména v ponižujícím, sexuálním, politickém nebo klamavém kontextu (riziko osobnostních práv, GDPR, deepfake).</li>
+    <li>Zakázat vkládání neveřejných osobních údajů hráčů do AI promptů bez právního základu.</li>
+    <li>Vyžadovat <strong>lidskou kontrolu</strong> před zařazením AI obsahu do oficiální nebo doporučené knihovny.</li>
+  </ul>
+
+  <h3>Situace → pravděpodobný režim → doporučení</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Situace</th>
+        <th>Pravděpodobný režim</th>
+        <th>Praktické doporučení</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Krátký prompt, výstup vložen bez úprav</td>
+        <td>Slabá/nejistá autorskoprávní ochrana; výstup <span class="partial">volný</span></td>
+        <td>Označit jako AI; nezařazovat automaticky do oficiální knihovny</td>
+      </tr>
+      <tr>
+        <td>AI text výrazně přepsán vlastním stylem</td>
+        <td>Lidské zpracování může být chráněné</td>
+        <td>Evidovat AI asistenci a autora lidských úprav</td>
+      </tr>
+      <tr>
+        <td>AI obrázek podle cizí postavy nebo značky</td>
+        <td><span class="no">Vysoké riziko</span> zásahu do cizích práv</td>
+        <td>Zakázat, nebo vyžadovat licenci</td>
+      </tr>
+      <tr>
+        <td>AI vytvoří podobu reálné osoby</td>
+        <td>Riziko osobnostních práv, GDPR, <strong>deepfake</strong></td>
+        <td>Vyžadovat souhlas, nebo zakázat</td>
+      </tr>
+      <tr>
+        <td>AI shrne soukromou herní kroniku</td>
+        <td>Riziko osobních údajů a důvěrného obsahu</td>
+        <td>Zpracovatelská smlouva, varování, režim soukromých dat</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>AI Act — časování a co reálně platí</h3>
+
+  <p>Nařízení EU o AI (AI Act) vstoupilo v platnost 1. 8. 2024 a uplatňuje se postupně. <strong>K datu 2. 8. 2026 ale NENÍ plná použitelnost</strong> — <span class="mono">Digital Omnibus</span> (dohoda trilogu 5/2026, EP 16. 6. 2026, Rada 29. 6. 2026) <strong>odkládá high-risk povinnosti</strong>. K 2. 8. 2026 platí governance, sankční rámec a transparentnost podle čl. 50; ostatní přichází později.</p>
+
+  <div class="phase">
+    <div class="num">2. 8. 2026</div>
+    <div class="body"><b>Čl. 50 (transparentnost) vymahatelný.</b> Omnibus jej NEodkládá. Informovat, že „chat za postavu" řídí AI; strojově značit AI bestiáře a portréty. Governance + sankční rámec v účinnosti.</div>
+  </div>
+  <div class="phase">
+    <div class="num">2. 12. 2026</div>
+    <div class="body"><b>Konec grace period pro strojové značení</b> výstupů systémů uvedených na trh před 2. 8. 2026. Do tohoto data i konec grace u nové prohibice NCII/CSAM (viz níže).</div>
+  </div>
+  <div class="phase">
+    <div class="num">2. 12. 2027</div>
+    <div class="body"><b>High-risk dle Annexu III</b> — odloženo Omnibusem (dříve avizované dřívější datum neplatí).</div>
+  </div>
+  <div class="phase">
+    <div class="num">2. 8. 2028</div>
+    <div class="body"><b>High-risk dle Annexu I</b> — odloženo Omnibusem.</div>
+  </div>
+
+  <div class="callout gold">
+    <div class="t">Sankce a Code of Practice</div>
+    <p>Porušení může být sankcionováno až do <strong>15 mil. €, resp. 3 % celosvětového obratu</strong> (dle typu porušení). <strong>Code of Practice</strong> (publ. 10. 6. 2026) NENÍ „účinný předpis" — je to <strong>dobrovolný důkaz souladu</strong> s čl. 50. Závazný je čl. 50 samotný, ne kodex. K 2. 7. 2026 nebyla publikace Omnibusu v Úředním věstníku potvrzena — data ověřit před nasazením.</p>
+  </div>
+
+  <h3>Čl. 50 v praxi Ikarosu</h3>
+
+  <p>Čl. 50 řeší mj. informování osob, že interagují s AI systémem, a označování AI generovaného/manipulovaného obsahu. AI Act definuje <strong>deepfake</strong> jako AI generovaný nebo manipulovaný obraz/audio/video, který se podobá existujícím osobám, objektům, místům či událostem a mohl by falešně působit jako autentický — nasazovatel má zveřejnit, že obsah byl uměle vytvořen nebo manipulován.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Funkce Ikarosu</th>
+        <th>Dopad čl. 50 / AI Actu</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI chatbot / „chat za postavu"</td>
+        <td>Uživatel má <strong>jasně vědět</strong>, že komunikuje s AI (interakční transparentnost)</td>
+      </tr>
+      <tr>
+        <td>Generátor portrétu postavy</td>
+        <td>Značit AI původ; u reálné osoby riziko deepfake a osobnostních práv</td>
+      </tr>
+      <tr>
+        <td>Generátor shrnutí kroniky</td>
+        <td>Značit AI asistenci; řešit GDPR a soukromý obsah</td>
+      </tr>
+      <tr>
+        <td>AI úprava fotky reálného člověka</td>
+        <td><span class="no">Vysoké riziko</span>; vyžadovat souhlas a označení</td>
+      </tr>
+      <tr>
+        <td>Veřejný AI obrázek v galerii</td>
+        <td>AI štítek a možnost nahlášení</td>
+      </tr>
+      <tr>
+        <td>Oficiální AI obsah platformy</td>
+        <td>Interní audit, transparentnost, zdrojová evidence</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Nová prohibice NCII/CSAM → moderace</h3>
+
+  <p>Digital Omnibus doplňuje do <span class="mono">čl. 5</span> AI Actu <strong>novou prohibici</strong> týkající se NCII (non-consensual intimate imagery) a CSAM (child sexual abuse material), s <strong>grace period do 2. 12. 2026</strong>. Pro Ikaros to znamená povinnost <strong>moderovat AI obrázky</strong> — filtry na zakázaný obsah a deepfake, notice-and-action, kontrola u veřejné galerie i komunitní knihovny. Tato prohibice je věcně provázaná s moderačním modulem (viz část o moderaci a DSA).</p>
+
+  <h3>GPAI, trénink a AI gramotnost</h3>
+
+  <p>AI Act ukládá poskytovatelům obecných modelů (GPAI) povinnosti v oblasti dokumentace, politiky souladu s autorským právem EU a shrnutí trénovacího obsahu — to je primárně povinnost poskytovatele modelu, ne běžného uživatele Ikarosu. Pro Ikaros je důležité <strong>vybírat poskytovatele</strong>, kteří tyto povinnosti plní.</p>
+
+  <div class="callout cyan">
+    <div class="t">Netrénovat na komunitním obsahu bez opt-in</div>
+    <p>Pokud by Ikaros trénoval vlastní model nebo dolaďoval model na datech uživatelů, situace by byla zásadně jiná — nutné řešit autorské licence, TDM výhrady, GDPR, AI Act, bezpečnost a dokumentaci modelu. <strong>Doporučení: netrénovat generativní modely na komunitním obsahu bez samostatné opt-in licence a právního auditu.</strong></p>
+  </div>
+
+  <p><strong>AI gramotnost:</strong> administrátoři a moderátoři pracující s AI mají být proškoleni v tom, co AI (ne)umí, jaké údaje se nesmí vkládat, jak rozeznat rizikové výstupy, jak značit AI obsah a kdy eskalovat právníkovi. AI výstup není právní jistota ani autorita; moderátor nesmí vkládat soukromé zprávy do veřejného AI nástroje; AI štítek se nesmí odstranit, pokud obsah vznikl převážně AI; oficiální knihovna nesmí být plně automaticky generována bez lidské kontroly.</p>
+
+  <h3>AI / LLM jako zpracovatel — DPA čl. 28 + transfer do USA</h3>
+
+  <p>Při integraci externího AI nástroje nestačí řešit jen autorské právo. <strong>LLM je zpracovatel osobních údajů</strong> ve smyslu GDPR → nutná <strong>zpracovatelská smlouva (DPA) podle čl. 28 GDPR</strong>. Protože většina poskytovatelů zpracovává data v USA, je nutné vyřešit <strong>transfer do třetí země</strong> — typicky standardními smluvními doložkami (<span class="mono">SCC</span>), případně adekvátností. Právní tituly: smlouva (provoz), oprávněný zájem (bezpečnost/moderace/analytika — nutná LIA), souhlas (jen volitelné funkce).</p>
+
+  <div class="feat">
+    <h4>Kontrolní otázky pro AI poskytovatele</h4>
+    <ul>
+      <li><strong>Trénink:</strong> používá poskytovatel prompty a výstupy k tréninku? Komunitní/soukromý obsah nesmí být bez souhlasu použit k tréninku třetí strany.</li>
+      <li><strong>Lokalita dat:</strong> kde se data zpracovávají a ukládají? Dopad na GDPR, transfer do třetích zemí a bezpečnost.</li>
+      <li><strong>DPA:</strong> je dostupná zpracovatelská smlouva podle čl. 28? Nutná, je-li poskytovatel zpracovatelem.</li>
+      <li><strong>Retence:</strong> jaká je retence promptů a logů? Lze uchování promptů vypnout? (minimalizace, bezpečnost)</li>
+      <li><strong>Licence k výstupům:</strong> jaké má poskytovatel licence k výstupům? Smluvní práva neřeší autorskoprávní vznik, ale určují použití služby.</li>
+      <li><strong>Filtry:</strong> existují filtry na zakázaný obsah a deepfake? (podpora compliance NCII/CSAM, ne náhrada vlastních pravidel)</li>
+    </ul>
+  </div>
+
+  <h3>AI governance: třídy A0–A6 a metadata <span class="mono">ai_origin</span></h3>
+
+  <p>Aby byly transparentnost a moderace vymahatelné v aplikaci, každý AI obsah nese metadata <span class="mono">ai_origin</span> (viz checklist pro vývojáře — požadavek „Každý AI obsah má <span class="mono">ai_origin</span>", priorita P0). Governance třídy odstupňují míru lidského vkladu a z ní plynoucí režim. Konkrétní hodnoty a mapování jsou návrh k odsouhlasení a implementaci; níže rešeršní matice.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Třída</th>
+        <th><span class="mono">ai_origin</span> (situace)</th>
+        <th>Autorství</th>
+        <th>Dopad / režim</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill">A0</span></td>
+        <td>Čistě lidský obsah, bez AI</td>
+        <td><span class="yes">lidské dílo</span></td>
+        <td>Standardní režim; bez AI štítku</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A1</span></td>
+        <td>Lidský obsah, AI jen návrh/brainstorming (nepoužit)</td>
+        <td><span class="yes">lidské dílo</span></td>
+        <td>Bez štítku; evidovat AI asistenci interně</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A2</span></td>
+        <td>AI výstup s podstatnou lidskou editací</td>
+        <td><span class="partial">chráněné lidské zpracování</span></td>
+        <td>AI štítek + autor úprav; publikaci povolit po editaci</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A3</span></td>
+        <td>Čistě AI výstup (prompt bez úprav)</td>
+        <td><span class="no">volný (10 C 13/2023)</span></td>
+        <td>AI štítek; nezařazovat auto do oficiální knihovny; klon neprezentovat jako dílo uživatele</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A4</span></td>
+        <td>AI obraz/audio/video — deepfake reálné osoby/entity</td>
+        <td><span class="no">volný, ale rizikový</span></td>
+        <td>Povinné označení „uměle vytvořeno" (čl. 50); souhlas osoby; jinak blokovat</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A5</span></td>
+        <td>AI interakce (chat za postavu / asistent)</td>
+        <td>n/a (interakce)</td>
+        <td>Informovat uživatele, že komunikuje s AI (čl. 50)</td>
+      </tr>
+      <tr>
+        <td><span class="pill">A6</span></td>
+        <td>Zakázaný AI obsah (NCII/CSAM, cizí IP kopie)</td>
+        <td><span class="no">nepřípustné</span></td>
+        <td>Moderace/blokace; grace u NCII/CSAM do 2. 12. 2026</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout cyan">
+    <div class="t">Implementační napojení</div>
+    <p>Metadata <span class="mono">ai_origin</span> se propisují do checklistu pro vývojáře (P0): „Každý AI obsah má <span class="mono">ai_origin</span>", „AI funkce zobrazí varování k osobním údajům a cizím právům", „Prompty a výstupy mají retenční nastavení". AI štítek musí být <strong>neodstranitelný</strong>, pokud obsah vznikl převážně AI (třídy A3+). Před klonováním a před publikací do knihovny zobrazit licenční/AI shrnutí.</p>
+  </div>
+
+  <h3>Shrnutí pro Ikaros</h3>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Co udělat do 2. 8. 2026</h4>
+      <ul>
+        <li>Informovat, že „chat za postavu" řídí AI (čl. 50, třída A5).</li>
+        <li>Strojově značit AI bestiáře a portréty; štítek <span class="mono">ai_origin</span>.</li>
+        <li>Uzavřít DPA (čl. 28) + SCC s AI poskytovateli.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Co udělat do 2. 12. 2026</h4>
+      <ul>
+        <li>Doladit strojové značení (konec grace).</li>
+        <li>Nasadit moderaci NCII/CSAM (konec grace prohibice, třída A6).</li>
+        <li>Filtry na deepfake a zakázaný obsah.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>Křížové odkazy: autorská ochrana UGC a klonování → část o autorském právu a komunitních licencích; moderace, notice-and-action a DSA → část o moderaci a DSA; GDPR tituly, DPIA a věk souhlasu → část o GDPR; checklisty pro vývojáře a právníka → závěrečné checklisty.</p>
+
+  <ul class="sources">
+    <li>Interní fact-check ledger (autoritativní nad podklady) — časování AI Actu, Digital Omnibus, statut Code of Practice, prohibice NCII/CSAM, MS Praha 10 C 13/2023, LLM = zpracovatel + SCC.</li>
+    <li>Projekt Ikaros — právně-informační rešerše, 3. část (Diskuse, AI, komunita), kap. 9 (AI text a obrázky) a 10 (AI Act, transparentnost, deepfake); checklisty pro vývojáře a právníka.</li>
+    <li>Nařízení EU 2024/1689 (AI Act), zejména čl. 5, čl. 50; Digital Omnibus (dohoda 2026); Code of Practice (10. 6. 2026). GDPR — čl. 28 (zpracovatel), transfer / SCC. Autorský zákon — § 2, § 5, § 6; rozsudek MS Praha 10 C 13/2023.</li>
+  </ul>
+</section>
