@@ -109,3 +109,13 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** Chystám se „jen rychle" spustit browser/server pro vizuální kontrolu; uživatel reaguje „žádné otvírání browseru".
 
 ---
+
+### CH-048 — Admin chat jsem převedl z mockupu doslova jako ohraničenou kartu, ač dohoda byla full-screen · 2026-07-03
+**Kontext:** Blok A admin chatu (`/admin/chat`). HTML mockup jsem kreslil jako samostatný soubor s okrajem a page hlavičkou (velký nadpis „Chat" + shell `max-width:1440px; height:clamp(...)`). Do Reactu jsem ho převedl 1:1 → ohraničená karta uprostřed stránky.
+**Co jsem udělal špatně:** Dohoda i referenční světový chat = **přes celou plochu** (full-bleed viewport). Přenesl jsem vizuál mockupu doslova (karta), místo abych trefil FORMÁT PLOCHY dle reference. Uživatel reklamoval („řekli jsme že to bude přes celou věc… a to není").
+**Proč to nefungovalo:** Nová route pod `IkarosLayout` nedědí chat full-height — `.main` má default `padding-top:220px` (welcome prostor) a `.mainChat` (full-výška) se aplikuje jen na `isChat` (`/chat*`), ne na `/admin/chat`. I kdybych shell roztáhl, layout ho zmáčkl.
+**Jak opraveno:** `isAdminChat = pathname.startsWith('/admin/chat')` → `mainChat` i pro admin chat; stránka bez velké hlavičky (back-link do sidebaru); shell `height:calc(100dvh − var(--header-h) − sp2)`, full width, bez radiusu.
+**Poučení:** Mockup HTML v izolovaném souboru je ukázka TVARU obsahu, ne formátu plochy — full-bleed vs. karta ověř proti referenční obrazovce (světový chat) a proti tomu, jak layout obaluje route. Nová route ve full-screen módu = zkontroluj, jestli dědí layout výjimku (`mainChat`/padding), ne jen CSS komponenty.
+**Příznak cyklení:** Uživatel ukazuje referenční screenshot „má to být přes celou věc / takto", moje verze je zmenšená/ohraničená karta.
+
+---

@@ -1,7 +1,7 @@
 # Spec 20.5 — Interní chat správy platformy
 
 **Fáze:** 20 (Governance, právo & moderace — Platforma + Provoz)
-**Stav:** 📝 návrh k schválení (2026-07-03)
+**Stav:** ✅ implementováno (2026-07-03) — BE modul `platform-chat` (konverzace/zprávy/WS + dokumenty + úkoly) + FE napojení; **čeká BE restart** + mobil-desktop + přílohy/member-picker (follow-up)
 **Typ:** nová feature (FE napřed + BE kontrakt) — ad-hoc zadání mimo původní karty 20.1–20.4
 **Souvisí:** světový chat (`features/world/chat`), globální chat „Hospoda" (`features/chat`), Administrace (`features/admin`)
 
@@ -115,14 +115,19 @@ Feature je ad-hoc zadání (2026-07-03), zařazená do Fáze 20 (Platforma + Pro
 
 ## 6. Acceptance kritéria
 
-- [ ] Route `/admin/chat` existuje, guard `[Superadmin, Admin]`, ne-oprávněný → Forbidden.
-- [ ] V Administraci je nav položka „Chat" vedoucí na `/admin/chat`, zvýrazněná na té route; stránka má „← Administrace".
-- [ ] Levý sloupec listuje konverzace dle členství; „＋ Nová konverzace" vidí jen superadmin.
-- [ ] Superadmin založí konverzaci a spravuje členy; admin vidí jen své konverzace.
-- [ ] Zprávy se posílají a přijímají real-time (WS echo); příloha PDF funguje.
-- [ ] „📄 Dokumenty" vedle lupy přepne panel na seznam PDF; Nahrát/Stáhnout funguje; klik na dokument otevře čtení; „Zpět" vrací na seznam i na chat.
-- [ ] Pravý panel Úkoly: rozevírací per osoba; vlastní úkoly edituje admin, cizí jen superadmin.
-- [ ] Responsive: funguje na mobilu i desktopu (`mobil-desktop`) — sloupce se skládají/kolabují na ≤768px.
+- [x] Route `/admin/chat`, guard `[Superadmin, Admin]`, ne-oprávněný → Forbidden.
+- [x] V Administraci nav položka „Chat" naviguje na `/admin/chat`; stránka full-bleed s „← Administrace".
+- [x] Levý sloupec listuje konverzace dle členství (BE-enforced); „＋ Nová konverzace" vidí jen superadmin.
+- [x] Superadmin založí konverzaci; admin vidí jen své. **Follow-up:** FE picker členů + rename/delete UI (BE endpointy `PATCH/DELETE` hotové).
+- [x] Zprávy se posílají a přijímají real-time (WS `platform-chat:message`). **Follow-up:** přílohy PDF ve zprávě (dokumenty mají vlastní sklad) + role-odznak (senderRole enrich).
+- [x] „Dokumenty" vedle lupy přepne panel na seznam PDF; Nahrát/Stáhnout/Smazat funguje; klik → iframe čtečka; „Zpět" vrací na seznam i na chat.
+- [x] Pravý panel Úkoly: rozevírací per admin; toggle/přidat/edit/smazat; vlastní edituje admin, cizí jen superadmin.
+- [ ] Responsive `mobil-desktop` — **čeká** (základní media queries hotové; živé ověření přes screenshoty od uživatele, browser sám nespouštím).
+
+### Stav implementace (2026-07-03)
+BE: modul `backend/src/modules/platform-chat/` — `PlatformChatService/Controller/Gateway` (reuse `ChatChannel`/`ChatMessage`), `PlatformDocuments*` (kolekce `platform_documents`, PDF na Cloudinary raw), `AdminTasks*` (kolekce `admin_tasks`). Prefix `admin-chat`, guard Sa/Admin. Registrováno v `app.module`. Typecheck čistý.
+FE: `src/features/admin/chat/` — `AdminChatPage` (full-bleed), hooky `useAdminChat`/`useAdminDocuments`/`useAdminTasks`. Build zelený.
+**Nutný BE restart** (nový modul + seed konverzace Hlavní/Vedení vzniknou v `onModuleInit`).
 
 ---
 

@@ -771,6 +771,9 @@ export function IkarosLayout() {
   // Administrace = široká správní tabulka → skryj pravý panel (Moje světy /
   // Oblíbené) pro plnou šířku main, stejně jako chat (focus mód).
   const isAdmin = pathname.startsWith('/admin');
+  // 20.5 — admin chat běží ve full-height chat módu (jako `/chat`), ne
+  // v 220px admin gridu → shell vyplní celý viewport přes celou plochu.
+  const isAdminChat = pathname.startsWith('/admin/chat');
   // Spec 15.7 — pravý panel se ukáže i anonimovi (obsah = AnonStartPanel
   // „Začni tady" místo Administrace). Skrytý jen v chat/admin focus módu.
   const showRightPanel = !isChat && !isAdmin;
@@ -903,7 +906,7 @@ export function IkarosLayout() {
         </aside>
 
         <main
-          className={clsx(s.main, isChat && s.mainChat)}
+          className={clsx(s.main, (isChat || isAdminChat) && s.mainChat)}
           style={mainStyle}
         >
           <Outlet />

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   Hash,
   Star,
-  Scale,
+  MessageSquare,
   Search,
   MoreHorizontal,
   Paperclip,
@@ -16,177 +17,162 @@ import {
   Upload,
   Download,
   Maximize2,
+  Trash2,
   Pencil,
   Check,
 } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
+import type { ChatMessage } from '@/features/chat/lib/types';
+import {
+  useAdminChatChannels,
+  useAdminChatMessages,
+  useAdminChatRealtime,
+  useSendAdminMessage,
+  useCreateAdminChannel,
+  adminChatKeys,
+} from '../api/useAdminChat';
+import {
+  useAdminDocuments,
+  useUploadDocument,
+  useDeleteDocument,
+} from '../api/useAdminDocuments';
+import {
+  useAdminTasks,
+  useCreateTask,
+  useUpdateTask,
+  useDeleteTask,
+} from '../api/useAdminTasks';
+import type { PlatformDocument, AdminTask } from '../lib/types';
 import s from './AdminChatPage.module.css';
 
-// ── Mock data (blok A). Nahradí API v bloku B/C. ──────────────────────────
-type Role = 'super' | 'admin';
-type ConvIconKey = 'hash' | 'star' | 'scale';
-
-interface Conv {
-  id: string;
-  name: string;
-  icon: ConvIconKey;
-  sub: string;
-  unread?: number;
-}
-interface Msg {
-  id: string;
-  author: string;
-  role: Role;
-  time: string;
-  text: string;
-  color: string;
-  att?: { name: string; size: string };
-}
-interface Doc {
-  id: string;
-  name: string;
-  desc: string;
-  size: string;
-  by: string;
-  byColor: string;
-  date: string;
-}
-interface Task {
-  id: string;
-  text: string;
-  done: boolean;
-}
-interface Person {
-  id: string;
-  name: string;
-  initial: string;
-  color: string;
-  online: boolean;
-  isMe: boolean;
-  tasks: Task[];
-}
-
-const CONVERSATIONS: Conv[] = [
-  { id: 'main', name: 'Hlavní', icon: 'hash', sub: 'Anna: hotovo, nahrála jsem to…', unread: 3 },
-  { id: 'vedeni', name: 'Vedení', icon: 'star', sub: 'Admini + superadmini' },
-  { id: 'pravni', name: 'Právní rámec', icon: 'scale', sub: 'Ty: pošlu draft do pátku' },
-];
-
-const MESSAGES: Msg[] = [
-  {
-    id: 'm1',
-    author: 'Tyky',
-    role: 'super',
-    time: '9:41',
-    color: '#e0a94a',
-    text: 'Ahoj, nahrál jsem do dokumentů aktuální právní rešerši. Mrkněte prosím na část III, ať to můžeme před spuštěním zavřít.',
-  },
-  {
-    id: 'm2',
-    author: 'PJ',
-    role: 'admin',
-    time: '9:44',
-    color: '#5f86d8',
-    text: 'Dík. Projedu to dnes odpoledne a hodím poznámky do úkolů.',
-  },
-  {
-    id: 'm3',
-    author: 'Anna',
-    role: 'admin',
-    time: '10:02',
-    color: '#4f9e78',
-    text: 'Doplnila jsem komunitní strategii, ať to máme pohromadě.',
-    att: { name: 'komunitni-strategie-v1.pdf', size: '3,2 MB' },
-  },
-];
-
-const DOCUMENTS: Doc[] = [
-  { id: 'd1', name: 'pravni-ramec-v1.0.pdf', desc: 'Právní rešerše · Část III', size: '4,8 MB', by: 'Tyky', byColor: '#e0a94a', date: '3. 7.' },
-  { id: 'd2', name: 'komunitni-strategie-v1.pdf', desc: 'Komunitní kniha', size: '3,2 MB', by: 'Anna', byColor: '#4f9e78', date: '3. 7.' },
-  { id: 'd3', name: 'vize-cast-I.pdf', desc: 'Vizní dokument', size: '6,1 MB', by: 'PJ', byColor: '#5f86d8', date: '1. 7.' },
-  { id: 'd4', name: 'provozni-rad.pdf', desc: 'Interní', size: '1,1 MB', by: 'Tyky', byColor: '#e0a94a', date: '28. 6.' },
-];
-
-const PEOPLE: Person[] = [
-  {
-    id: 'p1', name: 'Tyky', initial: 'T', color: '#e0a94a', online: true, isMe: true,
-    tasks: [
-      { id: 't1', text: 'Nahrát právní rešerši do dokumentů', done: true },
-      { id: 't2', text: 'Projít připomínky k části III', done: false },
-      { id: 't3', text: 'Připravit spuštění pro testery', done: false },
-    ],
-  },
-  {
-    id: 'p2', name: 'PJ', initial: 'P', color: '#5f86d8', online: true, isMe: false,
-    tasks: [
-      { id: 't4', text: 'Revize právní části III', done: false },
-      { id: 't5', text: 'Otestovat reset hesla přes e-mail', done: false },
-    ],
-  },
-  {
-    id: 'p3', name: 'Anna', initial: 'A', color: '#4f9e78', online: false, isMe: false,
-    tasks: [{ id: 't6', text: 'Doplnit komunitní strategii', done: true }],
-  },
-];
-
-const CONV_ICON: Record<ConvIconKey, typeof Hash> = { hash: Hash, star: Star, scale: Scale };
-
-function ConvIcon({ icon, size }: { icon: ConvIconKey; size: number }) {
-  const Icon = CONV_ICON[icon];
+// ── Helpery ───────────────────────────────────────────────────────────────
+function ConvIcon({ type, size }: { type: string; size: number }) {
+  const Icon =
+    type === 'staff-vedeni' ? Star : type === 'staff-main' ? Hash : MessageSquare;
   return <Icon size={size} aria-hidden />;
 }
 
+function fmtTime(iso: string | Date): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} kB`;
+  return `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`;
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' });
+}
+
+const AVATAR_PALETTE = [
+  '#e0a94a',
+  '#5f86d8',
+  '#4f9e78',
+  '#c56b9a',
+  '#8a7de0',
+  '#4fa6b8',
+];
+function colorFromId(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i += 1) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
 /**
- * 20.5 — Interní chat správy platformy. Samostatná route `/admin/chat`
- * (RoleGuard Superadmin/Admin na route). Blok A = layout + statická data;
- * napojení na BE (konverzace/dokumenty/úkoly) přijde v blocích B/C.
+ * 20.5 — Interní chat správy platformy (`/admin/chat`, RoleGuard Sa/Admin).
+ * Chat, dokumenty i úkoly jsou napojené na BE.
  */
 export default function AdminChatPage() {
   const user = useAtomValue(currentUserAtom);
   const isSuperadmin = user?.role === UserRole.Superadmin;
+  const qc = useQueryClient();
 
-  const [activeConvId, setActiveConvId] = useState('main');
+  const { data: channels } = useAdminChatChannels();
+  const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [view, setView] = useState<'chat' | 'docs'>('chat');
-  const [readingDoc, setReadingDoc] = useState<Doc | null>(null);
-  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set(['p3']));
+  const [readingDoc, setReadingDoc] = useState<PlatformDocument | null>(null);
+  const [messageText, setMessageText] = useState('');
 
-  const activeConv = CONVERSATIONS.find((c) => c.id === activeConvId) ?? CONVERSATIONS[0];
+  useEffect(() => {
+    if (!activeConvId && channels && channels.length > 0) {
+      setActiveConvId(channels[0].id);
+    }
+  }, [channels, activeConvId]);
 
-  const togglePerson = (id: string) =>
-    setCollapsed((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const activeConv = channels?.find((c) => c.id === activeConvId) ?? null;
+  const { data: messages } = useAdminChatMessages(
+    view === 'chat' ? activeConvId : null,
+  );
+  useAdminChatRealtime(activeConvId);
+  const sendMut = useSendAdminMessage(activeConvId ?? '');
+  const createChannel = useCreateAdminChannel();
+
+  const msgsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = msgsRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages]);
 
   const openChat = () => {
     setView('chat');
     setReadingDoc(null);
   };
 
+  const handleSend = () => {
+    const text = messageText.trim();
+    if (!text || !activeConvId) return;
+    setMessageText('');
+    sendMut.mutate(text, {
+      onSuccess: (msg) => {
+        qc.setQueryData<ChatMessage[]>(
+          adminChatKeys.messages(activeConvId),
+          (old) => {
+            if (!old) return [msg];
+            if (old.some((m) => m.id === msg.id)) return old;
+            return [...old, msg];
+          },
+        );
+      },
+    });
+  };
+
+  const handleNewChannel = () => {
+    const name = window.prompt('Název nové konverzace:')?.trim();
+    if (name) {
+      createChannel.mutate(
+        { name },
+        { onSuccess: (ch) => setActiveConvId(ch.id) },
+      );
+    }
+  };
+
+  const convSubtitle = activeConv
+    ? activeConv.accessMode === 'all'
+      ? 'Všichni správci'
+      : `${activeConv.allowedMemberIds.length} členů`
+    : '';
+
   return (
     <div className={s.page}>
-      <header className={s.head}>
-        <Link to="/admin" className={s.back}>
-          <ArrowLeft size={16} aria-hidden /> Administrace
-        </Link>
-        <h1 className={s.title}>Chat</h1>
-        <p className={s.sub}>
-          Interní chat platformy — samostatná stránka pro superadminy &amp; adminy
-        </p>
-      </header>
-
       <div className={s.shell}>
         {/* LEVÝ — konverzace */}
         <aside className={s.sidebar}>
           <div className={s.colhead}>
+            <Link to="/admin" className={s.back}>
+              <ArrowLeft size={14} aria-hidden /> Administrace
+            </Link>
             <span className={s.colTitle}>Chat týmu</span>
           </div>
           <div className={s.groupLabel}>Konverzace</div>
           <nav className={s.navlist}>
-            {CONVERSATIONS.map((c) => {
+            {(channels ?? []).map((c) => {
               const active = c.id === activeConvId && view === 'chat';
               return (
                 <button
@@ -199,19 +185,20 @@ export default function AdminChatPage() {
                   }}
                 >
                   <span className={s.navicon}>
-                    <ConvIcon icon={c.icon} size={16} />
+                    <ConvIcon type={c.type} size={16} />
                   </span>
                   <span className={s.navmeta}>
                     <span className={s.navtitle}>{c.name}</span>
-                    <span className={s.navsub}>{c.sub}</span>
+                    {c.lastMessagePreview && (
+                      <span className={s.navsub}>{c.lastMessagePreview}</span>
+                    )}
                   </span>
-                  {c.unread ? <span className={s.badge}>{c.unread}</span> : null}
                 </button>
               );
             })}
           </nav>
           {isSuperadmin && (
-            <button type="button" className={s.newbtn}>
+            <button type="button" className={s.newbtn} onClick={handleNewChannel}>
               <Plus size={15} aria-hidden /> Nová konverzace
             </button>
           )}
@@ -223,74 +210,100 @@ export default function AdminChatPage() {
             <div className={s.chat}>
               <div className={s.chhead}>
                 <span className={s.chAvatar}>
-                  <ConvIcon icon={activeConv.icon} size={18} />
+                  {activeConv ? (
+                    <ConvIcon type={activeConv.type} size={18} />
+                  ) : (
+                    <MessageSquare size={18} aria-hidden />
+                  )}
                 </span>
                 <div className={s.chHeadMeta}>
-                  <div className={s.chTitle}>{activeConv.name}</div>
-                  <div className={s.chSub}>Obecná diskuze · 5 členů · 3 online</div>
+                  <div className={s.chTitle}>{activeConv?.name ?? 'Chat'}</div>
+                  <div className={s.chSub}>{convSubtitle}</div>
                 </div>
                 <div className={s.spacer} />
-                <button type="button" className={s.docbtn} onClick={() => setView('docs')}>
+                <button
+                  type="button"
+                  className={s.docbtn}
+                  onClick={() => setView('docs')}
+                >
                   <FileText size={15} aria-hidden /> Dokumenty
                 </button>
                 <button type="button" className={s.iconbtn} title="Hledat ve zprávách">
                   <Search size={16} aria-hidden />
                 </button>
-                <button
-                  type="button"
-                  className={s.iconbtn}
-                  title={isSuperadmin ? 'Spravovat konverzaci a členy' : 'Konverzace'}
-                >
-                  <MoreHorizontal size={16} aria-hidden />
-                </button>
+                {isSuperadmin && (
+                  <button
+                    type="button"
+                    className={s.iconbtn}
+                    title="Spravovat konverzaci a členy"
+                  >
+                    <MoreHorizontal size={16} aria-hidden />
+                  </button>
+                )}
               </div>
 
-              <div className={s.msgs}>
-                <div className={s.daysep}>Dnes</div>
-                {MESSAGES.map((m) => (
+              <div className={s.msgs} ref={msgsRef}>
+                {(messages ?? []).map((m) => (
                   <div key={m.id} className={s.msg}>
-                    <span className={s.mav} style={{ background: m.color }}>
-                      {m.author[0]}
+                    <span
+                      className={s.mav}
+                      style={{ background: colorFromId(m.senderId) }}
+                    >
+                      {(m.senderName?.[0] ?? '?').toUpperCase()}
                     </span>
                     <div className={s.mbody}>
                       <div className={s.mtop}>
-                        <span className={s.mname}>{m.author}</span>
-                        <span
-                          className={
-                            m.role === 'super' ? `${s.chip} ${s.chipSuper}` : `${s.chip} ${s.chipAdmin}`
-                          }
-                        >
-                          {m.role === 'super' ? 'Superadmin' : 'Admin'}
-                        </span>
-                        <span className={s.mtime}>{m.time}</span>
+                        <span className={s.mname}>{m.senderName}</span>
+                        <span className={s.mtime}>{fmtTime(m.createdAt)}</span>
                       </div>
-                      <div className={s.mtext}>
-                        {m.text}
-                        {m.att && (
-                          <span className={s.att}>
-                            <span className={s.attPdf}>PDF</span> {m.att.name} · {m.att.size}
-                          </span>
-                        )}
-                      </div>
+                      <div className={s.mtext}>{m.content}</div>
                     </div>
                   </div>
                 ))}
+                {messages && messages.length === 0 && (
+                  <div className={s.emptyMsg}>
+                    Zatím žádné zprávy — napiš první.
+                  </div>
+                )}
               </div>
 
-              <div className={s.composer}>
+              <form
+                className={s.composer}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSend();
+                }}
+              >
                 <div className={s.cbox}>
-                  <button type="button" className={s.iconbtn} title="Přiložit PDF">
+                  <button
+                    type="button"
+                    className={s.iconbtn}
+                    title="Přiložit PDF (připravuje se)"
+                    disabled
+                  >
                     <Paperclip size={16} aria-hidden />
                   </button>
                   <input
                     className={s.input}
-                    placeholder={`Napiš zprávu do „${activeConv.name}"…`}
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder={
+                      activeConv
+                        ? `Napiš zprávu do „${activeConv.name}"…`
+                        : 'Vyber konverzaci…'
+                    }
+                    disabled={!activeConvId}
                   />
-                  <button type="button" className={s.sendbtn} title="Odeslat">
+                  <button
+                    type="submit"
+                    className={s.sendbtn}
+                    title="Odeslat"
+                    disabled={!activeConvId || !messageText.trim()}
+                  >
                     <Send size={16} aria-hidden />
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           ) : (
             <DocumentsView
@@ -298,94 +311,267 @@ export default function AdminChatPage() {
               onOpen={setReadingDoc}
               onBackToList={() => setReadingDoc(null)}
               onBackToChat={openChat}
-              canUpload={isSuperadmin || true /* každý admin smí nahrát */}
+              currentUserId={user?.id}
+              isSuperadmin={isSuperadmin}
             />
           )}
         </section>
 
         {/* PRAVÝ — úkoly týmu */}
-        <aside className={s.tasks}>
-          <div className={s.colhead}>
-            <span className={s.colTitle}>Úkoly týmu</span>
-          </div>
-          <div className={s.tasksBody}>
-            {PEOPLE.map((p) => {
-              const open = !collapsed.has(p.id);
-              const doneCount = p.tasks.filter((t) => t.done).length;
-              const canEdit = p.isMe || isSuperadmin;
-              return (
-                <div key={p.id} className={s.person}>
-                  <button type="button" className={s.phead} onClick={() => togglePerson(p.id)}>
-                    <span className={s.pav} style={{ background: p.color }}>
-                      {p.initial}
-                    </span>
-                    {p.online && <span className={s.online} aria-label="online" />}
-                    <span className={s.pname}>
-                      {p.name}
-                      {p.isMe && <span className={s.pme}> · ty</span>}
-                    </span>
-                    <span className={s.pcount}>
-                      {doneCount}/{p.tasks.length}
-                    </span>
-                    <ChevronDown
-                      size={13}
-                      className={open ? s.chev : `${s.chev} ${s.chevClosed}`}
-                      aria-hidden
-                    />
-                  </button>
-                  {open && (
-                    <div className={s.ptasks}>
-                      {p.tasks.map((t) => (
-                        <div key={t.id} className={t.done ? `${s.task} ${s.taskDone}` : s.task}>
-                          <span
-                            className={t.done ? `${s.chk} ${s.chkDone}` : s.chk}
-                            aria-hidden
-                          >
-                            {t.done && <Check size={12} />}
-                          </span>
-                          <span className={s.tasktext}>{t.text}</span>
-                          {canEdit && (
-                            <button
-                              type="button"
-                              className={s.taskedit}
-                              title={p.isMe ? 'Upravit' : 'Upravit (superadmin)'}
-                            >
-                              <Pencil size={12} aria-hidden />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                      {p.isMe && (
-                        <button type="button" className={s.addtask}>
-                          <Plus size={13} aria-hidden /> přidat úkol
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </aside>
+        <TasksPanel currentUserId={user?.id} isSuperadmin={isSuperadmin} />
       </div>
     </div>
   );
 }
 
-// ── Dokumenty (přepínač prostředního panelu) ──────────────────────────────
+// ── Úkoly týmu (napojené na BE) ───────────────────────────────────────────
+function TasksPanel({
+  currentUserId,
+  isSuperadmin,
+}: {
+  currentUserId?: string;
+  isSuperadmin: boolean;
+}) {
+  const { data: tasks } = useAdminTasks();
+  const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const [addingFor, setAddingFor] = useState<string | null>(null);
+  const [newText, setNewText] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+
+  const groups = useMemo(() => {
+    const map = new Map<
+      string,
+      { ownerId: string; ownerName: string; tasks: AdminTask[] }
+    >();
+    for (const t of tasks ?? []) {
+      const g = map.get(t.ownerId) ?? {
+        ownerId: t.ownerId,
+        ownerName: t.ownerName,
+        tasks: [],
+      };
+      g.tasks.push(t);
+      map.set(t.ownerId, g);
+    }
+    // Vlastní skupina vždy (i prázdná) — ať si můžu přidat úkol.
+    if (currentUserId && !map.has(currentUserId)) {
+      map.set(currentUserId, {
+        ownerId: currentUserId,
+        ownerName: 'Ty',
+        tasks: [],
+      });
+    }
+    const arr = Array.from(map.values());
+    arr.sort((a, b) => {
+      if (a.ownerId === currentUserId) return -1;
+      if (b.ownerId === currentUserId) return 1;
+      return a.ownerName.localeCompare(b.ownerName, 'cs');
+    });
+    return arr;
+  }, [tasks, currentUserId]);
+
+  const togglePerson = (id: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const submitNew = (ownerId: string) => {
+    const text = newText.trim();
+    setAddingFor(null);
+    setNewText('');
+    if (text) {
+      createTask.mutate({
+        text,
+        ...(ownerId !== currentUserId ? { ownerId } : {}),
+      });
+    }
+  };
+
+  const submitEdit = (id: string) => {
+    const text = editText.trim();
+    setEditingId(null);
+    setEditText('');
+    if (text) updateTask.mutate({ id, text });
+  };
+
+  return (
+    <aside className={s.tasks}>
+      <div className={s.colhead}>
+        <span className={s.colTitle}>Úkoly týmu</span>
+      </div>
+      <div className={s.tasksBody}>
+        {groups.map((g) => {
+          const isMe = g.ownerId === currentUserId;
+          const open = !collapsed.has(g.ownerId);
+          const doneCount = g.tasks.filter((t) => t.done).length;
+          const canEdit = isMe || isSuperadmin;
+          return (
+            <div key={g.ownerId} className={s.person}>
+              <button
+                type="button"
+                className={s.phead}
+                onClick={() => togglePerson(g.ownerId)}
+              >
+                <span
+                  className={s.pav}
+                  style={{ background: colorFromId(g.ownerId) }}
+                >
+                  {(g.ownerName[0] ?? '?').toUpperCase()}
+                </span>
+                <span className={s.pname}>
+                  {g.ownerName}
+                  {isMe && <span className={s.pme}> · ty</span>}
+                </span>
+                <span className={s.pcount}>
+                  {doneCount}/{g.tasks.length}
+                </span>
+                <ChevronDown
+                  size={13}
+                  className={open ? s.chev : `${s.chev} ${s.chevClosed}`}
+                  aria-hidden
+                />
+              </button>
+              {open && (
+                <div className={s.ptasks}>
+                  {g.tasks.map((t) => (
+                    <div
+                      key={t.id}
+                      className={t.done ? `${s.task} ${s.taskDone}` : s.task}
+                    >
+                      <button
+                        type="button"
+                        className={t.done ? `${s.chk} ${s.chkDone}` : s.chk}
+                        disabled={!canEdit}
+                        onClick={() =>
+                          canEdit &&
+                          updateTask.mutate({ id: t.id, done: !t.done })
+                        }
+                        aria-label={t.done ? 'Zrušit hotovo' : 'Označit hotovo'}
+                      >
+                        {t.done && <Check size={12} />}
+                      </button>
+                      {editingId === t.id ? (
+                        <input
+                          className={s.taskEditInput}
+                          value={editText}
+                          autoFocus
+                          onChange={(e) => setEditText(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') submitEdit(t.id);
+                            if (e.key === 'Escape') {
+                              setEditingId(null);
+                              setEditText('');
+                            }
+                          }}
+                          onBlur={() => submitEdit(t.id)}
+                        />
+                      ) : (
+                        <span className={s.tasktext}>{t.text}</span>
+                      )}
+                      {canEdit && editingId !== t.id && (
+                        <span className={s.taskActions}>
+                          <button
+                            type="button"
+                            className={s.taskedit}
+                            title="Upravit"
+                            onClick={() => {
+                              setEditingId(t.id);
+                              setEditText(t.text);
+                            }}
+                          >
+                            <Pencil size={12} aria-hidden />
+                          </button>
+                          <button
+                            type="button"
+                            className={s.taskedit}
+                            title="Smazat"
+                            onClick={() => {
+                              if (window.confirm('Smazat úkol?'))
+                                deleteTask.mutate(t.id);
+                            }}
+                          >
+                            <Trash2 size={12} aria-hidden />
+                          </button>
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {canEdit &&
+                    (addingFor === g.ownerId ? (
+                      <input
+                        className={s.taskEditInput}
+                        value={newText}
+                        autoFocus
+                        placeholder="Nový úkol…"
+                        onChange={(e) => setNewText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') submitNew(g.ownerId);
+                          if (e.key === 'Escape') {
+                            setAddingFor(null);
+                            setNewText('');
+                          }
+                        }}
+                        onBlur={() => submitNew(g.ownerId)}
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        className={s.addtask}
+                        onClick={() => {
+                          setAddingFor(g.ownerId);
+                          setNewText('');
+                        }}
+                      >
+                        <Plus size={13} aria-hidden /> přidat úkol
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {groups.length === 0 && (
+          <div className={s.emptyMsg}>Zatím žádné úkoly.</div>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+// ── Dokumenty (napojené na BE) ────────────────────────────────────────────
 function DocumentsView({
   readingDoc,
   onOpen,
   onBackToList,
   onBackToChat,
-  canUpload,
+  currentUserId,
+  isSuperadmin,
 }: {
-  readingDoc: Doc | null;
-  onOpen: (d: Doc) => void;
+  readingDoc: PlatformDocument | null;
+  onOpen: (d: PlatformDocument) => void;
   onBackToList: () => void;
   onBackToChat: () => void;
-  canUpload: boolean;
+  currentUserId?: string;
+  isSuperadmin: boolean;
 }) {
+  const { data: docs } = useAdminDocuments();
+  const uploadMut = useUploadDocument();
+  const deleteMut = useDeleteDocument();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) uploadMut.mutate(f);
+    e.target.value = '';
+  };
+
   if (readingDoc) {
     return (
       <div className={s.docs}>
@@ -394,26 +580,33 @@ function DocumentsView({
             <ArrowLeft size={15} aria-hidden /> Zpět na dokumenty
           </button>
           <div className={s.chHeadMeta}>
-            <div className={s.chTitle}>{readingDoc.name}</div>
-            <div className={s.chSub}>{readingDoc.desc}</div>
+            <div className={s.chTitle}>{readingDoc.filename}</div>
+            <div className={s.chSub}>
+              {fmtSize(readingDoc.sizeBytes)} · nahrál {readingDoc.uploaderName}
+            </div>
           </div>
           <div className={s.spacer} />
-          <button type="button" className={s.docbtn}>
+          <a
+            className={s.docbtn}
+            href={readingDoc.url}
+            target="_blank"
+            rel="noreferrer"
+            download
+          >
             <Download size={15} aria-hidden /> Stáhnout
-          </button>
+          </a>
         </div>
         <div className={s.readerBody}>
-          {/* B2: nativní náhled (iframe src=blob/url). Zatím zástupný list. */}
-          <div className={s.paper}>
-            <h2 className={s.paperH}>{readingDoc.desc}</h2>
-            <p className={s.paperNote}>
-              Náhled PDF „{readingDoc.name}" — nativní čtečka se doplní v bloku B2.
-            </p>
-          </div>
+          <iframe
+            className={s.pdfFrame}
+            src={readingDoc.url}
+            title={readingDoc.filename}
+          />
         </div>
       </div>
     );
   }
+
   return (
     <div className={s.docs}>
       <div className={s.chhead}>
@@ -422,14 +615,27 @@ function DocumentsView({
         </button>
         <div className={s.chHeadMeta}>
           <div className={s.chTitle}>Sdílené dokumenty</div>
-          <div className={s.chSub}>PDF dostupné všem adminům · klikni na dokument pro čtení</div>
+          <div className={s.chSub}>
+            PDF dostupné všem adminům · klikni na dokument pro čtení
+          </div>
         </div>
         <div className={s.spacer} />
-        {canUpload && (
-          <button type="button" className={s.docbtn}>
-            <Upload size={15} aria-hidden /> Nahrát PDF
-          </button>
-        )}
+        <input
+          type="file"
+          accept="application/pdf"
+          ref={fileRef}
+          style={{ display: 'none' }}
+          onChange={handleFile}
+        />
+        <button
+          type="button"
+          className={s.docbtn}
+          onClick={() => fileRef.current?.click()}
+          disabled={uploadMut.isPending}
+        >
+          <Upload size={15} aria-hidden />
+          {uploadMut.isPending ? ' Nahrávám…' : ' Nahrát PDF'}
+        </button>
       </div>
       <div className={s.doctable}>
         <div className={`${s.docrow} ${s.docrowHead}`}>
@@ -438,32 +644,71 @@ function DocumentsView({
           <span>Nahrál</span>
           <span className={s.right}>Akce</span>
         </div>
-        {DOCUMENTS.map((d) => (
-          <button key={d.id} type="button" className={s.docrow} onClick={() => onOpen(d)}>
-            <span className={s.docname}>
-              <span className={s.docPdf}>PDF</span>
-              <span className={s.docNm}>
-                {d.name}
-                <small>{d.desc}</small>
+        {(docs ?? []).map((d) => {
+          const canDelete = isSuperadmin || d.uploaderId === currentUserId;
+          return (
+            <div
+              key={d.id}
+              className={s.docrow}
+              onClick={() => onOpen(d)}
+              role="button"
+              tabIndex={0}
+            >
+              <span className={s.docname}>
+                <span className={s.docPdf}>PDF</span>
+                <span className={s.docNm}>{d.filename}</span>
               </span>
-            </span>
-            <span className={s.docmeta}>{d.size}</span>
-            <span className={s.docby}>
-              <span className={s.dot} style={{ background: d.byColor }}>
-                {d.by[0]}
-              </span>{' '}
-              {d.by} · {d.date}
-            </span>
-            <span className={s.docact}>
-              <span className={s.miniAct} title="Přečíst">
-                <Maximize2 size={14} aria-hidden />
+              <span className={s.docmeta}>{fmtSize(d.sizeBytes)}</span>
+              <span className={s.docby}>
+                {d.uploaderName} · {fmtDate(d.createdAt)}
               </span>
-              <span className={s.miniAct} title="Stáhnout">
-                <Download size={14} aria-hidden />
+              <span className={s.docact}>
+                <button
+                  type="button"
+                  className={s.miniAct}
+                  title="Přečíst"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen(d);
+                  }}
+                >
+                  <Maximize2 size={14} aria-hidden />
+                </button>
+                <a
+                  className={s.miniAct}
+                  href={d.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  download
+                  title="Stáhnout"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Download size={14} aria-hidden />
+                </a>
+                {canDelete && (
+                  <button
+                    type="button"
+                    className={s.miniAct}
+                    title="Smazat"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`Smazat „${d.filename}"?`)) {
+                        deleteMut.mutate(d.id);
+                      }
+                    }}
+                  >
+                    <Trash2 size={14} aria-hidden />
+                  </button>
+                )}
               </span>
-            </span>
-          </button>
-        ))}
+            </div>
+          );
+        })}
+        {docs && docs.length === 0 && (
+          <div className={s.emptyMsg}>
+            Zatím žádné dokumenty — nahraj první PDF.
+          </div>
+        )}
       </div>
     </div>
   );
