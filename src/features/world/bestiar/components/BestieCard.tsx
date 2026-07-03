@@ -10,8 +10,6 @@ import { Button } from '@/shared/ui';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { Bestie } from '../types';
-import { Drd16BestieCard } from './Drd16BestieCard';
-import { FateBestieCard } from './FateBestieCard';
 import { BestieDetail } from './BestieDetail';
 import styles from './BestieCard.module.css';
 import './bestieSkins.css';
@@ -42,33 +40,6 @@ export function BestieCard({
   onDelete,
 }: Props): React.ReactElement {
   const [open, setOpen] = useState(false);
-
-  // 16.2b-bestie Cesta B — drd16/fate mají zatím vlastní render (zruší se v K4,
-  // až univerzální karta pokryje všechny systémy).
-  if (bestie.systemId === 'drd16') {
-    return (
-      <Drd16BestieCard
-        bestie={bestie}
-        canEdit={canEdit}
-        canDelete={canDelete}
-        onEdit={onEdit}
-        onClone={onClone}
-        onDelete={onDelete}
-      />
-    );
-  }
-  if (bestie.systemId === 'fae' || bestie.systemId === 'fate') {
-    return (
-      <FateBestieCard
-        bestie={bestie}
-        canEdit={canEdit}
-        canDelete={canDelete}
-        onEdit={onEdit}
-        onClone={onClone}
-        onDelete={onDelete}
-      />
-    );
-  }
 
   const schema = systemEntitySchemaRegistry.get(bestie.systemId, 'bestie');
   // Poznámky = jen PJ+. `canEdit` slouží jako proxy PJ+ (zpřesní se v K5 role gate).

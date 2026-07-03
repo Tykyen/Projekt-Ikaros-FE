@@ -15,8 +15,13 @@ aktualizuje se po každém dokončeném motivu.
   - **K3 ✅** všech 11 zbývajících skinů napsáno do `bestieSkins.css` (12 motivů celkem).
     Render-verify na harness (`scratchpad/bestie-skins-harness.html`) = každý motiv vlastní tvar
     portrétu, žádná kolize/leak. Reálný `npm run build` prošel (10.16s, CSP OK).
-  - **K2** ověřit BestieDetail na jiných systémech (matrix, dnd5e, shadowrun) — nezačato.
-  - **K4** smazat Drd16BestieCard/FateBestieCard + reference — nezačato.
+  - **K2 ✅** `BestieDetail` ověřen na VŠECH 14 systémech render testem
+    (`BestieDetail.systems.spec.tsx`, 16/16) — syntetizuje staty ze schématu každého
+    systému, assertuje root + Popis + Poznámky + každou neprázdnou sekci. drd16/fae/fate
+    mají vlastní registrované schéma (ne generic fallback) → univerzál je pokryje.
+  - **K4 ✅** smazán switch v `BestieCard.tsx` + 6 souborů (Drd16BestieCard/FateBestieCard
+    .tsx+.module.css + 2 spec). Build 17.96s + bestiar suite 21/21 čisté. Zbytkový dluh:
+    fate-skins CSS drží zmínky `FateBestieCard` v komentářích (5 souborů, netknuto bez souhlasu).
   - **K5** mobil-desktop + funkce + napoveda + role gate poznámek (canSeeNotes ≠ canEdit) + commit.
 
 ## Co je NEMĚNNÉ vs VOLNÉ (napříč motivy)
