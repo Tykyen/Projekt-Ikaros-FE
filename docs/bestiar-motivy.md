@@ -6,9 +6,18 @@ aktualizuje se po každém dokončeném motivu.
 ## Cíl a postup
 - **Fáze 1 ✅ HOTOVO** — navrženo a ověřeno **všech 12 vzhledů** (kabátků) karty bestie
   (sbaleno + rozbaleno) na systému **drdplus** (Svět vil). HTML prototypy v `scratchpad/bestie-<motiv>.html`.
-- **Fáze 2 — DALŠÍ** — implementovat do FE kódu (BestieCard motiv-aware přes `data-theme`,
+- **Fáze 2 — PROBÍHÁ** — implementovat do FE kódu (BestieCard motiv-aware přes `data-theme`,
   per-motiv CSS) a **aplikovat na všech 14 systémů** (systém mění jen zobrazená pole, ne tvar).
   [Edit modal bestie řešit taky ve fázi 2.]
+  - **K1 ✅** pilot dark-fantasy: BE `description` pole + univerzální BestieCard (disclosure)
+    + BestieDetail (schema read) + tokeny + bestieSkins.css + editor +Popis. Build+testy OK.
+    ČEKÁ K1c naživo (za loginem, dělá uživatel; nutný BE deploy+restart kvůli `description`).
+  - **K3 ✅** všech 11 zbývajících skinů napsáno do `bestieSkins.css` (12 motivů celkem).
+    Render-verify na harness (`scratchpad/bestie-skins-harness.html`) = každý motiv vlastní tvar
+    portrétu, žádná kolize/leak. Reálný `npm run build` prošel (10.16s, CSP OK).
+  - **K2** ověřit BestieDetail na jiných systémech (matrix, dnd5e, shadowrun) — nezačato.
+  - **K4** smazat Drd16BestieCard/FateBestieCard + reference — nezačato.
+  - **K5** mobil-desktop + funkce + napoveda + role gate poznámek (canSeeNotes ≠ canEdit) + commit.
 
 ## Co je NEMĚNNÉ vs VOLNÉ (napříč motivy)
 - **Neměnné (kotva):** (a) mechanika **otevírání/zavírání** karty (sbaleno ↔ rozbaleno);

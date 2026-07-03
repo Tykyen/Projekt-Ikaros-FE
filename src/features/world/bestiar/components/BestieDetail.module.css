@@ -1,0 +1,207 @@
+/* 16.2h — Rozbalovací detail bestie: skeleton (jen --theme-* tokeny).
+   Per-motiv doladění (dlaždice, oddělovače) řeší bestieSkins.css. */
+
+.detail {
+  padding: 4px 24px 26px;
+  border-top: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.2));
+  animation: reveal 0.35s ease;
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sec {
+  margin-top: 20px;
+}
+.secTitle {
+  margin: 0 0 12px;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--theme-accent, #a96cff);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.secTitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--theme-border-soft, rgba(120, 100, 255, 0.26)),
+    transparent
+  );
+}
+.pjOnly {
+  font-family: var(--font-body, inherit);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--theme-text-dim, #6e6394);
+  letter-spacing: 0;
+}
+
+.lore {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--theme-text, #ece4ff);
+}
+.dropcap {
+  float: left;
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 0.82;
+  color: var(--theme-accent, #a96cff);
+  margin: 4px 12px 0 0;
+}
+
+/* HP bar */
+.hpBlock {
+  margin-bottom: 10px;
+}
+.hpMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--theme-text-muted, #b3a6d4);
+  margin-bottom: 6px;
+}
+.hpVal {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 16px;
+  color: var(--theme-accent-bright, #c9a4ff);
+}
+.hpBar {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.26));
+  border-radius: 2px;
+  overflow: hidden;
+}
+.hpBar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent-dim, #3a2470),
+    var(--theme-accent, #a96cff)
+  );
+}
+
+/* dlaždice statů */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+.cell {
+  padding: 8px 6px;
+  text-align: center;
+  background: var(--theme-surface-soft, rgba(38, 24, 72, 0.46));
+  border: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.26));
+  border-radius: 4px;
+}
+.cellKey {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--theme-text-dim, #6e6394);
+}
+.cellVal {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 18px;
+  color: var(--theme-text, #ece4ff);
+  line-height: 1.2;
+}
+
+/* útoky tabulka */
+.tableWrap {
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--theme-text-dim, #6e6394);
+  text-align: center;
+  padding: 5px 8px;
+  font-weight: 400;
+  border-bottom: 1px solid var(--theme-border-soft, rgba(120, 100, 255, 0.26));
+}
+.table th:first-child {
+  text-align: left;
+}
+.table td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-variant-numeric: tabular-nums;
+}
+.table td:first-child {
+  text-align: left;
+  font-family: var(--font-display, Georgia, serif);
+  color: var(--theme-heading, #fff);
+}
+
+/* schopnosti seznam */
+.abilList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.abilList li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 15px;
+  line-height: 1.42;
+}
+.abilList li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 9px;
+  color: var(--theme-accent, #a96cff);
+}
+.abilList b {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 600;
+  color: var(--theme-accent-bright, #c9a4ff);
+  margin-right: 6px;
+}
+
+/* poznámky */
+.notes {
+  margin: 0;
+  padding: 13px 18px;
+  background: var(--theme-surface-soft, rgba(38, 24, 72, 0.46));
+  border-left: 3px solid var(--theme-accent, #a96cff);
+  border-radius: 3px;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--theme-text-muted, #b3a6d4);
+  white-space: pre-wrap;
+}

@@ -67,6 +67,7 @@ export function BestieEditorModal({
     existing?.imageFit ?? null,
   );
   const [notes, setNotes] = useState(existing?.notes ?? '');
+  const [description, setDescription] = useState(existing?.description ?? '');
   const [scope, setScope] = useState<BestieScope>(
     existing ? existing.scope : defaultScope,
   );
@@ -108,6 +109,7 @@ export function BestieEditorModal({
       imageZoom: hasImage ? imageZoom : null,
       imageFit: hasImage ? imageFit : null,
       notes: notes.trim(),
+      description: description.trim(),
       systemStats: validation.filled,
     };
 
@@ -197,6 +199,20 @@ export function BestieEditorModal({
           </div>
         </div>
 
+        <div className={styles.row}>
+          <label className={styles.label}>
+            Popis
+            <textarea
+              className={styles.textarea}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              maxLength={4000}
+              placeholder="Jak bytost vypadá a chová se — ať ji hráč rozezná…"
+            />
+          </label>
+        </div>
+
         {!existing && (
           <div className={styles.row}>
             <label className={styles.label}>
@@ -238,7 +254,7 @@ export function BestieEditorModal({
 
         <div className={styles.row}>
           <label className={styles.label}>
-            Poznámky
+            Poznámky (jen PJ)
             <textarea
               className={styles.textarea}
               value={notes}

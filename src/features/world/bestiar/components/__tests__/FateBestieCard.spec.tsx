@@ -10,6 +10,7 @@ function makeBestie(over: Partial<Bestie>): Bestie {
     systemId: 'fae',
     name: 'Agent Mlžné trojice',
     notes: '',
+    description: '',
     systemStats: {},
     createdAt: '',
     updatedAt: '',

@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 16.2h K1 pilot: bestie karta motiv-aware (3 karty→1 + disclosure + schema-driven detail + pole `description` BE+FE) · 2026-07-03
+**Co zabralo:** Přepis generic `BestieCard` (drd16/fate switch zatím ponechán, smaže K4) na univerzální **skeleton + disclosure** (`useState`, `data-open`, hlavička role=button, akce `stopPropagation`) + nový **`BestieDetail`** (read-only, generuje sekce ZE SCHÉMATU: `combatBehavior:'damageable'`→HP bar, list s `listItemFields`→tabulka nebo `{label,value}`→seznam, number/string/enum→dlaždice; skrývá prázdné null/''; poznámky gate `canSeeNotes`). Nové BE pole **`description`** v `bestiae` modulu (7 míst). FE **`bestieSkins.css`** = per-motiv tvar scoped `[data-theme='dark-fantasy'] [data-bestie-card/-portrait]` přes **stabilní data-atributy** (ne module-hash). Modal +Popis (oddělené od Poznámky).
+**Proč to je správně:** dvě osy oddělené — **motiv (`data-theme`) = tvar/ornament** (scoped CSS + `--theme-*` tokeny), **systém = pole** (existující schema engine). Stabilní `data-bestie-*` selektory obcházejí hash CSS-modulů. `description` oddělený od `notes` (GM). **BE past:** `create`/`clone` v service NEmají spread dto → `description` nutné přidat explicitně (jinak tiše propadne); `update` jede přes `updateAtomic(dto)` = projde sám.
+**Jak ověřeno (staticky):** BE `typecheck`+`lint:check` ✓; FE `npm run build` (tsc-b+vite) ✓; vitest **16/16** (3 test-mocky doplněny o `description` — nové required pole shodilo build). **Naživo render (za loginem) čeká uživatele** — nemám prod auth.
+**Past (rodina CH-014):** PowerShell zdědil backend cwd z dřívějšího Bash `cd` → `npm run build` spustil **backend** (falešně vypadalo OK); opraveno `Set-Location` na FE. Před buildem ověřit, který repo.
+**Zhodnocení:** Dobře — spec→plán→schválení→kód, 0 cyklení. K1 pilot hotový; zbývá K3 (11 skinů) → K4 (smazat Drd16/FateBestieCard) → K5 (mobil + funkce/napoveda + role gate poznámek).
+
+---
+
 ### ✅ ŘEŠENÍ — Dračí Hlídka (drdh) bestie: schéma + panel mapa↔chat + napojení (skill `system` fáze 4) · 2026-07-01
 **Co zabralo:** prototyp=kontrakt (`c:\tmp\drdh-bestie-audit.html`) → delegace agentovi (vzor **drd2**). Schéma FE canonical `schemas/drdh/{bestie,token}.json` (bestie: sekce Boj/Tělo/Atributy/Odolnosti/Meta/Popis; `hp` damageable, `movement`, `initiative`); **token = SUPERSET** (health.* + combat + sekce `drdh-bestie` se snapshotem VŠECH bestie polí). `DrdhBestiePanel` (mapa) + sdílené jádro `DrdhBestieCombatActions` + `DrdhChatBestiePanel` (chat, 0 drift). Napojení: `bootstrap` registrace + `TokenSystemSheet`/`BestieInstancePanel` if-blok `drdh` + bestiář (`BestiarPage`/`EditorModal`/`Card`) čte schéma **generickky z registry → 0 branch**. Vlastní vzhled: medailon nestvůry místo erbu, Odolnosti (rez/imu/slab tagy) místo per-prof zdroje.
 **Proč to je správně:** token superset = BE strict validace (`token.update` REPLACE) edit nezahodí (rodina CH-FATE/drd16); canonical `drdh` přes `useResolvedSystemId` u VŠECH konzumentů (rodina CH-030/119); HP schema-aware (`combatBehavior:'damageable'` → `buildBestieToken`).

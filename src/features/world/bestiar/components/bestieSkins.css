@@ -1,0 +1,345 @@
+/* 16.2h — Motivové skiny karty bestie.
+   Globální (NE module) — scoped přes world `[data-theme]` (na WorldLayout .shell)
+   + stabilní data-atributy karty (`data-bestie-card`, `data-bestie-portrait`,
+   `data-bestie-detail`). Barvy/fonty jdou z --theme-* tokenů automaticky; zde
+   jen TVAR + ornament per motiv. Zdroj vzhledů: docs/bestiar-motivy.md.
+
+   Tvar portrétu = hlavní signature: hexagon / kruh / diagonál / hvězda /
+   polaroid / fotorámeček / hologram-rám. Barvy per motiv z tokenů. */
+
+/* ═══════════ společné (všechny motivy dostanou glow při rozbalení) ═══════════ */
+[data-bestie-card] {
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+/* Pomocné tvary (clip-path) */
+/* hexagon, star = přes proměnnou níže */
+
+/* ───────── Dark Fantasy — Pečeť (hexagon + kov) ───────── */
+[data-theme='dark-fantasy'] [data-bestie-card] {
+  border-color: var(--theme-border-secondary);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(200, 204, 214, 0.1);
+}
+[data-theme='dark-fantasy'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.72), 0 0 30px var(--theme-glow-gold);
+}
+[data-theme='dark-fantasy'] [data-bestie-portrait] {
+  width: 128px;
+  height: 128px;
+  border: none;
+  border-radius: 0;
+  padding: 4px;
+  background: linear-gradient(150deg, var(--theme-accent-cyan), var(--theme-accent-dim));
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  overflow: visible;
+}
+[data-theme='dark-fantasy'] [data-bestie-portrait] > img,
+[data-theme='dark-fantasy'] [data-bestie-portrait] > div {
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: #0a0406;
+}
+
+/* ───────── Fantasy — Popínavý rám (kruh + smaragd) ───────── */
+[data-theme='fantasy'] [data-bestie-card] {
+  border-radius: 30px 8px 30px 8px;
+  border-color: var(--theme-border-secondary);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+}
+[data-theme='fantasy'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 26px var(--theme-glow-cyan);
+}
+[data-theme='fantasy'] [data-bestie-portrait] {
+  border-radius: 50%;
+  border: 2px solid var(--theme-accent-cyan);
+  box-shadow: 0 0 18px var(--theme-glow-cyan), inset 0 0 18px rgba(0, 0, 0, 0.5);
+}
+
+/* ───────── Sci-Fi — Hologram (hranatý + cyan scan + brackets) ───────── */
+[data-theme='vesmir'] [data-bestie-card] {
+  border-color: var(--theme-border-soft);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+[data-theme='vesmir'] [data-bestie-card][data-open] {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 26px var(--theme-glow-gold);
+}
+[data-theme='vesmir'] [data-bestie-portrait] {
+  border-radius: 0;
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 0 20px var(--theme-glow-gold), inset 0 0 24px rgba(79, 212, 228, 0.2);
+}
+[data-theme='vesmir'] [data-bestie-portrait]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 2px,
+    rgba(79, 212, 228, 0.14) 2px 3px
+  );
+}
+
+/* ───────── Cyberpunk — Diagonální řez + žlutý neon ───────── */
+[data-theme='cyberpunk'] [data-bestie-card] {
+  border-color: var(--theme-border-soft);
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.5);
+}
+[data-theme='cyberpunk'] [data-bestie-card][data-open] {
+  border-color: var(--theme-border);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.6), 0 0 26px var(--theme-glow-gold);
+}
+[data-theme='cyberpunk'] [data-bestie-portrait] {
+  border-radius: 0;
+  border: 1px solid var(--theme-border);
+  clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
+}
+[data-theme='cyberpunk'] [data-bestie-portrait] > img,
+[data-theme='cyberpunk'] [data-bestie-portrait] > div {
+  clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
+}
+[data-theme='cyberpunk'] [data-bestie-portrait]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 84%;
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--theme-accent) 0 8px,
+    #0a0a08 8px 16px
+  );
+}
+
+/* ───────── Steampunk — Mosazný kruh (soukolí) ───────── */
+[data-theme='steampunk'] [data-bestie-card] {
+  border: 2px solid var(--theme-accent-dim);
+  border-radius: 5px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55);
+}
+[data-theme='steampunk'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 28px var(--theme-glow-gold);
+}
+[data-theme='steampunk'] [data-bestie-portrait] {
+  border-radius: 50%;
+  border: 3px solid var(--theme-accent);
+  box-shadow: 0 0 16px var(--theme-glow-gold), inset 0 0 14px rgba(0, 0, 0, 0.6);
+}
+
+/* ───────── Post-apokalypsa — Zelený rám + mech ───────── */
+[data-theme='apokalypsa'] [data-bestie-card] {
+  border-color: var(--theme-accent);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55), inset 0 0 40px rgba(20, 30, 14, 0.4);
+}
+[data-theme='apokalypsa'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 26px var(--theme-glow-cyan);
+}
+[data-theme='apokalypsa'] [data-bestie-portrait] {
+  border: 2px solid var(--theme-accent);
+  border-radius: 3px;
+  box-shadow: 0 0 16px var(--theme-glow-gold);
+}
+[data-theme='apokalypsa'] [data-bestie-portrait]::before {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: -3px;
+  width: 46px;
+  height: 34px;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at bottom left,
+    var(--theme-accent) 0%,
+    transparent 70%
+  );
+  opacity: 0.5;
+}
+
+/* ───────── Horor — Zaprášená fotografie (rámeček + sépie) ───────── */
+[data-theme='horor'] [data-bestie-card] {
+  border-color: var(--theme-border-secondary);
+  box-shadow: 0 14px 46px rgba(0, 0, 0, 0.7);
+}
+[data-theme='horor'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 26px var(--theme-glow-gold);
+}
+[data-theme='horor'] [data-bestie-portrait] {
+  border: none;
+  border-radius: 0;
+  padding: 7px;
+  background: linear-gradient(135deg, #3a2e1c, #1a140c);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(200, 154, 82, 0.2);
+}
+[data-theme='horor'] [data-bestie-portrait] > img {
+  filter: sepia(0.5) contrast(0.9) brightness(0.85);
+}
+
+/* ───────── Mystery — Vyšetřovací polaroid (bílý rám + náklon) ───────── */
+[data-theme='mystery'] [data-bestie-card] {
+  border-color: var(--theme-border-secondary);
+  box-shadow: 0 14px 46px rgba(0, 0, 0, 0.6);
+}
+[data-theme='mystery'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 26px var(--theme-glow-gold);
+}
+[data-theme='mystery'] [data-bestie-portrait] {
+  border: none;
+  border-radius: 2px;
+  padding: 7px 7px 20px;
+  background: #e4e2da;
+  transform: rotate(-2.5deg);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.7);
+  overflow: visible;
+}
+[data-theme='mystery'] [data-bestie-portrait] > img,
+[data-theme='mystery'] [data-bestie-portrait] > div {
+  filter: grayscale(0.35) contrast(1.05);
+}
+[data-theme='mystery'] [data-bestie-portrait]::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  z-index: 3;
+  background: radial-gradient(circle at 35% 30%, var(--theme-accent-bright), #a8121a 60%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ───────── Historický — Barokní rám + koruna ───────── */
+[data-theme='historie'] [data-bestie-card] {
+  border-color: var(--theme-border-soft);
+  box-shadow: 0 14px 46px rgba(0, 0, 0, 0.6);
+}
+[data-theme='historie'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 26px var(--theme-glow-gold);
+}
+[data-theme='historie'] [data-bestie-portrait] {
+  border: 3px solid var(--theme-accent);
+  border-radius: 2px;
+  padding: 3px;
+  background: linear-gradient(160deg, var(--theme-accent-bright), var(--theme-accent-dim));
+  box-shadow: 0 0 14px var(--theme-glow-gold);
+  overflow: visible;
+}
+[data-theme='historie'] [data-bestie-portrait] > img,
+[data-theme='historie'] [data-bestie-portrait] > div {
+  filter: sepia(0.3) contrast(1.02);
+}
+/* koruna nad rámem */
+[data-theme='historie'] [data-bestie-portrait]::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 22px;
+  z-index: 3;
+  background-color: var(--theme-accent);
+  clip-path: polygon(
+    6% 100%,
+    12% 26%,
+    32% 62%,
+    50% 8%,
+    68% 62%,
+    88% 26%,
+    94% 100%
+  );
+  filter: drop-shadow(0 0 5px var(--theme-glow-gold));
+}
+
+/* ───────── Současnost — Polaroid na dřevě (zaoblený, měkký) ───────── */
+[data-theme='moderni'] [data-bestie-card] {
+  border-radius: 10px;
+  border-color: var(--theme-border-soft);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+}
+[data-theme='moderni'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 24px var(--theme-glow-gold);
+}
+[data-theme='moderni'] [data-bestie-portrait] {
+  border: none;
+  border-radius: 2px;
+  padding: 7px 7px 20px;
+  background: #efe8da;
+  transform: rotate(-3deg);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+/* ───────── Western — Šerifská hvězda + dřevo ───────── */
+[data-theme='western'] [data-bestie-card] {
+  border: 2px solid var(--theme-accent-dim);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.6);
+}
+[data-theme='western'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 24px var(--theme-glow-gold);
+}
+[data-theme='western'] [data-bestie-portrait] {
+  border: none;
+  border-radius: 0;
+  padding: 6px;
+  background: linear-gradient(180deg, var(--theme-accent-bright), var(--theme-accent-dim));
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+  overflow: visible;
+  box-shadow: 0 0 16px var(--theme-glow-gold);
+}
+[data-theme='western'] [data-bestie-portrait] > img,
+[data-theme='western'] [data-bestie-portrait] > div {
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+  background: #0c0805;
+}
+
+/* ───────── Ikaros — Synthwave slunce (kruh + pruhy + neon) ───────── */
+[data-theme='ikaros'] [data-bestie-card] {
+  border-color: var(--theme-border-soft);
+  box-shadow: 0 14px 46px rgba(0, 0, 0, 0.55);
+}
+[data-theme='ikaros'] [data-bestie-card][data-open] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 26px var(--theme-glow-gold);
+}
+[data-theme='ikaros'] [data-bestie-portrait] {
+  border-radius: 50%;
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 0 26px var(--theme-glow-gold), inset 0 0 20px rgba(169, 108, 255, 0.3);
+}
+[data-theme='ikaros'] [data-bestie-portrait]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 7px,
+    rgba(10, 6, 24, 0.55) 7px 10px
+  );
+  -webkit-mask: linear-gradient(0deg, #000 0 45%, transparent 62%);
+  mask: linear-gradient(0deg, #000 0 45%, transparent 62%);
+}

@@ -1,15 +1,20 @@
 /**
  * 10.2d-prep-B — Bestie card v list.
+ * 16.2h — univerzální motiv-aware karta: sbaleno (portrét · jméno · popis ·
+ * akce · šipka) + rozbalovací detail (`BestieDetail`). Vzhled řídí motiv světa
+ * (`data-theme`) přes tokeny + skiny (`bestieSkins.css`); stabilní selektor
+ * `data-bestie-card`.
  */
+import { useState } from 'react';
 import { Button } from '@/shared/ui';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
-import { EntityStatbar } from '@/features/world/tactical-map/components/schema-form/EntityStatbar';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { Bestie } from '../types';
-import { getBestieAbilities } from '../lib/bestieAbilities';
 import { Drd16BestieCard } from './Drd16BestieCard';
 import { FateBestieCard } from './FateBestieCard';
+import { BestieDetail } from './BestieDetail';
 import styles from './BestieCard.module.css';
+import './bestieSkins.css';
 
 interface Props {
   bestie: Bestie;
@@ -36,7 +41,10 @@ export function BestieCard({
   onClone,
   onDelete,
 }: Props): React.ReactElement {
-  // 16.2b-bestie Cesta B — drd16 má custom „naturalistova deska" render.
+  const [open, setOpen] = useState(false);
+
+  // 16.2b-bestie Cesta B — drd16/fate mají zatím vlastní render (zruší se v K4,
+  // až univerzální karta pokryje všechny systémy).
   if (bestie.systemId === 'drd16') {
     return (
       <Drd16BestieCard
@@ -49,7 +57,6 @@ export function BestieCard({
       />
     );
   }
-  // Fate rodina (fae + fate) — „Karty osudu" kompaktní karta.
   if (bestie.systemId === 'fae' || bestie.systemId === 'fate') {
     return (
       <FateBestieCard
@@ -62,64 +69,88 @@ export function BestieCard({
       />
     );
   }
+
   const schema = systemEntitySchemaRegistry.get(bestie.systemId, 'bestie');
-  const abilities = getBestieAbilities(bestie);
+  // Poznámky = jen PJ+. `canEdit` slouží jako proxy PJ+ (zpřesní se v K5 role gate).
+  const canSeeNotes = canEdit;
+
+  const toggle = (): void => setOpen((o) => !o);
+
   return (
-    <article className={styles.card}>
-      <div className={styles.avatar}>
-        {bestie.imageUrl ? (
-          <img
-            src={bestie.imageUrl}
-            alt={bestie.name}
-            style={getImageStyle(
-              bestie.imageFocalX,
-              bestie.imageFocalY,
-              bestie.imageZoom,
-              bestie.imageFit,
+    <article className={styles.card} data-bestie-card data-open={open || undefined}>
+      <div
+        className={styles.head}
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        onClick={toggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        <div className={styles.portrait} data-bestie-portrait>
+          {bestie.imageUrl ? (
+            <img
+              src={bestie.imageUrl}
+              alt={bestie.name}
+              style={getImageStyle(
+                bestie.imageFocalX,
+                bestie.imageFocalY,
+                bestie.imageZoom,
+                bestie.imageFit,
+              )}
+            />
+          ) : (
+            <div className={styles.fallback}>{getInitials(bestie.name)}</div>
+          )}
+        </div>
+
+        <div className={styles.content}>
+          <h4 className={styles.name}>{bestie.name}</h4>
+          {bestie.description && (
+            <p className={styles.blurb}>{bestie.description}</p>
+          )}
+        </div>
+
+        <div className={styles.rightcol}>
+          <span className={styles.chev} aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </span>
+          <div
+            className={`${styles.actions} print-hide`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {canEdit && (
+              <Button variant="secondary" size="sm" onClick={onEdit}>
+                Upravit
+              </Button>
             )}
-          />
-        ) : (
-          <div className={styles.fallback}>{getInitials(bestie.name)}</div>
-        )}
+            <Button variant="ghost" size="sm" onClick={onClone}>
+              Klonovat
+            </Button>
+            {canDelete && (
+              <Button variant="danger" size="sm" onClick={onDelete}>
+                Smazat
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
-      <div className={styles.body}>
-        <h4 className={styles.name}>{bestie.name}</h4>
-        {schema && (
-          <EntityStatbar schema={schema} value={bestie.systemStats} compact />
-        )}
-        {abilities.length > 0 && (
-          <ul className={styles.abilities} aria-label="Schopnosti">
-            {abilities.map((a, i) => (
-              <li key={i} className={`${styles.ability} print-stat`}>
-                <span className={styles.abilityLabel}>{a.label}</span>
-                {a.value && (
-                  <span className={styles.abilityValue}>{a.value}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        {bestie.notes && (
-          <p className={styles.notes} title={bestie.notes}>
-            {bestie.notes}
-          </p>
-        )}
-      </div>
-      <div className={`${styles.actions} print-hide`}>
-        {canEdit && (
-          <Button variant="secondary" size="sm" onClick={onEdit}>
-            Upravit
-          </Button>
-        )}
-        <Button variant="ghost" size="sm" onClick={onClone}>
-          Klonovat
-        </Button>
-        {canDelete && (
-          <Button variant="danger" size="sm" onClick={onDelete}>
-            Smazat
-          </Button>
-        )}
-      </div>
+
+      {open && schema && (
+        <BestieDetail
+          schema={schema}
+          systemStats={bestie.systemStats}
+          description={bestie.description}
+          notes={bestie.notes}
+          canSeeNotes={canSeeNotes}
+        />
+      )}
     </article>
   );
 }

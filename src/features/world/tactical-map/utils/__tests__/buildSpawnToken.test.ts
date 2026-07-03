@@ -58,6 +58,7 @@ describe('buildSpawnToken — Bestie', () => {
       systemId: 'drd2',
       name: 'Skřet',
       notes: '',
+      description: '',
       systemStats: {
         'health.max': 12,
         armor: 2,

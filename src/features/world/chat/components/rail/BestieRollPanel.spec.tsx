@@ -54,6 +54,7 @@ const bestie = {
   name: 'Skřet',
   imageUrl: 'http://x/s.png',
   notes: 'Zlý skřet.',
+  description: '',
   systemStats: { abilities: [{ label: 'Oheň', value: '3' }] },
   createdAt: '',
   updatedAt: '',
