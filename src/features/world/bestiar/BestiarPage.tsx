@@ -68,6 +68,13 @@ export default function BestiarPage(): React.ReactElement {
     return false;
   };
 
+  // GM poznámky = reference pro hraní → vidí každý PJ+/admin (i u systémové
+  // bestie, kterou needituje) + vlastník své osobní bestie. Odpojeno od `canEdit`.
+  const canSeeNotes = (b: Bestie): boolean =>
+    isPjInWorld ||
+    isPlatformAdmin ||
+    (b.scope === 'user' && b.ownerUserId === currentUser?.id);
+
   const handleDelete = (b: Bestie): void => {
     if (!confirm(`Smazat "${b.name}"? (Půjde obnovit z koše)`)) return;
     softDelete.mutate(b.id);
@@ -140,6 +147,7 @@ export default function BestiarPage(): React.ReactElement {
             bestie={b}
             canEdit={canEdit(b)}
             canDelete={canEdit(b)}
+            canSeeNotes={canSeeNotes(b)}
             onEdit={() => setEditing(b)}
             onClone={() => setCloning(b)}
             onDelete={() => handleDelete(b)}

@@ -18,6 +18,9 @@ interface Props {
   bestie: Bestie;
   canEdit: boolean;
   canDelete: boolean;
+  /** GM poznámky (`notes`) — vidí jen PJ+/vlastník. Odpojeno od `canEdit`
+   *  (PJ smí ČÍST poznámky i u systémové bestie, kterou needituje). */
+  canSeeNotes: boolean;
   onEdit: () => void;
   onClone: () => void;
   onDelete: () => void;
@@ -35,6 +38,7 @@ export function BestieCard({
   bestie,
   canEdit,
   canDelete,
+  canSeeNotes,
   onEdit,
   onClone,
   onDelete,
@@ -42,8 +46,6 @@ export function BestieCard({
   const [open, setOpen] = useState(false);
 
   const schema = systemEntitySchemaRegistry.get(bestie.systemId, 'bestie');
-  // Poznámky = jen PJ+. `canEdit` slouží jako proxy PJ+ (zpřesní se v K5 role gate).
-  const canSeeNotes = canEdit;
 
   const toggle = (): void => setOpen((o) => !o);
 

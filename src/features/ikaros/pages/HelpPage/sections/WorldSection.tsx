@@ -497,6 +497,13 @@ export function WorldSection() {
             <strong>výřez</strong> — klikem vybereš, která část bude vidět (plus
             přiblížení), aby token na mapě i náhled v katalogu ukazovaly to podstatné.
           </p>
+          <p>
+            Každá bestie má <strong>veřejný popis</strong> (slovní charakteristika
+            tvora) oddělený od <strong>poznámek jen pro PJ</strong> (tajnosti, taktika).
+            Karta v katalogu se <strong>rozbaluje klikem</strong> — sbalená ukáže portrét,
+            jméno a popis, rozbalená celý statblok (boj, vlastnosti, útoky, schopnosti);
+            její vzhled se řídí <strong>motivem světa</strong>.
+          </p>
           <ScreenshotSlot media="svet.bestiar" />
         </Tool>
         <Tool icon={<Network size={16} />} title="Pavučina" audience={{ kind: 'vse', label: 'Členové (PJ vidí vše)' }} accent="pj">

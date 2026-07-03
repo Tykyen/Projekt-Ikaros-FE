@@ -22,7 +22,15 @@ aktualizuje se po každém dokončeném motivu.
   - **K4 ✅** smazán switch v `BestieCard.tsx` + 6 souborů (Drd16BestieCard/FateBestieCard
     .tsx+.module.css + 2 spec). Build 17.96s + bestiar suite 21/21 čisté. Zbytkový dluh:
     fate-skins CSS drží zmínky `FateBestieCard` v komentářích (5 souborů, netknuto bez souhlasu).
-  - **K5** mobil-desktop + funkce + napoveda + role gate poznámek (canSeeNotes ≠ canEdit) + commit.
+  - **K5 ✅** (2026-07-03): (a) **role gate** — `canSeeNotes` odpojeno od `canEdit`
+    (`BestiarPage` počítá `isPjInWorld || admin || owner`, nový prop na `BestieCard`);
+    (b) **mobil-desktop** ✅ 375/768/1440 (stack↔grid plynule, 0 horizontální scroll,
+    rudý HP bar + hexagon skin sedí; jediný nález = sdílený `Button sm` 33px<44px, app-wide,
+    ne card dluh); (c) **funkce** kap. 12 (render karty 16.2h + description/notes + canSeeNotes
+    + smazané karty + generic fallback) + datum; (d) **napoveda** WorldSection bestiar (veřejný
+    popis / PJ poznámky / rozbalovací karta / motiv) + datum, 25/25 testů.
+  - **Repo cleanup:** 34 stray `bestie-*.png` prototypů omylem commitnutých v FE rootu → smazáno.
+  - **ZBÝVÁ:** živý pilot K1c (uživatel, po FE build+deploy + BE restart) + ruční commit FE.
 
 ## Co je NEMĚNNÉ vs VOLNÉ (napříč motivy)
 - **Neměnné (kotva):** (a) mechanika **otevírání/zavírání** karty (sbaleno ↔ rozbaleno);

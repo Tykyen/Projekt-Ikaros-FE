@@ -222,7 +222,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Co jde dělat:**
 - **Deník** (`FateLikeSheet`, variant `fae`/`core`): Hlavní koncept + Problém + další aspekty · 6 Přístupů (+N) NEBO volné Dovednosti · Triky (název+popis) · Stres (sized boxy, default 3) · Následky (Drobný 2 / Mírný 4 / Vážný 6) · Obnova (★) · Deník/Poznámky. **Bez kostek** (záznam, ne boj). Print režim.
-- **Bestiář** (`FateBestieCard`, „Karty osudu"): 2 schémata (`fae`/`fate:bestie`) řízená `world.system` — Hlavní koncept + aspekty + Přístupy/Dovednosti + Triky + Stres + Následky; editor přes generický `EntitySchemaForm`.
+- **Bestiář** (katalog přes univerzální `BestieCard`+`BestieDetail`, 16.2h — dřív bespoke `FateBestieCard`, smazáno v K4): 2 schémata (`fae`/`fate:bestie`) řízená `world.system` — Hlavní koncept + aspekty + Přístupy/Dovednosti + Triky + Stres + Následky; editor přes generický `EntitySchemaForm`. (Herní panely na mapě/chatu níže zůstávají fate-specifické.)
 - **Taktická mapa**: PC combat panel (`FateCombatPanel` v `COMBAT_PANELS`) + bestie panel (`FateBestiePanel`) — sdílené UI jádro `FateCombatBody`; **hod 🎲 = 4dF + bonus**, klikací stres, Body osudu počítadlo, Iniciativa = prosté 4dF.
 - **Chat**: PC zdarma přes `DiaryRollPanel`→`COMBAT_PANELS`; bestie přes `FateChatBestiePanel` (katalog read-only + instance v boji editovatelná). Sdílí `fateBestieView` s mapou (0 drift).
 - **8 skinů** (default `minimal`) — viz „Skin deníku".
@@ -232,7 +232,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 **Zvláštnosti:** Deník+panel+bestie+chat sdílí 3 komponenty (`FateLikeSheet`, `FateCombatBody`, `fateBestieView`) přes `variant`/prefix → 0 drift. Bestie token = superset profilu v `systemStats` (BE `token.update` REPLACE + strict patch → schéma musí být superset). 4dF = fudge kostky (−/0/+).
 
 **Stav:** ✅ funguje.
-**Kód:** FE `_shared/FateLikeSheet.tsx`, `sheets/{fae/FaeSheet,fate/FateSheet}.tsx`, `presets/{fae,fate}.ts`, `styles/fate.css`; `bestiar/components/FateBestieCard.tsx`; `tactical-map/.../system-panels/{FateCombatPanel,FateBestiePanel}.tsx` + `fate/{FateCombatBody,fateBestieView}`; `chat/.../rail/FateChatBestiePanel.tsx`; schémata `tactical-map/schemas/{fae,fate}/`. BE: `fae/fate` token+bestie schémata v `backend/assets/schemas/` (export-schemas), jinak pass-through.
+**Kód:** FE `_shared/FateLikeSheet.tsx`, `sheets/{fae/FaeSheet,fate/FateSheet}.tsx`, `presets/{fae,fate}.ts`, `styles/fate.css`; katalog přes univerzální `bestiar/components/{BestieCard,BestieDetail}.tsx` (16.2h, `FateBestieCard` smazán); `tactical-map/.../system-panels/{FateCombatPanel,FateBestiePanel}.tsx` + `fate/{FateCombatBody,fateBestieView}`; `chat/.../rail/FateChatBestiePanel.tsx`; schémata `tactical-map/schemas/{fae,fate}/`. BE: `fae/fate` token+bestie schémata v `backend/assets/schemas/` (export-schemas), jinak pass-through.
 
 ---
 
@@ -349,7 +349,8 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Kdo (FE):**
 - Tlačítko „Nová bestie": system tab → jen globální Admin/Superadmin; user/world tab → `isPjInWorld` (PomocnyPJ+ nebo globální Admin). (`BestiarPage.tsx:84`)
-- `canEdit`: system → nikdy (kromě globálního Admina); user → jen owner; world → PomocnyPJ+. (`BestiarPage.tsx:58-64`)
+- `canEdit`: system → nikdy (kromě globálního Admina); user → jen owner; world → PomocnyPJ+. (`BestiarPage.tsx:64-69`)
+- `canSeeNotes` (viditelnost GM poznámek `notes` v rozbaleném detailu): `isPjInWorld || globální Admin || (user scope && owner)` — **odpojeno od `canEdit`** (16.2h), aby PJ mohl ČÍST poznámky i u systémové bestie, kterou needituje. Veřejný `description` vidí každý. Celá route je stejně PomocnyPJ+ gate. (`BestiarPage.tsx:71-76`)
 
 **Kdo (BE):** `bestiae.service.ts`:
 - `assertCanRead`: system = veřejné; user = jen owner (+globální Admin); world = člen světa.
@@ -364,7 +365,13 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 - **Schopnosti** bestie se editují přes per-system schéma (sekce „Schopnosti" v `bestie.json` → ukládá se do `systemStats.abilities`, list `{label,value}`). To je **jediný zdroj** — čtou ho katalogová karta (`BestieCard`) i spawn na mapu přes sdílený helper `getBestieAbilities` (`bestiar/lib/bestieAbilities.ts`). Spawn (`buildSpawnToken`) je kopíruje do `token.abilities`; token panel (`BestieStatblock`) je zobrazí a umožní **hod kostkou** (🎲 podle hodnoty). Dřívější duplicitní top-level pole `bestie.abilities` (model/DTO/schema) bylo **odstraněno** (D-NEW-BESTIE-ABILITIES-DUP) — editor do něj nikdy nepsal.
 
-**Render editoru/karty (per-system schéma):** editor (`BestieEditorModal` → generický `EntitySchemaForm`) i karta (`BestieCard` → `EntityStatbar`) se generují z `tactical-map/schemas/<system>/bestie.json` přes `systemEntitySchemaRegistry.get(systemId,'bestie')`. Bestie schéma mají: `matrix`, `dnd5e`, `coc`, `drd2`, `drd16`, **`drdplus` (16.2d)**, `fate`, `gurps` (`generic` má jen `token`, ne `bestie` → neznámý systém = „schéma není zaregistrované"). `drd16` má navíc **custom** kartu/form (`Drd16BestieCard`/`Drd16BestieForm`), ostatní jedou generic. Slovní popis bytosti = `Bestie.notes` (vestavěné v editoru, mimo schéma).
+**Render karty (16.2h — univerzální motiv-aware karta + disclosure):** katalogová karta = univerzální `BestieCard` (sbaleno: portrét · jméno · veřejný `description` (2 řádky) · šipka · akce; **ŽÁDNÉ staty**) + rozbalovací `BestieDetail` (read-only detail generovaný ze schématu: Popis → sekce schématu Boj/Vlastnosti/… → GM Poznámky). Nahradila per-system `EntityStatbar` a **smazané** bespoke karty `Drd16BestieCard`/`FateBestieCard` (K4) — drd16/fae/fate teď jedou univerzál se svým vlastním schématem (ověřeno testem `BestieDetail.systems.spec.tsx` napříč 14 systémy). Detail dělí `schema.sections[].fields[]` na damageable (HP bar) / list (tabulka útoků nebo `{label,value}` seznam schopností) / skalár (dlaždice); prázdná/nulová pole skrývá. (`bestiar/components/{BestieCard,BestieDetail}.tsx`)
+
+**Motivový vzhled (16.2h):** tvar/ornament karty řídí **motiv světa** (`data-theme` na `WorldLayout .shell`, 12 motivů) přes `bestieSkins.css` (globální, scoped na stabilní atributy `data-bestie-card/-portrait/-detail`); barvy/fonty z `--theme-*` tokenů. Osy: **systém = jaká pole**, **motiv = jak vypadá**. Portrét nese per-motiv signature tvar (dark-fantasy hexagon, fantasy kruh, western hvězda, mystery/moderni polaroid, …). Zdroj vzhledů: `docs/bestiar-motivy.md`. (Skiny = vizuál, ne funkční změna.)
+
+**Popis vs poznámky (16.2h):** nové univerzální pole **`description`** (veřejné, `maxLength 4000`) — slovní popis bytosti, vidí i hráč (sbalený blurb + rozbalený „Popis"); PJ tak rozliší duchy/tvory. `Bestie.notes` = **jen GM** (gate `canSeeNotes`, viz „Kdo (FE)"). Obě pole mimo per-system schéma, editovatelná v `BestieEditorModal` (label „Poznámky (jen PJ)"). **Nutný BE restart** po nasazení `description` (bez něj starý bundle pole tiše dropne). BE: `bestiae` schema/interface/Create+Update DTO/`toEntity`/service create+clone.
+
+**Render editoru (per-system schéma):** editor (`BestieEditorModal` → generický `EntitySchemaForm`) se generuje z `tactical-map/schemas/<system>/bestie.json` přes `systemEntitySchemaRegistry.get(systemId,'bestie')`. Bestie schéma mají: `generic` (fallback, 16.2g), `matrix`, `dnd5e`, `coc`, `drd2`, `drd16`, **`drdplus` (16.2d)**, `drdh`, `pi`, `fae`, `fate`, `gurps`, `shadowrun`, `jad` — neznámý systém spadne na `generic:bestie` (ne „schéma není zaregistrované"). `drd16` má navíc **custom edit form** `Drd16BestieForm` (reuse i v chat/mapa edit modalu), ostatní jedou generic form.
 - **DrD+ schéma (`drdplus/bestie.json`, 16.2d):** 6 sekcí — Boj (`mez_zraneni` = `damageable` HP, `ochrana` = `armor-reducer`, `nezranitelnost`, **`utoky`** = list `{name,bc,uc,oc,zz,type}`), Vlastnosti (Sil/Obr/Zrč/Vol/Int/Chr), Tělo a pohyb (`rychlost` = `movement`, Odolnost/Výdrž/Velikost/Rozměry), Smysly (5×), Výskyt a ekologie (Četnost/Aktivita enum + Místo/Organizace), Schopnosti (list `{label,value}`). Spec: `spec-16.2d-bestie-drdplus.md`.
 - **Normalizace `systemId` (16.2d):** `BestiarPage` mapuje `world.system` přes `resolveSystemId` — „dlouhá" id z nabídky (`drd-plus`→`drdplus`, `call-of-cthulhu`→`coc`, `draci-hlidka`→`drdh`) na canonical engine id. Bez toho by schema lookup minul a DrD+/CoC/Dračí hlídka bestiář spadl na „schéma není zaregistrované". BE `bestiae` je pass-through (ukládá/filtruje `systemId` beze změny → konzistentní). (`BestiarPage.tsx:27`, `systemId.ts`)
 
