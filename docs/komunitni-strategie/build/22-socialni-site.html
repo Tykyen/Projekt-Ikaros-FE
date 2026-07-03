@@ -1,0 +1,358 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Bod 5 · Část II</div>
+    <h2>Sociální sítě, které založit</h2>
+  </div>
+
+  <p class="lead">Sociální sítě nejsou reklamní plocha, ale provozní systém. U Ikara nejde o to „být všude", ale založit přesně ty kanály, které tým reálně udrží živé, a v takovém pořadí, aby každý další stál na hotovém základu. Tato kapitola dává konkrétní architekturu kanálů podle funkce, doporučené pořadí zakládání, hotovou strukturu Discordu a Facebooku, vizuální a obsahová pravidla, bezpečnostní minimum účtů a launch plán prvních 30 dní. Cílem je, aby tým podle ní mohl kanály reálně postavit a provozovat, ne jen „mít profil".</p>
+
+  <div class="callout">
+    <div class="t">Hlavní princip kanálové architektury</div>
+    <p><strong>Míň kanálů, ale živých.</strong> Prázdný nebo opuštěný profil škodí důvěře víc, než kdyby neexistoval — působí jako opuštěný projekt. Zakládej jen to, co udržíš aktualizované aspoň v minimální rutině. Každý kanál musí mít <strong>jasnou funkci, vlastníka a rytmus</strong>. Kanál bez vlastníka se nezakládá.</p>
+  </div>
+
+  <h3>Architektura kanálů podle funkce</h3>
+  <p>Kanály se nedělí podle platformy, ale podle <strong>role v komunikaci</strong>. Jedna vrstva = jeden účel; teprve k účelu se přiřadí platforma. Tabulka je zdroj pravdy pro to, co který kanál dělá a co dělat nesmí.</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>Vrstva</th><th>Funkce</th><th>Platforma</th><th>Co tam patří</th><th>Priorita</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="us"><strong>Oficiální identita</strong></td><td>Rozcestník, důvěra, kontakt</td><td>Web + stránka „Komunita"</td><td>Kdo jsme, pravidla, FAQ, odkazy na kanály, formulář</td><td class="yes">Nezbytné</td></tr>
+      <tr><td class="us"><strong>Komunitní jádro</strong></td><td>Obousměrná komunita, testeři, podpora</td><td>Discord</td><td>Onboarding, feedback, bug hlášení, hlasy komunity</td><td class="yes">Nezbytné</td></tr>
+      <tr><td><strong>Dosahová identita</strong></td><td>Oznámení, dohledatelnost, kontakt starší generace</td><td>Facebook stránka</td><td>Novinky, události, oficiální hlas, sdílení do skupin</td><td class="partial">Vysoká</td></tr>
+      <tr><td><strong>Vizuální</strong></td><td>Ukázat, jak to vypadá; brand</td><td>Instagram</td><td>Screenshoty, skiny, karty bestií, deníky, mapy</td><td class="partial">Vysoká</td></tr>
+      <tr><td><strong>Dlouhodobý obsah</strong></td><td>Hloubkové vysvětlení, evergreen, SEO</td><td>YouTube</td><td>Tutoriály, walkthrough dema, feature videa</td><td>Střední</td></tr>
+      <tr><td><strong>Přímý zásah</strong></td><td>Newsletter do inboxu, nezávislý na algoritmu</td><td>E-mail (newsletter)</td><td>Milníky, výzvy testerům, changelog souhrn</td><td class="partial">Vysoká</td></tr>
+      <tr><td><strong>Krátké video</strong></td><td>Objevitelnost u mladšího publika</td><td>Reels / TikTok / Shorts</td><td>15–45 s klipy z IG/YT obsahu (recyklace)</td><td>Nízká (fáze 4+)</td></tr>
+      <tr><td><strong>Externí účast</strong></td><td>Být tam, kde komunita už je</td><td>FB skupiny, Reddit, fóra</td><td>Hodnota + zapojení, ne vlastní feed</td><td class="partial">Vysoká</td></tr>
+      <tr><td><strong>Nezávislý kanál</strong></td><td>Pojistka proti výpadku/banu platformy</td><td>Vlastní web + newsletter + status</td><td>Status stránka, changelog, blog, RSS</td><td class="yes">Nezbytné</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout cyan">
+    <div class="t">Externí účast ≠ vlastní kanál</div>
+    <p>Facebook skupiny (RPG CZ/SK, D&amp;D CZ, LARP CZ), Reddit a fóra jako <a href="https://rpgforum.cz/">RPG Fórum</a> nebo <a href="https://www.d20.cz/">Kostka</a> se nezakládají — <strong>vstupuje se do nich</strong> podle pravidel dané komunity (viz Část III). Patří sem hodnota a zapojení, ne opakované vhazování vlastních příspěvků. Vlastní feed má jen oficiální identita, jádro, dosah a vizuál.</p>
+  </div>
+
+  <h3>Doporučené pořadí zakládání (fáze 0–5)</h3>
+  <p>Pořadí není libovolné. Každá fáze předpokládá, že předchozí je hotová. Nejdřív základ, který drží důvěru; teprve pak dosah.</p>
+  <div class="phase"><div class="num">0</div><div class="body"><b>Základ identity</b> — vlastní web se stránkou „Komunita", press kit, kontaktní formulář, status/changelog. Kanál nezakládej, dokud není kam poslat člověka, který se o projekt zajímá.</div></div>
+  <div class="phase"><div class="num">1</div><div class="body"><b>Discord (uzavřený)</b> + <b>Newsletter (double opt-in)</b> — komunitní jádro pro testery a přímý kanál nezávislý na algoritmu. Discord zpočátku jen na pozvánky.</div></div>
+  <div class="phase"><div class="num">2</div><div class="body"><b>Facebook stránka</b> + <b>Instagram</b> — oficiální hlas pro dosah a vizuál. Stránka se zakládá až s aspoň 6–9 připravenými příspěvky, ať profil není prázdný v den otevření.</div></div>
+  <div class="phase"><div class="num">3</div><div class="body"><b>YouTube</b> — nejdřív 1 pořádné video (walkthrough dema), pak kanál. Kanál bez videa je zbytečný.</div></div>
+  <div class="phase"><div class="num">4</div><div class="body"><b>Krátké video</b> (Reels/Shorts/TikTok) — až když existuje delší obsah, ze kterého se dá řezat. Nezakládat jako první, generuje nejvíc práce na nejméně důvěry.</div></div>
+  <div class="phase"><div class="num">5</div><div class="body"><b>Doplňkové</b> (Threads/Bluesky, Reddit účast, LinkedIn, Twitch) — jen podle reálné kapacity a konkrétního cíle, ne „pro jistotu".</div></div>
+
+  <h3>Co NEzakládat (aspoň zpočátku)</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Kanály s vysokou cenou údržby</h4>
+      <ul>
+        <li><b>TikTok jako první</b> — hltá nejvíc výroby, publikum je nejméně cílené na RPG.</li>
+        <li><b>X (Twitter)</b> — pro CZ RPG malý dosah, vysoký šum; zvážit jen crosspost přes Threads/Bluesky.</li>
+        <li><b>Vlastní fórum</b> — Discord + rpgforum.cz už roli plní; vlastní fórum by soutěžilo s komunitou (viz Úvod: nenahrazovat).</li>
+        <li><b>Telegram/WhatsApp veřejný kanál</b> — u CZ RPG minimální zvyklost; navíc riziko u dětských účtů.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Antivzory</h4>
+      <ul>
+        <li><b>Osobní účet místo organizačního</b> — porušuje bezpečnostní minimum (NÚKIB), padá s jedním člověkem.</li>
+        <li><b>Profil bez obsahu</b> — otevřít kanál a měsíc nic nedat = signál mrtvého projektu.</li>
+        <li><b>Stejný text do pěti skupin</b> — spam, ne komunikace (viz Část III).</li>
+        <li><b>Kanál bez vlastníka a rytmu</b> — nezakládat nic, co nemá jméno odpovědného a frekvenci.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Discord — komunitní jádro</h3>
+  <p>Discord je nejdůležitější vlastní kanál: obousměrný, drží testery, sbírá feedback a bug hlášení. Zakládá se jako <strong>organizační server na dedikovaný správcovský e-mail</strong>, ne na osobní účet. Zpočátku uzavřený (jen na pozvánky), veřejný až po fázi testování.</p>
+  <h4>Struktura kategorií a kanálů</h4>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Kategorie</th><th>Kanály</th><th>Přístup</th></tr></thead>
+    <tbody>
+      <tr><td><strong>📌 Vítej</strong></td><td><span class="mono">#pravidla</span>, <span class="mono">#představ-se</span>, <span class="mono">#oznámení</span>, <span class="mono">#changelog</span></td><td>Čtení všichni; psaní jen tým (kromě #představ-se)</td></tr>
+      <tr><td><strong>💬 Komunita</strong></td><td><span class="mono">#obecné</span>, <span class="mono">#hledám-hru</span>, <span class="mono">#ukaž-svůj-svět</span>, <span class="mono">#offtopic</span></td><td>Ověření členové</td></tr>
+      <tr><td class="us"><strong>🧪 Testeři</strong></td><td><span class="mono">#feedback</span>, <span class="mono">#nahlásit-chybu</span>, <span class="mono">#nápady</span>, <span class="mono">#co-testujeme</span></td><td>Role „Tester" (fáze 2)</td></tr>
+      <tr><td><strong>🛠️ Podpora</strong></td><td><span class="mono">#pomoc</span>, <span class="mono">#časté-dotazy</span></td><td>Ověření členové</td></tr>
+      <tr><td><strong>🎨 Systémy &amp; skiny</strong></td><td><span class="mono">#drd-jad</span>, <span class="mono">#dnd</span>, <span class="mono">#larp</span>, <span class="mono">#vlastní-světy</span></td><td>Ověření členové</td></tr>
+      <tr><td><strong>🔒 Tým</strong></td><td><span class="mono">#interní</span>, <span class="mono">#moderace</span>, <span class="mono">#eskalace</span></td><td>Jen tým a moderátoři</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h4>Role a onboarding</h4>
+  <div class="feat">
+    <h4>Doporučené role (od nejnižší)</h4>
+    <ul>
+      <li><b>@Nováček</b> — po vstupu; vidí jen #pravidla a #představ-se, dokud neodsouhlasí pravidla (reaction-role brána).</li>
+      <li><b>@Člen</b> — po odsouhlasení pravidel; plný přístup ke Komunitě a Podpoře.</li>
+      <li><b>@Tester</b> — přidělená ručně vybraným lidem ve fázi 2; odemyká kategorii Testeři.</li>
+      <li><b>@Moderátor</b> — komunitní správce; maže, řeší konflikty, eskaluje do #eskalace.</li>
+      <li><b>@Tým</b> — jádro projektu; jediná role s administrací serveru.</li>
+      <li><b>@PJ / @Hráč / @LARP</b> — samoobslužné (reaction-role) pro filtrování zájmů a zmínky.</li>
+    </ul>
+  </div>
+  <div class="callout gold">
+    <div class="t">Minimum, které musí být hotové PŘED otevřením Discordu</div>
+    <p>Připnutá <strong>pravidla + kodex chování</strong>; funkční <strong>onboarding brána</strong> (nováček nevidí vše hned); <strong>2FA povinné pro celý tým</strong> a zapnuté „require 2FA for moderation" na úrovni serveru; nastavený <strong>AutoMod</strong> (spam, odkazy, sprostá slova); jasné, <strong>kdo moderuje a v jakých časech</strong>; kanál <span class="mono">#nahlásit-chybu</span> se šablonou hlášení; alespoň jedno oznámení a jeden changelog záznam, aby server nebyl prázdný. Chybí-li cokoli z toho, Discord neotevírat.</p>
+  </div>
+  <h4>Týdenní rutina Discordu</h4>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Den</th><th>Akce</th><th>Kdo</th></tr></thead>
+    <tbody>
+      <tr><td>Po</td><td>Souhrn týdne + „na čem pracujeme" do #co-testujeme</td><td>Komunitní správce</td></tr>
+      <tr><td>St</td><td>Otázka do komunity / hlasování o prioritě</td><td>Komunitní správce</td></tr>
+      <tr><td>Pá</td><td>Changelog / opravené chyby z #nahlásit-chybu</td><td>Technický správce</td></tr>
+      <tr><td>Průběžně</td><td>Reakce na feedback do 24–48 h, triage bugů</td><td>Tým dle služby</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout">
+    <div class="t">Rizika Discordu a jak je pokrýt</div>
+    <p><strong>Vyhoření na jednom člověku</strong> → aspoň dva moderátoři, definované časy odpovědí, nikdo není 24/7. <strong>Toxická eskalace</strong> → AutoMod + jasný proces do #eskalace, spor přesunout z veřejného kanálu. <strong>Únik osobních dat</strong> → nezveřejňovat reporty, chránit oznamovatele. <strong>Únos serveru</strong> → 2FA, minimum administrátorů, dedikovaný e-mail, runbook „odcizený účet" (NÚKIB). <strong>Děti</strong> → v komunitním Discordu neprovozovat dětský režim; nezletilí patří do odděleného DDM prostředí.</p>
+  </div>
+
+  <h3>Facebook — stránka a skupina</h3>
+  <p>Facebook drží dosah a starší část komunity (organizátoři, DDM, herny, LARP). <strong>Stránka</strong> = oficiální hlas. <strong>Skupinu nezakládat hned</strong> — vzniká teprve, když stránka nestačí na obousměrnou debatu a Discord nepokrývá lidi, kteří na Discord nechodí. Do té doby stačí účast v existujících skupinách (viz adresář).</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Stránka (od fáze 2)</h4>
+      <ul>
+        <li>Organizační, ne osobní; 2FA na správcích.</li>
+        <li>Otevřít s 6–9 hotovými příspěvky, ať není prázdná.</li>
+        <li>Oficiální novinky, události, sdílení do skupin (s dovolením adminů).</li>
+        <li>Odkaz na web „Komunita" + Discord v záhlaví.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Skupina (kdy zvážit, fáze 4+)</h4>
+      <ul>
+        <li>Až když je stabilní jádro a stránka nestačí na diskuzi.</li>
+        <li>Riziko: tříští komunitu s Discordem — mít jasnou dělbu (Discord = testeři/podpora, FB skupina = širší veřejnost).</li>
+        <li>Ověřené vstupy, pravidla, moderace jako na Discordu.</li>
+      </ul>
+    </div>
+  </div>
+  <h4>Pravidla skupiny a tematické dny</h4>
+  <div class="feat">
+    <h4>Minimální pravidla (připnout)</h4>
+    <ul>
+      <li><b>Respekt a bez spamu</b> — žádná skrytá reklama, žádné přetahování hráčů.</li>
+      <li><b>Autorská práva</b> — sdílíš jen vlastní obsah nebo s uvedením autora; žádné cizí mapy/pravidla/obrázky bez svolení.</li>
+      <li><b>Bez politiky a osobních útoků</b>; konflikty do soukromé zprávy moderátorovi.</li>
+      <li><b>Věk</b> — skupina není pro děti pod 15 let bez souhlasu zákonného zástupce (viz právní část).</li>
+    </ul>
+  </div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Den</th><th>Rubrika</th><th>Obsah</th></tr></thead>
+    <tbody>
+      <tr><td>Út</td><td>Tip pro PJe</td><td>Konkrétní funkce Ikara na reálném problému (poznámky, tajné info)</td></tr>
+      <tr><td>Čt</td><td>Ukaž svůj svět</td><td>Výzva komunitě sdílet vlastní svět/postavu (s jejich svolením)</td></tr>
+      <tr><td>So</td><td>Za oponou</td><td>Vývojářský deník, changelog, „na čem děláme"</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Instagram — vizuální kanál</h3>
+  <p>Instagram ukazuje, <strong>jak Ikaros vypadá</strong> — skiny, karty bestií, deníky, mapy, motivy. Je to nejsilnější „důkaz kvality" na první pohled, proto se na něm nešetří (skiny drží profesionální úroveň, viz interní standard). Vizuál je konzistentní, ne náhodné screenshoty.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Formáty</h4>
+      <ul>
+        <li><b>Post (feed)</b> — čistý screenshot skinu / karty / mapy, 4:5.</li>
+        <li><b>Carousel</b> — „jeden svět v 6 obrazech": deník → bestiář → mapa → chat.</li>
+        <li><b>Reels</b> — 15–30 s průchod funkcí (recyklace z YT).</li>
+        <li><b>Stories</b> — zákulisí, ankety, rychlé changelogy (efemérní).</li>
+        <li><b>Highlights</b> — „Skiny", „Systémy", „Jak začít", „FAQ".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Vizuální pravidla</h4>
+      <ul>
+        <li>Jednotná paleta (synthwave brand: fialová, magenta, azurová).</li>
+        <li>Reálné screenshoty z produktu, ne stock ilustrace.</li>
+        <li>AI portréty/bestiáře <b>strojově značit</b> (čl. 50 AI Actu) a v textu přiznat AI původ.</li>
+        <li>Nikdy cizí chráněný obsah (mapy, ilustrace systémů) — jen vlastní/licenčně čistý.</li>
+        <li>Popisky s uvedením autora, když jde o svět člena komunity.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>YouTube — dlouhodobý obsah</h3>
+  <p>YouTube je evergreen a dohledatelný: kdo hledá „jak vést kampaň online", má najít Ikaros. Kanál se nezakládá prázdný — nejdřív jedno solidní video, pak teprve kanál. Minimum před otevřením: <strong>walkthrough dema světa</strong> (3–6 min), který je zároveň hlavním důkazem funkčnosti.</p>
+  <div class="feat">
+    <h4>Obsahové řady</h4>
+    <ul>
+      <li><b>Průvodce Ikarem</b> — krátká série: založ svět, veď deník, spravuj práva, exportuj.</li>
+      <li><b>Za oponou</b> — vývojářské video, roadmapa, jak vznikají skiny.</li>
+      <li><b>Systém v Ikaru</b> — jedno video na systém (DrD/JaD/D&amp;D…), co umí deník a bestiář.</li>
+      <li><b>Feature spotlight</b> — jedna funkce do hloubky (taktická mapa, kroniky, export).</li>
+    </ul>
+  </div>
+  <div class="callout cyan">
+    <div class="t">YouTube minimum</div>
+    <p>Titulek s klíčovým slovem (co člověk hledá), kapitoly v popisu, odkaz na web „Komunita" a Discord, kartu s dalším videem. Bez těchto čtyř věcí video nepublikovat — jinak se nedohledá a nekonvertuje.</p>
+  </div>
+
+  <h3>Newsletter — přímý kanál nezávislý na algoritmu</h3>
+  <p>Newsletter je jediný kanál, který <strong>není závislý na cizím algoritmu</strong> a doručí zprávu i tomu, kdo přestal chodit na Discord. Zároveň je nejcitlivější na právo (osobní údaje). Proto se od začátku dělá <strong>double opt-in</strong> a GDPR-korektně.</p>
+  <div class="feat">
+    <h4>Právně korektní newsletter — povinné prvky</h4>
+    <ul>
+      <li><b>Double opt-in</b> — po zadání e-mailu odejde potvrzovací mail; odběr začíná až po kliknutí na potvrzovací odkaz. Uchovat důkaz souhlasu (čas, IP, znění).</li>
+      <li><b>Účel a rozsah</b> — u formuláře jasně, co člověk dostane a jak často; žádné předzaškrtnuté políčko souhlasu.</li>
+      <li><b>Odhlášení jedním klikem</b> — funkční „Odhlásit" v každém e-mailu; odhlášení okamžité, bez nutnosti přihlášení.</li>
+      <li><b>Věk</b> — odběr nenabízet dětem pod 15 let bez souhlasu zákonného zástupce (§7 zák. 110/2019 Sb.).</li>
+      <li><b>Identita odesílatele</b> — jméno provozovatele + kontakt + odkaz na zásady zpracování osobních údajů.</li>
+      <li><b>Minimalizace dat</b> — sbírat jen e-mail (jméno volitelně), nic navíc.</li>
+    </ul>
+  </div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Kdy</th><th>Obsah newsletteru</th></tr></thead>
+    <tbody>
+      <tr><td>Uvítací (ihned po potvrzení)</td><td>Co Ikaros je, odkaz na demo, na Discord, na FAQ k datům/exportu/AI</td></tr>
+      <tr><td>Milník / větší release</td><td>Co je nového, ukázka, výzva zkusit a dát zpětnou vazbu</td></tr>
+      <tr><td>Měsíční souhrn</td><td>Changelog v lidské řeči, plán na další měsíc, dotaz na komunitu</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Doplňkové kanály (podle kapacity)</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Krátké video: TikTok / Reels / Shorts</h4>
+      <p class="small">Nezakládat jako první. Až když existuje delší obsah k řezání. Jeden klip → tři platformy (recyklace). Cíl: objevitelnost u mladších, ne primární kanál. Vysoká cena výroby na jednotku důvěry.</p>
+    </div>
+    <div class="card">
+      <h4>Reddit</h4>
+      <p class="small">Ne vlastní subreddit. Účast v r/rpg, r/DnD a obecných CZ subredditech (r/czech, r/Prague, r/brno). Dodržet <a href="https://karmaguy.io/en/blog/reddit-self-promotion-rules">pravidlo 90/10</a>: 2–4 týdny se zapojovat, pak teprve zmínka. Dedikovaný r/DnDCzech není ověřen — neuvádět.</p>
+    </div>
+    <div class="card">
+      <h4>LinkedIn</h4>
+      <p class="small">Jen pokud tým cílí na DDM, školy, instituce a partnerství (edu-larp, metodika). Ne pro hráčskou komunitu. Nízká priorita, ale legitimní pro B2B/institucionální oslovení.</p>
+    </div>
+    <div class="card">
+      <h4>Threads / Bluesky / X / Mastodon</h4>
+      <p class="small">Zvolit maximálně jednu textovou mikroplatformu jako crosspost oficiálního hlasu; nespravovat čtyři. Pro CZ RPG má X malý dosah a vysoký šum — zvážit spíš Threads/Bluesky. Andor2 je aktivní na Threads/IG — dobrý benchmark.</p>
+    </div>
+    <div class="card">
+      <h4>Twitch / streamy</h4>
+      <p class="small">Ne vlastní kanál na start. Cesta je přes actual-play týmy (<a href="https://natahu.tv/">Na tahu</a>, <a href="https://www.skorohrdinove.cz/">Skoro Hrdinové</a>, <a href="https://www.youtube.com/channel/UCEOwMyj5Zi0FXEqRZTqNBvA">Krotitelé draků</a>) — nástroj pro jejich kampaň, ne konkurence jejich obsahu.</p>
+    </div>
+    <div class="card">
+      <h4>Telegram / WhatsApp</h4>
+      <p class="small">U CZ RPG minimální zvyklost jako veřejný kanál. Navíc rizikové u dětských účtů. Zpočátku nezakládat; Discord roli plní.</p>
+    </div>
+  </div>
+
+  <h3>Bezpečnost účtů (NÚKIB)</h3>
+  <p>Sociální účty jsou brána k reputaci projektu. Řídíme se <a href="https://nukib.gov.cz/cs/infoservis/doporuceni/1518-doporuceni-pro-spravu-socialnich-siti-verze-1-0/">Doporučeními NÚKIB pro správu sociálních sítí (v1.0)</a>. Bezpečnost není volitelná — je to bránová podmínka před otevřením jakéhokoli veřejného kanálu.</p>
+  <div class="feat">
+    <h4>Bezpečnostní minimum pro každý účet</h4>
+    <ul>
+      <li><b>2FA na všech účtech</b> — Discord, Facebook, Instagram, YouTube, newsletter nástroj, e-mail. Bez 2FA se účet nezakládá.</li>
+      <li><b>Organizační, ne osobní účty</b> — správa přes projektovou identitu, ne přes soukromý profil jednotlivce, který může odejít.</li>
+      <li><b>Dedikovaný správcovský e-mail</b> — samostatná adresa pro sociální účty, ne osobní; sama chráněná 2FA.</li>
+      <li><b>Omezit počet správců + zastupitelnost</b> — minimum administrátorů, ale vždy aspoň dva (bus factor), přehled kdo má jaká práva.</li>
+      <li><b>Ne na soukromých zařízeních</b> bez zabezpečení; oddělit správu od soukromého používání.</li>
+      <li><b>Pravidelný audit přístupů</b> — kdo má přístup, odebrat po odchodu, kontrola připojených aplikací.</li>
+      <li><b>Incident plán</b> — runbook <a href="https://portal.nukib.gov.cz/verejnost-obcan/byl-mi-odcizen-ucet-na-socialnich-sitich">„odcizený účet" (NÚKIB)</a>, kontakt na koho eskalovat, případně hlášení Policii ČR.</li>
+    </ul>
+  </div>
+
+  <h3>Obsahová strategie — pilíře a rytmus</h3>
+  <p>Obsah se netvoří nahodile, ale kolem <strong>pěti pilířů</strong>. Každý příspěvek patří do jednoho pilíře; poměr drží kanál od toho, aby byl jen reklama.</p>
+  <div class="grid2">
+    <div class="card"><h4>1 · Ukázka produktu</h4><p class="small">Skiny, deníky, bestiáře, mapy, chat. Vizuální důkaz kvality. ~30 %.</p></div>
+    <div class="card"><h4>2 · Užitek pro PJe/hráče</h4><p class="small">Konkrétní problém → funkce Ikara. „Jak nepřijít o poznámky." ~25 %.</p></div>
+    <div class="card"><h4>3 · Za oponou</h4><p class="small">Vývoj, roadmapa, changelog, jak vznikají skiny. Buduje důvěru. ~20 %.</p></div>
+    <div class="card"><h4>4 · Komunita</h4><p class="small">Světy členů (s jejich svolením), výzvy, ankety, odpovědi. ~15 %.</p></div>
+  </div>
+  <div class="callout">
+    <div class="t">Pátý pilíř — vzdělávání a kontext</div>
+    <p>Obsah o hobby samotném (worldbuilding, vedení kampaně, bezpečnost/kalibrace u LARPu) bez přímé propagace produktu. Buduje autoritu a nese hodnotu i lidem, kteří Ikaros zatím nepoužívají. ~10 %. Právě tenhle pilíř dělá kanál snesitelný pro komunitu citlivou na reklamu.</p>
+  </div>
+  <h4>Frekvence per kanál</h4>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Kanál</th><th>Doporučená frekvence</th><th>Realistické minimum</th></tr></thead>
+    <tbody>
+      <tr><td class="us">Discord</td><td>Denně přítomnost, 2–3× týdně řízený obsah</td><td>Odpověď do 24–48 h + týdenní souhrn</td></tr>
+      <tr><td>Instagram</td><td>2–4× týdně post/reel + stories</td><td>1× týdně post</td></tr>
+      <tr><td>Facebook stránka</td><td>2–3× týdně (tematické dny)</td><td>1× týdně novinka</td></tr>
+      <tr><td>YouTube</td><td>1–2× měsíčně video</td><td>1× měsíčně</td></tr>
+      <tr><td>Newsletter</td><td>1× měsíčně + milníky</td><td>1× měsíčně</td></tr>
+      <tr><td>Krátké video</td><td>2–3× týdně (recyklace)</td><td>ad hoc z delšího obsahu</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h4>Měsíční rytmus (opakovatelný)</h4>
+  <div class="phase"><div class="num">T1</div><div class="body"><b>Milník / feature</b> — hlavní novinka měsíce: YT video + IG carousel + FB + newsletter avízo.</div></div>
+  <div class="phase"><div class="num">T2</div><div class="body"><b>Užitek</b> — tip pro PJe/hráče napříč IG/FB; anketa na Discordu.</div></div>
+  <div class="phase"><div class="num">T3</div><div class="body"><b>Komunita</b> — „ukaž svůj svět", spotlight člena (se svolením), reakce a shrnutí feedbacku.</div></div>
+  <div class="phase"><div class="num">T4</div><div class="body"><b>Za oponou + souhrn</b> — changelog, roadmapa, měsíční newsletter, plán na další měsíc.</div></div>
+
+  <h3>Právní minimum pro provoz kanálů</h3>
+  <p>Kanály nejsou právně neutrální — jakmile jsou veřejné, dopadají na ně pravidla o obsahu, datech, dětech a AI. Autorita je sesterská kniha „Právní rámec platformy"; níže je provozní výtah pro sociální sítě.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>GDPR a děti</h4>
+      <ul>
+        <li>Věk souhlasu se zpracováním OÚ v ČR = <b>15 let</b> (§7 zák. 110/2019 Sb.); mladší potřebuje souhlas zákonného zástupce.</li>
+        <li>Newsletter <b>double opt-in</b> + uchovaný důkaz souhlasu + odhlášení jedním klikem.</li>
+        <li>Fotky osob a dětí: §84–85 OZ (svolení k zachycení i šíření); u dětí souhlas zák. zástupce — moderovat nahrávaný obsah.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>DSA a AI</h4>
+      <ul>
+        <li>Řídíme se přímo nařízením <b>DSA (2022/2065)</b>; český adaptační zákon zatím nebyl přijat (neuvádět jeho číslo/datum).</li>
+        <li>Od <b>2.8.2026</b> transparenční povinnost dle <b>čl. 50 AI Actu</b>: informovat, že chat/obsah řídí AI, a strojově značit AI výstupy (bestiáře, portréty). Povinnosti pro vysoce rizikové systémy jsou odloženy (2027–2028).</li>
+        <li>Strojové značení výstupů: přechodné období do <b>2.12.2026</b> pro komponenty nasazené před 2.8.2026.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout gold">
+    <div class="t">Autorská práva na sítích</div>
+    <p>Na kanálech <strong>nikdy nesdílet cizí chráněný obsah</strong> — mapy, ilustrace, pravidlové texty herních systémů. U většiny systémů máme jen <strong>engine + referenční název</strong>, ne verbatim obsah: <span class="mono">DrD II</span> a <span class="mono">Příběhy Impéria</span> <strong>nejsou pod Creative Commons</strong> (© ALTAR, resp. Mytago), takže se z nich obsah nepřebírá. Ukazujeme jen vlastní/licenčně čistý obsah dema. Čistě AI vygenerovaný obrázek není autorské dílo uživatele, který zadal prompt — ošetřeno v podmínkách generování.</p>
+  </div>
+
+  <h3>Launch plán a prvních 30 dní</h3>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Den</th><th>Akce</th><th>Brána</th></tr></thead>
+    <tbody>
+      <tr><td>0 (příprava)</td><td>Web „Komunita", press kit, dedikovaný správcovský e-mail, 2FA všude</td><td>Kam poslat člověka existuje</td></tr>
+      <tr><td>1–3</td><td>Discord (uzavřený): pravidla, role, onboarding brána, AutoMod, kanály</td><td>Bezpečnostní minimum splněno</td></tr>
+      <tr><td>3–5</td><td>Newsletter double opt-in nasazen + uvítací e-mail</td><td>GDPR-korektní odběr funguje</td></tr>
+      <tr><td>5–10</td><td>Pozvat 10–20 testerů na Discord; sbírat feedback a bugy</td><td>Feedback board běží</td></tr>
+      <tr><td>10–14</td><td>Připravit 6–9 příspěvků; natočit walkthrough dema (YT video)</td><td>Zásoba obsahu existuje</td></tr>
+      <tr><td>14–18</td><td>Otevřít Facebook stránku + Instagram (s hotovými příspěvky)</td><td>Žádný profil není prázdný</td></tr>
+      <tr><td>18–21</td><td>Publikovat YT walkthrough; propojit všechny kanály navzájem</td><td>Důkaz funkčnosti veřejně</td></tr>
+      <tr><td>21–30</td><td>Nastartovat měsíční rytmus (pilíře, tematické dny); první měsíční newsletter</td><td>Provoz běží bez ad hoc chaosu</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="n">2FA</div><div class="l">na všech účtech — bránová podmínka (NÚKIB)</div></div>
+    <div class="stat"><div class="n">15</div><div class="l">let = věk souhlasu se zpracováním OÚ (ČR)</div></div>
+    <div class="stat"><div class="n">6–9</div><div class="l">hotových příspěvků před otevřením feedového kanálu</div></div>
+  </div>
+
+  <div class="closing">
+    <h3>Nejdůležitější věta pro social tým</h3>
+    <p>Nezakládáme kanály, abychom byli všude — zakládáme jen ty, které udržíme živé, bezpečné a užitečné. Prázdný profil škodí víc než žádný.</p>
+    <div class="sig">— kanálová páteř komunikace Ikara</div>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — komunitní rešerše, bod 5 „Sociální sítě, které založit" (architektura kanálů, Discord/FB/IG/YT/newsletter, doplňkové kanály).</li>
+    <li>Adresář zdrojů, kategorie 5 (sociální sítě a Discordy) a 4 (fóra, Reddit 90/10); právní/bezpečnostní kotvy: NÚKIB (správa sítí, odcizený účet), §7 zák. 110/2019 Sb., DSA 2022/2065, čl. 50 AI Actu — sladěno s fact-check ledgerem a knihou „Právní rámec platformy".</li>
+  </ul>
+</section>

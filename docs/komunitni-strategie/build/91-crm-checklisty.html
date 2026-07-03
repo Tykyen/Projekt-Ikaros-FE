@@ -1,0 +1,243 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Příloha B</div>
+    <h2>Sjednocené CRM a master checklisty</h2>
+  </div>
+
+  <p class="lead">Tahle příloha je provozní jádro celé strategie. Sjednocuje roztroušené seznamy kontaktů z bodů 3, 4, 8 a 9 do jedné evidenční tabulky (CRM), dává jí měsíční rutinu a doplňuje o master checklisty — deduplikované kontrolní seznamy, které se v původních rešerších opakovaly na pěti místech. Cílem je, aby podle této přílohy tým reálně fungoval: každý kontakt má stav a další krok, každé oslovení má bránu, a nikdo neosloví stejného člověka dvakrát nevhodně. Kdo dělá partnerství, otevře CRM tabulku; kdo chystá příspěvek nebo start, projde příslušný checklist; kdo řeší data a děti, jede podle právního bloku (autorita = kniha „Právní rámec platformy").</p>
+
+  <div class="callout">
+    <div class="t">Jak přílohu používat</div>
+    <p><strong>CRM = jeden zdroj pravdy o lidech a organizacích.</strong> Vede se v tabulce (sheet nebo lehká databáze), ne v hlavě a ne v chatu. <strong>Checklisty = brána před akcí.</strong> Nic se neoslovuje a nespouští, dokud příslušný seznam není odškrtaný. Když na kteroukoli položku STOP-brány zní „ne", akce se odkládá, ne obchází.</p>
+  </div>
+
+  <h3>Jednotná CRM tabulka — pole a jejich význam</h3>
+  <p>Každý oslovený subjekt (con, herna, DDM, médium, vydavatel, spolek, FB skupina, Discord, streamer, konkurent-partner) je jeden řádek. Sloupce jsou závazné — bez nich se ztratí, kdo byl osloven, co slíbil a kdy navázat. Vhodná nabídka i riziko se plní podle právního režimu systému (viz ledger, sekce C: <span class="mono">avoid</span> systémy se neoslovují jako hotová integrace, ale jako partnerství o licenci).</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>Pole</th><th>Co obsahuje</th><th>Příklad</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>ID</strong></td><td>Krátký unikátní kód, ať se řádek dá citovat v úkolech a poznámkách. Prefix dle segmentu (CON, LARP, FORUM, SOC, MEDIA, SHOP, DDM, PUB, TOOL).</td><td><span class="mono">CON-01</span>, <span class="mono">PUB-03</span></td></tr>
+      <tr><td><strong>Název</strong></td><td>Přesný oficiální název subjektu + web. U rebrandů uvést i historický název, ať nevznikne duplicita.</td><td>GameCon 2026; imago (dříve Fantasyobchod.cz)</td></tr>
+      <tr><td><strong>Typ</strong></td><td>Segment: con · larp portál · fórum · soc. skupina · Discord · médium · herna/obchod · vydavatel · DDM/škola · konkurent-partner.</td><td>vydavatel</td></tr>
+      <tr><td><strong>Priorita</strong></td><td><strong>A</strong> = přesná cílovka, oslovit brzy; <strong>B</strong> = relevantní, druhá vlna; <strong>C</strong> = širší dosah / kontext; <strong>R</strong> = <em>rizikový / neoslovovat teď</em> (chybí licence, právní háček, komunita citlivá na spam, subjekt neaktivní).</td><td>A</td></tr>
+      <tr><td><strong>Region</strong></td><td>Praha · Brno/Morava · Čechy (mimo Prahu) · Slezsko · SK · online. Kvůli plánování demo večerů a regionálních vln.</td><td>Brno/Morava</td></tr>
+      <tr><td><strong>Kontakt</strong></td><td>Konkrétní osoba + kanál (e-mail / FB / Discord / formulář). NE obecné „přes web" — dohledat jméno. Kde není osoba, uvést kanál a poznámku „ověřit osobu".</td><td>info@gamecon.cz · program „Chci organizovat"</td></tr>
+      <tr><td><strong>Vhodná nabídka</strong></td><td>Co konkrétně tomuhle subjektu nabízíme: demo stůl · přednáška · workshop · PR článek · reciproční odkaz · partnerský kód · licenční jednání · testerská skupina.</td><td>přednáška pro PJ + demo stůl s QR</td></tr>
+      <tr><td><strong>Riziko</strong></td><td>Na co u tohoto subjektu pozor: citlivost na sebepropagaci, licenční háček (systém <span class="mono">avoid</span>), děti (GDPR/foto), neaktivní/skončil, konkurent.</td><td>komunita citlivá na spam — přijít s hotovou ukázkou</td></tr>
+      <tr><td><strong>Stav</strong></td><td>Fáze vztahu: <span class="mono">nový</span> → <span class="mono">osloven</span> → <span class="mono">odpověděl</span> → <span class="mono">jedná se</span> → <span class="mono">domluveno</span> → <span class="mono">odmítl</span> → <span class="mono">spí</span> (dočasně odloženo).</td><td>osloven</td></tr>
+      <tr><td><strong>Další krok</strong></td><td>Jedna konkrétní příští akce + datum. Řádek bez dalšího kroku je mrtvý lead. Prázdné pole = chyba evidence.</td><td>follow-up e-mail 15.&nbsp;5., pokud bez reakce</td></tr>
+      <tr><td><strong>Vlastník</strong></td><td>Jeden člověk z týmu odpovědný za tento vztah. Ne „tým" — konkrétní jméno, ať se komunikace nekříží ani nezapomene.</td><td>Partner/PR — Jana</td></tr>
+      <tr><td class="us"><strong>GDPR souhlas</strong></td><td>Právní status kontaktu: <span class="mono">B2B veřejný</span> (firemní kontakt z webu — oprávněný zájem, netřeba souhlas) · <span class="mono">souhlas ano/ne</span> (u fyzické osoby do newsletteru) · <span class="mono">opt-out</span> (požádal, ať nepíšeme — <strong>závazné</strong>).</td><td>B2B veřejný</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Pravidlo evidence GDPR ve sloupci</div>
+    <p>Firemní e-maily zveřejněné pro obchodní styk (redakce, herny, cony) lze oslovit jednorázově na základě <strong>oprávněného zájmu</strong> — v CRM stačí <span class="mono">B2B veřejný</span>. Jakmile jde o <strong>fyzickou osobu a opakovanou komunikaci</strong> (newsletter, hromadné výzvy testerům), potřebuješ <span class="mono">souhlas ano</span>. Kdokoli řekne „nepište mi", nastav <span class="mono">opt-out</span> a řádek už nikdy neaktivuj. Nikdy nekupuj ani neškrábej osobní kontakty do hromadné rozesílky — to je jak právní, tak reputační mina.</p>
+  </div>
+
+  <h3>Doporučené provozní workflow (měsíční rutina)</h3>
+  <p>CRM není archiv — je to živý nástroj. Aby fungoval, potřebuje pravidelný rytmus. Doporučená kadence pro malý tým (2–4 lidé):</p>
+
+  <div class="feat">
+    <h4>Týdenní minimum (15–30 min, komunitní správce + Partner/PR)</h4>
+    <ul>
+      <li><b>Projít řádky se stavem <span class="mono">jedná se</span> a <span class="mono">osloven</span></b> — u každého ověřit, zda „další krok" nemá dnešní nebo prošlé datum, a vykonat ho.</li>
+      <li><b>Doplnit nové leady</b> nasbírané za týden (z conů, z adresáře heren, z fór) jako <span class="mono">nový</span> s prioritou a vlastníkem.</li>
+      <li><b>Zaznamenat každý kontakt</b>, který proběhl mimo tabulku (DM, komentář, e-mail), ať se tým neopakuje.</li>
+    </ul>
+  </div>
+  <div class="feat">
+    <h4>Měsíční revize (60–90 min, celý komunitní blok)</h4>
+    <ul>
+      <li><b>Reaktivace spících:</b> řádky <span class="mono">spí</span> a <span class="mono">osloven bez reakce 30+ dní</span> — buď jeden zdvořilý follow-up, nebo posun na <span class="mono">spí</span> / nižší prioritu.</li>
+      <li><b>Přepočet priorit:</b> co je „horké" (comeback, blížící se con, nový ročník konference) povýšit na A; co skončilo nebo neaktivní → <span class="mono">R</span>.</li>
+      <li><b>Kontrola termínů akcí:</b> u conů a festivalů ověřit, že datum a deadline přihlášek pořadu stále platí (ledger sekce B — část termínů 2026 je sporná; potvrdit u pořadatele).</li>
+      <li><b>Report:</b> kolik osloveno / odpovědělo / domluveno za měsíc; navázat na měřítka úspěchu (30/90 dní z bodu 11).</li>
+    </ul>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">A/B/C/R</div><div class="l">4 stupně priority řídí pořadí oslovování</div></div>
+    <div class="stat"><div class="n">1×/týd.</div><div class="l">projít otevřené „další kroky"</div></div>
+    <div class="stat"><div class="n">30 dní</div><div class="l">bez reakce → follow-up nebo „spí"</div></div>
+  </div>
+
+  <h3>Doporučené pracovní boardy (sloupce)</h3>
+  <p>Vedle CRM tabulky se práce řídí na dvou lehkých boardech (Trello/Notion/Kanban). CRM drží <em>vztahy</em>, boardy drží <em>úkoly a leady v pohybu</em>.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Board „Napojení / leady"</h4>
+      <p class="small">Kanban toku vztahu, zrcadlí sloupec Stav v CRM:</p>
+      <ul>
+        <li>Backlog (nový lead)</li>
+        <li>Připraveno oslovit (má nabídku + kontakt)</li>
+        <li>Osloveno / čeká na odpověď</li>
+        <li>Jedná se</li>
+        <li>Domluveno / hotovo</li>
+        <li>Spí / odmítnuto</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Board „Výstupy / úkoly"</h4>
+      <p class="small">Práce z bodu 11 (stránky, demo, press kit):</p>
+      <ul>
+        <li>To do</li>
+        <li>Rozpracováno</li>
+        <li>K revizi (obsah/právní)</li>
+        <li>Čeká na bránu (STOP/GO)</li>
+        <li>Hotovo</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Šablona úkolové karty</h3>
+  <p>Každý úkol na boardu i každé oslovení má jednotnou kartu, ať je práce předatelná a nic nechybí:</p>
+  <div class="callout gold">
+    <div class="t">Karta úkolu / oslovení</div>
+    <p><span class="mono">ID:</span> odkaz na CRM řádek nebo výstup (např. <span class="mono">MEDIA-02</span>) &nbsp;·&nbsp; <span class="mono">Název:</span> co se dělá &nbsp;·&nbsp; <span class="mono">Cíl:</span> co má vzniknout / jaká reakce se čeká &nbsp;·&nbsp; <span class="mono">Vlastník:</span> jméno &nbsp;·&nbsp; <span class="mono">Termín:</span> datum &nbsp;·&nbsp; <span class="mono">Brána:</span> který checklist musí být odškrtaný, než se pustí &nbsp;·&nbsp; <span class="mono">Definition of Done:</span> odesláno / zveřejněno / zapsáno do CRM &nbsp;·&nbsp; <span class="mono">Riziko:</span> co může selhat a plán B &nbsp;·&nbsp; <span class="mono">Poznámky:</span> odkazy, verze textu, historie kontaktu.</p>
+  </div>
+
+  <h2>Master checklisty</h2>
+  <p>Následující seznamy sjednocují kontrolní body, které se v bodech 3, 4, 8 a 9 opakovaly. Jsou to <strong>brány</strong>: než se akce spustí, projde se příslušný list a odškrtá. Co není odškrtnuté, blokuje.</p>
+
+  <h3>(a) Před oslovením testerů</h3>
+  <div class="feat">
+    <h4>Minimum, než napíšeš prvnímu člověku „vyzkoušej to"</h4>
+    <ul>
+      <li><b>Demo svět existuje</b> a je poloveřejně dostupný — čistě vlastní nebo licenčně nezávadný obsah, žádné cizí chráněné mapy/texty/ilustrace.</li>
+      <li><b>Stránka „Komunita a spolupráce"</b> (aspoň pracovní) jako rozcestník, kam testera pošleš.</li>
+      <li><b>FAQ důvěry</b> — hotové odpovědi na data, AI trénink, export/zálohu, cenu a „jste oficiální?".</li>
+      <li><b>Pravidla + způsob hlášení problému</b> — tester ví, co se maže a kam psát chybu.</li>
+      <li><b>Formulář zpětné vazby</b> + jasně určený člověk, který odpovídá do 48 h.</li>
+      <li><b>Uzavřený kanál pro testery</b> (Discord s rolemi a onboardingem) — organizační účet, ne soukromý.</li>
+      <li><b>Segmentovaný seznam 10–20 testerů</b> v CRM z různých skupin (PJ, hráč, larper, textové RPG, DDM), každý s vlastníkem a personalizovaným oslovením.</li>
+    </ul>
+  </div>
+
+  <h3>(b) Před veřejným startem</h3>
+  <div class="feat">
+    <h4>Přechod ze žluté do zelené — teprve pak veřejné příspěvky a média</h4>
+    <ul>
+      <li><b>Demo 1.0</b> po zapracování feedbacku testerů, bez cizího chráněného obsahu, s obecným disclaimerem u tolerance/neoficiálních systémů.</li>
+      <li><b>Cílové stránky bez přehnaných slibů</b> — Pro PJe, LARP, textové RPG, DDM; každá vlastním jazykem, ne univerzální text.</li>
+      <li><b>Discord</b> s pravidly, rolemi, moderací a odděleným bug kanálem.</li>
+      <li><b>Press kit</b> — logo, 3 délky popisu, screenshoty z dema, FAQ, kontakt.</li>
+      <li><b>Plán reakce na kritiku a nahlášení</b> (model ZPOMALIT z bodu 6, krizové scénáře, kdo eskaluje).</li>
+      <li><b>CRM aktivní</b> s prvními 10 kontakty a follow-up daty — veřejná vlna se nespouští „naslepo" bez evidence.</li>
+      <li><b>Vybraný první kanál je věcný</b> — např. <a href="https://rpgforum.cz/">RPG Fórum</a> nebo <a href="https://www.d20.cz/">Kostka / d20.cz</a>: příspěvek jako žádost o zpětnou vazbu, ne reklama; komunita je citlivá na sebepropagaci.</li>
+    </ul>
+  </div>
+
+  <h3>(c) Před partnerstvím</h3>
+  <div class="feat">
+    <h4>Než oslovíš vydavatele, festival, portál, hernu nebo médium</h4>
+    <ul>
+      <li><b>Licenční režim systému je ověřený</b> (ledger sekce C): pro <span class="mono">avoid</span> systémy (GURPS, Shadowrun, DrD+) se nenabízí hotová integrace, ale <em>jednání o licenci</em>. Vydavatelé otevření dohodě — <a href="https://www.black-tower.cz/">Black Tower</a> (Dračí Hlídka), a dotaz na softwarovou platformu u <a href="https://www.mytago.cz/">Mytago</a> (JaD) a <a href="https://www.altar.cz/">ALTAR</a> (DrD II).</li>
+      <li><b>Partner/press kit připraven</b> — partner musí rychle pochopit, co dostane a co se po něm chce (reciproční odkaz, demo, materiály).</li>
+      <li><b>Konkrétní nabídka pro daný typ</b>: con → přednáška/workshop/demo stůl s QR; herna/obchod → demo večer + QR u RPG pultu + partnerský kód; médium → PR článek/rozhovor + creator kit; portál → reciproční odkaz + novinka.</li>
+      <li><b>Kontaktní osoba dohledaná</b> — ne obecný web; u conů sekce „Chci organizovat / Přihlásit pořad", deadline přihlášek ověřen (přihlášky aktivit na <a href="https://gamecon.cz/">GameCon</a> bývají cca květen).</li>
+      <li><b>Competitive check u konkurentů-partnerů</b> — <a href="https://andor2.cz/">Andor2.cz</a> (nejbližší konkurent, AI vypravěč), <a href="https://www.aragorn.cz/">Aragorn.cz</a>, <a href="https://larpbuilder.cz/login.php">LARPBuilder</a> (LARP, česky): oslovit opatrně a s respektem, jsou to zároveň vzory.</li>
+      <li><b>Ověřeno, že subjekt je aktivní</b> — ledger vyřadil neaktivní/zaniklé (Deskofobie skončila, Odraz 2008–2012, Court of Moravia dnes není pořadatel). Nesměřovat tým na mrtvé cíle.</li>
+      <li><b>Žádné přivlastnění cizích zásluh ani obsahu</b> — u recipročních odkazů a integrací vždy uveden autor a značka respektována (u JaD mluvit „JaD", ne „D&D").</li>
+    </ul>
+  </div>
+
+  <h3>(d) Sociální sítě (provozní a bezpečnostní minimum)</h3>
+  <div class="feat">
+    <h4>Než se založí a spustí oficiální kanál (dle NÚKIB, v1.0)</h4>
+    <ul>
+      <li><b>2FA na všech účtech</b> bez výjimky (viz i právní blok níže).</li>
+      <li><b>Organizační, ne soukromý účet</b> — dedikovaný správcovský e-mail, ne osobní schránka jednotlivce.</li>
+      <li><b>Omezený počet správců + zastupitelnost</b> — komunikace nesmí stát na jednom člověku 24/7 (ochrana proti vyhoření z bodu 6).</li>
+      <li><b>Ne soukromá zařízení</b> pro správu, pravidelné audity přístupů.</li>
+      <li><b>Incident plán</b> s runbookem „odcizený účet" (NÚKIB), včetně hlášení Policii ČR u vážných případů.</li>
+      <li><b>Pravidla propagace daného místa přečtena</b> — na fórech/FB/Discordu se zeptat adminů; princip „hodnota před propagací" (Reddit 90/10 obecně: 2–4 týdny se zapojovat, pak teprve zmínit produkt).</li>
+      <li><b>Text připraven na míru</b> — do 100–150 slov + delší odkaz + demo/screenshot; ne univerzální text do pěti skupin.</li>
+    </ul>
+  </div>
+
+  <h3>(e) Právní / GDPR / děti</h3>
+  <p>Autorita těchto bodů je kniha „Právní rámec platformy" a fact-check ledger (sekce C). Formulace níže jsou schválená znění — nepřeformulovávat do silnějších tvrzení.</p>
+  <div class="feat">
+    <h4>Právní minimum, které blokuje veřejný provoz</h4>
+    <ul>
+      <li><b>Věk registrace 15 let.</b> §7 zák. 110/2019 Sb. — účet od 15 let; mladší potřebuje souhlas zákonného zástupce. Default soukromí u nezletilých. <em>Nepsat 16.</em></li>
+      <li><b>Cookies opt-in.</b> Analytické a marketingové cookies jen s aktivním souhlasem (§89/3 zák. 127/2005 Sb.); bez souhlasu jen technické nezbytné.</li>
+      <li><b>Foto osob a dětí.</b> §84–85 OZ — souhlas k zachycení i šíření; u detailních záběrů dětí souhlas zákonného zástupce; ošetřit v podmínkách nahrávání + moderaci.</li>
+      <li><b>AI transparentnost (čl. 50 AI Actu).</b> Od 2.8.2026 informovat, že chat za postavu a obsah řídí AI, a strojově značit AI výstupy (bestiáře, portréty); u komponent nasazených před 2.8.2026 přechodné období do 2.12.2026. <em>Povinnosti pro vysoce rizikové systémy jsou odloženy (2027–2028); Code of Practice je dobrovolný.</em></li>
+      <li><b>DSA.</b> Řídíme se přímo nařízením 2022/2065; český adaptační zákon zatím nebyl přijat — <em>neuvádět jeho číslo ani datum účinnosti.</em> Zajistit kontaktní místo, podmínky + moderaci, notice-and-action, odůvodnění.</li>
+      <li><b>Přístupnost.</b> Cílit na WCAG 2.2 AA (EN 301 549); posoudit, zda na Ikaros dopadá zák. 424/2023 Sb. dle výjimky mikropodniku. <em>Formulovat jako cíl + posouzení, ne jako splněnou povinnost.</em></li>
+      <li><b>2FA a přístupová práva</b> nasazené před startem (překryv se sociálními sítěmi i technickou rolí).</li>
+      <li><b>Licenční disclaimer</b> u neoficiálních/tolerance systémů — schválené znění z ledgeru (sekce C) v patičce šablon; DrD II a Příběhy Impéria <em>nejsou pod CC</em>, u většiny systémů jen engine + referenční název, ne verbatim obsah.</li>
+    </ul>
+  </div>
+  <div class="callout">
+    <div class="t">Speciál: děti a DDM/školy</div>
+    <p>Při práci s DDM, kroužky a knihovnami platí právní blok přísněji: oddělený dětský režim, neveřejné skupiny, souhlasy zákonných zástupců u fotek a publikace, poučení o rizicích. Zdroj metodiky a vzorů souhlasů: <a href="https://crdm.cz/">ČRDM</a> (bezplatná GDPR poradna, <a href="https://poradna.crdm.cz/gdpr">foto/souhlasy</a>) a FAQ ÚOOÚ ke školství. Ikaros pro děti nesmí působit jako otevřená sociální síť.</p>
+  </div>
+
+  <h3>(f) Moderace a komunitní bezpečnost</h3>
+  <div class="feat">
+    <h4>Než se otevře jakýkoli veřejný komunitní prostor</h4>
+    <ul>
+      <li><b>Kodex chování a pravidla</b> viditelně vyvěšené — jasné, co se maže a jak se řeší konflikty.</li>
+      <li><b>Reportovací proces</b> — kam a jak nahlásit obtěžování/porušení; oznamovatel je chráněn, soukromé informace z reportů se nevynášejí.</li>
+      <li><b>Role a eskalace</b> — kdo moderuje, kdo řeší právní/reputační věci interně (nikdy improvizovaně v komentářích).</li>
+      <li><b>Časy odpovědí a zastupitelnost</b> moderátorů (ochrana proti vyhoření).</li>
+      <li><b>Šablony odpovědí</b> na kritiku a krizové scénáře (z bodu 6: krádež obsahu, strach z AI, monetizační odpor, výpadek) připravené předem.</li>
+      <li><b>Pravidla pro soukromý vs. veřejný obsah</b> — clearance/práva jasně komunikované; tester ví, co je vidět a komu.</li>
+      <li><b>Larpová bezpečnost/kalibrace</b> u LARP funkcí — inspirace z ověřených zdrojů (<a href="https://participationsafety.com/">Participation Safety</a>, <a href="https://nordiclarp.org/2016/09/09/creating-culture-trust-safety-calibration-larp-mechanics/">Nordic Larp</a>): opt-in/opt-out, hranice, souhlasy.</li>
+    </ul>
+  </div>
+
+  <h3>(g) STOP brána a GO brána</h3>
+  <p>Poslední a nejdůležitější kontrola. STOP říká, kdy <strong>ještě neoslovovat</strong> širokou komunitu; GO definuje <strong>minimální stav</strong>, kdy je veřejná komunikace bezpečná.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>STOP — když platí cokoli z toho, neoslovuj veřejně</h4>
+      <ul>
+        <li>Chybí demo svět, nebo obsahuje cizí chráněný obsah.</li>
+        <li>Nejsou hotové odpovědi na data / AI / export / cenu.</li>
+        <li>Nejsou pravidla komunity ani způsob hlášení.</li>
+        <li>Není člověk, který 48 h po zveřejnění odpovídá.</li>
+        <li>Chybí právní minimum (věk 15, cookies opt-in, AI značení, disclaimer, 2FA).</li>
+        <li>Systém je <span class="mono">avoid</span> a není licence ani jednání s vydavatelem.</li>
+        <li>Subjekt je neaktivní/zaniklý, nebo text je univerzální spam.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>GO — minimální stav pro veřejnou komunikaci</h4>
+      <ul>
+        <li>Veřejná stránka + demo svět (licenčně čistý).</li>
+        <li>Stránka „Komunita" jako rozcestník pro každý kontakt.</li>
+        <li>FAQ důvěry + cílové stránky bez přehnaných slibů.</li>
+        <li>Discord s pravidly, rolemi, moderací a bug kanálem.</li>
+        <li>Press/partner kit + plán reakce na kritiku.</li>
+        <li>Právní minimum splněno a disclaimery na místě.</li>
+        <li>CRM aktivní, každý kontakt má vlastníka a další krok.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout cyan">
+    <div class="t">Semafor v jedné větě</div>
+    <p><span class="pill">STOP</span> chybí důkaz funkčnosti nebo právní minimum → jen interní test. <span class="pill cyan">ČEKAT</span> demo a materiály jsou, něco je nehotové → malý okruh testerů a známých autorit. <span class="pill green">GO</span> veřejná stránka, demo, pravidla, právo, kontakt, export a moderace → veřejnější komunikace, média a partnerství.</p>
+  </div>
+
+  <div class="closing">
+    <h3>Jedna tabulka, sedm bran</h3>
+    <p>CRM drží, s kým jednáme a co dál. Checklisty (a)–(g) hlídají, že nic nespustíme dřív, než je to bezpečné a připravené. Když se obojí vede poctivě, tým neztrácí kontakty, neopakuje chyby a nikdy neosloví komunitu ve chvíli, kdy na to projekt ještě není.</p>
+    <div class="sig">— provozní páteř: evidence + brány</div>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — komunitní rešerše, body 3 (co připravit), 4 (kontakty a CRM), 8 (rizika, právo, děti, moderace) a 9/11 (postup napojení, brány, harmonogram) — sjednoceno a deduplikováno.</li>
+    <li>Fact-check ledger (autorita): sekce C — právní sladění (věk 15, cookies opt-in, foto dětí, čl. 50 AI Actu, DSA, WCAG/EAA, licenční režim per systém); sekce A/B — vyřazení neaktivních subjektů a sporných termínů.</li>
+    <li>Master adresář zdrojů: kontakty, URL a segmentace subjektů (cony, larp, fóra, sítě, média, obchody, DDM, nástroje); NÚKIB (2FA/incident), ČRDM a ÚOOÚ (děti/GDPR), Participation Safety a Nordic Larp (bezpečnost/kalibrace).</li>
+  </ul>
+</section>

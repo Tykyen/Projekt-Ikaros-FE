@@ -1,0 +1,317 @@
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="kicker">Bod 8 · Část III</div>
+    <h2>Na co si dát pozor</h2>
+  </div>
+
+  <p class="lead">Většina projektů nepadne na tom, co udělá — padne na tom, co podcení. U Ikara se tři podceněné oblasti navíc navzájem posilují: <strong>nejasné zacházení s obsahem</strong> (čí je lore, kdo ho vidí, co s ním umí AI), <strong>špatně vysvětlená monetizace</strong> (dojem, že data nebo export jsou rukojmí) a <strong>nedostatečná moderace</strong> (žádná pravidla, žádný postup, žádný záznam). Každá z nich sama o sobě vyvolá dotaz. V kombinaci vyvolají nedůvěru, která se šíří rychleji než jakákoli kampaň. Tahle kapitola je provozní pojistka: mapa rizik, hotové právní formulace per systém, procesy pro moderaci a takedown a rozhodovací brány STOP / GO. Právní tvrzení se řídí sesterskou knihou <strong>„Právní rámec platformy"</strong>, která je pro ně autoritou; tato kapitola je jejich provozní výtah.</p>
+
+  <div class="callout gold">
+    <div class="t">Disclaimer — co tato kapitola je a co není</div>
+    <p>Jde o <strong>rešerši a provozní vodítko</strong>, ne o právní stanovisko. Formulace vycházejí z ověřených zdrojů (červenec 2026), ale právní stav se mění (Digital Omnibus, český adaptační zákon k DSA, WCAG/EAA výjimky). <strong>Před spuštěním placených funkcí, dětského režimu a AI modulů si vyžádejte stanovisko advokáta</strong> a ověřte aktuální znění předpisů. Kde tato kapitola a kniha „Právní rámec platformy" mluví o témže, vyhrává „Právní rámec".</p>
+  </div>
+
+  <h3>Exekutivní shrnutí — tři rizika, která se násobí</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>1 · Nejasné zacházení s obsahem</h4>
+      <p class="small">Worldbuilder investuje roky do lore. Když není jasně řečeno, kdo obsah vidí, komu patří, jak se exportuje a zda se na něm trénuje AI, projekt čte jako riziko, ne jako domov světa.</p>
+    </div>
+    <div class="card">
+      <h4>2 · Špatně vysvětlená monetizace</h4>
+      <p class="small">Stačí dojem, že export nebo záloha jsou za paywallem. „Základ zdarma" musí být doslova pravda a musí být hned vidět, jinak vzniká pocit vydírání a odchod komunity.</p>
+    </div>
+    <div class="card">
+      <h4>3 · Nedostatečná moderace</h4>
+      <p class="small">Bez pravidel, eskalace a logu nelze řešit krádež obsahu, obtěžování ani děti v otevřeném prostoru. Chybějící proces = improvizace v komentářích = reputační i právní škoda.</p>
+    </div>
+    <div class="card">
+      <h4>Proč se to násobí</h4>
+      <p class="small">Nejasný obsah + monetizační strach + žádná moderace = uživatel si domyslí nejhorší variantu u všech tří. Prevence každé z nich samostatně je levná; společná krize je drahá.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">15</div><div class="l">let = věk souhlasu dítěte se zpracováním OÚ (§7 zák. 110/2019)</div></div>
+    <div class="stat"><div class="n">2.8.2026</div><div class="l">čl. 50 AI Actu (transparence AI výstupů)</div></div>
+    <div class="stat"><div class="n">2.2 AA</div><div class="l">cílový standard přístupnosti (WCAG / EAA)</div></div>
+  </div>
+
+  <h3>Mapa rizik</h3>
+  <p>Registr hlavních rizik napojení. Závažnost = dopad, když nastane; pravděpodobnost = jak reálné je to bez prevence. Priorita práce = závažnost × pravděpodobnost.</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Oblast</th><th>Závaž.</th><th>Pravděp.</th><th>Spouštěč</th><th>Prevence</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Autorská práva systémů</strong></td><td class="no">Vysoká</td><td class="partial">Střední</td><td>Verbatim pravidla / bestiář / ilustrace cizího systému bez licence.</td><td>Režim per systém (níže), disclaimer, jen engine + referenční název.</td></tr>
+      <tr><td><strong>Obsah uživatelů (krádež)</strong></td><td class="no">Vysoká</td><td class="partial">Střední</td><td>Někdo nahraje cizí mapu/lore; jiný autor to pozná.</td><td>Notice-and-action, rychlý takedown, evidence, atribuce.</td></tr>
+      <tr><td><strong>Monetizace jako vydírání</strong></td><td class="no">Vysoká</td><td class="partial">Střední</td><td>Export/záloha za paywallem nebo tak vypadá.</td><td>Free základ doslova, export vždy zdarma, ceník předem.</td></tr>
+      <tr><td><strong>Nedůvěra k AI</strong></td><td class="partial">Střední</td><td class="no">Vysoká</td><td>Chybí AI policy; strach z tréninku na lore.</td><td>Opt-in trénink, značení AI výstupů, FAQ předem.</td></tr>
+      <tr><td><strong>Data / GDPR</strong></td><td class="no">Vysoká</td><td class="partial">Střední</td><td>Únik, chybný souhlas, nezletilí bez souhlasu zástupce.</td><td>Věk 15+, opt-in cookies, RoPA, DPIA, šifrování, 2FA.</td></tr>
+      <tr><td><strong>Děti v otevřeném prostoru</strong></td><td class="no">Vysoká</td><td class="partial">Střední</td><td>Dítě v neveřejné komunitě bez kontroly, foto dítěte veřejně.</td><td>Dětský režim, default soukromí, souhlas zástupce, moderace foto.</td></tr>
+      <tr><td><strong>Moderace / obtěžování</strong></td><td class="partial">Střední</td><td class="partial">Střední</td><td>Konflikt, nahlášení, žádný proces ani log.</td><td>Kodex, eskalační stupně, chráněný oznamovatel, log.</td></tr>
+      <tr><td><strong>Reklamní / předčasný start</strong></td><td class="partial">Střední</td><td class="no">Vysoká</td><td>Spam do fór, dojmy hotového bez důkazu.</td><td>STOP/GO brány, malý test, věcný tón.</td></tr>
+      <tr><td><strong>Bezpečnost účtů</strong></td><td class="no">Vysoká</td><td class="partial">Střední</td><td>Odcizený správcovský účet soc. sítě / admin.</td><td>2FA všude, dedikovaný správcovský e-mail, incident plán.</td></tr>
+      <tr><td><strong>Přístupnost (EAA)</strong></td><td class="partial">Střední</td><td class="partial">Střední</td><td>Placená služba nedostupná pro postižené uživatele.</td><td>WCAG 2.2 AA jako cíl, posoudit výjimku mikropodniku.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Autorská práva a licence — režim per systém</h3>
+  <p>Ikaros podporuje víc systémů a <strong>každý má jiný právní režim</strong>. Zjednodušené pravidlo pro celý tým: u většiny systémů nasazujeme jen <strong>engine (výpočty, deník, mapa) + referenční název</strong>, nikdy verbatim pravidlové texty, bestiáře ani ilustrace. Kde chybí SRD/otevřená licence, obsah <strong>nescrapujeme</strong>. Následující tabulka je závazná; sloupec „Co smíme" a „Co NEsmíme" platí bez výjimky.</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Systém</th><th>Režim</th><th>Co smíme</th><th>Co NEsmíme</th></tr></thead>
+    <tbody>
+      <tr><td><strong>D&amp;D 5e</strong></td><td class="yes">CC BY 4.0</td><td>SRD 5.2.1 obsah s povinnou atribucí (viz níže).</td><td>Míchat verze 5.1 a 5.2.x; vynechat atribuci.</td></tr>
+      <tr><td><strong>Fate / FAE</strong></td><td class="yes">CC BY 3.0</td><td>SRD text s verbatim atribucí + odkazem faterpg.com.</td><td>Uvádět jako 4.0; použít loga/font bez svolení.</td></tr>
+      <tr><td><strong>Jeskyně a draci (JaD)</strong></td><td class="partial">Tolerance + disclaimer</td><td>Pravidla, termíny, překladový klíč; vlastní tvorbu + komunitní logo.</td><td>Oficiální ilustrace, kopírované textové bloky, běžná loga. Před SW nasazením dotaz Mytago.</td></tr>
+      <tr><td><strong>DrD (1.6 / 16)</strong></td><td class="partial">Tolerance</td><td>Engine + referenční název; zdarma je jen Zjednodušené klasické DrD.</td><td>Scrapovat text/bestiář z drdplus.info a jiných.</td></tr>
+      <tr><td><strong>DrD II</strong></td><td class="partial">Posvěcený SRD</td><td>Datový obsah <strong>jen z drd2srd.d20.cz</strong> (svolení ALTARu i autorů), označit zdrojem.</td><td>Tvrdit, že je pod CC — <strong>NENÍ</strong>. Plné znění © ALTAR.</td></tr>
+      <tr><td><strong>DrD+</strong></td><td class="no">Bez licence</td><td>Engine + referenční název (pravidla se prodávají).</td><td>Scrapovat text/bestiář; MIT kryje jen kód kalkulátorů.</td></tr>
+      <tr><td><strong>Příběhy Impéria</strong></td><td class="partial">Engine + název</td><td>Fate 2e/Fudge mechanika (volná) + referenční název.</td><td>Tvrdit, že jsou pod CC — <strong>NEJSOU</strong>. Text/svět/jména/logo chráněné (Mytago).</td></tr>
+      <tr><td><strong>Call of Cthulhu</strong></td><td class="partial">Fan policy (jen web)</td><td>Web-based deník nekomerčně dle Chaosium Fan Material Policy.</td><td>VTT, aplikace, software — výslovně vyloučeny (nutná komerční licence).</td></tr>
+      <tr><td><strong>GURPS</strong></td><td class="no">Avoid</td><td>Nic bez licence — automatizovaný engine = „computer game" mimo fan policy.</td><td>Nasadit automatizovaný deník bez licence SJG.</td></tr>
+      <tr><td><strong>Shadowrun</strong></td><td class="no">Avoid</td><td>Nic bez přímého partnerství (Topps / Catalyst / Microsoft).</td><td>Sdílet statbloky z knih; bez OGL/SRD.</td></tr>
+      <tr><td><strong>Dračí Hlídka</strong></td><td class="partial">Avoid bez smlouvy</td><td>Nic bez smlouvy — ALE vydavatel Black Tower je licenci OTEVŘENÝ = cíl oslovení.</td><td>Nasazovat obsah před dohodou. All Rights Reserved.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout cyan">
+    <div class="t">Hotové atribuce a disclaimer do UI / patičky</div>
+    <p><strong>D&amp;D 5e (povinná):</strong> <span class="mono">This work includes material from the System Reference Document 5.2.1 („SRD 5.2.1") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd.</span> Verze 5.1 a 5.2.x NEkombinovat; uložit PDF licence k datu nasazení.</p>
+    <p><strong>Fate / FAE (povinná, verbatim):</strong> atribuce s odkazem <span class="mono">http://www.faterpg.com</span> (kanonický blok na fate-srd.com/official-licensing-fate). Licence je CC BY 3.0 Unported, nevirální.</p>
+    <p><strong>Obecný disclaimer (tolerance/neoficiální systémy):</strong> „Tato šablona je neoficiální komunitní pomůcka pro použití v Projektu Ikaros. Není vydána, schválena, podporována ani sponzorována držitelem práv k uvedenému RPG systému. Všechna práva k názvům, ochranným známkám, pravidlům, ilustracím a oficiálním produktům náleží jejich vlastníkům. Šablona neobsahuje oficiální pravidlové texty; k hraní je potřeba vlastnit legální zdroje pravidel." + AI dodatek: „Část obsahu je generována umělou inteligencí (čl. 50 AI Actu); AI výstupy jsou strojově značené."</p>
+  </div>
+
+  <h3>Takedown a notice-and-action</h3>
+  <p>Když někdo nahlásí cizí obsah (mapa, lore, ilustrace, pravidlový text), Ikaros musí mít <strong>jeden proces</strong>, ne improvizaci. Odpovídá povinnostem čl. 16–17 nařízení DSA (notice-and-action + odůvodnění rozhodnutí).</p>
+  <div class="feat">
+    <h4>Postup takedownu — pět kroků</h4>
+    <ul>
+      <li><b>1 · Příjem.</b> Nahlášení přes jedno místo (formulář „Nahlásit obsah" + kontaktní e-mail). Zapsat čas, oznamovatele, URL, důvod.</li>
+      <li><b>2 · Zajištění.</b> Sporný obsah <b>dočasně skrýt</b> do vyřešení (ne smazat — data se nemažou). Chráníme jak autora, tak nahrávajícího.</li>
+      <li><b>3 · Prověření.</b> Oslovit nahrávajícího o původ a oprávnění; oslovit oznamovatele o důkaz autorství.</li>
+      <li><b>4 · Rozhodnutí + odůvodnění.</b> Obnovit nebo trvale odstranit; oběma stranám poslat stručné <b>odůvodnění</b> a poučení o možnosti námitky (čl. 17 DSA).</li>
+      <li><b>5 · Záznam.</b> Výsledek, datum, osoba, další krok do logu moderace. Opakovaný porušovatel → stupňovaná sankce.</li>
+    </ul>
+  </div>
+  <div class="callout">
+    <div class="t">Veřejná odpověď při obvinění z krádeže</div>
+    <p>„Sporný obsah jsme do vyřešení skryli a prověřujeme původ a oprávnění. Chráníme autory." Právní obvinění se <strong>nikdy neřeší improvizovaně v komentářích</strong> — eskaluje se interně (viz moderace níže).</p>
+  </div>
+
+  <h3>Nedůvěra komunity a stránka „Důvěra"</h3>
+  <p>Nedůvěra vzniká z ticha. Prevence je jedna veřejná stránka, kam lze poslat každý dotaz na data, AI, export a cenu — <strong>trust page</strong>. Musí být hotová dřív, než se osloví worldbuildeři a textové RPG, protože ti řeší vlastnictví obsahu jako první.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Co na trust page musí být</h4>
+      <ul>
+        <li>Kdo Ikaros provozuje a jak ho kontaktovat.</li>
+        <li>Komu patří obsah (uživateli) a jak funguje <b>export/záloha</b>.</li>
+        <li>Co dělá a nedělá AI (a že trénink je opt-in).</li>
+        <li>Jaká data sbíráme, jak dlouho, jak je smazat.</li>
+        <li>Ceník: co je zdarma navždy, co je placené pohodlí.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Čeho se vyvarovat</h4>
+      <ul>
+        <li>Marketingový tón místo věcných odpovědí.</li>
+        <li>Sliby funkcí bez roadmapy („bude AI, která…").</li>
+        <li>Předstírané oficiální partnerství se systémy.</li>
+        <li>Právní tvrzení bez opory (raději „posuzujeme").</li>
+        <li>Skrytý paywall na export nebo zálohu.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Monetizace bez ztráty důvěry</h3>
+  <p>Model musí být čitelný na první pohled a musí odpovídat kontextu trhu: <strong>free tier je standard u všech konkurentů</strong> (World Anvil, Kanka, Roll20, LegendKeeper), placené 4–10 $/měs; LARP nástroje bývají zdarma. Cenová dostupnost pro české komunity může být diferenciátor — ale jen když je „základ zdarma" doslova pravda.</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Vždy zdarma</th><th>Může být placené</th><th>Nikdy za paywall</th></tr></thead>
+    <tbody>
+      <tr><td>Vedení světa, kampaně, postav, kronik, bestiáře.</td><td>Vyšší limity (počet světů, úložiště, obrázky).</td><td class="no">Export vlastního obsahu.</td></tr>
+      <tr><td>Základní práva a role (veřejné / hráčské / tajné).</td><td>Prémiové skiny a kosmetika.</td><td class="no">Záloha dat.</td></tr>
+      <tr><td>Deník, taktická mapa, chat pro běžnou hru.</td><td>Pokročilé AI funkce nad rámec základu.</td><td class="no">Smazání účtu a dat na žádost.</td></tr>
+      <tr><td>Přístup ke svým datům a jejich smazání.</td><td>Tým/organizace: víc správců, statistiky.</td><td class="no">Přístup k obsahu, který už uživatel vytvořil.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout gold">
+    <div class="t">Chyby monetizace, které vyvolají odpor</div>
+    <p>Export/záloha za paywallem („data jako rukojmí"). Ceník schovaný nebo měněný potichu. Dark patterns při rušení předplatného. Bezplatná varianta tak osekaná, že je fakticky demo. <strong>Pozn.:</strong> Digital Fairness Act je zatím jen návrh EU a DSA čl. 25 (dark patterns) na mikro/malý ne-VLOP subjekt <strong>nedopadá</strong> jako povinnost — ale férové UI je <strong>dobrá praxe</strong>, kterou komunita hlídá tvrději než regulátor. Placené funkce mohou spustit spotřebitelský režim (§1811/1820 OZ, odstoupení §1829/§1837 OZ) — posoudit s advokátem.</p>
+  </div>
+
+  <h3>Moderace — pravidla, eskalace, log</h3>
+  <p>Moderace není mazání, je to <strong>proces</strong>. Bez pravidel není jasné, co se maže a jak se řeší konflikty; bez eskalace řeší vše jeden člověk 24/7; bez logu se nelze bránit ani učit. Pro ne-VLOP platformu odpovídá minimu DSA: kontaktní místo (čl. 11/12), podmínky + moderace (čl. 14), notice-and-action (čl. 16), odůvodnění (čl. 17).</p>
+  <div class="feat">
+    <h4>Eskalační stupně (od nejmírnějšího)</h4>
+    <ul>
+      <li><b>0 · Úprava / poučení.</b> Drobné porušení — soukromá zpráva, oprava, kontext. Bez sankce.</li>
+      <li><b>1 · Skrytí obsahu.</b> Sporný nebo nahlášený obsah dočasně mimo veřejnost do posouzení.</li>
+      <li><b>2 · Varování.</b> Zapsané, s odkazem na konkrétní pravidlo; při opakování se stupňuje.</li>
+      <li><b>3 · Dočasné omezení.</b> Ztlumení, dočasný zákaz publikace nebo přístupu do části služby.</li>
+      <li><b>4 · Trvalé odstranění.</b> Ban účtu / trvalé smazání obsahu; u nezletilého kontakt na vedoucího/rodiče.</li>
+      <li><b>5 · Interní eskalace.</b> Právní, bezpečnostní, obtěžování, CSAM/NCII, dítě v ohrožení → mimo komentáře, dle incident plánu; závažné → Policie ČR.</li>
+    </ul>
+  </div>
+  <div class="callout cyan">
+    <div class="t">Log moderace — co povinně zapsat</div>
+    <p>Ke každému zásahu: <strong>datum · osoba · předmět (URL/účet) · porušené pravidlo · stupeň · odůvodnění · další krok</strong>. Oznamovatel je chráněný (jeho identita se nevynáší). Veřejně o konfliktu jen obecně: „Řešíme porušení pravidel podle interního procesu."</p>
+  </div>
+
+  <h3>GDPR, cookies a newsletter</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>GDPR — základ</h4>
+      <ul>
+        <li>Věk souhlasu se službami inf. společnosti = <b>15 let</b> (§7 zák. 110/2019 Sb.); pod 15 souhlas zástupce.</li>
+        <li>RoPA (čl. 30), <b>DPIA</b> pro AI modul + dětské účty (WP248: děti + moderace + AI).</li>
+        <li>Transfer OÚ do USA u AI/LLM API: SCC + Data Privacy Framework + DPA (čl. 28).</li>
+        <li>Default soukromí u účtů nezletilých; jasné smazání dat na žádost.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Cookies a newsletter</h4>
+      <ul>
+        <li><b>Opt-in</b> (§89/3 zák. 127/2005 Sb.): analytické a marketingové cookies jen s <b>aktivním souhlasem</b>; bez souhlasu jen technické.</li>
+        <li>Formulace: „Analytické a marketingové cookies používáme jen s tvým aktivním souhlasem."</li>
+        <li>Newsletter jen s prokazatelným souhlasem; snadné odhlášení v každém e-mailu.</li>
+        <li>Referenční metodika: ÚOOÚ (úřad neoslovovat, jen citovat).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>DSA — moderace a odpovědnost za obsah</h3>
+  <p>DSA (nařízení 2022/2065) je <strong>přímo použitelné od 17.2.2024</strong>. Český adaptační zákon (sněm. tisk 69) k létu 2026 <strong>NEPLATÍ</strong> — je v procesu; proto <strong>neuvádíme jeho číslo ani datum účinnosti</strong>. Formulace: „Řídíme se přímo nařízením DSA; český adaptační zákon zatím nebyl přijat." ČTÚ je koordinátor digitálních služeb (plné pravomoci až po přijetí zákona).</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Funkce Ikara</th><th>Režim dle DSA</th><th>Co to znamená</th></tr></thead>
+    <tbody>
+      <tr><td>Veřejné knihovny světů / hoster obsahu</td><td class="partial">„platforma"</td><td>Notice-and-action, podmínky + moderace, kontaktní místo, odůvodnění.</td></tr>
+      <tr><td>Soukromý chat, deníky, tajný obsah</td><td class="yes">jen „hosting"</td><td>Nižší povinnosti; neveřejné = ne veřejné šíření.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Povinnosti pro mikro/malý ne-VLOP subjekt: <strong>kontaktní místo</strong> (čl. 11/12), <strong>podmínky + moderace</strong> (čl. 14), <strong>notice-and-action</strong> (čl. 16), <strong>odůvodnění</strong> rozhodnutí (čl. 17). Rozšířené povinnosti VLOP (čl. 25 dark patterns aj.) na Ikaros nedopadají.</p>
+
+  <h3>AI — transparence, NCII/CSAM, trénink</h3>
+  <p>AI moduly (chat za postavu, generované bestiáře a portréty) mají vlastní pravidla. Klíč je <strong>čl. 50 AI Actu</strong> (nařízení 2024/1689).</p>
+  <div class="feat">
+    <h4>Co platí a odkdy</h4>
+    <ul>
+      <li><b>Od 2.8.2026</b> se vztahuje <b>transparenční povinnost dle čl. 50</b>: informovat uživatele, že chat za postavu a další obsah řídí AI, a strojově značit AI výstupy (bestiáře, portréty).</li>
+      <li><b>Grace do 2.12.2026</b> na strojové značení výstupů (čl. 50/2) u komponent nasazených <b>před</b> 2.8.2026.</li>
+      <li><b>High-risk povinnosti odloženy</b> Digital Omnibusem (Annex III → 2.12.2027, Annex I → 2.8.2028). <b>Není</b> plná použitelnost AI Actu k 2.8.2026. Před tiskem ověřit publikaci Omnibusu v OJ EU.</li>
+      <li><b>Code of Practice</b> na značení AI obsahu (10.6.2026) je <b>dobrovolné</b> vodítko, ne účinný předpis. Závazný je čl. 50 samotný.</li>
+      <li><b>Autorství:</b> čistě AI obrázek NENÍ autorské dílo (MS Praha 10 C 13/2023; prompt = námět). V podmínkách klonování/generování <b>nepřiřazovat autorství</b> uživateli, který zadal prompt.</li>
+      <li><b>NCII / CSAM:</b> nulová tolerance — okamžité odstranění, zablokování, eskalace mimo běžnou moderaci, u CSAM hlášení Policii ČR.</li>
+      <li><b>Trénink:</b> na uživatelském lore a obsahu <b>jen s výslovným opt-in</b> souhlasem; default je „netrénujeme".</li>
+    </ul>
+  </div>
+
+  <h3>Práce s dětmi a DDM</h3>
+  <p>DDM, kroužky a školy jsou reálná cílovka (potvrzené RPG kroužky: <a href="https://www.ddm-ph2.cz/krouzky/15332-draci-doupe-1">DDM Praha 2</a>, <a href="https://www.mddmuvaly.cz/krouzky/2245-dungeons-and-dragons-dnd-12">MDDM Úvaly</a>, <a href="https://www.ddmsuchdol.cz/krouzky/">DDM Praha-Suchdol</a>). Dětský režim ale <strong>nesmí působit jako sociální síť pro děti</strong> a musí splnit tvrdší pravidla.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Dětský režim — minimum</h4>
+      <ul>
+        <li>Účet od <b>15 let</b>; mladší jen se souhlasem zákonného zástupce (§7 zák. 110/2019 Sb.).</li>
+        <li>UI: „Účet si můžeš založit od 15 let; mladší uživatel potřebuje souhlas zákonného zástupce."</li>
+        <li><b>Default soukromí</b> u nezletilých; neveřejné skupiny, ne otevřený prostor.</li>
+        <li>Oddělený režim pro DDM/kroužky (vedení skupiny, ne volný sociální graf).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Foto a podoba dětí</h4>
+      <ul>
+        <li>Podoba osoby: <b>§84–85 OZ</b> (svolení k zachycení i šíření).</li>
+        <li>Detailní foto dětí → ÚOOÚ doporučuje <b>souhlas zákonného zástupce</b>.</li>
+        <li>Foto + strukturované údaje / soc. sítě → souhlas dle GDPR + poučení o rizicích.</li>
+        <li>Ošetřit v podmínkách nahrávání obrázků + moderaci; zdroj vzorů: <a href="https://poradna.crdm.cz/gdpr">ČRDM GDPR/foto</a>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="t">Právně-bezpečnostní opora pro dětský segment</div>
+    <p>Bezplatná GDPR poradna a vzory souhlasů: <a href="https://crdm.cz/">ČRDM</a> (poradna.crdm.cz). Bezpečnost dětí v aktivitách: <a href="https://msmt.gov.cz/dokumenty/metodicky-pokyn-k-zajisteni-bezpecnosti-a-ochrany-zdravi-deti-zaku-a-studentu-ve-skolach-a-skolskych-zarizenich-zrizovanych-ministerstvem-skolstvi-mladeze-a-telovychovy">MŠMT metodický pokyn BOZ</a>. Zpracovat interní GDPR metodiku „online platforma s dětmi" ze tří zdrojů ÚOOÚ (příručka + FAQ školství + cookies Q&amp;A) a DPIA pro AI + dětské účty.</p>
+  </div>
+
+  <h3>Bezpečnost účtů</h3>
+  <div class="feat">
+    <h4>Provozní minimum dle NÚKIB (Správa sociálních sítí v1.0)</h4>
+    <ul>
+      <li><b>2FA na všechny účty</b> — platforma, admin, oficiální kanály soc. sítí.</li>
+      <li>Omezit počet správců + <b>zastupitelnost</b>; dedikovaný <b>správcovský e-mail</b>, ne osobní.</li>
+      <li>Ne soukromá zařízení pro správu oficiálních účtů; pravidelné audity přístupů.</li>
+      <li><b>Incident plán</b> (report + hlášení Policii ČR); runbook „<a href="https://portal.nukib.gov.cz/verejnost-obcan/byl-mi-odcizen-ucet-na-socialnich-sitich">odcizený účet</a>" (NÚKIB) jako součást.</li>
+    </ul>
+  </div>
+
+  <h3>Přístupnost (WCAG 2.2 + EAA)</h3>
+  <p>V ČR platí <strong>zák. 424/2023 Sb.</strong> (transpozice EAA), povinnosti <strong>od 28.6.2025</strong> pro placené online služby; standard = <strong>WCAG 2.2 AA / EN 301 549</strong>. Mikropodnik služeb (&lt; 10 zaměstnanců A obrat/bilance do 2 mil. EUR) je vyňat + výjimka nepřiměřené zátěže (§15). Formulace: „Cílíme na WCAG 2.2 AA; posoudíme, zda na Ikaros dopadá zák. 424/2023 Sb. dle výjimky mikropodniku." Přístupnost bereme jako <strong>cíl kvality</strong> bez ohledu na to, zda výjimka platí.</p>
+
+  <h3>Krizové scénáře a první reakce</h3>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Scénář</th><th>První reakce</th><th>Veřejná odpověď</th></tr></thead>
+    <tbody>
+      <tr><td>Obvinění z krádeže obsahu</td><td>Sporný obsah skrýt, přijmout podklady, kontaktovat autora.</td><td>„Sporný obsah jsme skryli a prověřujeme původ a oprávnění. Chráníme autory."</td></tr>
+      <tr><td>Strach z AI tréninku</td><td>Odkázat na AI policy, ověřit reálné nastavení (opt-in).</td><td>Jasně, co se používá/nepoužívá; „na tvém lore netrénujeme bez tvého souhlasu."</td></tr>
+      <tr><td>Monetizační odpor</td><td>Vysvětlit model, oddělit free základ od placeného pohodlí.</td><td>„Základ zůstává dostupný, export ani záloha nejsou rukojmí."</td></tr>
+      <tr><td>NCII / CSAM nahlášeno</td><td>Okamžité odstranění, zablokování, eskalace mimo komentáře; CSAM → Policie ČR.</td><td>Veřejně jen obecně: „Řešíme závažné porušení podle interního a zákonného postupu."</td></tr>
+      <tr><td>Dítě v otevřeném prostoru</td><td>Omezit přístup, kontaktovat vedoucího/rodiče, prověřit režim.</td><td>Obecně: „Upravujeme nastavení dětského režimu; bezpečí nezletilých je priorita."</td></tr>
+      <tr><td>Únik dat / bezpečnostní incident</td><td>Zastavit kampaně, zjistit rozsah, aktivovat incident plán, zvážit ohlášení ÚOOÚ (72 h).</td><td>„Víme o incidentu, řešíme ho. Postup a rozsah upřesníme ve statusu."</td></tr>
+      <tr><td>Právní obvinění (licence)</td><td>Neřešit v komentářích; dotčený obsah skrýt, eskalovat interně/na advokáta.</td><td>„Prověřujeme a ozveme se; do vyjasnění jsme obsah skryli."</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Hlavní checklist, rizikový registr a brány</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Checklist před oslovením komunity</h4>
+      <ul>
+        <li>Trust page (data · AI · export · cena).</li>
+        <li>Režim per systém aplikován; disclaimery a atribuce v UI.</li>
+        <li>Takedown proces + formulář „Nahlásit obsah".</li>
+        <li>Kodex + eskalační stupně + log moderace.</li>
+        <li>Opt-in cookies + GDPR základ + věk 15+.</li>
+        <li>Značení AI výstupů + opt-in trénink.</li>
+        <li>2FA na všech účtech + incident plán.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Rizikový registr — vlastník + revize</h4>
+      <ul>
+        <li>Každé riziko z mapy má <b>vlastníka</b> a stav (otevřené / ošetřené).</li>
+        <li>Revize před každou bránou (test, veřejný start, partnerství).</li>
+        <li>Otevřené právní bílé místo = <b>čeká na advokáta</b>, ne „vyřešeno".</li>
+        <li>Změna předpisu (Omnibus, tisk 69, WCAG) → aktualizovat registr.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="phase">
+    <div class="num" style="background:linear-gradient(135deg,#b42d4f,#fb6088)">STOP</div>
+    <div class="body"><b>Brána STOP</b> — chybí trust page, disclaimery/atribuce, takedown proces, kodex + log, opt-in cookies, značení AI nebo 2FA. <b>Neoslovovat komunitu</b>; dořešit minimum. Právní bílé místo bez stanoviska advokáta u placených funkcí, dětského režimu nebo AI = automaticky STOP.</div>
+  </div>
+  <div class="phase">
+    <div class="num" style="background:linear-gradient(135deg,#1f8f66,#36d39a)">GO</div>
+    <div class="body"><b>Brána GO</b> — checklist splněn, rizikový registr má vlastníky a je po revizi, hotové formulace v UI, moderace i takedown fungují a jsou otestované na cvičném případu. Teprve pak veřejnější komunikace.</div>
+  </div>
+
+  <div class="closing">
+    <h3>Nejdůležitější věta této kapitoly</h3>
+    <p>Riziko nevzniká z toho, že něco nevíme — vzniká z toho, že to neřekneme nahlas a nemáme na to proces. Trust page, disclaimer, takedown a log jsou levné; krize z jejich absence je drahá.</p>
+    <div class="sig">— provozní pojistka celé strategie; autorita pro právo = kniha „Právní rámec platformy"</div>
+  </div>
+
+  <ul class="sources">
+    <li>Projekt Ikaros — komunitní rešerše, bod 8 „Na co si dát pozor" (rizika, právo, moderace, děti, AI, bezpečnost).</li>
+    <li>Fact-check ledger komunitní strategie, sekce C „Právní sladění" (autorita těchto formulací); nadřazená kniha „Právní rámec platformy".</li>
+    <li>Právní zdroje: <a href="https://www.zakonyprolidi.cz/cs/2019-110">zák. 110/2019 Sb. §7 (věk 15)</a>, <a href="https://eur-lex.europa.eu/eli/reg/2022/2065/oj">DSA 2022/2065</a>, <a href="https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50">AI Act čl. 50</a>, <a href="https://www.dndbeyond.com/srd">SRD 5.2.1 (CC BY 4.0)</a>, <a href="https://fate-srd.com/official-licensing-fate">Fate licencování (CC BY 3.0)</a>, <a href="https://drd2srd.d20.cz/">DrD II SRD</a>, <a href="https://www.chaosium.com/fan-material-policy/">Chaosium Fan Material Policy</a>, <a href="https://mpo.gov.cz/cz/podnikani/standardizace/pristupnost-vyrobku-a-sluzeb/zakon-c--424-2023-sb---o-pozadavcich-na-pristupnost-nekterych-vyrobku-a-sluzeb--279601/">zák. 424/2023 Sb. (EAA/WCAG)</a>, <a href="https://nukib.gov.cz/cs/infoservis/doporuceni/1518-doporuceni-pro-spravu-socialnich-siti-verze-1-0/">NÚKIB — správa soc. sítí</a>.</li>
+  </ul>
+</section>
