@@ -56,6 +56,7 @@ const ComingSoonPage       = lazy(() => import('@/features/ikaros/pages/Spolecna
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
+const AdminChatPage      = lazy(() => import('@/features/admin/chat/pages/AdminChatPage'));
 const DungeonBuilderPage = lazy(() => import('@/features/admin/pages/DungeonBuilderPage'));
 const IkarosEmotesAdminPage = lazy(() => import('@/features/ikaros/pages/IkarosEmotesAdminPage/IkarosEmotesAdminPage'));
 
@@ -223,6 +224,16 @@ export const router = createBrowserRouter([
         element: (
           <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
             {p(PlatformAdminPage)}
+          </RoleGuard>
+        ),
+      },
+      {
+        // 20.5 — interní chat správy platformy (samostatná stránka, ne tab).
+        path: 'admin/chat',
+        loader: requireAuth,
+        element: (
+          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
+            {p(AdminChatPage)}
           </RoleGuard>
         ),
       },

@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-047.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-048.**
 
 ## Jak je deník členěný
 
@@ -191,3 +191,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--rename-feature-rozcestí--camp-přes-byte-disjoint-literal-transform-febedocs--2026-07-03) | fe+be | Rename Rozcestí→Camp (chat-hub): byte-disjoint literal transform + whitelist (feature=ASCII `rozcesti`/České `Rozcestí` ≠ generický `rozcestník`/malé `rozcestí`) → 0 kolaterálu na weather/název lokace; routy+redirect, `git mv`, BE klíče+legacy migrace. Poučení: **whitelist z ÚPLNÉHO grepu vč. spec** (zapomněl `rozcestiPlaces.spec.ts`, chytil verify-grep) | verify-grep po transformaci povinný; whitelist z filtrovaného grepu = díra |
 | [CH-046](proces.md#ch-046--četl-jsem-špatný-roadmap2md-sousední-be-repo-místo-našeho-fe--tvrdil-uživateli-mylnou-premisu--2026-07-03) | proces | dvě `docs/` složky (BE vedle × náš FE) mají `roadmap2.md` s jiným obsahem → četl BE verzi, tvrdil uživateli „hotový BE plán, tam to nepatří"; ověř původ souboru proti cwd/git status (náš repo = `-FE`) | tvrdím o dokumentu opak, než uživatel čeká; křížový odkaz z jiného docs ukazuje jiný obsah |
 | [✅ ŘEŠENÍ](fe.md#-řešení--215-fáze-1-společná-tvorba-hub--oprava-anon-header-overflow--2026-07-03) | fe | 21.5 hub „Společná tvorba" (reuse SystemsHub grid + data-driven `tiles.ts` + sdílený `ComingSoonPage`/EmptyState + `NavItem pendingTypes` součet badge) + anon header overflow fix (ThemeSwitcher name→`display:none` mobil, 108→32px); prerender=on-demand bez whitelistu; playwright resize shazuje page→`ctx.newPage()` per viewport; FE-only=0 BE | — (spec→kód bez cyklení; header fix 2. pokus „zúžit≠skrýt") |
+| [CH-047](proces.md#ch-047--spustil-jsem-browserserver-pro-náhled-návrhu-ač-to-uživatel-zakázal--2026-07-03) | proces | spustil Playwright/lokální server pro náhled HTML návrhu, ač uživatel zakázal browser; návrhy dávej souborem, náhled si dělá uživatel sám | chystám „rychle" browser/server pro vizuál; uživatel „žádné otvírání browseru" |

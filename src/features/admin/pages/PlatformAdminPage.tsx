@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -6,6 +6,7 @@ import {
   Bug,
   Search,
   Trash2,
+  MessageSquare,
 } from 'lucide-react';
 import { Tabs, type TabItem } from '@/shared/ui/Tabs/Tabs';
 import { OverviewTab } from '../components/OverviewTab/OverviewTab';
@@ -36,6 +37,8 @@ const TABS: TabItem[] = [
   },
   { id: 'audit', label: 'Audit log', icon: <ClipboardList size={18} /> },
   { id: 'search-index', label: 'Search index', icon: <Search size={18} /> },
+  // 20.5 — „Chat" není obsahový tab: navádí na samostatnou route /admin/chat.
+  { id: 'chat', label: 'Chat', icon: <MessageSquare size={18} /> },
   // Dev-only nástroj — na produkci se nezobrazí.
   ...(IS_DEV
     ? [
@@ -65,11 +68,17 @@ const VALID = new Set<AdminTab>([
  */
 export default function PlatformAdminPage() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const raw = params.get('tab');
   const tab: AdminTab =
     raw && VALID.has(raw as AdminTab) ? (raw as AdminTab) : 'prehled';
 
   const changeTab = (next: string) => {
+    // 20.5 — „Chat" je odkaz na samostatnou stránku, ne přepnutí obsahu.
+    if (next === 'chat') {
+      navigate('/admin/chat');
+      return;
+    }
     setParams(
       (prev) => {
         const out = new URLSearchParams(prev);
