@@ -6,13 +6,15 @@
    proměnnou výšku při sbalení bez překryvu). Odsazení doleva od deníku. */
 .stack {
   position: absolute;
+  /* 15.5 — ukotveno mezi header (top) a spodek (bottom) → DEFINITIVNÍ výška a
+     standardní top→bottom scroll, takže poslední panel (Ambient) je vždy
+     dorolovatelný. (Dřív jen `bottom` + `max-height` → Chrome ořízl poslední
+     položku mimo scroll.) `top:20px` je uvnitř `.viewport`, který začíná pod
+     headerem, takže stack nikdy nezaleze pod horní lištu.
+     `padding-right` drží scrollbar mimo pravou hranu docků. */
+  top: 20px;
   bottom: 20px;
   right: calc(12px + var(--map-dock-width, 0px));
-  /* 15.5 — strop výšky jako u levého stacku (10.2o): rozbalení víc docků
-     nikdy nepřeroste přes horní okraj (pod header) — místo toho stack scrolluje.
-     Vyjížděcí panel palety efektů byl zrušen (inline), takže overflow nic neořízne.
-     `padding-right` drží scrollbar mimo pravou hranu docků. */
-  max-height: calc(100svh - var(--header-h, 60px) - 40px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -25,6 +27,12 @@
   z-index: 100;
   transition: right 0.12s ease;
   pointer-events: none;
+}
+
+/* Krátký obsah se zarazí dolů (dock vpravo dole); při přetečení margin zmizí
+   a scrolluje se celé — poslední panel zůstává dosažitelný. */
+.stack > *:first-child {
+  margin-top: auto;
 }
 .stack > * {
   pointer-events: auto;
@@ -96,10 +104,10 @@
 
 @media (max-width: 768px) {
   .stack {
+    top: 12px;
     bottom: 12px;
     /* 4px + 8px padding-right = ~12px jako dřív */
     right: calc(4px + var(--map-dock-width, 0px));
-    max-height: calc(100svh - var(--header-h, 60px) - 24px);
   }
   .dock {
     width: 200px;
