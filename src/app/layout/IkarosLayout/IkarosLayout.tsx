@@ -8,12 +8,11 @@ import {
   Mail,
   Users,
   User as UserIcon,
+  UserPlus,
   LogOut,
   Home,
   PlusCircle,
-  MessageSquare,
-  BookOpen,
-  Image as ImageIcon,
+  Palette,
   HelpCircle,
   Beer,
   Signpost,
@@ -92,6 +91,12 @@ type NavItemDef = {
    */
   pendingType?: PendingActionType;
   /**
+   * 21.5 — sloučená nav položka: badge = SOUČET těchto typů (tooltip vyjmenuje
+   * neprázdné). Alternativa k `pendingType`, když jedna položka zastřešuje více
+   * moderovaných sekcí (např. „Společná tvorba" = Diskuze + Články + Galerie).
+   */
+  pendingTypes?: PendingActionType[];
+  /**
    * Spec 15.7 — položka, která pro anonima vede jen na login (slepý odkaz), se
    * mu v menu vůbec nezobrazí. CTA na tvorbu světa je místo toho v hero kartě.
    */
@@ -103,9 +108,9 @@ const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
   // 15B.4a — veřejný rozcestník landing stránek RPG systémů (anon i člen)
   { navKey: 'systemy',       label: 'RPG systémy',   to: '/ikaros/systemy',                   icon: <Dices size={18} /> },
-  { navKey: 'diskuze',       label: 'Diskuze',       to: '/ikaros/diskuze',                   icon: <MessageSquare size={18} />, pendingType: PendingActionType.DiscussionPendingReview, anonHidden: true },
-  { navKey: 'clanky',        label: 'Články',        to: '/ikaros/clanky',                    icon: <BookOpen size={18} />,      pendingType: PendingActionType.ArticlePendingReview },
-  { navKey: 'galerie',       label: 'Galerie',       to: '/ikaros/galerie',                   icon: <ImageIcon size={18} />,     pendingType: PendingActionType.GalleryPendingReview },
+  // 21.5 — Diskuze/Články/Galerie sloučeny do rozcestníku „Společná tvorba";
+  // badge = součet jejich pending-review typů, ať moderace nezmizí z nav.
+  { navKey: 'tvorba',        label: 'Společná tvorba', to: '/ikaros/tvorba',                  icon: <Palette size={18} />,       pendingTypes: [PendingActionType.DiscussionPendingReview, PendingActionType.ArticlePendingReview, PendingActionType.GalleryPendingReview] },
   { navKey: 'vytvorit-svet', label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet',             icon: <PlusCircle size={18} />,    anonHidden: true },
 ];
 
@@ -139,18 +144,27 @@ export function NavItem({
   icon,
   label,
   pendingType,
+  pendingTypes,
   pendingByType,
   onClick,
 }: NavItemDef & {
   onClick?: () => void;
   pendingByType?: Partial<Record<PendingActionType, number>>;
 }) {
-  // Spec 3.8 — badge se zobrazí jen když má položka pendingType a BE pro
-  // current usera vrátil nenulový počet (chybějící klíč = uživatel typ nevidí).
-  const pendingCount = pendingType ? pendingByType?.[pendingType] ?? 0 : 0;
+  // Spec 3.8 + 21.5 — badge = jeden typ (pendingType) NEBO součet více typů
+  // (pendingTypes; sloučená položka „Společná tvorba"). Chybějící klíč v
+  // byType = uživatel daný typ nevidí (0).
+  const pendingReviewTypes = pendingTypes ?? (pendingType ? [pendingType] : []);
+  const pendingCount = pendingReviewTypes.reduce(
+    (sum, t) => sum + (pendingByType?.[t] ?? 0),
+    0,
+  );
   const tooltip =
-    pendingType && pendingCount > 0
-      ? pendingTooltip(pendingType, pendingCount)
+    pendingCount > 0
+      ? pendingReviewTypes
+          .filter((t) => (pendingByType?.[t] ?? 0) > 0)
+          .map((t) => pendingTooltip(t, pendingByType?.[t] ?? 0))
+          .join(' · ')
       : undefined;
   return (
     <NavLink
@@ -681,6 +695,7 @@ function HeaderLoggedOut() {
         className={s.headerBtn}
         onClick={() => setRegisterModalOpen(true)}
       >
+        <span className={s.headerBtnIcon}><UserPlus size={16} /></span>
         <span className={s.headerBtnLabel}>Registrace</span>
       </button>
     </nav>

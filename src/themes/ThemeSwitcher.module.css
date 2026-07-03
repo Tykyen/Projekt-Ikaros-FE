@@ -54,6 +54,22 @@
   color: var(--text-secondary);
 }
 
+/* D-NEW-ANON-HEADER-OVERFLOW — na mobilu se přepínač zúží na samotnou šipku
+   (název motivu skryt), ať se hlavička vejde bez vodorovného přetečení. Výběr
+   zůstává plně funkční přes rozbalovací nabídku (názvy tam jsou). */
+@media (max-width: 768px) {
+  .trigger {
+    padding: 0 9px;
+    gap: 0;
+  }
+  .triggerName {
+    display: none;
+  }
+  .triggerCaret {
+    font-size: 12px;
+  }
+}
+
 .popover {
   position: absolute;
   top: calc(100% + var(--sp-1));

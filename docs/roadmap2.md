@@ -473,7 +473,7 @@ Dotáhnout deníkový list + kostkové mechaniky pro **všechny systémy** s den
 
 **Pozn. k stavu kódu (výchozí bod, ne TODO):** funkčně má list+testy **12/12**; v mapě je combat panel u **6** (`matrix`, `drd2`, `dnd5e`, `gurps`, `fate`, `coc`), jen `onRoll` fallback u **2** (`drd16`, `drdplus`), bez klikacích hodů **3** (`jad`, `pi`, `shadowrun`), drift blokuje **1** (`drdh`); chat **0/12** (vše 16.1). Grafický průchod se dělá u všech bez ohledu na tento stav.
 
-#### - [ ] 16.2b Pilíř BESTIÁŘ — scope model + obsah
+#### - [x] 16.2b Pilíř BESTIÁŘ — scope model + obsah
 Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna bestie = lore/text + mapa `systém → statblok`** — přidání systému znamená jen přidat sadu statů, ne novou bestii.
 
 | scope | edituje | viditelnost | vznik |
@@ -507,25 +507,6 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Cíl rozsahu (rozhodnuto uživatelem 2026-06-23; 8. styl MLP přidán v 16.2c):** **8 stylů × všechny systémy** = každý systém **plně ostylovaný 8 způsoby** (per-systém, ne jen univerzální skin). **Jak chytře, ať to není 8×N CSS od nuly:** engine + 8 sdílených token sad jako kostra → per systém se aplikují a **doladí per-systém ornamenty/specifika** (fantasy DrD ≠ fantasy Matrix). Sdílený základ zlevní, výsledek = 8 plnohodnotných stylů na systém.
 **FE rozsah:** skin engine (token override vrstva) + 8 stylových sad + per-systém doladění + selector v nastavení + persistence (per-hráč). Předpoklad: konzistentní token názvy napříč sheety (Matrix `--mx-*`; sjednotit / mapovat při stavbě enginu). ⚠️ Retro (skeuomorfní/textury) je nejnáročnější — víc než token override (textury, border-image, bevel), počítat s vyšším nákladem než ploché styly.
 **Otevřené otázky:** PJ override per svět (vynutí styl všem)? Skin i pro deník v mapě/chatu (3 místa = 16.2a; **ovládání skinu chatu z chat prefs = 16.1d**, hráčská volba dle vzoru 5.9b)? Tisk respektuje skin, nebo zůstává neutrální? Originální ornamenty per skin (žádné sdílení — viz `feedback_skin_originality`)? **Obal `TokenInfoPanel` na mapě (hlavička: Zamknout/Odstranit/📌pin/skin/×/Body osudu) je sdílený všemi systémy — musí být skinnable (styl dle systému/skinu), aby ladil s combat panelem; ne hardcoded jeden styl.**
-
-#### Matice systémů (progress; pilíře Deník · Bestiář — Dodatky vyřazeny)
-##### Prioritně — české (příkop)
-- [ ] **Matrix / Ikaros pravidla** (`matrix`) — vlastní systém platformy. 
-- [ ] **Dračí Doupě 1.6** (`drd16`) — k6/k%, postih/bonus, pasti. 
-- [ ] **Dračí Doupě Plus** (`drd-plus`) — 
-- [ ] **Dračí Doupě II** (`drd2`) — 
-- [ ] **Jeskyně a Draci** (`jad`) — 
-- [ ] **Příběhy Impéria** (`pi`) — 
-- [ ] **Dračí Hlídka** (`draci-hlidka` / deník pod `drdh`) — ⚠️ **id drift** (D-NEW-SYS-DIARY-DRIFT): sjednotit id, pak dotáhnout. Deník (DrdhSheet, 6 povolání) už existuje. 
-##### Parita — zahraniční
-- [ ] **Dungeons & Dragons 5e** (`dnd5e`) — d20 + modifikátory. 
-- [ ] **Shadowrun** (`shadowrun`) — d6 pool. 
-- [ ] **GURPS** (`gurps`) — 3d6 roll-under. 
-- [ ] **Fate Accelerated** (`fae`) — 4dF (fudge), 6 Přístupů. 
-- [ ] **Fate Core** (`fate`) — 4dF (fudge), Dovednosti. 
-- [ ] **Call of Cthulhu** (`call-of-cthulhu`) — k% + sanity. 
-##### Engine pro vlastní systém
-- [ ] **Vlastní systém** (`vlastni` / `generic`) — nedotahovat obsah, dát PJ **nástroje** (editor schématu listu + custom bestie). Most k Fázi 21 (komunitní tvorba).
 
 **Otevřené otázky:** Pořadí dotahování deníků (DrD 1.6 → JaD → DrD II → …)? Kdy/jak vrátit „dodatky k pravidlům" (vyřazeny z 16.2)? Pre/post moderace komunitního bestiáře (→ 21.4)?
 
@@ -779,6 +760,26 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Cíl:** Schvalování, hodnocení a atribuce sdíleného obsahu (items/bestie/mapy/generátorové tabulky).
 **Proč:** Komunitní obsah potřebuje kvalitu a moderaci; 🔁 schvalovací toky, co už máme (články/galerie), + role správců.
 **Otevřené otázky:** Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)? Kdo kurátoruje (noví správci)?
+
+### - [ ] 21.5 „Společná tvorba" — komunitní rozcestník + nové knihovny (herbář · lektvary · kouzla · hádanky) — [dopad vysoký · náklad střední] 🔁 *(zadání 2026-07-03)*
+> **Fáze 1 ✅ (2026-07-03):** hub `/ikaros/tvorba` (8 dlaždic) + nav sloučení (Diskuze/Články/Galerie → „Společná tvorba", badge agregován) + 5 proklikatelných stubů „Připravujeme". Spec: [arch/phase-21/spec-21.5-spolecna-tvorba.md](arch/phase-21/spec-21.5-spolecna-tvorba.md). Zbývá 21.5a–d (jednotlivé knihovny) + aktivace Bestiáře 16.2b-2.
+**Cíl:** Jeden platformový vstupní bod **„Společná tvorba"** (`/ikaros/tvorba`) — rozcestník (hub) s dlaždicemi (tlačítky) na veškerou komunitní tvorbu: **Diskuze · Články · Galerie** (existují) + **Bestiář · Herbář · Lektvary · Kouzla · Hádanky**. Vše na proklik. Herbář/Lektvary/Kouzla/Hádanky jsou **nové komunitní knihovny** postavené na **stejném scope + klon modelu jako bestiář (16.2b)**.
+**Proč:** Sjednotí roztříštěné komunitní sekce pod jednu identitu a uvolní hlavní navigaci (3 body → 1 tlačítko). Nové knihovny rozšiřují 21.1 o další typy obsahu; bestiář je referenční implementace, ostatní **dědí model** → levné přidání. (Tvoje zadání 2026-07-03: „na bestiáři stavíme ostatní".)
+**Vstupní body — jeden obsah, dva vchody:**
+- **Bestiář** dlaždice → **komunitní scope bestiáře (16.2b-2)**, NE nová paralelní featura. Světový bestiář (`/svet/:slug/bestiar`) zůstává; hub je platformový katalog téhož modelu.
+- **Diskuze/Články/Galerie** → existující routy (`/ikaros/diskuze`, `/clanky`, `/galerie`).
+**Nové knihovny (pod-kroky — model jednou, obsah postupně):**
+- **21.5a Herbář** — katalog rostlin/bylin (lore + účinky/vlastnosti + per-systém staty dle vzoru bestie „systém → statblok").
+- **21.5b Lektvary** — alchymie / spotřební předměty (ingredience → uvařený, zpravidla jednorázový efekt).
+- **21.5c Kouzla** — magické formule / spelly (efekt, náročnost/mana, dosah, per-systém staty). **= realizace „kouzla" typu už zmíněného v 21.1** (nezakládat druhou knihovnu kouzel).
+- **21.5d Hádanky** — komunitní katalog hádanek/hlavolamů pro PJ (zadání + řešení + nápovědy; reveal řešení jako AKJ-style clearance, 🔁 16.2b-3).
+**Sdílí s:** 21.1 (knihovní model, grant „smí přispívat do globální knihovny"), 21.4 (kurátorství/moderace), 16.2b (scope + klon + povýšení).
+**Navigace (FE):** `PRIMARY_NAV` — nahradit body Diskuze/Články/Galerie jedním „Společná tvorba"; **RPG systémy zůstává samostatně** (veřejný SEO landing 15B.4a/22.1, ne komunitní tvorba).
+**Pořadí stavby:** hub + route + úprava nav + stuby „Připravujeme" (vše proklikatelné) → **Bestiář (16.2b-2) jako první plná featura = šablona** → Herbář → Lektvary → Kouzla → Hádanky.
+**BE:** nové kolekce herbář/lektvary/kouzla/hádanky dle vzoru bestiáře (scope, klon-snapshot, grant); reuse moderace (21.4).
+**FE:** hub stránka (mřížka dlaždic) + route `/ikaros/tvorba` + úprava `PRIMARY_NAV` + list/detail/editor per knihovna (vzor bestiář).
+**Rozhodnuto (2026-07-03):** **Lektvary a Kouzla = oddělené knihovny** (lektvar = alchymie/spotřební předmět; kouzlo = sesílaná formule), obě na sdíleném modelu; Kouzla naplňují „kouzla" z 21.1 (žádný duplikát).
+**Otevřené otázky:** Hádanky — reveal řešení komu (PJ/hráč/veřejně)? Route `/ikaros/tvorba` vs `/ikaros/spolecna-tvorba`? Patří sem i procedurální generátory (21.2) jako dlaždice?
 
 ---
 

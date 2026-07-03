@@ -88,3 +88,13 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Poučení:** `vitest run` ≠ type-check. **Po napsání/úpravě každého .spec znovu `npm run build`** (ne jen vitest), protože testy jsou v tsc -b projektu. Pořadí „kód → build → testy → hotovo" je špatně; správně „kód + testy → build → hotovo". Rodina [project_fe_test_precommit] (vitest bez striktního type-checku) + [project_fe_build_preexisting_errors] (tsc --noEmit/dílčí běh nestačí, nutný plný `npm run build`).
 
 **Zhodnocení:** špatně — předčasné „hotovo + build✓" (build byl stale vůči pozdějšímu testu); chytil to až uživatel CI logem. Dobře — reprodukováno lokálně jedním plným buildem (ne hádáno z uťatého CI screenshotu), kořen jednoznačný, fix triviální.
+
+---
+
+### CH-046 — Četl jsem špatný `roadmap2.md` (sousední BE repo) místo našeho FE → tvrdil uživateli mylnou premisu · 2026-07-03
+**Kontext:** Zadání „přidej Společnou tvorbu, uprav roadmap2". Workspace má **dvě `docs/` složky**: `Projekt-ikaros\docs` (BE, přidaný working dir) a `Projekt-ikaros-FE\docs` (náš repo). Oba obsahují `roadmap2.md`, ale **úplně jiný obsah** — BE = „Opravný plán backendu" (fáze 0–6, vše ✅); FE = „master-plan Etapy II" (fáze 14–22 vč. Fáze 16 „Český příkop" a Fáze 21 „Komunitní tvorba"). Na úvod jsem Read otevřel absolutní cestu do **BE** verze a na jejím základě uživateli tvrdil: „roadmap2 je hotový BE plán, fáze 0–6, komunitní featura tam nepatří → dej to do roadmap-fe".
+**Co jsem udělal špatně:** Neověřil jsem, že čtu soubor z **našeho** repa. `git status` na úvodu ukazoval `M docs/roadmap2.md` — relativní k cwd (`Projekt-ikaros-FE`), tedy FE verze. Já sáhl absolutní cestou do sousedního BE stromu. Mylnou premisu jsem prezentoval jako fakt a postavil na ní doporučení.
+**Jak odhaleno:** `phase-16/README.md` odkazuje `Roadmap: docs/roadmap2.md (Fáze 16)` — jenže verze, co jsem četl, žádnou Fázi 16 neměla. Rozpor „dokument má/nemá Fázi 16" ukázal, že čtu jiný soubor.
+**Proč to je problém:** Mylná premisa → špatné doporučení (roadmap-fe místo roadmap2) → uživatel musel korigovat („jde nahoru… 16. část"). Zbytečné kolo hned na startu; eroze důvěry v můj úvodní rozbor.
+**Poučení:** V multi-repo workspace s duplicitními názvy (`roadmap2.md`, `roadmap-fe.md`, `funkce/`, `chybovy-denik/` existují v OBOU stromech) ověř, že čtený soubor je z **aktivního repa** — `git status` cesty jsou relativní k cwd; absolutní cesta našeho repa obsahuje `-FE`. Než postavím tvrzení na obsahu souboru, zkontroluj původ, zvlášť u „prázdný/hotový, tam to nepatří" závěrů.
+**Příznak cyklení:** Tvrdím o dokumentu opak toho, co uživatel čeká; křížový odkaz z jiného docs souboru ukazuje jiný obsah, než čtu.

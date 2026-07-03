@@ -1268,6 +1268,16 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 
 ---
 
+### ✅ ŘEŠENÍ — 21.5 fáze 1 „Společná tvorba" hub + oprava anon header overflow · 2026-07-03
+**Co zabralo (hub):** rozcestník `/ikaros/tvorba` reuse vzoru `SystemsHubPage` (glass-grid + `CornerOrnament` + SEO ItemList/Breadcrumbs), data-driven `tiles.ts` (8 dlaždic, přepnutí stub→živé = 1 flag), sdílený stub `ComingSoonPage` reuse `EmptyState` (kontext z pathname → 1 komponenta pro 5 routes, `noindex`). Nav sloučení 3→1 „Společná tvorba" s `NavItem` prop `pendingTypes` = **součet** pending typů (moderační badge se sloučením neztratil; tooltip vyjmenuje neprázdné).
+**Poučení 1 (prerender):** prerender je **on-demand** (`/{*path}`) — NEMÁ statický route-whitelist; spec předpoklad „přidat do whitelistu" byl mylný, reálně stačí `STATIC_PATHS` (TTL). Ověř realitu, nepiš spec z domněnky.
+**Poučení 2 (header fix — nezabral napoprvé):** 1. pokus (ThemeSwitcher `triggerName max-width:72px` + přidat ikonu Registraci) ušetřil jen 11 px a **ikona Registrace tlačítko dokonce rozšířila** → nestačilo. Zabralo až **skrytí názvu motivu** (`display:none`, zůstane jen šipka; výběr běží přes dropdown) → trigger 108→32 px. Poučení: měř šířky JEDNOTLIVÝCH dětí kontejneru (`getBoundingClientRect().width`), neodhaduj viníka; zúžit ≠ skrýt.
+**Poučení 3 (playwright/mobil-desktop):** `browser_resize`/`setViewportSize` v tomhle MCP shazuje MCP page (`Target closed`). Obejít přes `page.context().newPage()` per viewport (fresh page, `setViewportSize` PŘED `goto`) v jednom `run_code_unsafe` snippetu → spolehlivé měření `scrollWidth`/`clientWidth`/šířek dětí. Off-canvas drawer (`position:fixed` mimo obrazovku) je v offenders **false-positive** — `scrollW===clientW` to vyvrátí.
+**Jak ověřeno:** `npm run build` ✓ (4×), vitest hub+gating 6/6 + HelpPage 25/25 ✓, eslint ✓, lint:colors 3180=baseline (0 přírůstek), mobil-desktop měřením: hub 3→1 sloupec 0 overflow (375/768/1440), header po fixu `scrollW===clientW` na 360/375/768. funkce (kap.04) + napoveda (PlatformSection) + roadmap 21.5 + spec + dluh (D-NEW-ANON-HEADER-OVERFLOW → Vyřešené).
+**Zhodnocení:** dobře — spec→plán→souhlas→kód bez cyklení; header fix 2. pokus (poučení „zúžit ≠ skrýt"). Celá 21.5 fáze 1 je **FE-only** (0 BE) → žádný BE restart. Čeká FE commit.
+
+---
+
 ### CH-037 — replace_all u CSS selektoru spolkl mezeru descendant kombinátoru → rozbil base embed blok všech systémů · 2026-06-29
 **Kontext:** 16.2g JaD skiny — přidával jsem `jad` do per-skin signature i base bloků v `DiceLogPanel.module.css` + `DiceRollOverlay.module.css` přes `:is([drd2],[jad])`.
 **Co jsem udělal špatně:** u base bloku jsem dal `replace_all` old=`[data-diary-system='drd2']) ` (paren **+ koncová mezera**, = descendant kombinátor před `.panel`/`.readout`) → new=`[data-diary-system='drd2'], [data-diary-system='jad'])` **BEZ koncové mezery**. Výsledek: `) .panel` (potomek) → `).panel` (compound) → selektor cílí element, který je SOUČASNĚ `[data-diary-system]` i `.panel` (nikdy) → base embed blok (surface/text/title…) přestal platit pro VŠECHNY systémy (drd16/drdplus/drd2/jad).

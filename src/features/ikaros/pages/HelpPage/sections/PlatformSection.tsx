@@ -20,6 +20,7 @@ import {
   Beer,
   Smartphone,
   Dices,
+  Palette,
 } from 'lucide-react';
 import { HelpAccordion, HelpSubAccordion, TagChip, ScreenshotSlot, type TagKind } from '../components';
 
@@ -162,6 +163,17 @@ export function PlatformSection() {
 
       {/* ── Obsah komunity ─────────────────────────────────────────────── */}
       <HelpAccordion icon={<BookOpen size={20} />} title="Obsah komunity" accent="corrector">
+        <Tool icon={<Palette size={16} />} title="Společná tvorba (rozcestník)" audience={{ kind: 'vse', label: 'Všichni' }} accent="corrector">
+          <p>
+            Jedno tlačítko v hlavním menu, které otevře rozcestník veškeré
+            komunitní tvorby. Najdeš tu dlaždice na <strong>Diskuze</strong>,{' '}
+            <strong>Články</strong> a <strong>Galerii</strong> (fungují) a
+            připravované sekce <strong>Bestiář, Herbář, Lektvary, Kouzla</strong>{' '}
+            a <strong>Hádanky</strong> — ty zatím nesou štítek „Připravujeme" a klik
+            tě zavede na stránku, že se sekce chystá. RPG systémy mají v menu
+            vlastní tlačítko.
+          </p>
+        </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
           <p>
             Literární archiv komunity. Přehled s vyhledáváním, řazením a filtrem

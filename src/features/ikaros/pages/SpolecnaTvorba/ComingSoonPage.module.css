@@ -1,0 +1,7 @@
+/* 21.5 — stub „Připravujeme" (sdílený pro nepostavené knihovny tvorby). */
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--sp-4, 1rem) var(--sp-4, 1rem) var(--sp-8, 3rem);
+}

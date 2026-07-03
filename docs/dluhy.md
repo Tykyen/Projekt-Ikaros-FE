@@ -118,3 +118,12 @@ fallback na Map + testy).
 > Bezpečný krok (ALLOW datové dirs → `lint:colors` 4397→1622) **hotov 2026-06-27** — viz git log.
 **Zbývá (skutečný chrome drift, ~1622 ve ~160 souborech):** vizuální projití per komponenta napříč 2–3 tématy (proto **ne v automatickém commitu** — riziko rozbití skinů bez živé kontroly). Top cíle: `TemplateEditorModal`, `NotificationCenter`, `PostavaLayout`…
 **Trigger:** sjednocení vzhledu / nový skin odhalí drift. **Měření:** `npm run lint:colors`.
+
+---
+
+## Vyřešené
+
+### D-NEW-ANON-HEADER-OVERFLOW — Anon hlavička přetékala na úzkém mobilu · ✅ 2026-07-03
+**Kde:** `src/themes/ThemeSwitcher.module.css` + `IkarosLayout.tsx` (`HeaderLoggedOut`).
+**Kořen:** ThemeSwitcher trigger držel plný název motivu (~108 px) a na mobilu se neskrýval (nemá `.headerBtnLabel`), takže anon hlavička přetékala ~42 px; „Registrace" navíc po skrytí labelu zůstávalo prázdné tlačítko.
+**Oprava:** `@media (max-width:768px)` v ThemeSwitcheru skryje název motivu (zůstane jen šipka; výběr běží přes rozbalovací nabídku) → trigger 108→32 px; „Registrace" dostalo ikonu `UserPlus` (na mobilu ikona místo prázdna). Ověřeno měřením: `scrollWidth === clientWidth` na 360/375/768, `hOverflow=false`, žádný `_headerNav`/`_headerBtn` offender.

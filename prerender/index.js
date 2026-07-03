@@ -24,7 +24,9 @@ const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT ?? 15000);
 // dynamický obsah (světy/články/galerie) → krátce, ať náhled nezastará.
 const TTL_STATIC = 24 * 60 * 60 * 1000; // 24 h
 const TTL_DYNAMIC = 30 * 60 * 1000; // 30 min
-const STATIC_PATHS = /^\/(podminky)?$|^\/ikaros\/napoveda/;
+// 21.5 — hub „Společná tvorba" je statický (mění se zřídka) → dlouhé TTL jako
+// napoveda. Stuby (bestiar/herbar/…) jsou noindex, TTL nerozhoduje.
+const STATIC_PATHS = /^\/(podminky)?$|^\/ikaros\/(napoveda|tvorba)/;
 
 function ttlForPath(pathname) {
   return STATIC_PATHS.test(pathname) ? TTL_STATIC : TTL_DYNAMIC;

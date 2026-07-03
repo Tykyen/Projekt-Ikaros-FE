@@ -50,6 +50,9 @@ const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPag
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
 // 3.7 — `/ikaros/oblibene` stránka oblíbeného obsahu (záložky napříč moduly).
 const FavoritesPage        = lazy(() => import('@/features/ikaros/pages/FavoritesPage'));
+// 21.5 — „Společná tvorba" rozcestník + sdílený stub „Připravujeme".
+const TvorbaHubPage        = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/TvorbaHubPage'));
+const ComingSoonPage       = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/ComingSoonPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -165,6 +168,14 @@ export const router = createBrowserRouter([
       { path: 'ikaros/galerie/nahrat',        element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id/upravit',   element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id',           element: p(GalleryDetailPage) },
+      // 21.5 — „Společná tvorba" hub (veřejný) + stuby nepostavených knihoven.
+      // Stuby vedou na sdílenou ComingSoonPage (kontext čte z pathname).
+      { path: 'ikaros/tvorba',          element: p(TvorbaHubPage) },
+      { path: 'ikaros/bestiar',         element: p(ComingSoonPage) },
+      { path: 'ikaros/herbar',          element: p(ComingSoonPage) },
+      { path: 'ikaros/lektvary',        element: p(ComingSoonPage) },
+      { path: 'ikaros/kouzla',          element: p(ComingSoonPage) },
+      { path: 'ikaros/hadanky',         element: p(ComingSoonPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug
       { path: 'ikaros/systemy',         element: p(SystemsHubPage) },

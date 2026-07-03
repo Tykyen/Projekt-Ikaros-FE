@@ -10,9 +10,21 @@ Společné principy ověřené v kódu:
 
 ---
 
+### Společná tvorba — rozcestník komunitního obsahu
+- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii (aktivní) a připravované knihovny Bestiář/Herbář/Lektvary/Kouzla/Hádanky (zatím stuby).
+- **Kde:** route `/ikaros/tvorba` (`TvorbaHubPage`). Hlavní navigace: jedno tlačítko „Společná tvorba" (ikona `Palette`), které **nahradilo** samostatné položky Diskuze/Články/Galerie. „RPG systémy" zůstává v nav samostatně (veřejný SEO landing, ne komunitní tvorba). Stuby: `/ikaros/{bestiar,herbar,lektvary,kouzla,hadanky}` → sdílená `ComingSoonPage`.
+- **Kdo:** hub i stuby **veřejné** (anon, bez `requireAuth`) — router `src/app/router.tsx`. Jednotlivé cíle si řeší vlastní gating (Diskuze má `requireAuth` → anon klik = login). Data dlaždic `src/features/ikaros/pages/SpolecnaTvorba/tiles.ts`.
+- **Co jde dělat:** proklik na kteroukoli sekci — aktivní dlaždice vede na svou stránku, stub na `ComingSoonPage` („Připravujeme", `noindex`) s odkazem zpět na hub. Aktivní dlaždice nese moderační badge (počet pending pro recenzenta) z `usePendingActionsCount`.
+- **Hranice / co neumí:** Bestiář/Herbář/Lektvary/Kouzla/Hádanky jsou **jen kostry** — žádný obsah, datový model ani editor (viz roadmap2 21.5a–d; Bestiář = komunitní scope 16.2b-2). Hub je čistě navigační vrstva, sám žádný obsah nedrží.
+- **Zvláštnosti:** navigační badge „Společná tvorba" v `IkarosLayout` agreguje **součet** pending typů Diskuze+Články+Galerie (`NavItem` prop `pendingTypes`), aby moderátor o signál sloučením nepřišel; tooltip vyjmenuje neprázdné. Hub v prerenderu klasifikován jako statická cesta (delší TTL); stuby `noindex`.
+- **Stav:** 🚧 (fáze 1 hub + nav + stuby ✅ 2026-07-03; knihovny 21.5a–d nepostaveny)
+- **Kód:** FE `src/features/ikaros/pages/SpolecnaTvorba/` (`TvorbaHubPage.tsx`, `ComingSoonPage.tsx`, `tiles.ts`), nav `src/app/layout/IkarosLayout/IkarosLayout.tsx` (`PRIMARY_NAV`, `NavItem`), routy `src/app/router.tsx`. BE: žádné (čistě FE navigace).
+
+---
+
 ### Články — přehled a čtení
 - **Co to je:** Komunitní wiki/blog články platformy s kategoriemi, hodnocením, oblíbenými a stavem přečtení.
-- **Kde:** route `/ikaros/clanky` (`ArticlesPage`). Menu „Články" (s badge počtu pending pro recenzenty). Detail `/ikaros/clanky/:id` (`ArticleDetailPage`).
+- **Kde:** route `/ikaros/clanky` (`ArticlesPage`). Dlaždice „Články" v rozcestníku **Společná tvorba** (badge počtu pending pro recenzenty). Detail `/ikaros/clanky/:id` (`ArticleDetailPage`).
 - **Kdo:**
   - **FE:** seznam i detail jsou **veřejné** (anon, bez `requireAuth`). Router `src/app/router.tsx:149` a `:153`.
   - **BE:** `GET /ikaros-articles` a `GET /ikaros-articles/:id` přes `OptionalJwtAuthGuard` — anon vidí jen `Published`; recenzent (`SpravceClanku`/`Admin`/`Superadmin`) vidí `Published + Pending`; přihlášený autor navíc své vlastní (`ikaros-articles.controller.ts:39`, service `:111`/`:211`).
@@ -49,7 +61,7 @@ Společné principy ověřené v kódu:
 
 ### Galerie — prohlížení a nahrávání
 - **Co to je:** Komunitní obrázková galerie s kategoriemi, hvězdičkovým hodnocením, oblíbenými a schvalovacím řízením (stejný vzor jako Články).
-- **Kde:** route `/ikaros/galerie` (`GalleryPage`), nahrání/úprava `/ikaros/galerie/nahrat` a `/ikaros/galerie/:id/upravit` (`GalleryUploadPage`), detail `/ikaros/galerie/:id` (`GalleryDetailPage`). Menu „Galerie".
+- **Kde:** route `/ikaros/galerie` (`GalleryPage`), nahrání/úprava `/ikaros/galerie/nahrat` a `/ikaros/galerie/:id/upravit` (`GalleryUploadPage`), detail `/ikaros/galerie/:id` (`GalleryDetailPage`). Dlaždice „Galerie" v rozcestníku **Společná tvorba**.
 - **Kdo:**
   - **FE:** seznam i detail veřejné (anon); upload/editace `requireAuth` — router `:154`–`:158`.
   - **BE:** `GET` přes `OptionalJwtAuthGuard` (anon `Published`, recenzent + `Pending`). Nahrávat smí kdokoli přihlášený. Schvaluje recenzent `Superadmin`/`Admin`/`SpravceGalerie` (`ADMIN_ROLES` v `ikaros-gallery.service.ts:22`).
@@ -72,7 +84,7 @@ Společné principy ověřené v kódu:
 
 ### Diskuze — vlákna a příspěvky
 - **Co to je:** Fórum platformy. Diskuze (vlákno) se schvalováním, příspěvky, lajky, správci vlákna, pozvánkami a moderací nahlášených příspěvků.
-- **Kde:** route `/ikaros/diskuze` (`DiscussionsPage`), nová `/ikaros/diskuze/nova` (`DiscussionsNewPage`), detail `/ikaros/diskuze/:id` (`DiscussionDetailPage`). Menu „Diskuze".
+- **Kde:** route `/ikaros/diskuze` (`DiscussionsPage`), nová `/ikaros/diskuze/nova` (`DiscussionsNewPage`), detail `/ikaros/diskuze/:id` (`DiscussionDetailPage`). Dlaždice „Diskuze" v rozcestníku **Společná tvorba**.
 - **Kdo:**
   - **FE i BE: jen pro přihlášené.** Celý controller je za `JwtAuthGuard` (`ikaros-discussions.controller.ts:41`), všechny FE routy mají `requireAuth` (router `:176`–`:178`). Anon **vůbec nevidí** žádnou diskuzi.
   - **Vytvořit diskuzi** smí kdokoli přihlášený; pokud není admin, diskuze jde do `Pending` (`isApproved=false`) a čeká na schválení (`ikaros-discussions.service.ts:275`). Admin/recenzent (`SpravceDiskuzi`/`Admin`/`Superadmin`) má diskuzi rovnou schválenou.

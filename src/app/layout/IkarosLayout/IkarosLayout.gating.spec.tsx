@@ -4,9 +4,10 @@ import { Provider as JotaiProvider, createStore } from 'jotai';
 import { MemoryRouter } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 
-// Spec 15.7 — anon nevidí slepé odkazy (Vytvořit svět / Diskuze / Camp),
-// ale vidí veřejné položky + Hospodu. Mockujeme jen hooky, které SidebarContent
-// volá při renderu (data nejsou předmětem testu, jen gating položek).
+// Spec 15.7 + 21.5 — anon nevidí slepé odkazy (Vytvořit svět / Camp), ale vidí
+// veřejné položky (Úvodník, RPG systémy, Společná tvorba) + Hospodu. Diskuze/
+// Články/Galerie už nejsou samostatné nav položky — sloučeny do „Společná
+// tvorba" (21.5). Mockujeme jen hooky, které SidebarContent volá při renderu.
 vi.mock('@/features/world/api/useWorlds', () => ({
   usePublicWorlds: () => ({ data: [] }),
   useMyWorlds: () => ({ data: [], isLoading: false, isError: false }),
@@ -32,22 +33,21 @@ function renderSidebar(isAuthenticated: boolean) {
   });
 }
 
-describe('SidebarContent — anon gating (15.7)', () => {
-  it('anon nevidí Vytvořit svět / Diskuze / Camp, vidí veřejné + Hospodu', () => {
+describe('SidebarContent — anon gating (15.7 / 21.5)', () => {
+  it('anon nevidí Vytvořit svět / Camp, vidí veřejné položky + Hospodu', () => {
     renderSidebar(false);
     expect(screen.queryByText('Vytvořit svět')).toBeNull();
-    expect(screen.queryByText('Diskuze')).toBeNull();
     expect(screen.queryByText('Camp I.')).toBeNull();
     expect(screen.getByText('Úvodník')).toBeInTheDocument();
-    expect(screen.getByText('Články')).toBeInTheDocument();
-    expect(screen.getByText('Galerie')).toBeInTheDocument();
+    expect(screen.getByText('RPG systémy')).toBeInTheDocument();
+    expect(screen.getByText('Společná tvorba')).toBeInTheDocument();
     expect(screen.getByText('Hospoda')).toBeInTheDocument();
   });
 
-  it('přihlášený vidí Vytvořit svět, Diskuze i Camp I.', () => {
+  it('přihlášený vidí Vytvořit svět, Společnou tvorbu i Camp I.', () => {
     renderSidebar(true);
     expect(screen.getByText('Vytvořit svět')).toBeInTheDocument();
-    expect(screen.getByText('Diskuze')).toBeInTheDocument();
+    expect(screen.getByText('Společná tvorba')).toBeInTheDocument();
     expect(screen.getByText('Camp I.')).toBeInTheDocument();
   });
 });
