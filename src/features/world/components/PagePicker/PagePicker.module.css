@@ -50,7 +50,7 @@
    topmost, když je otevřený (16.5). */
 .dropdown {
   position: fixed;
-  z-index: 10100;
+  z-index: 100100;
   max-height: 320px;
   overflow-y: auto;
   background: var(--surface-2);

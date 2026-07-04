@@ -5,9 +5,10 @@
 .overlay {
   position: fixed;
   inset: 0;
-  /* Fullscreen tier — nad theme dekoracemi (9999), jako GalleryLightbox. Na
-     z-1000 (modal tier) ho na taktické mapě překryla vrstva → černo + nereaguje. */
-  z-index: 10000;
+  /* Nad VŠÍM: theme dekorace 9999, dice overlaye až 10001. Na z-10000 ho na
+     taktické mapě překryl DiceRollOverlay (10001) → viewer se otevřel, ale pod
+     ním. 100000 = jasně nad celým dice/decoration tierem. */
+  z-index: 100000;
   display: flex;
   flex-direction: column;
   background: color-mix(in srgb, var(--surface-0, var(--surface-1)) 88%, transparent);
