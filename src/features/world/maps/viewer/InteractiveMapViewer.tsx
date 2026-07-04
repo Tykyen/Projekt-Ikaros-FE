@@ -100,6 +100,18 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
   const [dragOverride, setDragOverride] = useState<{ x: number; y: number } | null>(
     null,
   );
+  // Portál cíl = fullscreen prvek (taktická mapa jde přes `requestFullscreen`;
+  // portál do `body` by byl MIMO fullscreen prvek → neviditelný), jinak `body`.
+  const [portalTarget, setPortalTarget] = useState<Element>(
+    () => document.fullscreenElement ?? document.body,
+  );
+  useEffect(() => {
+    const update = () =>
+      setPortalTarget(document.fullscreenElement ?? document.body);
+    update();
+    document.addEventListener('fullscreenchange', update);
+    return () => document.removeEventListener('fullscreenchange', update);
+  }, []);
 
   // Měř velikost stage (viewport). Canvas = fitovaný box obrázku dopočítaný z
   // poměru stran → pin je % canvasu = % obrázku (bez letterboxu).
@@ -396,7 +408,7 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
           </div>
         </div>
       </div>,
-      document.body,
+      portalTarget,
     );
   }
 
@@ -643,7 +655,7 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
         />
       )}
     </div>,
-    document.body,
+    portalTarget,
   );
 }
 
