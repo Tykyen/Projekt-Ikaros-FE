@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -93,23 +94,45 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
   const [listOpen, setListOpen] = useState(false);
   const [scenePop, setScenePop] = useState<DOMRect | null>(null);
   const [chatPop, setChatPop] = useState<DOMRect | null>(null);
-  const [baseSize, setBaseSize] = useState({ w: 1, h: 1 });
+  const [stageSize, setStageSize] = useState({ w: 0, h: 0 });
   const [imgRatio, setImgRatio] = useState<number | null>(null);
   const [dragPinId, setDragPinId] = useState<string | null>(null);
   const [dragOverride, setDragOverride] = useState<{ x: number; y: number } | null>(
     null,
   );
 
-  // Měř neškálovanou velikost canvasu (offsetWidth/Height = před transformem).
+  // Měř velikost stage (viewport). Canvas = fitovaný box obrázku dopočítaný z
+  // poměru stran → pin je % canvasu = % obrázku (bez letterboxu).
   useEffect(() => {
-    const el = canvasRef.current;
+    const el = stageRef.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => {
-      setBaseSize({ w: el.offsetWidth || 1, h: el.offsetHeight || 1 });
-    });
+    const measure = () => setStageSize({ w: el.clientWidth, h: el.clientHeight });
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
+    measure();
     return () => ro.disconnect();
-  }, [imgRatio]);
+  }, []);
+
+  // Wheel zoom přes NATIVNÍ non-passive listener (React onWheel je passive →
+  // preventDefault by házel chybu do konzole).
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      zoomBy(e.deltaY < 0 ? 0.2 : -0.2);
+    };
+    el.addEventListener('wheel', handler, { passive: false });
+    return () => el.removeEventListener('wheel', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fitovaný box obrázku (contain) uvnitř stage.
+  const fitted = useMemo(() => {
+    const { w, h } = stageSize;
+    if (!imgRatio || w === 0 || h === 0) return { w: 0, h: 0 };
+    return imgRatio > w / h ? { w, h: w / imgRatio } : { w: h * imgRatio, h };
+  }, [stageSize, imgRatio]);
 
   // Escape zavírá popovery → jinak celý viewer.
   useEffect(() => {
@@ -158,11 +181,11 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
   const clusters: PinClusterItem[] = useMemo(() => {
     if (dragPinId) return pinsForRender.map((p) => ({ id: p.id, x: p.x, y: p.y, pins: [p] }));
     return clusterPins(pinsForRender, {
-      width: baseSize.w,
-      height: baseSize.h,
+      width: fitted.w || 1,
+      height: fitted.h || 1,
       scale,
     });
-  }, [pinsForRender, dragPinId, baseSize, scale]);
+  }, [pinsForRender, dragPinId, fitted, scale]);
 
   // ── Souřadnicové převody (přes živý rect canvasu, letterbox-safe) ──────────
   function clientToNorm(cx: number, cy: number): { x: number; y: number } {
@@ -192,8 +215,8 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
   function focusOn(cx: number, cy: number, targetScale: number) {
     const ns = Math.max(1, Math.min(MAX_SCALE, targetScale));
     setScale(ns);
-    setTx(-(cx - 0.5) * baseSize.w * ns);
-    setTy(-(cy - 0.5) * baseSize.h * ns);
+    setTx(-(cx - 0.5) * fitted.w * ns);
+    setTy(-(cy - 0.5) * fitted.h * ns);
   }
   function zoomBy(delta: number) {
     setScale((sc) => {
@@ -286,11 +309,6 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
     }
   }
 
-  function onWheel(e: React.WheelEvent) {
-    e.preventDefault();
-    zoomBy(e.deltaY < 0 ? 0.2 : -0.2);
-  }
-
   // ── Editor ──────────────────────────────────────────────────────────────────
   function clampEditorPos(left: number, top: number) {
     const sr = stageRef.current?.getBoundingClientRect();
@@ -362,7 +380,7 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
   }
 
   if (!map) {
-    return (
+    return createPortal(
       <div
         className={s.overlay}
         ref={overlayRef}
@@ -377,13 +395,14 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
             </button>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body,
     );
   }
 
   const linked = !!map.linkedSceneId;
 
-  return (
+  return createPortal(
     <div
       className={s.overlay}
       ref={overlayRef}
@@ -475,13 +494,13 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
           onPointerDown={onStagePointerDown}
           onPointerMove={onStagePointerMove}
           onPointerUp={onStagePointerUp}
-          onWheel={onWheel}
         >
           <div
             className={`${s.canvas} ${panning || dragPinId ? s.canvasDragging : ''}`}
             ref={canvasRef}
             style={{
-              aspectRatio: imgRatio ?? undefined,
+              width: fitted.w || undefined,
+              height: fitted.h || undefined,
               transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
             }}
           >
@@ -623,7 +642,8 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
           onClose={() => setChatPop(null)}
         />
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }
 
