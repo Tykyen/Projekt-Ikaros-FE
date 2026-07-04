@@ -655,12 +655,21 @@
 .editor,
 .listPanel,
 .popover {
-  backdrop-filter: blur(16px) saturate(1.2);
+  /* brightness < 1 ztmaví jasnou mapu ZA panelem → tmavá frosted karta, text
+     čitelný bez ohledu na barevnost mapy. */
+  -webkit-backdrop-filter: blur(18px) brightness(0.45) saturate(1.15);
+  backdrop-filter: blur(18px) brightness(0.45) saturate(1.15);
   border-color: var(--line-strong, var(--accent));
 }
 .tooltip,
 .readPop {
   box-shadow: 0 10px 30px -8px color-mix(in srgb, var(--surface-0, black) 85%, transparent);
+}
+/* jistota kontrastu textu i na světlých motivech */
+.tipInfo,
+.tipHint,
+.rpBody {
+  color: color-mix(in srgb, var(--text-muted) 55%, var(--text-strong));
 }
 
 @media (prefers-reduced-motion: reduce) {
