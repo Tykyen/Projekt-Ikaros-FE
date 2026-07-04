@@ -20,6 +20,8 @@ import {
   Pencil,
   Check,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { apiClient } from '@/shared/api';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import type { ChatMessage } from '@/features/chat/lib/types';
@@ -561,10 +563,50 @@ function DocumentsView({
     e.target.value = '';
   };
 
-  // Cloudinary raw PDF blokuje naše CSP v <iframe> → otevřít v nové kartě
-  // (nativní PDF viewer prohlížeče).
-  const openDoc = (d: PlatformDocument) =>
-    window.open(d.url, '_blank', 'noopener,noreferrer');
+  // 20.5 — Cloudinary drží PDF jako `raw` (bez `.pdf`, hlavička nutí stažení) →
+  // přímé otevření URL by soubor jen stáhlo bez přípony. Čteme přes BE „view"
+  // endpoint, který přebalí na `application/pdf` + `inline` → prohlížeč otevře
+  // čtečku. Okno otevřeme hned (user-gesture, obejde popup blocker), obsah
+  // doplníme po dotažení blobu (auth přes apiClient interceptor).
+  const openDoc = async (d: PlatformDocument) => {
+    // 'noopener' by vrátilo null (nešel by nastavit obsah) → handle bereme bez
+    // něj a `opener` nulujeme ručně (stejná ochrana proti manipulaci ze záložky).
+    const w = window.open('', '_blank');
+    if (w) w.opener = null;
+    try {
+      const res = await apiClient.get(`/admin-chat/documents/${d.id}/view`, {
+        responseType: 'blob',
+      });
+      const url = URL.createObjectURL(res.data as Blob);
+      if (w) w.location.href = url;
+      else window.open(url, '_blank', 'noopener,noreferrer');
+      // Blob URL musí přežít, než ho karta načte; po chvíli uvolníme paměť.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch {
+      w?.close();
+      toast.error('Dokument se nepodařilo otevřít.');
+    }
+  };
+
+  // Stažení přes stejný BE endpoint: blob je same-origin → `a.download` s názvem
+  // funguje (u přímé Cloudinary URL je cross-origin a název se ignoruje).
+  const downloadDoc = async (d: PlatformDocument) => {
+    try {
+      const res = await apiClient.get(`/admin-chat/documents/${d.id}/view`, {
+        responseType: 'blob',
+      });
+      const url = URL.createObjectURL(res.data as Blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${d.filename.replace(/\.pdf$/i, '')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Stažení se nepodařilo.');
+    }
+  };
 
   const [renameTarget, setRenameTarget] = useState<PlatformDocument | null>(
     null,
@@ -631,17 +673,17 @@ function DocumentsView({
                     <Pencil size={14} aria-hidden />
                   </button>
                 )}
-                <a
+                <button
+                  type="button"
                   className={s.miniAct}
-                  href={d.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  download
                   title="Stáhnout"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void downloadDoc(d);
+                  }}
                 >
                   <Download size={14} aria-hidden />
-                </a>
+                </button>
                 {canManage && (
                   <button
                     type="button"
