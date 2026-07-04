@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
-import type { ChatMessage, ChatAttachment } from '@/features/chat/lib/types';
+import type {
+  ChatMessage,
+  ChatAttachment,
+  ChatMapRef,
+} from '@/features/chat/lib/types';
 import type {
   GroupWithChannels,
   ChannelUnread,
@@ -72,6 +76,8 @@ export interface SendWorldMessagePayload {
   /** Klíč velikosti písma (CHAT_FONT_SIZE_KEYS); BE fallback membership.chatFontSize. */
   customFontSize?: string;
   attachments?: ChatAttachment[];
+  /** 16.5c — poslaná interaktivní mapa (odkaz na WorldMapEntry). */
+  mapRef?: ChatMapRef;
   /** Reply (6.2a) — ID citované zprávy. */
   replyToId?: string;
   /** Whisper (6.2a) — pole userIds (BE doplní odesílatele). */

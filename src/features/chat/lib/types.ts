@@ -34,6 +34,17 @@ export interface ChatAttachment {
   size: number;
 }
 
+/**
+ * 16.5c — reference na interaktivní mapu poslanou do chatu (odkaz, ne obrázek).
+ * FE dopočítá náhled/piny z živé mapy dle viditelnosti příjemce; `title` =
+ * fallback snapshot, když mapa zmizí / není dostupná.
+ */
+export interface ChatMapRef {
+  worldMapId: string;
+  worldId: string;
+  title: string;
+}
+
 export interface ChatMessage {
   id: string;
   channelId: string;
@@ -75,6 +86,8 @@ export interface ChatMessage {
   replyToSenderName?: string;
   /** Přílohy zprávy — obrázky / dokumenty (krok 4.3b). */
   attachments?: ChatAttachment[];
+  /** 16.5c — poslaná interaktivní mapa (odkaz na WorldMapEntry). */
+  mapRef?: ChatMapRef | null;
   /** RP datum ve hře — `YYYY-MM-DD` (krok 6.2d). */
   rpDate?: string;
   /** Hod kostkou (BE detekce regexem nebo `dicePayload`) — needitovatelné (krok 6.2c). */

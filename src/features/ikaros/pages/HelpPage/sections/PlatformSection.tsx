@@ -280,6 +280,23 @@ export function PlatformSection() {
             globální.
           </p>
         </Tool>
+        <Tool icon={<MessageSquare size={16} />} title="Interní chat správy" audience={{ kind: 'admin', label: 'Jen admini' }} accent="warning">
+          <p>
+            Oddělené pracoviště pro tým správy na vlastní stránce. Vlevo{' '}
+            <strong>konverzace</strong> (týmový chat v reálném čase; přednastavené
+            „Hlavní" a „Vedení", nové zakládá Superadmin a určuje, kdo v nich je —
+            všichni správci, nebo jen vybraní), uprostřed{' '}
+            <strong>sdílené dokumenty</strong> (PDF — nahraješ, otevřeš ke čtení
+            přímo v prohlížeči, stáhneš), vpravo <strong>úkoly týmu</strong>{' '}
+            (osobní seznam úkolů každého admina, viditelný ostatním; cizí úkoly
+            upravuje jen Superadmin).
+          </p>
+          <p>
+            Dokumenty jsou zatím omezené na <strong>10 MB na soubor</strong> —
+            větší PDF zatím rozděl na menší části. Otevřeš odkazem „Chat" v
+            Administraci (jen přihlášený admin).
+          </p>
+        </Tool>
       </HelpAccordion>
     </>
   );

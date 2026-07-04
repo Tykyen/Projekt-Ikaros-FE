@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>16.5 — Interaktivní mapa s piny · návrh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* --- brand / theme tokens (ikaros synthwave); v appce přijdou z motivu --- */
+    --bg-0: #080510;
+    --bg-1: #100a20;
+    --bg-2: #17102e;
+    --panel: rgba(30, 20, 55, .72);
+    --panel-solid: #1a1230;
+    --line: rgba(168, 85, 247, .22);
+    --line-strong: rgba(168, 85, 247, .45);
+    --text: #ece7fb;
+    --text-dim: #a79cc7;
+    --violet: #a855f7;
+    --violet-2: #8b5cf6;
+    --magenta: #d946ef;
+    --cyan: #22d3ee;
+    --amber: #f5b942;
+    --green: #34d399;
+    --danger: #f4547a;
+    --shadow: 0 18px 50px -18px rgba(0,0,0,.85);
+    --font-display: "Rajdhani", system-ui, sans-serif;
+    --font-mono: "Space Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  [hidden] { display: none !important; }
+  body {
+    background:
+      radial-gradient(1200px 700px at 78% -8%, rgba(168,85,247,.18), transparent 60%),
+      radial-gradient(900px 600px at 8% 100%, rgba(34,211,238,.10), transparent 55%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1));
+    color: var(--text);
+    font-family: var(--font-display);
+    letter-spacing: .2px;
+    min-height: 100vh;
+    padding: 40px 20px 90px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+
+  /* --- page header --- */
+  .doc-head { margin-bottom: 34px; }
+  .kicker {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--violet);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .kicker::before { content:""; width: 26px; height: 1px; background: var(--line-strong); }
+  h1 { font-size: clamp(30px, 5vw, 52px); font-weight: 700; margin: 10px 0 6px; line-height: 1.02; }
+  h1 em { font-style: normal; color: transparent; background: linear-gradient(92deg, var(--violet), var(--magenta) 60%, var(--cyan)); -webkit-background-clip: text; background-clip: text; }
+  .lede { color: var(--text-dim); max-width: 62ch; font-size: 16px; line-height: 1.55; }
+
+  /* --- section scaffolding --- */
+  section { margin-top: 54px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .sec-num { font-family: var(--font-mono); font-size: 13px; color: var(--cyan); }
+  .sec-head h2 { font-size: 24px; margin: 0; font-weight: 700; }
+  .sec-note { color: var(--text-dim); font-size: 14px; margin: -4px 0 18px; max-width: 70ch; line-height: 1.5; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+  }
+
+  /* ===================== VIEWER ===================== */
+  .viewer-shell { padding: 14px; }
+  .viewer-topbar { display: flex; align-items: center; gap: 10px; padding: 4px 6px 12px; flex-wrap: wrap; }
+  .viewer-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+  .viewer-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 10px var(--violet); }
+  .spacer { flex: 1; }
+  .btn {
+    font-family: var(--font-display); font-weight: 600; font-size: 13px;
+    color: var(--text); background: rgba(168,85,247,.10);
+    border: 1px solid var(--line-strong); border-radius: 10px;
+    padding: 8px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+    transition: .16s;
+  }
+  .btn:hover { background: rgba(168,85,247,.22); transform: translateY(-1px); }
+  .btn.icon { padding: 8px 10px; }
+  .btn.on { background: linear-gradient(92deg, var(--violet), var(--magenta)); border-color: transparent; color: #fff; box-shadow: 0 6px 18px -6px var(--magenta); }
+  .btn svg { width: 16px; height: 16px; }
+
+  .stage {
+    position: relative; overflow: hidden; border-radius: 12px;
+    border: 1px solid var(--line);
+    aspect-ratio: 16 / 9; cursor: grab;
+    background: #0b0818;
+  }
+  .stage.adding { cursor: crosshair; }
+  .stage.panning { cursor: grabbing; }
+  .canvas {
+    position: absolute; inset: 0; transform-origin: 0 0;
+    transition: transform .12s ease-out;
+  }
+  /* stylizovaná „mapa" (zástupný obrázek) */
+  .map-art { position: absolute; inset: 0; }
+  .map-art .sea {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(700px 380px at 30% 34%, rgba(34,211,238,.10), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.028) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.028) 0 1px, transparent 1px 46px),
+      linear-gradient(160deg, #0d1030, #0a0a1e 60%, #100a24);
+  }
+  .land { position:absolute; filter: drop-shadow(0 0 22px rgba(168,85,247,.25)); }
+  .land path { fill: rgba(60,42,96,.62); stroke: rgba(168,85,247,.55); stroke-width: 1.4; }
+  .compass { position:absolute; right: 18px; bottom: 14px; width: 54px; height: 54px; opacity:.5; }
+  .compass path, .compass circle { stroke: var(--cyan); fill: none; stroke-width: 1.2; }
+  .scanline { position:absolute; inset:0; pointer-events:none; mix-blend-mode: overlay;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.14) 0 2px, transparent 2px 4px); opacity:.35; }
+
+  /* --- PIN --- */
+  .pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; --c: var(--cyan); }
+  .pin .stalk { width: 2px; height: 15px; margin: 0 auto; background: linear-gradient(var(--c), transparent); }
+  .pin .flag {
+    position: relative; width: 26px; height: 26px; margin-bottom: -3px;
+    display: grid; place-items: center;
+    background: color-mix(in srgb, var(--c) 22%, #12091f);
+    border: 1.5px solid var(--c); border-radius: 9px 9px 9px 2px;
+    color: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 12%, transparent), 0 6px 16px -4px rgba(0,0,0,.7);
+    transition: .16s;
+  }
+  .pin .flag svg { width: 15px; height: 15px; }
+  .pin:hover .flag { transform: translateY(-3px) scale(1.08); box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 18%, transparent), 0 10px 22px -6px var(--c); }
+  .pin .pulse { position:absolute; inset:0; border-radius: inherit; }
+  .pin.secret .flag { border-style: dashed; }
+  .pin.dead   { --c: #7d7d94 !important; }
+  .pin.dead .flag { opacity:.7; }
+  /* malý indikátor cíle v rohu vlaječky (page ↗ / map ▣ / info i) */
+  .pin .tbadge { position:absolute; right:-5px; bottom:-5px; width:15px; height:15px; border-radius:50%; background:#100a20; border:1.5px solid var(--c); display:grid; place-items:center; color:var(--c); font:700 9px/1 var(--font-mono); }
+  .pin .tbadge svg { width:9px; height:9px; }
+
+  /* ping prstenec u „map" cíle = vede hloub */
+  .pin.tt-map .flag::after {
+    content:""; position:absolute; inset:-2px; border-radius: inherit;
+    border: 1.5px solid var(--c); animation: ping 1.8s ease-out infinite; opacity:0;
+  }
+  @keyframes ping { 0%{ transform:scale(1); opacity:.6 } 100%{ transform:scale(1.9); opacity:0 } }
+
+  /* tooltip / popisek */
+  .tip {
+    position: absolute; transform: translate(-50%, -100%); margin-top: -6px;
+    background: var(--panel-solid); border: 1px solid var(--line-strong);
+    border-radius: 10px; padding: 9px 12px; min-width: 150px; max-width: 240px;
+    box-shadow: var(--shadow); pointer-events: none; z-index: 40;
+    opacity: 0; translate: 0 4px; transition: .14s;
+  }
+  .tip.show { opacity: 1; translate: 0 0; }
+  .tip .t-label { font-weight: 700; font-size: 14px; }
+  .tip .t-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-top: 3px; display:flex; align-items:center; gap:6px; }
+  .tip .t-chip { color: var(--c, var(--cyan)); }
+  .tip .t-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 5px; }
+
+  /* zoom dock */
+  .zoom-dock { position: absolute; left: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 30; }
+  .zoom-dock .btn { background: var(--panel-solid); padding: 7px 9px; }
+  /* skok zpět na taktickou / reciproční */
+  .stage-top-right { position:absolute; right: 12px; top: 12px; display:flex; gap:8px; z-index:30; }
+
+  /* editor popover (přidání pinu) */
+  .editor {
+    position: absolute; z-index: 60; width: 268px;
+    background: var(--panel-solid); border: 1px solid var(--line-strong);
+    border-radius: 14px; box-shadow: var(--shadow); padding: 14px;
+    opacity: 0; pointer-events: none; translate: 0 6px; transition: .16s;
+  }
+  .editor.show { opacity: 1; pointer-events: auto; translate: 0 0; }
+  .editor h4 { margin: 0 0 10px; font-size: 15px; display:flex; align-items:center; gap:7px; }
+  .field { margin-bottom: 10px; }
+  .field label { display:block; font-size: 11px; letter-spacing: .5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; font-family: var(--font-mono); }
+  .field input, .field select {
+    width: 100%; background: #0e0920; border: 1px solid var(--line); color: var(--text);
+    border-radius: 9px; padding: 8px 10px; font-family: var(--font-display); font-size: 14px;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--violet); box-shadow: 0 0 0 3px rgba(168,85,247,.25); }
+  /* vlastní chevron místo nativní šipky selectu (mimo motiv) */
+  .field select, .chat-pick select {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 34px;
+  }
+  /* rozbalené položky aspoň laděné (podpora omezená napříč OS) */
+  .field select option, .chat-pick select option, .chat-pick select optgroup { background: var(--panel-solid); color: var(--text); }
+
+  /* PagePicker (cíl = stránka): search + dropdown + chip */
+  .pagepick { position: relative; }
+  .pp-inputwrap { display:flex; align-items:center; gap:8px; background:#0e0920; border:1px solid var(--line); border-radius:9px; padding:0 10px; }
+  .pp-inputwrap:focus-within { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(168,85,247,.25); }
+  .pp-inputwrap svg { width:15px; height:15px; color: var(--text-dim); flex:none; }
+  .pp-inputwrap input { border:0; background:transparent; box-shadow:none; padding:8px 0; }
+  .pp-inputwrap input:focus { outline:none; box-shadow:none; }
+  .pp-dropdown { position:absolute; left:0; right:0; top:calc(100% + 5px); z-index:70;
+    background: var(--panel-solid); border:1px solid var(--line-strong); border-radius:10px; overflow:hidden;
+    box-shadow: var(--shadow); display:none; max-height:172px; overflow-y:auto; }
+  .pp-dropdown.show { display:block; }
+  .pp-option { display:flex; align-items:center; gap:9px; width:100%; text-align:left; padding:8px 11px; background:transparent; border:0; color:var(--text); cursor:pointer; font-family:var(--font-display); font-size:14px; }
+  .pp-option:hover, .pp-option.active { background: rgba(168,85,247,.16); }
+  .pp-option svg { width:14px; height:14px; color:var(--cyan); flex:none; }
+  .pp-option .po-title { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pp-option .po-type { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); text-transform:uppercase; }
+  .pp-option.create { color: var(--cyan); border-top:1px dashed var(--line); }
+  .pp-option.create svg { color: var(--cyan); }
+  .pp-empty { padding:10px 12px; font-size:13px; color:var(--text-dim); }
+  .pp-chip { display:flex; align-items:center; gap:8px; background: rgba(34,211,238,.10); border:1px solid rgba(34,211,238,.4); border-radius:9px; padding:7px 10px; }
+  .pp-chip svg { width:15px; height:15px; color:var(--cyan); flex:none; }
+  .pp-chip-title { flex:1; font-size:14px; font-weight:600; }
+  .pp-chip-type { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); text-transform:uppercase; }
+  .pp-chip button { background:transparent; border:0; color:var(--text-dim); cursor:pointer; display:grid; place-items:center; }
+  .pp-chip button:hover { color: var(--danger); }
+  .pp-chip button svg { width:14px; height:14px; }
+
+  /* info textarea */
+  .field textarea { width:100%; background:#0e0920; border:1px solid var(--line); color:var(--text); border-radius:9px; padding:8px 10px; font-family:var(--font-display); font-size:14px; resize:vertical; min-height:56px; line-height:1.4; }
+  .field textarea:focus { outline:none; border-color:var(--violet); box-shadow:0 0 0 3px rgba(168,85,247,.25); }
+
+  /* vzhled: ikony + barvy */
+  .icon-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+  .icon-grid button { aspect-ratio:1; display:grid; place-items:center; border:1px solid var(--line); border-radius:9px; background:#0e0920; color:var(--text-dim); cursor:pointer; transition:.14s; }
+  .icon-grid button svg { width:17px; height:17px; }
+  .icon-grid button:hover { color:var(--text); border-color:var(--line-strong); }
+  .icon-grid button.sel { color:#fff; border-color:var(--violet); background:rgba(168,85,247,.18); box-shadow:0 0 0 2px rgba(168,85,247,.25) inset; }
+  .color-row { display:flex; gap:8px; margin-top:8px; }
+  .color-row button { width:24px; height:24px; border-radius:50%; border:2px solid transparent; cursor:pointer; position:relative; }
+  .color-row button::after { content:""; position:absolute; inset:3px; border-radius:50%; background:var(--sw); }
+  .color-row button.sel { border-color:#fff; box-shadow:0 0 0 3px var(--sw); }
+
+  /* editor scroll (přibylo polí) */
+  .editor { max-height:min(78vh,470px); overflow:auto; }
+
+  /* čtecí popover pro pin „jen informace" */
+  .read-pop { position:absolute; transform:translate(-50%,-100%); margin-top:-8px; z-index:55;
+    background:var(--panel-solid); border:1px solid var(--line-strong); border-radius:12px; padding:12px 14px 13px; width:236px; box-shadow:var(--shadow); }
+  .read-pop .rp-head { display:flex; align-items:center; gap:9px; }
+  .read-pop .rp-ic { width:28px; height:28px; border-radius:8px 8px 8px 2px; display:grid; place-items:center; border:1.5px solid var(--c); color:var(--c); background:color-mix(in srgb, var(--c) 16%, #12091f); flex:none; }
+  .read-pop .rp-ic svg { width:16px; height:16px; }
+  .read-pop .rp-title { font-weight:700; font-size:15px; }
+  .read-pop .rp-close { margin-left:auto; background:transparent; border:0; color:var(--text-dim); cursor:pointer; }
+  .read-pop .rp-close svg { width:15px; height:15px; }
+  .read-pop .rp-body { font-size:13px; color:var(--text-dim); line-height:1.5; margin-top:8px; }
+
+  /* tenký posuvník laděný do motivu (Firefox) */
+  * { scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.55) transparent; }
+  /* WebKit / Chromium */
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--violet), var(--magenta)); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--magenta), var(--violet)); background-clip: padding-box; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+
+  /* výběr chatu pro „Poslat do chatu" */
+  .chat-pick { position: fixed; z-index: 120; width: 250px; background: var(--panel-solid); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); padding: 8px; }
+  .chat-pick .cp-head { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); padding: 4px 8px 6px; }
+  .cp-group { font-size: 11px; color: var(--violet); font-weight: 700; padding: 9px 8px 3px; display:flex; align-items:center; gap:6px; }
+  .cp-group svg { width:12px; height:12px; }
+  .cp-item { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 8px 9px; background: transparent; border: 0; border-radius: 8px; color: var(--text); cursor: pointer; font-family: var(--font-display); font-size: 14px; }
+  .cp-item:hover { background: rgba(168,85,247,.16); }
+  .cp-item svg { width: 14px; height: 14px; color: var(--text-dim); flex: none; }
+  .cp-results { max-height: 172px; overflow-y: auto; border: 1px solid var(--line); border-radius: 9px; background: #0e0920; margin-bottom: 12px; padding: 3px; }
+  .cp-item span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cp-item.sel { background: rgba(168,85,247,.22); }
+  .cp-item .cp-check { color: var(--violet); display: none; }
+  .cp-item.sel .cp-check { display: block; }
+  .cp-empty { padding: 10px 12px; font-size: 13px; color: var(--text-dim); }
+  .seg { display:flex; gap:6px; }
+  .seg button { flex:1; font-size:12px; padding:7px 4px; border-radius:9px; border:1px solid var(--line); background:transparent; color:var(--text-dim); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .seg button svg { width:16px; height:16px; }
+  .seg button.sel { color:#fff; border-color: var(--violet); background: rgba(168,85,247,.16); }
+  .editor-actions { display:flex; gap:8px; margin-top: 12px; }
+  .editor-actions .btn { flex:1; justify-content:center; }
+  .btn.primary { background: linear-gradient(92deg, var(--violet), var(--magenta)); border-color: transparent; color:#fff; }
+  .btn.ghost-danger { color: var(--danger); border-color: rgba(244,84,122,.4); background: rgba(244,84,122,.08); }
+  .vis-row { display:flex; align-items:center; gap:8px; font-size:13px; color: var(--text-dim); }
+  .switch { width: 38px; height: 22px; border-radius: 999px; background: #2a2145; border:1px solid var(--line); position:relative; cursor:pointer; transition:.15s; flex:none; }
+  .switch .knob { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background: var(--text-dim); transition:.15s; }
+  .switch.on { background: linear-gradient(92deg, var(--violet), var(--magenta)); border-color:transparent; }
+  .switch.on .knob { left: 18px; background:#fff; }
+
+  /* legenda pod viewerem */
+  .legend { display:flex; gap:18px; flex-wrap:wrap; padding: 12px 8px 4px; font-size: 13px; color: var(--text-dim); }
+  .legend .li { display:flex; align-items:center; gap:8px; }
+  .legend .sw { width: 20px; height: 20px; border-radius: 7px 7px 7px 2px; display:grid; place-items:center; border:1.5px solid; }
+  .legend .sw svg { width:12px; height:12px; }
+
+  /* ===================== typologie vlaječek ===================== */
+  .type-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(215px,1fr)); gap:14px; padding: 16px; }
+  .type { border:1px solid var(--line); border-radius:13px; padding:16px; background: rgba(12,8,26,.5); }
+  .type .th { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .type .badge { width:34px; height:34px; border-radius:10px 10px 10px 3px; display:grid; place-items:center; border:1.6px solid; }
+  .type .badge svg { width:18px; height:18px; }
+  .type h5 { margin:0; font-size:15px; }
+  .type p { margin:6px 0 0; font-size:13px; color: var(--text-dim); line-height:1.5; }
+
+  /* ===================== dock (počasí + zelený pill) ===================== */
+  .dock-demo { padding: 20px; display:flex; gap: 26px; align-items:flex-start; flex-wrap:wrap; }
+  .fake-map {
+    flex:1; min-width: 300px; aspect-ratio: 16/9; border-radius:14px; position:relative; overflow:hidden;
+    border:1px solid var(--line);
+    background: radial-gradient(600px 300px at 60% 30%, rgba(52,211,153,.06), transparent), linear-gradient(160deg,#0c1030,#0a0a1e);
+  }
+  .fake-map .lbl { position:absolute; left:14px; bottom:12px; font-family:var(--font-mono); font-size:11px; color:var(--text-dim); letter-spacing:1px; }
+  .weather-slot { position:absolute; top:12px; right:12px; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+  .pill {
+    display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px;
+    background: var(--panel-solid); border:1px solid var(--line-strong); color:var(--text); font-weight:600; font-size:14px; cursor:pointer;
+    box-shadow: var(--shadow);
+  }
+  .pill svg { width:18px; height:18px; }
+  .pill.weather .temp { font-family: var(--font-mono); }
+  .pill.mapjump { position:relative; }
+  .pill.mapjump.live { border-color: rgba(52,211,153,.6); color: #d8fff0; }
+  .pill.mapjump.live .glow { color: var(--green); filter: drop-shadow(0 0 6px var(--green)); animation: breathe 2.4s ease-in-out infinite; }
+  .pill.mapjump.live::after {
+    content:""; position:absolute; inset:-1px; border-radius:inherit; border:1px solid var(--green);
+    opacity:0; animation: haloPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100%{ opacity:.75 } 50%{ opacity:1 } }
+  @keyframes haloPulse { 0%,100%{ opacity:0 } 50%{ opacity:.5 } }
+  .pill.mapjump.off { opacity:.5; cursor:not-allowed; }
+  .dock-copy { flex: 0 0 260px; }
+  .dock-copy h5 { margin:0 0 8px; font-size:16px; }
+  .dock-copy p { margin:0 0 10px; font-size:13.5px; color:var(--text-dim); line-height:1.55; }
+  .state-toggle { display:flex; gap:8px; margin-top:6px; }
+
+  /* ===================== chat karta ===================== */
+  .chat-demo { padding: 20px; display:flex; gap:22px; flex-wrap:wrap; }
+  .chat-stream { flex:1; min-width: 300px; display:flex; flex-direction:column; gap:12px; }
+  .msg { display:flex; gap:10px; align-items:flex-start; }
+  .msg .ava { width:34px; height:34px; border-radius:50%; flex:none; background:linear-gradient(135deg,var(--violet),var(--magenta)); display:grid; place-items:center; font-weight:700; font-size:14px; color:#fff; }
+  .bubble { background: rgba(12,8,26,.6); border:1px solid var(--line); border-radius:4px 14px 14px 14px; padding:10px 12px; max-width: 360px; }
+  .bubble .who { font-size:12px; color:var(--violet); font-weight:700; margin-bottom:4px; }
+  .bubble p { margin:0; font-size:14px; color:var(--text); }
+
+  .map-attach {
+    margin-top: 10px; width: 320px; max-width:100%; border:1px solid var(--line-strong); border-radius:12px; overflow:hidden;
+    background: var(--panel-solid); cursor:pointer; transition:.16s; box-shadow: var(--shadow);
+  }
+  .map-attach:hover { transform: translateY(-2px); border-color: var(--violet); }
+  .map-attach .thumb { height:130px; position:relative; background: linear-gradient(160deg,#0d1030,#0a0a1e); overflow:hidden; }
+  .map-attach .thumb .mini-land { position:absolute; inset:0; }
+  .map-attach .thumb .mini-land path { fill: rgba(60,42,96,.62); stroke: rgba(168,85,247,.5); stroke-width:1.4; }
+  .map-attach .thumb .mp { position:absolute; width:9px; height:9px; border-radius:50% 50% 50% 2px; transform:translate(-50%,-50%); box-shadow:0 0 8px currentColor; }
+  .map-attach .meta { padding:10px 12px; display:flex; align-items:center; gap:10px; }
+  .map-attach .meta .mi { width:32px; height:32px; border-radius:9px; background:rgba(168,85,247,.14); display:grid; place-items:center; color:var(--violet); flex:none; }
+  .map-attach .meta .mi svg { width:17px; height:17px; }
+  .map-attach .meta .txt { flex:1; min-width:0; }
+  .map-attach .meta .txt .mt { font-weight:700; font-size:14px; }
+  .map-attach .meta .txt .ms { font-family:var(--font-mono); font-size:11px; color:var(--text-dim); }
+  .map-attach .meta .open { color:var(--cyan); }
+  .chat-copy { flex: 0 0 240px; }
+  .chat-copy h5 { margin:0 0 8px; font-size:16px; }
+  .chat-copy p { margin:0 0 10px; font-size:13.5px; color:var(--text-dim); line-height:1.55; }
+
+  /* toast */
+  .toast-host { position: fixed; left:50%; bottom: 26px; transform: translateX(-50%); display:flex; flex-direction:column; gap:8px; z-index:200; align-items:center; }
+  .toast {
+    font-family: var(--font-mono); font-size:13px; background: var(--panel-solid);
+    border:1px solid var(--line-strong); color:var(--text); padding:10px 16px; border-radius:11px;
+    box-shadow: var(--shadow); display:flex; align-items:center; gap:9px;
+    animation: toastIn .2s ease, toastOut .3s ease 2.1s forwards;
+  }
+  .toast svg { width:16px; height:16px; color: var(--cyan); }
+  @keyframes toastIn { from{ opacity:0; translate:0 12px } to{ opacity:1; translate:0 0 } }
+  @keyframes toastOut { to{ opacity:0; translate:0 8px } }
+
+  .foot { margin-top: 60px; padding-top: 20px; border-top:1px solid var(--line); color: var(--text-dim); font-size:13px; line-height:1.6; }
+  .foot code { font-family: var(--font-mono); color: var(--cyan); background: rgba(34,211,238,.08); padding:1px 6px; border-radius:5px; }
+
+  @media (max-width: 640px) {
+    .dock-copy, .chat-copy { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doc-head">
+    <span class="kicker">Fáze 16.5 · návrh grafiky (frontend-design)</span>
+    <h1>Interaktivní mapa<br><em>s vlaječkami na stránky</em></h1>
+    <p class="lede">Vrstva klikacích pinů nad obrázkovou mapou z atlasu. Hráč klikne na vlaječku → přejde na stránku lokace nebo hlouběji na jinou mapu. PJ piny tvoří klikáním do mapy. Mapa se dá poslat do chatu a propojit s taktickou mapou. Toto je klikací návrh — vyzkoušej si interakce.</p>
+  </div>
+
+  <!-- ============ 1. VIEWER ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Interaktivní viewer</h2></div>
+    <p class="sec-note">Nahrazuje statickou prohlížečku (dnešní <em>ImageLightbox</em>) u map, které mají piny. Najeď na vlaječku → popisek. Klikni → „naviguje". Zapni <strong>Upravit</strong> (PJ) a klikni do mapy → přidáš pin. Táhni myší = posun, kolečko = zoom.</p>
+
+    <div class="card viewer-shell">
+      <div class="viewer-topbar">
+        <span class="viewer-title"><span class="dot"></span> Mapa světa — Aelorie</span>
+        <span class="spacer"></span>
+        <button class="btn" id="sendChat" title="Poslat mapu do chatu jako klikací kartu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Poslat do chatu
+        </button>
+        <button class="btn icon" id="pjToggle" title="Přepnout pohled PJ / hráč">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span id="pjLabel">Pohled: PJ</span>
+        </button>
+        <button class="btn" id="editToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span id="editLabel">Upravit</span>
+        </button>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="canvas" id="canvas">
+          <!-- zástupná „mapa" -->
+          <div class="map-art">
+            <div class="sea"></div>
+            <svg class="land" viewBox="0 0 1000 560" width="100%" height="100%" preserveAspectRatio="none">
+              <path d="M120,180 C180,120 300,120 360,170 C420,150 470,190 520,180 C560,250 500,300 540,360 C470,420 360,430 300,390 C230,430 150,400 140,330 C90,300 90,220 120,180 Z"/>
+              <path d="M640,120 C720,90 840,120 880,190 C920,250 880,330 800,360 C760,300 700,300 660,250 C630,210 610,160 640,120 Z"/>
+              <path d="M560,400 C620,380 700,410 690,460 C650,500 580,500 550,460 C540,430 540,410 560,400 Z"/>
+            </svg>
+            <svg class="compass" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17"/><path d="M20 6 L24 20 L20 34 L16 20 Z"/></svg>
+            <div class="scanline"></div>
+          </div>
+          <!-- piny se injektují JS -->
+          <div id="pinHost"></div>
+        </div>
+
+        <!-- horní pravý roh: propojení (PJ edit) + reciproční skok na taktickou -->
+        <div class="stage-top-right">
+          <button class="btn" id="linkScene" hidden title="Propojit tuto mapu s taktickou scénou">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+            <span id="linkSceneLabel">Propojit scénu</span>
+          </button>
+          <button class="btn" id="toTactical" hidden title="Otevřít taktickou mapu propojené scény">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 19-9-9 19-2-8-8-2Z"/></svg>
+            Taktická mapa
+          </button>
+        </div>
+
+        <!-- zoom dock -->
+        <div class="zoom-dock">
+          <button class="btn icon" id="zin" title="Přiblížit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="btn icon" id="zout" title="Oddálit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button>
+          <button class="btn icon" id="zreset" title="Vycentrovat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6 2.3L3 8"/><path d="M3 3v5h5"/></svg></button>
+        </div>
+
+        <!-- tooltip -->
+        <div class="tip" id="tip"></div>
+        <!-- čtecí popover pro pin „jen informace" -->
+        <div class="read-pop" id="readPop" hidden></div>
+        <!-- pin editor popover -->
+        <div class="editor" id="editor">
+          <h4><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg> <span id="eTitleText">Nová vlaječka</span></h4>
+          <div class="field">
+            <label>Popisek</label>
+            <input id="fLabel" type="text" placeholder="např. Přístav Mir500" />
+          </div>
+          <div class="field">
+            <label>Informace (volitelné)</label>
+            <textarea id="fInfo" placeholder="Krátký odstavec o místě — vidí ho hráč v bublině pinu."></textarea>
+          </div>
+          <div class="field">
+            <label>Co pin dělá po kliknutí</label>
+            <div class="seg" id="fType">
+              <button data-t="page" class="sel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11H4Z"/><path d="M15 4v5h5"/></svg>Stránka</button>
+              <button data-t="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></svg>Jiná mapa</button>
+              <button data-t="none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5h.01"/></svg>Jen info</button>
+            </div>
+          </div>
+          <div class="field" id="fTargetField">
+            <label id="fTargetLabel">Vybrat stránku</label>
+            <!-- cíl = stránka → PagePicker (search + autocomplete + chip) -->
+            <div class="pagepick" id="pagePick">
+              <div class="pp-inputwrap" id="ppInputWrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                <input id="ppInput" type="text" placeholder="Vyhledej stránku…" autocomplete="off" />
+              </div>
+              <div class="pp-dropdown" id="ppDropdown"></div>
+              <div class="pp-chip" id="ppChip" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11H4Z"/><path d="M15 4v5h5"/></svg>
+                <span class="pp-chip-title" id="ppChipTitle"></span>
+                <span class="pp-chip-type" id="ppChipType"></span>
+                <button type="button" id="ppClear" aria-label="Odstranit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+              </div>
+            </div>
+            <!-- cíl = jiná mapa → jednoduchý select (map je málo) -->
+            <select id="fMapSelect" hidden>
+              <option>Východní pláně</option>
+              <option>Ostrovy jihu</option>
+              <option>Podzemní říše</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Vzhled vlaječky — ikona</label>
+            <div class="icon-grid" id="fIcons"></div>
+            <label style="margin-top:10px">Barva</label>
+            <div class="color-row" id="fColors"></div>
+          </div>
+          <div class="field">
+            <div class="vis-row"><span class="switch" id="fSecret"><span class="knob"></span></span> Tajná vlaječka (jen PJ)</div>
+          </div>
+          <div class="editor-actions">
+            <button class="btn ghost-danger" id="eDelete" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg> Smazat</button>
+            <button class="btn" id="eCancel">Zrušit</button>
+            <button class="btn primary" id="eSave">Přidat</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span class="li"><span class="sw" style="border-color:var(--cyan);color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span> rohový odznáček ↗ = otevře stránku</span>
+        <span class="li"><span class="sw" style="border-color:var(--magenta);color:var(--magenta)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 8 4-8 4-8-4Z"/></svg></span> ▣ = otevře jinou mapu</span>
+        <span class="li"><span class="sw" style="border-color:var(--violet);color:var(--violet);font:700 12px/1 var(--font-mono)">i</span> i = jen informace</span>
+        <span class="li"><span class="sw" style="border-color:var(--amber);color:var(--amber);border-style:dashed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 4v5c0 4-3 6-7 9-4-3-7-5-7-9V7Z"/></svg></span> přerušovaně = tajná (jen PJ)</span>
+        <span class="li"><span class="sw" style="border-color:#7d7d94;color:#7d7d94"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span> šedá = mrtvý cíl</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. TYPOLOGIE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Vzhled a role vlaječky</h2></div>
+    <p class="sec-note"><strong>Vzhled (ikona + barva) si volíš</strong> — tvar zůstává vlaječka, ať hráč hned pozná pin. <strong>Roli</strong> (co pin dělá po kliknutí) nese malý <strong>odznáček v rohu</strong>, ne barva. Barvu tak máš volnou pro vlastní systém (např. modrá = přátelské, červená = nebezpečné).</p>
+    <div class="card">
+      <div class="type-grid">
+        <div class="type">
+          <div class="th"><span class="badge" style="border-color:var(--violet);color:var(--violet);background:color-mix(in srgb,var(--violet) 18%,#12091f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V8l3 2V7l3 2V7l3 2V7l3 2v11Z"/><path d="M10 21v-4h4v4"/></svg></span><h5>Ikona + barva = tvá volba</h5></div>
+          <p>Tématické ikony — přístav, hrad, věž, hora, hvozd, jeskyně, lebka, hvězda… + 6 barev z palety motivu. Pin tak vypráví, co na místě je.</p>
+        </div>
+        <div class="type">
+          <div class="th"><span class="badge" style="border-color:var(--cyan);color:var(--cyan);background:color-mix(in srgb,var(--cyan) 18%,#12091f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span><h5>Rohový odznáček = role</h5></div>
+          <p><strong>↗</strong> otevře stránku · <strong>▣</strong> otevře jinou mapu · <strong>i</strong> jen informace (klik ukáže text, žádný proklik). Hráč z odznáčku pozná, jestli je pin klikací.</p>
+        </div>
+        <div class="type">
+          <div class="th"><span class="badge" style="border-color:var(--amber);color:var(--amber);border-style:dashed;background:color-mix(in srgb,var(--amber) 16%,#12091f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 4v5c0 4-3 6-7 9-4-3-7-5-7-9V7Z"/></svg></span><h5>Tajná vlaječka</h5></div>
+          <p>Přerušovaný okraj. Vidí ji jen PJ nebo vybraní hráči (<code>visibleToPlayerIds</code>). Skryté lokace, spoilery. Nezávislé na barvě i ikoně.</p>
+        </div>
+        <div class="type">
+          <div class="th"><span class="badge" style="border-color:#7d7d94;color:#7d7d94;background:#181528"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span><h5>Mrtvý cíl</h5></div>
+          <p>Šedá, neklikací. Cíl (stránka/mapa) zmizel. Pin nespadne — zešedne + hláška „cíl už neexistuje". PJ ho v editoru přesměruje nebo smaže.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. DOCK — zelený pill ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Propojení s taktickou mapou</h2></div>
+    <p class="sec-note">V pravém horním doku taktické mapy (u pilulky počasí) se <strong>pilulka „Příběhová mapa"</strong> objeví <strong>jen když je propojená mapa aktivní a přístupná</strong> — svítí <span style="color:var(--green)">zeleně</span>, klik ji otevře. Bez propojení pilulka není vidět vůbec (žádné zašedlé místo).</p>
+    <div class="card">
+      <div class="dock-demo">
+        <div class="fake-map">
+          <div class="weather-slot">
+            <button class="pill weather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M6 6 4.5 4.5M19.5 19.5 18 18M18 6l1.5-1.5M4.5 19.5 6 18"/><circle cx="12" cy="12" r="4"/></svg><span class="temp">18°C</span></button>
+            <button class="pill mapjump live" id="mapPill" title="Otevřít příběhovou mapu">
+              <svg class="glow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              Příběhová mapa
+            </button>
+          </div>
+          <div class="lbl">TAKTICKÁ MAPA · scéna „Brány města"</div>
+        </div>
+        <div class="dock-copy">
+          <h5>Chování</h5>
+          <p><span style="color:var(--green)">●</span> <strong>Aktivní:</strong> scéna má propojenou příběhovou mapu a máš k ní přístup → pilulka se zobrazí a svítí zeleně. Klik → otevře viewer.</p>
+          <p><span style="color:#7d7d94">○</span> <strong>Neaktivní:</strong> žádné propojení nebo bez přístupu → pilulka se <strong>vůbec nezobrazí</strong>. Nezabírá místo, neplete hráče.</p>
+          <p><strong>Kde PJ propojí</strong> (1:1, jedna scéna na mapu): ve vieweru tlačítko <strong>„Propojit scénu"</strong> (PJ, i mimo edit mód), nebo předem v <strong>editoru mapy</strong> polem „Propojená scéna" — přímo z atlasu, než hru spustíš.</p>
+          <p style="font-size:12px">Přepni si stav:</p>
+          <div class="state-toggle">
+            <button class="btn" data-pill="on">Aktivní</button>
+            <button class="btn" data-pill="off">Neaktivní</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;padding:18px">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+        <div style="flex:0 0 300px;max-width:100%">
+          <div class="cp-head" style="padding:0 0 10px;letter-spacing:1.5px">Editor mapy v atlasu — přípravna</div>
+          <div class="field"><label>Název</label><input value="Mapa světa — Aelorie" readonly></div>
+          <div class="field"><label>Viditelnost</label><select><option>Veřejná (všichni členové)</option><option>Jen vybraní hráči</option></select></div>
+          <div class="field" style="border:1px solid rgba(52,211,153,.5);border-radius:10px;padding:11px;background:rgba(52,211,153,.06)">
+            <label style="color:var(--green);display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg> Propojená scéna (volitelné)</label>
+            <select><option>Souboj u Bran města</option><option>Přístavní doky v noci</option><option value="">— nepropojeno —</option></select>
+          </div>
+        </div>
+        <div class="dock-copy" style="flex:1">
+          <h5>Flow přípravy (v atlasu)</h5>
+          <p><strong>1)</strong> Založíš mapu v atlasu, nahraješ obrázek, nastavíš viditelnost.</p>
+          <p><strong>2)</strong> Otevřeš viewer, naklikáš vlaječky (stránky / jiné mapy / info).</p>
+          <p><strong>3)</strong> Propojíš se scénou — tady polem „Propojená scéna", nebo tlačítkem ve vieweru. Scéna nemusí existovat hned.</p>
+          <p style="color:var(--text)"><strong>Za hry:</strong> hráč v propojené scéně uvidí zelenou pilulku a otevře přesně tuhle připravenou mapu. Hráč sám nic nepropojuje — jen se „napojí" tím, že je ve scéně.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. CHAT KARTA ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Poslání mapy do chatu</h2></div>
+    <p class="sec-note">Nový typ přílohy „odkaz na mapu". V chatu se zobrazí <strong>karta</strong> (náhled + název + počet pinů). Klik ji otevře ve stejném interaktivním vieweru — piny fungují úplně stejně. Ne živá mapa ve zprávě (výkon v dlouhém chatu).</p>
+    <div class="card">
+      <div class="chat-demo">
+        <div class="chat-stream">
+          <div class="msg">
+            <div class="ava">PJ</div>
+            <div>
+              <div class="bubble">
+                <div class="who">Vypravěč</div>
+                <p>Družina dorazila k pobřeží. Tady je mapa okolí — mrkněte na značky.</p>
+              </div>
+              <div class="map-attach" id="chatCard">
+                <div class="thumb">
+                  <svg class="mini-land" viewBox="0 0 1000 560" width="100%" height="100%" preserveAspectRatio="none"><path d="M120,180 C180,120 300,120 360,170 C420,150 470,190 520,180 C560,250 500,300 540,360 C470,420 360,430 300,390 C230,430 150,400 140,330 C90,300 90,220 120,180 Z"/><path d="M640,120 C720,90 840,120 880,190 C920,250 880,330 800,360 C760,300 700,300 660,250 C630,210 610,160 640,120 Z"/></svg>
+                  <span class="mp" style="left:33%;top:52%;color:var(--cyan)"></span>
+                  <span class="mp" style="left:56%;top:40%;color:var(--magenta)"></span>
+                  <span class="mp" style="left:72%;top:60%;color:var(--cyan)"></span>
+                </div>
+                <div class="meta">
+                  <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                  <span class="txt"><span class="mt">Mapa světa — Aelorie</span><span class="ms">3 vlaječky · klikací</span></span>
+                  <span class="open"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-copy">
+          <h5>Detaily</h5>
+          <p>Cíl vybíráš přes <strong>vyhledávání konverzace</strong> (i mezi desítkami chatů) + volitelná zpráva. Zkus „Poslat do chatu" nahoře ve vieweru.</p>
+          <p>Náhled respektuje viditelnost — tajné piny se ve zmenšenině hráči neukážou.</p>
+          <p>Klik na kartu → viewer v modálu, stejná navigace pin → stránka / mapa.</p>
+          <p style="font-size:12px;color:var(--violet)">↑ zkus na kartu kliknout</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <strong>Poznámky k návrhu.</strong><br>
+    · Barvy jdou z <code>theme tokenů</code> → viewer se sám přebarví pod každým z 8 skinů světa (tady ukázán na ikaros).<br>
+    · Souřadnice pinu = <code>{x, y}</code> 0–1 nad obrázkem → funguje na mobilu i desktopu, přežije výměnu obrázku mapy.<br>
+    · Data pinu: <code>{ id, x, y, label, info, targetType:'page'|'map'|'none', targetSlug|targetMapId, icon, color, secret, visibleToPlayerIds }</code> embedováno do <code>WorldMapEntry.pins[]</code>.<br>
+    · PJ pin <strong>vytvoří</strong> (klik do mapy), <strong>upraví/přesune</strong> (tažení) i <strong>smaže</strong> — editor má režim „Nová" i „Upravit + Smazat".<br>
+    · Cíl „stránka" = sdílený <code>PagePicker</code> (autocomplete). Cíl „jiná mapa" = select. Cíl „jen informace" = bez prokliku, klik ukáže text v bublině.<br>
+    · Zelená pilulka „Příběhová mapa" na taktické mapě se zobrazí <strong>jen když je propojení aktivní a přístupné</strong>.<br>
+    · „Poslat do chatu" = klikací karta (otevře viewer v modálu), respektuje viditelnost pinů (tajné se ve zmenšenině hráči neukážou).<br>
+    · Rozsah: 16.5a piny+editor+viewer · 16.5b pilulka propojení s taktickou · 16.5c chat karta. Stavíme naráz.<br>
+    · Toto je <em>vzhledový návrh</em>, ne finální kód — po schválení píšu <code>spec-16.5.md</code>.
+  </div>
+</div>
+
+<!-- popover: poslat mapu do chatu (výběr konverzace + zpráva) -->
+<div class="chat-pick" id="chatPick" hidden>
+  <div class="cp-head">Poslat mapu do chatu</div>
+  <div class="field" style="margin-bottom:8px">
+    <label>Do které konverzace <span style="color:var(--text-dim);font-family:var(--font-mono);font-size:10px;text-transform:none;letter-spacing:0">— hledej, máš jich hodně</span></label>
+    <div class="pp-inputwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="cpSearch" type="text" placeholder="Hledej konverzaci nebo kanál…" autocomplete="off" />
+    </div>
+  </div>
+  <div class="cp-results" id="cpResults"></div>
+  <div class="field">
+    <label>Zpráva (volitelné)</label>
+    <textarea id="cpMsg" placeholder="Napiš pár slov k mapě…"></textarea>
+  </div>
+  <button class="btn primary" id="cpSend" style="width:100%;justify-content:center" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> <span id="cpSendLabel">Vyber konverzaci</span>
+  </button>
+</div>
+
+<!-- popover: propojit mapu s taktickou scénou (1:1) -->
+<div class="chat-pick" id="scenePick" hidden>
+  <div class="cp-head">Propojená taktická scéna</div>
+  <div class="field">
+    <label>Scéna světa (jen jedna)</label>
+    <select id="spSelect">
+      <option value="">— nepropojeno —</option>
+      <option>Souboj u Bran města</option>
+      <option>Přístavní doky v noci</option>
+      <option>Trůnní sál</option>
+    </select>
+  </div>
+  <button class="btn primary" id="spSave" style="width:100%;justify-content:center">Uložit propojení</button>
+</div>
+
+<div class="toast-host" id="toastHost"></div>
+
+<script>
+(function(){
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('canvas');
+  const pinHost = document.getElementById('pinHost');
+  const tip = document.getElementById('tip');
+  const editor = document.getElementById('editor');
+  const toastHost = document.getElementById('toastHost');
+
+  const readPop = document.getElementById('readPop');
+  let isPJ = true, editMode = false;
+  let pending = null; // {x,y} nového pinu
+
+  function svg(inner){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+inner+'</svg>'; }
+  function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+  // --- tématické ikony vlaječky (volí PJ) ---
+  const PLACE_ICONS = {
+    marker:'<path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+    flag:'<path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/>',
+    city:'<path d="M3 21h18M6 21V7l6-4v18M18 21V11l-6-4"/>',
+    castle:'<path d="M4 21V8l3 2V7l3 2V7l3 2V7l3 2v11Z"/><path d="M10 21v-4h4v4"/>',
+    tower:'<path d="M8 21V6l4-3 4 3v15M6 21h12M10 10h4M10 14h4"/>',
+    anchor:'<circle cx="12" cy="5" r="2"/><path d="M12 7v13M5 13a7 7 0 0 0 14 0M4 13h3M17 13h3"/>',
+    tree:'<path d="M12 2 6 12h3l-4 6h5v4h4v-4h5l-4-6h3Z"/>',
+    mountain:'<path d="m3 20 6-11 3.5 6L16 10l5 10Z"/>',
+    cave:'<path d="M3 21v-8a9 9 0 0 1 18 0v8h-6v-6a3 3 0 0 0-6 0v6Z"/>',
+    skull:'<path d="M12 2a8 8 0 0 0-5 14v3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-3a8 8 0 0 0-5-14Z"/><circle cx="9.5" cy="12" r="1.3"/><circle cx="14.5" cy="12" r="1.3"/>',
+    star:'<path d="m12 3 2.6 5.6L21 9.5l-4.6 4.3L17.6 21 12 17.7 6.4 21l1.2-7.2L3 9.5l6.4-.9Z"/>',
+    gem:'<path d="M6 3h12l3 6-9 12L3 9Z"/><path d="M3 9h18M9 3 6 9l6 12 6-12-3-6"/>',
+  };
+  const COLORS = { cyan:'var(--cyan)', magenta:'var(--magenta)', violet:'var(--violet)', green:'var(--green)', amber:'var(--amber)', red:'var(--danger)' };
+  const TBADGE = { page:'<path d="M7 17 17 7M9 7h8v8"/>', map:'<path d="m12 3 8 4-8 4-8-4Z"/>' };
+  const TYPE_LABEL = { page:'stránka', map:'mapa', none:'jen informace' };
+  const HINT = { page:'klik → otevře stránku', map:'klik → otevře mapu', none:'klik → zobrazí informace' };
+
+  // výchozí piny (x,y v %); vzhled = icon+color (volba PJ), cíl = targetType
+  let pins = [
+    { id:1, x:34, y:52, label:'Přístav Mir500', info:'Rušný obchodní přístav, brána do Východních plání. Kotví tu i pašeráci.', targetType:'page', target:'Přístav Mir500', icon:'anchor', color:'cyan', secret:false },
+    { id:2, x:57, y:40, label:'Východní pláně', info:'Rozlehlý region s vlastní podrobnou mapou.', targetType:'map', target:'Východní pláně', icon:'mountain', color:'magenta', secret:false },
+    { id:3, x:72, y:60, label:'Hlavní město Aeloria', info:'Sídlo královny Isoldy a rady mágů.', targetType:'page', target:'Hlavní město Aeloria', icon:'castle', color:'violet', secret:false },
+    { id:4, x:47, y:72, label:'Skrytá pevnost Vran', info:'Opuštěná pevnost kultu Popela. Hráči zatím netuší, že existuje.', targetType:'page', target:'Pevnost Vran', icon:'skull', color:'amber', secret:true },
+    { id:5, x:20, y:34, label:'Bitva u Bílé řeky', info:'Zde padlo vojsko severu. Jen památník — žádná samostatná stránka.', targetType:'none', target:null, icon:'star', color:'green', secret:false },
+  ];
+  let nextId = 6;
+
+  function toast(msg, icon){
+    const t = document.createElement('div');
+    t.className='toast';
+    t.innerHTML = svg(icon||'<path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/>')+'<span>'+msg+'</span>';
+    toastHost.appendChild(t);
+    setTimeout(()=>t.remove(), 2400);
+  }
+
+  function render(){
+    pinHost.innerHTML='';
+    pins.forEach(p=>{
+      if(p.secret && !isPJ) return; // hráč tajné nevidí
+      const el = document.createElement('div');
+      el.className = 'pin tt-'+p.targetType+(p.secret?' secret':'')+(p.dead?' dead':'');
+      el.style.left = p.x+'%'; el.style.top = p.y+'%';
+      el.style.setProperty('--c', COLORS[p.color]||'var(--cyan)');
+      const badge = p.targetType==='none' ? '<span class="tbadge">i</span>' : '<span class="tbadge">'+svg(TBADGE[p.targetType])+'</span>';
+      el.innerHTML = '<div class="flag">'+svg(PLACE_ICONS[p.icon]||PLACE_ICONS.marker)+badge+'</div><div class="stalk"></div>';
+      el.addEventListener('mouseenter', ()=>{ if(!draggingPin) showTip(p); });
+      el.addEventListener('mouseleave', hideTip);
+      el.addEventListener('mousedown', (e)=>startPinPointer(e,p,el));
+      el.style.cursor = 'pointer';
+      pinHost.appendChild(el);
+    });
+  }
+
+  // --- pin: klik (akce / edit) vs. tažení (přesun v edit módu) ---
+  let draggingPin=null, pinMoved=false, pinStart=null;
+  function startPinPointer(e,p,el){
+    e.stopPropagation();
+    draggingPin={p,el}; pinMoved=false; pinStart={x:e.clientX,y:e.clientY};
+    if(editMode && isPJ){ el.style.cursor='grabbing'; hideTip(); }
+  }
+  window.addEventListener('mousemove',(e)=>{
+    if(!draggingPin) return;
+    const dx=e.clientX-pinStart.x, dy=e.clientY-pinStart.y;
+    if(!pinMoved && Math.hypot(dx,dy)>4) pinMoved=true;
+    if(pinMoved && editMode && isPJ){
+      const r=stage.getBoundingClientRect();
+      const nx=((e.clientX-r.left-tx)/scale)/r.width*100;
+      const ny=((e.clientY-r.top-ty)/scale)/r.height*100;
+      draggingPin.p.x=Math.max(2,Math.min(98,nx)); draggingPin.p.y=Math.max(4,Math.min(96,ny));
+      draggingPin.el.style.left=draggingPin.p.x+'%'; draggingPin.el.style.top=draggingPin.p.y+'%';
+    }
+  });
+  window.addEventListener('mouseup',(e)=>{
+    if(!draggingPin) return;
+    const dp=draggingPin; draggingPin=null;
+    dp.el.style.cursor='pointer';
+    if(pinMoved){ if(editMode&&isPJ) toast('Vlaječka přesunuta','<path d="M5 9 2 12l3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>'); return; }
+    if(editMode && isPJ) openEditorForPin(dp.p, e);
+    else onPinClick(dp.p);
+  });
+
+  function showTip(p){
+    const c = COLORS[p.color]||'var(--cyan)';
+    const meta = (p.secret?'tajná · ':'')+(TYPE_LABEL[p.targetType]||'');
+    tip.innerHTML =
+      '<div class="t-label">'+p.label+'</div>'+
+      '<div class="t-meta"><span class="t-chip" style="--c:'+c+'">'+meta+'</span></div>'+
+      (p.info?'<div class="t-hint" style="border-top:0;padding-top:4px">'+truncate(p.info,80)+'</div>':'')+
+      '<div class="t-hint">'+(p.dead?'cíl už neexistuje':HINT[p.targetType])+'</div>';
+    tip.style.left = p.x+'%'; tip.style.top = p.y+'%';
+    tip.classList.add('show');
+  }
+  function hideTip(){ tip.classList.remove('show'); }
+
+  function onPinClick(p){
+    if(p.dead){ toast('Cíl už neexistuje — PJ ho může přesměrovat.','<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>'); return; }
+    if(p.targetType==='none'){ openRead(p); return; }
+    navigate(p);
+  }
+  function openRead(p){
+    hideTip();
+    readPop.style.setProperty('--c', COLORS[p.color]||'var(--cyan)');
+    readPop.innerHTML =
+      '<div class="rp-head"><span class="rp-ic">'+svg(PLACE_ICONS[p.icon]||PLACE_ICONS.marker)+'</span><span class="rp-title">'+p.label+'</span>'+
+      '<button type="button" class="rp-close" id="rpClose">'+svg('<path d="M18 6 6 18M6 6l12 12"/>')+'</button></div>'+
+      (p.info?'<div class="rp-body">'+p.info+'</div>':'<div class="rp-body" style="opacity:.6">Bez dalších informací.</div>');
+    readPop.style.left=p.x+'%'; readPop.style.top=p.y+'%';
+    readPop.hidden=false;
+    document.getElementById('rpClose').onclick=(e)=>{ e.stopPropagation(); readPop.hidden=true; };
+  }
+  function navigate(p){
+    if(p.targetType==='map') toast('→ otevírám mapu „'+p.target+'"', TBADGE.map);
+    else toast('→ otevírám stránku „'+p.target+'"', '<path d="M4 4h11l5 5v11H4Z"/><path d="M15 4v5h5"/>');
+  }
+
+  // ---- zoom / pan ----
+  let scale=1, tx=0, ty=0, panning=false, sx=0, sy=0;
+  function apply(){ canvas.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')'; }
+  document.getElementById('zin').onclick=()=>{ scale=Math.min(3,scale+0.25); apply(); };
+  document.getElementById('zout').onclick=()=>{ scale=Math.max(1,scale-0.25); if(scale===1){tx=0;ty=0;} apply(); };
+  document.getElementById('zreset').onclick=()=>{ scale=1;tx=0;ty=0; apply(); };
+  stage.addEventListener('wheel',(e)=>{ e.preventDefault(); scale=Math.max(1,Math.min(3,scale+(e.deltaY<0?0.15:-0.15))); if(scale===1){tx=0;ty=0;} apply(); },{passive:false});
+  stage.addEventListener('mousedown',(e)=>{ if(editMode) return; if(e.target.closest('.pin')||e.target.closest('.editor')||e.target.closest('.btn')) return; panning=true; sx=e.clientX-tx; sy=e.clientY-ty; stage.classList.add('panning'); });
+  window.addEventListener('mousemove',(e)=>{ if(!panning) return; tx=e.clientX-sx; ty=e.clientY-sy; apply(); });
+  window.addEventListener('mouseup',()=>{ panning=false; stage.classList.remove('panning'); });
+
+  // ---- PJ / edit toggle ----
+  const pjToggle=document.getElementById('pjToggle'), pjLabel=document.getElementById('pjLabel');
+  const editToggle=document.getElementById('editToggle'), editLabel=document.getElementById('editLabel');
+  pjToggle.onclick=()=>{ isPJ=!isPJ; pjLabel.textContent='Pohled: '+(isPJ?'PJ':'hráč'); if(!isPJ) editMode=false; syncEdit(); editToggle.style.display=isPJ?'':'none'; closeEditor(); render(); };
+  function syncEdit(){ editToggle.classList.toggle('on',editMode); editLabel.textContent=editMode?'Hotovo':'Upravit'; stage.classList.toggle('adding',editMode); updateSceneUI(); }
+  editToggle.onclick=()=>{ if(!isPJ) return; editMode=!editMode; syncEdit(); closeEditor(); };
+
+  // ---- klik do mapy = nový pin ----
+  stage.addEventListener('click',(e)=>{
+    // klik mimo pin / čtecí popover → zavře čtení
+    if(!e.target.closest('.pin') && !e.target.closest('.read-pop')) readPop.hidden=true;
+    if(!editMode || !isPJ) return;
+    if(e.target.closest('.pin')||e.target.closest('.editor')||e.target.closest('.zoom-dock')||e.target.closest('.stage-top-right')) return;
+    const r = stage.getBoundingClientRect();
+    const x = ((e.clientX - r.left - tx)/scale)/r.width*100;
+    const y = ((e.clientY - r.top - ty)/scale)/r.height*100;
+    pending = { x:Math.max(2,Math.min(98,x)), y:Math.max(4,Math.min(96,y)) };
+    openEditor(e.clientX - r.left, e.clientY - r.top);
+  });
+
+  // ---- editor popover ----
+  const fLabel=document.getElementById('fLabel'), fInfo=document.getElementById('fInfo'), fType=document.getElementById('fType'), fTargetLabel=document.getElementById('fTargetLabel'), fTargetField=document.getElementById('fTargetField'), fSecret=document.getElementById('fSecret');
+  const pagePick=document.getElementById('pagePick'), ppInputWrap=document.getElementById('ppInputWrap'), ppInput=document.getElementById('ppInput'), ppDropdown=document.getElementById('ppDropdown'), ppChip=document.getElementById('ppChip'), ppChipTitle=document.getElementById('ppChipTitle'), ppChipType=document.getElementById('ppChipType'), ppClear=document.getElementById('ppClear'), fMapSelect=document.getElementById('fMapSelect');
+  const fIcons=document.getElementById('fIcons'), fColors=document.getElementById('fColors');
+  const eTitleText=document.getElementById('eTitleText'), eSaveBtn=document.getElementById('eSave'), eDelete=document.getElementById('eDelete');
+  let curType='page', curIcon='marker', curColor='cyan', selectedPage=null, editingId=null;
+
+  // výběr vzhledu — ikony
+  const ICON_ORDER=['marker','flag','city','castle','tower','anchor','tree','mountain','cave','skull','star','gem'];
+  fIcons.innerHTML=ICON_ORDER.map(k=>'<button type="button" data-ic="'+k+'"'+(k==='marker'?' class="sel"':'')+'>'+svg(PLACE_ICONS[k])+'</button>').join('');
+  fIcons.querySelectorAll('button').forEach(b=>b.onclick=()=>{ curIcon=b.dataset.ic; fIcons.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b)); });
+  // výběr vzhledu — barvy
+  const COLOR_ORDER=['cyan','magenta','violet','green','amber','red'];
+  fColors.innerHTML=COLOR_ORDER.map(k=>'<button type="button" data-col="'+k+'" style="--sw:'+COLORS[k]+'"'+(k==='cyan'?' class="sel"':'')+'></button>').join('');
+  fColors.querySelectorAll('button').forEach(b=>b.onclick=()=>{ curColor=b.dataset.col; fColors.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b)); });
+  function setSel(host,val,attr){ host.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x.dataset[attr]===val)); }
+
+  // adresář stránek světa (v appce = usePagesDirectory)
+  const PAGES = [
+    { title:'Přístav Mir500', type:'lokace' },
+    { title:'Hlavní město Aeloria', type:'lokace' },
+    { title:'Severní hvozd', type:'lokace' },
+    { title:'Pevnost Vran', type:'lokace' },
+    { title:'Esoterický řád', type:'organizace' },
+    { title:'Královna Isolda', type:'postava' },
+  ];
+  function renderPageDropdown(q){
+    const query=q.trim().toLowerCase();
+    const hits = PAGES.filter(p=>p.title.toLowerCase().includes(query));
+    let html='';
+    if(hits.length===0 && !query){ html='<div class="pp-empty">Začni psát název stránky…</div>'; }
+    else {
+      html = hits.map(p=>'<button type="button" class="pp-option" data-title="'+p.title+'" data-type="'+p.type+'">'+svg('<path d="M4 4h11l5 5v11H4Z"/><path d="M15 4v5h5"/>')+'<span class="po-title">'+p.title+'</span><span class="po-type">'+p.type+'</span></button>').join('');
+      const exact = PAGES.some(p=>p.title.toLowerCase()===query);
+      if(query && !exact){ html += '<button type="button" class="pp-option create" data-title="'+q.trim()+'" data-type="nová">'+svg('<path d="M14 4H6v16h12V8Z"/><path d="M14 4v4h4M12 12v4M10 14h4"/>')+'<span class="po-title">Odkázat na „'+q.trim()+'"</span><span class="po-type">zatím neexistuje</span></button>'; }
+      if(!html) html='<div class="pp-empty">Žádná stránka neodpovídá.</div>';
+    }
+    ppDropdown.innerHTML=html;
+    ppDropdown.querySelectorAll('.pp-option').forEach(b=>b.onclick=()=>pickPage(b.dataset.title,b.dataset.type));
+  }
+  function pickPage(title,type){ selectedPage={title,type}; ppChipTitle.textContent=title; ppChipType.textContent=type; ppChip.hidden=false; ppInputWrap.hidden=true; ppDropdown.classList.remove('show'); }
+  function resetPagePicker(){ selectedPage=null; ppInput.value=''; ppChip.hidden=true; ppInputWrap.hidden=false; ppDropdown.classList.remove('show'); }
+  ppInput.addEventListener('focus',()=>{ renderPageDropdown(ppInput.value); ppDropdown.classList.add('show'); });
+  ppInput.addEventListener('input',()=>{ renderPageDropdown(ppInput.value); ppDropdown.classList.add('show'); });
+  ppClear.onclick=()=>{ resetPagePicker(); ppInput.focus(); };
+
+  function applyType(){
+    fType.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x.dataset.t===curType));
+    if(curType==='none'){ fTargetField.hidden=true; return; }
+    fTargetField.hidden=false;
+    const isMap=curType==='map';
+    fTargetLabel.textContent=isMap?'Vybrat mapu':'Vybrat stránku';
+    pagePick.hidden=isMap; fMapSelect.hidden=!isMap;
+  }
+  fType.querySelectorAll('button').forEach(b=>b.onclick=()=>{ curType=b.dataset.t; applyType(); });
+  fSecret.onclick=()=>fSecret.classList.toggle('on');
+
+  function placeEditor(px,py){
+    const w=280, h=470, r=stage.getBoundingClientRect();
+    let left=Math.min(px+10, r.width-w-8), top=Math.min(py+10, r.height-h-8);
+    left=Math.max(8,left); top=Math.max(8,top);
+    editor.style.left=left+'px'; editor.style.top=top+'px';
+    editor.classList.add('show'); editor.scrollTop=0;
+  }
+  function openEditor(px,py){ // NOVÝ pin (pending nastaven volajícím)
+    editingId=null;
+    fLabel.value=''; fInfo.value=''; curType='page'; curIcon='marker'; curColor='cyan';
+    applyType(); resetPagePicker();
+    setSel(fIcons,'marker','ic'); setSel(fColors,'cyan','col');
+    fSecret.classList.remove('on');
+    eTitleText.textContent='Nová vlaječka'; eSaveBtn.textContent='Přidat'; eDelete.hidden=true;
+    placeEditor(px,py);
+    setTimeout(()=>fLabel.focus(),50);
+  }
+  function openEditorForPin(p,e){ // ÚPRAVA existujícího
+    editingId=p.id; pending=null;
+    fLabel.value=p.label; fInfo.value=p.info||'';
+    curType=p.targetType; curIcon=p.icon||'marker'; curColor=p.color||'cyan';
+    applyType();
+    if(curType==='map'){ if(p.target) fMapSelect.value=p.target; }
+    else if(curType==='page'){ if(p.target) pickPage(p.target,'lokace'); else resetPagePicker(); }
+    setSel(fIcons,curIcon,'ic'); setSel(fColors,curColor,'col');
+    fSecret.classList.toggle('on', !!p.secret);
+    eTitleText.textContent='Upravit vlaječku'; eSaveBtn.textContent='Uložit'; eDelete.hidden=false;
+    const r=stage.getBoundingClientRect(); placeEditor(e.clientX-r.left, e.clientY-r.top);
+  }
+  function closeEditor(){ editor.classList.remove('show'); ppDropdown.classList.remove('show'); pending=null; editingId=null; }
+  document.getElementById('eCancel').onclick=closeEditor;
+  eDelete.onclick=()=>{ if(editingId!=null){ pins=pins.filter(p=>p.id!==editingId); render(); toast('Vlaječka smazána','<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'); } closeEditor(); };
+  eSaveBtn.onclick=()=>{
+    const target = curType==='none' ? null : (curType==='map' ? fMapSelect.value : (selectedPage ? selectedPage.title : (ppInput.value.trim()||'Bez cíle')));
+    const data = { label:fLabel.value.trim()||'Bez názvu', info:fInfo.value.trim(), targetType:curType, target, icon:curIcon, color:curColor, secret:fSecret.classList.contains('on') };
+    if(editingId!=null){ const p=pins.find(p=>p.id===editingId); if(p) Object.assign(p,data); toast('Vlaječka uložena','<path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/>'); }
+    else if(pending){ pins.push(Object.assign({id:nextId++,x:pending.x,y:pending.y},data)); toast('Vlaječka přidána','<path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/>'); }
+    else return;
+    closeEditor(); render();
+  };
+
+  // ---- propojení s taktickou scénou (1:1) + reciproční skok ----
+  const linkSceneBtn=document.getElementById('linkScene'), linkSceneLabel=document.getElementById('linkSceneLabel'), toTacticalBtn=document.getElementById('toTactical');
+  const scenePick=document.getElementById('scenePick'), spSelect=document.getElementById('spSelect'), spSave=document.getElementById('spSave');
+  let linkedScene='Souboj u Bran města'; // WorldMapEntry.linkedSceneId (mock; jen jedna scéna)
+
+  function updateSceneUI(){
+    toTacticalBtn.hidden = !linkedScene;                 // skok jen když je propojeno (v appce navíc: hráč má scénu přístupnou)
+    linkSceneBtn.hidden = !isPJ;                          // propojení = PJ příprava, viditelné vždy (i mimo edit)
+    linkSceneLabel.textContent = linkedScene ? 'Scéna: '+linkedScene : 'Propojit scénu';
+  }
+  function positionPop(el, btn){ const r=btn.getBoundingClientRect(); el.style.top=(r.bottom+6)+'px'; let left=r.right-el.offsetWidth; left=Math.max(8, Math.min(left, window.innerWidth-el.offsetWidth-8)); el.style.left=left+'px'; }
+
+  linkSceneBtn.onclick=(e)=>{ e.stopPropagation(); chatPick.hidden=true; spSelect.value=linkedScene||''; scenePick.hidden=false; positionPop(scenePick, linkSceneBtn); };
+  spSave.onclick=()=>{ linkedScene=spSelect.value; scenePick.hidden=true; updateSceneUI(); toast(linkedScene?('Propojeno se scénou „'+linkedScene+'"'):'Propojení zrušeno','<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7"/>'); };
+  toTacticalBtn.onclick=()=>{ if(linkedScene) toast('→ otevírám taktickou mapu scény „'+linkedScene+'"','<path d="m3 11 19-9-9 19-2-8-8-2Z"/>'); };
+
+  // ---- poslat do chatu (vyhledávací picker konverzace + zpráva) ----
+  const sendChatBtn=document.getElementById('sendChat'), chatPick=document.getElementById('chatPick'), cpSend=document.getElementById('cpSend'), cpSendLabel=document.getElementById('cpSendLabel'), cpSearch=document.getElementById('cpSearch'), cpResults=document.getElementById('cpResults'), cpMsg=document.getElementById('cpMsg');
+  // konverzace uživatele (v appce = jeho ChatChannel napříč kanály); reálně jich mohou být desítky
+  const CONV = [
+    {g:'Družina', c:'Obecné'}, {g:'Družina', c:'Souboj u brány'}, {g:'Družina', c:'Soukromé PJ'}, {g:'Družina', c:'Zákulisí'},
+    {g:'Svět', c:'Tržiště'}, {g:'Svět', c:'Krčma U Draka'}, {g:'Svět', c:'Rada mágů'}, {g:'Svět', c:'Oznámení'},
+    {g:'Frakce', c:'Kult Popela'}, {g:'Frakce', c:'Královská garda'}, {g:'Frakce', c:'Cech zlodějů'},
+    {g:'Soukromé', c:'Aria'}, {g:'Soukromé', c:'Bran'}, {g:'Soukromé', c:'Kaelen'},
+  ];
+  let selectedConv=null;
+  const chIcon='<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/>';
+  const grpIcon='<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/>';
+  const checkIcon='<path d="m5 12 5 5L20 7"/>';
+  function renderConv(q){
+    const query=q.trim().toLowerCase();
+    const hits=CONV.filter(x=>(x.g+' '+x.c).toLowerCase().includes(query));
+    if(hits.length===0){ cpResults.innerHTML='<div class="cp-empty">Nic neodpovídá.</div>'; return; }
+    let html='', lastG=null;
+    hits.forEach(x=>{
+      if(x.g!==lastG){ html+='<div class="cp-group">'+svg(grpIcon)+'Kanál '+x.g+'</div>'; lastG=x.g; }
+      const full=x.g+' › '+x.c; const sel=selectedConv===full?' sel':'';
+      html+='<button type="button" class="cp-item'+sel+'" data-full="'+full+'">'+svg(chIcon)+'<span>'+x.c+'</span><svg class="cp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">'+checkIcon+'</svg></button>';
+    });
+    cpResults.innerHTML=html;
+    cpResults.querySelectorAll('.cp-item').forEach(b=>b.onclick=()=>{ selectedConv=b.dataset.full; renderConv(cpSearch.value); cpSend.disabled=false; cpSendLabel.textContent='Odeslat do: '+selectedConv; });
+  }
+  sendChatBtn.onclick=(e)=>{
+    e.stopPropagation(); scenePick.hidden=true;
+    if(chatPick.hidden){
+      selectedConv=null; cpSearch.value=''; cpMsg.value=''; cpSend.disabled=true; cpSendLabel.textContent='Vyber konverzaci'; renderConv('');
+      chatPick.hidden=false; positionPop(chatPick, sendChatBtn); setTimeout(()=>cpSearch.focus(),30);
+    } else chatPick.hidden=true;
+  };
+  cpSearch.addEventListener('input',()=>renderConv(cpSearch.value));
+  cpSend.onclick=()=>{ if(!selectedConv) return; const msg=cpMsg.value.trim(); chatPick.hidden=true; toast('→ odesláno do „'+selectedConv+'"'+(msg?' se zprávou':' (bez zprávy)'),'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>'); };
+
+  // zavřít popovery na klik mimo
+  document.addEventListener('mousedown',(e)=>{
+    if(!chatPick.hidden && !chatPick.contains(e.target) && !e.target.closest('#sendChat')) chatPick.hidden=true;
+    if(!scenePick.hidden && !scenePick.contains(e.target) && !e.target.closest('#linkScene')) scenePick.hidden=true;
+  });
+
+  // ---- sekce 3: pill přepínač ----
+  const mapPill=document.getElementById('mapPill');
+  document.querySelectorAll('[data-pill]').forEach(b=>b.onclick=()=>{ mapPill.hidden = b.dataset.pill!=='on'; });
+  mapPill.onclick=()=>{ if(mapPill.classList.contains('live')) toast('→ otevírám příběhovou mapu','<path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11Z"/>'); };
+
+  // ---- sekce 4: chat karta ----
+  document.getElementById('chatCard').onclick=()=>toast('→ otevírám mapu ve vieweru (modál)','<path d="M7 17 17 7M9 7h8v8"/>');
+
+  render(); syncEdit();
+})();
+</script>
+</body>
+</html>

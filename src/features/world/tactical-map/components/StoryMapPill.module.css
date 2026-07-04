@@ -1,0 +1,44 @@
+/* 16.5b — pilulka „Příběhová mapa" v pravém horním doku taktické mapy.
+   Zelený glow = propojení aktivní a přístupné. Ladí k pilulce počasí. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent-success) 55%, transparent);
+  background: var(--surface-1);
+  color: color-mix(in srgb, var(--accent-success) 30%, var(--text-strong));
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.pill:hover {
+  border-color: var(--accent-success);
+  transform: translateY(-1px);
+}
+.glow {
+  color: var(--accent-success);
+  filter: drop-shadow(0 0 5px var(--accent-success));
+  animation: storyPulse 2.4s ease-in-out infinite;
+}
+@keyframes storyPulse {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow {
+    animation: none;
+  }
+  .pill:hover {
+    transform: none;
+  }
+}

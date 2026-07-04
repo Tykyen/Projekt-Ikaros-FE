@@ -6,7 +6,7 @@ import {
   Search,
   ChevronRight,
 } from 'lucide-react';
-import { Spinner, Button, ConfirmDialog, ImageLightbox } from '@/shared/ui';
+import { Spinner, Button, ConfirmDialog } from '@/shared/ui';
 import { PrintButton } from '@/features/world/export/print';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMaps } from './api/useWorldMaps';
@@ -14,6 +14,7 @@ import { useWorldMapFolders } from './api/useWorldMapFolders';
 import { useDeleteWorldMap } from './api/useWorldMapMutations';
 import { useDeleteWorldMapFolder } from './api/useWorldMapFolderMutations';
 import { MapCard } from './components/MapCard';
+import { InteractiveMapViewer } from './viewer/InteractiveMapViewer';
 import { MapEditorModal } from './components/MapEditorModal';
 import { FolderCard } from './components/FolderCard';
 import { FolderEditorModal } from './components/FolderEditorModal';
@@ -48,7 +49,7 @@ export default function WorldMapsPage() {
   );
   const [deleteFolderTarget, setDeleteFolderTarget] =
     useState<WorldMapFolder | null>(null);
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [viewerMapId, setViewerMapId] = useState<string | null>(null);
 
   if (loading || mapsLoading || foldersLoading) return <Spinner center />;
 
@@ -80,11 +81,6 @@ export default function WorldMapsPage() {
     crumbs.unshift(cursor);
     cursor = cursor.parentId ? byId.get(cursor.parentId) : undefined;
   }
-
-  const lightboxImages = visibleMaps.map((m) => ({
-    url: m.imageUrl,
-    alt: m.title,
-  }));
 
   async function confirmDeleteMap() {
     if (!deleteMapTarget) return;
@@ -213,13 +209,13 @@ export default function WorldMapsPage() {
           )}
           {visibleMaps.length > 0 && (
             <div className={s.grid}>
-              {visibleMaps.map((m, i) => (
+              {visibleMaps.map((m) => (
                 <MapCard
                   key={m.id}
                   map={m}
                   isPJ={isPJ}
                   editMode={editMode}
-                  onOpen={() => setLightboxIndex(i)}
+                  onOpen={() => setViewerMapId(m.id)}
                   onEdit={() => {
                     setEditingMap(m);
                     setMapEditorOpen(true);
@@ -232,12 +228,11 @@ export default function WorldMapsPage() {
         </>
       )}
 
-      {lightboxIndex !== null && (
-        <ImageLightbox
-          images={lightboxImages}
-          index={lightboxIndex}
-          onClose={() => setLightboxIndex(null)}
-          onIndexChange={setLightboxIndex}
+      {viewerMapId && (
+        <InteractiveMapViewer
+          worldId={worldId}
+          mapId={viewerMapId}
+          onClose={() => setViewerMapId(null)}
         />
       )}
 

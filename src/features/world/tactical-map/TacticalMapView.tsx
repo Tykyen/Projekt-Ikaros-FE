@@ -71,6 +71,7 @@ import { InitiativeBar } from "./components/initiative/InitiativeBar";
 import { MapConnectionBadge } from "./components/MapConnectionBadge";
 import { MapWeatherPanel } from "./components/weather/MapWeatherPanel";
 import { MapWeatherAtmosphere } from "./components/weather/MapWeatherAtmosphere";
+import { StoryMapPill } from "./components/StoryMapPill";
 import { useMapWeather } from "./hooks/useMapWeather";
 import { DiceLogPanel } from "./components/dice/DiceLogPanel";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
@@ -2118,6 +2119,9 @@ export function TacticalMapView(): React.ReactElement {
           clearWeather={weather.clearWeather}
           isMutating={weather.isMutating}
         />
+        {/* 16.5b — příběhová mapa propojená s aktivní scénou (jen když existuje
+            a je přístupná; jinak vrací null). */}
+        <StoryMapPill worldId={worldId} sceneId={scene?.id ?? null} />
         {/* 10.2j — poznámkový blok (pod počasím, ve společném sloupci, aby se
             držel i při rozbaleném panelu počasí). PJ = deník napříč světem,
             hráč = poznámky jeho postavy. Hráč bez postavy → skryto. */}

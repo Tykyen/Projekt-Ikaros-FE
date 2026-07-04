@@ -175,6 +175,52 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
 
 ---
 
+## Interní chat správy platformy (`/admin/chat`) — 20.5
+
+Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organizaci týmu správy. Tři podsystémy pod jedním shellem (konverzace vlevo, obsah uprostřed, úkoly vpravo). Vše pod BE prefixem `admin-chat`, guard `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles(Superadmin, Admin)` na všech třech controllerech (`platform-chat`, `platform-documents`, `admin-tasks`).
+
+- **Kde:** route `admin/chat` (`router.tsx:232`, `loader: requireAuth` + `RoleGuard roles={[Superadmin, Admin]}`). FE `features/admin/chat/pages/AdminChatPage.tsx`. Layout běží ve full-height chat módu (`IkarosLayout.tsx:776` `isAdminChat`).
+- **Kdo (celá stránka):** FE RoleGuard Superadmin+Admin; BE stejné role na každém endpointu. Žádný jiný přístup.
+- **Stav:** 🚧 funkční, čeká deploy + BE restart; dokumenty nad 10 MB blokované (viz níže).
+
+### Konverzace (chat)
+- **Co to je:** vícekanálový interní chat týmu správy. Reuse chatového jádra (`ChatChannel`/`ChatMessage` přes DI tokeny `IChatChannelRepository`/`IChatMessageRepository`, jako global-chat).
+- **Kde:** BE `platform-chat.controller.ts` (`GET/POST /admin-chat/channels`, `/channels/:id/messages`, `PATCH/DELETE /channels/:id`), WS `platform-chat.gateway.ts` (`platform-chat:join/leave`, event `platform-chat:message`). FE `api/useAdminChat.ts`.
+- **Kdo:** čtení/psaní = každý admin (Sa+Admin). **Zakládání / úprava / mazání konverzace = jen Superadmin** (gate na FE tlačítkách + BE). Členství per-konverzace: `accessMode:'all'` (všichni správci) nebo `'members'` + `allowedMemberIds` (vybraní přes checkbox v `ChannelModal.tsx`).
+- **Co jde dělat:** psát zprávy (real-time WS echo + dedupe), zakládat konverzace (Superadmin), určit členy (všichni / vybraní), přejmenovat, smazat (ne seed).
+- **Seed konverzace:** „Hlavní" (`staff-main`, accessMode all) + „Vedení" (`staff-vedeni`) v marker-skupině `__platform_staff__`; seed = jen přejmenování, nelze smazat.
+- **Hranice / co neumí:** žádné soukromé 1:1 (záměr — vytvoří je Superadmin jako `members` konverzaci); bez TTL zpráv; bez příloh v chatu (přílohy řeší samostatný modul Dokumenty).
+- **Zvláštnosti:** WS room `platform-chat:{channelId}` gatuje admin roli i členství; po reconnectu re-join.
+- **Stav:** 🚧 (funkční, čeká BE restart).
+- **Kód:** FE `features/admin/chat/pages/AdminChatPage.tsx`, `api/useAdminChat.ts`, `components/ChannelModal.tsx`; BE `modules/platform-chat/platform-chat.{controller,service,gateway}.ts`.
+
+### Sdílené dokumenty (PDF)
+- **Co to je:** společný sklad PDF dostupný všem adminům (nahrát / číst / stáhnout). Bez AI, jen úložiště.
+- **Kde:** BE `platform-documents.controller.ts` (`GET /admin-chat/documents`, `POST` upload, `GET /:id/view` čtečka, `PATCH/:id` rename, `DELETE/:id`). FE `api/useAdminDocuments.ts`, DocumentsView v `AdminChatPage.tsx`.
+- **Kdo:** čtení + upload = všichni admini; **rename/delete = Superadmin nebo nahravatel** (gate v service). Soubory na Cloudinary `resource_type:'raw'`, folder `platform-docs`.
+- **Co jde dělat:**
+  - **Nahrát PDF** (`POST`, jen `application/pdf` + magic-byte `%PDF` check, `upload_chunked_stream` chunk 6 MB, multer strop 30 MB).
+  - **Otevřít ke čtení** — klik na řádek → BE `view` endpoint stáhne z Cloudinary a přebalí na `Content-Type: application/pdf` + `Content-Disposition: inline` (jinak by Cloudinary raw soubor jen stáhl bez přípony); FE fetch → blob → `window.open`.
+  - **Stáhnout** (ikona ↓) — přes stejný `view` endpoint, blob same-origin → `a.download = název.pdf`.
+  - **Přejmenovat / smazat** (Sa nebo nahravatel).
+- **Hranice / co neumí:**
+  - ⚠️ **Reálný strop 10 MB na soubor** — Cloudinary FREE účet odmítne soubor > 10 MiB (`File size too large, Maximum is 10485760, Upgrade your plan`). `upload_chunked_stream` + multer 30 MB jsou nasazené pro budoucnost, ale account limit chunked NEobejde → soubory nad 10 MB padají na 502. Řešení (odloženo): zmenšit PDF, disk úložiště pro velké, nebo placený Cloudinary plán.
+  - Jen PDF (žádné jiné typy). Bez verzování, bez složek.
+- **Zvláštnosti:** české názvy — multer čte `originalname` jako latin1, překódováno zpět na UTF-8 (`upload.service.ts` `uploadPlatformDocument`). Upload-chyba se od 20.5 vrací s konkrétní Cloudinary hláškou (dřív mlhavé 502) + FE toast.
+- **Stav:** 🚧 (do 10 MB funguje; nad 10 MB blokované Cloudinary free limitem).
+- **Kód:** FE `api/useAdminDocuments.ts`, DocumentsView v `AdminChatPage.tsx`; BE `modules/platform-chat/platform-documents.{controller,service}.ts`, `modules/upload/upload.service.ts:uploadPlatformDocument`.
+
+### Úkoly týmu
+- **Co to je:** TODO seznam per admin, veřejně viditelný mezi všemi adminy (pravý panel, rozevírací per osoba).
+- **Kde:** BE `admin-tasks.controller.ts` (`GET/POST /admin-chat/tasks`, `PATCH/DELETE /:id`, `GET /staff`). FE `api/useAdminTasks.ts`, TasksPanel v `AdminChatPage.tsx`.
+- **Kdo:** vidí všichni admini; **vlastní úkoly edituje každý admin, cizí jen Superadmin** (gate v service). Skupiny podle seznamu správců (`listStaff` → `usersRepo.findByRoles([Superadmin, Admin])`).
+- **Co jde dělat:** přidat úkol, odškrtnout (toggle done), upravit text, smazat — dle oprávnění výše.
+- **Hranice / co neumí:** bez termínů, priorit, přiřazování cizímu adminovi (úkol patří tomu, kdo ho vytvořil, resp. jeho skupině).
+- **Stav:** 🚧 (funkční, čeká BE restart).
+- **Kód:** FE `api/useAdminTasks.ts`, TasksPanel v `AdminChatPage.tsx`; BE `modules/platform-chat/admin-tasks.{controller,service}.ts`.
+
+---
+
 ## Vyhledávání (search modul)
 
 - **Co to je:** vyhledávání stránek v rámci JEDNOHO světa, kombinace dvou providerů.
@@ -282,3 +328,4 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
 12. **`getUsers` in-memory filtr** — `includeDeleted`/`hasPendingDeletion` se filtruje až po vytažení stránky → nekonzistentní paginace. (`admin.service.ts:120`)
 13. **MeiliSearch tichý fail** — bez běžícího Docker MeiliSearchu fulltext vrací prázdno bez tvrdé chyby (jen warning v logu). Provozní past. (`meili-search.service.ts:62`)
 14. ✅ OPRAVENO 2026-06-18 — **Stale komentář** — `article-review.provider.ts:11` tvrdí, že BE enum má „dvojité uu" v `SpravceClanku`; reálně je BE i FE shodně `SpravceClanku`. Komentář je zastaralý.
+15. **Admin-chat dokumenty nad 10 MB (Cloudinary free limit)** — upload PDF > 10 MiB padá na 502 (`File size too large, Maximum is 10485760`). `upload_chunked_stream` + multer 30 MB jsou nasazené, ale account cap chunked neobejde. Odloženo (uživatel: „nech pro budoucnost") — trvalé řešení = disk úložiště pro velké soubory nebo placený Cloudinary plán. (`upload.service.ts:uploadPlatformDocument`, `platform-documents.controller.ts`)

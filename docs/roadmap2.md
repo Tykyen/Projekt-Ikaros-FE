@@ -519,7 +519,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 ### 16.4 → přesunuto na Fázi 22  — [D2 · dopad vysoký · náklad střední]
 > **Přesunuto na úplný konec (2026-07-03):** onboarding nového PJ + demo svět dává smysl teprve po dokončení všeho ostatního — nový uživatel má potkat **hotový** produkt, ne rozestavěnou appku. Plný popis viz **Fáze 23 → 23.1**.
 
-### - [ ] 16.5 Interaktivní mapa s body na stránky — [C1 · dopad vysoký · náklad střední] 🔁
+### - [x] 16.5 Interaktivní mapa s body na stránky — [C1 · dopad vysoký · náklad střední] 🔁 ✅ 2026-07-04 (piny + editor + viewer + propojení scény + chat karta; čeká BE restart)
 **Cíl:** Na obrázek mapy připíchneš body; klik otevře wiki stránku té lokace.
 **Proč:** Spojí geografii s příběhem — dělá svět „živým" (vlajka LegendKeeperu). Máme atlas a 3D vesmír zvlášť, ne klikací piny na 2D mapě.
 **Návrh přípravy:** spec na vrstvu pinů nad atlasem (🔁 `world-maps`), navázání na `Page`, řízení viditelnosti přes AKJ.

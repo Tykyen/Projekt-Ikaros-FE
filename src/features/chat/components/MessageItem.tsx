@@ -18,6 +18,7 @@ import { formatTime, formatChatStamp, formatChatFull } from '../lib/format';
 import { EmojiPickerPopover } from './EmojiPickerPopover';
 import { KebabMenu, type KebabMenuItem } from '@/shared/ui/KebabMenu/KebabMenu';
 import { MessageAttachments } from './MessageAttachments';
+import { MapRefCard } from './MapRefCard';
 import { DiceMessage } from '@/features/world/chat/dice/components/DiceMessage';
 import s from './MessageItem.module.css';
 
@@ -546,6 +547,9 @@ export function MessageItem({
       {message.attachments && message.attachments.length > 0 && (
         <MessageAttachments attachments={message.attachments} />
       )}
+
+      {/* 16.5c — poslaná interaktivní mapa (klikací karta → viewer). */}
+      {message.mapRef && <MapRefCard mapRef={message.mapRef} />}
 
       {/* Emoji reakce (4.3a). */}
       {reactions.length > 0 && (

@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-051.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-052.**
 
 ## Jak je deník členěný
 
@@ -196,3 +196,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-049](proces.md#ch-049--full-bleed-přes-2-konfliktní-grid-třídy--main-spadl-do-úzkého-tracku--2026-07-03) | fe/css | full-bleed přes 2 konfliktní grid třídy (`bodyFull` nepřebilo `bodyNoRight`) + `display:none` sidebar → `main` do úzkého 280px tracku, chat neviditelný; třídy měnící touž vlastnost dělej výlučně | „nic se nezobrazuje" po full-bleed; jen úzký levý sloupec vidět |
 | [✅ ŘEŠENÍ](fe.md#-řešení--205-čtečka-pdf-admin-chatu-be-view-endpoint-přebalí-cloudinary-raw-na-inline-applicationpdf--2026-07-04) | fe+be | 20.5 čtečka PDF: BE proxy `view` přebalí Cloudinary raw na `inline application/pdf` (funguje i pro už nahrané); pasti = `noopener`→null handle + cross-origin `download` se ignoruje | — (BE tsc/eslint/elev + FE tsc-b ✓; živě po deployi) |
 | [CH-050](proces.md#ch-050--cyklil-jsem-na-upload-502-hádáním-příčiny-ač-ji-be-catch--zahazoval--2026-07-04) | proces | cyklil jsem na upload 502 hádáním, ač BE `catch {}` reálnou Cloudinary chybu zahazoval; nejdřív odhal chybu (logError+propagace), pak oprav | ≥3 návrhy příčiny téhož 502 + „zkus a pošli screenshot"; uživatel „už jsme to řešili" |
+| [CH-051](proces.md#ch-051--opravil-jsem-velikostní-502-chunked-uploadem-ač-jde-o-account-limit-cloudinary-chunked-ho-neobejde--2026-07-04) | proces | opravil velikostní 502 chunked uploadem, ač jde o Cloudinary account cap 10 MiB/soubor (chunked neobejde); ověř že fix řeší PŘESNÝ limit z hlášky | „opravím velikost" bez přečtení jakého limitu a na jaké vrstvě; fix nezmění text hlášky |
+| [✅ ŘEŠENÍ](fe.md#-řešení--165-interaktivní-mapa-s-vlaječkami-piny-end-to-end-febe--2026-07-04) | fe+be | 16.5 interaktivní mapa: vrstva pinů nad atlasem (viewer zoom/pan+editor+drag+clustering+panel), cíl page/map/none, tajné piny, propojení scény 1:1 (`linkedSceneId`→zelená pilulka), chat `mapRef`→karta. Pravidla: souřadnice 0..1, převody přes živý getBoundingClientRect, pointer-capture na stage, granulární pin ops + toEntry whitelist, leak-safe strip | — (spec→návrh→kód bez cyklení; BE 18/18+169/169, FE build+9/9 ✓; živě čeká BE restart) |

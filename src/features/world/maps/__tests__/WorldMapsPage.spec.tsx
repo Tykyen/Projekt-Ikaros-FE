@@ -42,6 +42,8 @@ function makeMap(over: Partial<WorldMapEntry> = {}): WorldMapEntry {
     order: 0,
     isPublic: false,
     visibleToPlayerIds: [],
+    pins: [],
+    linkedSceneId: null,
     createdAt: '',
     updatedAt: '',
     ...over,

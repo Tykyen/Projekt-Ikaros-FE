@@ -138,3 +138,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** ≥3 návrhy příčiny téhož 502 + opakované „zkus a pošli screenshot"; uživatel říká „řešili jsme to už".
 
 ---
+
+### CH-051 — Opravil jsem velikostní 502 „chunked" uploadem, ač jde o account limit Cloudinary (chunked ho neobejde) · 2026-07-04
+**Kontext:** Upload PDF 11,5 MB padal na 502. Transparency hláška (CH-050) potvrdila kořen = velikost > 10 MB. Hned jsem nasadil `upload_chunked_stream` + zvedl multer strop na 30 MB.
+**Co jsem udělal špatně:** chunked upload obchází per-REQUEST size limit, ale Cloudinary FREE plán má account-level cap 10 MiB NA SOUBOR („Maximum is 10485760. Upgrade your plan") — ten chunked NEOBEJDE. Opravil jsem správně identifikovaný kořen špatným nástrojem, aniž jsem ověřil, že řeší KONKRÉTNÍ limit z hlášky.
+**Proč to nefungovalo:** 10485760 = 10 MiB je plan-level max asset size, ne request limit; rozdělení přenosu nezmění, že uložený asset je 11,3 MB > cap. Cloudinary hláška sama radí „upgrade plan", ne „chunk".
+**Poučení:** ověř, že navržené řešení řeší PŘESNÝ limit z chybové hlášky, ne obecnou kategorii („velikost"). Ironicky hned po zápisu CH-050 (neopravuj naslepo) jsem opravil naslepo — tentokrát mě zachránila právě ta transparency hláška, kterou CH-050 zavedlo. Přínos: hláška teď zafungovala end-to-end (BE detail + FE toast).
+**Příznak cyklení:** „opravím velikost" bez přečtení, JAKÝ limit a na jaké vrstvě; navržená oprava nezmění text chybové hlášky.
+
+---

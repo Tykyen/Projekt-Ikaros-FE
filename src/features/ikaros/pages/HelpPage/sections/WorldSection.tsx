@@ -318,10 +318,15 @@ export function WorldSection() {
         </Tool>
         <Tool icon={<MapIcon size={16} />} title="Mapy (atlas)" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="info">
           <p>
-            Atlas nahraných obrázkových map (kontinent, město, podzemí…) — mřížka
-            karet, klik otevře mapu na celou obrazovku. Viditelnost řídí PJ u každé
-            mapy (veřejná nebo jen vybraní hráči). PJ má režim Upravit (přidat, upravit,
-            smazat, pořadí).
+            Atlas obrázkových map (kontinent, město, podzemí…) — mřížka karet,
+            klik otevře mapu v interaktivním prohlížeči (zoom, posun). PJ nad mapou
+            tvoří <strong>vlaječky</strong>: klikni do mapy → připni značku s popiskem
+            a cílem — otevře <strong>stránku lokace</strong>, <strong>jinou mapu</strong>{' '}
+            (proklik svět → region → město), nebo ukáže jen <strong>informace</strong>.
+            Hráč na vlaječku klikne a je odveden dál; tajné vlaječky vidí jen PJ nebo
+            vybraní. Mapu lze <strong>propojit s taktickou scénou</strong> (v boji se
+            pak objeví zelená pilulka „Příběhová mapa") a <strong>poslat do chatu</strong>{' '}
+            jako klikací kartu. Viditelnost řídí PJ u každé mapy i vlaječky.
           </p>
         </Tool>
       </HelpAccordion>

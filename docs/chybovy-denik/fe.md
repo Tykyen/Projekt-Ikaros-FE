@@ -1611,3 +1611,18 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** dobře — kořen správně určen až z důkazu (screenshot staženého souboru), ne z chybné „502" hypotézy; obě pasti pochyceny v kódu, ne testerem. Zbývá reálné ověření po deployi OBOU repo + funkce/napoveda.
 
 ---
+
+### ✅ ŘEŠENÍ — 16.5 interaktivní mapa s vlaječkami (piny) end-to-end FE+BE · 2026-07-04
+**Co se postavilo:** Nad obrázkovým atlasem (13.4) vrstva klikacích pinů (cíl page/map/none, ~30 ikon + 6 barev, tajné piny), interaktivní viewer (zoom/pan, editor, tažení, shlukování, panel „Vlaječky"), propojení mapy s taktickou scénou 1:1 (`linkedSceneId` → zelená pilulka `StoryMapPill`), a poslání mapy do chatu (`ChatMessage.mapRef` → `MapRefCard`). Spec `docs/arch/phase-16/spec-16.5.md`.
+**Klíčová rozhodnutí (NEboř je):**
+- **Souřadnice pinu 0..1** (ne px) → responzivní, přežije výměnu obrázku.
+- **Canvas = flex-centrovaný fitovaný box + `aspect-ratio` inline; převody klient↔normalized přes ŽIVÝ `getBoundingClientRect`** (letterbox-safe), ne ruční transform matika. Tooltip/čtecí bublina pozicované z rectu canvasu.
+- **Pointer capture na STAGE, ne na pin** → tažení nespadne, když se pin při clusteringu odmountuje; clustering se během tažení vypíná (pin renderován samostatně).
+- **BE granulární pin ops** (`$push`/`arrayFilters`/`$pull`), ne whole-array PATCH → race-safe i při ~100 pinech. **`toEntry` whitelist mapper MUSÍ mapovat `pins`+`linkedSceneId`** — jinak tichý drop ([[project_map_token_tomapper_whitelist]]).
+- **Leak-safe:** tajné piny + `visibleToPlayerIds` strip v `world-maps.service.stripForPlayer`; reverse lookup scény jen nad už visibility-filtrovaným seznamem map; chat `mapRef` = samostatné pole na zprávě (NE přetěžovat souborový `ChatAttachment`), karta resolvuje z živé mapy (ne snapshot).
+- **Vzhled ≠ cíl:** barvu/ikonu volí PJ, roli nese rohový odznáček (↗/▣/i) — jinak by se volba barvy prala s významem. Reuse sdíleného `PagePicker` (žádná 4. kopie).
+- **lint:colors:** pin paleta = data (ALLOW `/maps/constants/pinAppearance`); chrome bez hex fallbacků (`var(--token, var(--fallback))`).
+**Jak ověřeno:** BE `tsc` + jest (world-maps 18/18, chat 169/169) ✓; FE `tsc -b` + produkční `build` + vitest maps 9/9 + `lint:colors` (moje soubory čisté) + eslint 0 errors ✓. Živě čeká **restart BE** (nová pole) + ruční klik-ověření a `mobil-desktop` uživatelem (browser nespouštím).
+**Zhodnocení:** dobře — spec→návrh(proto HTML)→souhlas→kód bez cyklení; velký rozsah (BE+FE, ~20 souborů) zvládnut po vrstvách s průběžným typecheck/testem po každé vrstvě. Reziduum: živé ověření + restart BE.
+
+---

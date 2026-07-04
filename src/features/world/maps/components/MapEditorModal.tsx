@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Modal, Button } from '@/shared/ui';
 import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/HeroUploadCard';
+import { listMapScenes } from '@/features/world/tactical-map/api/mapApi';
 import {
   useCreateWorldMap,
   useUpdateWorldMap,
@@ -44,6 +46,16 @@ export function MapEditorModal({
   const [folderId, setFolderId] = useState<string | null>(
     editing?.folderId ?? defaultFolderId ?? null,
   );
+  // 16.5b — propojená taktická scéna (1:1). Jen při editaci existující mapy.
+  const [linkedSceneId, setLinkedSceneId] = useState<string | null>(
+    editing?.linkedSceneId ?? null,
+  );
+  const { data: scenes = [] } = useQuery({
+    queryKey: ['map', 'world-scenes', worldId],
+    queryFn: () => listMapScenes(worldId),
+    enabled: open && isEdit && !!worldId,
+    staleTime: 60_000,
+  });
 
   const pending = create.isPending || update.isPending;
   const canSave = title.trim().length > 0 && imageUrl.length > 0;
@@ -63,7 +75,10 @@ export function MapEditorModal({
     };
     try {
       if (isEdit && editing) {
-        await update.mutateAsync({ id: editing.id, patch: payload });
+        await update.mutateAsync({
+          id: editing.id,
+          patch: { ...payload, linkedSceneId },
+        });
         toast.success('Mapa upravena.');
       } else {
         await create.mutateAsync(payload);
@@ -146,6 +161,25 @@ export function MapEditorModal({
             ))}
           </select>
         </label>
+
+        {isEdit && (
+          <label className={s.row}>
+            <span className={s.label}>Propojená scéna (taktická mapa)</span>
+            <select
+              className={s.input}
+              value={linkedSceneId ?? ''}
+              onChange={(e) => setLinkedSceneId(e.target.value || null)}
+              data-native-select
+            >
+              <option value="">— nepropojeno —</option>
+              {scenes.map((sc) => (
+                <option key={sc.id} value={sc.id}>
+                  {sc.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <MapVisibilityField
           worldId={worldId}

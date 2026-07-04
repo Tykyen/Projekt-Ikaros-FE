@@ -20,23 +20,35 @@ Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Ne
 ## 14.1 — Obrázkový atlas „Mapy" (`/mapy`)
 
 ### Atlas map se složkami
-- **Co to je:** Statická galerie obrázkových map světa, organizovaná do vnořeného stromu složek (13.4/13.4b). Není interaktivní — slouží k prohlížení (lightbox).
+- **Co to je:** Galerie obrázkových map světa ve vnořeném stromu složek (13.4/13.4b). Od **16.5 interaktivní**: nad mapou jdou klikací **vlaječky (piny)** na stránky / jiné mapy / info, mapa se dá **propojit s taktickou scénou** a **poslat do chatu** (viz „Interaktivní vlaječky" níže).
 - **Kde:** FE `src/features/world/maps/WorldMapsPage.tsx`. BE `modules/world-maps`.
 - **Kdo:**
   - Čtení: každý člen, ale s **leak-safe visibility filtrem** (viz níže).
-  - Správa (přidat/upravit/smazat mapu i složku, řadit): **PJ** světa (`canManage` = `>= WorldRole.PJ`, NE PomocnyPJ!) nebo global Admin+. FE gate `isPJ` zobrazí tlačítka „Upravit / Složka / Mapa". BE `WorldMapsService.assertCanManage` (`world-maps.service.ts:50`).
+  - Správa (přidat/upravit/smazat mapu i složku, řadit, **vlaječky, propojení scény**): **PomocnyPJ+** světa (`canManage` = `>= WorldRole.PomocnyPJ`, D-NEW-INV-MAPS) nebo global Admin+. FE gate `isPJ` zobrazí edit UI. BE `WorldMapsService.assertCanManage`.
 - **Co jde dělat (vše):**
   - PJ: vytvořit mapu (titulek, popis, `imageUrl`, viditelnost), upravit, smazat, přeřadit (`reorder`).
   - PJ: vytvořit/upravit/smazat/přeřadit složku; vnořovat (parentId), ochrana proti cyklu (`updateFolder` `world-maps.service.ts:238`).
   - Smazání složky **nemaže obsah** — mapy a podsložky se přesunou o úroveň výš (`removeFolder` → `reparentChildren`+`reparentMaps`, `:284`).
   - Navigace přes breadcrumb („Atlas" → složka → podsložka).
   - Hledání napříč celým atlasem (ploché, ignoruje strom; podle titulku + popisu).
-  - Prohlížení mapy v `ImageLightbox` (klik na kartu).
+  - Otevření mapy v **interaktivním vieweru** (`InteractiveMapViewer`, zoom/pan + vrstva pinů) — klik na kartu (nahradil statický lightbox).
 - **Viditelnost (leak-safe):** Každá mapa i složka má `isPublic` + `visibleToPlayerIds`. Hráč vidí mapu, jen když je viditelná **a zároveň** je viditelná **celá cesta složek k rootu** (kaskáda, memoizovaná `visibleFolderIds` `world-maps.service.ts:68`). Hráčská odpověď má `visibleToPlayerIds` vyprázdněné (`:116`) — hráč nezjistí, komu je co viditelné. PJ/Admin dostane vše.
 - **Zvláštnosti:** Orphan blob cleanup — při změně/smazání `imageUrl` se emituje `media.orphaned` (`:169`,`:186`, audit UM-03/UM-05).
-- **Hranice / co NEumí:** Žádné anotace, kreslení, pinning ani propojení s taktickou mapou. Mapy jsou jen obrázky. Nelze hromadný upload. Žádná real-time aktualizace (TanStack Query, ne WS).
+- **Hranice / co NEumí:** Žádné kreslení tvarů / vrstvy / měření (to je taktická mapa). Nelze hromadný upload. Piny/atlas bez real-time sync (TanStack invalidace, ne WS). Živý ukazatel „tady jste v příběhu" = samostatná 17.12.
 - **Stav:** ✅ hotové.
 - **Kód:** FE `maps/WorldMapsPage.tsx`, `maps/types.ts`, `maps/api/*`, `maps/components/{MapCard,FolderCard,MapEditorModal,FolderEditorModal,MapVisibilityField}.tsx`. BE `world-maps/world-maps.controller.ts`, `world-maps.service.ts`.
+
+### Interaktivní vlaječky, propojení scény, chat — 16.5
+
+- **Co to je:** Vrstva klikacích **vlaječek (pinů)** nad obrázkem mapy. Každý pin má popisek, volitelný info-odstavec, **cíl** (`page` → stránka světa přes `PagePicker` · `map` → jiná mapa atlasu · `none` → jen informace) a **vzhled** (~30 ikon + 6 barev). Roli cíle nese rohový odznáček (↗/▣/i), ne barva.
+- **CRUD (PomocnyPJ+, FE `isPJ`):** klik do mapy = nový pin, klik na pin = úprava + smazat, tažení = přesun. BE granulární pin ops (`POST/PATCH/DELETE /world-maps/:worldId/maps/:mapId/pins`, `$push`/`arrayFilters`/`$pull` — race-safe i při ~100 pinech).
+- **Viditelnost pinu:** per pin `isPublic`/`visibleToPlayerIds` (default zdědí z mapy); **tajné piny** hráči nechodí (`stripForPlayer` ve `world-maps.service.ts`). Mrtvý cíl (smazaná/nedostupná mapa) = pin zešedne, neklikací (žádný 403).
+- **Škála ~100 pinů:** shlukování při odzoomu (`clusterPins`) + panel „Vlaječky" (hledání + doskok na pin).
+- **Propojení s taktickou scénou (1:1):** `WorldMapEntry.linkedSceneId`. Nastaví PJ v editoru mapy (pole „Propojená scéna") nebo ve vieweru („Propojit scénu"). Na taktické mapě té scény se objeví **zelená pilulka „Příběhová mapa"** (`StoryMapPill`) — **jen** když je propojení aktivní a přístupné; klik otevře mapu. Reciproční skok viewer → taktická.
+- **Poslat do chatu:** tlačítko ve vieweru → výběr konverzace (hledání) + volitelná zpráva → zpráva s přílohou `mapRef` (`ChatMessage.mapRef`, odkaz ne obrázek). V chatu klikací karta `MapRefCard` → otevře viewer; respektuje viditelnost pinů příjemce.
+- **Stav:** ✅ implementováno (16.5); ⏳ čeká restart BE (nové pole `pins`/`linkedSceneId`/`mapRef`).
+- **Spec:** `docs/arch/phase-16/spec-16.5.md` + návrh `proto-16.5-mapa-piny.html`.
+- **Kód:** FE `maps/viewer/{InteractiveMapViewer,PinLayer,PinMarker,PinEditorPopover,PinListPanel,SceneLinkPopover,SendToChatPopover}.tsx`, `maps/viewer/lib/clusterPins.ts`, `maps/constants/pinAppearance.ts`, `chat/components/MapRefCard.tsx`, `tactical-map/components/StoryMapPill.tsx`. BE `world-maps` (pin CRUD + `linkedSceneId`), `chat` (`mapRef`).
 
 ---
 
