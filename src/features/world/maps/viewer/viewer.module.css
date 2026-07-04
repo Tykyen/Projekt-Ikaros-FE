@@ -5,7 +5,9 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  /* Fullscreen tier — nad theme dekoracemi (9999), jako GalleryLightbox. Na
+     z-1000 (modal tier) ho na taktické mapě překryla vrstva → černo + nereaguje. */
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   background: color-mix(in srgb, var(--surface-0, var(--surface-1)) 88%, transparent);
