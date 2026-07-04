@@ -56,13 +56,13 @@ export function StartSection() {
         <InfoGrid>
           <InfoCard icon={<Eye size={22} />} title="Bez přihlášení" accent="reader">
             Úvodník platformy, veřejné vesmíry, tahle nápověda a podmínky, články a
-            galerie ke čtení. Do <strong>Hospody</strong> můžeš nakouknout i jako
+            galerie ke čtení. Do <strong>Putyky</strong> můžeš nakouknout i jako
             host (po ověření „nejsi robot") — popovídáš si pod přezdívkou anonym.
             Diskuze a vstup do světů vyžadují účet.
           </InfoCard>
           <InfoCard icon={<KeyRound size={22} />} title="Po registraci" accent="success">
             Vlastní profil a postava, vstup do vesmírů i tvorba světa, soukromá
-            pošta a globální chat (Hospoda), pravý panel s administrací a oblíbenými,
+            pošta a globální chat (Putyka), pravý panel s administrací a oblíbenými,
             přepínač motivů uložený k účtu.
           </InfoCard>
         </InfoGrid>
@@ -72,7 +72,7 @@ export function StartSection() {
         <TermGrid
           items={[
             { term: 'Hlavička', desc: 'Logo (na úvodník), přepínač motivů, zvonek (notifikace), Pošta, Profil, Odhlásit. U anonyma Přihlásit / Registrace.' },
-            { term: 'Levý sidebar', desc: 'Navigace, seznam vesmírů a chat. Po přihlášení i Diskuze, Vytvořit svět a Camp; nepřihlášenému se tyhle skryjí (zůstává Úvodník, Nápověda, Články, Galerie, vesmíry a Hospoda).' },
+            { term: 'Levý sidebar', desc: 'Navigace, seznam vesmírů a chat. Po přihlášení i Diskuze, Vytvořit svět a Camp; nepřihlášenému se tyhle skryjí (zůstává Úvodník, Nápověda, Články, Galerie, vesmíry a Putyka).' },
             { term: 'Hlavní panel', desc: 'Obsah aktuální stránky. Nepřihlášenému se na úvodníku navíc ukáže pás ukázek z aplikace.' },
             { term: 'Pravý panel', desc: 'Po přihlášení administrace, moje světy a oblíbené. Bez přihlášení tu najdeš „Začni tady" — tři kroky, jak se zapojit.' },
             { term: 'Zvonek', desc: 'Souhrn zpráv ze všech tvých světů + záložky Události a Ke zpracování.' },
@@ -96,7 +96,7 @@ export function StartSection() {
             { term: 'AKJ', desc: 'Stupeň utajení stránky/záložky. Bez přístupu uvidíš jen zamčenou záložku, ne její obsah.' },
             { term: 'Motiv (theme)', desc: 'Vizuální styl — platforma má vlastní, každý svět taky svůj.' },
             { term: 'Camp', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik.' },
-            { term: 'Hospoda', desc: 'Globální chat pro celou platformu napříč světy. Nakouknout a popovídat si jako host (anonym) můžeš i bez registrace — jen text.' },
+            { term: 'Putyka', desc: 'Globální chat pro celou platformu napříč světy. Nakouknout a popovídat si jako host (anonym) můžeš i bez registrace — jen text.' },
             { term: 'Pavučina', desc: 'Vztahový graf kampaně — kdo koho má rád, frakce, příběhové linky.' },
             { term: 'Taktická mapa', desc: 'Hex-grid plocha pro boj a scény s tokeny, iniciativou a mlhou války.' },
           ]}

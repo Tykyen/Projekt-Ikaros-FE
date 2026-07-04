@@ -23,7 +23,7 @@ export function AnonChatGate() {
     <div className={s.gate}>
       <div className={s.card}>
         <Beer size={40} className={s.icon} aria-hidden="true" />
-        <h2 className={s.title}>Vstup do Hospody jako host</h2>
+        <h2 className={s.title}>Vstup do Putyky jako host</h2>
         <p className={s.lead}>
           Popovídej si s komunitou pod dočasnou přezdívkou — bez registrace.
           Vlastní svět, postavu a poštu získáš až po registraci.

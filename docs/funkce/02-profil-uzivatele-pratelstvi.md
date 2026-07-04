@@ -13,7 +13,7 @@
 - **Co jde dělat (sekce shora dolů):**
   - **Osobní karta (`ProfileHeader`):** read fields — Uživatelské jméno, Jméno (displayName), E-mail (+ badge Ověřeno/Neověřeno + „Poslat znovu" + „Změnit"), Město, Účet založen, Poslední přihlášení, Barva chatu (swatch + hex), Globální motiv, RoleStar (hvězda role). Edit mode: displayName (max 32), Město (max 100), avatar uploader (5 MB, server resize 512). E-mail v edit módu read-only, mění se přes `ChangeEmailModal`.
   - **Něco o mně (`BioSection`):** textarea bio max 1000 znaků (počítadlo).
-  - **Postava v Campu (`CharacterSection`):** globální chat-postava napříč Ikaros chaty (Hospoda + Camp). Pole: Jméno postavy (max 64), Popis (max 1000), Avatar postavy (samostatný slot, 5 MB, resize 256, fallback `being.webp`).
+  - **Postava v Campu (`CharacterSection`):** globální chat-postava napříč Ikaros chaty (Putyka + Camp). Pole: Jméno postavy (max 64), Popis (max 1000), Avatar postavy (samostatný slot, 5 MB, resize 256, fallback `being.webp`).
   - **Přátelé (`FriendsSection`):** kompaktní výpis přijatých přátel (avatar + jméno → klik na veřejný profil), odkaz „Spravovat →" do `/ikaros/uzivatele?tab=pratele`.
   - **Světy (`WorldsSection`), Moje postavy (`MyCharactersSection`), Akce (`ProfileEventsSection`):** dynamické sekce (cross-world membership/postavy/události).
   - **Komunita (`CommunityPlaceholders`):** „Moje diskuze / Moje články / Moje galerie" — STATICKÉ placeholdery „Bude dostupné v dalším updatu (fáze 3)", žádné requesty.

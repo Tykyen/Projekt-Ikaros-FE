@@ -39,7 +39,7 @@ export function AccountSection() {
           platformovou „postavu" — personu, pod kterou se objevíš v chatech a
           komunitě Ikaru. Je nezávislá na herních postavách uvnitř světů.
           V <strong>Camp</strong> pod ní vystupuješ přímo u zpráv (tvé jméno
-          a obrázek postavy); v Hospodě se ukazuje účet.
+          a obrázek postavy); v Putyce se ukazuje účet.
         </p>
       </HelpAccordion>
 
@@ -150,7 +150,7 @@ export function AccountSection() {
             { term: 'Vlastní článek a galerie', desc: 'Schválení, zamítnutí nebo nové hodnocení tvého článku či obrázku.' },
             { term: 'Novinky světa', desc: 'Nová novinka ve světě, jehož jsi členem.' },
             { term: 'Novinky Ikarosu', desc: 'Oznámení a novinky celé platformy.' },
-            { term: 'Hospoda', desc: 'Zprávy v Interdimenzionální hospodě — standardně vypnuto, ať tě každá hláška neruší.' },
+            { term: 'Putyka', desc: 'Zprávy v Dimenzionální Putyce — standardně vypnuto, ať tě každá hláška neruší.' },
           ]}
         />
         <CalloutBox variant="tip">

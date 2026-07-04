@@ -12,7 +12,8 @@ export type NotificationCategory =
   | 'ownContent'
   | 'worldNews'
   | 'ikarosNews'
-  | 'hospoda';
+  | 'hospoda'
+  | 'adminChat';
 
 export const NOTIFICATION_CATEGORY_DEFAULTS: Record<
   NotificationCategory,
@@ -25,6 +26,7 @@ export const NOTIFICATION_CATEGORY_DEFAULTS: Record<
   worldNews: true,
   ikarosNews: true,
   hospoda: false,
+  adminChat: true,
 };
 
 export const PUSH_ENABLED_DEFAULT = true;
@@ -102,8 +104,18 @@ export const NOTIFICATION_GROUPS: NotificationGroupMeta[] = [
     items: [
       {
         key: 'hospoda',
-        title: 'Hospoda',
-        desc: 'Nová zpráva v Interdimenzionální hospodě (globální chat). Standardně vypnuto, aby tě každá zpráva nerušila.',
+        title: 'Putyka',
+        desc: 'Nová zpráva v Dimenzionální Putyce (globální chat). Standardně vypnuto, aby tě každá zpráva nerušila.',
+      },
+    ],
+  },
+  {
+    title: 'Správa platformy',
+    items: [
+      {
+        key: 'adminChat',
+        title: 'Chat správy',
+        desc: 'Nová zpráva v interním chatu správy platformy (jen tým správy).',
       },
     ],
   },

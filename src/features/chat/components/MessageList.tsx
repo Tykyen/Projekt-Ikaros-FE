@@ -22,7 +22,7 @@ interface MessageListProps {
   onReply: (message: ChatMessage) => void;
   /** Toggle emoji reakce (4.3a). */
   onToggleReaction: (messageId: string, emoji: string) => void;
-  /** Text prázdného stavu. Default Hospoda („Hospoda je tichá…"). */
+  /** Text prázdného stavu. Default Putyka („Putyka je tichá…"). */
   emptyText?: string;
   /** 6.1 — skryje reply tlačítka (reply až 6.2). Default true. */
   allowReply?: boolean;
@@ -45,6 +45,8 @@ interface MessageListProps {
   ) => { name: string; avatarUrl: string | null } | null;
   /** 6.2-followup — slug masky → href karty (jen world chat). Viz `MessageItem`. */
   resolveOverrideHref?: (slug: string) => string;
+  /** 20.5 — odznak vedle jména odesílatele (RoleStar v admin chatu). Viz `MessageItem`. */
+  renderSenderBadge?: (message: ChatMessage) => React.ReactNode;
   /** 13.2a — deep-link z notifikačního feedu: po načtení doscrolluj + zvýrazni
    *  tuto zprávu. Pokud není v načteném okně, no-op (jako skok z citace). */
   jumpToMessageId?: string | null;
@@ -79,7 +81,7 @@ export function MessageList({
   onDelete,
   onReply,
   onToggleReaction,
-  emptyText = 'Hospoda je tichá… zatím. 🍺',
+  emptyText = 'Putyka je tichá… zatím. 🍺',
   allowReply = true,
   allowReactions = true,
   renderContent,
@@ -94,6 +96,7 @@ export function MessageList({
   resolveAccountAvatar,
   resolvePjDisplay,
   resolveOverrideHref,
+  renderSenderBadge,
   jumpToMessageId,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -266,6 +269,7 @@ export function MessageList({
             resolvePjDisplay={resolvePjDisplay}
             resolveReplyPjName={resolveReplyPjName}
             resolveOverrideHref={resolveOverrideHref}
+            renderSenderBadge={renderSenderBadge}
           />
         );
       })}

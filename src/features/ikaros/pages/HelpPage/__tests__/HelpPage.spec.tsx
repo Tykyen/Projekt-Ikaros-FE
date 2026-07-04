@@ -50,7 +50,7 @@ describe('HelpPage', () => {
     renderHelp();
     fireEvent.click(screen.getByRole('tab', { name: 'Platforma' }));
     expect(screen.getByTestId('probe-search').textContent).toBe('?sekce=platforma');
-    expect(screen.getByText(/Hospoda \(globální chat\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Putyka \(globální chat\)/)).toBeInTheDocument();
   });
 
   it('klik na „Svět" → URL ?sekce=svet + taktická mapa', () => {

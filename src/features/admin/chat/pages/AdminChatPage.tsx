@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,8 +9,6 @@ import {
   MessageSquare,
   Search,
   MoreHorizontal,
-  Paperclip,
-  Send,
   Plus,
   ChevronDown,
   FileText,
@@ -24,12 +22,20 @@ import { toast } from 'sonner';
 import { apiClient, parseApiError } from '@/shared/api';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
+import { RoleStar } from '@/shared/ui';
 import type { ChatMessage } from '@/features/chat/lib/types';
+import { MessageList } from '@/features/chat/components/MessageList';
+import { TypingIndicator } from '@/features/chat/components/TypingIndicator';
+import { toChatItems } from '@/features/chat/lib/chatItems';
+import { useSocket } from '@/features/chat/api/useSocket';
+import { AdminChatComposer } from '../components/AdminChatComposer';
 import {
   useAdminChatChannels,
   useAdminChatMessages,
   useAdminChatRealtime,
   useSendAdminMessage,
+  useDeleteAdminMessage,
+  useUploadAdminAttachment,
   adminChatKeys,
 } from '../api/useAdminChat';
 import { ChannelModal } from '../components/ChannelModal';
@@ -57,12 +63,6 @@ function ConvIcon({ type, size }: { type: string; size: number }) {
   return <Icon size={size} aria-hidden />;
 }
 
-function fmtTime(iso: string | Date): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
-}
-
 const AVATAR_PALETTE = [
   '#e0a94a',
   '#5f86d8',
@@ -87,9 +87,22 @@ export default function AdminChatPage() {
   const qc = useQueryClient();
 
   const { data: channels } = useAdminChatChannels();
+  // Avatar z osobní karty: nové zprávy nesou `senderAvatarUrl` (BE), historické
+  // dopočítáme ze seznamu správců podle senderId (obdoba resolveAccountAvatar).
+  const { data: staff } = useAdminStaff();
+  const staffById = useMemo(
+    () => new Map((staff ?? []).map((m) => [m.id, m])),
+    [staff],
+  );
+  // userId → username pro `MessageItem` (recovery ObjectID senderName).
+  const usersById = useMemo(
+    () => new Map((staff ?? []).map((m) => [m.id, m.username])),
+    [staff],
+  );
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [view, setView] = useState<'chat' | 'docs'>('chat');
-  const [messageText, setMessageText] = useState('');
+  const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [surfaceColor, setSurfaceColor] = useState('#12151d');
 
   useEffect(() => {
     if (!activeConvId && channels && channels.length > 0) {
@@ -101,28 +114,60 @@ export default function AdminChatPage() {
   const { data: messages } = useAdminChatMessages(
     view === 'chat' ? activeConvId : null,
   );
-  useAdminChatRealtime(activeConvId);
+  const { typingNames } = useAdminChatRealtime(activeConvId);
+  const socket = useSocket();
   const sendMut = useSendAdminMessage(activeConvId ?? '');
+  const deleteMut = useDeleteAdminMessage(activeConvId ?? '');
+  const uploadMut = useUploadAdminAttachment(activeConvId ?? '');
   const [channelModal, setChannelModal] = useState<{
     open: boolean;
     channel: AdminChatChannel | null;
   }>({ open: false, channel: null });
 
-  const msgsRef = useRef<HTMLDivElement>(null);
+  const items = useMemo(() => toChatItems(messages ?? []), [messages]);
+
+  // Barva pozadí panelu pro kontrast guard textu zpráv (čteno z DOM po mountu).
+  const centerRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    const el = msgsRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [messages]);
+    if (!centerRef.current) return;
+    const bg = getComputedStyle(centerRef.current).backgroundColor;
+    if (bg) setSurfaceColor(bg);
+  }, []);
+
+  const resolveAccountAvatar = useCallback(
+    (senderId: string) => staffById.get(senderId)?.avatarUrl,
+    [staffById],
+  );
+
+  // RoleStar vedle jména odesílatele (dle globální role z members). Aditivní
+  // prop `MessageItem` — world/global chat ho nepředává.
+  const renderSenderBadge = useCallback(
+    (m: ChatMessage) => {
+      const sm = staffById.get(m.senderId);
+      return sm ? <RoleStar role={sm.role as UserRole} size="sm" /> : null;
+    },
+    [staffById],
+  );
+
+  const emitTyping = useCallback(
+    (isTyping: boolean) => {
+      if (!activeConvId) return;
+      socket.emit('platform-chat:typing', { channelId: activeConvId, isTyping });
+    },
+    [socket, activeConvId],
+  );
 
   const openChat = () => {
     setView('chat');
   };
 
-  const handleSend = () => {
-    const text = messageText.trim();
-    if (!text || !activeConvId) return;
-    setMessageText('');
-    sendMut.mutate(text, {
+  const handleSend = (payload: {
+    content?: string;
+    attachments?: ChatMessage['attachments'];
+    replyToId?: string;
+  }) => {
+    if (!activeConvId) return;
+    sendMut.mutate(payload, {
       onSuccess: (msg) => {
         qc.setQueryData<ChatMessage[]>(
           adminChatKeys.messages(activeConvId),
@@ -169,6 +214,8 @@ export default function AdminChatPage() {
                   type="button"
                   className={active ? `${s.navitem} ${s.navactive}` : s.navitem}
                   onClick={() => {
+                    // Přepnutí konverzace ruší rozepsanou odpověď (patřila jiné).
+                    if (c.id !== activeConvId) setReplyTo(null);
                     setActiveConvId(c.id);
                     openChat();
                   }}
@@ -194,7 +241,7 @@ export default function AdminChatPage() {
         </aside>
 
         {/* STŘED — chat / dokumenty */}
-        <section className={s.center}>
+        <section className={s.center} ref={centerRef}>
           {view === 'chat' ? (
             <div className={s.chat}>
               <div className={s.chhead}>
@@ -232,68 +279,39 @@ export default function AdminChatPage() {
                 )}
               </div>
 
-              <div className={s.msgs} ref={msgsRef}>
-                {(messages ?? []).map((m) => (
-                  <div key={m.id} className={s.msg}>
-                    <span
-                      className={s.mav}
-                      style={{ background: colorFromId(m.senderId) }}
-                    >
-                      {(m.senderName?.[0] ?? '?').toUpperCase()}
-                    </span>
-                    <div className={s.mbody}>
-                      <div className={s.mtop}>
-                        <span className={s.mname}>{m.senderName}</span>
-                        <span className={s.mtime}>{fmtTime(m.createdAt)}</span>
-                      </div>
-                      <div className={s.mtext}>{m.content}</div>
-                    </div>
-                  </div>
-                ))}
-                {messages && messages.length === 0 && (
-                  <div className={s.emptyMsg}>
-                    Zatím žádné zprávy — napiš první.
-                  </div>
-                )}
+              <MessageList
+                items={items}
+                currentUserId={user?.id ?? ''}
+                surfaceColor={surfaceColor}
+                canDelete={isSuperadmin}
+                usersById={usersById}
+                allowReactions={false}
+                onDelete={(id) => deleteMut.mutate(id)}
+                onReply={setReplyTo}
+                onToggleReaction={() => {}}
+                resolveAccountAvatar={resolveAccountAvatar}
+                renderSenderBadge={renderSenderBadge}
+                emptyText="Zatím žádné zprávy — napiš první."
+              />
+
+              <div className={s.typingRow}>
+                <TypingIndicator names={typingNames} />
               </div>
 
-              <form
-                className={s.composer}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSend();
-                }}
-              >
-                <div className={s.cbox}>
-                  <button
-                    type="button"
-                    className={s.iconbtn}
-                    title="Přiložit PDF (připravuje se)"
-                    disabled
-                  >
-                    <Paperclip size={16} aria-hidden />
-                  </button>
-                  <input
-                    className={s.input}
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder={
-                      activeConv
-                        ? `Napiš zprávu do „${activeConv.name}"…`
-                        : 'Vyber konverzaci…'
-                    }
-                    disabled={!activeConvId}
-                  />
-                  <button
-                    type="submit"
-                    className={s.sendbtn}
-                    title="Odeslat"
-                    disabled={!activeConvId || !messageText.trim()}
-                  >
-                    <Send size={16} aria-hidden />
-                  </button>
-                </div>
-              </form>
+              <AdminChatComposer
+                disabled={!activeConvId}
+                replyTo={replyTo}
+                onCancelReply={() => setReplyTo(null)}
+                onUploadAttachment={(f) => uploadMut.mutateAsync(f)}
+                onSend={handleSend}
+                onTypingStart={() => emitTyping(true)}
+                onTypingStop={() => emitTyping(false)}
+                placeholder={
+                  activeConv
+                    ? `Napiš zprávu do „${activeConv.name}"…`
+                    : 'Vyber konverzaci…'
+                }
+              />
             </div>
           ) : (
             <DocumentsView
@@ -355,11 +373,15 @@ function TasksPanel({
         ? staff.map((m) => ({
             ownerId: m.id,
             ownerName: m.username,
+            avatarUrl: m.avatarUrl as string | undefined,
+            role: m.role as UserRole | undefined,
             tasks: byOwner.get(m.id) ?? [],
           }))
         : Array.from(byOwner.entries()).map(([id, ts]) => ({
             ownerId: id,
             ownerName: ts[0]?.ownerName ?? '?',
+            avatarUrl: undefined as string | undefined,
+            role: undefined as UserRole | undefined,
             tasks: ts,
           }));
     members.sort((a, b) => {
@@ -415,16 +437,26 @@ function TasksPanel({
                 className={s.phead}
                 onClick={() => togglePerson(g.ownerId)}
               >
-                <span
-                  className={s.pav}
-                  style={{ background: colorFromId(g.ownerId) }}
-                >
-                  {(g.ownerName[0] ?? '?').toUpperCase()}
-                </span>
+                {g.avatarUrl ? (
+                  <img
+                    className={s.pav}
+                    src={g.avatarUrl}
+                    alt={g.ownerName}
+                    style={{ objectFit: 'cover' }}
+                  />
+                ) : (
+                  <span
+                    className={s.pav}
+                    style={{ background: colorFromId(g.ownerId) }}
+                  >
+                    {(g.ownerName[0] ?? '?').toUpperCase()}
+                  </span>
+                )}
                 <span className={s.pname}>
                   {g.ownerName}
                   {isMe && <span className={s.pme}> · ty</span>}
                 </span>
+                {g.role != null && <RoleStar role={g.role} size="sm" />}
                 <span className={s.pcount}>
                   {doneCount}/{g.tasks.length}
                 </span>

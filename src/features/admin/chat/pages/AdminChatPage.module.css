@@ -46,7 +46,10 @@
   border-left: 1px solid var(--frame-border);
 }
 .center {
-  background: var(--surface-2);
+  /* Vyšší krytí než --surface-2 (jen 45 %) — dlouhý text zpráv na
+     poloprůhledném pozadí splýval s obrázkem motivu. --surface-1 (72 %)
+     drží čitelnost, zůstává theme-token (glass efekt motivu zachován). */
+  background: var(--surface-1);
 }
 
 .colhead {
@@ -375,6 +378,16 @@
   place-items: center;
   font-size: 10px;
   font-weight: 700;
+}
+
+/* Typing indikátor — mezi výpisem a composerem (skrytý, když nikdo nepíše). */
+.typingRow {
+  padding: 2px 18px;
+  min-height: 0;
+}
+.typingRow:empty {
+  display: none;
+  padding: 0;
 }
 
 /* ── Composer ──────────────────────────────────────────────────────────── */

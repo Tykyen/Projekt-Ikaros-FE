@@ -33,7 +33,7 @@ export const HELP_MEDIA = {
   // ── Platforma ───────────────────────────────────────────────────────
   'platforma.hospoda': {
     src: undefined,
-    alt: 'Hospoda — globální chat',
+    alt: 'Putyka — globální chat',
     caption: 'Globální chat: zprávy, přítomní a šepot',
   },
   'platforma.profil': {

@@ -273,7 +273,7 @@ export function ChatInput({
           onKeyDown={(e) => {
             if (e.key === 'Enter') void send();
           }}
-          placeholder={isWhisper ? 'Šeptaná zpráva…' : 'Napiš do hospody…'}
+          placeholder={isWhisper ? 'Šeptaná zpráva…' : 'Napiš do putyky…'}
           maxLength={4000}
           disabled={disabled}
         />

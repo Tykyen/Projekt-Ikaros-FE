@@ -1,0 +1,241 @@
+/* 20.5 — composer interního chatu správy. Tvary z admin chatu, barvy z
+   motiv-tokenů. Generické jádro (bez world-specifik). */
+
+.composer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px 16px;
+  border-top: 1px solid var(--frame-border);
+}
+
+/* ── Reply card ────────────────────────────────────────────────────────── */
+.replyCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border-left: 3px solid var(--theme-accent, var(--accent));
+  background: var(--surface-2);
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+.replyIcon {
+  color: var(--theme-accent, var(--accent));
+  flex: none;
+}
+.replyName {
+  font-weight: 600;
+  color: var(--theme-accent, var(--accent));
+  flex: none;
+}
+.replyExcerpt {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.replyCancel {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 6px;
+  display: inline-flex;
+  flex: none;
+}
+.replyCancel:hover {
+  color: var(--text);
+}
+
+/* ── Attach preview lišta ──────────────────────────────────────────────── */
+.attachBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.attachItem {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--surface-3);
+  border: 1px solid var(--frame-border);
+}
+.attachThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.attachDoc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  gap: 2px;
+  color: var(--text-muted);
+}
+.attachDocName {
+  font-size: 9px;
+  text-align: center;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.1;
+}
+.attachRemove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 17px;
+  height: 17px;
+  border: none;
+  border-radius: 50%;
+  background: rgb(var(--black-rgb, 0 0 0) / 0.6);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.attachLimit {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.fileInput {
+  display: none;
+}
+
+/* ── Psací box (textarea + lišta akcí) ─────────────────────────────────── */
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 14px;
+  padding: 8px 10px 8px;
+}
+.box:focus-within {
+  border-color: var(--theme-accent, var(--accent));
+}
+.boxDisabled {
+  opacity: 0.7;
+}
+
+.input {
+  width: 100%;
+  min-height: 24px;
+  max-height: 148px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 4px 2px;
+}
+.input::placeholder {
+  color: var(--text-muted);
+}
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stampWrap {
+  position: relative;
+  display: inline-flex;
+}
+.stamp {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex: none;
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+.stamp:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--frame-border);
+}
+.stampActive {
+  color: var(--theme-accent, var(--accent));
+  border-color: var(--theme-accent, var(--accent));
+}
+.stamp:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.send {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: none;
+  background: var(--theme-accent, var(--accent));
+  color: var(--text-on-accent, #0b1526);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: none;
+  transition:
+    filter 120ms ease,
+    opacity 120ms ease;
+}
+.send:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Mobil — větší font (iOS auto-zoom < 16px) + dostupná tlačítka ─────── */
+@media (max-width: 768px) {
+  .composer {
+    padding: 12px 14px 14px;
+  }
+  .input {
+    font-size: 16px;
+  }
+  .send {
+    font-size: 15px;
+    padding: 9px 16px;
+  }
+}

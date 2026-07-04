@@ -102,6 +102,12 @@ interface MessageItemProps {
    * Globální chat resolver nepředá → jméno zůstává prostý text.
    */
   resolveOverrideHref?: (slug: string) => string;
+  /**
+   * 20.5 — volitelný odznak vedle jména odesílatele (např. `RoleStar` dle
+   * globální role v admin chatu). Aditivní: world/global chat ho nepředají →
+   * nic se nevykreslí, žádná regrese.
+   */
+  renderSenderBadge?: (message: ChatMessage) => React.ReactNode;
 }
 
 /** Jedna položka výpisu chatu — veřejná zpráva / whisper / smazaná zpráva. */
@@ -134,6 +140,7 @@ export function MessageItem({
   resolvePjDisplay,
   resolveReplyPjName,
   resolveOverrideHref,
+  renderSenderBadge,
 }: MessageItemProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const reactionBtnRef = useRef<HTMLButtonElement>(null);
@@ -237,6 +244,7 @@ export function MessageItem({
           {!grouped && (
             <div className={s.meta}>
               <span className={s.name}>{displayName}</span>
+              {renderSenderBadge?.(message)}
               {stamp && <time className={s.time} title={stampFull}>{stamp}</time>}
             </div>
           )}
@@ -372,6 +380,7 @@ export function MessageItem({
               displayName
             )}
           </span>
+          {renderSenderBadge?.(message)}
           {isNpc && (
             <span
               className={s.npcTag}

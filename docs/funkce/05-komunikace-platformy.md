@@ -1,21 +1,21 @@
 # 05 — Komunikace platformy
 
-Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Hospoda + Camp I.–III.), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
+Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Putyka + Camp I.–III.), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
 
 > Pozn.: **Chat uvnitř světa** (`/svet/:slug/chat`) je samostatná funkce a patří do kapitoly o světech. Custom obrázkové emoty jsou tam (viz sekce „Emoty" níže).
 
 ---
 
-### Globální chat — Hospoda
-- **Co to je:** Veřejná real-time klábosna platformy („Interdimenzionální hospoda") — jeden sdílený kanál pro všechny napříč světy. **15.8 — i pro nepřihlášené (host).**
-- **Kde:** route `/chat` (`ChatPage` → `ChatRoom room="hospoda"`). Levý panel: sekce „Chat", položka „Hospoda" (viditelná i anonimovi z 15.7).
+### Globální chat — Putyka
+- **Co to je:** Veřejná real-time klábosna platformy („Dimenzionální Putyka") — jeden sdílený kanál pro všechny napříč světy. **15.8 — i pro nepřihlášené (host).**
+- **Kde:** route `/chat` (`ChatPage` → `ChatRoom room="hospoda"`). Levý panel: sekce „Chat", položka „Putyka" (viditelná i anonimovi z 15.7). Pozn.: interní klíč místnosti + WS eventy zůstávají `hospoda` (kontrakt s BE, přejmenoval se jen zobrazený název).
 - **Kdo:**
   - **FE:** `/chat` je **veřejné** (15.8 — zrušen `requireAuth`). Nepřihlášený bez host session vidí captcha bránu `AnonChatGate`; po ověření má guest session a vejde v „host módu".
-  - **BE:** `GlobalChatController` za `GuestOrMemberGuard` (`global-chat.controller.ts`) — pustí člena (plný member gate) i hosta (guest JWT, role `Guest`). **Host smí jen Hospodu** (`assertGuestScope` → Camp 403), **jen text** (upload → 403). Mazání = `AdminGuard`. Ban hosta = `POST /global-chat/anon-ban` (Admin, váže na anon-id).
+  - **BE:** `GlobalChatController` za `GuestOrMemberGuard` (`global-chat.controller.ts`) — pustí člena (plný member gate) i hosta (guest JWT, role `Guest`). **Host smí jen Putyku** (`assertGuestScope` → Camp 403), **jen text** (upload → 403). Mazání = `AdminGuard`. Ban hosta = `POST /global-chat/anon-ban` (Admin, váže na anon-id).
 - **Host (anonym) — 15.8:**
   - **Vstup:** captcha (Turnstile) → `POST /auth/anon-session` → guest JWT (role `Guest`, TTL `ANON_SESSION_TTL` = 14 d) + náhodné jméno `anonym{1000–9999}`. Session v `localStorage: ikaros.anonToken` (oddělená od členské), drží přes reload/reconnect. Po registraci/přihlášení se zahodí.
-  - **Smí:** číst Hospodu + psát **text**, vidět přítomné. Zpráva nese odznak „host" (`isAnonymous`), bez avataru.
-  - **Nesmí:** upload příloh, šepot, mazání, Camp, cokoli mimo Hospodu (guest token scope + sentinel `UserRole.Guest = 99` nikdy neprojde gating).
+  - **Smí:** číst Putyku + psát **text**, vidět přítomné. Zpráva nese odznak „host" (`isAnonymous`), bez avataru.
+  - **Nesmí:** upload příloh, šepot, mazání, Camp, cokoli mimo Putyku (guest token scope + sentinel `UserRole.Guest = 99` nikdy neprojde gating).
   - **Moderace:** Admin zabanuje `anon-id` (kolekce `anon_bans`) → 403 při psaní; **rate-limit 10 zpráv/min** per anon-id (in-memory, jen host).
 - **Co jde dělat:**
   - Psát zprávy (text + barva `chatColor` z profilu), **odpovídat** na zprávu (reply preview), **reagovat** emoji reakcí, **nahrávat přílohy** (max **10 MB**).
@@ -27,7 +27,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - Žádné trvalé vlákno/archiv, žádné kategorie. Mazání jen Admin+ (uživatel nesmaže ani vlastní).
 - **Zvláštnosti:**
   - **Identita autora zprávy = účet** (`username` + `avatarUrl`). Od **4.2e** se ukládá jako **snapshot** při odeslání (`resolveSenderIdentity` → `senderName`/`senderAvatarUrl`, `global-chat.service.ts`) — zpráva si jméno+avatar pamatuje natrvalo. FE má navíc fallback resolver z presence pro zprávy bez snapshotu (`roomAvatarFor`). Dřív zprávy ukazovaly jen iniciálu (avatar se neplnil).
-  - **15.9 — push jen z Hospody a opt-in:** odeslaná zpráva spustí web push **jen v Hospodě** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda')` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Hospodu výslovně zapnul v profilu. Camp push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Campu — opraveno). Payload bez `url` → bublina otevře jen `/`. (`global-chat.service.ts` `sendMessage`.)
+  - **15.9 — push jen z Putyky a opt-in:** odeslaná zpráva spustí web push **jen v Putyce** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda')` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Putyku výslovně zapnul v profilu. Camp push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Campu — opraveno). Payload bez `url` → bublina otevře jen `/`. (`global-chat.service.ts` `sendMessage`.)
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
@@ -40,8 +40,8 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **BE:** stejný controller; `RoomKey` = `hospoda | camp-1 | camp-2 | camp-3` (`global-chat.service.ts:24`).
   - **Změna prostředí** scény = jen role s platformovou funkcí: `Superadmin`, `Admin`, `SpravceClanku`, `SpravceGalerie`, `SpravceDiskuzi` (`ROOM_STAFF_ROLES` / `RolesGuard`, `global-chat.controller.ts:46`; FE `STAFF_ROLES` v `CampPage.tsx:22`).
 - **Co jde dělat:**
-  - Vše jako v Hospodě (psát, reply, reakce, přílohy, šepty, presence).
-  - **Vystupovat za postavu** — na rozdíl od Hospody nese zpráva i panel přítomných **jméno + avatar postavy** z profilu („Postava v Campu": `characterName`/`characterAvatarUrl`), ne účet. Kdo postavu nevyplnil → fallback na účet.
+  - Vše jako v Putyce (psát, reply, reakce, přílohy, šepty, presence).
+  - **Vystupovat za postavu** — na rozdíl od Putyky nese zpráva i panel přítomných **jméno + avatar postavy** z profilu („Postava v Campu": `characterName`/`characterAvatarUrl`), ne účet. Kdo postavu nevyplnil → fallback na účet.
   - Staff: vybrat **styl** (např. `fantasy`) + **lokaci** (place) — `PUT /global-chat/rooms/:room/environment`; změna se přes WS `chat:room:environment` rozešle všem v místnosti a nastaví pozadí + popis scény (`CampHeader`/`CampDescription`).
 - **Hranice / co neumí:** prostředí je **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných stylů/míst (`campPlaces` na FE). Postava je **globální** (jedna napříč všemi Campy, z profilu) — ne per-místnost. **Jméno** ve zprávě se opraví až novým snapshotem; staré zprávy (před 4.2e) ukazují `username` do vypršení 1h TTL (FE řeší jen avatar, ne jméno). Stejné 1h TTL zpráv.
 - **Zvláštnosti:**
@@ -104,18 +104,18 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Vlastní článek / galerie** → schválení / zamítnutí / nové hodnocení **autorovi** `notify(..., 'ownContent')` s `url` (kap. 04).
   - **Novinky světa** → členům světa (mimo Zadatele) `notifyUsers(..., 'worldNews')` (kap. 13).
   - **Novinky Ikarosu** → `notifyAll(..., 'ikarosNews')` (kap. 04).
-  - **Hospoda** → `notifyAll(..., 'hospoda')`, **opt-in** (kategorie default VYP).
+  - **Putyka** → `notifyAll(..., 'hospoda')`, **opt-in** (kategorie default VYP).
   - Filtr příjemců dle preferencí běží v `PushService` (`filterByCategory`/`userWantsCategory` → `wantsPush`); `undefined` pole = default z kódu. Viz funkce „Nastavení notifikací" níže.
 - **Doručovací politika (13.2c-push-delivery, 2026-06-19):** každý push nese **TTL** (default 4 h, konst. `DEFAULT_TTL_SECONDS`) — provider po vypršení notifikaci zahodí, takže offline telefon už nedostane **dny staré** zprávy. Validní **`topic`** (server-side collapse, RFC 8030) navíc nahradí předchozí nedoručenou ve frontě → jen poslední, ne hromada. (`push.service.ts` `sendToSubscriptions`.)
 - **Hranice / co neumí:**
   - **Pošta nepushuje** (jen WS) — soukromá zpráva na telefon nedorazí jako push.
-  - **`notifyAll` payloady (novinky Ikarosu, Hospoda) nemají `url`** → bublina otevře `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie) `url` **mají**.
+  - **`notifyAll` payloady (novinky Ikarosu, Putyka) nemají `url`** → bublina otevře `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie) `url` **mají**.
   - **Granularita jen per-typ, ne per-svět** — nelze ztlumit konkrétní svět (plánováno jako pozdější rozšíření).
   - iOS vyžaduje PWA přidanou na plochu (standardní omezení Safari pro Web Push) — 15.1 install hint to usnadňuje instrukcí „Sdílet → Přidat na plochu" (viz blok „Instalace na plochu (PWA)" níže).
 - **Zvláštnosti:**
   - Neplatné subscription (HTTP 404/410) se automaticky promazávají (`push.service.ts`). VAPID klíče z env (`VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY`); chybí-li, modul při startu spadne na `!` non-null assertu.
   - **Úklid rotovaných odběrů (13.2c-push-delivery):** SW má `pushsubscriptionchange` handler → re-subscribe (auth není v SW dostupný, BE origin dostává query `?api=` z `main.tsx`). Nahlášení nového endpointu řeší FE `usePush` autentizovaně — na mountu porovná endpoint s `localStorage['push:endpoint']`, při změně pošle `POST /push/subscribe` s `oldEndpoint` → BE starý smaže (`subscribe` v `push.service.ts`). Bez toho se mrtvé endpointy hromadily → **duplicitní push na jedno zařízení**.
-- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), **15.9** doplnilo per-typ předvolby + filtr příjemců; dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push (novinky Ikarosu, Hospoda) nejsou naplněné.
+- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), **15.9** doplnilo per-typ předvolby + filtr příjemců; dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push (novinky Ikarosu, Putyka) nejsou naplněné.
 - **Kód:** FE `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx`, `PushDevicesList.tsx`, `public/sw.js`, `src/app/main.tsx`. BE `backend/src/modules/push/push.controller.ts`, `push.service.ts`, `dto/subscribe.dto.ts`; chat push `backend/src/modules/chat/chat.service.ts`.
 
 ### Nastavení notifikací (preference) — 15.9
@@ -124,7 +124,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Kdo:** přihlášený, jen vlastní preference (`PATCH /users/me/notification-preferences`, `JwtAuthGuard`). Bez role-gate.
 - **Co jde dělat:**
   - **Master `pushEnabled`** (default ZAP) — vypnutím se ztlumí veškerý push bez ohledu na kategorie.
-  - **7 kategorií** ve 4 skupinách (default ZAP kromě Hospody): *Můj svět* — `worldChat`, `worldEvent`; *Můj obsah* — `ownDiscussion`, `ownContent`; *Novinky* — `worldNews`, `ikarosNews`; *Komunita* — `hospoda` (default **VYP**).
+  - **7 kategorií** ve 4 skupinách (default ZAP kromě Putyky): *Můj svět* — `worldChat`, `worldEvent`; *Můj obsah* — `ownDiscussion`, `ownContent`; *Novinky* — `worldNews`, `ikarosNews`; *Komunita* — `hospoda` (default **VYP**).
   - **Per-device přepínač** (reuse `usePush`) — povolení push na tomto zařízení (hardware brána, nezávislá na kategoriích).
 - **Hranice / co neumí:**
   - **Řídí jen push bublinu**, ne obsah notifikačního centra (zvoneček ukazuje vše vždy).
@@ -182,11 +182,11 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. **Push bez deep-linku jen u broadcastu.** `notifyAll` payloady (novinky Ikarosu, Hospoda) neobsahují `url` → klik otevře jen `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie — 15.9) už `url` **mají**; SW deep-link (`sw.js:35`) funguje. Zbývá doplnit `url` do broadcast payloadů.
+1. **Push bez deep-linku jen u broadcastu.** `notifyAll` payloady (novinky Ikarosu, Putyka) neobsahují `url` → klik otevře jen `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie — 15.9) už `url` **mají**; SW deep-link (`sw.js:35`) funguje. Zbývá doplnit `url` do broadcast payloadů.
 2. **Pošta bez push.** Soukromá/systémová zpráva nikdy nedorazí jako push na telefon (jen WS + badge). Pro uživatele matoucí, když chat pushuje a pošta ne.
-3. **Dva nezávislé „emote" systémy se snadno zamění.** Globální chat = textové emoji; svět = custom obrázkové. Sdílí UI termín „emoty", ale ne kód ani datový zdroj. V průvodci jasně oddělit, aby amatér nehledal v Hospodě obrázkové emoty světa.
+3. **Dva nezávislé „emote" systémy se snadno zamění.** Globální chat = textové emoji; svět = custom obrázkové. Sdílí UI termín „emoty", ale ne kód ani datový zdroj. V průvodci jasně oddělit, aby amatér nehledal v Putyce obrázkové emoty světa.
 4. **1h TTL globálního chatu** není v UI nikde explicitně komunikováno — uživatel může být překvapen, že se historie „ztrácí". Vhodné zmínit v nápovědě.
 5. **VAPID fail-fast.** Bez env klíčů push modul spadne na non-null assertu při startu (`push.service.ts:31`) — provozní závislost; ověřit, že produkce má klíče (dle MEMORY 3/3 OK).
 6. **Push granularita jen per-typ, ne per-svět** (15.9) — uživatel nemůže ztlumit konkrétní svět, jen celou kategorii. Plánováno jako pozdější rozšíření.
 
-> **Vyřešeno 15.9 (smazáno z výše):** globální chat už nepushuje každou zprávu všem (Hospoda opt-in, Camp push zrušen, exclude přes preference); per-typ předvolby existují (sekce „Nastavení notifikací").
+> **Vyřešeno 15.9 (smazáno z výše):** globální chat už nepushuje každou zprávu všem (Putyka opt-in, Camp push zrušen, exclude přes preference); per-typ předvolby existují (sekce „Nastavení notifikací").

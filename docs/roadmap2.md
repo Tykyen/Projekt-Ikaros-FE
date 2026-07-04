@@ -577,12 +577,25 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE/FE:** veřejný katalog šablon + klonování do světa.
 **Otevřené otázky:** Moderovat sdílené šablony? Atribuce autora? Sdílet i celé světy, nebo jen scény/bestie/stránky?
 
-### - [ ] 17.6 Integrace hlasu (odkaz nebo embed Jitsi) — [D4 · dopad střední · náklad malý]
-**Cíl:** Pole „hlasová místnost" na úrovni scény/světa + tlačítko „Připojit se k hlasu". Stupně: (1) jen odkaz na Discord/Jitsi; (2) **embed Jitsi přímo do okna Ikara** („vše na jednom okně").
-**Proč:** Skupiny chtějí mluvit; **vlastní** hlasový/video stack od nuly (WebRTC SFU, TURN servery) je drahý a křehký — ten neděláme.
-> 💡 **Korekce k „zdarma to nepůjde":** „vše v jednom okně" **jde zdarma** přes **Jitsi Meet** — je open-source, `meet.jit.si` je veřejně zdarma a místnost lze **embednout iframem** přímo do scény/světa. Zdarma nejde jen *vlastní* hlasový stack; **integrace cizího (Jitsi) zdarma je**. Volitelně později self-host Jitsi (víc soukromí, vyžaduje server).
-**FE:** pole odkazu + tlačítko; embed Jitsi iframe (Jitsi External API).
-**Otevřené otázky:** Jen odkaz (nejlevnější), nebo rovnou embed Jitsi? Per scéna, nebo per svět? Self-host Jitsi později kvůli soukromí?
+### - [ ] 17.6 Integrace hlasu a videa přes Jitsi — [D4 · dopad střední/vysoký · náklad malý až střední]
+
+**Cíl:** Přidat ke světu nebo scéně komunikační místnost pro hlas i obraz. Hráči budou mít tlačítko „Připojit se k hovoru“. První stupeň otevře Jitsi v nové kartě, druhý stupeň vloží Jitsi přímo do okna Ikara pomocí Jitsi IFrame API.
+
+**Proč:** Herní skupiny často potřebují nejen psát, ale i mluvit a vidět se. Vlastní hlasový/video stack od nuly by byl drahý, technicky složitý a náročný na provoz. Jitsi umožní dodat hlas i obraz rychle, bez stavby vlastní WebRTC infrastruktury.
+
+**Rozsah:** Ikaros nebude přenášet ani ukládat zvuk a video. Bude pouze spravovat název/odkaz místnosti, zobrazovat tlačítko pro připojení a případně vkládat Jitsi hovor do rozhraní světa nebo scény.
+
+**Stupně:**
+1. Odkaz na Jitsi místnost.
+2. Embed Jitsi přímo do Ikara.
+3. Volitelně vlastní místnosti pro konkrétní scény.
+4. Později self-host Jitsi kvůli větší kontrole a soukromí.
+
+**FE:** pole pro komunikační místnost, tlačítko „Připojit se k hovoru“, Jitsi iframe, možnost minimalizovat, otevřít v nové kartě nebo zobrazit ve větším panelu.
+
+**BE:** uložení poskytovatele, názvu místnosti, režimu zobrazení a vazby na svět/scénu.
+
+**Otevřené otázky:** Začít pouze odkazem, nebo rovnou embed? Má být výchozí místnost per svět, nebo per scéna? Má být kamera výchozí, nebo má hráč vstupovat nejdřív s vypnutou kamerou? Má se později řešit self-host Jitsi?
 
 ### - [ ] 17.7 Rodokmeny — [C2 · dopad nízký · náklad střední] 🔁 (volitelné)
 **Cíl:** Vizuální strom „rodič → dítě / sňatek".
@@ -617,7 +630,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** dedikované mobilní pohledy (deník, komunita) + bottom tab bar; hod z mobilu → sdílená mapa.
 **Otevřené otázky:** Auto-přepnutí dle zařízení, nebo volba? Které moduly mají mobilní companion verzi?
 
-### - [ ] 17.12 Živá příběhová mapa napojená na hru (chat / bojová scéna) — [nápad 2026-06-15 · dopad střední · náklad střední] 🔁
+### - [x] 17.12 Živá příběhová mapa napojená na hru (chat / bojová scéna) — [nápad 2026-06-15 · dopad střední · náklad střední] 🔁
 **Cíl:** U vlajkové hry vidí hráči **aktivní mapu napojenou na probíhající hru** — na chat nebo přímo na bojovou scénu — kde koukají, **kde zrovna jsou v příběhu**. Mapa se „rozsvítí" u aktuální lokace/scény, kterou hra právě řeší.
 **Proč:** Spojuje příběh s geografií živě — hráč neztrácí orientaci v ságe; posiluje imerzi. Tvůj nápad (2026-06-15) — „zajímavá varianta". Staví na interaktivní mapě s piny (16.5) a propojuje ji se stavem hry (aktivní scéna / chat kanál → pin na mapě).
 **Návrh přípravy:** rozhodnout, co je „aktuální poloha v příběhu" (aktivní scéna? kanál světového chatu? ručně PJ?); navázání pin (16.5) ↔ scéna/kanál; 🔁 taktická mapa + per-player scene assignment (`project_takticka_mapa_assignment`), world-room WS signál (`project_map_world_room_join`).
@@ -642,27 +655,13 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 - **Levnější (nulová) alternativa = procedurální generátory** z dat a náhodných tabulek (jména, věk, vzhled, příběhy, rodina…) — **bez peněz**, plně v naší režii, viz **Fáze 21.2**. AI je pak volitelná *chytřejší* vrstva nad nimi (uhladit text), ne náhrada.
 - **Závěr:** technicky triviální, finančně zanedbatelné. Otázka není „jestli to půjde", ale „jak moc to chceme a kde dát limity".
 
-### - [ ] 18.1 Generátor NPC & popisů na klik — [F1 · dopad střední · náklad střední]
+### - [ ] 18.1 Generátory viz již přiravené na bázy připravené databáze.
 **Cíl:** Tlačítko „navrhni NPC" (jméno, povaha, vzhled, krátké pozadí) a „rozveď popis" na stránce/postavě.
 **Proč:** Zkracuje přípravu z hodin na minuty — silný důvod zůstat.
 **Návrh přípravy:** vybrat AI poskytovatele a model; promyšlené promptování v kontextu světa/systému; limity per uživatel/svět. *(Pozn.: při návrhu napojení na Claude/Anthropic API použít skill `claude-api`.)*
 **BE:** služba s frontou + limity; ukládání výstupu jako konceptu k doladění.
 **FE:** tlačítka v editoru stránky/postavy; jasné označení „návrh AI".
-**Otevřené otázky:** Který poskytovatel? Limit volání (denní/měsíční)? Kdo platí náklady (provoz vs. podporovatelé)?
-
-### - [ ] 18.2 AI shrnutí session / příběhového kanálu — [F3 · dopad nízký · náklad malý] 🔁
-**Cíl:** Z dlouhého **příběhového kanálu světového chatu** (16.1) nebo session vytvoří „co se stalo minule".
-**Proč:** U dlouhých ság, kde kanál žije týdny, je shrnutí zlato — hráč rychle dožene děj.
-**BE/FE:** poslat text kanálu na AI → uložit shrnutí ke kanálu/scéně.
-**Otevřené otázky:** Automaticky, nebo na vyžádání? Kdo shrnutí vidí (PJ/all)?
-
-### - [ ] 18.3 AI portréty & ilustrace — [F2 · dopad nízký · náklad střední]
-**Cíl:** Generování portrétu postavy/NPC nebo ilustrace lokace v editoru.
-**Proč:** Vizuál zvedá zážitek; ne každý umí kreslit/hledat obrázky.
-**Návrh přípravy:** vybrat generátor obrázků; 🔁 nahrání do Cloudinary; **zvážit licenční/etické otázky AI artu** (část komunity odmítá → volitelné, označené).
-**Otevřené otázky:** Vůbec ano? Pokud ano, jen volitelně a viditelně označené? Náklady na generování obrázků?
-
----
+**Otevřené otázky:** Který poskytovatel? Limit volání (denní/měsíční)? Kdo platí náklady (provoz vs. podporovatelé)?¨
 
 ## Fáze 19 — Růst, metriky & udržitelnost
 **Přílohy A + B.** Aby platforma nejen fungovala, ale **rostla a uživila se** (časem i tvého času). Většinou levné, vysoký nepřímý dopad.
@@ -679,15 +678,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE:** kvóty + počítadla; limity/fronty pro AI.
 **Otevřené otázky:** Výše kvót? Co dělat při překročení (blok vs. upozornění)?
 
-### - [ ] 19.3 Odstřižení od starého webu → **přesunuto do 14.8** (Pojistka)
-> Patří do bezpečnostní pojistky, ne do růstu — starý web může zhasnout kdykoli (riziko R5), PDF to řadí do H0. Plné zadání viz **[14.8](#--148-odstřižení-od-starého-webu-smtp--embedding-model--h0-08--dopad-střední--náklad-střední--přesun-z-193)**.
-
-### - [ ] 19.4 Model podpory (dary / „podporovatel") — [Příloha B]
-**Cíl:** Dobrovolné dary/Patreon na provoz; drobná kosmetika jako poděkování (nikdy herní výhoda).
+### - [ ] 19.2 Model podpory (dary / „podporovatel") — [Příloha B]
+**Cíl:** Dobrovolné dary/Patreon na provoz; drobná kosmetika jako poděkování (nikdy herní výhoda). + možnosti nástvby
 **Proč:** Komunita ráda přispěje na projekt, který má ráda; štědrý free základ zůstává konkurenční výhodou.
 **Otevřené otázky:** Vůbec teď, nebo až platforma žije (scénář A)? Jaká kosmetika je „fér" (odznak/barva), aby nerozdělila komunitu?
 
-### - [ ] 19.5 LFG / nábory (objevování her a hráčů) — [analýza sekce 5] 🔁
+### - [ ] 19.3 LFG / nábory (objevování her a hráčů) — [analýza sekce 5] 🔁
 **Cíl:** Lehké „hledám hru / hledám hráče" — nábory navázané na přehled světů + adresář.
 **Proč:** Reálná potřeba i v ČR, kterou nikdo česky neřeší; pomáhá proti prázdné platformě (krok 5 trychtýře).
 **Otevřené otázky:** Samostatná featura, nebo rozšíření přehledu světů? Moderace náborů?

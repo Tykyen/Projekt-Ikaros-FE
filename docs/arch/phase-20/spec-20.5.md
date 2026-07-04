@@ -1,7 +1,7 @@
 # Spec 20.5 — Interní chat správy platformy
 
 **Fáze:** 20 (Governance, právo & moderace — Platforma + Provoz)
-**Stav:** ✅ implementováno (2026-07-03) — BE modul `platform-chat` (konverzace/zprávy/WS + dokumenty + úkoly) + FE napojení; **čeká BE restart** + mobil-desktop + přílohy/member-picker (follow-up)
+**Stav:** ✅ implementováno (2026-07-03) — BE modul `platform-chat` (konverzace/zprávy/WS + dokumenty + úkoly) + FE napojení; **+ 2026-07-04: avatar z profilu + role-odznak (RoleStar) + notifikace (push PWA + in-app badge, sekce 4.D)**; **čeká BE restart** + mobil-desktop + přílohy/member-picker + perzistentní unread (follow-up)
 **Typ:** nová feature (FE napřed + BE kontrakt) — ad-hoc zadání mimo původní karty 20.1–20.4
 **Souvisí:** světový chat (`features/world/chat`), globální chat „Hospoda" (`features/chat`), Administrace (`features/admin`)
 
@@ -99,6 +99,36 @@ Feature je ad-hoc zadání (2026-07-03), zařazená do Fáze 20 (Platforma + Pro
 - Endpointy: list (všichni admini), create (owner=self, superadmin i pro cizího), toggle done, edit, delete, reorder. Autorizace: owner NEBO superadmin.
 - Real-time: nemusí být WS; stačí refetch/invalidace TanStack po mutaci (úkoly nejsou konverzace). Volitelně lehký WS signál `admin:tasks:updated`.
 
+### 4.D Notifikace (2026-07-04, follow-up)
+
+Nová zpráva → ostatní účastníci dostanou **web push (PWA)** i **in-app badge (na stránky)**. Dřív chat doručoval zprávu jen do otevřené místnosti (`platform-chat:message` → room `platform-chat:{channelId}`), takže mimo `/admin/chat` se o ní nikdo nedozvěděl.
+
+**Příjemci** (`PlatformChatService.resolveRecipients`): `accessMode:'all'` → všichni Superadmin+Admin (`usersRepo.findByRoles`); `accessMode:'members'` → `allowedMemberIds` + všichni Superadmini. Vždy **mínus odesílatel**.
+
+**Web push (PWA):** `PushService.notifyUsers(ids, {title: název kanálu, body: „odesílatel: náhled", url:'/admin/chat', tag:'admin-chat-{channelId}'}, 'adminChat')`, fire-and-forget po odeslání. Nová push kategorie **`adminChat`** (dual-source FE+BE `notification-preferences`), default **ZAP**, opt-out v profilu → „Nastavení notifikací" → skupina „Správa platformy".
+
+**In-app badge (na stránky):** service emituje `platform-chat.activity {recipientIds, channelId}` → gateway rozešle WS `platform-chat:activity {channelId}` do room `user:{id}` každého příjemce. FE hook `useAdminChatLive` (globální v `IkarosLayout`) tiká `adminChatUnseenAtom` → nepřečtený badge na nav položce **„Chat správy"** v Administraci; reset při vstupu na `/admin/chat`.
+- 📚 **Efemérní** (client-side counter, po reloadu se resetuje). **Perzistentní unread** (BE `lastReadAt` per uživatel/kanál) = odložený follow-up.
+
+**Dotčené soubory:** BE `common/notifications/notification-preferences.ts`, `platform-chat.service.ts`, `platform-chat.gateway.ts`; FE `shared/types`, `notifications/lib/notificationPreferences.ts`, `admin/chat/model/adminChatStore.ts`, `admin/chat/api/useAdminChatLive.ts`, `IkarosLayout.tsx`; WS kontrakt `docs/websocket-api.md`. **Nutný BE restart.**
+
+### 4.E Chat parita — sdílené komponenty (2026-07-04, follow-up)
+
+Admin chat původně použil vlastní ochuzený `<input>` + ruční render zpráv (odchylka od reuse-spec §3 — viz [CH-053](../../chybovy-denik/proces.md)) → chyběla „pravidla chatu". Přepojeno na sdílené komponenty + doplněny chybějící BE endpointy.
+
+**FE:**
+- **`AdminChatComposer`** (nová, generické jádro vytažené z `ChannelComposer` bez world-specifik): auto-grow textarea (1–6 řádků), **Enter odešle / Shift+Enter nový řádek** (na coarse pointeru Enter = nový řádek), **emoji** (`EmojiPickerPopover`), **Ctrl+V** obrázků/GIF + tlačítko přílohy (upload-on-send), **reply** card + cancel, typing emit.
+- Zapojen sdílený **`MessageList`/`MessageItem`** místo ručního renderu → klikací afordance (přílohy jako karty, reply-quote se skokem na originál), grouping, **delete** tlačítko (Sa nebo odesílatel), **reply**. `RoleStar` zachován přes nový VOLITELNÝ prop `renderSenderBadge` (aditivní; world/global ho nepředají).
+- **`TypingIndicator`** pod výpisem. Kontrast (#1): `.center` → `--surface-1` (72 %) místo `--surface-2` (45 %).
+
+**BE (`platform-chat`):**
+- **Reply:** DTO `replyToId?`; service `resolveReply` (tichý fallback při chybějícím/cizím/smazaném cíli).
+- **Delete:** `DELETE /admin-chat/channels/:cid/messages/:mid` (204); auth **Superadmin NEBO odesílatel** (`message.senderId`); soft-delete `{isDeleted, content:null, attachments:[]}`; WS `platform-chat:message:deleted`; Cloudinary cleanup příloh.
+- **Upload:** `POST /admin-chat/channels/:cid/upload` (10 MB) → `UploadService.uploadPlatformChatFile` (folder `platform-chat/{cid}`); DTO `attachments?` + `assertAttachmentsOrigin(['platform-chat/'])`; `content` volitelný (text NEBO příloha, jinak `PLATFORM_CHAT_EMPTY`).
+- **Typing:** WS `platform-chat:typing` (in `{channelId,isTyping}` → out `{channelId,username,isTyping}`, identita z `client.data.userId`).
+
+**Ověřeno:** BE tsc+lint zelené; FE tsc `-b` exit 0, 339 testů + cross-check kontraktu FE↔BE. **Nutný BE restart.** Živě čeká `mobil-desktop` (composer responsive: font 16px ≤768px proti iOS zoom).
+
 ---
 
 ## 5. Out of scope (V1)
@@ -122,6 +152,8 @@ Feature je ad-hoc zadání (2026-07-03), zařazená do Fáze 20 (Platforma + Pro
 - [x] Zprávy se posílají a přijímají real-time (WS `platform-chat:message`). **Follow-up:** přílohy PDF ve zprávě (dokumenty mají vlastní sklad) + role-odznak (senderRole enrich).
 - [x] „Dokumenty" vedle lupy přepne panel na seznam PDF; Nahrát/Stáhnout/Smazat funguje; klik → iframe čtečka; „Zpět" vrací na seznam i na chat.
 - [x] Pravý panel Úkoly: rozevírací per admin; toggle/přidat/edit/smazat; vlastní edituje admin, cizí jen superadmin.
+- [x] **Avatar + role-odznak (2026-07-04):** zprávy i panel úkolů ukazují avatar odesílatele (`senderAvatarUrl` / fallback ze staff dle `senderId`) a `RoleStar` dle globální role.
+- [x] **Notifikace (2026-07-04):** nová zpráva → web push (PWA, kategorie `adminChat`, default ZAP) + in-app badge „Chat správy" (WS `platform-chat:activity`, efemérní). **Follow-up:** perzistentní unread (BE `lastReadAt`).
 - [ ] Responsive `mobil-desktop` — **čeká** (základní media queries hotové; živé ověření přes screenshoty od uživatele, browser sám nespouštím).
 
 ### Stav implementace (2026-07-03)

@@ -47,6 +47,7 @@ export interface NotificationPreferences {
   worldNews?: boolean;
   ikarosNews?: boolean;
   hospoda?: boolean;
+  adminChat?: boolean;
 }
 
 export interface User {

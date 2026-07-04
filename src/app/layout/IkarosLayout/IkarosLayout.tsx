@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Beer,
   Signpost,
+  MessageSquare,
   Sparkles,
   ShieldCheck,
   Dices,
@@ -55,6 +56,8 @@ import { usePresenceInit } from '@/shared/presence/usePresence';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
+import { useAdminChatLive } from '@/features/admin/chat/api/useAdminChatLive';
+import { adminChatUnseenAtom } from '@/features/admin/chat/model/adminChatStore';
 import {
   NotificationCenter,
   useChatFeedLive,
@@ -127,7 +130,7 @@ const CHAT_ROOMS: {
    *  Hospoda zůstává (budoucí anon-chat, zatím klik → login). */
   anonHidden?: boolean;
 }[] = [
-  { key: 'hospoda',   roomKey: 'hospoda',    label: 'Hospoda',       to: '/chat' },
+  { key: 'hospoda',   roomKey: 'hospoda',    label: 'Putyka',        to: '/chat' },
   { key: 'camp1', roomKey: 'camp-1', label: 'Camp I.',   to: '/chat/camp',  anonHidden: true },
   { key: 'camp2', roomKey: 'camp-2', label: 'Camp II.',  to: '/chat/camp2', anonHidden: true },
   { key: 'camp3', roomKey: 'camp-3', label: 'Camp III.', to: '/chat/camp3', anonHidden: true },
@@ -440,6 +443,7 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
   const { data: pendingCount } = usePendingActionsCount(!!currentUser);
+  const adminChatUnseen = useAtomValue(adminChatUnseenAtom);
 
   const label = isAdmin ? 'Uživatelé' : 'Přátelé';
   const badge = pendingCount?.total ?? 0;
@@ -506,6 +510,22 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
                 <Sparkles size={18} />
               </span>
               <span className={s.navItemLabel}>Emoty</span>
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/admin/chat" className={s.navItem} onClick={onNav}>
+              <span className={s.navItemIcon}>
+                <MessageSquare size={18} />
+              </span>
+              <span className={s.navItemLabel}>Chat správy</span>
+              {adminChatUnseen > 0 && (
+                <span
+                  className={s.navItemBadge}
+                  aria-label={`${adminChatUnseen} nepřečtených zpráv`}
+                >
+                  {adminChatUnseen}
+                </span>
+              )}
             </Link>
           )}
         </div>
@@ -802,6 +822,8 @@ export function IkarosLayout() {
   useAccountTransferNotifications();
   // 13.2a — „Souhrn chatů" živě: badge u zvonku tiká na `chat:feed:bump`.
   useChatFeedLive();
+  // 20.5 — live badge admin chatu: tiká na `platform-chat:activity`.
+  useAdminChatLive();
   // 15B.7 — page-view ping pro analytics (fire-and-forget; boti/prerender se
   // filtrují na BE). Pokrývá všechny Ikaros routy; world routy řeší WorldLayout.
   usePageViewPing();

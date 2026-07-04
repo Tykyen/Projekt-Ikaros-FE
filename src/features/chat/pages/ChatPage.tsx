@@ -5,7 +5,7 @@ import { anonSessionAtom } from '../store/anonSession';
 import { ChatRoom } from '../components/ChatRoom';
 import { AnonChatGate } from '../components/AnonChatGate';
 
-/** Stránka `/chat` — globální chat „Hospoda" (krok 4.1). 15.8 — veřejná: host
+/** Stránka `/chat` — globální chat „Putyka" (krok 4.1). 15.8 — veřejná: host
  *  bez session vidí captcha bránu, pak chat v „host módu". */
 export default function ChatPage() {
   const isAuth = useAtomValue(isAuthenticatedAtom);
@@ -14,7 +14,7 @@ export default function ChatPage() {
   return (
     <ChatRoom
       room="hospoda"
-      roomName="Interdimenzionální hospoda"
+      roomName="Dimenzionální Putyka"
       icon={<Beer size={18} />}
     />
   );

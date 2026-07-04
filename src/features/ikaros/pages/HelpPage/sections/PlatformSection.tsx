@@ -92,7 +92,7 @@ export function PlatformSection() {
 
       {/* ── Komunikace ─────────────────────────────────────────────────── */}
       <HelpAccordion icon={<MessageSquare size={20} />} title="Komunikace" accent="info">
-        <Tool icon={<Beer size={16} />} title="Hospoda (globální chat)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
+        <Tool icon={<Beer size={16} />} title="Putyka (globální chat)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             Jedna sdílená místnost pro celou platformu napříč světy. Píšeš v reálném
             čase, vidíš přítomné a kdo píše. Nahoře volíš „Všem" (veřejně) nebo
@@ -106,7 +106,7 @@ export function PlatformSection() {
           <p>
             Tři atmosférické roleplay místnosti — hra na jeden večer bez kostek.
             Každá má prostředí (styl + jedna z 20 lokací s ilustrací na pozadí).
-            Stejné chatovací funkce jako Hospoda, ale <strong>u zpráv i v seznamu
+            Stejné chatovací funkce jako Putyka, ale <strong>u zpráv i v seznamu
             přítomných</strong> vystupuješ jako svoje <strong>postava</strong>{' '}
             (jméno a obrázek z profilu „Postava v Campu"), ne jako účet. Kdo
             postavu nevyplnil, zobrazí se účtem. Klik na osobu otevře kartu její

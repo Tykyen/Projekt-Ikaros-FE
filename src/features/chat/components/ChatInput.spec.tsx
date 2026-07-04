@@ -61,7 +61,7 @@ describe('ChatInput', () => {
 
   it('Enter odešle veřejnou zprávu', () => {
     const p = setup();
-    const input = screen.getByPlaceholderText(/hospody/);
+    const input = screen.getByPlaceholderText(/putyky/);
     fireEvent.change(input, { target: { value: 'zdravím' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(p.onSendPublic).toHaveBeenCalledWith('zdravím', []);
@@ -69,13 +69,13 @@ describe('ChatInput', () => {
 
   it('prázdná zpráva se neodešle', () => {
     const p = setup();
-    fireEvent.keyDown(screen.getByPlaceholderText(/hospody/), { key: 'Enter' });
+    fireEvent.keyDown(screen.getByPlaceholderText(/putyky/), { key: 'Enter' });
     expect(p.onSendPublic).not.toHaveBeenCalled();
   });
 
   it('psaní spustí onTypingStart', () => {
     const p = setup();
-    fireEvent.change(screen.getByPlaceholderText(/hospody/), {
+    fireEvent.change(screen.getByPlaceholderText(/putyky/), {
       target: { value: 'p' },
     });
     expect(p.onTypingStart).toHaveBeenCalled();

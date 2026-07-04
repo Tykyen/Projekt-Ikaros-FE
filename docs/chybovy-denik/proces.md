@@ -147,3 +147,11 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** „opravím velikost" bez přečtení, JAKÝ limit a na jaké vrstvě; navržená oprava nezmění text chybové hlášky.
 
 ---
+
+### CH-053 — Admin chat (20.5) implementován jako ochuzená kopie místo reuse sdílených chat komponent (spec to předepisoval) · 2026-07-04
+**Kontext:** Uživatel při testu admin chatu (`/admin/chat`) postupně hlásil sérii chybějících „základních věcí": text se nezalomí na víc řádků, Enter/Shift+Enter, emoji, Ctrl+V obrázky/GIF, odpověď, mazání, typing indikátor, klikací odkazy, čitelnost (text splývá s pozadím). „Já myslel, že pravidla chatu máme."
+**Co bylo špatně:** Spec 20.5 (audit §3) explicitně předepisoval **reuse** sdílených chat primitiv (`ChatInput`, `MessageList`, `MessageItem`). Implementace místo toho dala vlastní ochuzený `<input type="text">` + ruční `.map` render zpráv → žádné „pravidlo chatu" (multiline, emoji, paste, reply, delete, linkify, grouping, typing) na admin chat neplatí. Odhalilo se to až sérií uživatelských stížností při testu, ne při implementaci.
+**Poučení:** U featury specifikované jako „reuse komponenty X" ověř, že se X **skutečně zapojilo**, ne že vznikla zjednodušená vlastní kopie se stejným vzhledem. „Vypadá stejně" ≠ „má stejné chování" — sdílená komponenta nese chování (klávesy, paste, linkify), které vlastní kopie tiše postrádá. Řešení = zpětně napojit `MessageList`/`MessageItem` + vytáhnout generické composer jádro z `ChannelComposer` + doplnit chybějící BE (reply/delete/upload/typing).
+**Příznak cyklení:** uživatel opakovaně hlásí „chybí i tohle základní" u jedné featury; „myslel jsem, že to máme".
+
+---
