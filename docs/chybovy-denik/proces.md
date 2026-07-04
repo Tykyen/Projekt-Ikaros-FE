@@ -129,3 +129,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** „přes celou věc" nefunguje po full-bleed úpravě; jen úzký levý sloupec vidět, zbytek prázdný.
 
 ---
+
+### CH-050 — Cyklil jsem na upload 502 hádáním příčiny, ač ji BE `catch {}` zahazoval · 2026-07-04
+**Kontext:** Upload PDF admin chatu (20.5) vracel 502. Opakovaně (napříč dvěma sessions) jsem navrhoval příčiny (náběh BE, PWA cache, MIME, chybějící přípona, velikost) a úkoloval uživatele testováním — bez skutečných dat ze serveru.
+**Co jsem udělal špatně:** hádal jsem kořen 502 a posílal uživatele „zkus a pošli screenshot", místo abych nejdřív zajistil, aby backend reálnou příčinu VYDAL. `uploadPlatformDocument` měl `catch {}` bez zachycení erroru → Cloudinary důvod (velikost/typ/nastavení účtu) se zahodil a klient dostal jen mlhavé „502".
+**Proč to nefungovalo:** bez reálné chyby je každý návrh jen dohad; uživatel navíc testoval prod na stale verzi (viz CH-015) → feedback nikdy nezkonvergoval. Musel to zastavit („už jsme to řešili, nechci se hromadit najednou").
+**Poučení:** když handler polyká chybu (`catch {}` / generický 502), PRVNÍ krok diagnostiky = odhalit ji (logError + propagovat konkrétní message), teprve pak opravovat. Nehádej příčinu, kterou kód aktivně skrývá. Diagnostiku dělej změnou co odhalí pravdu, ne dalším kolem hypotéz na uživateli.
+**Příznak cyklení:** ≥3 návrhy příčiny téhož 502 + opakované „zkus a pošli screenshot"; uživatel říká „řešili jsme to už".
+
+---

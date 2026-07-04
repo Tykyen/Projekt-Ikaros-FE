@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-050.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-051.**
 
 ## Jak je deník členěný
 
@@ -194,3 +194,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-047](proces.md#ch-047--spustil-jsem-browserserver-pro-náhled-návrhu-ač-to-uživatel-zakázal--2026-07-03) | proces | spustil Playwright/lokální server pro náhled HTML návrhu, ač uživatel zakázal browser; návrhy dávej souborem, náhled si dělá uživatel sám | chystám „rychle" browser/server pro vizuál; uživatel „žádné otvírání browseru" |
 | [CH-048](proces.md#ch-048--admin-chat-jsem-převedl-z-mockupu-doslova-jako-ohraničenou-kartu-ač-dohoda-byla-full-screen--2026-07-03) | fe/proces | admin chat převeden z mockupu jako ohraničená karta, ač dohoda=full-screen; nová route nedědila chat full-height (`.main` 220px + `mainChat` jen `isChat`) | uživatel „má to být přes celou věc/takto", moje verze zmenšená karta |
 | [CH-049](proces.md#ch-049--full-bleed-přes-2-konfliktní-grid-třídy--main-spadl-do-úzkého-tracku--2026-07-03) | fe/css | full-bleed přes 2 konfliktní grid třídy (`bodyFull` nepřebilo `bodyNoRight`) + `display:none` sidebar → `main` do úzkého 280px tracku, chat neviditelný; třídy měnící touž vlastnost dělej výlučně | „nic se nezobrazuje" po full-bleed; jen úzký levý sloupec vidět |
+| [✅ ŘEŠENÍ](fe.md#-řešení--205-čtečka-pdf-admin-chatu-be-view-endpoint-přebalí-cloudinary-raw-na-inline-applicationpdf--2026-07-04) | fe+be | 20.5 čtečka PDF: BE proxy `view` přebalí Cloudinary raw na `inline application/pdf` (funguje i pro už nahrané); pasti = `noopener`→null handle + cross-origin `download` se ignoruje | — (BE tsc/eslint/elev + FE tsc-b ✓; živě po deployi) |
+| [CH-050](proces.md#ch-050--cyklil-jsem-na-upload-502-hádáním-příčiny-ač-ji-be-catch--zahazoval--2026-07-04) | proces | cyklil jsem na upload 502 hádáním, ač BE `catch {}` reálnou Cloudinary chybu zahazoval; nejdřív odhal chybu (logError+propagace), pak oprav | ≥3 návrhy příčiny téhož 502 + „zkus a pošli screenshot"; uživatel „už jsme to řešili" |

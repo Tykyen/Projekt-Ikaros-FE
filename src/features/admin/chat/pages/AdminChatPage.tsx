@@ -21,7 +21,7 @@ import {
   Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { apiClient } from '@/shared/api';
+import { apiClient, parseApiError } from '@/shared/api';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import type { ChatMessage } from '@/features/chat/lib/types';
@@ -559,7 +559,12 @@ function DocumentsView({
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
-    if (f) uploadMut.mutate(f);
+    if (f)
+      uploadMut.mutate(f, {
+        // Ukázat skutečný důvod selhání (BE teď vrací konkrétní Cloudinary hlášku
+        // místo mlhavého 502) — jinak by uživatel viděl chybu jen v konzoli.
+        onError: (err) => toast.error(parseApiError(err)),
+      });
     e.target.value = '';
   };
 
