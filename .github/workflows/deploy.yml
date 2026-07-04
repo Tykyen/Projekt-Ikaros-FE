@@ -72,7 +72,11 @@ jobs:
             set -e
             cd ${{ env.DEPLOY_PATH }}
             docker image prune -f
-            docker compose build
+            # --no-cache: Docker jinak reusoval starý FE build layer (COPY . . +
+            # npm run build) i po rsyncu nového kódu → server servíroval stale
+            # bundle (build proběhl za ~46 s = cache hit). Plný rebuild = jistota,
+            # že se nasadí aktuální commit. Deploy je ruční/občasný, pár min navíc OK.
+            docker compose build --no-cache
           '
 
       - name: Deploy
