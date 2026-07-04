@@ -159,8 +159,11 @@
 }
 
 /* 20.5 — admin chat = full-bleed přes celou plochu (i bez levé navigace),
-   jako světový chat. Musí být ZA `.bodyNoRight` (přebije jeho grid). */
-.bodyFull {
+   jako světový chat. COMPOUND `.body.bodyFull` (specificita 0-2-0) — musí
+   přebít `.body` grid override i v responsive @media (řádky ~574, 590), kde
+   se `.body` přepisuje na 3 sloupce (0-1-0); jinak by admin chat na ≤1280px
+   spadl do 220px tracku a střed+pravý panel zkolabovaly (bug: main=220px). */
+.body.bodyFull {
   grid-template-columns: 1fr;
 }
 .bodyFull .sidebar {
