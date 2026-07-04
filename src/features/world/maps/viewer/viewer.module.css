@@ -648,6 +648,21 @@
   cursor: pointer;
 }
 
+/* 16.5 — čitelnost panelů nad pestrou/jasnou mapou: frosted glass (rozmaže
+   obsah za panelem) + pevnější okraj. Bez toho průsvitné --surface-1 splývá. */
+.tooltip,
+.readPop,
+.editor,
+.listPanel,
+.popover {
+  backdrop-filter: blur(16px) saturate(1.2);
+  border-color: var(--line-strong, var(--accent));
+}
+.tooltip,
+.readPop {
+  box-shadow: 0 10px 30px -8px color-mix(in srgb, var(--surface-0, black) 85%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pinWrap:hover .flag,
   .cluster:hover,

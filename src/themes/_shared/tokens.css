@@ -102,6 +102,9 @@
 
   /* Glows / atmosféry — fallback pro layout komponenty */
   --success-glow: rgba(62, 207, 142, 0.6);
+  /* Sémantická „úspěch/živé" barva (zelená). Dřív referencovaná bez definice
+     (16.5 pilulka příběhové mapy, MapToolDock…) → sjednoceno sem. */
+  --accent-success: #3ecf8e;
 
   /* Scrim / overlay — semi-transparent backdrop nad obsahem (drag&drop, modaly) */
   --scrim: rgb(0 0 0 / 0.55);

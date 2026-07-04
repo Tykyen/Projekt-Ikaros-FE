@@ -45,10 +45,12 @@
 }
 
 /* Renderován přes Portal do body → position: fixed, souřadnice + šířka inline
-   z useAnchoredPosition. z-index nad world obsahem, pod modaly (--z-modal 400). */
+   z useAnchoredPosition. z-index musí být NAD fullscreen overlaye (mapviewer
+   1000, LinkPicker 1000), aby dropdown fungoval i uvnitř nich — dropdown má být
+   topmost, když je otevřený (16.5). */
 .dropdown {
   position: fixed;
-  z-index: 350;
+  z-index: 1100;
   max-height: 320px;
   overflow-y: auto;
   background: var(--surface-2);
