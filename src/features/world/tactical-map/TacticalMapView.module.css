@@ -49,6 +49,12 @@
   align-items: flex-end;
   gap: 6px;
 }
+/* 16.5b — každý přímý potomek slotu je klikatelný (slot sám ne, ať nepohlcuje
+   pan/zoom mimo obsah). Bez tohoto musel auto nastavovat každý panel sám a
+   StoryMapPill na to zapomněl → pilulka nešla kliknout. */
+.weatherSlot > * {
+  pointer-events: auto;
+}
 @media (max-width: 768px) {
   .connectionBadgeSlot {
     top: 8px;

@@ -396,6 +396,7 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
       <div
         className={s.overlay}
         ref={overlayRef}
+        style={{ position: portalTarget === document.body ? undefined : 'absolute' }}
         onMouseDown={(e) => e.target === overlayRef.current && onClose()}
       >
         <div className={s.shell}>
@@ -418,6 +419,7 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
     <div
       className={s.overlay}
       ref={overlayRef}
+      style={{ position: portalTarget === document.body ? undefined : 'absolute' }}
       onMouseDown={(e) => e.target === overlayRef.current && onClose()}
     >
       <div className={s.shell}>

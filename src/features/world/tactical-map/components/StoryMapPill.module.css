@@ -13,6 +13,10 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semi);
   cursor: pointer;
+  /* Dok .weatherSlot má pointer-events:none; každý panel v něm si musí vrátit
+     auto, jinak není klikatelný (klik propadne na PIXI canvas). Bez tohoto pin
+     nešel zmáčknout a viewer se nikdy neotevřel (16.5b). */
+  pointer-events: auto;
   box-shadow: var(--shadow-md);
   transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
