@@ -28,9 +28,10 @@ import {
   useAdminChatMessages,
   useAdminChatRealtime,
   useSendAdminMessage,
-  useCreateAdminChannel,
   adminChatKeys,
 } from '../api/useAdminChat';
+import { ChannelModal } from '../components/ChannelModal';
+import { InputModal } from '../components/InputModal';
 import {
   useAdminDocuments,
   useUploadDocument,
@@ -44,7 +45,7 @@ import {
   useUpdateTask,
   useDeleteTask,
 } from '../api/useAdminTasks';
-import type { PlatformDocument, AdminTask } from '../lib/types';
+import type { PlatformDocument, AdminTask, AdminChatChannel } from '../lib/types';
 import s from './AdminChatPage.module.css';
 
 // ── Helpery ───────────────────────────────────────────────────────────────
@@ -100,7 +101,10 @@ export default function AdminChatPage() {
   );
   useAdminChatRealtime(activeConvId);
   const sendMut = useSendAdminMessage(activeConvId ?? '');
-  const createChannel = useCreateAdminChannel();
+  const [channelModal, setChannelModal] = useState<{
+    open: boolean;
+    channel: AdminChatChannel | null;
+  }>({ open: false, channel: null });
 
   const msgsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -130,14 +134,10 @@ export default function AdminChatPage() {
     });
   };
 
-  const handleNewChannel = () => {
-    const name = window.prompt('Název nové konverzace:')?.trim();
-    if (name) {
-      createChannel.mutate(
-        { name },
-        { onSuccess: (ch) => setActiveConvId(ch.id) },
-      );
-    }
+  const handleNewChannel = () =>
+    setChannelModal({ open: true, channel: null });
+  const handleEditChannel = () => {
+    if (activeConv) setChannelModal({ open: true, channel: activeConv });
   };
 
   const convSubtitle = activeConv
@@ -223,6 +223,7 @@ export default function AdminChatPage() {
                     type="button"
                     className={s.iconbtn}
                     title="Spravovat konverzaci a členy"
+                    onClick={handleEditChannel}
                   >
                     <MoreHorizontal size={16} aria-hidden />
                   </button>
@@ -304,6 +305,16 @@ export default function AdminChatPage() {
         {/* PRAVÝ — úkoly týmu */}
         <TasksPanel currentUserId={user?.id} isSuperadmin={isSuperadmin} />
       </div>
+
+      <ChannelModal
+        open={channelModal.open}
+        channel={channelModal.channel}
+        currentUserId={user?.id}
+        onClose={() => setChannelModal({ open: false, channel: null })}
+        onSaved={(id) => {
+          if (id) setActiveConvId(id);
+        }}
+      />
     </div>
   );
 }
@@ -555,12 +566,10 @@ function DocumentsView({
   const openDoc = (d: PlatformDocument) =>
     window.open(d.url, '_blank', 'noopener,noreferrer');
 
-  const renameDoc = (d: PlatformDocument) => {
-    const name = window.prompt('Nový název dokumentu:', d.filename)?.trim();
-    if (name && name !== d.filename) {
-      renameMut.mutate({ id: d.id, filename: name });
-    }
-  };
+  const [renameTarget, setRenameTarget] = useState<PlatformDocument | null>(
+    null,
+  );
+  const renameDoc = (d: PlatformDocument) => setRenameTarget(d);
 
   return (
     <div className={s.docs}>
@@ -658,6 +667,17 @@ function DocumentsView({
           </div>
         )}
       </div>
+      <InputModal
+        open={!!renameTarget}
+        onClose={() => setRenameTarget(null)}
+        title="Přejmenovat dokument"
+        label="Nový název"
+        initialValue={renameTarget?.filename}
+        onConfirm={(name) => {
+          if (renameTarget && name !== renameTarget.filename)
+            renameMut.mutate({ id: renameTarget.id, filename: name });
+        }}
+      />
     </div>
   );
 }

@@ -1,0 +1,128 @@
+/* 20.5 — sdílené styly modalů admin chatu (nová/edit konverzace, přejmenování). */
+
+.field {
+  margin-bottom: 16px;
+}
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.input {
+  width: 100%;
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 12px;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--theme-accent, var(--accent));
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--text);
+  padding: 7px 0;
+  cursor: pointer;
+}
+.radio input {
+  accent-color: var(--theme-accent, var(--accent));
+}
+
+.memberList {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--frame-border);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+.member:hover {
+  background: var(--surface-2);
+}
+.member input {
+  accent-color: var(--theme-accent, var(--accent));
+  flex: none;
+}
+.empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 12px;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btnGhost {
+  padding: 9px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--frame-border);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btnGhost:hover {
+  color: var(--text);
+  border-color: var(--theme-accent, var(--accent));
+}
+.btnDanger {
+  padding: 9px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--danger, #ff5577);
+  background: transparent;
+  color: var(--danger, #ff5577);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btnDanger:hover {
+  background: color-mix(in srgb, var(--danger, #ff5577) 14%, transparent);
+}
+.btnPrimary {
+  padding: 9px 18px;
+  border-radius: 9px;
+  border: none;
+  background: var(--theme-accent, var(--accent));
+  color: var(--text-on-accent, #0b1526);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

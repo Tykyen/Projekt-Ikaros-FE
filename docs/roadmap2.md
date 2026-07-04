@@ -509,20 +509,15 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **Otevřené otázky:** Pořadí dotahování deníků (DrD 1.6 → JaD → DrD II → …)? Kdy/jak vrátit „dodatky k pravidlům" (vyřazeny z 16.2)? Pre/post moderace komunitního bestiáře (→ 21.4)?
 
-### - [ ] 16.3 Migrace obsahu ze starých fórovek / Matrixu — [E3 · dopad vysoký · náklad střední] 🔁
+### - [x] 16.3 Migrace obsahu ze starých fórovek / Matrixu — [E3 · dopad vysoký · náklad střední] 🔁
 **Cíl:** Import postav, stránek a vláken ze staré DB; ideálně generický import z phpBB/Webnode exportů.
 **Proč:** Komunity nepřejdou, když musí ručně přepsat roky obsahu. Snadný import = rozdíl mezi „zkusím" a „nemám čas"; získává **celé skupiny najednou** — přímá odpověď na síťový efekt. (Migrace uživatelů Matrixu už běží — viz `project_matrix_user_migration`.)
 **Návrh přípravy:** zmapovat strukturu staré Matrix DB; navrhnout mapování entit; one-off vs. opakovatelný import; dotáhnout krok 19 z Etapy I (migrace dat).
 **BE:** migrační skripty (postavy/stránky/vlákna); idempotence; logování.
 **Otevřené otázky:** Jen Matrix, nebo i generický phpBB/Webnode? Mapovat staré účty na nové (vazba na běžící user migraci)? Jak řešit chybějící/nekonzistentní data?
 
-### - [ ] 16.4 Onboarding nového PJ + demo svět — [D2 · dopad vysoký · náklad střední] 👑adopce
-**Cíl:** Průvodce při založení světa + volitelný předvyplněný „demo svět" (ukázková stránka, postava, scéna, chat) + kontextové tipy.
-**Proč:** Strmá křivka učení je napříč oborem stížnost č. 1; **37 % nováčků odchází do 6 měsíců** kvůli ní. Přímá páka na retenci (viz Příloha A — trychtýř). Nápověda je výborná — tohle je její aktivní, vtažená verze.
-**Návrh přípravy:** zmapovat „cestu nového uživatele" (Příloha A); vybrat 3–5 kroků průvodce; seed demo světa (read-only sandbox).
-**BE:** seed demo světa (🔁 vzor seedů při create světa).
-**FE:** průvodce (wizard) + kontextové tipy + vstup do demo světa.
-**Otevřené otázky:** Demo svět sdílený read-only, nebo kopie per uživatel? Průvodce přeskočitelný? Tipy odznačitelné („už nezobrazovat")?
+### 16.4 → přesunuto na Fázi 22  — [D2 · dopad vysoký · náklad střední]
+> **Přesunuto na úplný konec (2026-07-03):** onboarding nového PJ + demo svět dává smysl teprve po dokončení všeho ostatního — nový uživatel má potkat **hotový** produkt, ne rozestavěnou appku. Plný popis viz **Fáze 23 → 23.1**.
 
 ### - [ ] 16.5 Interaktivní mapa s body na stránky — [C1 · dopad vysoký · náklad střední] 🔁
 **Cíl:** Na obrázek mapy připíchneš body; klik otevře wiki stránku té lokace.
@@ -801,6 +796,15 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Proč:** Education je akviziční i retenční vrstva (World Anvil Academy, Kanka learning hub); obsahový flywheel — produkt generuje obsah, obsah přivádí uživatele. CWV zlepší UX i ranking.
 **Obsah/FE:** redakční obsah (🔁 článkový modul) + perf optimalizace (lazy loading, image pipeline, code splitting).
 **Otevřené otázky:** Kdo píše obsah? Dávkovat udržitelně (vyžaduje průběžnou údržbu).
+
+### - [ ] 22.3 Onboarding nového PJ + demo svět (bývalý 16.4) — [D2 · dopad vysoký · náklad střední] 👑adopce
+> Přesunuto z 16.4 (2026-07-03): onboarding = ÚPLNÝ ZÁVĚR; nový uživatel má vidět hotový produkt, ne rozdělanou appku.
+**Cíl:** Průvodce při založení světa + volitelný předvyplněný „demo svět" (ukázková stránka, postava, scéna, chat) + kontextové tipy.
+**Proč:** Strmá křivka učení je napříč oborem stížnost č. 1; **37 % nováčků odchází do 6 měsíců** kvůli ní. Přímá páka na retenci (viz Příloha A — trychtýř). Nápověda je výborná — tohle je její aktivní, vtažená verze.
+**Návrh přípravy:** zmapovat „cestu nového uživatele" (Příloha A); vybrat 3–5 kroků průvodce; seed demo světa (read-only sandbox).
+**BE:** seed demo světa (🔁 vzor seedů při create světa).
+**FE:** průvodce (wizard) + kontextové tipy + vstup do demo světa.
+**Otevřené otázky:** Demo svět sdílený read-only, nebo kopie per uživatel? Průvodce přeskočitelný? Tipy odznačitelné („už nezobrazovat")?
 
 ---
 

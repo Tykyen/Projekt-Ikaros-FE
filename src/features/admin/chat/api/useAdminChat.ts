@@ -87,8 +87,11 @@ export function useAdminChatRealtime(channelId: string | null) {
 export function useCreateAdminChannel() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (dto: { name: string; memberIds?: string[] }) =>
-      api.post<AdminChatChannel>(`${BASE}/channels`, dto),
+    mutationFn: (dto: {
+      name: string;
+      allMembers?: boolean;
+      memberIds?: string[];
+    }) => api.post<AdminChatChannel>(`${BASE}/channels`, dto),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: adminChatKeys.channels }),
   });
@@ -103,6 +106,7 @@ export function useUpdateAdminChannel() {
     }: {
       channelId: string;
       name?: string;
+      allMembers?: boolean;
       memberIds?: string[];
     }) => api.patch<AdminChatChannel>(`${BASE}/channels/${channelId}`, dto),
     onSuccess: () =>

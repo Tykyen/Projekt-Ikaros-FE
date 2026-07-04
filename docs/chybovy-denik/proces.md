@@ -119,3 +119,13 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** Uživatel ukazuje referenční screenshot „má to být přes celou věc / takto", moje verze je zmenšená/ohraničená karta.
 
 ---
+
+### CH-049 — Full-bleed přes 2 konfliktní grid třídy → main spadl do úzkého tracku · 2026-07-03
+**Kontext:** Dotažení full-bleed (CH-048): skrýt levý navigační sidebar `IkarosLayout`, ať admin chat zabere celou šířku. Přidal jsem `isAdminChat && s.bodyFull` (grid `1fr`) VEDLE existujícího `(isChat||isAdmin) && s.bodyNoRight` (grid `280px 1fr`) + `.bodyFull .sidebar{display:none}`.
+**Co jsem udělal špatně:** Aplikoval jsem OBĚ konfliktní grid třídy zároveň na `.body`. `.bodyFull` NEpřebilo `.bodyNoRight` (v bundlu vyhrál `bodyNoRight`) → grid zůstal dvousloupcový. Se skrytým sidebarem (`display:none`) se `main` auto-placnul do PRVNÍHO tracku (280px) místo aby vyplnil plochu → chat i pravý panel neviditelné (jen ~280px levého sloupce), zbytek prázdné pozadí. Uživatel: „proč se mi tady nic nezobrazuje".
+**Proč to nefungovalo:** Dvě třídy se stejnou specificitou měnící `grid-template-columns` = výsledek závisí na pořadí v bundlu (křehké, nespoléhat). `display:none` na grid item track uvolní → zbylý in-flow item (`main`) se přesune do prvního cellu.
+**Jak opraveno:** Třídy VÝLUČNĚ ternárem: `isAdminChat ? s.bodyFull : (isChat||isAdmin) && s.bodyNoRight`. Admin chat dostane jen `bodyFull` (grid `1fr`) → main vyplní.
+**Poučení:** Nikdy neaplikuj DVĚ třídy měnící TÉŽ vlastnost (grid-template-columns) na stejný element — override je závislý na pořadí bundlu, ne na zdrojovém pořadí. Použij výlučnou logiku. Při skrývání grid sloupce (`display:none`) ověř, kam se přesunou zbylé items (auto-placement do 1. tracku).
+**Příznak cyklení:** „přes celou věc" nefunguje po full-bleed úpravě; jen úzký levý sloupec vidět, zbytek prázdný.
+
+---
