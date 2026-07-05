@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Home,
   Globe2,
+  Mic,
   MessageSquare,
   Mail,
   Bell,
@@ -101,6 +102,19 @@ export function PlatformSection() {
             Zprávy mizí po hodině; příchody a odchody se zapisují do chatu.
           </p>
           <ScreenshotSlot media="platforma.hospoda" />
+        </Tool>
+        <Tool icon={<Mic size={16} />} title="Voice krčma (hlasový chat)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
+          <p>
+            Hlasová místnost pro <strong>pokec na mikrofonu</strong> — mezi Putykou
+            a Campy. Klikneš na <strong>„Usednout k mikrofonu"</strong> a mluvíš;
+            kamera je volitelná, jde i <strong>sdílet obrazovku</strong>. Vedle
+            hlasu běží textový pokec, takže píšeš i mluvíš zároveň.
+          </p>
+          <p>
+            Tlačítkem <strong>„Otevřít v samostatném okně"</strong> vytáhneš krčmu
+            do vlastního okna — třeba na druhý monitor. Voice krčma je jen pro{' '}
+            <strong>přihlášené</strong> (host se do ní nedostane).
+          </p>
         </Tool>
         <Tool icon={<Globe2 size={16} />} title="Camp (Fantasy · Mystery · Sci-fi)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>

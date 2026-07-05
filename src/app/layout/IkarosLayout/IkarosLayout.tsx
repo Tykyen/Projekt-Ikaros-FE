@@ -131,6 +131,8 @@ const CHAT_ROOMS: {
   anonHidden?: boolean;
 }[] = [
   { key: 'hospoda',   roomKey: 'hospoda',    label: 'Putyka',        to: '/chat' },
+  // 17.6 — Voice krčma: hlasová místnost mezi Putykou a Campy, jen registrovaní.
+  { key: 'voice', roomKey: 'voice-krcma', label: 'Voice krčma', to: '/chat/voice', anonHidden: true },
   { key: 'camp1', roomKey: 'camp-1', label: 'Fantasy camp', to: '/chat/camp',  anonHidden: true },
   { key: 'camp2', roomKey: 'camp-2', label: 'Mystery camp', to: '/chat/camp2', anonHidden: true },
   { key: 'camp3', roomKey: 'camp-3', label: 'Sci-fi camp',  to: '/chat/camp3', anonHidden: true },

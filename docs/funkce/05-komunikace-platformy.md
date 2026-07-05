@@ -1,6 +1,6 @@
 # 05 — Komunikace platformy
 
-Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Putyka + Camp: Fantasy/Mystery/Sci-fi), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
+Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Putyka + Voice krčma + Camp: Fantasy/Mystery/Sci-fi), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
 
 > Pozn.: **Chat uvnitř světa** (`/svet/:slug/chat`) je samostatná funkce a patří do kapitoly o světech. Custom obrázkové emoty jsou tam (viz sekce „Emoty" níže).
 
@@ -31,6 +31,25 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
+
+### Globální chat — Voice krčma (17.6)
+- **Co to je:** Globální **hlasová** místnost („Voice krčma") pro pokec na mikrofonu — voice-first (velké dlaždice účastníků), text pokec běží vedle. Hlas / video / sdílení obrazovky pohání **Jitsi** (`meet.jit.si`) za **provider adaptérem** (připraveno na pozdější výměnu za LiveKit bez přepisu UI). **Jen registrovaní** (host ji nevidí ani do ní nevejde).
+- **Kde:** route `/chat/voice` (`VoiceKrcmaPage` → `VoiceKrcmaRoom`). Levý panel „Chat": položka „Voice krčma" **mezi Putykou a Campy** (`CHAT_ROOMS`, `anonHidden`). Interní klíč místnosti `voice-krcma`.
+- **Kdo:**
+  - **FE:** `chat/voice` je `requireAuth`. Host nemá položku v sidebaru (`anonHidden`) a přímý přístup na URL ho vrátí do Putyky.
+  - **BE:** stejný `GlobalChatController` / `RoomKey` = `… | voice-krcma`; host → 403 **automaticky** (`assertGuestScope` / guest gate pouští jen `hospoda`). Identita autora textu = **účet** (jako Putyka, ne postava).
+- **Co jde dělat:**
+  - **Usednout k mikrofonu** → připojení k Jitsi hovoru (mikrofon zap, kamera vyp — účel je hlas). Ovládání vlastními tlačítky: **mikrofon**, **kamera** (volitelná), **sdílet obrazovku**, **odejít**.
+  - **Text pokec** vedle hovoru (reuse `ChatRoom`) — psát i mluvit zároveň.
+  - **Otevřít v samostatném okně** (`⧉`) → `window.open` na druhý monitor (pop-out; jen hlasová plocha, `?popout`).
+  - Vidět **roster** „kdo je na mikrofonu" + jeho stav mikrofonu (WS voice presence).
+- **Zvláštnosti:**
+  - **Náš rám je skin-aware** (voice-bar / dlaždice / ovladače přes `--theme-*` → přebarví se s platformovým skinem; identita „Řezbářská krčma" ve tvaru/ornamentu zůstává). **Vnitřek Jitsi iframe** (video mřížka) se jen sladí — plnou kontrolu dá až LiveKit.
+  - **Voice presence** (`voice:join/leave/state` → `chat:voice:presence/state`) je oddělená od textové presence („být v místnosti" ≠ „být v hovoru"); anti-spoof z ověřeného JWT, multi-tab dedup, reconnect re-join.
+  - **Jitsi nedělá signaling na našem BE** — audio/WebRTC/TURN běží uvnitř iframe pod CSP Jitsi; náš BE drží jen textový pokec + roster metadat.
+  - **CSP + Permissions-Policy** povolují `meet.jit.si` (script/frame/connect + delegace kamery/mikrofonu do iframe).
+- **Stav:** ✅ implementováno (BE jest 118/118; FE build/tsc/eslint/vitest ✓). ⚠️ **Čeká BE restart + CSP redeploy + živý test hlasu/videa na reálném zařízení** ([[feedback_be_restart_required]]). Room-name na veřejném `meet.jit.si` NENÍ bezpečnost (self-host Jitsi + JWT = follow-up).
+- **Kód:** FE `src/features/voice/` (`components/VoiceKrcmaRoom.tsx`, `useVoice.ts`, `provider/{loadJitsiApi,JitsiVoiceProvider,types}.ts`, `api/useVoicePresence.ts`, `config.ts`), `pages/VoiceKrcmaPage.tsx`; route `app/router.tsx`, sidebar `IkarosLayout.tsx` `CHAT_ROOMS`, typy `features/chat/lib/types.ts`. BE `global-chat.service.ts` (`RoomKey`/`ROOM_DEFS`/`resolveSenderIdentity`), `global-chat.gateway.ts` (voice presence), `presence-messages.ts`; kontrakt `docs/websocket-api.md`. CSP `default.conf.template`. Spec `docs/arch/phase-17/spec-17.6.md`.
 
 ### Globální chat — Camp (Fantasy · Mystery · Sci-fi)
 - **Co to je:** Tři atmosférické roleplay místnosti se **sdíleným prostředím** (žánr + lokace) a ilustračním pozadím scény, pro **hru na jeden večer**. Každý Camp má **zamčený žánr** (default: camp-1 = Fantasy, camp-2 = Mystery/`mystic`, camp-3 = Sci-fi) → **název = žánr** („Fantasy camp" / „Mystery camp" / „Sci-fi camp"). Technicky tři kanály téhož globálního chatu. (16.6 — pivot z „Camp I./II./III.")

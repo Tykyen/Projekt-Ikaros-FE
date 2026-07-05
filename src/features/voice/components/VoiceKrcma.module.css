@@ -1,0 +1,422 @@
+/*
+ * 17.6 — Voice krčma „Řezbářská" skin.
+ * Identita = TVAR + ORNAMENT (dřevo, kované okování, vyřezávaný vlys), STÁLÁ.
+ * Barvy VÝHRADNĚ z --theme-* tokenů → krčma se přebarví s platformovým skinem.
+ * Overlaye přes rgb(var(--black-rgb)/α) / rgb(var(--white-rgb)/α), nikdy hardcode.
+ */
+
+.wrap {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--sp-3);
+  height: 100%;
+  min-height: 0;
+  padding: var(--sp-3);
+}
+/* Pop-out okno (window.open) — jen hlasová plocha přes celé okno. */
+.wrap[data-popout] {
+  grid-template-columns: 1fr;
+}
+
+/* ── Hlasová plocha = dřevěný panel ─────────────────────────────── */
+.voice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  color: var(--theme-text);
+  background:
+    linear-gradient(
+      180deg,
+      var(--theme-surface-strong),
+      var(--theme-surface)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 3px,
+      rgb(var(--black-rgb) / 0.05) 3px 4px
+    );
+  border: 1px solid var(--theme-border);
+  box-shadow:
+    inset 0 1px 0 rgb(var(--white-rgb) / 0.05),
+    var(--depth-panel, 0 20px 50px -30px rgb(var(--black-rgb) / 0.8));
+}
+
+/* Signature ornament: vyřezávaný dřevěný vlys (řezbářská lišta). */
+.frieze {
+  flex: none;
+  height: 12px;
+  opacity: 0.55;
+  border-block: 1px solid var(--theme-border);
+  background-color: var(--theme-surface-strong);
+  background-image:
+    linear-gradient(135deg, var(--theme-accent) 25%, transparent 25%),
+    linear-gradient(-135deg, var(--theme-accent) 25%, transparent 25%),
+    linear-gradient(rgb(var(--black-rgb) / 0.18), rgb(var(--black-rgb) / 0.18));
+  background-size:
+    14px 12px,
+    14px 12px,
+    100% 100%;
+  background-position:
+    0 0,
+    7px 0,
+    0 0;
+}
+
+/* ── Hlavička = vyřezávaný štít ─────────────────────────────────── */
+.head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--theme-border-soft);
+}
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--theme-heading);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.reg {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--theme-accent-bright);
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--theme-border);
+}
+.live {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--theme-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.live[data-live]::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+.popout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--theme-text-muted);
+  background: var(--theme-surface-soft);
+  border: 1px solid var(--theme-border-soft);
+  transition: border-color 0.12s ease;
+}
+.popout:hover {
+  color: var(--theme-heading);
+  border-color: var(--theme-accent);
+}
+
+/* ── Stage: Jitsi + lobby overlay + ovladače ────────────────────── */
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.jitsi {
+  flex: 1;
+  min-height: 0;
+  background: rgb(var(--black-rgb) / 0.35);
+}
+.jitsi[aria-hidden='true'] {
+  visibility: hidden;
+}
+
+/* Lobby overlay (nepřipojen) — kryje prázdný Jitsi kontejner. */
+.lobby {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  text-align: center;
+  background:
+    radial-gradient(
+      120% 90% at 50% 20%,
+      rgb(var(--white-rgb) / 0.04),
+      transparent 60%
+    ),
+    var(--theme-surface);
+}
+.empty {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--theme-text-muted);
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+.err {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: 640px;
+}
+
+/* ── Účastník: portrét v dřevěném rámu s kovaným okováním ───────── */
+.tile,
+.chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--theme-surface-soft),
+    var(--theme-surface-strong)
+  );
+  border: 1px solid var(--theme-border);
+  box-shadow: inset 0 0 0 1px rgb(var(--black-rgb) / 0.2);
+}
+.tile {
+  flex-direction: column;
+  padding: var(--sp-3);
+  gap: var(--sp-2);
+}
+.chip {
+  padding: 4px 10px 4px 4px;
+}
+
+/* Rohové kované okování (dva pásky do L). */
+.corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 3px;
+  left: 3px;
+  border-top: 2px solid var(--theme-accent);
+  border-left: 2px solid var(--theme-accent);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.corner[data-pos='tr'] {
+  left: auto;
+  right: 3px;
+  border-left: 0;
+  border-right: 2px solid var(--theme-accent);
+}
+.corner[data-pos='bl'] {
+  top: auto;
+  bottom: 3px;
+  border-top: 0;
+  border-bottom: 2px solid var(--theme-accent);
+}
+.corner[data-pos='br'] {
+  top: auto;
+  left: auto;
+  right: 3px;
+  bottom: 3px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 2px solid var(--theme-accent);
+  border-bottom: 2px solid var(--theme-accent);
+}
+.chip .corner {
+  display: none;
+}
+
+.avatar {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    140deg,
+    var(--theme-accent),
+    var(--theme-accent-bright)
+  );
+  border: 1px solid var(--theme-border);
+}
+.chip .avatar {
+  width: 30px;
+  height: 30px;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mono {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--text-on-accent, var(--theme-heading));
+}
+.chip .mono {
+  font-size: var(--text-sm);
+}
+.pname {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-sm);
+  color: var(--theme-text);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mutedIcon {
+  color: var(--danger);
+}
+
+.enter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--text-on-accent, var(--theme-heading));
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    var(--theme-accent-bright),
+    var(--theme-accent)
+  );
+  border: 1px solid var(--theme-accent);
+  box-shadow:
+    0 0 0 1px rgb(var(--black-rgb) / 0.2),
+    0 10px 24px -12px var(--theme-glow-gold);
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+.enter:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.enter:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Roster pruh nad Jitsi (připojeno). */
+.rosterBar {
+  flex: none;
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--theme-border-soft);
+  background: rgb(var(--black-rgb) / 0.2);
+}
+
+/* ── Ovládací lišta ─────────────────────────────────────────────── */
+.controls {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-top: 1px solid var(--theme-border-soft);
+  background: linear-gradient(
+    0deg,
+    var(--theme-surface-strong),
+    transparent
+  );
+}
+.ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--theme-text);
+  background: var(--theme-surface-soft);
+  border: 1px solid var(--theme-border);
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease;
+}
+.ctl:hover {
+  transform: translateY(-1px);
+  border-color: var(--theme-accent);
+}
+.ctl[data-on] {
+  color: var(--theme-heading);
+  background: var(--theme-nav-active-bg, var(--theme-surface-strong));
+  border-color: var(--theme-accent);
+}
+.ctl[data-off] {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+.leave {
+  width: auto;
+  padding: 0 var(--sp-4);
+  color: var(--text-on-danger, var(--theme-heading));
+  background: var(--danger);
+  border-color: var(--danger);
+  font-size: var(--text-sm);
+}
+.leave:hover {
+  filter: brightness(1.08);
+  border-color: var(--danger);
+}
+
+/* ── Text pokec vpravo ──────────────────────────────────────────── */
+.pokec {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--theme-border-soft);
+}
+
+/* ── Mobil: pokec pod hlasovou plochou ──────────────────────────── */
+@media (max-width: 900px) {
+  .wrap {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(360px, 1fr) minmax(240px, 320px);
+  }
+}

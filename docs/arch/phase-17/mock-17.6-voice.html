@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikaros · Hlas &amp; video (17.6) — návrh vzhledu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Crimson+Pro:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   NÁVRH — Hlas & video (17.6, Jitsi adaptér)
+   Toto je MOCKUP vzhledu, ne živý hovor. Dlaždice jsou fake.
+   Skin-aware: barvy jsou tokeny → přepínač nahoře mění celý list.
+   ============================================================ */
+
+:root{
+  --r: 14px;
+  --r-sm: 10px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --font-disp: "Fraunces", Georgia, serif;
+  --font-body: "Crimson Pro", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ---- SKINY (data-skin na <html>) ------------------------- */
+html[data-skin="vily"]{        /* Svět víl — fialová */
+  --acc: 168 85 247;  --acc2: 192 132 252;
+  --bg0: 16 12 24; --bg1: 30 23 38; --bg2: 39 30 50;
+  --line: 168 85 247; --line-a: .16;
+  --ink: 237 233 244; --mut: 168 158 184; --spk: 200 150 255;
+  --grain-op: .04;
+}
+html[data-skin="krev"]{        /* Svět víl / chat — vínová */
+  --acc: 190 42 62;  --acc2: 233 90 108;
+  --bg0: 20 11 13; --bg1: 30 18 20; --bg2: 40 22 25;
+  --line: 190 42 62; --line-a: .18;
+  --ink: 240 226 228; --mut: 190 150 154; --spk: 239 100 100;
+  --grain-op: .05;
+}
+html[data-skin="putyka"]{      /* Dimenzionální Putyka — modrá noc (globální chat skin) */
+  --acc: 96 140 255;  --acc2: 138 180 255;
+  --bg0: 9 15 34; --bg1: 17 26 54; --bg2: 25 36 70;
+  --line: 120 160 255; --line-a: .16;
+  --ink: 219 230 255; --mut: 150 170 214; --spk: 138 180 255;
+  --grain-op: .04;
+}
+html[data-skin="krcma"]{       /* Voice krčma — VLASTNÍ identita (NEdědí), teplé hospodské světlo */
+  --acc: 214 150 66;  --acc2: 240 194 120;
+  --bg0: 26 18 11; --bg1: 38 27 17; --bg2: 51 37 23;
+  --line: 214 150 66; --line-a: .2;
+  --ink: 242 229 208; --mut: 192 166 132; --spk: 252 202 118;
+  --grain-op: .06;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:var(--font-body);
+  color:rgb(var(--ink));
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgb(var(--acc)/.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgb(var(--acc)/.08), transparent 55%),
+    rgb(var(--bg0));
+  min-height:100vh;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+/* jemný filmový grain */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
+  opacity:var(--grain-op);mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- Rám stránky ----------------------------------------- */
+.wrap{max-width:1180px;margin:0 auto;padding:32px 22px 90px}
+.head{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+h1{font-family:var(--font-disp);font-weight:600;font-size:clamp(26px,4vw,40px);margin:0;letter-spacing:-.01em}
+h1 .sub{display:block;font-size:14px;font-weight:400;color:rgb(var(--mut));letter-spacing:.02em;margin-top:6px}
+.legend{font-size:15px;color:rgb(var(--mut));max-width:520px}
+
+/* skin přepínač */
+.skins{display:flex;gap:8px;align-items:center}
+.skins b{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgb(var(--mut));margin-right:4px}
+.skinbtn{
+  font-family:var(--font-body);font-size:14px;cursor:pointer;
+  padding:7px 14px;border-radius:999px;color:rgb(var(--ink));
+  background:rgb(var(--bg1));border:1px solid rgb(var(--line)/.28);transition:.2s var(--ease);
+}
+.skinbtn:hover{border-color:rgb(var(--acc)/.6)}
+.skinbtn[aria-pressed="true"]{background:rgb(var(--acc)/.16);border-color:rgb(var(--acc));color:#fff}
+
+/* sekce / scéna */
+.scene{margin-top:46px}
+.scene > .cap{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.scene > .cap .n{font-family:var(--font-mono);font-size:12px;color:rgb(var(--acc2));
+  border:1px solid rgb(var(--acc)/.4);border-radius:6px;padding:2px 8px}
+.scene > .cap h2{font-family:var(--font-disp);font-weight:600;font-size:22px;margin:0}
+.scene > .cap p{margin:0;color:rgb(var(--mut));font-size:15px}
+
+/* obecný panel = „skin chrome" */
+.panel{
+  position:relative;background:
+    linear-gradient(180deg, rgb(var(--bg2)/.7), rgb(var(--bg1)));
+  border:1px solid rgb(var(--line)/var(--line-a));
+  border-radius:var(--r);overflow:hidden;
+  box-shadow:0 20px 60px -30px rgb(0 0 0 /.8), inset 0 1px 0 rgb(255 255 255 /.03);
+}
+/* signature zoubkovaný okraj (jako chat v Ikaru) */
+.zig{height:7px;width:100%;
+  background:
+    linear-gradient(135deg, rgb(var(--acc)/.5) 25%, transparent 25%) -8px 0/16px 14px,
+    linear-gradient(-135deg, rgb(var(--acc)/.5) 25%, transparent 25%) -8px 0/16px 14px;
+  opacity:.5}
+
+/* ======= mock „app frame" hlavičky ======= */
+.appbar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgb(var(--line)/.14)}
+.appbar .title{font-family:var(--font-disp);font-weight:600;font-size:19px;display:flex;align-items:center;gap:9px}
+.appbar .title .glyph{color:rgb(var(--acc2))}
+.appbar .tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.iconbtn{
+  width:38px;height:38px;display:grid;place-items:center;border-radius:10px;cursor:pointer;
+  background:rgb(var(--bg1));border:1px solid rgb(var(--line)/.16);color:rgb(var(--mut));transition:.18s var(--ease);
+}
+.iconbtn:hover{color:rgb(var(--ink));border-color:rgb(var(--acc)/.5)}
+.iconbtn svg{width:19px;height:19px}
+
+/* ======= PŘIPOJOVACÍ TLAČÍTKO ======= */
+.joinbtn{
+  display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+  font-family:var(--font-body);font-size:15px;color:rgb(var(--ink));
+  padding:8px 14px 8px 11px;border-radius:11px;
+  background:linear-gradient(180deg, rgb(var(--acc)/.22), rgb(var(--acc)/.12));
+  border:1px solid rgb(var(--acc)/.55);transition:.2s var(--ease);
+}
+.joinbtn:hover{border-color:rgb(var(--acc));box-shadow:0 0 0 4px rgb(var(--acc)/.14)}
+.joinbtn svg{width:18px;height:18px;color:rgb(var(--acc2))}
+.joinbtn .count{font-family:var(--font-mono);font-size:12px;background:rgb(var(--acc));color:#fff;
+  border-radius:999px;padding:1px 7px;font-weight:700}
+.joinbtn.live .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84}
+
+/* mini avatary „kdo je uvnitř" u tlačítka */
+.miniheads{display:flex}
+.miniheads span{width:22px;height:22px;border-radius:50%;margin-left:-7px;border:2px solid rgb(var(--bg1));
+  display:grid;place-items:center;font-family:var(--font-mono);font-size:10px;font-weight:700;color:#fff}
+
+/* ======= DLAŽDICE ÚČASTNÍKA ======= */
+.tiles{display:grid;gap:10px}
+.tile{
+  position:relative;aspect-ratio:16/10;border-radius:var(--r-sm);overflow:hidden;
+  background:rgb(var(--bg0));border:1px solid rgb(var(--line)/.14);
+  display:grid;place-items:center;transition:.2s var(--ease);
+}
+.tile .cam{position:absolute;inset:0}
+.tile .mono{font-family:var(--font-disp);font-weight:700;font-size:34px;color:#fff;opacity:.92;
+  width:74px;height:74px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(140deg, rgb(var(--acc)/.9), rgb(var(--acc2)/.6))}
+.tile .name{position:absolute;left:8px;bottom:7px;z-index:3;font-size:13px;color:#fff;
+  background:rgb(0 0 0 /.5);backdrop-filter:blur(6px);padding:2px 9px;border-radius:999px;
+  display:flex;align-items:center;gap:6px}
+.tile .name svg{width:13px;height:13px}
+.tile .muted-i{color:#ff8b8b}
+.tile.speaking{border-color:rgb(var(--spk))}
+.tile.speaking::after{content:"";position:absolute;inset:0;border-radius:var(--r-sm);pointer-events:none;
+  box-shadow:0 0 0 2px rgb(var(--spk)), 0 0 22px rgb(var(--spk)/.5);animation:spk 1.4s var(--ease) infinite}
+@keyframes spk{0%,100%{opacity:.55}50%{opacity:1}}
+/* „video zapnuto" placeholder */
+.cam.on{background:
+  radial-gradient(120% 90% at 30% 20%, rgb(var(--acc2)/.5), transparent 55%),
+  radial-gradient(120% 120% at 80% 90%, rgb(var(--acc)/.55), transparent 50%),
+  rgb(var(--bg2))}
+.cam.screen{background:
+  repeating-linear-gradient(135deg, rgb(var(--acc)/.10) 0 10px, transparent 10px 20px), rgb(var(--bg2))}
+.tile .badge-share{position:absolute;top:8px;left:8px;z-index:3;font-size:11px;color:#fff;
+  background:rgb(var(--acc)/.85);padding:2px 8px;border-radius:6px;display:flex;gap:5px;align-items:center}
+
+/* ======= OVLÁDACÍ LIŠTA (náš rám) ======= */
+.controls{display:flex;align-items:center;justify-content:center;gap:9px;padding:12px;
+  background:rgb(var(--bg0)/.6);border-top:1px solid rgb(var(--line)/.14)}
+.ctl{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;cursor:pointer;
+  background:rgb(var(--bg2));border:1px solid rgb(var(--line)/.2);color:rgb(var(--ink));transition:.16s var(--ease)}
+.ctl:hover{border-color:rgb(var(--acc)/.6);transform:translateY(-1px)}
+.ctl svg{width:20px;height:20px}
+.ctl.on{background:rgb(var(--acc)/.18);border-color:rgb(var(--acc));color:#fff}
+.ctl.off{background:rgb(255 90 90 /.14);border-color:#ff6b6b;color:#ff9b9b}
+.ctl.leave{background:linear-gradient(180deg,#e5484d,#c0343a);border-color:#e5484d;color:#fff;width:auto;padding:0 16px;gap:8px;font-family:var(--font-body);font-size:15px}
+.ctl.leave:hover{filter:brightness(1.08)}
+.ctl .lab{font-size:15px}
+
+/* ======= EMBEDDED VOICE PANEL v chatu (4. sloupec) ======= */
+.chatgrid{display:grid;grid-template-columns:210px 1fr 340px;min-height:440px}
+.chatgrid .side{background:rgb(var(--bg0)/.5);border-right:1px solid rgb(var(--line)/.12);padding:14px 12px}
+.chatgrid .side .grp{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgb(var(--mut));margin:14px 6px 6px}
+.chatgrid .side .conv{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;font-size:15px;color:rgb(var(--ink))}
+.chatgrid .side .conv.active{background:rgb(var(--acc)/.14);border:1px solid rgb(var(--acc)/.4)}
+.chatgrid .side .conv .voice-flag{margin-left:auto;font-size:11px;color:#3ddc84;display:flex;align-items:center;gap:4px}
+.chatgrid .main{padding:16px;display:flex;flex-direction:column;gap:12px;background:
+  radial-gradient(700px 400px at 60% 0%, rgb(var(--acc)/.05), transparent 60%)}
+.msg{display:flex;gap:10px;align-items:flex-start}
+.msg .av{width:34px;height:34px;border-radius:8px;background:linear-gradient(140deg,rgb(var(--acc)/.8),rgb(var(--acc2)/.5));
+  display:grid;place-items:center;color:#fff;font-family:var(--font-mono);font-weight:700;font-size:13px;flex:none}
+.msg .body .who{font-family:var(--font-disp);font-weight:600;font-size:15px}
+.msg .body .who .t{font-family:var(--font-mono);font-size:11px;color:rgb(var(--mut));margin-left:8px}
+.msg .body .txt{color:rgb(var(--ink));opacity:.9}
+.voicecol{background:rgb(var(--bg0)/.55);border-left:1px solid rgb(var(--line)/.12);display:flex;flex-direction:column}
+.voicecol .vh{padding:12px 14px;border-bottom:1px solid rgb(var(--line)/.12);display:flex;align-items:center;gap:9px}
+.voicecol .vh .lbl{font-family:var(--font-disp);font-weight:600;font-size:16px}
+.voicecol .vh .live{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:#3ddc84;display:flex;gap:5px;align-items:center}
+.voicecol .vh .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84}
+.voicecol .vtiles{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:1}
+.voicecol .vtiles .tile .mono{width:52px;height:52px;font-size:24px}
+
+/* ======= PERZISTENTNÍ VOICE-BAR ======= */
+.voicebar{display:flex;align-items:center;gap:14px;padding:10px 14px;
+  background:linear-gradient(180deg, rgb(var(--bg2)), rgb(var(--bg1)));
+  border:1px solid rgb(var(--line)/.24);border-radius:var(--r);
+  box-shadow:0 18px 50px -24px rgb(0 0 0 /.9)}
+.voicebar .where{font-size:14px;color:rgb(var(--mut));display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.voicebar .where b{font-family:var(--font-disp);color:rgb(var(--ink));font-size:15px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.voicebar .where .live{color:#3ddc84;font-family:var(--font-mono);font-size:11px;display:flex;gap:5px;align-items:center}
+.voicebar .heads{display:flex;margin-right:auto}
+.voicebar .heads .h{width:30px;height:30px;border-radius:50%;margin-left:-8px;border:2px solid rgb(var(--bg1));
+  display:grid;place-items:center;color:#fff;font-family:var(--font-mono);font-size:11px;font-weight:700;position:relative}
+.voicebar .heads .h.spk{outline:2px solid rgb(var(--spk));outline-offset:1px;animation:spk 1.4s infinite}
+.voicebar .mini{display:flex;gap:7px}
+.voicebar .mini .ctl{width:40px;height:40px;border-radius:11px}
+.voicebar .mini .ctl svg{width:18px;height:18px}
+
+/* ======= TAKTICKÁ MAPA — plovoucí panel ======= */
+.mapstage{position:relative;height:440px;border-radius:var(--r);overflow:hidden;
+  background:
+    repeating-linear-gradient(60deg, rgb(var(--acc)/.05) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(-60deg, rgb(var(--acc)/.05) 0 1px, transparent 1px 46px),
+    radial-gradient(120% 100% at 50% 30%, rgb(var(--bg2)), rgb(var(--bg0)));
+  border:1px solid rgb(var(--line)/.14)}
+.mapstage .maplabel{position:absolute;top:12px;left:14px;font-family:var(--font-disp);font-weight:600;
+  font-size:15px;color:rgb(var(--ink));opacity:.6}
+.floatvoice{position:absolute;top:14px;right:14px;width:230px;border-radius:12px;overflow:hidden;
+  background:rgb(var(--bg1)/.86);backdrop-filter:blur(10px);border:1px solid rgb(var(--line)/.28);
+  box-shadow:0 20px 50px -22px rgb(0 0 0 /.9)}
+.floatvoice .fh{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgb(var(--line)/.16);
+  font-family:var(--font-mono);font-size:11px;color:rgb(var(--mut));cursor:grab}
+.floatvoice .fh .live{color:#3ddc84;display:flex;gap:5px;align-items:center;margin-left:auto}
+.floatvoice .fh .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#3ddc84;box-shadow:0 0 7px #3ddc84}
+.floatvoice .fh .collapse{cursor:pointer;color:rgb(var(--mut))}
+.floatvoice .ftiles{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+.floatvoice .ftiles .tile{aspect-ratio:1/1}
+.floatvoice .ftiles .tile .mono{width:38px;height:38px;font-size:18px}
+.floatvoice .ftiles .tile .name{font-size:10px;padding:1px 6px}
+.floatvoice .fctl{display:flex;gap:6px;justify-content:center;padding:8px;border-top:1px solid rgb(var(--line)/.16)}
+.floatvoice .fctl .ctl{width:36px;height:36px;border-radius:10px}
+.floatvoice .fctl .ctl svg{width:16px;height:16px}
+/* kolabovaná bublina na mapě */
+.voicebubble{position:absolute;bottom:16px;right:16px;display:flex;align-items:center;gap:8px;
+  padding:7px 12px 7px 8px;border-radius:999px;background:rgb(var(--bg1)/.9);backdrop-filter:blur(8px);
+  border:1px solid rgb(var(--acc)/.4);cursor:pointer}
+.voicebubble .heads .h{width:26px;height:26px;font-size:10px}
+.voicebubble .t{font-size:13px;color:rgb(var(--ink))}
+
+/* ======= POP-OUT okno ======= */
+.popwin{width:360px;border-radius:12px;overflow:hidden;border:1px solid rgb(var(--line)/.3);
+  box-shadow:0 30px 80px -20px rgb(0 0 0 /.95);background:rgb(var(--bg1))}
+.popwin .titlebar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgb(var(--bg0));
+  border-bottom:1px solid rgb(var(--line)/.2);font-family:var(--font-mono);font-size:11px;color:rgb(var(--mut))}
+.popwin .titlebar .dots{display:flex;gap:6px;margin-right:6px}
+.popwin .titlebar .dots i{width:11px;height:11px;border-radius:50%;background:rgb(var(--line)/.4)}
+.popwin .titlebar .pin{margin-left:auto;color:rgb(var(--acc2))}
+.popwin .ptiles{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+.popwin .ptiles .tile .mono{width:44px;height:44px;font-size:20px}
+.popwin .controls{padding:9px}
+.popwin .controls .ctl{width:40px;height:40px;border-radius:11px}
+
+/* pop-out MENU */
+.popmenu{width:260px;border-radius:12px;overflow:hidden;background:rgb(var(--bg1));
+  border:1px solid rgb(var(--line)/.26);box-shadow:0 24px 60px -20px rgb(0 0 0 /.9)}
+.popmenu .mi{display:flex;gap:11px;align-items:flex-start;padding:12px 14px;cursor:pointer;transition:.15s var(--ease)}
+.popmenu .mi:hover{background:rgb(var(--acc)/.12)}
+.popmenu .mi + .mi{border-top:1px solid rgb(var(--line)/.1)}
+.popmenu .mi svg{width:20px;height:20px;color:rgb(var(--acc2));flex:none;margin-top:2px}
+.popmenu .mi .tt{font-family:var(--font-disp);font-weight:600;font-size:15px}
+.popmenu .mi .dd{font-size:13px;color:rgb(var(--mut))}
+.popmenu .mi .tag{font-family:var(--font-mono);font-size:10px;color:rgb(var(--mut));border:1px solid rgb(var(--line)/.3);
+  border-radius:5px;padding:1px 6px;margin-left:auto;flex:none}
+
+/* rozložení dvousloupců pro poslední scény */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+@media(max-width:820px){
+  .chatgrid{grid-template-columns:1fr}
+  .chatgrid .side,.voicecol{display:none}
+  .two{grid-template-columns:1fr}
+  .floatvoice{position:static;width:auto;margin:14px}
+}
+
+/* poznámkový lístek */
+.note{margin-top:14px;padding:14px 16px;border-radius:12px;font-size:15px;
+  background:rgb(var(--acc)/.07);border:1px solid rgb(var(--acc)/.24);color:rgb(var(--ink))}
+.note b{font-family:var(--font-disp)}
+.note .k{color:rgb(var(--acc2))}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid rgb(var(--line)/.14);color:rgb(var(--mut));font-size:14px}
+.foot code{font-family:var(--font-mono);font-size:12px;background:rgb(var(--bg2));padding:2px 6px;border-radius:5px;color:rgb(var(--acc2))}
+
+/* ======= VOICE KRČMA (voice-first, globální, jen registrovaní) ======= */
+.flagcap .n{background:rgb(var(--acc));color:#fff;border-color:rgb(var(--acc))}
+.krcma{display:grid;grid-template-columns:190px 1fr 250px;min-height:480px}
+.krcma .kside{background:rgb(var(--bg0)/.5);border-right:1px solid rgb(var(--line)/.12);padding:14px 12px}
+.krcma .kside .grp{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgb(var(--mut));margin:6px 6px}
+.krcma .kside .conv{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:9px;font-size:15px;color:rgb(var(--ink));margin-bottom:3px}
+.krcma .kside .conv.active{background:rgb(var(--acc)/.16);border:1px solid rgb(var(--acc)/.45)}
+.krcma .kside .conv .voice-flag{margin-left:auto;font-size:11px;color:#3ddc84;font-family:var(--font-mono)}
+.krcma .kmain{display:flex;flex-direction:column}
+.krcma .khead{display:flex;align-items:center;gap:11px;padding:13px 16px;border-bottom:1px solid rgb(var(--line)/.14);flex-wrap:wrap}
+.krcma .khead .lbl{font-family:var(--font-disp);font-weight:600;font-size:19px;display:flex;align-items:center;gap:8px}
+.krcma .khead .reg{font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;color:rgb(var(--acc2));
+  border:1px solid rgb(var(--acc)/.4);border-radius:6px;padding:3px 8px;display:flex;gap:5px;align-items:center}
+.krcma .khead .live{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:#3ddc84;display:flex;gap:5px;align-items:center}
+.krcma .khead .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84}
+.krcma .kstage{flex:1;padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-content:start;
+  background:radial-gradient(720px 400px at 50% -10%, rgb(var(--acc)/.06), transparent 60%)}
+.krcma .kstage .tile{aspect-ratio:4/3}
+.krcma .kstage .tile .mono{width:58px;height:58px;font-size:25px}
+.krcma .ktext{background:rgb(var(--bg0)/.5);border-left:1px solid rgb(var(--line)/.12);display:flex;flex-direction:column}
+.krcma .ktext .tt{padding:11px 13px;border-bottom:1px solid rgb(var(--line)/.12);font-family:var(--font-disp);font-weight:600;font-size:14px;color:rgb(var(--mut))}
+.krcma .ktext .tmsgs{flex:1;padding:12px 13px;display:flex;flex-direction:column;gap:10px;font-size:14px;color:rgb(var(--ink))}
+.krcma .ktext .tmsgs b{font-family:var(--font-disp);color:rgb(var(--acc2))}
+.krcma .ktext .tin{margin:0 12px 12px;padding:9px 12px;border-radius:10px;background:rgb(var(--bg2));border:1px solid rgb(var(--line)/.18);color:rgb(var(--mut));font-size:14px}
+@media(max-width:820px){.krcma{grid-template-columns:1fr}.krcma .kside,.krcma .ktext{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>Hlas &amp; video
+        <span class="sub">Návrh 17.6 · Jitsi adaptér · náš rám okolo, Jitsiho dlaždice uvnitř</span>
+      </h1>
+    </div>
+    <div class="skins" role="group" aria-label="Přepínač skinu">
+      <b>Skin</b>
+      <button class="skinbtn" data-set="vily" aria-pressed="false">Svět víl</button>
+      <button class="skinbtn" data-set="krev" aria-pressed="true">Chat (vínová)</button>
+      <button class="skinbtn" data-set="putyka" aria-pressed="false">Putyka</button>
+    </div>
+  </div>
+  <p class="legend">Voice UI je <b>skin-aware</b> — přepni skin nahoře a celý návrh se přebarví přes tokeny. Stejný kód, tři světy. Klikací: ztlum/kameru/pop-out si můžeš vyzkoušet.</p>
+
+  <!-- ============ 1. PŘIPOJOVACÍ TLAČÍTKO ============ -->
+  <section class="scene">
+    <div class="cap"><span class="n">01</span><h2>Vstupní bod</h2><p>— tlačítko v hlavičce konverzace, vedle presence</p></div>
+    <div class="panel">
+      <div class="zig"></div>
+      <div class="appbar">
+        <div class="title"><span class="glyph">🍺</span> Dimenzionální Putyka</div>
+        <div class="tools">
+          <!-- stav A: nikdo nevolá -->
+          <button class="joinbtn" title="Nikdo zatím nevolá">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 10.5 20 8v8l-4.5-2.5"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg>
+            Zahájit hovor
+          </button>
+          <!-- stav B: hovor běží -->
+          <button class="joinbtn live" title="3 lidé v hovoru">
+            <span class="dot"></span>
+            <div class="miniheads">
+              <span style="background:linear-gradient(140deg,#7c5cff,#c084fc)">T</span>
+              <span style="background:linear-gradient(140deg,#e5484d,#ff8b6b)">A</span>
+              <span style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</span>
+            </div>
+            Připojit se <span class="count">3</span>
+          </button>
+          <div class="iconbtn" title="Přítomní"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 3-4.5 5.5-4.5S13.9 16 14.5 19M15 5.5a3 3 0 0 1 0 5.6M21 19c-.4-2-1.6-3.4-3.2-4"/></svg></div>
+        </div>
+      </div>
+      <div style="padding:22px 18px;color:rgb(var(--mut))">
+        Vlevo <b>„Zahájit hovor"</b> (nikdo zatím nevolá) · vpravo živý stav: zelená tečka, avatary uvnitř a počet.
+        Klik → připojíš se, otevře se panel z&nbsp;kroku 2.
+      </div>
+    </div>
+    <div class="note"><b class="k">Hranice Jitsi:</b> tlačítko, počty i avatary „kdo je uvnitř" jsou <b>náš</b> prvek (přes Jitsi API). Uvnitř hovoru už mřížku kreslí Jitsi — tu barevně sladíme jen zvenčí (logo, toolbar), ne dlaždice.</div>
+  </section>
+
+  <!-- ============ ★ VOICE KRČMA ============ -->
+  <section class="scene">
+    <div class="cap flagcap"><span class="n">★</span><h2>Voice krčma — nová hlasová síň</h2><p>— vlastní místnost mezi Putykou a Campem · jen registrovaní · primárně mikrofon</p></div>
+    <div class="panel">
+      <div class="zig"></div>
+      <div class="krcma">
+        <div class="kside">
+          <div class="grp">Chat</div>
+          <div class="conv">🍺 Putyka</div>
+          <div class="conv active">🎙️ Voice krčma <span class="voice-flag">● 5</span></div>
+          <div class="conv">⬡ Fantasy Camp</div>
+          <div class="conv">⬡ Mystery Camp</div>
+          <div class="conv">⬡ Sci-fi Camp</div>
+        </div>
+        <div class="kmain">
+          <div class="khead">
+            <span class="lbl">🎙️ Voice krčma</span>
+            <span class="reg"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> jen registrovaní</span>
+            <span class="live">živě · 5 na mikrofonu</span>
+          </div>
+          <div class="kstage">
+            <div class="tile speaking"><div class="cam on"></div><div class="name">Tyky</div></div>
+            <div class="tile"><div class="mono">A</div><div class="name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="muted-i"><path d="M4 4l16 16M9 4.5A2.5 2.5 0 0 1 14 5v4"/><path d="M5 10v1a7 7 0 0 0 10 6"/></svg> Alambert</div></div>
+            <div class="tile"><div class="mono" style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</div><div class="name">PJ</div></div>
+            <div class="tile"><div class="mono" style="background:linear-gradient(140deg,#e5484d,#ff8b6b)">Ž</div><div class="name">Žena</div></div>
+            <div class="tile"><div class="mono" style="background:linear-gradient(140deg,#c78a3b,#e8c06a)">V</div><div class="name">Vyvolávač</div></div>
+            <div class="tile" style="place-items:center;border-style:dashed"><div style="color:rgb(var(--mut));font-size:13px;text-align:center">+ přijít<br>na mikrofon</div></div>
+          </div>
+          <div class="controls">
+            <div class="ctl on" data-toggle="mic" title="Mikrofon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></div>
+            <div class="ctl" data-toggle="cam" title="Kamera (volitelná)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 10.5 20 8v8l-4.5-2.5"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg></div>
+            <div class="ctl" data-toggle="screen" title="Sdílet obrazovku"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+            <div class="ctl" title="Zvuková zařízení"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12"/></svg></div>
+            <div class="ctl" data-pop title="Vytáhnout do okna"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8"/><path d="M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4"/></svg></div>
+            <div class="ctl leave" title="Odejít z krčmy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9c5-3 13-3 18 0l-2.5 3-3.5-1v-2.2A12 12 0 0 0 9 8.6V11L5.5 12 3 9Z"/></svg><span class="lab">Odejít</span></div>
+          </div>
+        </div>
+        <div class="ktext">
+          <div class="tt">Pokec (text vedle hlasu)</div>
+          <div class="tmsgs">
+            <div><b>Tyky:</b> kdo se přidá na oneshot v pátek?</div>
+            <div><b>Alambert:</b> jsem tu, jen poslouchám 👂</div>
+            <div><b>PJ:</b> hodím odkaz na svět…</div>
+          </div>
+          <div class="tin">Napiš do krčmy…</div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b class="k">Voice-first:</b> střed = kdo je na mikrofonu (velké dlaždice), text je jen postranní pokec. <b class="k">Zámek</b> = dovnitř jen přihlášení; anonymní host krčmu ani nevidí. Kamera je volitelná — účel je pokec hlasem, ne video-porada.</div>
+  </section>
+
+  <!-- ============ 2. EMBEDDED PANEL v chatu ============ -->
+  <section class="scene">
+    <div class="cap"><span class="n">02</span><h2>V chatu — postranní panel</h2><p>— hovor jako 4. sloupec, píšeš i mluvíš zároveň</p></div>
+    <div class="panel">
+      <div class="zig"></div>
+      <div class="chatgrid">
+        <div class="side">
+          <div class="grp">Postavy</div>
+          <div class="conv active">FOksiGen <span class="voice-flag">● 3</span></div>
+          <div class="conv">Rytíři</div>
+          <div class="grp">Globální</div>
+          <div class="conv">Herní informace</div>
+        </div>
+        <div class="main">
+          <div class="msg"><div class="av">Ž</div><div class="body"><div class="who">Žena <span class="t">16:08</span></div><div class="txt">Iniciativa hozena — jdeme na to.</div></div></div>
+          <div class="msg"><div class="av" style="background:linear-gradient(140deg,#555,#888)">P</div><div class="body"><div class="who">PJ <span class="t">23:03</span></div><div class="txt">Zapínám kameru, ukážu vám tu mapu.</div></div></div>
+        </div>
+        <div class="voicecol">
+          <div class="vh"><span class="lbl">Hovor</span><span class="live">živě · 3</span></div>
+          <div class="vtiles">
+            <div class="tile speaking"><div class="cam on"></div><div class="name">Tyky</div></div>
+            <div class="tile"><div class="mono">A</div><div class="name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="muted-i"><path d="M4 4l16 16M9 4.5A2.5 2.5 0 0 1 14 5v4"/><path d="M5 10v1a7 7 0 0 0 10 6"/></svg> Alambert</div></div>
+            <div class="tile"><div class="mono" style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</div><div class="name">PJ</div></div>
+            <div class="tile" style="place-items:center"><div style="color:rgb(var(--mut));font-size:13px;text-align:center">+ pozvat<br>na hovor</div></div>
+          </div>
+          <div class="controls">
+            <div class="ctl on" data-toggle="mic" title="Mikrofon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></div>
+            <div class="ctl off" data-toggle="cam" title="Kamera vypnutá"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16"/><path d="M15.5 10.5 20 8v8M3 6h9v10a1 1 0 0 1-1 1H4"/></svg></div>
+            <div class="ctl" data-toggle="screen" title="Sdílet obrazovku"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+            <div class="ctl" data-pop title="Vytáhnout do okna"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8"/><path d="M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4"/></svg></div>
+            <div class="ctl leave" title="Odejít z hovoru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9c5-3 13-3 18 0l-2.5 3-3.5-1v-2.2A12 12 0 0 0 9 8.6V11L5.5 12 3 9Z"/></svg><span class="lab">Odejít</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b class="k">Zelený rámeček</b> = kdo právě mluví (pulzuje). <b class="k">Kamera zapnutá</b> = video dlaždice, jinak monogram. <b class="k">Alambert má ztlumený mikrofon</b> → červená ikona. Panel jde skrýt a zůstat jen ve voice-baru (krok 3).</div>
+  </section>
+
+  <!-- ============ 3. PERZISTENTNÍ VOICE-BAR ============ -->
+  <section class="scene">
+    <div class="cap"><span class="n">03</span><h2>Voice-bar, který přežije navigaci</h2><p>— odejdeš z chatu na mapu, hovor jede dál</p></div>
+    <div class="voicebar">
+      <div class="heads">
+        <div class="h spk" style="background:linear-gradient(140deg,#7c5cff,#c084fc)">T</div>
+        <div class="h" style="background:linear-gradient(140deg,#e5484d,#ff8b6b)">A</div>
+        <div class="h" style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</div>
+      </div>
+      <div class="where">
+        <b>🍺 Dimenzionální Putyka</b>
+        <span class="live">● v hovoru · 3</span>
+      </div>
+      <div class="mini">
+        <div class="ctl on" data-toggle="mic" title="Mikrofon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></div>
+        <div class="ctl" data-toggle="cam" title="Kamera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 10.5 20 8v8l-4.5-2.5"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg></div>
+        <div class="ctl" data-pop title="Vytáhnout do okna"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8"/><path d="M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4"/></svg></div>
+        <div class="ctl leave" title="Odejít"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9c5-3 13-3 18 0l-2.5 3-3.5-1v-2.2A12 12 0 0 0 9 8.6V11L5.5 12 3 9Z"/></svg><span class="lab">Odejít</span></div>
+      </div>
+    </div>
+    <div class="note"><b class="k">Kde bydlí:</b> ve vrstvě layoutu (mimo chat), takže přežije přechod chat → mapa → deník. To je přesně důvod, proč hovor nezmizí, když odejdeš — a základ pro pop-out do vlastního okna.</div>
+  </section>
+
+  <!-- ============ 4. TAKTICKÁ MAPA ============ -->
+  <section class="scene">
+    <div class="cap"><span class="n">04</span><h2>Na taktické mapě — plovoucí panel</h2><p>— vidíš lidi i bitvu, panel nezakrývá a jde sbalit</p></div>
+    <div class="two">
+      <div>
+        <div class="mapstage">
+          <div class="maplabel">⚔️ Bojová scéna</div>
+          <div class="floatvoice">
+            <div class="fh">HOVOR · přetáhni <span class="collapse" title="Sbalit do bubliny">▁</span> <span class="live">3</span></div>
+            <div class="ftiles">
+              <div class="tile speaking"><div class="cam on"></div><div class="name">Tyky</div></div>
+              <div class="tile"><div class="mono">A</div></div>
+              <div class="tile"><div class="mono" style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</div></div>
+              <div class="tile"><div class="cam screen"></div><div class="badge-share"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/></svg>mapa</div></div>
+            </div>
+            <div class="fctl">
+              <div class="ctl on" data-toggle="mic" title="Mikrofon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></div>
+              <div class="ctl" data-toggle="cam" title="Kamera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 10.5 20 8v8l-4.5-2.5"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg></div>
+              <div class="ctl" data-pop title="Vytáhnout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8"/><path d="M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4"/></svg></div>
+              <div class="ctl leave" style="width:36px;padding:0" title="Odejít"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9c5-3 13-3 18 0l-2.5 3-3.5-1v-2.2A12 12 0 0 0 9 8.6V11L5.5 12 3 9Z"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mapstage">
+          <div class="maplabel">⚔️ Bojová scéna — panel sbalený</div>
+          <div class="voicebubble" title="Rozbalit hovor">
+            <div class="heads">
+              <div class="h spk" style="background:linear-gradient(140deg,#7c5cff,#c084fc)">T</div>
+              <div class="h" style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</div>
+            </div>
+            <span class="t">Hovor · 3 ●</span>
+          </div>
+        </div>
+        <div class="note" style="margin-top:12px"><b class="k">Sbaleno do bubliny</b> v rohu → maximum mapy pro bitvu, hovor pořád jede. Klik = rozbalí panel zpět.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. POP-OUT ============ -->
+  <section class="scene">
+    <div class="cap"><span class="n">05</span><h2>Pop-out — hovor mimo appku</h2><p>— na druhý monitor / plovoucí okno nad vším</p></div>
+    <div class="two">
+      <div>
+        <div class="popmenu" style="margin-bottom:18px">
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg><div><div class="tt">Nová karta prohlížeče</div><div class="dd">Klasické okno, přetáhneš na 2. monitor</div></div><span class="tag">vždy</span></div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="12" y="11" width="7" height="6" rx="1" fill="currentColor" opacity=".3"/></svg><div><div class="tt">Plovoucí okénko nad vším</div><div class="dd">Vždy navrchu, i přes jiné appky (Picture-in-Picture)</div></div><span class="tag">Chrome</span></div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H4z"/><path d="M2 20h20"/></svg><div><div class="tt">Zpět dovnitř</div><div class="dd">Vrátit hovor do panelu Ikara</div></div></div>
+        </div>
+        <div class="note"><b class="k">Výběr při kliku na „vytáhnout".</b> Plovoucí okénko (PiP) je ten Discord mini-player, co plave nad ostatními appkami — Chrome/Edge. Nová karta funguje všude.</div>
+      </div>
+      <div>
+        <div class="popwin">
+          <div class="titlebar"><div class="dots"><i></i><i></i><i></i></div> Ikaros · Hovor <span class="pin" title="Vždy navrchu">📌 navrchu</span></div>
+          <div class="ptiles">
+            <div class="tile speaking"><div class="cam on"></div><div class="name">Tyky</div></div>
+            <div class="tile"><div class="mono">A</div><div class="name">Alambert</div></div>
+            <div class="tile"><div class="mono" style="background:linear-gradient(140deg,#2f9e6b,#6be0a0)">P</div><div class="name">PJ</div></div>
+            <div class="tile"><div class="cam screen"></div><div class="badge-share">mapa</div></div>
+          </div>
+          <div class="controls">
+            <div class="ctl on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></div>
+            <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 10.5 20 8v8l-4.5-2.5"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg></div>
+            <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/></svg></div>
+            <div class="ctl leave" style="width:40px;padding:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9c5-3 13-3 18 0l-2.5 3-3.5-1v-2.2A12 12 0 0 0 9 8.6V11L5.5 12 3 9Z"/></svg></div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:12px"><b class="k">⚠️ U Jitsi:</b> při vytažení se iframe reloadne → 1–2 s reconnect. S pozdějším LiveKitem bude přesun plynulý bez přerušení.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p><b>Co je tady „náš" a co „Jitsiho":</b> rám, tlačítka, voice-bar, plovoucí panel, pop-out volby, skin barvy = <b>náš kód</b> (ovládáme Jitsi přes jeho API). Mřížka dlaždic uvnitř hovoru = <b>Jitsiho iframe</b>. Vše postaveno na <code>provider</code> adaptéru → pozdější přepnutí na LiveKit = výměna modulu, ne přepis tohoto UI.</p>
+    <p><b>Mobil:</b> voice-bar se scvrkne na spodní lištu (avatary + mic + odejít), panel na fullscreen sheet. Doladí se v <code>mobil-desktop</code>.</p>
+    <p><b>Pozn. Putyka:</b> hlas default jen pro přihlášené — anonymní host zůstává u textu (konzistentní s 15.8).</p>
+  </div>
+
+</div>
+
+<script>
+  const root = document.documentElement;
+  root.setAttribute('data-skin','krev');
+  document.querySelectorAll('.skinbtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      root.setAttribute('data-skin', b.dataset.set);
+      document.querySelectorAll('.skinbtn').forEach(x=>x.setAttribute('aria-pressed', x===b));
+    });
+  });
+  // demo toggly na ovladačích
+  document.querySelectorAll('[data-toggle]').forEach(c=>{
+    c.addEventListener('click',()=>{
+      if(c.classList.contains('on')){c.classList.remove('on');c.classList.add('off');}
+      else if(c.classList.contains('off')){c.classList.remove('off');}
+      else{c.classList.add('on');}
+    });
+  });
+</script>
+</body>
+</html>

@@ -589,7 +589,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** speciální layout nad existujícími `CampaignRelationship` (typy rodič/potomek/choť). Nižší priorita.
 **Otevřené otázky:** Samostatná featura, nebo jen nový pohled v Pavučině?
 
-### - [ ] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
+### - [] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
 **Cíl:** Ovládání z klávesnice + popisky pro čtečky u ikonových tlačítek.
 **Proč:** Rozšiřuje okruh hráčů a je to správně; kontrastní audit už běží (`audit:contrast`).
 **Hotovo (1. vrstva):** globální fokusový prsten (`--focus-ring` token + `:where()` fallback), sdílený `IconButton` (vynucený `aria-label` + coarse ≥44px), `aria-label` na DrdPlus hotspoty, klávesnice: Escape+`aria-expanded` na world-nav dropdown, Escape na mobilní drawer, `role=tablist/tab` na NotifCenter. Spec `docs/arch/phase-17/spec-17.8.md`, přehled v `docs/funkce/00-prehled.md`.

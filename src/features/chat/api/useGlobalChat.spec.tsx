@@ -218,6 +218,7 @@ describe('useRoomPresenceCounts (4.2c §4)', () => {
     'camp-1': 0,
     'camp-2': 0,
     'camp-3': 0,
+    'voice-krcma': 0,
   };
 
   it('načte počty přítomných z REST endpointu', async () => {

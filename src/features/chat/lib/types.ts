@@ -7,7 +7,12 @@ import type { RoomStyle } from './campPlaces';
 export type { RoomStyle };
 
 /** Klíč globální chat místnosti — zrcadlí BE `RoomKey`. */
-export type RoomKey = 'hospoda' | 'camp-1' | 'camp-2' | 'camp-3';
+export type RoomKey =
+  | 'hospoda'
+  | 'camp-1'
+  | 'camp-2'
+  | 'camp-3'
+  | 'voice-krcma';
 
 /** Sdílené prostředí Campu — styl + lokace (z `GET .../environment`). */
 export interface RoomEnvironment {
@@ -210,4 +215,29 @@ export interface StartHere {
 export interface StartHereEvent {
   room: RoomKey;
   startHere: StartHere | null;
+}
+
+// ── 17.6 Voice krčma — hlasový hovor (Jitsi) ─────────────────────────────
+
+/** Účastník hlasového hovoru — zrcadlí BE `VoiceParticipantView`. */
+export interface VoiceParticipant {
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  muted: boolean;
+  cam: boolean;
+}
+
+/** WS `chat:voice:presence` — celý snímek rosteru hovoru v místnosti. */
+export interface VoiceRosterEvent {
+  room: RoomKey;
+  roster: VoiceParticipant[];
+}
+
+/** WS `chat:voice:state` — delta změny mikrofonu/kamery účastníka. */
+export interface VoiceStateEvent {
+  room: RoomKey;
+  userId: string;
+  muted: boolean;
+  cam: boolean;
 }

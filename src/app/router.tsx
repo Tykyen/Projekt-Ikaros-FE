@@ -21,6 +21,7 @@ import ErrorPage from '@/pages/errors/ErrorPage';
 const DashboardPage    = lazy(() => import('@/features/ikaros/pages/DashboardPage'));
 const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
 const CampPage     = lazy(() => import('@/features/chat/pages/CampPage'));
+const VoiceKrcmaPage = lazy(() => import('@/features/voice/pages/VoiceKrcmaPage'));
 const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
@@ -191,6 +192,8 @@ export const router = createBrowserRouter([
       // 15.8 — `/chat` (Hospoda) veřejné: host bez session dostane captcha bránu
       // (ChatPage). Camp níže zůstávají login-only.
       { path: 'chat',                   element: p(ChatPage) },
+      // 17.6 — Voice krčma (hlasová místnost, jen registrovaní)
+      { path: 'chat/voice',         element: p(VoiceKrcmaPage), loader: requireAuth },
       // 4.2a — Camp I.–III. (atmosférické roleplay místnosti)
       { path: 'chat/camp',          element: p(CampPage),     loader: requireAuth },
       { path: 'chat/camp2',         element: p(CampPage),     loader: requireAuth },
