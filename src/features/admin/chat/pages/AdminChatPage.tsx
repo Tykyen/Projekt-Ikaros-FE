@@ -36,6 +36,7 @@ import {
   useSendAdminMessage,
   useDeleteAdminMessage,
   useUploadAdminAttachment,
+  useToggleAdminReaction,
   adminChatKeys,
 } from '../api/useAdminChat';
 import { ChannelModal } from '../components/ChannelModal';
@@ -119,6 +120,7 @@ export default function AdminChatPage() {
   const sendMut = useSendAdminMessage(activeConvId ?? '');
   const deleteMut = useDeleteAdminMessage(activeConvId ?? '');
   const uploadMut = useUploadAdminAttachment(activeConvId ?? '');
+  const reactionMut = useToggleAdminReaction(activeConvId ?? '');
   const [channelModal, setChannelModal] = useState<{
     open: boolean;
     channel: AdminChatChannel | null;
@@ -285,10 +287,12 @@ export default function AdminChatPage() {
                 surfaceColor={surfaceColor}
                 canDelete={isSuperadmin}
                 usersById={usersById}
-                allowReactions={false}
+                allowReactions
                 onDelete={(id) => deleteMut.mutate(id)}
                 onReply={setReplyTo}
-                onToggleReaction={() => {}}
+                onToggleReaction={(messageId, emoji) =>
+                  reactionMut.mutate({ messageId, emoji })
+                }
                 resolveAccountAvatar={resolveAccountAvatar}
                 renderSenderBadge={renderSenderBadge}
                 emptyText="Zatím žádné zprávy — napiš první."

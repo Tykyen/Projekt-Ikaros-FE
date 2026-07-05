@@ -169,6 +169,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Co jde dělat:**
   - V globálním chatu: psát emotikony (`:)`, `:D`, `:P`, …) → automaticky se vykreslí jako emoji; vybrat emoji z pickeru; dávat emoji **reakce** na zprávy.
   - V chatu světa: psát `:zkratka:` custom emote → vykreslí se jako `<img>` (obrázek); autocomplete při psaní.
+  - **Klikací odkazy (20.6):** http(s) URL v textu se v OBOU chatech (globální Putyka/Camp i světový) automaticky převede na klikací odkaz (`target=_blank`, `rel=noopener noreferrer nofollow`). Jen `http(s)://` (ne `javascript:`/`data:` — XSS-safe, render přes React `<a>`, žádné `dangerouslySetInnerHTML`); sdílené `chat/lib/linkify.tsx` (global/admin přes `renderPlainChatContent`, world přes `renderChatContent` na plain segmentech mezi mentions).
 - **Hranice / co neumí:**
   - **V globálním chatu/poště se custom OBRÁZKOVÉ emoty NEPOUŽÍVAJÍ** — `MessageItem` tam jede jen textovou konverzi (`emotes.ts`); modul `emotes` konzumuje výhradně `features/world/chat`.
   - **Pošta** nemá emote/emoji picker (čistý text/předmět).

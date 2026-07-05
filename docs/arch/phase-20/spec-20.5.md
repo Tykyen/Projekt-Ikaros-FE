@@ -129,6 +129,8 @@ Admin chat původně použil vlastní ochuzený `<input>` + ruční render zprá
 
 **Ověřeno:** BE tsc+lint zelené; FE tsc `-b` exit 0, 339 testů + cross-check kontraktu FE↔BE. **Nutný BE restart.** Živě čeká `mobil-desktop` (composer responsive: font 16px ≤768px proti iOS zoom).
 
+**Doplněno 2026-07-05:** **emoji reakce** na zprávy (`PUT /admin-chat/channels/:cid/messages/:mid/reactions/:emoji` → celá zpráva, WS `platform-chat:message:updated`; `allowReactions` zapnuto, reagovat smí admin s přístupem) + **klikací http(s) odkazy** v textu napříč chaty (§20.6 sdílený `chat/lib/linkify.tsx`, XSS-safe; N1 phishing i N2 emote-v-URL ošetřeny). BE tsc+lint + FE tsc + 40 render testů zelené.
+
 ---
 
 ## 5. Out of scope (V1)

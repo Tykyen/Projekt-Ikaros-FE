@@ -1654,3 +1654,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Proč správně:** parita = SKUTEČNÝ reuse sdílené komponenty (ne fork); rozšíření sdílené komponenty aditivním volitelným propem = žádná regrese ostatních chatů; explicitní kontrakt v obou promptech = dva agenti se sešli bez driftu.
 **Jak ověřeno:** BE tsc+lint zelené; FE tsc `-b` exit 0 + 339 testů (vč. 30 na MessageItem/MessageList s novým propem); **adversariální cross-check kontraktu FE↔BE** (URL, WS event názvy, payloady, DTO pole) — sedělo 1:1. Živě čeká `mobil-desktop` + BE restart.
 **Zhodnocení:** DOBŘE — paralelizace BE+FE je bezpečná JEN proti explicitnímu předem dohodnutému kontraktu + povinný adversariální cross-check po sloučení. Pro-tip: rozšiřuj sdílenou komponentu volitelným propem, ne forkem. (Reziduum: mrtvé CSS třídy po starém composeru v `AdminChatPage.module.css` — drobný úklid.)
+
+---
+
+### ✅ ŘEŠENÍ — 20.6 klikací URL v chatu (globální + světový + admin) sdílenou linkify utilitou · 2026-07-05
+**Problém:** holé `http(s)` URL v textu zpráv se nikde (global/world/admin) nelinkovaly — jen plain text; uživatel chtěl klikací odkazy napříč všemi chaty.
+**Co zabralo:** sdílená `chat/lib/linkify.tsx` (`linkifyText(text)→ReactNode[]`) napojená do OBOU render cest jednou vrstvou: global/admin přes nový `renderPlainChatContent` (MessageItem fallback, dřív `parseEmotes` → string), world přes `renderChatContent` (linkify na plain segmentech mezi mentions). Admin chat dostal linkify zdarma (sdílí `MessageItem`).
+**Bezpečnost (adversariální agent review):** matchuje JEN `http(s)://` → `javascript:`/`data:` se nikdy nelinkne (ne XSS); render přes React `<a>` (auto-escape, žádné `dangerouslySetInnerHTML`); `rel=noopener noreferrer nofollow`+`target=_blank` (tabnabbing); regex bez ReDoS; `lastIndex` reset. Nález N1 (phishing: userinfo `@` / bidi v text=href) opraven `isSafeUrl` (klamavé URL nelinkovat). N2 (emote `:x:` uvnitř URL ji rozbije) opraven přepisem `linkifyText` na „rozděl podle URL → ne-URL segmenty zpracuj callbackem" → emote/mention běží až na plain segmentech mimo URL (obě render cesty).
+**Jak ověřeno:** `tsc -b` exit 0; 40 testů (linkify 12, renderPlainContent 5 vč. N2, world renderChatContent 5 vč. N2, MessageItem/List 18).
+**Zhodnocení:** DOBŘE — jedna sdílená utilita + napojení do obou cest = konzistence napříč chaty; adversariální security agent chytil 2 reálné (Low) nálezy mimo mé testy. Past: bidi/zero-width znaky v regexu psát přes rozsahy/escapes, ne literály (transient selhání transformu při tsc-b běhu).

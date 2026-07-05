@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import type { ChatMessage } from '../lib/types';
-import { parseEmotes } from '../lib/emotes';
+import { renderPlainChatContent } from '../lib/renderPlainContent';
 import { resolveTombstone } from '@/shared/lib/tombstone';
 import { guardChatColor } from '../lib/chatColorGuard';
 import { formatTime, formatChatStamp, formatChatFull } from '../lib/format';
@@ -53,7 +53,8 @@ interface MessageItemProps {
   /**
    * 6.2 — vlastní render funkce obsahu (mention spans, world emote img).
    * Dostává celou zprávu, ať může číst `mentions[]` pro highlight self.
-   * Globální chat ji nepředává → fallback na `parseEmotes` string transform.
+   * Globální chat ji nepředává → fallback `renderPlainChatContent` (emoji +
+   * klikací http(s) odkazy).
    */
   renderContent?: (message: ChatMessage) => React.ReactNode;
   /**
@@ -170,7 +171,7 @@ export function MessageItem({
   const rawText = message.content ?? '';
   const content = renderContent
     ? renderContent(message)
-    : parseEmotes(rawText);
+    : renderPlainChatContent(rawText);
   const textColor = guardChatColor(message.color, surfaceColor);
   const reactions = Object.entries(message.reactions ?? {});
   // Recovery pro historické zprávy: BE měl bug, kdy bez `characterPath` ukládal

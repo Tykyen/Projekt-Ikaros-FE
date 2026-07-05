@@ -839,7 +839,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 8. **Globální scope (21.1):** zavést komunitní/globální scope; přidávat smí Admin/Superadmin/SpravceDiskuzi + **grantovatelně i běžný hráč** s nápady (viz 21.1).
 
 **Stále otevřené:**
-9. **Drift systémů:** `draci-hlidka` (id v nabídce) ↔ `drdh` (id deníku) = **táž Dračí Hlídka, dvě id** → sjednotit před 16.2 (dluh D-NEW-SYS-DIARY-DRIFT, viz drift v 16.2).
+
 10. **Generátory (21.2):** které první (jména → příběh → rodina)? Formát tabulek pro komunitní příspěvky?
 11. **Veřejnost — detaily (17.3):** co přesně lze zveřejnit (stránky/mapa/timeline/postavy)? Per-stránka, nebo per-svět přepínač? SEO náhledové karty?
 12. **Co chybí světovému chatu pro dlouhé příběhy (16.1):** zjistit cíleným průchodem reálným chatem (vyžádám si screen).

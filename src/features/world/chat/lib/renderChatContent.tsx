@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 import { EMOTES, parseEmotes } from '@/features/chat/lib/emotes';
+import { linkifyText } from '@/features/chat/lib/linkify';
 import { EmoteImage } from '../components/EmoteImage';
 import { MENTION_REGEX } from './parseMentions';
 
@@ -150,10 +151,14 @@ function splitByMentions(
   return nodes;
 }
 
-/** Hlavní render — string → ReactNode (smíšený text + emote + mention). */
-export function renderChatContent(
+/**
+ * Emote (static + world `<img>`) + mention render pro JEDEN ne-URL segment.
+ * Volá se z `renderChatContent` přes `linkifyText` na částech mimo URL.
+ */
+function renderRich(
   text: string,
   opts: RenderChatContentOpts,
+  baseKey: string,
 ): ReactNode {
   const withStatic = applyStaticEmotes(text);
   const parts = splitByWorldEmotes(withStatic, opts.worldEmotes, opts.emoteClass);
@@ -168,10 +173,23 @@ export function renderChatContent(
           opts.mentions,
           opts.mentionClass,
           opts.mentionSelfClass,
-          `s${i}`,
+          `${baseKey}-s${i}`,
         ),
       );
     }
   });
-  return out;
+  return <Fragment key={baseKey}>{out}</Fragment>;
+}
+
+/**
+ * Hlavní render — string → ReactNode. Linkify PRVNÍ (http(s) URL zůstane
+ * celistvá), emote + mention běží jen na ne-URL segmentech (`renderRich`).
+ */
+export function renderChatContent(
+  text: string,
+  opts: RenderChatContentOpts,
+): ReactNode {
+  return linkifyText(text, 'w', (segment, key) =>
+    renderRich(segment, opts, key),
+  );
 }

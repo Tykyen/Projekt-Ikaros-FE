@@ -120,6 +120,22 @@ export function useUploadAdminAttachment(channelId: string) {
 }
 
 /**
+ * Přepnutí emoji reakce na zprávě (`PUT .../reactions/:emoji`). Vrací celou
+ * aktualizovanou zprávu; WS `platform-chat:message:updated` ji propíše všem
+ * (i odesílateli, takže optimistic není potřeba).
+ */
+export function useToggleAdminReaction(channelId: string) {
+  return useMutation({
+    mutationFn: ({ messageId, emoji }: { messageId: string; emoji: string }) =>
+      api.put<ChatMessage>(
+        `${BASE}/channels/${channelId}/messages/${messageId}/reactions/${encodeURIComponent(
+          emoji,
+        )}`,
+      ),
+  });
+}
+
+/**
  * Real-time aktivní konverzace + join/leave room. Room
  * `platform-chat:{channelId}` (BE gate ověří admin roli + členství). Vrací
  * jména právě píšících (mimo aktuálního uživatele) pro `TypingIndicator`.
@@ -180,6 +196,14 @@ export function useAdminChatRealtime(channelId: string | null): {
       );
     },
   );
+
+  // Změna zprávy (reakce / edit) — server pošle celou aktualizovanou zprávu,
+  // nahradíme ji v cache (guard `old ? … : old` nevytvoří prázdný seznam).
+  useSocketEvent<ChatMessage>('platform-chat:message:updated', (m) => {
+    qc.setQueryData<ChatMessage[]>(adminChatKeys.messages(m.channelId), (old) =>
+      old ? old.map((x) => (x.id === m.id ? m : x)) : old,
+    );
+  });
 
   // Typing indikátor — per-username timer s TTL (re-emit „píše" ho prodlouží,
   // `isTyping:false` / vypršení ho odebere). Vlastní psaní ignorujeme.
