@@ -161,14 +161,26 @@ function DrawerSubGroup({
 function NavDropdown({ group, onClose }: { group: NavNode; onClose: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
+    // 17.8 — Escape zavře dropdown a vrátí fokus na spouštěč (klávesnice).
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        btnRef.current?.focus();
+      }
+    };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('keydown', onKey);
+    };
   }, [open]);
 
   if (!('items' in group)) {
@@ -186,14 +198,17 @@ function NavDropdown({ group, onClose }: { group: NavNode; onClose: () => void }
   return (
     <div className={s.navItem} ref={ref}>
       <button
+        ref={btnRef}
         className={clsx(s.navLink, open && s.navLinkActive)}
         onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
       >
         {group.label}
-        <span className={clsx(s.chevron, open && s.chevronOpen)}>▾</span>
+        <span className={clsx(s.chevron, open && s.chevronOpen)} aria-hidden="true">▾</span>
       </button>
       {open && (
-        <div className={s.dropdown}>
+        <div className={s.dropdown} role="menu">
           {(group.items ?? []).map((item) =>
             item.children ? (
               <DropdownAccordion

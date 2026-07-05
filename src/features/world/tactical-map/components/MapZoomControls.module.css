@@ -36,6 +36,15 @@
   background: rgb(var(--map-ui-accent-rgb) / 0.2);
 }
 
+/* 17.4 — dotykové terče: na hrubém ukazateli (prst) min. 44×44 (WCAG 2.5.8). */
+@media (pointer: coarse) {
+  .btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+}
+
 .btnReset {
   font-size: 11px;
   letter-spacing: 0.5px;

@@ -557,12 +557,11 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE/FE:** parser + mapování na naši scénu/stěny.
 **Otevřené otázky:** Které varianty formátu podporovat? Kam s licencemi importovaných map (jen vlastní soubory)?
 
-### - [ ] 17.4 Doladění mobilní hry na mapě — [D3 · dopad střední · náklad střední]
+### - [x] 17.4 Doladění mobilní hry na mapě — [D3 · dopad střední · náklad střední] ✅
 **Cíl:** Plné dotykové ovládání mapy (pinch-zoom, tažení tokenů, výběr) na malém displeji.
 **Proč:** Český hráč hraje hodně z mobilu; dotyk na mapě bývá u VTT bolavé místo (pravidlo projektu „mobil i desktop").
-**Návrh přípravy:** cílený průchod skillem `mobil-desktop` přes taktickou mapu.
-**FE:** gesta, velikosti dotykových terčů, sbalitelné panely, výkon.
-**Otevřené otázky:** Zjednodušené mobilní rozvržení mapy, nebo plná parita s desktopem?
+**Hotovo:** 1-prst pan mapy (dřív vůbec nešlo), pinch = zoom+posun zároveň, long-tap na tokenu = akce (velký terč místo „i" badge), dotykové terče ≥44px (coarse), wheel bez Ctrl (desktop bonus). Disambiguace token vs. pan přes dvojitý gate. Unit testy + build zelené. Spec `docs/arch/phase-17/spec-17.4.md`, funkce kap. 14.
+**Zbývá:** živý „pocit pod palcem" na reálném telefonu (headless nemá pravý touchscreen); `mobil-desktop` panely na 375px. Rozhodnuto: **parita** s desktopem (zjednodušený mobilní layout = 17.11 companion mód).
 
 ### - [ ] 17.6 Integrace hlasu a videa přes Jitsi — [D4 · dopad střední/vysoký · náklad malý až střední]
 
@@ -590,11 +589,11 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** speciální layout nad existujícími `CampaignRelationship` (typy rodič/potomek/choť). Nižší priorita.
 **Otevřené otázky:** Samostatná featura, nebo jen nový pohled v Pavučině?
 
-### - [ ] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁
+### - [ ] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
 **Cíl:** Ovládání z klávesnice + popisky pro čtečky u ikonových tlačítek.
 **Proč:** Rozšiřuje okruh hráčů a je to správně; kontrastní audit už běží (`audit:contrast`).
-**FE:** fokusové stavy, `aria-label`, ovládání chatu/menu z klávesnice (inkrementálně).
-**Otevřené otázky:** Cílit konkrétní WCAG úroveň (AA), nebo průběžné zlepšování?
+**Hotovo (1. vrstva):** globální fokusový prsten (`--focus-ring` token + `:where()` fallback), sdílený `IconButton` (vynucený `aria-label` + coarse ≥44px), `aria-label` na DrdPlus hotspoty, klávesnice: Escape+`aria-expanded` na world-nav dropdown, Escape na mobilní drawer, `role=tablist/tab` na NotifCenter. Spec `docs/arch/phase-17/spec-17.8.md`, přehled v `docs/funkce/00-prehled.md`.
+**Zbývá (🔁 průběžně, dluh):** `eslint-plugin-jsx-a11y`, migrace všech deníkových listů na `IconButton`, `KebabMenu` šipková navigace, focus trap do draverů/NotifCenter. **Rozhodnuto:** průběžné zlepšování, ne jednorázová WCAG AA certifikace.
 
 ### - [ ] 17.9 Streamer overlay (OBS režim) — [H4-04 · dopad střední · náklad střední]
 **Cíl:** Režim zobrazení, který skryje všechna okna/menu/lišty a nechá jen čistou mapu s průhledným pozadím pro chroma key — připravené pro OBS.

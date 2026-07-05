@@ -34,6 +34,15 @@ a:hover { color: var(--accent-bright); }
 button { font-family: inherit; cursor: pointer; }
 input, textarea, select { font-family: inherit; }
 
+/* 17.8 — globální fokusový prsten (a11y). `:where()` = 0 specificita, takže
+   per-téma i per-komponentní `:focus-visible` (box-shadow ringy) tohle přebijí;
+   je to jen fallback pro base a skiny bez vlastního ringu. `:focus-visible`
+   (ne `:focus`) → prsten jen při klávesové navigaci, ne po kliku myší. */
+:where(a, button, [role='button'], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--focus-ring, 2px solid currentColor);
+  outline-offset: var(--focus-ring-offset, 2px);
+}
+
 /* Native <select> dropdown options — bez tohoto OS vykresluje světlý systémový popup,
    ve kterém splývá light text z parent selectu. Sjednocuje vzhled napříč všemi formuláři. */
 select option {

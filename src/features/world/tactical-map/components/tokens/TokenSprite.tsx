@@ -45,6 +45,9 @@ import { resolveCharacterHp } from '../../utils/resolveCharacterHp';
 import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import type { ImageFit } from '@/shared/lib/imageStyle';
 
+/** 17.4 — práh long-tapu prstem (podržet a pustit beze změny pozice) → detail. */
+const LONG_TAP_MS = 500;
+
 /** Výřez obrázku tokenu (bestie focal/zoom/fit z bestiáře). */
 export interface TokenImageCrop {
   focalX?: number | null;
@@ -269,7 +272,11 @@ export function TokenSprite({
   // Time-based (< 250ms) selhával: rychlý drag = vyvolal jak drag tak select.
   // Teď: ukládáme start coords, při pointerup počítáme distance — pokud > 5px,
   // byl to drag (cancel select), jinak click (select).
-  const downCoordsRef = useRef<{ x: number; y: number } | null>(null);
+  // 17.4 — navíc ukládáme čas: touch „long-tap" (podržet ≥ LONG_TAP_MS a pustit
+  // beze změny pozice) = otevřít detail/akce tokenu. Velký terč pro palec místo
+  // maličkého „i" badge. Vyhodnocení až na pointerup → nikdy nevystřelí uprostřed
+  // dragu (posun > práh = drag, ne long-tap) a nepotřebuje časovač/listenery.
+  const downCoordsRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
   // 10.2g — stopPropagation z badge handlerů v této @pixi/react verzi
   // nezabrání rodičovskému handleru → klik na 'i' jinak spustí i drag.
@@ -286,7 +293,11 @@ export function TokenSprite({
 
   const handlePointerDown = (e: FederatedPointerEvent): void => {
     if (isInfoBadgeTarget(e)) return;
-    downCoordsRef.current = { x: e.client.x, y: e.client.y };
+    downCoordsRef.current = {
+      x: e.client.x,
+      y: e.client.y,
+      t: typeof performance !== 'undefined' ? performance.now() : Date.now(),
+    };
     if (canDrag && onPointerDown) onPointerDown(e, token);
   };
 
@@ -299,6 +310,12 @@ export function TokenSprite({
     const dy = e.client.y - down.y;
     // Drag = pohyb > 5px → no select (drag handler v useTokenDrag řeší move)
     if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) return;
+    // 17.4 — long-tap prstem (bez posunu) → detail/akce tokenu.
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (e.pointerType === 'touch' && now - down.t >= LONG_TAP_MS) {
+      onOpenInfo(token.id);
+      return;
+    }
     onSelect(token.id);
   };
 

@@ -1,4 +1,4 @@
-﻿import { useState, type ReactNode } from 'react';
+﻿import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { toast } from 'sonner';
@@ -812,6 +812,19 @@ export function IkarosLayout() {
     setRightDrawerOpen(false);
   }
 
+  // 17.8 — Escape zavře otevřený mobilní drawer (klávesová obsluha).
+  useEffect(() => {
+    if (!drawerOpen && !rightDrawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDrawerOpen(false);
+        setRightDrawerOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [drawerOpen, rightDrawerOpen]);
+
   const setMyRooms = useSetAtom(myRoomsAtom);
   useSocketInit();
   usePresenceInit();
@@ -930,6 +943,9 @@ export function IkarosLayout() {
         <div
           className={clsx(s.drawerBackdrop, (drawerOpen || rightDrawerOpen) && s.drawerBackdropOpen)}
           onClick={closeDrawers}
+          role="button"
+          tabIndex={-1}
+          aria-label="Zavřít menu"
         />
         <aside
           className={clsx(s.drawerSidebar, drawerOpen && s.drawerSidebarOpen)}

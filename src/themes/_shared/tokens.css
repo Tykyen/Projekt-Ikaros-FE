@@ -89,6 +89,12 @@
     inset 0 2px 4px 0 rgba(0, 0, 0, 0.35),
     inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
 
+  /* 17.8 — fokusový prsten (a11y). Default používá --accent; téma může
+     přebít --focus-ring vlastní barvou/šířkou. Globální pravidlo v reset.css
+     je přes :where() (0 specificita) → per-téma :focus-visible ringy vyhrají. */
+  --focus-ring: 2px solid var(--accent, #8a6aff);
+  --focus-ring-offset: 2px;
+
   /* Transitions */
   --transition-fast: 100ms ease;
   --transition-base: 180ms ease;

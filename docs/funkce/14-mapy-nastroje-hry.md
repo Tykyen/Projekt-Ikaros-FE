@@ -85,6 +85,21 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - Config: `{gridType, size, originX, originY, showGrid, unitsPerCell, unitLabel, showScale, allowPlayerDrawing, showHpPc/Npc/Bestie}`.
 - **Kód:** `grid/{types,hexAdapter,squareAdapter,index}.ts`, `components/HexGrid.tsx`.
 
+### Dotykové ovládání mapy (mobil — 17.4)
+- **Co to je:** Plnohodnotné ovládání taktické mapy prstem na dotykovém displeji (parita s desktopem, jen adaptovaná gesta).
+- **Kde:** `/takticka-mapa`, kdokoli s přístupem ke scéně (žádný role gate na gesta).
+- **Co jde dělat:**
+  - **1 prst na prázdnu = posun mapy** (dřív nešlo vůbec). Gate: nespustí se na tokenu (patří tažení) ani při aktivním PJ nástroji (kreslí prstem).
+  - **2 prsty = zoom + posun zároveň** (pinch anchor v map-space pod aktuálním midpointem; dřív jen zoom o fixní bod). Po zvednutí jednoho prstu plynule pokračuje 1-prstový pan.
+  - **1 prst tažení na tokenu = přesun tokenu** (beze změny; `useTokenDrag` si gesto „zabere" přes sdílený `isTokenDraggingRef`).
+  - **Long-tap na tokenu (podržet ≥500 ms a pustit beze změny pozice) = otevře detail/akce tokenu** — velký terč pro palec místo maličkého „i" badge (jen `pointerType:'touch'`; vyhodnocení na puštění → nikdy nevystřelí uprostřed tažení).
+  - Zoom `+/−`/fullscreen tlačítka na hrubém ukazateli min. **44×44** (`@media (pointer: coarse)`).
+  - **Desktop bonus:** kolečko myši zoomuje i **bez Ctrl/Cmd** (mapa je full-bleed, uvnitř není co scrollovat; Ctrl/Cmd i trackpad-pinch fungují dál).
+- **Hranice / co neumí:** bez setrvačného (inertia) panu, bez haptiky, bez rotace mapy, bez radiálního/kontextového menu na tokenu (long-tap otevře stejný panel jako „i"). Zjednodušený mobilní layout mapy = samostatný krok 17.11 (companion mód), ne 17.4. **Skutečný „pocit pod palcem" (přesnost pinche, setrvačnost) ověřuje tester na reálném zařízení** — headless nemá pravý touchscreen.
+- **Zvláštnosti:** disambiguace token vs. pan přes **dvojitý gate** (na pointerdown i pointermove) — deterministické bez ohledu na pořadí PIXI federated vs. DOM eventů. `touch-action:none` na `.viewport` (nutné pro vlastní gesta). Unit testy pokrývají 1-prst pan, gate, pinch+pan anchor.
+- **Stav:** ✅ (logika + testy ověřeny; živý dotykový průchod na telefonu čeká na testera).
+- **Kód:** FE `hooks/useViewportPanZoom.ts` (pan/pinch/wheel), `hooks/useTokenDrag.ts` (`isDraggingRef`), `TacticalMapView.tsx` (sdílený ref + wiring), `components/tokens/TokenSprite.tsx` (`LONG_TAP_MS`), `components/MapZoomControls.module.css` (coarse terče), test `hooks/__tests__/useViewportPanZoom.test.tsx`. Bez BE zásahu.
+
 ### Měřítko a stupnice (15.3)
 - **Co to je:** Stupnice po horním + levém okraji mapy (`MapScaleFrame`), značka = buňka, popisek po 5 buňkách v jednotkách scény (`unitsPerCell` × `unitLabel`, default 1 / „m"). **Viditelná všem** (z `config`). Toggle „Zobrazit stupnici" (`showScale`, default zap.).
 - Rozteč značek z `adapter.toPixel(1,0)−toPixel(0,0)` → uniformní napříč typy mřížky (hex √3·size, square size).

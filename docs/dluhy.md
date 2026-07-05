@@ -10,6 +10,15 @@
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
+### D-17.8-A11Y-BACKLOG — Přístupnost: odložené vrstvy nad rámec 17.8 v1
+**Soubory:** `eslint.config.js`, `.storybook/preview.tsx`; `shared/ui/IconButton` (adopce), deníkové/combat listy (`features/world/pages/CharacterDetailPage/diary-systems/**`, `token-panel/system-panels/**`); `shared/ui/KebabMenu/KebabMenu.tsx`; `app/layout/IkarosLayout/IkarosLayout.tsx` + `features/notifications/components/NotificationCenter.tsx` (focus trap).
+**Problém:** 17.8 dodala jen první konzistentní vrstvu (globální focus ring, IconButton primitiv, aria-label na DrdPlus hotspoty, Escape/ARIA na menu/drawer). Zbývá: (1) **žádný `eslint-plugin-jsx-a11y`** → a11y regrese nikdo staticky nehlídá; (2) icon-only tlačítka v ostatních systémech (mimo DrdPlus) stále bez systematické migrace na `IconButton`; (3) `KebabMenu` bez roving-tabindex/šipkové navigace (jen Tab+Escape); (4) **focus trap jen v `Modal`** — mobilní drawery a NotificationCenter mají jen Escape, ne trap ani focus-restore; (5) Storybook axe addon běží v `test:'todo'` (neblokuje CI).
+**Dopad:** Nízký — základní a11y funguje; jde o dotažení pokrytí a prevenci regresí. Roadmap 17.8 je značené 🔁 (průběžné).
+**Řešení:** (1) přidat plugin v `warn` a postupně čistit; (2) extrahovat `useFocusTrap`/`Drawer` z `Modal` a napojit na drawery+NotifCenter; (3) roving-tabindex do `KebabMenu`; (4) dávková migrace listů na `IconButton`; (5) axe `todo`→`error` po vyčištění.
+**Kdy:** průběžně v dalších inkrementech 17.8 (🔁); plugin+focus trap jako první, mají největší páku.
+
+---
+
 ### D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN — DrD+ bestie v chatu se neoskinuje
 **Soubory:** `src/features/world/chat/components/rail/BestieInstancePanel.tsx` + `BestieRollPanel.tsx` — drdplus větev bestie panelu v chatu.
 **Problém:** drdplus bestie v chatu se renderuje BEZ `DiarySkinScope` (vnější `<aside>` nese jen `data-diary-system`, ne `data-diary-skin`) → compound selektor skinu `[data-diary-system='drdplus'][data-diary-skin='X']` nesedne a bestie zůstane na default vzhledu bez ohledu na zvolený skin. Nekonzistence: na mapě (TokenSystemSheet) je drdplus bestie scoped správně, v chatu ne. Stejnou mezeru měl drd2 — opravená v 16.2f obalením `DiarySkinScope`; drdplus zbývá.

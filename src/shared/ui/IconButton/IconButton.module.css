@@ -1,0 +1,52 @@
+/* 17.8 — icon-only tlačítko. Fokus dědí z globálního :focus-visible (reset.css). */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+  transition: background var(--transition-fast, 100ms ease),
+    border-color var(--transition-fast, 100ms ease),
+    color var(--transition-fast, 100ms ease);
+}
+
+.iconBtn:hover {
+  background: rgb(var(--white-rgb) / 0.08);
+}
+
+.iconBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Velikosti */
+.sm { width: 28px; height: 28px; font-size: 14px; }
+.md { width: 34px; height: 34px; font-size: 16px; }
+.lg { width: 40px; height: 40px; font-size: 18px; }
+
+/* Varianty */
+.solid {
+  background: rgb(var(--white-rgb) / 0.06);
+  border-color: rgb(var(--white-rgb) / 0.12);
+}
+.solid:hover {
+  background: rgb(var(--white-rgb) / 0.12);
+}
+.danger {
+  color: var(--danger);
+}
+.danger:hover {
+  background: rgb(var(--white-rgb) / 0.1);
+}
+
+/* 17.4/17.8 — dotykové terče: na hrubém ukazateli (prst) min. 44×44. */
+@media (pointer: coarse) {
+  .sm, .md, .lg {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

@@ -169,11 +169,16 @@ describe('useViewportPanZoom', () => {
   });
 
   describe('onWheel zoom (cursor-anchored)', () => {
-    it('vyžaduje ctrl/meta key, jinak ignoruje', () => {
-      const { result } = setupHook(makeViewport());
-      const evt = new WheelEvent('wheel', { deltaY: -100, ctrlKey: false });
+    it('17.4 — plné kolečko (bez modifikátoru) zoomuje', () => {
+      const { result } = setupHook(makeViewport(1000, 800));
+      const evt = new WheelEvent('wheel', {
+        deltaY: -100,
+        ctrlKey: false,
+        clientX: 500,
+        clientY: 400,
+      });
       act(() => result.current.onWheel(evt));
-      expect(result.current.zoom).toBe(1); // beze změny
+      expect(result.current.zoom).toBe(1.1); // zoomuje i bez Ctrl
     });
 
     it('Ctrl+wheel scroll up → zoom in', () => {
@@ -263,6 +268,82 @@ describe('useViewportPanZoom', () => {
         ),
       );
       expect(result.current.offsetX).toBe(0);
+    });
+  });
+
+  // 17.4 — touch gesta: 1-prst pan (+ gate na token drag), pinch zoom+pan.
+  describe('touch pan + pinch (17.4)', () => {
+    function setupTouch(
+      viewport: HTMLDivElement,
+      opts: { suppressLeftPan?: boolean; tokenDrag?: boolean } = {},
+    ) {
+      return renderHook(() => {
+        const ref = useRef<HTMLDivElement | null>(viewport);
+        return useViewportPanZoom(
+          ref,
+          TEST_SCENE_ID,
+          opts.suppressLeftPan ?? false,
+          () => opts.tokenDrag ?? false,
+        );
+      });
+    }
+
+    const touchDown = (id: number, x: number, y: number): PointerEvent =>
+      new PointerEvent('pointerdown', { pointerId: id, pointerType: 'touch', clientX: x, clientY: y });
+    const touchMove = (id: number, x: number, y: number): PointerEvent =>
+      new PointerEvent('pointermove', { pointerId: id, pointerType: 'touch', clientX: x, clientY: y });
+
+    it('1 prst na prázdnu posune mapu', () => {
+      const { result } = setupTouch(makeViewport());
+      act(() => result.current.onPointerDown(touchDown(1, 100, 100)));
+      act(() => result.current.onPointerMove(touchMove(1, 160, 130)));
+      expect(result.current.offsetX).toBe(60);
+      expect(result.current.offsetY).toBe(30);
+    });
+
+    it('1 prst NEposune mapu, když se táhne token (gate)', () => {
+      const { result } = setupTouch(makeViewport(), { tokenDrag: true });
+      act(() => result.current.onPointerDown(touchDown(1, 100, 100)));
+      act(() => result.current.onPointerMove(touchMove(1, 160, 130)));
+      expect(result.current.offsetX).toBe(0);
+      expect(result.current.offsetY).toBe(0);
+    });
+
+    it('1 prst NEposune mapu při aktivním nástroji (suppressLeftPan)', () => {
+      const { result } = setupTouch(makeViewport(), { suppressLeftPan: true });
+      act(() => result.current.onPointerDown(touchDown(1, 100, 100)));
+      act(() => result.current.onPointerMove(touchMove(1, 160, 130)));
+      expect(result.current.offsetX).toBe(0);
+    });
+
+    it('pinch = zoom + pan (map-anchor pod aktuálním midpointem)', () => {
+      // f1 (0,0), f2 (100,0) → midpoint (50,0), dist 100, zoom 1, anchor map (50,0).
+      const { result } = setupTouch(makeViewport(1000, 800));
+      act(() => result.current.onPointerDown(touchDown(1, 0, 0)));
+      act(() => result.current.onPointerDown(touchDown(2, 100, 0)));
+      // f2 → (200,0): dist 200 → zoom 2; midpoint (100,0).
+      // offset = midpoint - anchor*zoom = 100 - 50*2 = 0.
+      act(() => result.current.onPointerMove(touchMove(2, 200, 0)));
+      expect(result.current.zoom).toBe(2);
+      expect(result.current.offsetX).toBeCloseTo(0, 6);
+      expect(result.current.offsetY).toBeCloseTo(0, 6);
+    });
+
+    it('po zvednutí 1 z 2 prstů zbývající prst pokračuje panem', () => {
+      const { result } = setupTouch(makeViewport(1000, 800));
+      act(() => result.current.onPointerDown(touchDown(1, 100, 100)));
+      act(() => result.current.onPointerDown(touchDown(2, 300, 100)));
+      // zvedni f2 → zbývá f1 na (100,100) → nastartuje pan z té pozice
+      act(() =>
+        result.current.onPointerUp(
+          new PointerEvent('pointerup', { pointerId: 2, pointerType: 'touch' }),
+        ),
+      );
+      const zoomAfterPinch = result.current.zoom;
+      act(() => result.current.onPointerMove(touchMove(1, 140, 100)));
+      // pan o +40 v X, zoom se pokračováním nemění
+      expect(result.current.offsetX).toBe(40);
+      expect(result.current.zoom).toBe(zoomAfterPinch);
     });
   });
 

@@ -111,6 +111,7 @@ function SpellCard({
                   <button
                     type="button"
                     className="dp-del"
+                    aria-label="Smazat řádek náročnosti"
                     onClick={() => setNaroc(naroc.filter((_, k) => k !== j))}
                   >
                     ✕
@@ -337,6 +338,7 @@ function FormuleCard({
                       <button
                         type="button"
                         className="dp-del"
+                        aria-label="Smazat parametr"
                         onClick={() => setA('params', params.filter((_, k) => k !== j))}
                       >
                         ✕
@@ -377,6 +379,7 @@ function FormuleCard({
                       <button
                         type="button"
                         className="dp-del"
+                        aria-label="Smazat rys"
                         onClick={() => setA('rysy', rysy.filter((_, k) => k !== j))}
                       >
                         ✕
@@ -433,7 +436,7 @@ function FormuleCard({
                     <td><input value={String(m[6] ?? '')} disabled={disabled} placeholder="Poloměr +4 …" onChange={(e) => patch(6, e.target.value)} /></td>
                     {!disabled && (
                       <td>
-                        <button type="button" className="dp-del" onClick={() => setA('mods', mods.filter((_, k) => k !== j))}>✕</button>
+                        <button type="button" className="dp-del" aria-label="Smazat modifikátor" onClick={() => setA('mods', mods.filter((_, k) => k !== j))}>✕</button>
                       </td>
                     )}
                   </tr>
@@ -597,7 +600,7 @@ function DemonCard({
                   ))}
                   {!disabled && (
                     <td>
-                      <button type="button" className="dp-del" onClick={() => setA('params', params.filter((_, k) => k !== j))}>✕</button>
+                      <button type="button" className="dp-del" aria-label="Smazat parametr" onClick={() => setA('params', params.filter((_, k) => k !== j))}>✕</button>
                     </td>
                   )}
                 </tr>
@@ -631,7 +634,7 @@ function DemonCard({
                     <td><input className="dp-num" value={String(r[2] ?? '')} disabled={disabled} placeholder="±0" onChange={(e) => patch(2, e.target.value)} /></td>
                     {!disabled && (
                       <td>
-                        <button type="button" className="dp-del" onClick={() => setA('rysy', rysy.filter((_, k) => k !== j))}>✕</button>
+                        <button type="button" className="dp-del" aria-label="Smazat rys" onClick={() => setA('rysy', rysy.filter((_, k) => k !== j))}>✕</button>
                       </td>
                     )}
                   </tr>

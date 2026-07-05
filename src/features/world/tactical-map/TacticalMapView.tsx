@@ -323,6 +323,12 @@ export function TacticalMapView(): React.ReactElement {
   // Reset na null při pointerup (konec tahu) a změně nástroje.
   const brushBarrierIdRef = useRef<string | null>(null);
 
+  // 17.4 — sdílený flag „táhne se token"; useTokenDrag ho nastavuje,
+  // useViewportPanZoom čte (gate 1-prstového panu). Ref vzniká PŘED oběma hooky,
+  // protože panZoom je deklarován před useTokenDrag.
+  const isTokenDraggingRef = useRef(false);
+  const isTokenDragActive = useCallback(() => isTokenDraggingRef.current, []);
+
   const panZoom = useViewportPanZoom(
     viewportRef,
     scene?.id ?? null,
@@ -331,6 +337,7 @@ export function TacticalMapView(): React.ReactElement {
       fogTool.active ||
       rulerActive ||
       drawingTool.activeKind !== null,
+    isTokenDragActive,
   );
 
   // 10.2c-edit-5 — bbox mapy z MapBackground.onLoad. Předáno do HexGrid
@@ -802,6 +809,7 @@ export function TacticalMapView(): React.ReactElement {
       showGrid: true,
     },
     onDrop: handleTokenDrop,
+    isDraggingRef: isTokenDraggingRef,
   });
 
   // Lookup bestie ze query cache (BestiePalette zobrazuje aktivní podle ID;

@@ -35,6 +35,7 @@ import {
   Palette,
   Lightbulb,
   Download,
+  Hand,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -347,6 +348,21 @@ export function WorldSection() {
         </p>
         <ScreenshotSlot media="svet.takticka-mapa" />
 
+          <MapFeature icon={<Hand size={15} />} title="Ovládání mapy (myš i dotyk)">
+            <p>
+              <strong>Na počítači:</strong> mapu posuneš tažením myší, přiblížíš
+              kolečkem. Token přesuneš tažením, kliknutím ho vybereš, kliknutím na
+              „i" otevřeš jeho panel.
+            </p>
+            <p>
+              <strong>Na mobilu/tabletu:</strong> mapu posuneš <strong>jedním
+              prstem</strong> po prázdné ploše, přiblížíš a zároveň posuneš{' '}
+              <strong>dvěma prsty</strong> (pinch). Token přesuneš tažením prstem.
+              <strong> Podržením prstu na tokenu</strong> (asi vteřinu) otevřeš jeho
+              panel — nemusíš mířit na malé „i". Tlačítka přiblížení jsou na dotyku
+              větší, ať se dobře trefíš.
+            </p>
+          </MapFeature>
           <MapFeature icon={<Grid3x3 size={15} />} title="Typ mřížky a měřítko">
             <p>
               U každé scény si PJ v „Upravit scénu" vybere mřížku: <strong>šestiúhelníky</strong>{' '}

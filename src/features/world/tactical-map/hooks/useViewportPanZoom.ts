@@ -101,8 +101,16 @@ export function useViewportPanZoom(
    * 10.2g — když `true`, levé tlačítko myši NEpanuje (PJ kreslí efekty
    * tažením — left-drag patří nástroji, ne posunu mapy). Prostřední tlačítko
    * a 2-prsty panují vždy. Čteno přes ref (živá hodnota bez re-bind handlerů).
+   * 17.4 — platí i pro 1-prstový touch pan (aktivní nástroj kreslí prstem).
    */
   suppressLeftPan = false,
+  /**
+   * 17.4 — vrací `true`, když se právě táhne token. 1-prstový touch pan mapy
+   * pak NEstartuje (na pointerdown) a ani se neposune (na pointermove) — gesto
+   * patří tokenu. Dvojitý gate = deterministické bez ohledu na pořadí eventů
+   * (PIXI federated handler tokenu vs. bublající DOM handler viewportu).
+   */
+  isTokenDragActive: () => boolean = () => false,
 ): UseViewportPanZoomResult {
   const [state, setState] = useState<ViewportState>(() => {
     cleanupLegacyKeys();
@@ -113,6 +121,11 @@ export function useViewportPanZoom(
   useEffect(() => {
     suppressLeftPanRef.current = suppressLeftPan;
   }, [suppressLeftPan]);
+
+  const isTokenDragActiveRef = useRef(isTokenDragActive);
+  useEffect(() => {
+    isTokenDragActiveRef.current = isTokenDragActive;
+  }, [isTokenDragActive]);
 
   // Live ref pro callbacks bez re-binding
   const stateRef = useRef(state);
@@ -151,10 +164,13 @@ export function useViewportPanZoom(
     return () => clearTimeout(t);
   }, [state, sceneId]);
 
-  // Wheel zoom (cursor-anchored). Vyžaduje Ctrl/Cmd.
+  // Wheel zoom (cursor-anchored).
+  // 17.4 — dřív vyžadoval Ctrl/Cmd; mapa je full-bleed a uvnitř není co
+  // scrollovat, takže plné kolečko = zoom (u VTT očekávané). Ctrl/Cmd i
+  // trackpad-pinch (ctrl+wheel) fungují dál. `passive:false` listener +
+  // preventDefault brání scrollu stránky.
   const onWheel = useCallback(
     (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       cancelPanAnim(); // user gesto přeruší pan-to-token tween
       const ratio = e.deltaY < 0 ? 1.1 : 0.9;
@@ -184,29 +200,58 @@ export function useViewportPanZoom(
   const isPanning = useRef(false);
   const panStart = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
   const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map());
+  // 17.4 — pinch drží zoom + anchor v MAP-space (bod pod počátečním midpointem).
+  // Anchor je invariant gesta: na každý move ho promítneme pod AKTUÁLNÍ midpoint
+  // → zoom i posun dvěma prsty zároveň (dřív fixní cx/cy = jen zoom).
   const pinchStart = useRef<{
     dist: number;
     zoom: number;
-    cx: number;
-    cy: number;
+    mapAnchorX: number;
+    mapAnchorY: number;
   } | null>(null);
 
+  // 17.4 — spočti pinch anchor z aktuálních 2 pointerů (map-space bod pod
+  // midpointem). Vrací null, když chybí rect / nulová vzdálenost.
+  const computePinchStart = useCallback(() => {
+    const pts = Array.from(activePointers.current.values()).slice(0, 2);
+    if (pts.length < 2) return null;
+    const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (dist <= 0 || !rect) return null;
+    const cur = stateRef.current;
+    const screenX = (pts[0].x + pts[1].x) / 2 - rect.left;
+    const screenY = (pts[0].y + pts[1].y) / 2 - rect.top;
+    return {
+      dist,
+      zoom: cur.zoom,
+      mapAnchorX: (screenX - cur.offsetX) / cur.zoom,
+      mapAnchorY: (screenY - cur.offsetY) / cur.zoom,
+    };
+  }, [viewportRef]);
+
   const onPointerDown = useCallback((e: PointerEvent) => {
-    // Touch — sleduj pointers, detekuj 2-finger pinch
+    // Touch — sleduj pointers, detekuj 2-finger pinch + 1-finger pan
     if (e.pointerType === 'touch' || e.pointerType === 'pen') {
       activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (activePointers.current.size === 2) {
-        const pts = Array.from(activePointers.current.values());
-        const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-        if (dist > 0) {
-          pinchStart.current = {
-            dist,
-            zoom: stateRef.current.zoom,
-            cx: (pts[0].x + pts[1].x) / 2,
-            cy: (pts[0].y + pts[1].y) / 2,
-          };
-        }
+        // Druhý prst → přepni z případného 1-prst panu na pinch+pan.
+        pinchStart.current = computePinchStart();
         isPanning.current = false;
+        return;
+      }
+      // 17.4 — 1 prst na PRÁZDNU = pan mapy. Přeskoč, když gesto patří tokenu
+      // (drag) nebo aktivnímu nástroji (kreslí prstem, jako left-drag myší).
+      if (activePointers.current.size === 1) {
+        if (isTokenDragActiveRef.current()) return;
+        if (suppressLeftPanRef.current) return;
+        cancelPanAnim();
+        isPanning.current = true;
+        panStart.current = {
+          x: e.clientX,
+          y: e.clientY,
+          offsetX: stateRef.current.offsetX,
+          offsetY: stateRef.current.offsetY,
+        };
       }
       return;
     }
@@ -224,7 +269,7 @@ export function useViewportPanZoom(
       };
       if (e.button === 1) e.preventDefault(); // suppress autoscroll icon
     }
-  }, [cancelPanAnim]);
+  }, [cancelPanAnim, computePinchStart]);
 
   const onPointerMove = useCallback(
     (e: PointerEvent) => {
@@ -232,34 +277,33 @@ export function useViewportPanZoom(
         activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
       }
 
-      // Pinch zoom
+      // 17.4 — pinch zoom + pan: promítni map-space anchor pod AKTUÁLNÍ midpoint.
       if (pinchStart.current && activePointers.current.size >= 2) {
         const pts = Array.from(activePointers.current.values()).slice(0, 2);
         const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
         if (dist <= 0) return;
-        const ratio = dist / pinchStart.current.dist;
-        const current = stateRef.current;
-        const newZoom = clampZoom(pinchStart.current.zoom * ratio);
+        const start = pinchStart.current;
+        const newZoom = clampZoom(start.zoom * (dist / start.dist));
 
         const rect = viewportRef.current?.getBoundingClientRect();
         if (!rect) {
-          setState({ ...current, zoom: newZoom });
+          setState((s) => ({ ...s, zoom: newZoom }));
           return;
         }
-        const screenX = pinchStart.current.cx - rect.left;
-        const screenY = pinchStart.current.cy - rect.top;
-        const mapX = (screenX - current.offsetX) / current.zoom;
-        const mapY = (screenY - current.offsetY) / current.zoom;
+        const screenX = (pts[0].x + pts[1].x) / 2 - rect.left;
+        const screenY = (pts[0].y + pts[1].y) / 2 - rect.top;
         setState({
           zoom: newZoom,
-          offsetX: screenX - mapX * newZoom,
-          offsetY: screenY - mapY * newZoom,
+          offsetX: screenX - start.mapAnchorX * newZoom,
+          offsetY: screenY - start.mapAnchorY * newZoom,
         });
         return;
       }
 
-      // Pan (mouse drag)
+      // Pan (mouse drag NEBO 1-prst touch). 17.4 — gate: když se táhne token,
+      // neposouvej mapu (i kdyby pan „nastartoval" dřív, než se dragRef nastavil).
       if (!isPanning.current) return;
+      if (isTokenDragActiveRef.current()) return;
       setState((s) => ({
         ...s,
         offsetX: panStart.current.offsetX + (e.clientX - panStart.current.x),
@@ -271,11 +315,31 @@ export function useViewportPanZoom(
 
   const onPointerUp = useCallback((e: PointerEvent) => {
     activePointers.current.delete(e.pointerId);
-    if (activePointers.current.size < 2) {
-      pinchStart.current = null;
+    if (activePointers.current.size >= 2) return; // pořád víc prstů → beze změny
+    pinchStart.current = null;
+    // 17.4 — po zvednutí jednoho z dvou prstů zbývá jeden: plynule pokračuj
+    // 1-prstovým panem (pokud gesto nepatří tokenu / nástroji), ať mapa
+    // „neztuhne" mezi pinchem a dalším posunem.
+    if (
+      activePointers.current.size === 1 &&
+      !isTokenDragActiveRef.current() &&
+      !suppressLeftPanRef.current
+    ) {
+      const pt = activePointers.current.values().next().value;
+      if (pt) {
+        cancelPanAnim();
+        isPanning.current = true;
+        panStart.current = {
+          x: pt.x,
+          y: pt.y,
+          offsetX: stateRef.current.offsetX,
+          offsetY: stateRef.current.offsetY,
+        };
+        return;
+      }
     }
     isPanning.current = false;
-  }, []);
+  }, [cancelPanAnim]);
 
   // Imperative setZoom (centered anchor) pro UI tlačítka +/-
   const setZoom = useCallback(

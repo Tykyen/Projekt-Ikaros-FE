@@ -203,7 +203,7 @@ function RangerZamereni({ cda, disabled }: SecProps) {
             onChange={(n) => cda.updateArr('ran_zam', i, { praxe: n })}
           />
           {!disabled && (
-            <button type="button" className="dp-del" onClick={() => cda.removeArr('ran_zam', i)}>
+            <button type="button" className="dp-del" aria-label="Smazat zaměstnání" onClick={() => cda.removeArr('ran_zam', i)}>
               ✕
             </button>
           )}
@@ -446,7 +446,7 @@ function ThiefSchopnosti({ cda, disabled }: SecProps) {
                 </td>
                 {!disabled && (
                   <td>
-                    <button type="button" className="dp-del" onClick={() => cda.removeArr('thi_schopnosti', i)}>✕</button>
+                    <button type="button" className="dp-del" aria-label="Smazat schopnost" onClick={() => cda.removeArr('thi_schopnosti', i)}>✕</button>
                   </td>
                 )}
               </tr>

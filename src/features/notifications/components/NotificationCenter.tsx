@@ -86,11 +86,15 @@ export function NotificationCenter() {
           </button>
         </header>
 
-        <nav className={s.tabs}>
+        <nav className={s.tabs} role="tablist" aria-label="Typ notifikací">
           {tabs.map((t) => (
             <button
               key={t.id}
               type="button"
+              role="tab"
+              id={`notif-tab-${t.id}`}
+              aria-selected={tab === t.id}
+              aria-controls="notif-tabpanel"
               className={clsx(s.tab, tab === t.id && s.tabActive)}
               onClick={() => setTab(t.id)}
             >
@@ -99,7 +103,12 @@ export function NotificationCenter() {
           ))}
         </nav>
 
-        <div className={s.body}>
+        <div
+          className={s.body}
+          role="tabpanel"
+          id="notif-tabpanel"
+          aria-labelledby={`notif-tab-${tab}`}
+        >
           {tab === 'chats' && <ChatFeedTab />}
           {tab === 'events' && <EventsTab />}
           {tab === 'todo' && hasPending && <PendingTab />}

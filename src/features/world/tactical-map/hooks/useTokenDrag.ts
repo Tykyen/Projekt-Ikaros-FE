@@ -7,7 +7,13 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2d.md C4.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from 'react';
 import type { FederatedPointerEvent } from 'pixi.js';
 import { getGridAdapter } from '../grid';
 import type { HexConfig, MapToken, Point } from '../types';
@@ -22,6 +28,14 @@ interface Args {
   viewport: ViewportState;
   config: HexConfig;
   onDrop: (tokenId: string, q: number, r: number) => void;
+  /**
+   * 17.4 — sdílený flag „táhne se token" (živý ref). Nastaví se true na
+   * pointerdown tokenu, false na drop/cancel. `useViewportPanZoom` ho čte, aby
+   * 1-prstový pan mapy NEstartoval na tokenu (gesto patří tokenu, ne posunu).
+   * Vlastní ho rodič (`TacticalMapView`), protože panZoom vzniká PŘED tímto
+   * hookem — sdílený ref oba propojí bez ohledu na pořadí.
+   */
+  isDraggingRef?: MutableRefObject<boolean>;
 }
 
 interface DragState {
@@ -32,7 +46,12 @@ interface DragState {
   delta: Point;
 }
 
-export function useTokenDrag({ viewport, config, onDrop }: Args): {
+export function useTokenDrag({
+  viewport,
+  config,
+  onDrop,
+  isDraggingRef,
+}: Args): {
   dragState: DragState | null;
   handleTokenPointerDown: (e: FederatedPointerEvent, token: MapToken) => void;
 } {
@@ -70,6 +89,7 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
     const handleUp = (e: PointerEvent): void => {
       const start = dragRef.current;
       dragRef.current = null;
+      if (isDraggingRef) isDraggingRef.current = false;
       if (!start) {
         setDragState(null);
         return;
@@ -98,6 +118,7 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
     };
     const handleCancel = (): void => {
       dragRef.current = null;
+      if (isDraggingRef) isDraggingRef.current = false;
       setDragState(null);
     };
     const handleEsc = (e: KeyboardEvent): void => {
@@ -113,7 +134,7 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
       window.removeEventListener('pointercancel', handleCancel);
       window.removeEventListener('keydown', handleEsc);
     };
-  }, [config.size, config.gridType, onDrop, screenToMapaDelta]);
+  }, [config.size, config.gridType, onDrop, screenToMapaDelta, isDraggingRef]);
 
   const handleTokenPointerDown = useCallback(
     (e: FederatedPointerEvent, token: MapToken): void => {
@@ -127,6 +148,8 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
         startScreenX: e.client.x,
         startScreenY: e.client.y,
       };
+      // 17.4 — zaber gesto: viewport pan tenhle prst přeskočí.
+      if (isDraggingRef) isDraggingRef.current = true;
       setDragState({
         token,
         startQ: token.q,
@@ -134,7 +157,7 @@ export function useTokenDrag({ viewport, config, onDrop }: Args): {
         delta: { x: 0, y: 0 },
       });
     },
-    [],
+    [isDraggingRef],
   );
 
   return { dragState, handleTokenPointerDown };
