@@ -40,7 +40,14 @@ export const adminChatKeys = {
   channels: ['admin-chat', 'channels'] as const,
   messages: (channelId: string) =>
     ['admin-chat', 'messages', channelId] as const,
+  unread: ['admin-chat', 'unread'] as const,
 };
+
+/** Nepřečtené per konverzace (BE `GET /admin-chat/unread`). */
+export interface AdminChatUnread {
+  channelId: string;
+  count: number;
+}
 
 /** Konverzace admin chatu dostupné aktuálnímu uživateli (BE filtruje dle členství). */
 export function useAdminChatChannels() {
@@ -59,6 +66,40 @@ export function useAdminChatMessages(channelId: string | null) {
         limit: 50,
       }),
     enabled: !!channelId,
+  });
+}
+
+/**
+ * 20.5b — nepřečtené per konverzace (BE seed, přežije reload). Enabled jen
+ * pro adminy (ne-admin by dostal 403). Živý tik + reset řeší
+ * `useAdminChatUnreadTotal` / mark-read mutace, které tuto cache invalidují.
+ */
+export function useAdminChatUnread(enabled = true) {
+  return useQuery({
+    queryKey: adminChatKeys.unread,
+    queryFn: () => api.get<AdminChatUnread[]>(`${BASE}/unread`),
+    enabled,
+  });
+}
+
+/**
+ * 20.5b — celkový počet nepřečtených pro badge „Chat správy" (součet přes
+ * konverzace). Jen čte cache (seedovanou/živě drženou `useAdminChatLive` v root
+ * layoutu) — žádný vlastní WS listener, ať badge nezávisí na (na)mountování
+ * sidebaru. Dedupe query se sdílí se seedem.
+ */
+export function useAdminChatUnreadTotal(isAdmin: boolean): number {
+  const { data } = useAdminChatUnread(isAdmin);
+  return (data ?? []).reduce((sum, u) => sum + u.count, 0);
+}
+
+/** 20.5b — označit konverzaci přečtenou (BE `POST .../read`), pak refetch unread. */
+export function useMarkAdminChatRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (channelId: string) =>
+      api.post(`${BASE}/channels/${channelId}/read`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: adminChatKeys.unread }),
   });
 }
 

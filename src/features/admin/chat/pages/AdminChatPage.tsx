@@ -33,6 +33,7 @@ import {
   useAdminChatChannels,
   useAdminChatMessages,
   useAdminChatRealtime,
+  useMarkAdminChatRead,
   useSendAdminMessage,
   useDeleteAdminMessage,
   useUploadAdminAttachment,
@@ -116,6 +117,18 @@ export default function AdminChatPage() {
     view === 'chat' ? activeConvId : null,
   );
   const { typingNames } = useAdminChatRealtime(activeConvId);
+  const markRead = useMarkAdminChatRead();
+
+  // 20.5b — otevřená konverzace = přečtená. Běží při vstupu do ní i při
+  // příchozí nové zprávě (změna počtu), aby badge „Chat správy" pro právě
+  // sledovanou konverzaci nerostl. `markRead` je stabilní (mutace).
+  const msgCount = view === 'chat' ? (messages?.length ?? 0) : 0;
+  useEffect(() => {
+    if (view === 'chat' && activeConvId && msgCount > 0) {
+      markRead.mutate(activeConvId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeConvId, view, msgCount]);
   const socket = useSocket();
   const sendMut = useSendAdminMessage(activeConvId ?? '');
   const deleteMut = useDeleteAdminMessage(activeConvId ?? '');

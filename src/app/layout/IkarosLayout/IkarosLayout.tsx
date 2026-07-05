@@ -57,7 +57,7 @@ import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
 import { useAdminChatLive } from '@/features/admin/chat/api/useAdminChatLive';
-import { adminChatUnseenAtom } from '@/features/admin/chat/model/adminChatStore';
+import { useAdminChatUnreadTotal } from '@/features/admin/chat/api/useAdminChat';
 import {
   NotificationCenter,
   useChatFeedLive,
@@ -443,7 +443,8 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
   const isAdmin =
     currentUser?.role === UserRole.Superadmin || currentUser?.role === UserRole.Admin;
   const { data: pendingCount } = usePendingActionsCount(!!currentUser);
-  const adminChatUnseen = useAtomValue(adminChatUnseenAtom);
+  // 20.5b — badge „Chat správy": BE-backed součet nepřečtených (přežije reload).
+  const adminChatUnseen = useAdminChatUnreadTotal(isAdmin);
 
   const label = isAdmin ? 'Uživatelé' : 'Přátelé';
   const badge = pendingCount?.total ?? 0;

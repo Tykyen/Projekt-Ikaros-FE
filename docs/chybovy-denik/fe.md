@@ -4,6 +4,17 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 20.5b persistentní unread badge admin chatu: reuse world-chat read-state (BE+FE) · 2026-07-05
+**Kontext:** Badge „Chat správy" byl efemérní (WS-only, reset po reloadu) — offline/pre-reload zprávy nikdy neukázal. Uživatel: „doufám, že má kolečko nových zpráv jako ve světě" → chce BE-backed, přežije reload.
+**Klíčové zjištění (3 průzkumní agenti PŘED kódem):** admin chat (`platform-chat` modul) už reusuje `chat` modul a zprávy jsou `ChatMessage` s Mongo ObjectId → **hotová read-state infra existuje** (kolekce `channelreadstatus`, `IChannelReadStatusRepository`, `messageRepo.countAfter(_id>lastRead)`), jen nebyla zapojená a repo nebyl exportovaný z `ChatModule`. Ušetřilo to psaní nové kolekce/migrace — jen zapojit vzor `chat.service.getUnreadCounts`/`markAsRead` 1:1.
+**Řešení BE:** export `IChannelReadStatusRepository` z `chat.module`; inject do `PlatformChatService`; `getUnreadCounts(user)` (per-kanál count), `markChannelRead(channelId, user)`, `upsert` v `sendMessage` (odesílatel nevidí vlastní zprávu jako unread); endpointy `GET /admin-chat/unread` + `POST /channels/:id/read` (guard Sa+Admin). **Bez nové kolekce/migrace** (klíč `{userId,channelId}` unikátní i pro admin kanály).
+**Řešení FE:** `useAdminChatUnread` (seed), `useAdminChatUnreadTotal` (badge součet), `useMarkAdminChatRead`; `useAdminChatLive` přepsán z efemérního atomu na root-level seed + WS `platform-chat:activity` invalidace (nízká frekvence → refetch místo optimistic reduceru); mark-read per konverzace v `AdminChatPage` (vstup + příchozí zpráva); smazán osiřelý `adminChatStore.ts`.
+**Poučení / rozhodnutí:** • WS listener dal do root-level hooku (vždy mount), ne do sidebaru (na mobilu unmountuje) → badge nezávisí na (na)mountování sidebaru. • Reset badge = per-konverzace mark-read (jako svět), ne globální „vše přečteno" při vstupu na stránku. • BE test nezaložen — v `platform-chat` modulu žádný vzor + velký mock setup v noci = riziko falešného testu; logika je 1:1 kopie testovaného `chat.service`, runtime po restartu.
+**Jak ověřeno (staticky):** BE `tsc --noEmit` ✓ + eslint ✓ + elevation-bypass ✓; FE `tsc -b` ✓ + eslint (0 err; 1 pre-existující warning na cizím auto-select efektu) ✓ + IkarosLayout/nav testy 75/75 ✓. **⚠️ Čeká BE restart** (nový endpoint + injektovaný repo; bez restartu starý bundle). Naživo neověřeno (fb_no_browser).
+**Zhodnocení:** Dobře — nesrovnalost (efemérní vs persistentní) prokomunikována s uživatelem PŘED prací, průzkum 3 agentů odhalil hotovou reuse infru (0 nové kolekce), BE+FE odděleně (ne mixed batch), spec→kód, 0 cyklení. Zbývá restart+vizuál.
+
+---
+
 ### ✅ ŘEŠENÍ — 16.1g nápovědní paleta pojmenovaných barev: sdílená `NamedColorPalette` napříč 7 color pickery · 2026-07-05
 **Kontext:** Uživatel chtěl u každého color pickeru nápovědu s pojmenovanými barvami (vzor = polská tabulka 16 HTML barev), česky a čitelnou, „všude ve světě i u budoucích".
 **Nesrovnalost chycená v diskuzi PŘED kódem:** (1) polskou tabulku nelze kopírovat doslova — půlka barev (black/navy/maroon) je krajně tmavá → v chatu na tmavém pozadí mizí; navrhl jsem **kurátorskou sadu 18 barev středního jasu** čitelných na tmavém i světlém podkladu. (2) „palety" jsou 2 kategorie: **react-colorful** (2×, velký gradient) vs **nativní `<input type=color>`** (5×, malý OS čtvereček) — do OS pickeru nezasáhneme, paleta jde jen *vedle* něj.
