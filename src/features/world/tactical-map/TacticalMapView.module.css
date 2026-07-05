@@ -15,6 +15,10 @@
   min-height: calc(100svh - var(--header-h, 60px));
   overflow: hidden;
   background: var(--map-canvas-bg);
+  /* Spec 5.9c — globální „Velikost rozhraní" zvětšuje celou app přes zoom na
+     <html>. PIXI plátno by tím rozmazalo a rozhodilo souřadnice kliků, proto
+     mapu vracíme na 1:1 (má vlastní pan/zoom). --ui-scale dědí z :root. */
+  zoom: calc(1 / var(--ui-scale, 1));
   /* Disable browser native gestures (pinch zoom by triggered zoom page-level) */
   touch-action: none;
   /* Disable text selection během drag */

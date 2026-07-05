@@ -501,6 +501,11 @@ export interface UserThemeSettings {
   themeId?: string;
   adjust?: WorldThemeAdjust;
   overrides?: Record<string, string>;
+  /**
+   * Spec 5.9c — velikost celého rozhraní (CSS `zoom`), 1.0–1.5, default 1.
+   * Přístupnost (slabší zrak): zvětší text, tlačítka, ikony i odstupy.
+   */
+  uiScale?: number;
 }
 
 export interface WorldMembership {

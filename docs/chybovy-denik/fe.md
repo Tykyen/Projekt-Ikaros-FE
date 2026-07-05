@@ -4,6 +4,16 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 5.9c Velikost rozhraní (a11y dioptrie): globální CSS `zoom` na `<html>` místo font-scale · 2026-07-05
+**Kontext:** Testeři se slabším zrakem — písmo/UI malé. Zadání znělo „zvětšit písmo", ale správné řešení bylo zvětšit CELÉ rozhraní.
+**Změna přístupu (v diskuzi PŘED kódem):** První nápad „root font-size zoom" jsem **zavrhl statickou analýzou** — grep ukázal `font-size` v **px ~1700× vs rem ~700×** → root font-size by zvětšil jen menšinu textu (nekonzistence). Zvolen **CSS `zoom` na `documentElement`**: škáluje px i rem, přepočítá layout (na rozdíl od `transform:scale`, který ořezává), a **jeden ovladač pokryje vše** vč. portálů/modalů/Putyky/Campu/světového chatu → 0 změn `ChatRoom`/`MessageItem`.
+**Co zabralo:** `themeSettings.uiScale` (1.0–1.5) — reuse existující 5.9 trubky: `PlatformThemePreview` (živý náhled), slider v `AppearanceSection` (Doladění vzhledu) přes `saveAdjust`, effect v `ThemeProvider` nastaví `zoom`+`--ui-scale` na `<html>` (NENÍ pod `worldThemeActive` gate → platí i ve světě). Mapa: `.viewport { zoom: calc(1/var(--ui-scale,1)) }` → PIXI plátno 1:1 (jinak blur + rozhozené kliky).
+**Proč správně:** **BE 0 změn** — `themeSettings` je volný objekt + shallow-merge v `users.service` → `uiScale` (top-level skalár) přežije uložení jasu/kontrastu i naopak; persistence past ze specu §5 tím padá. Past mapy (PIXI zoom) chycena PŘEDEM v návrhu, ne až testem.
+**Jak ověřeno (staticky):** `npm run build` (tsc-b+vite) ✓, eslint ✓, lint:colors bez regrese (diff nepřidal barvu). Struktura responzivní (`.body overflow:hidden`, `.main min-width:0`, wrap). **Naživo za loginem čeká uživatele** — browser sám nespouštím (fb_no_browser); hlavní vizuál = mapa 1:1 + mobil 150 % scroll.
+**Zhodnocení:** Dobře — nesrovnalost (px/rem mix) chycena statickou analýzou v diskuzní fázi, přístup obrácen před psaním kódu; spec→souhlas→kód, reuse infry, 0 cyklení. Zbývá vizuál → `funkce`+`napoveda`+commit.
+
+---
+
 ### ✅ ŘEŠENÍ — 16.2h K1 pilot: bestie karta motiv-aware (3 karty→1 + disclosure + schema-driven detail + pole `description` BE+FE) · 2026-07-03
 **Co zabralo:** Přepis generic `BestieCard` (drd16/fate switch zatím ponechán, smaže K4) na univerzální **skeleton + disclosure** (`useState`, `data-open`, hlavička role=button, akce `stopPropagation`) + nový **`BestieDetail`** (read-only, generuje sekce ZE SCHÉMATU: `combatBehavior:'damageable'`→HP bar, list s `listItemFields`→tabulka nebo `{label,value}`→seznam, number/string/enum→dlaždice; skrývá prázdné null/''; poznámky gate `canSeeNotes`). Nové BE pole **`description`** v `bestiae` modulu (7 míst). FE **`bestieSkins.css`** = per-motiv tvar scoped `[data-theme='dark-fantasy'] [data-bestie-card/-portrait]` přes **stabilní data-atributy** (ne module-hash). Modal +Popis (oddělené od Poznámky).
 **Proč to je správně:** dvě osy oddělené — **motiv (`data-theme`) = tvar/ornament** (scoped CSS + `--theme-*` tokeny), **systém = pole** (existující schema engine). Stabilní `data-bestie-*` selektory obcházejí hash CSS-modulů. `description` oddělený od `notes` (GM). **BE past:** `create`/`clone` v service NEmají spread dto → `description` nutné přidat explicitně (jinak tiše propadne); `update` jede přes `updateAtomic(dto)` = projde sám.

@@ -33,17 +33,22 @@ export function AppearanceSection({ user }: Props) {
   const setPreview = useSetAtom(platformThemePreviewAtom);
   const [brightness, setBrightness] = useState(ts?.adjust?.brightness ?? 1);
   const [contrast, setContrast] = useState(ts?.adjust?.contrast ?? 1);
+  // 5.9c — velikost celého rozhraní (CSS zoom), 1.0–1.5.
+  const [uiScale, setUiScale] = useState(ts?.uiScale ?? 1);
   const [overrides, setOverrides] = useState<Record<string, string>>(
     ts?.overrides ?? {},
   );
 
   useEffect(() => {
-    setPreview({ overrides, adjust: { brightness, contrast } });
-  }, [overrides, brightness, contrast, setPreview]);
+    setPreview({ overrides, adjust: { brightness, contrast }, uiScale });
+  }, [overrides, brightness, contrast, uiScale, setPreview]);
   useEffect(() => () => setPreview(null), [setPreview]);
 
   const adjustDirty =
-    brightness !== 1 || contrast !== 1 || Object.keys(overrides).length > 0;
+    brightness !== 1 ||
+    contrast !== 1 ||
+    uiScale !== 1 ||
+    Object.keys(overrides).length > 0;
 
   // F-28 — BE vyžaduje úplný 6-místný hex (`@Matches(/^#[0-9a-fA-F]{6}$/)`).
   // Ruční HEX input může pustit neúplný hex (`#ABC`, `#`) → bez gate by BE
@@ -65,7 +70,7 @@ export function AppearanceSection({ user }: Props) {
   async function saveAdjust() {
     try {
       await update.mutateAsync({
-        themeSettings: { adjust: { brightness, contrast }, overrides },
+        themeSettings: { adjust: { brightness, contrast }, overrides, uiScale },
       });
       toast.success('Doladění vzhledu uloženo.');
     } catch {
@@ -75,6 +80,7 @@ export function AppearanceSection({ user }: Props) {
   function resetAdjust() {
     setBrightness(1);
     setContrast(1);
+    setUiScale(1);
     setOverrides({});
   }
 
@@ -103,9 +109,25 @@ export function AppearanceSection({ user }: Props) {
           <h2 className={styles.sectionTitle}>Doladění vzhledu</h2>
         </header>
         <p className={styles.placeholderHint}>
-          Jen pro tebe — motiv zůstává, doladíš si jas, kontrast a barvy pro
-          svou čitelnost. Platí na všech zařízeních.
+          Jen pro tebe — motiv zůstává, doladíš si velikost, jas, kontrast a
+          barvy pro svou čitelnost. Platí na všech zařízeních.
         </p>
+
+        <div className={styles.themeRow}>
+          <label className={styles.text} style={{ flex: 1 }}>
+            Velikost rozhraní — {Math.round(uiScale * 100)} %
+            <input
+              type="range"
+              min={1}
+              max={1.5}
+              step={0.1}
+              value={uiScale}
+              onChange={(e) => setUiScale(Number(e.target.value))}
+              aria-label="Velikost rozhraní"
+              style={{ width: '100%' }}
+            />
+          </label>
+        </div>
 
         <div className={styles.themeRow}>
           <label className={styles.text} style={{ flex: 1 }}>

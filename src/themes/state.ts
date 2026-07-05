@@ -26,6 +26,8 @@ export const worldThemePreviewAtom = atom<WorldThemePreview | null>(null);
 export interface PlatformThemePreview {
   overrides?: Record<string, string>;
   adjust?: { brightness?: number; contrast?: number; bgDim?: number };
+  /** Spec 5.9c — živý náhled velikosti rozhraní (CSS `zoom`, 1.0–1.5). */
+  uiScale?: number;
 }
 export const platformThemePreviewAtom = atom<PlatformThemePreview | null>(null);
 
