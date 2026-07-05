@@ -27,6 +27,7 @@
 }
 
 .hero {
+  position: relative;
   flex-shrink: 0;
   width: 96px;
   height: 96px;
@@ -105,6 +106,41 @@
 .card:hover .cta {
   background: var(--accent-soft, var(--accent));
   color: var(--accent-bright);
+}
+
+/* Katalog #3 — zamčená karta (private svět pro nečlena): bez navigace, tlumená. */
+.locked {
+  cursor: default;
+}
+.locked:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--frame-border);
+}
+.locked .hero {
+  filter: grayscale(0.35) brightness(0.72);
+}
+.lockBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-1);
+  border: 1px solid var(--frame-border);
+  color: var(--text-secondary);
+}
+.ctaMuted {
+  border-color: var(--frame-border);
+  color: var(--text-secondary);
+}
+.locked:hover .cta {
+  background: transparent;
+  color: var(--text-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {

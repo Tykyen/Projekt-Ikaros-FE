@@ -166,3 +166,12 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** „install/build prošel (exit 0)", ale navazující krok (lint/test) selže na něčem, co ten krok měl zajistit; task exit 0 u příkazu, jehož skutečná práce se nespustila.
 
 ---
+
+### CH-057 — Chybná diagnóza „owner nevidí orchestraci = de-elevovaný admin, nahoď se" (byl to majitel) · 2026-07-05
+**Kontext:** Uživatel poslal screenshot taktické mapy s tlačítkem „Aktivovat admina" a hlásil, že na světě „Sciuri…" chybí panel Orchestrace. Ptal se, jestli je to právy kvůli private světu.
+**Co bylo špatně:** Z přítomnosti tlačítka „Aktivovat admina" (= `AdminElevationToggle`) jsem usoudil, že se na svět dívá **nečlen-admin, který je de-elevovaný** → skrytá orchestrace je „správně, jen se nahoď". Uživatel pak upřesnil: **„dotyčný je MAJITEL světa."** Owner má z `create()` PJ membership (`worlds.service.ts:437-443`), takže elevaci k orchestraci NEpotřebuje a vidět ji MÁ. Moje rada „nahoď se" byla mimo — „Aktivovat admina" je jen **ortogonální** admin toggle (owner může být zároveň platform admin), ne důkaz, že de-elevace je příčina.
+**Reálný kořen (viz [audit ✅ ŘEŠENÍ](audit.md)):** `TacticalMapView.isPJ` postrádá owner-bypass, který má `WorldLayout`/`WorldContext`; + `matrix-world.seed` zakládal svět bez owner membershipu.
+**Poučení:** Neusuzuj příčinu chybějícího oprávnění z JEDNOHO UI signálu (elevation toggle) bez ověření **vztahu diváka ke světu** (owner vs člen vs nečlen-admin). Owner ≠ de-elevovaný admin, i když oba vidí stejný toggle. Ptej se „kdo přesně se dívá a jaký má vztah ke světu" DŘÍV, než navrhnu řešení přes mechaniku elevace.
+**Příznak cyklení:** navrhuju „nahoď se / je to správně" na hlášený chybějící prvek, uživatel opáčí „ale je to majitel / má tam být".
+
+---

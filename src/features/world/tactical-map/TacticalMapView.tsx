@@ -25,6 +25,7 @@ import { useAtomValue } from "jotai";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import { WorldVoiceButton } from "@/features/voice/components/WorldVoiceButton";
 import { currentUserAtom } from "@/shared/store/authStore";
+import { InputModal } from "@/features/admin/chat/components/InputModal";
 import { WorldRole } from "@/shared/types";
 import { useMapTheme } from "./hooks/useMapTheme";
 import { useViewportPanZoom } from "./hooks/useViewportPanZoom";
@@ -1308,14 +1309,19 @@ export function TacticalMapView(): React.ReactElement {
       currentUser,
     ],
   );
+  // Text anotace — nahrazuje nativní `window.prompt` (neskinovaný OS dialog) za
+  // sdílený InputModal (portál i do fullscreenu mapy). Drží map-space bod, kam se
+  // text umístí po potvrzení.
+  const [textAnchor, setTextAnchor] = useState<{ x: number; y: number } | null>(
+    null,
+  );
   const handleDrawingPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>): void => {
       if (!viewportRef.current || !scene || !drawingTool.activeKind) return;
       const rect = viewportRef.current.getBoundingClientRect();
       const p = screenToMap(e.clientX, e.clientY, rect, panZoom);
       if (drawingTool.activeKind === "text") {
-        const text = window.prompt("Text anotace:")?.trim();
-        if (text) commitDrawing("text", [p.x, p.y], text);
+        setTextAnchor({ x: p.x, y: p.y });
         return;
       }
       drawingOriginRef.current = p;
@@ -1335,7 +1341,6 @@ export function TacticalMapView(): React.ReactElement {
       drawingTool.color,
       drawingTool.visibility,
       currentUser,
-      commitDrawing,
     ],
   );
   const handleDrawingPointerMove = useCallback(
@@ -2242,6 +2247,21 @@ export function TacticalMapView(): React.ReactElement {
       >
         <TacticalMapHelp audience={isPJ ? "pj" : "hrac"} />
       </WorldHelpModal>
+
+      {/* Text anotace (kreslicí nástroj „Text") — náhrada nativního window.prompt
+          za sdílený, skinovaný InputModal (portál i do fullscreenu mapy). */}
+      <InputModal
+        open={textAnchor !== null}
+        onClose={() => setTextAnchor(null)}
+        title="Text anotace"
+        label="Text anotace:"
+        placeholder="Napiš text…"
+        confirmLabel="OK"
+        onConfirm={(value) => {
+          if (textAnchor)
+            commitDrawing("text", [textAnchor.x, textAnchor.y], value);
+        }}
+      />
 
       {/* 10.2j — overlay přes celý viewport (uvnitř fullscreenu mapy). Mountuje
           se až jsou data načtená, aby initialContent nebyl prázdný. */}

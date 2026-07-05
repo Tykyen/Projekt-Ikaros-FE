@@ -10,6 +10,15 @@
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
+### D-R-AUDIT-CREATE-TX — create() světa není transakční (poloprázdný svět při seed-failu)
+**Soubor:** `backend/src/modules/worlds/worlds.service.ts:425-481` — `create()`
+**Problém:** Netransakční řetěz ~7 kroků (world → PJ membership → měny → počasí → kalendář → diarySchema → verze) bez rollbacku. Když spadne krok PO membershipu, HTTP vrátí 500, ale svět+membership už persistují → poloprázdný svět + matoucí chyba. Kontrast: `approveAccessRequest` transakci MÁ (D-061).
+**Dopad:** Nízký/střední — seedy jsou defaulty (backfillovatelné); owner (membership) vzniká vždy PŘED seedy, takže „tvůrce nemá všechny věci" ≠ ztráta vlastnictví.
+**Řešení:** (a) Mongo `session.withTransaction` přes všechny služby (velké — nutno protáhnout session), nebo (b) lehčí pojistka: obalit post-membership seed kroky `try/catch` + `logWarn` (svět nikdy neskončí bez membershipu, seed-fail jen zaloguje místo 500). Doporučení: (b) hned, (a) později.
+**Kdy:** nízká priorita; NENÍ potvrzený aktivní bug (orchestrace „nemá věci" byla FE owner-bypass, ne spadlý seed — audit 2026-07-05).
+
+---
+
 ### D-17.8-A11Y-BACKLOG — Přístupnost: odložené vrstvy nad rámec 17.8 v1
 **Hotovo 2026-07-05 (většina backlogu):**
 - (1) ✅ **`eslint-plugin-jsx-a11y` ve `warn`** — `eslint.config.js`; 34 pravidel z `flatConfigs.recommended` downgradováno na warn. Instalováno `--legacy-peer-deps` (plugin 6.10.2 deklaruje peer eslint ≤9, projekt má eslint 10; flat config fakticky funguje — ověřeno `--print-config`).
