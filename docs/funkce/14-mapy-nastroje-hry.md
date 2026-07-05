@@ -185,6 +185,26 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - NPC token skrytý mlhou pro hráče (`isTokenHiddenByFog`). PJ vidí vše.
 - **Kód:** `components/fog/{FogLayer,FogPalette,fogUtils}.tsx`, `hooks/useFogTool.ts`.
 
+### Import hotových map — UVTT / .dd2vtt (17.2)
+- **Co to je:** PJ naimportuje hotovou mapu ve formátu UVTT (Dungeondraft, DungeonFog) → vznikne **nová scéna** s pozadím, kalibrovanou mřížkou a uloženými **zdmi + světly**.
+- **Kde:** taktická mapa → „⚙ Orchestrace" → „Aktivní scény" → tlačítko **„📥 Import UVTT"** (skrytý file input `.dd2vtt,.uvtt,.df2vtt,.json`).
+- **Kdo:** FE gate `isPjStrict` (PJ 5+, stejně jako „+ Nová"). BE operace `scene.walls.replace`/`scene.lights.replace` PJ-only (authorizer `default` → `MAP_OP_FORBIDDEN`).
+- **Co jde dělat:** vybrat soubor → `parseUvtt` (tolerantní k verzím 0.2–1.0) → base64 obrázek přes `useUploadImage` na Cloudinary → `POST /maps` (name z názvu souboru) → op `scene.config` (kalibrace: `gridType='square'`, `size=pixels_per_grid`, `backgroundScale=1`, geometrie `px = gridUnit×ppg`) → `scene.walls.replace` (z `line_of_sight`+`objects_line_of_sight` jako zdi, `portals` jako dveře) → `scene.lights.replace` → aktivace + self-assign.
+- **Hranice / co neumí:** import = **vždy nová scéna** (ne přepis); UVTT nenese tokeny/postavy (jen prostředí); půlbuňkový posun originu k doladění proti reálnému renderu; verze UVTT ověřeny zatím jen orientačně (ne na reálných vzorcích); bez ručního kreslení/editace zdí (jen import + toggle dveří přes 17.1).
+- **Zvláštnosti:** config jde přes op `scene.config` (obejde `CreateMapDto`/`HexConfigDto` whitelist, který zná jen size/originX/originY/showGrid); zdi/světla jsou „spící data" — opticky nic nedělají, dokud se nezapne `visionMode='dynamic'` (17.1). `scene.walls`/`scene.lights` musí být ve whitelistu `maps.repository.toEntity` (jinak GET vrací `[]`).
+- **Stav:** 🚧 funkční, **BE čeká restart** (nová schema pole `walls`/`lights`); reálný import `.dd2vtt` a kalibrace k ověření v živé appce.
+- **Kód:** FE `import/{parseUvtt,useImportUvttScene}.ts`, `components/pj-panel/MapPjPanel.tsx`, `components/WallsLayer.tsx`. BE `schemas/map-scene.schema.ts`, `interfaces/map-scene.interface.ts`, `dto/operations/{scene-ops.dto,index}.ts`, `operations/map-operations.service.ts`, `repositories/maps.repository.ts`.
+
+### Dynamické světlo & linie pohledu — LoS (17.1)
+- **Co to je:** Automatická viditelnost — token „vidí" jen tam, kam dohlédne **přes zdi**; mlha se počítá sama z pozic PC tokenů + zdí (klient-side raycasting, angle-sweep visibility polygon). Nahrazuje ruční štětec fogu.
+- **Kde:** „Upravit scénu" → sekce **„Viditelnost (LoS)"** → přepínač „Automatická viditelnost přes zdi" (+ „Temná scéna" + „Dosvit (buňky)").
+- **Kdo:** PJ nastaví `config.visionMode`/`darkness`/`visionRange` (op `scene.config`, PJ-only). Výsledek (mlha) vidí hráči i PJ přes stávající `FogLayer` (PJ poloprůsvitně, hráč opaque).
+- **Co jde dělat:** přepnout `manual`↔`dynamic`; zapnout temnou scénu → token vidí jen do dosvitu (`visionRange` buněk, default 4) nebo do dosahu světel; **PJ klikne na dveře** (úchyt na `WallsLayer`) → otevře/zavře → LoS se ihned přepočítá (op `scene.walls.replace`, optimistic).
+- **Hranice / co neumí:** buňkové rozlišení (ne pixel-perfect stíny); LoS ze **všech PC tokenů** (ne per-hráč individuální vidění); přepočet na změnu pozice/zdí (memoizováno), ne živě během dragu; vyžaduje `fogEnabled`; žádná „explored" paměť (jen aktuální LoS); **runtime FPS na velké scéně neověřen** (klient-side); barevné míchání světel / darkvision typy mimo scope.
+- **Zvláštnosti:** reuse `FogLayer` — LoS jen dodá `revealedSet` (derived) místo ručního štětce; otevřené dveře (`door.open`) `wallsToSegments` vynechá; `LightsLayer` glow (`blendMode='add'`) jen v `darkness`. Jádro `vision/raycast.ts` unit-testováno (za zeď nedohlédne, dveře propustí, temno ořízne).
+- **Stav:** 🚧 funkční, čeká **BE restart** (kvůli perzistenci `walls` z 17.2) + runtime ověření výkonu.
+- **Kód:** FE `vision/raycast.ts`, `TacticalMapView.tsx` (`revealedSet` memo + `handleToggleDoor`), `components/{WallsLayer,LightsLayer}.tsx`, `components/pj-panel/EditSceneModal.tsx`. Bez BE zásahu (config je volný objekt).
+
 ### Efekty + šablony oblastí (15.3)
 - PJ paleta „🎨 Efekty": barva hexu (`color`), exploze (kruhové prstence, varianty), bariéra (kruh / brush tah). Mazání souřadnicové (klik na hex smaže efekty, které ho pokrývají — deterministické, ne Pixi hit-test). „Smazat vše". Optimistic + rollback. Op `effect.add/update/remove`, `scene.effects.replace`.
 - **Šablony oblastí (15.3):** nástroj „📐 Šablona" — `kužel / linie / koule / čtverec`. PJ klikne origin + táhne směr/dosah → **živý náhled**, pustí → uloží se jako stávající `color` effect (reuse, žádné nové úložiště). Buňky tvaru se počítají v **pixel-space** (`templateCells`) → uniformní pro hex/čtverec/none.

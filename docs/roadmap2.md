@@ -541,27 +541,21 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **Závislosti:** 17.1 a 17.2 silně těží z Fáze 15.2 (mřížka); dělat až po ní.
 
-### - [ ] 17.1 Dynamické světlo & linie pohledu (LoS) — [B2 · dopad vysoký · náklad velký]
+### - [x] 17.1 Dynamické světlo & linie pohledu (LoS) — [B2 · dopad vysoký · náklad velký] — ✅ 2026-07-05 (BE čeká restart)
+> **✅ Implementováno 2026-07-05 (spec-17.1).** Klient-side raycasting (angle-sweep visibility polygon, `vision/raycast.ts`, 12 unit testů). **Reuse FogLayeru** — LoS jen dodá derived `revealedSet` z pozic PC tokenů + zdí (`scene.walls` z 17.2) místo ručního štětce; blur/role-alpha/skrytí NPC zůstává. Přepínač „Viditelnost (LoS)" v Upravit scénu (`visionMode: manual|dynamic`). Temná scéna (`darkness` + `visionRange` dosvit) + osvětlené oblasti ze `scene.lights` (`LightsLayer` glow). PJ klikatelné dveře (`WallsLayer` → `scene.walls.replace` → LoS re-compute). Bez BE zásahu (config volný objekt). Reziduum: runtime FPS na velké scéně + kalibrace k ověření v živé appce. Detail: `docs/arch/phase-17/spec-17.1.md`, funkce/14.3.
 **Cíl:** Token automaticky vidí jen tam, kam dohlédne přes stěny a podle světla.
 **Proč:** Náš fog je dnes ruční štětec; automatická vize je herně i atmosféricky o úroveň výš (vlajka Foundry).
 **Návrh přípravy:** **velká featura — povinný spec + prototyp.** Vrstva stěn/překážek + výpočet viditelnosti (raycasting; u hexu i čtverce). Výkon na velkých scénách. Doporučení: až po 15.2 a 17.2 (import map se stěnami zlevní obsah).
 **BE/FE:** vrstva stěn (editor + úložiště); real-time výpočet vize per token; integrace s fogem.
 **Otevřené otázky:** Spočítat na klientovi, nebo serveru? Zdroje světla jako entity? Migrace existujícího ručního fogu?
 
-### - [ ] 17.2 Import hotových map (UVTT / .dd2vtt) — [B4 · dopad střední · náklad střední]
+### - [x] 17.2 Import hotových map (UVTT / .dd2vtt) — [B4 · dopad střední · náklad střední] — ✅ 2026-07-05 (BE čeká restart)
+> **✅ Implementováno 2026-07-05 (spec-17.2).** Parser `import/parseUvtt.ts` (tolerantní 0.2–1.0, 12 unit testů) → nová scéna: obrázek na Cloudinary + kalibrace mřížky (`gridType='square'`, `size=pixels_per_grid`, `backgroundScale=1`) + zdi (`line_of_sight`+`objects_line_of_sight`) + dveře (`portals`) + světla. Tlačítko „📥 Import UVTT" v PJ orchestraci (PJ 5+). **BE:** nová pole `scene.walls`/`scene.lights` (schema/interface/repository whitelist) + op `scene.walls.replace`/`scene.lights.replace` (PJ-only). Zdi „spící data", rozsvítí je 17.1. Reziduum: reálný `.dd2vtt` + půlbuňkový posun originu k ověření v živé appce; **nutný BE restart**. Detail: `docs/arch/phase-17/spec-17.2.md`, funkce/14.3.
 **Cíl:** Načtení mapy ve formátu UVTT (nese i stěny a světla) → hotová scéna.
 **Proč:** Obří ekosystém hotových map; jeden import = scéna připravená i pro 17.1. PJ nemusí nic kreslit.
 **Návrh přípravy:** spec parseru UVTT → scéna (obrázek + stěny + světla + rozměr mřížky).
 **BE/FE:** parser + mapování na naši scénu/stěny.
 **Otevřené otázky:** Které varianty formátu podporovat? Kam s licencemi importovaných map (jen vlastní soubory)?
-
-### - [ ] 17.3 Veřejná „výkladní skříň" světa — [C3 · dopad střední · náklad střední] 🔁
-**Cíl:** Přepínač „veřejná prezentace" — vybrané stránky/mapa/timeline viditelné i nepřihlášenému.
-**Proč:** Celý World Anvil stojí na publikování světa čtenářům; nový zájemce dnes nevidí ukázku, na kterou by se chytil. Marketing i pýcha autora; živí trychtýř (Příloha A, krok 1).
-**Návrh přípravy:** 🔁 rozšířit existující `isPublic` + leak-safe filtry; rozhodnout, co lze zveřejnit.
-**BE:** veřejné read-only endpointy s přísnými leak-safe filtry (pozor `auth-leak-policy`).
-**FE:** veřejná prezentační stránka světa (bez přihlášení).
-**Otevřené otázky:** Co všechno jde zveřejnit (stránky/mapa/timeline/postavy)? Per-stránka, nebo per-svět přepínač? SEO/náhledové karty pro sdílení?
 
 ### - [ ] 17.4 Doladění mobilní hry na mapě — [D3 · dopad střední · náklad střední]
 **Cíl:** Plné dotykové ovládání mapy (pinch-zoom, tažení tokenů, výběr) na malém displeji.
@@ -569,13 +563,6 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** cílený průchod skillem `mobil-desktop` přes taktickou mapu.
 **FE:** gesta, velikosti dotykových terčů, sbalitelné panely, výkon.
 **Otevřené otázky:** Zjednodušené mobilní rozvržení mapy, nebo plná parita s desktopem?
-
-### - [ ] 17.5 Sdílení & klonování světů/šablon — [E4 · dopad střední · náklad střední] 🔁
-**Cíl:** „Publikovat jako šablonu" pro svět/scénu/bestii → katalog k naklonování.
-**Proč:** Obsah přitahuje obsah; buduje síťový efekt klíčový u niky. Máme privátní knihovnu map — chybí veřejné sdílení.
-**Návrh přípravy:** rozhodnout co lze sdílet a co se při klonu nese (pozor na PC tokeny — 🔁 `project_takticka_mapa_library`).
-**BE/FE:** veřejný katalog šablon + klonování do světa.
-**Otevřené otázky:** Moderovat sdílené šablony? Atribuce autora? Sdílet i celé světy, nebo jen scény/bestie/stránky?
 
 ### - [ ] 17.6 Integrace hlasu a videa přes Jitsi — [D4 · dopad střední/vysoký · náklad malý až střední]
 
@@ -801,6 +788,23 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE:** seed demo světa (🔁 vzor seedů při create světa).
 **FE:** průvodce (wizard) + kontextové tipy + vstup do demo světa.
 **Otevřené otázky:** Demo svět sdílený read-only, nebo kopie per uživatel? Průvodce přeskočitelný? Tipy odznačitelné („už nezobrazovat")?
+
+### - [ ] 22.4 Veřejná „výkladní skříň" světa (bývalý 17.3) — [C3 · dopad střední · náklad střední] 🔁
+> Přesunuto z 17.3 (2026-07-05): publikace světa čtenářům = SEO/marketing páka, patří k finálnímu SEO dotažení Etapy II.
+**Cíl:** Přepínač „veřejná prezentace" — vybrané stránky/mapa/timeline viditelné i nepřihlášenému.
+**Proč:** Celý World Anvil stojí na publikování světa čtenářům; nový zájemce dnes nevidí ukázku, na kterou by se chytil. Marketing i pýcha autora; živí trychtýř (Příloha A, krok 1).
+**Návrh přípravy:** 🔁 rozšířit existující `isPublic` + leak-safe filtry; rozhodnout, co lze zveřejnit.
+**BE:** veřejné read-only endpointy s přísnými leak-safe filtry (pozor `auth-leak-policy`).
+**FE:** veřejná prezentační stránka světa (bez přihlášení).
+**Otevřené otázky:** Co všechno jde zveřejnit (stránky/mapa/timeline/postavy)? Per-stránka, nebo per-svět přepínač? SEO/náhledové karty pro sdílení?
+
+### - [ ] 22.5 Sdílení & klonování světů/šablon (bývalý 17.5) — [E4 · dopad střední · náklad střední] 🔁
+> Přesunuto z 17.5 (2026-07-05): veřejný katalog + síťový efekt = růstová/marketing páka závěru Etapy II.
+**Cíl:** „Publikovat jako šablonu" pro svět/scénu/bestii → katalog k naklonování.
+**Proč:** Obsah přitahuje obsah; buduje síťový efekt klíčový u niky. Máme privátní knihovnu map — chybí veřejné sdílení.
+**Návrh přípravy:** rozhodnout co lze sdílet a co se při klonu nese (pozor na PC tokeny — 🔁 `project_takticka_mapa_library`).
+**BE/FE:** veřejný katalog šablon + klonování do světa.
+**Otevřené otázky:** Moderovat sdílené šablony? Atribuce autora? Sdílet i celé světy, nebo jen scény/bestie/stránky?
 
 ---
 
