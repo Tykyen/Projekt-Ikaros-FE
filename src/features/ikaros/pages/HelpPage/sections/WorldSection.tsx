@@ -33,6 +33,8 @@ import {
   Pencil,
   Share2,
   Palette,
+  Lightbulb,
+  Download,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -454,6 +456,27 @@ export function WorldSection() {
               PJ zapne mlhu a štětcem (1 / 7 / 19 hexů) odhaluje nebo zahaluje oblasti.
               Hráč vidí jen odhalené; nepřátele v mlze nevidí. Vlastní postava hráče
               kolem sebe kousek mlhy odhaluje. „Zahalit vše" vrátí mapu do mlhy.
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Lightbulb size={15} />} title="Automatická viditelnost (světlo a stěny)">
+            <p>
+              Místo ručního odhalování mlhy může PJ v „Upravit scénu" zapnout
+              <strong> Automatickou viditelnost přes zdi</strong>. Pak se mlha počítá
+              sama: postava vidí jen tam, kam dohlédne — <strong>zdi jí blokují výhled
+              za roh</strong>. V „temné scéně" vidí jen kousek kolem sebe a do světla.
+              PJ může kliknout na <strong>dveře</strong> a otevřít/zavřít je — postavy
+              pak uvidí (nebo přestanou vidět) do vedlejší místnosti. Nejlíp funguje na
+              mapách načtených importem, které rovnou nesou zdi. Vyžaduje zapnutou mlhu.
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Download size={15} />} title="Import hotové mapy">
+            <p>
+              PJ může načíst hotovou mapu ze souboru <strong>UVTT / .dd2vtt</strong>
+              (z nástrojů jako Dungeondraft nebo DungeonFog, kterých jsou na internetu
+              tisíce). Tlačítko <strong>📥 Import UVTT</strong> v panelu scén. Z jednoho
+              souboru vznikne nová scéna s pozadím, mřížkou a rovnou i se zdmi a světly
+              — PJ nemusí nic kreslit. Postavy se importem nepřidávají, ty přidáš jako
+              obvykle.
             </p>
           </MapFeature>
           <MapFeature icon={<ListOrdered size={15} />} title="Iniciativa a boj">
