@@ -4,21 +4,21 @@ import { PageSections } from '../components/PageSections';
 import { PageSidebar } from '../components/PageSidebar';
 import { ZoomableImage } from '../components/ZoomableImage';
 import type { Page } from '../../api/pages.types';
-import s from './RodokmenLayout.module.css';
+import s from './ZoomLayout.module.css';
 
 interface Props {
   page: Page;
 }
 
 /**
- * 7.1b — Layout pro typ Rodokmen. Hero obrázek = velký zoomovatelný
- * (`ZoomableImage`, custom pan/zoom 0.25–5×). Pod ním TipTap content
- * + sekce. Sidebar (table) zachován vpravo.
+ * 7.1b — Layout pro typ Zoom (dříve „Rodokmen"). Hero obrázek = velký
+ * zoomovatelný (`ZoomableImage`, custom pan/zoom 0.25–5×). Pod ním TipTap
+ * content + sekce. Sidebar (table) zachován vpravo.
  *
  * Bez `imageUrl` = degraded fallback do default OstatniLayout chování
  * (žádný hero, jen content).
  */
-export function RodokmenLayout({ page }: Props) {
+export function ZoomLayout({ page }: Props) {
   return (
     <div className={s.layout}>
       <main className={s.main}>

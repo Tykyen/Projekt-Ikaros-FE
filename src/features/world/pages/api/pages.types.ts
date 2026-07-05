@@ -13,7 +13,10 @@ export const PAGE_TYPES = {
   Noviny: 'Noviny',
   Seznam: 'Seznam',
   Galerie: 'Galerie',
-  Rodokmen: 'Rodokmen',
+  // Dříve „Rodokmen" — layout velkého zoomovatelného obrázku. Přejmenováno na
+  // „Zoom", název „Rodokmen" se uvolnil pro budoucí typ strom rodiny. BE
+  // normalizuje legacy dokumenty (type='Rodokmen') na 'Zoom' při čtení.
+  Zoom: 'Zoom',
   Obrazovka: 'Obrazovka',
   Ostatni: 'Ostatní',
   // 9.1 — sjednocení Character → Page. PC = má `ownerUserId`, NPC = bez.
@@ -34,6 +37,9 @@ export const ALL_PAGE_TYPES: PageType[] = Object.values(PAGE_TYPES);
  */
 export function resolvePageTypeFromUrl(token: string): PageType | undefined {
   if (!token) return undefined;
+  // Legacy: typ „Rodokmen" přejmenován na „Zoom" — starý odkaz `?type=Rodokmen`
+  // (bookmark) přesměruj na nový typ místo pádu do undefined.
+  if (token === 'Rodokmen') return PAGE_TYPES.Zoom;
   if ((ALL_PAGE_TYPES as readonly string[]).includes(token)) {
     return token as PageType;
   }

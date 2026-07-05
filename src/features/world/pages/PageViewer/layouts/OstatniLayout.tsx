@@ -40,7 +40,7 @@ function readMagicLevels(page: Page): string[] | null {
  *
  * `bigImage=true` → hero obrázek se NEzobrazí v sidebaru. Pro typ Lokace s
  * velkou mapou používá specifický layout (zatím delegováno tomuto default —
- * ZoomableImage napojíme ve Fázi 2 přes RodokmenLayout/wrapper).
+ * ZoomableImage napojíme ve Fázi 2 přes ZoomLayout/wrapper).
  */
 export function OstatniLayout({ page }: Props) {
   const magicLevels = readMagicLevels(page);

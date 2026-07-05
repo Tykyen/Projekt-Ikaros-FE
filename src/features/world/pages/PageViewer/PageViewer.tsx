@@ -15,7 +15,7 @@ import { LokaceLayout } from './layouts/LokaceLayout';
 import { NovinyLayout } from './layouts/NovinyLayout';
 import { SeznamLayout } from './layouts/SeznamLayout';
 import { GalerieLayout } from './layouts/GalerieLayout';
-import { RodokmenLayout } from './layouts/RodokmenLayout';
+import { ZoomLayout } from './layouts/ZoomLayout';
 import { ObrazovkaLayout } from './layouts/ObrazovkaLayout';
 import { PostavaLayout } from './layouts/PostavaLayout';
 import { RulebookHub } from './layouts/RulebookHub';
@@ -38,7 +38,7 @@ interface Props {
  * 7.1 — Typ-agnostic presenter. Volí konkrétní layout podle `page.type`,
  * dělá pre-render výpočty sdílené napříč typy (read-time).
  *
- * Layouty se přidávají ve Fázi 2 (Lokace, Noviny, Seznam, Galerie, Rodokmen,
+ * Layouty se přidávají ve Fázi 2 (Lokace, Noviny, Seznam, Galerie, Zoom,
  * Obrazovka). Default = `OstatniLayout` pro typ „Ostatní" a fallback pro
  * nepoznané typy.
  */
@@ -47,7 +47,7 @@ const LAYOUTS: Record<PageType, React.ComponentType<{ page: Page }>> = {
   Noviny: NovinyLayout,
   Seznam: SeznamLayout,
   Galerie: GalerieLayout,
-  Rodokmen: RodokmenLayout,
+  Zoom: ZoomLayout,
   Obrazovka: ObrazovkaLayout,
   Ostatní: OstatniLayout,
   // 9.1 — sjednocení Character → Page

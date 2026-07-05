@@ -15,7 +15,7 @@ interface Props {
 }
 
 /**
- * 7.1b (Rodokmen + Lokace s `bigImage`) — Custom pan/zoom velkých obrázků.
+ * 7.1b (Zoom + Lokace s `bigImage`) — Custom pan/zoom velkých obrázků.
  * Žádná lib, jen `transform: scale(s) translate(x, y)` + drag handler.
  * Controls overlay top-left (frosted glass). Klávesy nahoru/dolů = zoom,
  * šipky = pan, „0" = reset.

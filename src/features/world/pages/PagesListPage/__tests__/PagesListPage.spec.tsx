@@ -9,7 +9,7 @@ import type { PageDirectoryEntry } from '../../api/pages.types';
 const DIRECTORY: PageDirectoryEntry[] = [
   { id: 'p1', slug: 'aralion', title: 'Aralion', type: 'Lokace', order: 0, updatedAt: '2026-05-01T00:00:00.000Z' },
   { id: 'p2', slug: 'noviny-1', title: 'Denní zprávy', type: 'Noviny', order: 1, updatedAt: '2026-05-01T00:00:00.000Z' },
-  { id: 'p3', slug: 'rod-king', title: 'Rod králů', type: 'Rodokmen', order: 2, updatedAt: '2026-05-01T00:00:00.000Z' },
+  { id: 'p3', slug: 'rod-king', title: 'Rod králů', type: 'Zoom', order: 2, updatedAt: '2026-05-01T00:00:00.000Z' },
 ];
 
 let mockDirectory: PageDirectoryEntry[] = [];

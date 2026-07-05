@@ -78,7 +78,7 @@ export function NewPageWizardModal({
           <ChoiceCard
             icon={<FileText size={28} aria-hidden />}
             title="Wiki stránka"
-            subtitle="Lokace, Noviny, Seznam, Galerie, Rodokmen, …"
+            subtitle="Lokace, Noviny, Seznam, Galerie, Zoom, …"
             onClick={() => onChoose('wiki')}
           />
           <ChoiceCard

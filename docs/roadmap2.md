@@ -612,14 +612,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** docking framework + kontextová menu.
 **Otevřené otázky:** Side-drawer napřed, nebo rovnou plovoucí okna? Ukládat rozložení panelů per uživatel?
 
-### - [ ] 17.11 Companion mobilní režim — mobil jako deník — [H4-06 · dopad střední · náklad velký] 🔁
-**Cíl:** Na mobilu se Ikaros během hry přepne do role **asistenta hráče**: místo obří mapy velký interaktivní **deník postavy** (záložky, obří HP, masivní tlačítka útoků/hodů, které odešlou hod na hlavní mapu sdílenou třeba na TV). Komunita/pošta ve stylu WhatsApp/Discord se spodním tab barem.
-**Proč:** Vtlačit 4K mapu na 6" displej je chyba — mobil není na hraní mapy, mobil je **osobní deník**. Český hráč hraje hodně z mobilu. Rozdělit zážitek podle zařízení. (Rozšiřuje 17.4, které řeší jen dotyk na mapě.)
-**Návrh přípravy:** cílený `mobil-desktop` průchod; sdílet logiku s desktopem, lišit jen layout (dvě UI varianty = víc údržby).
-**FE:** dedikované mobilní pohledy (deník, komunita) + bottom tab bar; hod z mobilu → sdílená mapa.
-**Otevřené otázky:** Auto-přepnutí dle zařízení, nebo volba? Které moduly mají mobilní companion verzi?
 
-### - [x] 17.12 Živá příběhová mapa napojená na hru (chat / bojová scéna) — [nápad 2026-06-15 · dopad střední · náklad střední] 🔁
+### - [x] 17.1 Živá příběhová mapa napojená na hru (chat / bojová scéna) — [nápad 2026-06-15 · dopad střední · náklad střední] 🔁
 **Cíl:** U vlajkové hry vidí hráči **aktivní mapu napojenou na probíhající hru** — na chat nebo přímo na bojovou scénu — kde koukají, **kde zrovna jsou v příběhu**. Mapa se „rozsvítí" u aktuální lokace/scény, kterou hra právě řeší.
 **Proč:** Spojuje příběh s geografií živě — hráč neztrácí orientaci v ságe; posiluje imerzi. Tvůj nápad (2026-06-15) — „zajímavá varianta". Staví na interaktivní mapě s piny (16.5) a propojuje ji se stavem hry (aktivní scéna / chat kanál → pin na mapě).
 **Návrh přípravy:** rozhodnout, co je „aktuální poloha v příběhu" (aktivní scéna? kanál světového chatu? ručně PJ?); navázání pin (16.5) ↔ scéna/kanál; 🔁 taktická mapa + per-player scene assignment (`project_takticka_mapa_assignment`), world-room WS signál (`project_map_world_room_join`).
