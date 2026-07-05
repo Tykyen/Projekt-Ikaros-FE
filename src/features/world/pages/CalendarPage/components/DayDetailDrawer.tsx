@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { X, CalendarRange, User, Users, MapPin } from 'lucide-react';
 import { formatFantasyDate, type CalendarConfig, type FantasyDate } from '@/shared/lib/calendarEngine';
-import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useFocusTrap } from '@/shared/ui';
 import s from './DayDetailDrawer.module.css';
 
 /** Minimální tvar UnifiedEvent který drawer potřebuje. */
@@ -59,7 +59,8 @@ export function DayDetailDrawer({
   onEventClick,
 }: Props) {
   const drawerRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(drawerRef, true);
+  // 17.8 — sjednoceno na sdílený `@/shared/ui` hook (lokální duplicitní smazán).
+  useFocusTrap({ active: true, containerRef: drawerRef });
 
   // ESC close.
   useEffect(() => {

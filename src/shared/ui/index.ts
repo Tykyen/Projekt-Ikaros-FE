@@ -4,6 +4,7 @@ export { Input } from './Input/Input';
 export { Card } from './Card/Card';
 export { Spinner } from './Spinner/Spinner';
 export { Modal } from './Modal/Modal';
+export { useFocusTrap } from './useFocusTrap';
 export { ConfirmDialog } from './ConfirmDialog/ConfirmDialog';
 export { KebabMenu } from './KebabMenu/KebabMenu';
 export type { KebabMenuItem } from './KebabMenu/KebabMenu';

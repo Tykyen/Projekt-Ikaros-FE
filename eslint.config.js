@@ -5,6 +5,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
@@ -34,4 +35,14 @@ export default defineConfig([globalIgnores(['dist']), {
     'react-hooks/exhaustive-deps': 'warn',
     'react-refresh/only-export-components': 'warn',
   },
+}, {
+  // 17.8 (dluh D-17.8) — jsx-a11y ve `warn`: statická a11y kontrola (icon-only
+  // tlačítka bez jména, chybějící alt, klik bez klávesnice…), aby a11y regrese
+  // nikdo nezaváděl potichu. `warn` (ne `error`), ať to neblokuje build/CI a
+  // pokrytí se čistí postupně. Pravidla bereme z recommended, downgrade na warn.
+  files: ['**/*.{ts,tsx}'],
+  plugins: { 'jsx-a11y': jsxA11y },
+  rules: Object.fromEntries(
+    Object.keys(jsxA11y.flatConfigs.recommended.rules).map((rule) => [rule, 'warn']),
+  ),
 }, ...storybook.configs["flat/recommended"]])

@@ -17,7 +17,7 @@ import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
-import { UserAvatar } from '@/shared/ui';
+import { UserAvatar, useFocusTrap } from '@/shared/ui';
 import {
   themeAtom,
   worldThemePreviewAtom,
@@ -242,6 +242,18 @@ export function WorldLayout() {
   // URL nese slug (`/svet/matrix`) — případně ObjectId u starých odkazů.
   const { worldSlug = '' } = useParams<{ worldSlug: string }>();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // 17.8 — mobilní drawer světa: focus trap + navrácení fokusu na hamburger
+  // (dřív chyběl i Escape). `inert` + dialog role viz JSX drawer níže.
+  const worldDrawerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap({ active: drawerOpen, containerRef: worldDrawerRef });
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDrawerOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [drawerOpen]);
   // 9.1 — wizard pro tvorbu nového obsahu (Wiki / PC / NPC).
   const [wizardOpen, setWizardOpen] = useState(false);
   // 13.1 — vyhledávací modal světa (otevírá pole „Hledat…" i Ctrl/Cmd+K).
@@ -652,7 +664,15 @@ export function WorldLayout() {
               className={clsx(s.drawerBackdrop, drawerOpen && s.drawerBackdropOpen)}
               onClick={() => setDrawerOpen(false)}
             />
-            <div className={clsx(s.drawer, drawerOpen && s.drawerOpen)}>
+            <div
+              ref={worldDrawerRef}
+              tabIndex={-1}
+              inert={!drawerOpen}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu světa"
+              className={clsx(s.drawer, drawerOpen && s.drawerOpen)}
+            >
               {/* Tester-feedback — zvýrazněný chat jako první položka draweru. */}
               {realWorldId && (
                 <ChatNavLink

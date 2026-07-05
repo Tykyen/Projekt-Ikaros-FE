@@ -11,20 +11,18 @@
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
 ### D-17.8-A11Y-BACKLOG — Přístupnost: odložené vrstvy nad rámec 17.8 v1
-**Soubory:** `eslint.config.js`, `.storybook/preview.tsx`; `shared/ui/IconButton` (adopce), deníkové/combat listy (`features/world/pages/CharacterDetailPage/diary-systems/**`, `token-panel/system-panels/**`); `shared/ui/KebabMenu/KebabMenu.tsx`; `app/layout/IkarosLayout/IkarosLayout.tsx` + `features/notifications/components/NotificationCenter.tsx` (focus trap).
-**Problém:** 17.8 dodala jen první konzistentní vrstvu (globální focus ring, IconButton primitiv, aria-label na DrdPlus hotspoty, Escape/ARIA na menu/drawer). Zbývá: (1) **žádný `eslint-plugin-jsx-a11y`** → a11y regrese nikdo staticky nehlídá; (2) icon-only tlačítka v ostatních systémech (mimo DrdPlus) stále bez systematické migrace na `IconButton`; (3) `KebabMenu` bez roving-tabindex/šipkové navigace (jen Tab+Escape); (4) **focus trap jen v `Modal`** — mobilní drawery a NotificationCenter mají jen Escape, ne trap ani focus-restore; (5) Storybook axe addon běží v `test:'todo'` (neblokuje CI).
-**Dopad:** Nízký — základní a11y funguje; jde o dotažení pokrytí a prevenci regresí. Roadmap 17.8 je značené 🔁 (průběžné).
-**Řešení:** (1) přidat plugin v `warn` a postupně čistit; (2) extrahovat `useFocusTrap`/`Drawer` z `Modal` a napojit na drawery+NotifCenter; (3) roving-tabindex do `KebabMenu`; (4) dávková migrace listů na `IconButton`; (5) axe `todo`→`error` po vyčištění.
-**Kdy:** průběžně v dalších inkrementech 17.8 (🔁); plugin+focus trap jako první, mají největší páku.
+**Hotovo 2026-07-05 (většina backlogu):**
+- (1) ✅ **`eslint-plugin-jsx-a11y` ve `warn`** — `eslint.config.js`; 34 pravidel z `flatConfigs.recommended` downgradováno na warn. Instalováno `--legacy-peer-deps` (plugin 6.10.2 deklaruje peer eslint ≤9, projekt má eslint 10; flat config fakticky funguje — ověřeno `--print-config`).
+- (2) ✅ **sdílený `useFocusTrap`** (`shared/ui/useFocusTrap.ts`, extrakce z `Modal`) → napojen na `Modal` (refactor, 2 efekty→1), `NotificationCenter`, oba mobilní drawery v `IkarosLayout` (+`inert` na zavřený drawer) a mobilní drawer ve `WorldLayout` (+Escape, dřív chyběl). Duplicitní lokální `CalendarPage/hooks/useFocusTrap` smazán, `DayDetailDrawer` sjednocen na sdílený.
+- (3) ✅ **`KebabMenu` roving-tabindex** — šipky ↑↓ (wrap, přeskočí disabled) + Home/End, jen aktivní položka v tab pořadí; +2 testy (8/8).
+- (4) ✅ **borderline aria-label** — DrdPlus gender toggle (♀/♂). **Audit (agent) našel 0 prázdných icon-only tlačítek** v diary/combat/chat listech → migrace na `IconButton` NENÍ a11y oprava (všechna tlačítka už mají jméno), jen kosmetika. `IconButton` má nulovou adopci; migrace přeřazena na nízkoprio (viz níže).
 
----
-
-### D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN — DrD+ bestie v chatu se neoskinuje
-**Soubory:** `src/features/world/chat/components/rail/BestieInstancePanel.tsx` + `BestieRollPanel.tsx` — drdplus větev bestie panelu v chatu.
-**Problém:** drdplus bestie v chatu se renderuje BEZ `DiarySkinScope` (vnější `<aside>` nese jen `data-diary-system`, ne `data-diary-skin`) → compound selektor skinu `[data-diary-system='drdplus'][data-diary-skin='X']` nesedne a bestie zůstane na default vzhledu bez ohledu na zvolený skin. Nekonzistence: na mapě (TokenSystemSheet) je drdplus bestie scoped správně, v chatu ne. Stejnou mezeru měl drd2 — opravená v 16.2f obalením `DiarySkinScope`; drdplus zbývá.
-**Dopad:** Nízký — kosmetika; bestie v chatu nedrží zvolený skin (jen u drdplus).
-**Řešení:** obalit `DrdPlusChatBestiePanel` v obou souborech `<DiarySkinScope worldId={worldId}>…</DiarySkinScope>` (vzor drd16/matrix/drd2 větve). ~4 řádky/soubor.
-**Kdy:** při příští práci na drdplus skinech / chatu, nebo v rámci uzávěru drdplus skinů (jejich `mobil-desktop`/funkce/napoveda je taky pending).
+**Zbývá (zúžený, nízká priorita):**
+- **IconButton adopce** — ~16 ručních `<button>+lucide` (chat: `ChannelItem/Group/View`, `EmoteCard`, rail `*Panel`…) má aria-label, ale neadoptovalo primitiv. Čistě konzistenční refactor; POZOR `IconButton .iconBtn` = ghost/transparent styl → migrace MĚNÍ vzhled → nutný `mobil-desktop` per skin, ne slepě.
+- **Storybook axe** (`.storybook/preview.tsx`) — zůstává `test:'todo'`. Přepnutí na `error` je **no-op**, dokud jsou storybook component testy mimo `vitest run` (D-033, ESM/CJS race) → axe se v CI nespouští. Trigger: browser-mode axe v CI (vyřešení D-033) + ověřená čistota 14 stories.
+- **Focus trap do in-app overlayů** (nad rámec původního znění dluhu, objev auditu 2026-07-05): `WorldChatRoom` mobilní sidebar + scrim, `ChatContextRail` (bez Escape/trap/dialog), `MapNotebookOverlay` + `TokenInfoPanel` (mají Escape+`role=dialog`, chybí trap/restore). Sdílený `useFocusTrap` je připraven — chybí napojení. **Odloženo:** vyžaduje živý mobilní/mapový test (trap ve špatně posouzeném kontextu zhorší UX), proto ne naslepo.
+**Dopad:** Nízký — základní a11y funguje, hlídá lint. Roadmap 17.8 značené 🔁 (průběžné).
+**Kdy:** IconButton+overlaye při příští práci na daných plochách (s `mobil-desktop`); axe s D-033.
 
 ---
 
@@ -131,6 +129,11 @@ fallback na Map + testy).
 ---
 
 ## Vyřešené
+
+### D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN — DrD+ bestie v chatu se neoskinuje · ✅ 2026-07-05
+**Kde:** `src/features/world/chat/components/rail/BestieInstancePanel.tsx` + `BestieRollPanel.tsx` (drdplus větev).
+**Kořen:** drdplus bestie v chatu se renderovala BEZ `DiarySkinScope` → na potomka nevzniklo `data-diary-skin`, takže `--dd-*` skin tokeny (z `diary-skins.css`) se neinjektly a panel `.root` spadl na pergamen fallbacky (`var(--dd-*, <default>)`) = default vzhled bez ohledu na skin. Zavádějící komentář tvrdil „self-contained, `.root` má vlastní --dd-*", ale ty byly v 16.2d odebrány (mapa je zdroj pravdy: `TokenSystemSheet` drdplus obaluje `DiarySkinScope` správně).
+**Oprava:** obaleno `<DiarySkinScope worldId={worldId}>` v obou souborech (vzor drd2/drd16). Komentáře opraveny. Ověřeno: `npm run build` ✓.
 
 ### D-NEW-ANON-HEADER-OVERFLOW — Anon hlavička přetékala na úzkém mobilu · ✅ 2026-07-03
 **Kde:** `src/themes/ThemeSwitcher.module.css` + `IkarosLayout.tsx` (`HeaderLoggedOut`).

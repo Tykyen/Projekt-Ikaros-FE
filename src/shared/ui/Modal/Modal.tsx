@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
+import { useFocusTrap } from '../useFocusTrap';
 import s from './Modal.module.css';
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';
@@ -18,9 +19,6 @@ interface ModalProps {
   ariaLabel?: string;
 }
 
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
 export function Modal({
   open,
   onClose,
@@ -33,7 +31,6 @@ export function Modal({
 }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement | null>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   // Zavřít na Escape
   useEffect(() => {
@@ -53,58 +50,8 @@ export function Modal({
     };
   }, [open]);
 
-  // Focus management — uložit předchozí focus, focus dovnitř, navrátit při zavření
-  useEffect(() => {
-    if (!open) return;
-    previousFocusRef.current = document.activeElement as HTMLElement | null;
-
-    // Focus dovnitř modalu — preferujeme form fields (input/select/textarea),
-    // jinak první focusable, jinak samotný dialog. Důvod: form-modaly chceme
-    // mít zaměřené přímo v poli, ne na "×" tlačítku.
-    const dialog = dialogRef.current;
-    if (dialog) {
-      const formField = dialog.querySelector<HTMLElement>(
-        'input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
-      );
-      const focusables = dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
-      const target = formField ?? focusables[0] ?? dialog;
-      target.focus();
-    }
-
-    return () => {
-      previousFocusRef.current?.focus?.();
-    };
-  }, [open]);
-
-  // Focus trap — Tab/Shift+Tab uvnitř modalu cykluje
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-      const dialog = dialogRef.current;
-      if (!dialog) return;
-      const focusables = Array.from(
-        dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-      ).filter((el) => !el.hasAttribute('disabled'));
-      if (focusables.length === 0) {
-        e.preventDefault();
-        return;
-      }
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-
-      if (e.shiftKey && active === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && active === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [open]);
+  // 17.8 — focus dovnitř + trap + navrácení fokusu (sdílený hook, dřív 2 efekty tady).
+  useFocusTrap({ active: open, containerRef: dialogRef });
 
   if (!open) return null;
 

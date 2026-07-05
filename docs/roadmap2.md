@@ -591,11 +591,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** speciální layout nad existujícími `CampaignRelationship` (typy rodič/potomek/choť). Nižší priorita.
 **Otevřené otázky:** Samostatná featura, nebo jen nový pohled v Pavučině?
 
-### - [] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
+### - [x] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
 **Cíl:** Ovládání z klávesnice + popisky pro čtečky u ikonových tlačítek.
 **Proč:** Rozšiřuje okruh hráčů a je to správně; kontrastní audit už běží (`audit:contrast`).
 **Hotovo (1. vrstva):** globální fokusový prsten (`--focus-ring` token + `:where()` fallback), sdílený `IconButton` (vynucený `aria-label` + coarse ≥44px), `aria-label` na DrdPlus hotspoty, klávesnice: Escape+`aria-expanded` na world-nav dropdown, Escape na mobilní drawer, `role=tablist/tab` na NotifCenter. Spec `docs/arch/phase-17/spec-17.8.md`, přehled v `docs/funkce/00-prehled.md`.
-**Zbývá (🔁 průběžně, dluh):** `eslint-plugin-jsx-a11y`, migrace všech deníkových listů na `IconButton`, `KebabMenu` šipková navigace, focus trap do draverů/NotifCenter. **Rozhodnuto:** průběžné zlepšování, ne jednorázová WCAG AA certifikace.
+**Hotovo (2. vrstva, 2026-07-05):** `eslint-plugin-jsx-a11y` ve `warn` (34 pravidel, statické hlídání regresí); sdílený `useFocusTrap` (extrakce z `Modal`) napojen na Modal/NotifCenter/oba drawery IkarosLayout (+`inert`)/WorldLayout drawer (+Escape), duplicitní `CalendarPage/hooks/useFocusTrap` smazán (sjednoceno); `KebabMenu` roving-tabindex (šipky/Home/End +2 testy). Detail dluh `D-17.8-A11Y-BACKLOG`.
+**Zbývá (🔁 nízká priorita):** `IconButton` adopce ~16 ručních tlačítek (audit: 0 prázdných icon tlačítek → kosmetika, ne a11y oprava; mění vzhled → per-skin `mobil-desktop`); focus trap do in-app overlayů (chat rail/sidebar, mapa notebook/token panel — čeká živý mobilní/mapový test); storybook axe `todo`→`error` (blokováno D-033 — storybook testy mimo CI, přepnutí by byl no-op). **Rozhodnuto:** průběžné zlepšování, ne jednorázová WCAG AA certifikace.
 
 ### - [ ] 17.9 Streamer overlay (OBS režim) — [H4-04 · dopad střední · náklad střední]
 **Cíl:** Režim zobrazení, který skryje všechna okna/menu/lišty a nechá jen čistou mapu s průhledným pozadím pro chroma key — připravené pro OBS.

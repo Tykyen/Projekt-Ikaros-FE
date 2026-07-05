@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { X } from 'lucide-react';
 import clsx from 'clsx';
+import { useFocusTrap } from '@/shared/ui';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import {
   centerOpenAtom,
@@ -31,6 +32,9 @@ export function NotificationCenter() {
   const hasPending = (pending?.total ?? 0) > 0;
   // D-030 — jeden zdroj pravdy o push pro přepínač i seznam zařízení.
   const push = usePush();
+  // 17.8 — focus trap + navrácení fokusu na zvonek (dřív jen Escape).
+  const panelRef = useRef<HTMLElement | null>(null);
+  useFocusTrap({ active: open, containerRef: panelRef });
 
   // Otevření = „viděno" → vynuluj chat badge.
   useEffect(() => {
@@ -68,6 +72,8 @@ export function NotificationCenter() {
       role="presentation"
     >
       <aside
+        ref={panelRef}
+        tabIndex={-1}
         className={s.panel}
         onClick={(e) => e.stopPropagation()}
         role="dialog"

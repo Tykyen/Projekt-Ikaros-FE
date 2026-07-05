@@ -76,6 +76,43 @@ describe('KebabMenu', () => {
     expect(container).toBeDefined();
   });
 
+  it('roving tabindex: ArrowDown/ArrowUp cyklí fokus mezi položkami', () => {
+    render(<KebabMenu anchor={makeAnchor()} open onClose={() => {}} items={items} />);
+    const menu = screen.getByRole('menu');
+    const [a, b] = screen.getAllByRole('menuitem');
+    // Po otevření je fokus i tabindex=0 na první položce.
+    expect(a).toHaveFocus();
+    expect(a).toHaveAttribute('tabindex', '0');
+    expect(b).toHaveAttribute('tabindex', '-1');
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(b).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' }); // wrap na začátek
+    expect(a).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowUp' }); // wrap na konec
+    expect(b).toHaveFocus();
+  });
+
+  it('roving tabindex přeskočí disabled položku', () => {
+    render(
+      <KebabMenu
+        anchor={makeAnchor()}
+        open
+        onClose={() => {}}
+        items={[
+          { key: 'a', label: 'Akce A', onClick: vi.fn() },
+          { key: 'b', label: 'Disabled', disabled: true, onClick: vi.fn() },
+          { key: 'c', label: 'Akce C', onClick: vi.fn() },
+        ]}
+      />,
+    );
+    const menu = screen.getByRole('menu');
+    const a = screen.getByRole('menuitem', { name: 'Akce A' });
+    const c = screen.getByRole('menuitem', { name: 'Akce C' });
+    expect(a).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' }); // přeskočí disabled 'b'
+    expect(c).toHaveFocus();
+  });
+
   it('disabled item nereaguje na klik', async () => {
     const onClick = vi.fn();
     render(

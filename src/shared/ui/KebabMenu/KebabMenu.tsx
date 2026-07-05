@@ -41,10 +41,55 @@ export function KebabMenu({
   ariaLabel = 'Akce',
 }: KebabMenuProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(
     null,
   );
   const [isMobile, setIsMobile] = useState(false);
+  // 17.8 — roving tabindex: v tab pořadí je jen `activeIndex` (0), ostatní -1;
+  // šipky ↑↓/Home/End přesouvají fokus i „0" mezi menuitem (WAI-ARIA menu).
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Při otevření zaměř první ne-disabled položku (a zařaď ji do tab pořadí).
+  useEffect(() => {
+    if (!open) return;
+    const first = items.findIndex((it) => !it.disabled);
+    const idx = first === -1 ? 0 : first;
+    setActiveIndex(idx);
+    itemRefs.current[idx]?.focus();
+  }, [open, items]);
+
+  const onMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const n = items.length;
+    if (n === 0) return;
+    const focusAt = (idx: number) => {
+      setActiveIndex(idx);
+      itemRefs.current[idx]?.focus();
+    };
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const dir = e.key === 'ArrowDown' ? 1 : -1;
+      let next = activeIndex;
+      for (let step = 0; step < n; step++) {
+        next = (next + dir + n) % n; // wrap + přeskoč disabled
+        if (!items[next]?.disabled) break;
+      }
+      focusAt(next);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      const idx = items.findIndex((it) => !it.disabled);
+      if (idx !== -1) focusAt(idx);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      for (let i = n - 1; i >= 0; i--) {
+        if (!items[i]?.disabled) {
+          focusAt(i);
+          break;
+        }
+      }
+    }
+    // Enter/Space řeší nativní <button> aktivace (onClick) — netřeba zvlášť.
+  };
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -109,11 +154,16 @@ export function KebabMenu({
         style={style}
         role="menu"
         aria-label={ariaLabel}
+        onKeyDown={onMenuKeyDown}
       >
-        {items.map((item) => (
+        {items.map((item, i) => (
           <button
             key={item.key}
+            ref={(el) => {
+              itemRefs.current[i] = el;
+            }}
             role="menuitem"
+            tabIndex={i === activeIndex ? 0 : -1}
             className={clsx(
               s.item,
               item.variant === 'danger' && s.itemDanger,

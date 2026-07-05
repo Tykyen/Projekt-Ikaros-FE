@@ -256,6 +256,7 @@ function FormuleCard({
                 <button
                   type="button"
                   className="dp-gender"
+                  aria-label="Přepnout pohlaví"
                   disabled={disabled}
                   onClick={() =>
                     setA(
@@ -425,7 +426,7 @@ function FormuleCard({
                     <td>
                       <span className="dp-prof-chip">
                         <input value={String(m[1] ?? '')} disabled={disabled} placeholder="Profil" onChange={(e) => patch(1, e.target.value)} />
-                        <button type="button" className="dp-gender" disabled={disabled} onClick={() => patch(2, m[2] === '♀' ? '♂' : '♀')}>
+                        <button type="button" className="dp-gender" aria-label="Přepnout pohlaví" disabled={disabled} onClick={() => patch(2, m[2] === '♀' ? '♂' : '♀')}>
                           {String(m[2] ?? '♂')}
                         </button>
                       </span>

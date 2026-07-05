@@ -155,3 +155,14 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** uživatel opakovaně hlásí „chybí i tohle základní" u jedné featury; „myslel jsem, že to máme".
 
 ---
+
+### CH-056 — Maskovaný exit status 3× během 17.8 (npm/build): falešná „zelená" z pipe, legacy-peer-deps a `$TMPDIR` · 2026-07-05
+**Kontext:** instalace `eslint-plugin-jsx-a11y` + build ověření během a11y práce (17.8).
+**Co bylo špatně — tři maskování skutečného výsledku za sebou:**
+1. `npm install ... 2>&1 | tail -20` → **pipe vrací exit posledního článku (`tail`)**, takže npm ERESOLVE selhání (peer eslint ≤9 vs. projekt eslint 10) reportlo jako „exit 0". Málem jsem považoval neúspěšný install za hotový.
+2. Oprava přes `--legacy-peer-deps` **tiše odstranila 8 balíčků** vč. tranzitivního `@testing-library/dom` (peer `@testing-library/react`, který normální install drží) → celá test suite padala `Cannot find module`. Regrese způsobená mým vlastním installem.
+3. `npm run build > $TMPDIR/log 2>&1; echo BUILD_EXIT:$?` na pozadí → **`$TMPDIR` není v Git Bash na Windows nastavený** → redirect na `/log` = Permission denied → `npm run build` se VŮBEC nespustil, ale task skončil „exit 0" (protože `echo` uspěl). Můj závěr „build prošel" byl mylný.
+**Poučení:** exit status po `| tail`/`| grep`/`| head` je status POSLEDNÍHO článku, ne příkazu vlevo — na kontrolu úspěchu použij `${PIPESTATUS[0]}` nebo `; echo EXIT:$?` bez pipe. Po `npm install --legacy-peer-deps` VŽDY ověř test suite (přepočet stromu umí sebrat tranzitivní peers). V Git Bash na Windows nespoléhat na `$TMPDIR` (prázdný) — použít explicitní scratchpad cestu; po background buildu ověřit SKUTEČNÝ `BUILD_EXIT` z logu, ne task exit (ten je z `echo`).
+**Příznak cyklení:** „install/build prošel (exit 0)", ale navazující krok (lint/test) selže na něčem, co ten krok měl zajistit; task exit 0 u příkazu, jehož skutečná práce se nespustila.
+
+---

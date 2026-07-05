@@ -155,20 +155,24 @@ export function BestieRollPanel({
           </DiarySkinScope>
         ) : systemId === 'drdplus' ? (
           // 16.2d-chat — DrD+ katalogová bestie: pergamen panel (2k6+/d6,
-          // BČ→iniciativa), read-only (bez onPatch).
-          <DrdPlusChatBestiePanel
-            worldId={worldId}
-            channelId={channelId}
-            rollerName={bestie.name}
-            avatarUrl={bestie.imageUrl}
-            systemStats={bestie.systemStats}
-            abilities={abilities.map((a) => ({
-              name: a.label,
-              description: a.value,
-            }))}
-            notes={bestie.notes}
-            canEdit={false}
-          />
+          // BČ→iniciativa), read-only. Panel `.root` konzumuje skin tokeny
+          // (--dd-*) z předka → vlastní DiarySkinScope (data-diary-skin), aby
+          // chat = mapa i u bestie (D-16.2F).
+          <DiarySkinScope worldId={worldId}>
+            <DrdPlusChatBestiePanel
+              worldId={worldId}
+              channelId={channelId}
+              rollerName={bestie.name}
+              avatarUrl={bestie.imageUrl}
+              systemStats={bestie.systemStats}
+              abilities={abilities.map((a) => ({
+                name: a.label,
+                description: a.value,
+              }))}
+              notes={bestie.notes}
+              canEdit={false}
+            />
+          </DiarySkinScope>
         ) : systemId === 'drd2' ? (
           // 16.2f-chat — DrD II katalogová bestie (read-only); konzumuje skin
           // tokeny (--dd-*) z předka → vlastní DiarySkinScope (data-diary-skin).

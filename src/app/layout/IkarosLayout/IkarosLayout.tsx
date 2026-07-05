@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, type ReactNode } from 'react';
+﻿import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { toast } from 'sonner';
@@ -50,7 +50,7 @@ import { LoginModal } from '@/features/auth/components/LoginModal';
 import { RegisterModal } from '@/features/auth/components/RegisterModal';
 import { ForgotPasswordModal } from '@/features/auth/components/ForgotPasswordModal';
 import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
-import { UserAvatar } from '@/shared/ui';
+import { UserAvatar, useFocusTrap } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
@@ -787,6 +787,12 @@ function HeaderLoggedIn() {
 export function IkarosLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  // 17.8 — focus trap + navrácení fokusu na hamburger u obou mobilních draverů
+  // (dřív jen Escape). `inert` na zavřeném draveru viz JSX níže.
+  const leftDrawerRef = useRef<HTMLElement | null>(null);
+  const rightDrawerRef = useRef<HTMLElement | null>(null);
+  useFocusTrap({ active: drawerOpen, containerRef: leftDrawerRef });
+  useFocusTrap({ active: rightDrawerOpen, containerRef: rightDrawerRef });
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
   // Hospoda (`/chat*`) běží bez pravého panelu — viz spec-chat-hide-right-panel.
   const pathname = useLocation().pathname;
@@ -950,6 +956,9 @@ export function IkarosLayout() {
           aria-label="Zavřít menu"
         />
         <aside
+          ref={leftDrawerRef}
+          tabIndex={-1}
+          inert={!drawerOpen}
           className={clsx(s.drawerSidebar, drawerOpen && s.drawerSidebarOpen)}
           data-frame-panel="sidebar"
         >
@@ -976,6 +985,9 @@ export function IkarosLayout() {
 
         {showRightPanel && (
           <aside
+            ref={rightDrawerRef}
+            tabIndex={-1}
+            inert={!rightDrawerOpen}
             className={clsx(s.drawerRightSidebar, rightDrawerOpen && s.drawerRightSidebarOpen)}
             data-frame-panel="right"
           >
