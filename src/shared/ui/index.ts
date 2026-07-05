@@ -41,4 +41,11 @@ export type {
   ErrorStateProps,
   StateIllustration,
 } from './StatePlaceholder';
+export { NamedColorPalette } from './NamedColorPalette';
+export {
+  NAMED_COLORS,
+  NAMED_COLOR_GROUPS,
+  readableTextOn,
+} from './NamedColorPalette';
+export type { NamedColor, NamedColorGroup } from './NamedColorPalette';
 

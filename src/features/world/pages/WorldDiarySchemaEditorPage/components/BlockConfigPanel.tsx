@@ -1,6 +1,6 @@
 import { useRef, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
-import { Input, Button } from '@/shared/ui';
+import { Input, Button, NamedColorPalette } from '@/shared/ui';
 import { useUploadImage, parseApiError } from '@/shared/api';
 import type {
   DiarySchemaBlock,
@@ -203,6 +203,12 @@ export function BlockConfigPanel({
                 setConfigField('color', e.target.value)
               }
             />
+            {!readOnly && (
+              <NamedColorPalette
+                value={block.config?.color ?? undefined}
+                onPick={(hex) => setConfigField('color', hex)}
+              />
+            )}
           </div>
         )}
 

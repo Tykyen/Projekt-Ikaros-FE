@@ -18,6 +18,12 @@
   margin: 0;
 }
 
+.rowWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .row {
   display: flex;
   align-items: center;

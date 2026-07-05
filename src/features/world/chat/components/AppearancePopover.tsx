@@ -5,6 +5,7 @@ import { X, Undo2 } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 import { guardChatColor } from '@/features/chat/lib/chatColorGuard';
+import { NamedColorPalette } from '@/shared/ui';
 import {
   CHAT_FONTS,
   CHAT_FONT_SIZES,
@@ -293,6 +294,10 @@ export function AppearancePopover({
             upravena pro kontrast.
           </p>
         )}
+        <NamedColorPalette
+          value={color ?? undefined}
+          onPick={(hex) => setColor(hex)}
+        />
       </section>
 
       {/* Velikost písma */}

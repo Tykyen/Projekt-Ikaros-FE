@@ -1,3 +1,4 @@
+import { NamedColorPalette } from '@/shared/ui';
 import { getTheme } from '@/themes/registry';
 import {
   THEME_TOKENS,
@@ -41,36 +42,45 @@ export function ThemeCustomEditor({ themeId, overrides, onChange }: Props) {
         {THEME_TOKENS.map((token) => {
           const { hex, alpha } = parseColor(tokenValue(token.key));
           return (
-            <div key={token.key} className={s.row}>
-              <span className={s.label}>{token.label}</span>
-              <input
-                type="color"
-                className={s.color}
-                value={hex}
-                aria-label={token.label}
-                onChange={(e) =>
-                  setToken(
-                    token.key,
-                    toCssColor(e.target.value, alpha, token.kind),
-                  )
-                }
-              />
-              {token.kind === 'alpha' && (
+            <div key={token.key} className={s.rowWrap}>
+              <div className={s.row}>
+                <span className={s.label}>{token.label}</span>
                 <input
-                  type="range"
-                  className={s.alpha}
-                  min={0}
-                  max={100}
-                  value={Math.round(alpha * 100)}
-                  aria-label={`${token.label} — průhlednost`}
+                  type="color"
+                  className={s.color}
+                  value={hex}
+                  aria-label={token.label}
                   onChange={(e) =>
                     setToken(
                       token.key,
-                      toCssColor(hex, Number(e.target.value) / 100, token.kind),
+                      toCssColor(e.target.value, alpha, token.kind),
                     )
                   }
                 />
-              )}
+                {token.kind === 'alpha' && (
+                  <input
+                    type="range"
+                    className={s.alpha}
+                    min={0}
+                    max={100}
+                    value={Math.round(alpha * 100)}
+                    aria-label={`${token.label} — průhlednost`}
+                    onChange={(e) =>
+                      setToken(
+                        token.key,
+                        toCssColor(hex, Number(e.target.value) / 100, token.kind),
+                      )
+                    }
+                  />
+                )}
+              </div>
+              <NamedColorPalette
+                value={hex}
+                onPick={(picked) =>
+                  setToken(token.key, toCssColor(picked, alpha, token.kind))
+                }
+                label={`Pojmenované barvy — ${token.label}`}
+              />
             </div>
           );
         })}

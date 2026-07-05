@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { HexColorPicker } from 'react-colorful';
+import { NamedColorPalette } from '@/shared/ui';
 import { DEFAULT_CHAT_COLOR } from '../../lib/chatColor';
 import styles from './ChatColorPicker.module.css';
 
@@ -67,6 +68,8 @@ export function ChatColorPicker({
       >
         {previewText}
       </div>
+
+      <NamedColorPalette value={value} onPick={onChange} />
     </div>
   );
 }

@@ -4,6 +4,16 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 16.1g nápovědní paleta pojmenovaných barev: sdílená `NamedColorPalette` napříč 7 color pickery · 2026-07-05
+**Kontext:** Uživatel chtěl u každého color pickeru nápovědu s pojmenovanými barvami (vzor = polská tabulka 16 HTML barev), česky a čitelnou, „všude ve světě i u budoucích".
+**Nesrovnalost chycená v diskuzi PŘED kódem:** (1) polskou tabulku nelze kopírovat doslova — půlka barev (black/navy/maroon) je krajně tmavá → v chatu na tmavém pozadí mizí; navrhl jsem **kurátorskou sadu 18 barev středního jasu** čitelných na tmavém i světlém podkladu. (2) „palety" jsou 2 kategorie: **react-colorful** (2×, velký gradient) vs **nativní `<input type=color>`** (5×, malý OS čtvereček) — do OS pickeru nezasáhneme, paleta jde jen *vedle* něj.
+**Řešení:** sdílená `src/shared/ui/NamedColorPalette` (`<details>` sbaleno + adaptivní mřížka dlaždic, klik = `onPick(hex)`; `readableTextOn` auto bílý/tmavý text dle jasu) + `palette.ts` (18 barev, 3 skupiny). Nasazeno na 7 pickerů: ChatColorPicker, AppearancePopover, StyleRail, BlockConfigPanel, NodeEditorForm, GroupColorEditor, ThemeCustomEditor. Budoucí picker ji dostane jedním importem.
+**Pasti a poučení:** • **lint:colors chytá `rgb()` stíny v CSS, ne jen hex** — chrome depth stíny potřebují per-řádek `lint-colors-ignore` (skript kontroluje výskyt barvy na řádku); sloučil jsem multi-line box-shadow na 1 řádek + ignore. • **Pevné `repeat(2,1fr)` selhává na úzkém `.rail`** → `repeat(auto-fill, minmax(116px,1fr))` = prohlížeč zvolí počet sloupců (1 v railu, 2 v popoveru, víc v panelu) bez media query. • **ThemeCustomEditor má alpha** — paleta dá jen hex, alfu zachovávám přes `toCssColor(hex, alpha, kind)` z aktuální hodnoty tokenu. • N-picker kontexty (skupiny, theme tokeny) = řádek obalen do column wrapperu, paleta per řádek se štítkem.
+**Jak ověřeno (staticky):** `tsc -b` ✓, eslint ✓, lint:colors bez regrese (3213, mé 4 rgb ošetřeny), 7/7 unit testů (`NamedColorPalette.spec`), HelpPage 25/25. Naživo za loginem čeká uživatele (fb_no_browser) — vyžádán screenshot rail+popover na mobilu.
+**Zhodnocení:** Dobře — spec→návrh(HTML mock)→souhlas→kód, obě nesrovnalosti (kontrast + 2 kategorie) chyceny v diskuzi před psaním, reuse jedné komponenty místo 7 kopií, 0 cyklení. Zbývá jen vizuální potvrzení + commit (uživatel).
+
+---
+
 ### ✅ ŘEŠENÍ — 5.9c Velikost rozhraní (a11y dioptrie): globální CSS `zoom` na `<html>` místo font-scale · 2026-07-05
 **Kontext:** Testeři se slabším zrakem — písmo/UI malé. Zadání znělo „zvětšit písmo", ale správné řešení bylo zvětšit CELÉ rozhraní.
 **Změna přístupu (v diskuzi PŘED kódem):** První nápad „root font-size zoom" jsem **zavrhl statickou analýzou** — grep ukázal `font-size` v **px ~1700× vs rem ~700×** → root font-size by zvětšil jen menšinu textu (nekonzistence). Zvolen **CSS `zoom` na `documentElement`**: škáluje px i rem, přepočítá layout (na rozdíl od `transform:scale`, který ořezává), a **jeden ovladač pokryje vše** vč. portálů/modalů/Putyky/Campu/světového chatu → 0 změn `ChatRoom`/`MessageItem`.

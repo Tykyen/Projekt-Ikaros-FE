@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import { toast } from 'sonner';
 import { ImagePlus } from 'lucide-react';
-import { Button } from '@/shared/ui';
+import { Button, NamedColorPalette } from '@/shared/ui';
 import { useUploadImage } from '@/shared/api';
 import type { WorldSettings } from '@/shared/types';
 import { useUpdateWorldSettings } from '@/features/world/api/useUpdateWorldSettings';
@@ -100,18 +100,21 @@ export function GroupColorEditor({ worldId, settings }: Props) {
         {rows.length === 0 && (
           <p className={s.empty}>Zatím žádné skupiny.</p>
         )}
-        {rows.map((row, idx) => (
-          <div key={row.name} className={s.row}>
+        {rows.map((row, idx) => {
+          const setColor = (color: string) => {
+            const next = [...rows];
+            next[idx] = { ...row, color };
+            setRows(next);
+          };
+          return (
+          <div key={row.name} className={s.rowWrap}>
+            <div className={s.row}>
             <input
               type="color"
               className={s.color}
               value={row.color}
               aria-label={`Barva skupiny ${row.name}`}
-              onChange={(e) => {
-                const next = [...rows];
-                next[idx] = { ...row, color: e.target.value };
-                setRows(next);
-              }}
+              onChange={(e) => setColor(e.target.value)}
             />
             <span
               className={s.emblem}
@@ -155,8 +158,15 @@ export function GroupColorEditor({ worldId, settings }: Props) {
             >
               Smazat
             </button>
+            </div>
+            <NamedColorPalette
+              value={row.color}
+              onPick={setColor}
+              label={`Pojmenované barvy — ${row.name}`}
+            />
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className={s.addRow}>

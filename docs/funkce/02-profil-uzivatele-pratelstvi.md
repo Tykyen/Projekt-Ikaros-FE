@@ -17,7 +17,7 @@
   - **Přátelé (`FriendsSection`):** kompaktní výpis přijatých přátel (avatar + jméno → klik na veřejný profil), odkaz „Spravovat →" do `/ikaros/uzivatele?tab=pratele`.
   - **Světy (`WorldsSection`), Moje postavy (`MyCharactersSection`), Akce (`ProfileEventsSection`):** dynamické sekce (cross-world membership/postavy/události).
   - **Komunita (`CommunityPlaceholders`):** „Moje diskuze / Moje články / Moje galerie" — STATICKÉ placeholdery „Bude dostupné v dalším updatu (fáze 3)", žádné requesty.
-  - **Vzhled (`AppearanceSection`):** Globální motiv (ThemeSwitcher, ukládá lokálně i na server), Doladění vzhledu (jas/kontrast slidery 70–130 %, override barev → `themeSettings.adjust`/`overrides`), Barva chatu (`ChatColorPicker`, hex #RRGGBB).
+  - **Vzhled (`AppearanceSection`):** Globální motiv (ThemeSwitcher, ukládá lokálně i na server), Doladění vzhledu (**Velikost rozhraní** slider 100–150 % → `themeSettings.uiScale`, spec 5.9c; jas/kontrast slidery 70–130 %, override barev → `themeSettings.adjust`/`overrides`), Barva chatu (`ChatColorPicker`, hex #RRGGBB, + rozbalovací **nápovědní paleta** 18 pojmenovaných barev — 16.1g `NamedColorPalette`, klik = rychlá volba; sekce defaultně sbalená). Stejná sdílená paleta (`src/shared/ui/NamedColorPalette`) je i u ostatních color pickerů světa (barva zprávy v chatu, barva textu stránky, pruh v deníku, těleso univerza, barva skupiny, tokeny motivu).
   - **Soukromí (`PrivacySection`):** 3 přepínače — „Neviditelný mód" (`hiddenPresence`, po změně reconnect socketu), „Skrýt v adresáři uživatelů" (`hiddenInDirectory`), „Jen pro přátele" (`profileVisibility: 'public'|'friends'`).
   - **Notifikace (`NotificationPreferencesSection`, 15.9):** master push vypínač + 7 kategorií ve 4 skupinách + per-device přepínač. Řídí, na co chodí web push. Detail viz kap. 05 „Nastavení notifikací (preference)".
   - **Bezpečnost (`SecuritySection`):** Username (žádost o změnu — schvaluje admin, cooldown 30 dní), Změna hesla (viz kap. 01), 2FA (viz kap. 01), Důvěryhodná zařízení (viz kap. 01).
@@ -30,6 +30,7 @@
   - Username nelze měnit přímo — jen žádostí se schválením + 30denní cooldown.
 - **Zvláštnosti:**
   - Theme se ukládá lokálně i na server (sync napříč zařízeními), doladění vzhledu je per-user a aplikuje se na všech zařízeních.
+  - **Velikost rozhraní (5.9c)** = CSS `zoom` na `<html>` (aplikuje `ThemeProvider`, `--ui-scale` + `zoom`), zvětší CELÉ rozhraní (text, tlačítka, ikony) napříč platformou, světy i chaty (Putyka/Camp/svět) — jedno hrdlo, žádná změna chat komponent. Ukládá se do `themeSettings.uiScale` (BE volný objekt + shallow-merge → koexistuje s jas/kontrast). **Taktická mapa (PIXI) je z zoomu vyňata** (`.viewport { zoom: calc(1/var(--ui-scale)) }`) → plátno zůstává 1:1; mapové HUD overlaye uvnitř `.viewport` se také nezvětšují.
   - Změna username řešena dedikovaným flow `me/username-request` (vytvořit/získat/zrušit) + admin schválení; po loginu toast o rozhodnuté žádosti (D-028 `last-unseen-decided`).
 - **Stav:** ✅ funguje (komunitní placeholdery 🚧).
 - **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27`, `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `CommunityPlaceholders.tsx:13`, BE `users.controller.ts:60`/`:71`, `dto/update-user.dto.ts:14`.

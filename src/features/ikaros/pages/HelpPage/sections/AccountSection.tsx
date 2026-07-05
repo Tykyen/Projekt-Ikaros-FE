@@ -10,6 +10,7 @@ import {
   Trash2,
   Globe2,
   Bell,
+  Palette,
 } from 'lucide-react';
 import { HelpAccordion, StepList, CalloutBox, TermGrid } from '../components';
 
@@ -41,6 +42,32 @@ export function AccountSection() {
           V <strong>Camp</strong> pod ní vystupuješ přímo u zpráv (tvé jméno
           a obrázek postavy); v Putyce se ukazuje účet.
         </p>
+      </HelpAccordion>
+
+      <HelpAccordion icon={<Palette size={20} />} title="Vzhled a čitelnost" accent="accent">
+        <p>
+          V sekci <strong>Vzhled</strong> si zvolíš <strong>motiv</strong> platformy
+          a v <strong>Doladění vzhledu</strong> si vše přizpůsobíš jen pro sebe.
+        </p>
+        <p>
+          <strong>Velikost rozhraní</strong> (100–150 %) zvětší celé rozhraní —
+          písmo, tlačítka i ikony. Hodí se, když je ti výchozí velikost malá nebo
+          hůř čteš. Dál si posuvníky doladíš <strong>jas</strong> a{' '}
+          <strong>kontrast</strong>, případně jednotlivé barvy.
+        </p>
+        <p>
+          <strong>Barva chatu</strong> určuje barvu tvých zpráv v chatech. Pod
+          výběrem barvy si rozbalíš <strong>Pojmenované barvy</strong> — sadu
+          barev s názvy, kde stačí kliknout a barva se rovnou použije. Krajně
+          tmavé a světlé odstíny v ní schválně nejsou, aby tvé zprávy zůstaly
+          čitelné na tmavém i světlém pozadí. Stejnou nápovědu najdeš u všech
+          výběrů barvy ve světě.
+        </p>
+        <CalloutBox variant="tip">
+          Doladění se ukládá na tvůj účet, takže platí na{' '}
+          <strong>všech zařízeních</strong> — nastavíš jednou na počítači a stejně
+          to máš i na telefonu.
+        </CalloutBox>
       </HelpAccordion>
 
       <HelpAccordion icon={<AtSign size={20} />} title="Přezdívka & e-mail" accent="info">

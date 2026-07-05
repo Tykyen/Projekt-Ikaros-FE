@@ -15,6 +15,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { LinkPickerPopover, type LinkSuggestion } from '@/shared/ui/LinkPicker';
+import { NamedColorPalette } from '@/shared/ui';
 import s from './StyleRail.module.css';
 
 interface Props {
@@ -229,6 +230,10 @@ export function StyleRail({ editor, directory, makeSlug }: Props) {
             <RotateCcw size={13} aria-hidden />
           </button>
         </div>
+        <NamedColorPalette
+          value={state.color || undefined}
+          onPick={(hex) => chain().setColor(hex).run()}
+        />
       </div>
 
       {/* Blok / nadpis. */}

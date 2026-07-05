@@ -1,0 +1,96 @@
+.hint {
+  margin-top: 10px;
+}
+
+.summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text, var(--theme-text));
+  user-select: none;
+}
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.chev {
+  font-size: 0.7rem;
+  color: var(--text-muted, var(--theme-text-muted));
+  transition: transform 0.18s ease;
+}
+.hint[open] .chev {
+  transform: rotate(90deg);
+}
+
+.note {
+  margin: 4px 0 10px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted, var(--theme-text-muted));
+}
+
+.tiles {
+  display: grid;
+  /* Adaptivní: úzký rail → 1 sloupec, popover/karta → 2, širší panel → víc. */
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+  gap: 6px;
+}
+
+.tile {
+  position: relative;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-height: 44px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15); /* lint-colors-ignore — chrome depth */
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+.tile:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15), 0 3px 10px rgb(0 0 0 / 0.35); /* lint-colors-ignore — chrome depth */
+}
+.tile:focus-visible {
+  outline: 2px solid var(--accent, var(--theme-accent));
+  outline-offset: 2px;
+}
+.tile.active {
+  box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px rgb(0 0 0 / 0.35); /* lint-colors-ignore — aktivní rámeček + chrome depth */
+}
+
+.nm {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.hx {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.66rem;
+  opacity: 0.82;
+  letter-spacing: 0.02em;
+}
+.chk {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* Mobil: dlaždice trochu vyšší pro pohodlný touch target. */
+@media (max-width: 768px) {
+  .tile {
+    min-height: 48px;
+  }
+}

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useUploadImage } from '@/shared/api';
+import { NamedColorPalette } from '@/shared/ui';
 import { PagePicker } from '@/features/world/components/PagePicker/PagePicker';
 import { UNIVERSE_NODE_TYPES } from '../types';
 import type { UniverseNode, UniverseNodeType } from '../types';
@@ -110,6 +111,11 @@ export function NodeEditorForm({
           onChange={(e) => patch({ size: Number(e.target.value) })}
         />
       </div>
+
+      <NamedColorPalette
+        value={form.color}
+        onPick={(hex) => patch({ color: hex })}
+      />
 
       <input
         className={styles.input}
