@@ -36,6 +36,7 @@ import { AdminElevationToggle } from '@/features/world/components/AdminElevation
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 import { resolvePersona } from './resolvePersona';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
+import { WorldVoiceHost } from '@/features/voice/components/WorldVoiceHost';
 
 /* ── Nav ── */
 // Systémová nav + filtrace + vlastní headline (12.2) žijí v `worldNavConfig.ts`
@@ -735,6 +736,10 @@ export function WorldLayout() {
             worldSlug={worldSlug}
           />
         )}
+
+        {/* 17.6 — hlasový hovor světa; hostuje se tu (mimo Outlet), aby přežil
+            přechod mapa↔chat. Zobrazí se jen když je session aktivní. */}
+        {realWorldId && <WorldVoiceHost />}
       </div>
     </WorldContext.Provider>
   );

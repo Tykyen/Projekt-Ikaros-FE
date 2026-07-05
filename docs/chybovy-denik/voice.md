@@ -32,3 +32,32 @@ Průzkumný agent (Jitsi/CSP) uvedl, že `Permissions-Policy: camera=(), microph
 **Fix:** delegovat na Jitsi origin v `default.conf.template` — `camera=(self "https://meet.jit.si")`, `microphone=(...)`, `display-capture=(...)`.
 
 **Poučení:** agentní závěr o CSP/Permissions-Policy je **hypotéza, ne fakt** — u browser security policy ověř mechaniku (delegace feature do iframe vyžaduje origin v allowlistu rodiče). Stejný typ pasti jako CH-META (agentní TL;DR = hypotéza k ověření).
+
+## CH-055 — Voice krčma visela na „Připojuji…": prejoin v skrytém iframe — 2026-07-05
+
+**Oblast:** fe/jitsi. **Příznak cyklení:** „hlas se dlouho připojuje / nejde", tlačítko „Připojuji…" navždy.
+
+Uživatel nahlásil, že se krčma nepřipojí. Konzole: `[app:conference-web] Clear the initialGUM promise! (prejoinVisible=true)` — Jitsi zobrazil **prejoin obrazovku** (kde se klikne „Připojit" + povolí mikrofon), ALE náš iframe byl během `connecting` schovaný (`visibility:hidden`, kryl ho lobby overlay). Uživatel prejoin nevidel → neměl kam kliknout → GUM (getUserMedia) promise se nikdy nedokončil → `videoConferenceJoined` nepřišel → věčné „Připojuji…".
+
+Dvě propojené příčiny, obě moje:
+1. **`prejoinPageEnabled: false` nezabral** — `meet.jit.si` (novější Jitsi) používá `prejoinConfig: { enabled: false }`; starý klíč ignoruje.
+2. **Iframe skrytý během `connecting`** — `aria-hidden`/visibility jen na `!joined`, ale prejoin i permission prompt jsou vidět až po interakci → schované pod lobby overlayem.
+
+**Fix:** (1) přidat `prejoinConfig.enabled:false` (+ ponechat starý klíč pro BC); (2) iframe viditelný když `joined || connecting`, lobby jen když `!joined && !connecting`, + neblokující hláška „povol mikrofon".
+
+**Poučení:** u Jitsi iframe adaptéru **nikdy neskrývej iframe během připojování** — prejoin/permission prompt tam žije. Ověř aktuální config klíče (`prejoinConfig`, ne `prejoinPageEnabled`). `ERR_BLOCKED_BY_ADBLOCKER` na `amplitude.com` = jen Jitsi telemetrie, ne příčina. **Vyžádat konzoli byl správný krok** — `prejoinVisible=true` dalo diagnózu okamžitě (necyklit na CSP hypotéze bez dat).
+
+## ✅ ŘEŠENÍ — 17.6 rozšíření: video+hlas do světového chatu + taktické mapy — 2026-07-05
+
+**Co postaveno:** hovor i ve SVĚTĚ (chat + mapa), na přání uživatele (původní záměr). **Bez BE změn** — Jitsi řeší vše, room per svět.
+- **Jeden hovor na svět** `ikaros-world-{worldId}` — sdílený chatem i mapou (připojíš se v chatu, jsi slyšet i na mapě).
+- **Persistence přes navigaci** (mapa↔chat): `WorldVoiceHost` mountnutý ve `WorldLayout` **MIMO `<Outlet/>`** (přežije navigaci), `worldVoiceSessionAtom` (jotai, vzor `soundActivation.ts`) drží session; tlačítka v chatu/mapě jen togglují atom. Jitsi iframe žije v hostu → odchod ze stránky ho neodmountuje.
+- `WorldVoiceButton` (📞 Phone/PhoneOff) v hlavičce světového chatu (`ChannelView`) + na mapě (`weatherSlot`). Skin-aware `--theme-*`.
+
+**Proč správně:** persistence = klíč — `useVoice` dělá `dispose()` při unmountu, takže hostitel MUSÍ být stabilní (WorldLayout, ne stránka). Roster („kdo je v hovoru") vynechán = **0 BE změn** (`useVoicePresence` bere fixní `RoomKey`, per-svět by vyžadoval BE; Jitsi účastníky ukazuje sám). Reuse `useVoice` adaptéru → rozšíření bez duplikace.
+
+**Ověřeno:** tsc ✓, voice eslint 0 errors, build ✓. Živý test = uživatel.
+
+**⚠️ Pre-existing dluh (NE moje):** `TacticalMapView.tsx:712` react-compiler error „Compilation Skipped: Existing memoization could not be preserved" na fog `useMemo` (17.1) — nedotčeno mým editem (import + tlačítko), neblokuje `npm run build` (ten je tsc+vite, ne eslint).
+
+**Follow-up:** badge „kdo je v hovoru" u tlačítka (chce BE voice presence per svět) · přesun/resize plovoucího hostu.

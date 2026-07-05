@@ -23,6 +23,7 @@ import type { Application as PixiApplication } from "pixi.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import { useWorldContext } from "@/features/world/context/WorldContext";
+import { WorldVoiceButton } from "@/features/voice/components/WorldVoiceButton";
 import { currentUserAtom } from "@/shared/store/authStore";
 import { WorldRole } from "@/shared/types";
 import { useMapTheme } from "./hooks/useMapTheme";
@@ -579,7 +580,7 @@ export function TacticalMapView(): React.ReactElement {
         toast.error(`Dveře selhaly: ${parseApiError(err)}`);
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [scene, worldId, isPJ, queryClient],
   );
   const moveMutation = useMutation({
@@ -2214,6 +2215,8 @@ export function TacticalMapView(): React.ReactElement {
         {scene && <SceneSoundPlayer scene={scene} />}
         {/* 13.6 — in-situ nápověda (cheat-sheet ovládání mapy, role-aware). */}
         <WorldHelpButton label="Nápověda k mapě" onClick={() => setHelpOpen(true)} />
+        {/* 17.6 — připojit se k hlasovému hovoru světa (sdílený s chatem). */}
+        <WorldVoiceButton worldId={worldId} />
       </div>
 
       {/* 13.6 — modal s nápovědou k taktické mapě. */}

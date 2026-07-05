@@ -1,0 +1,151 @@
+/* 17.6 — plovoucí hostitel hovoru ve světě. Barvy z --theme-* (skin-aware). */
+
+.host {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 200;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  color: var(--theme-text);
+  background: var(--theme-surface-strong);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 20px 50px -20px rgb(var(--black-rgb) / 0.8);
+}
+.host[data-min] {
+  width: 220px;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--theme-border-soft);
+  font-size: var(--text-sm);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+.label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--theme-heading);
+}
+.min {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--theme-border-soft);
+  color: var(--theme-text-muted);
+}
+.min:hover {
+  color: var(--theme-heading);
+  border-color: var(--theme-accent);
+}
+.min:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+.body {
+  position: relative;
+  height: 200px;
+  transition: height 0.15s ease;
+}
+.body[data-min] {
+  height: 0;
+}
+.jitsi {
+  width: 100%;
+  height: 100%;
+  background: rgb(var(--black-rgb) / 0.4);
+}
+.jitsi[aria-hidden='true'] {
+  visibility: hidden;
+}
+.connecting {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: var(--sp-3);
+  font-size: var(--text-sm);
+  color: var(--theme-heading);
+  background: rgb(var(--black-rgb) / 0.5);
+  pointer-events: none;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  border-top: 1px solid var(--theme-border-soft);
+}
+.ctl {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--theme-text);
+  background: var(--theme-surface-soft);
+  border: 1px solid var(--theme-border);
+  transition: border-color 0.12s ease;
+}
+.ctl:hover {
+  border-color: var(--theme-accent);
+}
+.ctl:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+.ctl[data-on] {
+  color: var(--theme-heading);
+  border-color: var(--theme-accent);
+  background: var(--theme-surface-strong);
+}
+.ctl[data-off] {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+.leave {
+  color: var(--text-on-danger, var(--theme-heading));
+  background: var(--danger);
+  border-color: var(--danger);
+}
+.leave:hover {
+  filter: brightness(1.08);
+  border-color: var(--danger);
+}
+
+@media (max-width: 560px) {
+  .host {
+    right: 8px;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .body {
+    transition: none;
+  }
+}

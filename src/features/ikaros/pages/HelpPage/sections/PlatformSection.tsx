@@ -115,6 +115,12 @@ export function PlatformSection() {
             do vlastního okna — třeba na druhý monitor. Voice krčma je jen pro{' '}
             <strong>přihlášené</strong> (host se do ní nedostane).
           </p>
+          <p>
+            Hlas a video najdeš i <strong>uvnitř světa</strong> — tlačítkem 📞
+            v hlavičce světového chatu nebo na taktické mapě se připojíš k hovoru
+            svého světa. Je to <strong>jeden hovor sdílený chatem i mapou</strong>,
+            takže se drží, i když mezi nimi přepínáš.
+          </p>
         </Tool>
         <Tool icon={<Globe2 size={16} />} title="Camp (Fantasy · Mystery · Sci-fi)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>

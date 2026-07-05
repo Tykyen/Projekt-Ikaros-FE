@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import { Menu, Users, Search, Palette, BookOpen, Glasses } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
 import { WorldHelpButton, WorldHelpModal, ChatHelp } from '@/features/world/help';
+import { WorldVoiceButton } from '@/features/voice/components/WorldVoiceButton';
 import type { User } from '@/shared/types';
 import { getSocket } from '@/features/chat/api/socket';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
@@ -521,6 +522,8 @@ export function ChannelView({
         >
           <Glasses size={18} />
         </button>
+        {/* 17.6 — připojit se k hlasovému hovoru světa (sdílený s mapou). */}
+        <WorldVoiceButton worldId={worldId} className={s.search} />
         {onToggleRail && (
           <button
             type="button"

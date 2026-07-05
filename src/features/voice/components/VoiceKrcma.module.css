@@ -147,6 +147,20 @@
 .jitsi[aria-hidden='true'] {
   visibility: hidden;
 }
+/* Neblokující hláška během připojování (prompt na mikrofon je nad ní). */
+.connecting {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: var(--sp-2) var(--sp-3);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--theme-heading);
+  background: rgb(var(--black-rgb) / 0.55);
+  pointer-events: none;
+}
 
 /* Lobby overlay (nepřipojen) — kryje prázdný Jitsi kontejner. */
 .lobby {

@@ -42,7 +42,10 @@ export class JitsiVoiceProvider implements VoiceProvider {
       configOverwrite: {
         startWithAudioMuted: opts.startWithAudioMuted ?? false,
         startWithVideoMuted: opts.startWithVideoMuted ?? true,
+        // Prejoin obrazovku vypínáme — připojí rovnou. `prejoinPageEnabled` je
+        // starý klíč (meet.jit.si ho ignoruje), `prejoinConfig.enabled` je nový.
         prejoinPageEnabled: false,
+        prejoinConfig: { enabled: false },
         disableDeepLinking: true,
         disableInviteFunctions: true,
       },

@@ -125,14 +125,21 @@ export function VoiceKrcmaRoom() {
             </div>
           )}
 
-          {/* Jitsi kontejner je v DOM vždy — join() do něj mountuje iframe. */}
+          {/* Jitsi kontejner je v DOM vždy — join() do něj mountuje iframe.
+              Viditelný i během připojování, ať je vidět prompt na mikrofon. */}
           <div
             className={s.jitsi}
             ref={voice.containerRef}
-            aria-hidden={!voice.joined}
+            aria-hidden={!voice.joined && !voice.connecting}
           />
 
-          {!voice.joined && (
+          {voice.connecting && (
+            <div className={s.connecting} aria-live="polite">
+              Připojuji ke krčmě — povol prosím mikrofon v prohlížeči…
+            </div>
+          )}
+
+          {!voice.joined && !voice.connecting && (
             <div className={s.lobby}>
               {count > 0 ? (
                 <ul className={s.tiles}>
