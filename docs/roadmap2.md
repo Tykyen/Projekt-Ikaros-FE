@@ -563,7 +563,9 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Hotovo:** 1-prst pan mapy (dřív vůbec nešlo), pinch = zoom+posun zároveň, long-tap na tokenu = akce (velký terč místo „i" badge), dotykové terče ≥44px (coarse), wheel bez Ctrl (desktop bonus). Disambiguace token vs. pan přes dvojitý gate. Unit testy + build zelené. Spec `docs/arch/phase-17/spec-17.4.md`, funkce kap. 14.
 **Zbývá:** živý „pocit pod palcem" na reálném telefonu (headless nemá pravý touchscreen); `mobil-desktop` panely na 375px. Rozhodnuto: **parita** s desktopem (zjednodušený mobilní layout = 17.11 companion mód).
 
-### - [ ] 17.6 Integrace hlasu a videa přes Jitsi — [D4 · dopad střední/vysoký · náklad malý až střední]
+### - [x] 17.6 Integrace hlasu a videa přes Jitsi — [D4 · dopad střední/vysoký · náklad malý až střední] ✅ *(2026-07-05)*
+
+> ✅ **Implementováno 2026-07-05 — nad rámec původní karty** (ta chtěla „jen odkaz/embed"): **Voice krčma** (globální hlasová místnost, voice-first, jen registrovaní) + **hlas/video/sdílení obrazovky ve světovém chatu a na taktické mapě** (jeden hovor na svět `ikaros-world-{id}`, persistentní přes přechod mapa↔chat přes `WorldVoiceHost` ve `WorldLayout` mimo `<Outlet/>`). Jitsi (`meet.jit.si`) za **provider adaptérem** → pozdější LiveKit = výměna modulu bez přepisu UI. **Pop-out** oknem (`window.open`). **Skin-aware** `--theme-*` (krčma nese vlastní „Řezbářskou" identitu, přebarví se skinem). BE room + WS voice presence (krčma) jest 118/118; FE build/tsc/eslint/vitest ✓. CSP + Permissions-Policy `meet.jit.si`. Spec [spec-17.6](arch/phase-17/spec-17.6.md), deník [voice.md](chybovy-denik/voice.md) (✅ + 2× CH), funkce [05](funkce/05-komunikace-platformy.md). **Živě ověřeno — hlas i mikrofon fungují.** Follow-up (volitelné): roster „kdo volá" badge per svět (BE presence), LiveKit upgrade, self-host Jitsi + JWT, guard „1 aktivní hovor / uživatel".
 
 **Cíl:** Přidat ke světu nebo scéně komunikační místnost pro hlas i obraz. Hráči budou mít tlačítko „Připojit se k hovoru“. První stupeň otevře Jitsi v nové kartě, druhý stupeň vloží Jitsi přímo do okna Ikara pomocí Jitsi IFrame API.
 

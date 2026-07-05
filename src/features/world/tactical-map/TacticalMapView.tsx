@@ -709,24 +709,32 @@ export function TacticalMapView(): React.ReactElement {
 
   // 10.2h — efektivně odhalené hexy = revealedHexes ∪ hexy PC tokenů. Sdíleno
   // mezi FogLayer (maska) a NPC visibility gate (TokenLayer).
+  // 17.1 — vstupy LoS reveal vytažené jako lokální hodnoty, ať useMemo deps
+  // odpovídají 1:1 tomu, co se uvnitř používá (jinak react-compiler ESLint
+  // pravidlo memoizaci „nezachová" — member-access vs. optional deps).
+  const sceneConfig = scene?.config;
+  const sceneTokens = scene?.tokens;
+  const sceneWalls = scene?.walls;
+  const sceneLights = scene?.lights;
+  const sceneRevealedHexes = scene?.revealedHexes;
   const revealedSet = useMemo(() => {
     // 17.1 — dynamická viditelnost: mlha odvozená z LoS PC tokenů + zdí.
-    if (scene?.config.visionMode === 'dynamic' && mapBounds) {
+    if (sceneConfig?.visionMode === 'dynamic' && mapBounds && sceneTokens) {
       return computeVisionReveal(
-        scene.tokens,
-        scene.walls ?? [],
-        scene.lights ?? [],
-        scene.config,
+        sceneTokens,
+        sceneWalls ?? [],
+        sceneLights ?? [],
+        sceneConfig,
         mapBounds,
       );
     }
-    return effectivelyRevealed(scene?.revealedHexes ?? [], scene?.tokens ?? []);
+    return effectivelyRevealed(sceneRevealedHexes ?? [], sceneTokens ?? []);
   }, [
-    scene?.config,
-    scene?.revealedHexes,
-    scene?.tokens,
-    scene?.walls,
-    scene?.lights,
+    sceneConfig,
+    sceneRevealedHexes,
+    sceneTokens,
+    sceneWalls,
+    sceneLights,
     mapBounds,
   ]);
 
