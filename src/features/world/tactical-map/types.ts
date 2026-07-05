@@ -63,6 +63,45 @@ export interface MapDrawing {
   visibility: 'pj' | 'all';
 }
 
+/**
+ * 17.2 — zeď/dveře na scéně. `points` = map-space px páry `[x0,y0,x1,y1,...]`
+ * (lomená čára; import z UVTT `line_of_sight` polygonů a `portals`).
+ * `blocksSight` čte 17.1 (LoS). Bez 17.1 zeď opticky neblokuje — jen se
+ * vykreslí PJ jako editovatelná vrstva („spící data").
+ */
+export interface MapWall {
+  id: string;
+  points: number[];
+  type: 'wall' | 'door';
+  /** Jen `type='door'` — stav dveří (otevřené neblokují výhled). */
+  door?: {
+    open: boolean;
+    locked?: boolean;
+  };
+  /** Blokuje linii pohledu (17.1). Default true. */
+  blocksSight: boolean;
+  /** Rezerva — blokace pohybu (dnes neřešíme). */
+  blocksMovement?: boolean;
+}
+
+/**
+ * 17.2 — bodový zdroj světla na scéně (import z UVTT `lights`). Souřadnice a
+ * `range` v map-space px. Dynamické vykreslení řeší 17.1; bez něj se jen
+ * uloží.
+ */
+export interface MapLight {
+  id: string;
+  x: number;
+  y: number;
+  /** Dosah v map-space px. */
+  range: number;
+  /** 0..1. */
+  intensity: number;
+  /** `#rrggbb`. */
+  color: string;
+  shadows?: boolean;
+}
+
 export interface MapTokenAbility {
   name: string;
   description: string;
@@ -201,6 +240,10 @@ export interface MapScene {
   effects: MapEffect[];
   /** 15.4 — anotace (kresby) na scéně. */
   drawings?: MapDrawing[];
+  /** 17.2 — zdi/dveře (import UVTT; „spící data" pro 17.1 LoS). */
+  walls?: MapWall[];
+  /** 17.2 — zdroje světla (import UVTT; render až 17.1). */
+  lights?: MapLight[];
   fogEnabled: boolean;
   revealedHexes: HexCoord[];
   templateId?: string;
@@ -277,6 +320,9 @@ export type MapOperation =
       revealedHexes: HexCoord[];
     }
   | { type: 'scene.effects.replace'; effects: MapEffect[] }
+  // 17.2 — import UVTT: nahrazení zdí/světel scény
+  | { type: 'scene.walls.replace'; walls: MapWall[] }
+  | { type: 'scene.lights.replace'; lights: MapLight[] }
   | { type: 'scene.npc-templates.replace'; npcTemplates: MapSceneNpc[] }
   | { type: 'scene.tokens.replace-npc'; tokens: MapToken[] }
   | { type: 'scene.sounds.set'; activeSoundIds: string[] }
@@ -409,6 +455,16 @@ export interface HexConfig {
   showScale?: boolean;
   /** 15.4 — smí hráč kreslit anotace na této scéně? Chybí = `false`. */
   allowPlayerDrawing?: boolean;
+  /**
+   * 17.1 — zdroj mlhy. `manual` (chybí) = ruční štětec (BC). `dynamic` =
+   * automatická LoS z pozic PC tokenů + zdí (`scene.walls`). `dynamic`
+   * vyžaduje `fogEnabled`.
+   */
+  visionMode?: 'manual' | 'dynamic';
+  /** 17.1 — temná scéna: token vidí jen do dosvitu/světel. Chybí = `false`. */
+  darkness?: boolean;
+  /** 17.1 — dosvit tokenu v buňkách (jen `darkness`). Chybí = default. */
+  visionRange?: number;
   /**
    * 10.2g — per-scéna viditelnost HP barů dle typu tokenu.
    * Chybí (undefined) = `true` (BC + default zapnuto).

@@ -219,6 +219,13 @@ export function applyOperationToScene(
     case 'scene.effects.replace':
       return { ...scene, effects: op.effects };
 
+    // 17.2 — import UVTT: nahrazení zdí/světel
+    case 'scene.walls.replace':
+      return { ...scene, walls: op.walls };
+
+    case 'scene.lights.replace':
+      return { ...scene, lights: op.lights };
+
     case 'scene.npc-templates.replace':
       return { ...scene, npcTemplates: op.npcTemplates };
 

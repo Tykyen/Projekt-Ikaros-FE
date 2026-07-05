@@ -10,7 +10,7 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §2 (PJ orchestrator), §5.
  */
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
@@ -28,6 +28,8 @@ import { EditSceneModal } from './EditSceneModal';
 import { MapLibraryModal } from './MapLibraryModal';
 import { LoadPreparationDialog } from './LoadPreparationDialog';
 import { ClearSceneDialog } from './ClearSceneDialog';
+import { useImportUvttScene } from '../../import/useImportUvttScene';
+import { UvttParseError } from '../../import/parseUvtt';
 import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
@@ -209,6 +211,20 @@ export function MapPjPanel({
     },
   });
 
+  // 17.2 — import hotové mapy z UVTT/.dd2vtt souboru.
+  const importUvtt = useImportUvttScene(worldId, currentUserId);
+  const uvttInputRef = useRef<HTMLInputElement>(null);
+  const handleUvttFile = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // umožní vybrat stejný soubor znovu
+    if (file) importUvtt.mutate(file);
+  };
+  const importErrorMessage = importUvtt.error
+    ? importUvtt.error instanceof UvttParseError
+      ? importUvtt.error.message
+      : 'Import mapy selhal — zkontroluj, že jde o platný UVTT/.dd2vtt soubor.'
+    : null;
+
   return (
     <aside className={styles.panel}>
       <header
@@ -267,7 +283,29 @@ export function MapPjPanel({
                 >
                   🎬 Načíst přípravu
                 </button>
+                {/* 17.2 — import hotové mapy (UVTT/.dd2vtt): pozadí + mřížka + zdi + světla */}
+                <button
+                  type="button"
+                  className={styles.newSceneBtn}
+                  onClick={() => uvttInputRef.current?.click()}
+                  disabled={importUvtt.isPending}
+                  title="Naimportuje hotovou mapu ze souboru UVTT / .dd2vtt (Dungeondraft, DungeonFog) — vytvoří novou scénu se zdmi a světly"
+                >
+                  {importUvtt.isPending ? 'Importuji…' : '📥 Import UVTT'}
+                </button>
+                <input
+                  ref={uvttInputRef}
+                  type="file"
+                  accept=".dd2vtt,.uvtt,.df2vtt,.json"
+                  hidden
+                  onChange={handleUvttFile}
+                />
               </div>
+            )}
+            {importErrorMessage && (
+              <p className={styles.error} role="alert">
+                {importErrorMessage}
+              </p>
             )}
             <ActiveScenesList
               scenes={activeScenes}

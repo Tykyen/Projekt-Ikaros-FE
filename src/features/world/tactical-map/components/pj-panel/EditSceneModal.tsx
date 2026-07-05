@@ -118,6 +118,10 @@ export function EditSceneModal({
         (config.showScale ?? true) !== (scene.config.showScale ?? true) ||
         (config.allowPlayerDrawing ?? false) !==
           (scene.config.allowPlayerDrawing ?? false) ||
+        (config.visionMode ?? 'manual') !==
+          (scene.config.visionMode ?? 'manual') ||
+        (config.darkness ?? false) !== (scene.config.darkness ?? false) ||
+        (config.visionRange ?? null) !== (scene.config.visionRange ?? null) ||
         config.size !== scene.config.size ||
         config.originX !== scene.config.originX ||
         config.originY !== scene.config.originY ||
@@ -420,6 +424,60 @@ export function EditSceneModal({
               Zobrazit stupnici
             </label>
           </div>
+        </section>
+
+        {/* 17.1 — dynamická viditelnost (LoS): token vidí jen přes zdi. */}
+        <section className={styles.section}>
+          <h4 className={styles.sectionTitle}>Viditelnost (LoS)</h4>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={config.visionMode === 'dynamic'}
+              onChange={(e) =>
+                setConfig((c) => ({
+                  ...c,
+                  visionMode: e.target.checked ? 'dynamic' : 'manual',
+                }))
+              }
+            />
+            Automatická viditelnost přes zdi
+          </label>
+          <p className={styles.sectionHint}>
+            Mlha se počítá sama z pozic postav a zdí (import UVTT). Vyžaduje
+            zapnutou mlhu. Vypnuto = ruční štětec.
+          </p>
+          {config.visionMode === 'dynamic' && (
+            <div className={styles.configGrid}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={config.darkness ?? false}
+                  onChange={(e) =>
+                    setConfig((c) => ({ ...c, darkness: e.target.checked }))
+                  }
+                />
+                Temná scéna (vidím jen do dosvitu / světel)
+              </label>
+              {config.darkness && (
+                <label className={styles.label}>
+                  Dosvit (buňky)
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={config.visionRange ?? 4}
+                    min={1}
+                    max={40}
+                    onChange={(e) =>
+                      setConfig((c) => ({
+                        ...c,
+                        visionRange: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </label>
+              )}
+            </div>
+          )}
         </section>
 
         {/* 15.4 — povolení kreslení hráčům na této scéně. */}

@@ -46,10 +46,13 @@ import {
   isTokenHiddenByFog,
 } from "./components/fog/fogUtils";
 import { getGridAdapter, type GridAdapter } from "./grid";
+import { computeVisionReveal } from "./vision/raycast";
 import { MapZoomControls } from "./components/MapZoomControls";
 import { MapMeasureControls } from "./components/MapMeasureControls";
 import { MapDrawingControls } from "./components/MapDrawingControls";
 import { MapDrawingLayer } from "./components/MapDrawingLayer";
+import { WallsLayer } from "./components/WallsLayer";
+import { LightsLayer } from "./components/LightsLayer";
 import { useDrawingTool } from "./hooks/useDrawingTool";
 import { MapToolDock, MapDockStack } from "./components/MapToolDock";
 import { MapEmptyState } from "./components/MapEmptyState";
@@ -540,6 +543,38 @@ export function TacticalMapView(): React.ReactElement {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scene?.id, worldId, queryClient],
   );
+
+  // 17.1 — PJ přepíná dveře (open/closed) → dynamická LoS se přepočítá
+  // (memo dep = scene.walls). Optimistic + rollback (vzor broadcastSounds).
+  const handleToggleDoor = useCallback(
+    (doorId: string): void => {
+      if (!scene || !worldId || !isPJ) return;
+      const walls = (scene.walls ?? []).map((w) =>
+        w.id === doorId && w.type === "door"
+          ? {
+              ...w,
+              door: { open: !(w.door?.open ?? false), locked: w.door?.locked },
+            }
+          : w,
+      );
+      const op: MapOperation = { type: "scene.walls.replace", walls };
+      const prev = queryClient.getQueryData<MapScene>(
+        mapSceneQueryKey(worldId),
+      );
+      if (prev) {
+        queryClient.setQueryData(
+          mapSceneQueryKey(worldId),
+          applyOperationToScene(prev, op),
+        );
+      }
+      void postMapOperation(scene.id, op).catch((err) => {
+        if (prev) queryClient.setQueryData(mapSceneQueryKey(worldId), prev);
+        toast.error(`Dveře selhaly: ${parseApiError(err)}`);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scene, worldId, isPJ, queryClient],
+  );
   const moveMutation = useMutation({
     mutationFn: ({ sceneId, op }: { sceneId: string; op: MapOperation }) =>
       postMapOperation(sceneId, op),
@@ -666,10 +701,26 @@ export function TacticalMapView(): React.ReactElement {
 
   // 10.2h — efektivně odhalené hexy = revealedHexes ∪ hexy PC tokenů. Sdíleno
   // mezi FogLayer (maska) a NPC visibility gate (TokenLayer).
-  const revealedSet = useMemo(
-    () => effectivelyRevealed(scene?.revealedHexes ?? [], scene?.tokens ?? []),
-    [scene?.revealedHexes, scene?.tokens],
-  );
+  const revealedSet = useMemo(() => {
+    // 17.1 — dynamická viditelnost: mlha odvozená z LoS PC tokenů + zdí.
+    if (scene?.config.visionMode === 'dynamic' && mapBounds) {
+      return computeVisionReveal(
+        scene.tokens,
+        scene.walls ?? [],
+        scene.lights ?? [],
+        scene.config,
+        mapBounds,
+      );
+    }
+    return effectivelyRevealed(scene?.revealedHexes ?? [], scene?.tokens ?? []);
+  }, [
+    scene?.config,
+    scene?.revealedHexes,
+    scene?.tokens,
+    scene?.walls,
+    scene?.lights,
+    mapBounds,
+  ]);
 
   // 10.2h — fog brush: štětec na hex (reveal/fog dle režimu). Dedup posledního
   // hexu (výkon při tažení). Jen PJ + aktivní fog tool + zapnutá mlha.
@@ -1660,6 +1711,15 @@ export function TacticalMapView(): React.ReactElement {
                   />
                 )}
               </pixiContainer>
+              {/* 17.1 — glow světel (jen temná scéna); pod tokeny a mlhou. */}
+              <pixiContainer label="layer-lighting">
+                {scene && (
+                  <LightsLayer
+                    lights={scene.lights ?? []}
+                    visible={scene.config.darkness === true}
+                  />
+                )}
+              </pixiContainer>
               <pixiContainer label="layer-tokens">
                 {scene && (
                   <TokenLayer
@@ -1693,6 +1753,16 @@ export function TacticalMapView(): React.ReactElement {
                     mapBounds={mapBounds}
                     theme={theme}
                     isPJ={isPJ}
+                  />
+                )}
+              </pixiContainer>
+              {/* 17.2 — zdi/dveře z importu UVTT (jen PJ; „spící data" pro 17.1). */}
+              <pixiContainer label="layer-walls">
+                {scene && (
+                  <WallsLayer
+                    walls={scene.walls ?? []}
+                    visible={isPJ}
+                    onToggleDoor={isPJ ? handleToggleDoor : undefined}
                   />
                 )}
               </pixiContainer>
