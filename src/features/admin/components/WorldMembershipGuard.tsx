@@ -57,6 +57,13 @@ export function WorldMembershipGuard({
     return <>{children}</>;
   }
 
+  // R-AUDIT — vlastník světa je vždy PJ (mirror WorldLayout/WorldContext isPJ).
+  // Bez toho by owner, jehož membership dočasně chybí/nedoteklo, byl z vlastního
+  // světa přesměrován jako nečlen.
+  if (user && world?.ownerId === user.id) {
+    return <>{children}</>;
+  }
+
   if (worldRole != null && worldRole >= minWorldRole) {
     return <>{children}</>;
   }

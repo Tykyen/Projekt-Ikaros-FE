@@ -447,8 +447,14 @@ export function TacticalMapView(): React.ReactElement {
   // „nahozený" (world.elevated); mirror BE `worldAdminBypass`. De-elevated admin
   // se na mapě chová jako jeho world role.
   const isElevatedHere = world?.elevated === true;
+  // N-16 / R-AUDIT — isPJ MUSÍ zahrnout owner-bypass (world.ownerId === currentUser.id),
+  // stejně jako WorldLayout/WorldContext. Bez něj owner, jehož membership dočasně
+  // chybí/nedoteklo (např. Matrix svět seedovaný bez membershipu), ztratil na mapě
+  // PJ nástroje (orchestraci), i když ho nav pořád bral jako PJ.
   const isPJ =
-    isElevatedHere || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
+    world?.ownerId === currentUser?.id ||
+    isElevatedHere ||
+    (userRole !== null && userRole >= WorldRole.PomocnyPJ);
 
   // 10.2j G3 — drž ref pro onLiveDiceRoll aktuální (počítá se pod useMapScene).
   // Sync v effectu (ne za renderu) — `handleLiveDiceRoll` ref čte až ve WS

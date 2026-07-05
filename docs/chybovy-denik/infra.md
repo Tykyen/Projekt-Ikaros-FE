@@ -20,3 +20,21 @@ Produkční build (`deploy.yml`, čistý server bez MITM) arg **nedává** → z
 **Jak ověřeno:** `docker build --build-arg INSECURE_TLS=1` prošel; smoke test (render + cache + fallback) OK.
 
 **Zhodnocení — dobře:** degradace TLS izolovaná na lokální build (přepínač default vypnutý), prod zůstává čistý HTTPS; HTTP apk je u alpine bezpečné díky podpisům. **Poučení:** za MITM proxí padají v dockeru jak apk, tak npm po HTTPS — diagnostikuj `apk update` (TLS warning), ne obsah balíčku; fix drž jako opt-in, ať neoslabíš prod.
+
+---
+
+## ✅ ŘEŠENÍ — FE deploy padal na `npm ci` ERESOLVE (eslint@10 × jsx-a11y peer) — chyběl `.npmrc` v repu — 2026-07-05
+
+**Kontext:** FE `Deploy to Server` workflow → `docker compose build` → Dockerfile `RUN npm ci` selhal. Navazuje na dnešní [CH-056] a řešení 17.8, kde eslint zvednutý na 10, ale `eslint-plugin-jsx-a11y@6.10.2` deklaruje peer jen `eslint ≤9`.
+
+**Příznak:** `#16 [frontend build 4/7] RUN npm ci` → `npm error ERESOLVE could not resolve … Found: eslint@10.3.0 … peer eslint@"^3 || … || ^9" from eslint-plugin-jsx-a11y@6.10.2` → `process "/bin/sh -c npm ci" did not complete successfully: exit code 1`. Lokální `npm run build` prošel (existující `node_modules`), takže drift se projevil až v čistém dockeru.
+
+**Kořen:** `legacy-peer-deps` byl použit jen lokálně/ad-hoc při 17.8, ale **nebyl zafixovaný v repu** → čistý `npm ci` v Dockeru o toleranci nevěděl a padl na striktním peer-checku. Chyba NENÍ z přejmenování typu stránky (Rodokmen→Zoom); je to pre-existující dependency drift.
+
+**Co zabralo:** commitnutý `.npmrc` s `legacy-peer-deps=true` (root repo) + Dockerfile `COPY package*.json .npmrc ./` (glob `package*.json` `.npmrc` NEbere) před `npm ci`. jsx-a11y s flat configem/novým eslintem funguje, jen má zastaralý peer range.
+
+**Proč to je správně (a ne přegenerovat lock):** `npm ci` instaluje PŘESNĚ podle `package-lock.json`, **nepřeřešuje** strom → legacy-peer-deps tu jen tlumí peer varování, nemění balíky. To se liší od `npm install --legacy-peer-deps` z [CH-056], které lock přeřeší a umí vypustit tranzitivní `@testing-library/dom` (rozbité testy). Ověřeno: lock ten balík stále má (grep 5×).
+
+**Jak ověřeno:** `npm ci --dry-run` (s `.npmrc`) → `up to date in 2s`, exit 0 (ERESOLVE zmizel, lock konzistentní); `@testing-library/dom` v locku 5×. Reálný docker build proběhne až po pushnutí + redeployi.
+
+**Zhodnocení — dobře, ale workaround:** odblokuje deploy s nulovým dopadem na verze/testy. **Poučení:** (1) `legacy-peer-deps` použitý lokálně MUSÍ do repa (`.npmrc`), jinak čistý `npm ci` v CI/dockeru padne; (2) `.npmrc` v Dockerfile explicitně kopírovat — glob `package*.json` ho nezahrne; (3) čistý stav dřív než čerstvý `npm ci`, ne lokální `npm run build` na starých `node_modules`. Dlouhodobě: upgrade jsx-a11y na eslint-10-kompatibilní verzi → zrušit workaround.
