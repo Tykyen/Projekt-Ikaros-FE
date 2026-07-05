@@ -83,6 +83,127 @@
   font-size: var(--text-xs);
 }
 
+/* Statický název lokace pro hráče (read-only — scénu řídí správci). */
+.placeName {
+  min-width: 0;
+  color: var(--theme-text, var(--text));
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Žánrový štítek — „vypálený znak Campu" (16.6, read-only pro hráče) ── */
+.genreBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3) var(--sp-1) var(--sp-2);
+  border: 1px solid var(--theme-border, var(--border));
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-accent, var(--accent)) 15%, transparent),
+    color-mix(in srgb, var(--theme-accent, var(--accent)) 5%, transparent)
+  );
+}
+
+.genreIco {
+  font-size: var(--text-md);
+  line-height: 1;
+}
+
+.genreText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.genreKicker {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.genreName {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semi);
+  font-size: var(--text-sm);
+  color: var(--theme-heading, var(--accent));
+}
+
+/* Odznáček dočasného staff override žánru (přerušovaný, dle proto). */
+.overrideTag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 3px var(--sp-2);
+  border: 1px dashed
+    color-mix(in srgb, var(--theme-accent, var(--accent)) 55%, transparent);
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--theme-accent, var(--accent));
+  white-space: nowrap;
+}
+
+/* ── Skupina akcí vpravo: 📜 Uložit · 📂 Načíst · 📖 Popis ── */
+.gameActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+/* „Pečeť" — akce hry (uložit / načíst). */
+.seal {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 34px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-full);
+  background: var(--theme-surface, var(--bg-card));
+  color: var(--theme-text, var(--text));
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.seal:hover:not(:disabled) {
+  border-color: var(--theme-accent, var(--accent));
+  color: var(--theme-heading, var(--accent));
+}
+
+.seal:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+/* Načíst hru — jemně zvýrazněný okraj (druhá pečeť). */
+.sealLoad {
+  border-color: color-mix(
+    in srgb,
+    var(--theme-accent, var(--accent)) 42%,
+    transparent
+  );
+}
+
+.sealIcon {
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+
 /* Tlačítko popisu místa — „pečeť". */
 .descBtn {
   display: inline-flex;
@@ -129,8 +250,19 @@
     flex: 1 1 100%;
   }
 
-  .descBtn {
+  /* Akce hry padnou nad ovládání a zúží se na ikony (text zmizí). */
+  .gameActions {
     order: 1;
     margin-left: auto;
+  }
+
+  .sealLabel {
+    display: none;
+  }
+
+  .seal {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
   }
 }

@@ -527,12 +527,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** umístění/editace pinů (PJ), klik → stránka; mobilní ovládání.
 **Otevřené otázky:** Piny i na 3D vesmírné mapě, nebo jen 2D atlas? Viditelnost per AKJ úroveň? Vnořené mapy (klik na město → mapa města)?
 
-### - [ ] 16.6 One-shot v Campu — hra na jeden večer + uložení/načtení scény — [dopad střední · náklad střední] 🔁
-**Cíl:** Camp (globální chat) jako místo pro **krátké hry na jeden večer**: hráči se sejdou, dají dohromady příběh. Klíčové: **uložit scénu** (taktickou mapu + rozestavení) a **načíst** ji, aby se dala znovu zahrát.
-**Proč:** Tvoje zadání (2026-06-15): one-shoty patří do Campu, dlouhé kampaně do světového chatu (viz 16.1). One-shot bez setupu = nízká bariéra, „start in seconds" — přivádí i lidi, co nechtějí zakládat celý svět.
-**Návrh přípravy:** rozhodnout, co „scéna" v Campu je (taktická scéna mimo svět? lehčí varianta?); 🔁 sdílení/klonování scén (17.5) + knihovna map (`project_takticka_mapa_library`, full snapshot kromě PC tokenů).
-**BE/FE:** uložení scény do (osobní/sdílené) knihovny + načtení do Campu; provázat s taktickou mapou.
-**Otevřené otázky:** Scéna v Campu = plná taktická mapa, nebo zjednodušená? Kdo smí scénu uložit/sdílet? Patří k tomu i one-shot kostky/postavy bez světa?
+### - [x] 16.6 One-shot v Campu — hra na jeden večer + uložení/načtení hry — ✅ 2026-07-05 (BE čeká restart)
+> **✅ Implementováno 2026-07-05 (spec-16.6).** **Pivot proti původnímu návrhu (autor 2026-07-05):** „uložit" = **chatový log** (kdo co řekl), NE taktická scéna/rozestavení (to autor explicitně odmítl). Rozsah nad rámec karty: (a) **zamčený žánr per Camp** — přejmenování „Camp I./II./III." → „Fantasy/Mystery/Sci-fi camp" (default žánr; hlavička dynamická dle aktuálního žánru; interní klíče/routy beze změny); (b) **auto-rotace lokace** cronem 12:00/00:00 (náhodná v žánru) + staff dočasný override do dalšího okna + admin nastavitelný default žánr; (c) **uložení/načtení hry** — 1 slot per hráč, snímek scény + 20 posledních zpráv, blok „Tady jste skončili" nad živým logem (sdílený, WS). Hráč scénu nemění (staff-only), načíst smí svou hru. Detail: `docs/arch/phase-16/spec-16.6.md`, funkce/05.
+**Cíl:** Camp jako místo pro **krátké hry na jeden večer**: hráči se sejdou, dají dohromady příběh, a mají **kotvu „kde jsme skončili"** (uložit + načíst pár posledních zpráv + scénu), aby se dalo navázat.
+**Proč:** Tvoje zadání (2026-06-15): one-shoty patří do Campu, dlouhé kampaně do světového chatu (viz 16.1). One-shot bez setupu = nízká bariéra, „start in seconds".
+**Odloženo (mimo scope):** taktická mapa/rozestavení v Campu, sdílení/klonování scén, více uložených her per hráč, soukromé instance Campu (Camp zůstává veřejný).
+**Reziduum:** presence bug (vlastní přítomnost v Putyce se po reloadu neodečte v panelu) — diagnostikováno, oprava variantou A (BE autoritativní přítomnost) domluvena po 16.6.
 
 ---
 

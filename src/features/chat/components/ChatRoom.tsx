@@ -55,6 +55,8 @@ export interface RoomScene {
   node: ReactNode;
   /** URL ilustrace lokace — pozadí místnosti. */
   backgroundUrl?: string;
+  /** 16.6 — obsah nad živým logem (blok „Tady jste skončili"). */
+  logTopNode?: ReactNode;
 }
 
 export interface ChatRoomProps {
@@ -465,6 +467,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
 
       <div className={s.body}>
         <div className={clsx(s.messages, scene && s.scenePanel)}>
+          {scene?.logTopNode}
           <MessageList
             items={items}
             currentUserId={user.id}

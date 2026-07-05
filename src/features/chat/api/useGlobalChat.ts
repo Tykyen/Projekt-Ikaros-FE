@@ -23,6 +23,7 @@ export const chatQueryKeys = (room: RoomKey) =>
     roomInfo: ['global-chat', room, 'room-info'] as const,
     messages: ['global-chat', room, 'messages'] as const,
     environment: ['global-chat', room, 'environment'] as const,
+    startHere: ['global-chat', room, 'startHere'] as const,
   }) as const;
 
 /**

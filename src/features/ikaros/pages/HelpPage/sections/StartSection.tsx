@@ -95,7 +95,7 @@ export function StartSection() {
             { term: 'Token', desc: 'Figurka postavy nebo bestie na taktické mapě, se kterou se pohybuje.' },
             { term: 'AKJ', desc: 'Stupeň utajení stránky/záložky. Bez přístupu uvidíš jen zamčenou záložku, ne její obsah.' },
             { term: 'Motiv (theme)', desc: 'Vizuální styl — platforma má vlastní, každý svět taky svůj.' },
-            { term: 'Camp', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik.' },
+            { term: 'Camp', desc: 'Atmosférické roleplay místnosti pro hru na jeden večer bez mechanik — Fantasy, Mystery a Sci-fi camp. Scéna se sama střídá, jednu rozehranou hru si můžeš uložit a načíst.' },
             { term: 'Putyka', desc: 'Globální chat pro celou platformu napříč světy. Nakouknout a popovídat si jako host (anonym) můžeš i bez registrace — jen text.' },
             { term: 'Pavučina', desc: 'Vztahový graf kampaně — kdo koho má rád, frakce, příběhové linky.' },
             { term: 'Taktická mapa', desc: 'Hex-grid plocha pro boj a scény s tokeny, iniciativou a mlhou války.' },

@@ -1,6 +1,6 @@
 # 05 — Komunikace platformy
 
-Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Putyka + Camp I.–III.), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
+Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat** (Putyka + Camp: Fantasy/Mystery/Sci-fi), **poštu / soukromé zprávy**, **notifikace a web push** a **použití emotů**. Vše ověřeno přímo v kódu FE i BE.
 
 > Pozn.: **Chat uvnitř světa** (`/svet/:slug/chat`) je samostatná funkce a patří do kapitoly o světech. Custom obrázkové emoty jsou tam (viz sekce „Emoty" níže).
 
@@ -32,24 +32,30 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
 
-### Globální chat — Camp I.–III.
-- **Co to je:** Tři atmosférické roleplay místnosti se **sdíleným prostředím** (vizuální styl + lokace) a ilustračním pozadím scény. Technicky tři další kanály téhož globálního chatu.
-- **Kde:** routy `/chat/camp`, `/chat/camp2`, `/chat/camp3` (`CampPage` → `CampRoom`). Levý panel: „Camp I./II./III." s počty přítomných.
+### Globální chat — Camp (Fantasy · Mystery · Sci-fi)
+- **Co to je:** Tři atmosférické roleplay místnosti se **sdíleným prostředím** (žánr + lokace) a ilustračním pozadím scény, pro **hru na jeden večer**. Každý Camp má **zamčený žánr** (default: camp-1 = Fantasy, camp-2 = Mystery/`mystic`, camp-3 = Sci-fi) → **název = žánr** („Fantasy camp" / „Mystery camp" / „Sci-fi camp"). Technicky tři kanály téhož globálního chatu. (16.6 — pivot z „Camp I./II./III.")
+- **Kde:** routy `/chat/camp`, `/chat/camp2`, `/chat/camp3` (`CampPage` → `CampRoom`); interní klíče `camp-1/2/3` a routy **beze změny** (rename jen zobrazený název). Levý panel: „Fantasy/Mystery/Sci-fi camp" (`CHAT_ROOMS`, stabilní domovský žánr) s počty přítomných. Hlavička místnosti = **dynamický název dle aktuálního žánru** (`genreLabel(env.style)`) — při staff override se přepne.
 - **Kdo:**
-  - **FE:** `requireAuth` (router `:169`–`:171`).
-  - **BE:** stejný controller; `RoomKey` = `hospoda | camp-1 | camp-2 | camp-3` (`global-chat.service.ts:24`).
-  - **Změna prostředí** scény = jen role s platformovou funkcí: `Superadmin`, `Admin`, `SpravceClanku`, `SpravceGalerie`, `SpravceDiskuzi` (`ROOM_STAFF_ROLES` / `RolesGuard`, `global-chat.controller.ts:46`; FE `STAFF_ROLES` v `CampPage.tsx:22`).
+  - **FE:** `requireAuth` (router `:194`–`:197`).
+  - **BE:** stejný controller; `RoomKey` = `hospoda | camp-1 | camp-2 | camp-3`; Camp klíče `CAMP_ROOM_KEYS` (`global-chat.service.ts`).
+  - **Změna scény** (žánr/lokace) = jen role s platformovou funkcí: `Superadmin`, `Admin`, `SpravceClanku`, `SpravceGalerie`, `SpravceDiskuzi` (`ROOM_STAFF_ROLES` / `RolesGuard`; FE `STAFF_ROLES` v `CampPage.tsx`). Hráč scénu **nemění** (read-only štítek + zamčená lokace).
+  - **Default žánr Campu** = admin (`Superadmin`/`Admin`): `PUT /global-chat/rooms/:room/default` (trvalé přerozdělení, např. víc fantasy). `GET /global-chat/rooms/defaults` čte kdokoli člen.
+  - **Uložit/načíst hru** = **přihlášený člen** (host/anon → 403 `GUEST_NO_SAVED_GAME`).
 - **Co jde dělat:**
-  - Vše jako v Putyce (psát, reply, reakce, přílohy, šepty, presence).
-  - **Vystupovat za postavu** — na rozdíl od Putyky nese zpráva i panel přítomných **jméno + avatar postavy** z profilu („Postava v Campu": `characterName`/`characterAvatarUrl`), ne účet. Kdo postavu nevyplnil → fallback na účet.
-  - Staff: vybrat **styl** (např. `fantasy`) + **lokaci** (place) — `PUT /global-chat/rooms/:room/environment`; změna se přes WS `chat:room:environment` rozešle všem v místnosti a nastaví pozadí + popis scény (`CampHeader`/`CampDescription`).
-- **Hranice / co neumí:** prostředí je **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných stylů/míst (`campPlaces` na FE). Postava je **globální** (jedna napříč všemi Campy, z profilu) — ne per-místnost. **Jméno** ve zprávě se opraví až novým snapshotem; staré zprávy (před 4.2e) ukazují `username` do vypršení 1h TTL (FE řeší jen avatar, ne jméno). Stejné 1h TTL zpráv.
+  - Vše jako v Putyce (psát, reply, reakce, přílohy, šepty, presence) + **vystupovat za postavu** (jméno/avatar postavy z profilu, fallback účet).
+  - Staff: **override lokace i žánru** — `PUT /global-chat/rooms/:room/environment`; přes WS `chat:room:environment` všem; nastaví pozadí + popis (`CampHeader`/`CampDescription`). Override je **dočasný do dalšího rotačního okna** (viz Zvláštnosti).
+  - **📜 Uložit hru** (hráč) — `POST /global-chat/rooms/:room/save-game`: snímek scény (žánr+lokace) + **posledních 20 veřejných zpráv** (`SavedChatLine`: jméno/text/barva/čas; vynechá system + šepty) → **1 slot per hráč** (upsert, přepíše). Tlačítko aktivní jen když je log neprázdný.
+  - **📂 Načíst hru** (hráč) — `POST /global-chat/saved-game/load`: přepne scénu Campu, kde byla hra uložena, na uloženou (žánr+lokace) a publikuje blok **„Tady jste skončili"** (`StartHereBlock`) nad živým logem; FE přenese hráče do toho Campu. Vidí ho **všichni přítomní** (i nově příchozí přes targeted WS emit). `GET /global-chat/saved-game` (můj slot), `DELETE` (smaž).
+- **Hranice / co neumí:** prostředí **sdílené pro celou místnost** (ne osobní), výběr jen z předdefinovaných žánrů/míst (`campPlaces`). Postava **globální** (jedna napříč Campy). **1 uložená hra per hráč** (další uložení přepíše — žádná historie/pojmenované sloty). Blok „Tady jste skončili" je **read-only kotva** (ne obnova celé session; žádná taktická mapa/tokeny — pivot proti roadmapě). Načtení **přepíše scénu i cizí probíhající hře** ve veřejném Campu (záměr — veřejný prostor). Prostředí + `startHere` **in-memory** (restart BE → reset na default žánr + placeId 1); uložené hry v DB (`campsavedgames`) přežijí. TTL zpráv **1 h**.
 - **Zvláštnosti:**
-  - **Identita postavy = snapshot při odeslání** (4.2e): zpráva si pamatuje, za kterou postavu byla psána, i když hráč postavu/avatar později změní (záměr pro roleplay — opak render-time PJ persony ve světovém chatu). `resolveSenderIdentity(room≠hospoda)` v `global-chat.service.ts`; FE pravidlo `roomAvatarFor` + panel `UserList` mode `character`.
-  - Přepnutí mezi Campy dělá čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická lokální změna), aby se neduplikovalo do useState.
-  - **15.9 — Camp negeneruje web push.** Sdílený `sendMessage` posílá push jen pro `room === 'hospoda'`; zprávy z Campu push nespouští (záměr — atmosférický roleplay, ne notifikační kanál).
-- **Stav:** ✅
-- **Kód:** FE `src/features/chat/pages/CampPage.tsx`, `components/ChatRoom.tsx`, `lib/roomAvatar.ts`, `components/CampHeader.tsx`, `CampDescription.tsx`, `lib/campRooms.ts`, `lib/campPlaces.ts`. BE `global-chat.service.ts` (`resolveSenderIdentity`/`sendMessage`/`sendWhisper`), `global-chat.controller.ts:179`, `global-chat.gateway.ts:175`. Spec `docs/arch/phase-4/spec-4.2e.md`.
+  - **Auto-rotace lokace** — `CampRotationJob` (`@Cron('0 0,12 * * *')`, tj. **12:00 a 00:00**) přepne každý Camp na **default žánr + náhodnou lokaci** a **vyresetuje `startHere`** (`applyRotation` na gateway). Tím jakýkoli staff override „dojede" — **žádné trackování času**, cron ho ve fixním okně přepíše.
+  - **`startHere` = sdílený in-memory stav místnosti** (WS `chat:room:startHere` s obálkou `{room, startHere|null}`); `null` = blok zhasne (rotace/clear). Nově příchozí dostane stav targeted emitem při `chat:room:join`. FE `useStartHere(room)`; lokální × jen skryje (do dalšího loadu).
+  - **Identita postavy = snapshot při odeslání** (4.2e): zpráva si pamatuje, za koho byla psána. `resolveSenderIdentity(room≠hospoda)`; FE `roomAvatarFor` + `UserList` mode `character`.
+  - **Sync názvů kanálů** při startu BE (`onModuleInit`) — přejmenuje i staré DB kanály „Camp I." → „Fantasy camp" (idempotentní), ať neprosakují do souhrnů chatů.
+  - Přepnutí mezi Campy = čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická změna).
+  - **15.9 — Camp negeneruje web push** (jen `room === 'hospoda'`).
+- **Stav:** ✅ (BE čeká restart — in-memory env/startHere + cron/DI + sync názvů; [[feedback_be_restart_required]])
+- **Kód:** FE `src/features/chat/pages/CampPage.tsx`, `components/ChatRoom.tsx` (`scene.logTopNode`), `components/CampHeader.tsx`, `CampDescription.tsx`, `StartHereBlock.tsx`, `lib/campRooms.ts`, `lib/campPlaces.ts` (`CAMP_DEFAULT_GENRE`/`genreLabel`), `api/useSavedGame.ts`, `lib/roomAvatar.ts`. BE `global-chat.service.ts` (saveGame/loadGame/getSavedGame/deleteSavedGame/defaults, `CAMP_DEFAULT_GENRE`, `genreLabel`, `randomPlaceId`), `global-chat.gateway.ts` (`startHere`/`applyRotation`/per-room default env), `global-chat.controller.ts` (6 endpointů), `camp-rotation.job.ts`, `schemas/camp-saved-game.schema.ts`, `schemas/camp-room-config.schema.ts`. Spec `docs/arch/phase-16/spec-16.6.md` (+ 4.2a/4.2e základ).
 
 ---
 

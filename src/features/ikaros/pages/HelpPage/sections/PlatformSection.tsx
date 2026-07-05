@@ -102,15 +102,28 @@ export function PlatformSection() {
           </p>
           <ScreenshotSlot media="platforma.hospoda" />
         </Tool>
-        <Tool icon={<Globe2 size={16} />} title="Camp I.–III." audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
+        <Tool icon={<Globe2 size={16} />} title="Camp (Fantasy · Mystery · Sci-fi)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             Tři atmosférické roleplay místnosti — hra na jeden večer bez kostek.
-            Každá má prostředí (styl + jedna z 20 lokací s ilustrací na pozadí).
+            Každá má <strong>pevný žánr</strong>: Fantasy camp, Mystery camp a
+            Sci-fi camp. Prostředí (jedna z 20 lokací s ilustrací na pozadí) se{' '}
+            <strong>samo střídá dvakrát denně</strong> — v poledne a o půlnoci;
+            navíc ji mohou kdykoli přepnout správci. Scénu <strong>neměníš</strong>{' '}
+            — jen v ní hraješ.
+          </p>
+          <p>
             Stejné chatovací funkce jako Putyka, ale <strong>u zpráv i v seznamu
             přítomných</strong> vystupuješ jako svoje <strong>postava</strong>{' '}
             (jméno a obrázek z profilu „Postava v Campu"), ne jako účet. Kdo
             postavu nevyplnil, zobrazí se účtem. Klik na osobu otevře kartu její
             postavy.
+          </p>
+          <p>
+            Můžeš si <strong>uložit jednu rozehranou hru</strong> 📜 — zapamatuje
+            si scénu a posledních pár zpráv. Když ji později <strong>načteš</strong>{' '}
+            📂, scéna se obnoví a nad chatem se ukáže blok „Tady jste skončili",
+            ať víte, kde jste přestali. Uloženou hru máš jen jednu — další uložení
+            tu předchozí přepíše. Zprávy jinak mizí po hodině.
           </p>
         </Tool>
         <Tool icon={<Mail size={16} />} title="Pošta" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">

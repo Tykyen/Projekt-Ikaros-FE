@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import s from './IkarosLayout.module.css';
 import { pendingTooltip } from './pendingBadge';
-import { useSocketInit } from '@/features/chat/api/useSocket';
+import { useSocketInit, useSocketEvent } from '@/features/chat/api/useSocket';
 import { useAccountTransferNotifications } from '@/features/world/pages/api/useAccountTransferNotifications';
 import { usePresenceHeartbeat } from '@/features/chat/api/usePresenceHeartbeat';
 import { useRoomPresenceCounts } from '@/features/chat/api/useGlobalChat';
@@ -131,9 +131,9 @@ const CHAT_ROOMS: {
   anonHidden?: boolean;
 }[] = [
   { key: 'hospoda',   roomKey: 'hospoda',    label: 'Putyka',        to: '/chat' },
-  { key: 'camp1', roomKey: 'camp-1', label: 'Camp I.',   to: '/chat/camp',  anonHidden: true },
-  { key: 'camp2', roomKey: 'camp-2', label: 'Camp II.',  to: '/chat/camp2', anonHidden: true },
-  { key: 'camp3', roomKey: 'camp-3', label: 'Camp III.', to: '/chat/camp3', anonHidden: true },
+  { key: 'camp1', roomKey: 'camp-1', label: 'Fantasy camp', to: '/chat/camp',  anonHidden: true },
+  { key: 'camp2', roomKey: 'camp-2', label: 'Mystery camp', to: '/chat/camp2', anonHidden: true },
+  { key: 'camp3', roomKey: 'camp-3', label: 'Sci-fi camp',  to: '/chat/camp3', anonHidden: true },
 ];
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -812,12 +812,19 @@ export function IkarosLayout() {
     setRightDrawerOpen(false);
   }
 
+  const setMyRooms = useSetAtom(myRoomsAtom);
   useSocketInit();
   usePresenceInit();
   useFriendshipsSocket();
   useWorldAccessSocket();
   // 4.2d §4 — chat heartbeat běží globálně: presence drží i mimo `ChatRoom`.
   usePresenceHeartbeat(isAuthenticated);
+  // Presence self-detection (varianta A): BE pošle tomuto socketu jeho reálné
+  // místnosti → nav odečítá „mě" dle serveru, ne dle efemérního klientského
+  // stavu. Opravuje „vidím se v Putyce, kam jsem nešel" (socket tam zůstal).
+  useSocketEvent<RoomKey[]>('chat:my-rooms', (rooms) =>
+    setMyRooms(new Set(rooms)),
+  );
   // D-8.6-transfer-notification — globální subscriber na WS event
   // `account:transfer:received` (toast + cache invalidate).
   useAccountTransferNotifications();

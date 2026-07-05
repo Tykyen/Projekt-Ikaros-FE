@@ -6,9 +6,9 @@ import type { RoomKey } from './types';
  */
 export const CAMP_ROUTES: Record<string, { room: RoomKey; name: string }> =
   {
-    camp: { room: 'camp-1', name: 'Camp I.' },
-    camp2: { room: 'camp-2', name: 'Camp II.' },
-    camp3: { room: 'camp-3', name: 'Camp III.' },
+    camp: { room: 'camp-1', name: 'Fantasy camp' },
+    camp2: { room: 'camp-2', name: 'Mystery camp' },
+    camp3: { room: 'camp-3', name: 'Sci-fi camp' },
   };
 
 /** Místnost dle URL segmentu; `undefined` pro neznámý segment. */

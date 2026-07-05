@@ -1,0 +1,128 @@
+/* Blok „Tady jste skončili" (16.6) — archivní stránka deníku nad živým logem.
+   Vše přes --theme-* tokeny → funguje pod všemi motivy (lint:colors ✓). */
+.block {
+  margin: var(--sp-1) 0 var(--sp-4);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-left: 3px solid var(--theme-accent, var(--accent));
+  border-radius: var(--radius-md, var(--radius-sm));
+  background: var(--theme-surface-soft, var(--bg-secondary));
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px dashed var(--theme-border-soft, var(--border));
+}
+
+/* Pečeť — ornament z akcentu motivu (ne hardcoded vosková červená). */
+.seal {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--theme-accent, var(--accent));
+  color: var(--theme-on-accent, var(--theme-surface-strong, var(--bg-secondary)));
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semi);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  color: var(--theme-heading, var(--accent));
+}
+
+.meta {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--theme-text-muted, var(--text-muted));
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  flex-shrink: 0;
+  display: inline-flex;
+  padding: 2px;
+  border: none;
+  background: none;
+  color: var(--theme-text-muted, var(--text-muted));
+  cursor: pointer;
+  transition: color var(--transition-base);
+}
+
+.close:hover {
+  color: var(--theme-heading, var(--accent));
+}
+
+/* Ztlumené tělo — vizuálně „minulost", odlišené od živých zpráv. */
+.body {
+  padding: var(--sp-2) var(--sp-3);
+  opacity: 0.85;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: 2px 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+.time {
+  flex-shrink: 0;
+  min-width: 42px;
+  font-size: var(--text-xs);
+  color: var(--theme-text-muted, var(--text-muted));
+  font-variant-numeric: tabular-nums;
+}
+
+.who {
+  flex-shrink: 0;
+  font-weight: var(--weight-medium);
+  color: var(--theme-text, var(--text));
+}
+
+.msg {
+  color: var(--theme-text, var(--text));
+  min-width: 0;
+  word-break: break-word;
+}
+
+/* Předěl mezi minulostí a živým logem. */
+.resume {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--theme-text-muted, var(--text-muted));
+}
+
+.resume::before,
+.resume::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--theme-border-soft, var(--border));
+}
+
+@media (max-width: 768px) {
+  .meta {
+    display: none;
+  }
+}

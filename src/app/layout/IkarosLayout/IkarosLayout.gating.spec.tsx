@@ -37,17 +37,17 @@ describe('SidebarContent — anon gating (15.7 / 21.5)', () => {
   it('anon nevidí Vytvořit svět / Camp, vidí veřejné položky + Putyku', () => {
     renderSidebar(false);
     expect(screen.queryByText('Vytvořit svět')).toBeNull();
-    expect(screen.queryByText('Camp I.')).toBeNull();
+    expect(screen.queryByText('Fantasy camp')).toBeNull();
     expect(screen.getByText('Úvodník')).toBeInTheDocument();
     expect(screen.getByText('RPG systémy')).toBeInTheDocument();
     expect(screen.getByText('Společná tvorba')).toBeInTheDocument();
     expect(screen.getByText('Putyka')).toBeInTheDocument();
   });
 
-  it('přihlášený vidí Vytvořit svět, Společnou tvorbu i Camp I.', () => {
+  it('přihlášený vidí Vytvořit svět, Společnou tvorbu i Fantasy camp', () => {
     renderSidebar(true);
     expect(screen.getByText('Vytvořit svět')).toBeInTheDocument();
     expect(screen.getByText('Společná tvorba')).toBeInTheDocument();
-    expect(screen.getByText('Camp I.')).toBeInTheDocument();
+    expect(screen.getByText('Fantasy camp')).toBeInTheDocument();
   });
 });

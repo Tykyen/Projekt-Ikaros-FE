@@ -100,3 +100,40 @@ export function placeImageUrl(style: RoomStyle, image: string): string {
 export function findPlace(style: RoomStyle, placeId: string): Place | undefined {
   return CAMP_PLACES[style].find((p) => p.id === placeId);
 }
+
+// ── 16.6 — žánr per Camp + název ────────────────────────────────────────
+
+/**
+ * Default (domovský) žánr každého Campu (16.6). Zdroj pravdy zrcadlí BE
+ * `CAMP_DEFAULT_GENRE`. Nav používá tento default (stabilní název), hlavička
+ * místnosti se řídí *aktuálním* žánrem z prostředí (dočasný staff override).
+ */
+export const CAMP_DEFAULT_GENRE: Record<'camp-1' | 'camp-2' | 'camp-3', RoomStyle> = {
+  'camp-1': 'fantasy',
+  'camp-2': 'mystic',
+  'camp-3': 'scifi',
+};
+
+/** Název Campu odvozený od žánru (16.6): „Fantasy camp" / „Mystery camp" / „Sci-fi camp". */
+export function genreLabel(style: RoomStyle): string {
+  switch (style) {
+    case 'fantasy':
+      return 'Fantasy camp';
+    case 'mystic':
+      return 'Mystery camp';
+    case 'scifi':
+      return 'Sci-fi camp';
+  }
+}
+
+/** Krátký název žánru pro štítek (16.6): „Fantasy" / „Mystery" / „Sci-fi". */
+export function genreShortLabel(style: RoomStyle): string {
+  switch (style) {
+    case 'fantasy':
+      return 'Fantasy';
+    case 'mystic':
+      return 'Mystery';
+    case 'scifi':
+      return 'Sci-fi';
+  }
+}

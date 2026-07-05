@@ -167,3 +167,47 @@ export interface ReactionEvent {
 export type ChatItem =
   | { kind: 'message'; message: ChatMessage }
   | { kind: 'system'; id: string; text: string; at: string };
+
+// ── 16.6 One-shot v Campu — uložení/načtení „hry" ────────────────────────
+
+/**
+ * Jeden řádek uloženého snímku hry (16.6). Immutable kopie zprávy v okamžiku
+ * uložení — jméno/text/barva/čas; NE živá reference (autor se může změnit).
+ */
+export interface SavedChatLine {
+  senderName: string;
+  content: string;
+  color: string | null;
+  createdAt: string;
+}
+
+/**
+ * Uložená „hra" hráče (16.6) — 1 slot per hráč. Snímek scény (styl+lokace)
+ * + posledních ~20 zpráv jako kotva „kde jsme skončili".
+ */
+export interface CampSavedGame {
+  room: RoomKey;
+  style: RoomStyle;
+  placeId: string;
+  messages: SavedChatLine[];
+  savedAt: string;
+}
+
+/**
+ * Sdílený stav místnosti po načtení hry (16.6) — blok „Tady jste skončili"
+ * nad živým logem. Vidí ho všichni přítomní; reset při rotaci 12:00/00:00.
+ */
+export interface StartHere {
+  lines: SavedChatLine[];
+  byUserName: string;
+  at: string;
+}
+
+/**
+ * WS `chat:room:startHere` — set i clear bloku „Tady jste skončili" místnosti.
+ * `startHere: null` → blok zhasne (rotace scény / clear). Vyplněno → načtená hra.
+ */
+export interface StartHereEvent {
+  room: RoomKey;
+  startHere: StartHere | null;
+}
