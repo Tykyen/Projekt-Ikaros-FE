@@ -1,0 +1,18 @@
+- Finding files
+Processed 932 files (5.7s) (1 warning)
+
+✖ Found 12 circular dependencies!
+
+1) modules/chat/chat.service.ts > modules/worlds/worlds.service.ts > modules/world-weather/world-weather.service.ts
+2) modules/characters/characters.module.ts > modules/pages/pages.module.ts
+3) modules/auth/auth.module.ts > modules/users/users.module.ts > modules/characters/characters.module.ts > modules/pages/pages.module.ts > modules/worlds/worlds.module.ts
+4) modules/pages/pages.module.ts > modules/worlds/worlds.module.ts
+5) modules/users/users.module.ts > modules/characters/characters.module.ts > modules/pages/pages.module.ts > modules/worlds/worlds.module.ts
+6) modules/worlds/worlds.module.ts > modules/world-calendar-config/world-calendar-config.module.ts
+7) modules/worlds/worlds.module.ts > modules/world-currencies/world-currencies.module.ts
+8) modules/chat/chat.module.ts > modules/auth/auth.module.ts > modules/users/users.module.ts > modules/characters/characters.module.ts > modules/pages/pages.module.ts > modules/worlds/worlds.module.ts > modules/world-weather/world-weather.module.ts
+9) modules/worlds/worlds.module.ts > modules/world-weather/world-weather.module.ts
+10) modules/chat/chat.module.ts > modules/auth/auth.module.ts > modules/users/users.module.ts > modules/upload/upload.module.ts
+11) modules/ikaros-articles/ikaros-articles.module.ts > modules/ikaros-categories/ikaros-categories.module.ts
+12) modules/global-chat/global-chat.gateway.ts > modules/global-chat/global-chat.service.ts
+

@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { Button } from '@/shared/ui/Button/Button';
 import { Input } from '@/shared/ui/Input/Input';
+import { parseApiError } from '@/shared/api/client';
 import { useUpdateCurrencies } from '../api';
 import type { WorldCurrencyItem } from '../types';
 import {
@@ -77,10 +78,7 @@ export function CurrencyFormModal({
           onClose();
         },
         onError: (err) => {
-          const msg =
-            (err as Error & { response?: { data?: { message?: string } } })
-              ?.response?.data?.message ?? 'Uložení selhalo.';
-          toast.error(msg);
+          toast.error(parseApiError(err));
         },
       },
     );

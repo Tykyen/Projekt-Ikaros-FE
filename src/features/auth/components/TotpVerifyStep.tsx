@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Modal, Input, Button } from '@/shared/ui';
 import { useLoginTotp } from '@/features/auth/api/useAuth';
 import { consumeLoginIntent } from '@/shared/lib/loginIntent';
+import { parseApiErrorCode } from '@/shared/api/client';
 import s from './TotpVerifyStep.module.css';
 
 interface Props {
@@ -29,15 +30,15 @@ export function TotpVerifyStep({ open, challengeId, onCancel }: Props) {
 
   function mapError(err: unknown): string {
     if (axios.isAxiosError(err)) {
-      const data = err.response?.data as { code?: string } | undefined;
+      const code = parseApiErrorCode(err);
       const status = err.response?.status;
-      if (data?.code === 'TOTP_INVALID_CODE') {
+      if (code === 'TOTP_INVALID_CODE') {
         return useBackup ? 'Neplatný záložní kód.' : 'Neplatný kód.';
       }
       if (
-        data?.code === 'EXPIRED_TOKEN' ||
-        data?.code === 'INVALID_TOKEN' ||
-        data?.code === 'ALREADY_USED'
+        code === 'EXPIRED_TOKEN' ||
+        code === 'INVALID_TOKEN' ||
+        code === 'ALREADY_USED'
       ) {
         return 'Platnost přihlášení vypršela, přihlas se prosím znovu.';
       }

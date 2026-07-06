@@ -339,10 +339,12 @@ export const kyberpunkTheme: Theme = {
     '--warning':              '#c8ff00',
     '--warning-soft':         'rgba(200, 255, 0, 0.12)',
     '--warning-soft-border':  'rgba(200, 255, 0, 0.40)',
-    '--danger':               '#ff2050',
-    '--danger-soft':          'rgba(255, 32, 80, 0.16)',
-    '--danger-soft-border':   'rgba(255, 32, 80, 0.40)',
-    '--danger-focus-ring':    'rgba(255, 32, 80, 0.30)',
+    /* A11Y-CONTRAST: ztmaveno z #ff2050 (na --text-on-danger #fff5fa dávalo
+       jen 3.53:1) — #e30031 dává 4.57:1, ≥ WCAG AA 4.5:1. Stejný hue/sat. */
+    '--danger':               '#e30031',
+    '--danger-soft':          'rgba(227, 0, 49, 0.16)',
+    '--danger-soft-border':   'rgba(227, 0, 49, 0.40)',
+    '--danger-focus-ring':    'rgba(227, 0, 49, 0.30)',
     '--info':                 '#00f0ff',
     '--text-on-accent':       '#04101a',
     '--text-on-danger':       '#fff5fa',

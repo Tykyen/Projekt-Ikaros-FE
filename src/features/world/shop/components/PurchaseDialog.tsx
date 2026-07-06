@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { Button } from '@/shared/ui/Button/Button';
+import { parseApiError, parseApiErrorCode } from '@/shared/api/client';
 import { useCharacterAccounts } from '@/features/world/pages/api/useCharacterAccounts';
 import {
   convertAmount,
@@ -113,15 +114,10 @@ export function PurchaseDialog({
           onClose();
         },
         onError: (err) => {
-          const data = (
-            err as Error & {
-              response?: { data?: { message?: string; code?: string } };
-            }
-          )?.response?.data;
           toast.error(
-            data?.code === 'INSUFFICIENT_FUNDS'
+            parseApiErrorCode(err) === 'INSUFFICIENT_FUNDS'
               ? 'Na účtu není dostatek prostředků.'
-              : (data?.message ?? 'Nákup selhal.'),
+              : parseApiError(err),
           );
         },
       },

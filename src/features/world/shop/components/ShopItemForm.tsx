@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { Button } from '@/shared/ui/Button/Button';
 import { Input } from '@/shared/ui/Input/Input';
+import { parseApiError } from '@/shared/api/client';
 import { CurrencyAmountInput } from '@/features/world/currencies/shared/CurrencyAmountInput';
 import type { WorldCurrencyItem } from '@/features/world/currencies/types';
 import { PagePicker } from '@/features/world/pages/PageEditor/components/PagePicker';
@@ -101,10 +102,7 @@ export function ShopItemForm({
       onClose();
     };
     const onErr = (err: unknown) => {
-      const msg =
-        (err as Error & { response?: { data?: { message?: string } } })
-          ?.response?.data?.message ?? 'Uložení selhalo.';
-      toast.error(msg);
+      toast.error(parseApiError(err));
     };
 
     if (isEdit && initial) {

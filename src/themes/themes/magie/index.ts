@@ -329,10 +329,12 @@ export const magieTheme: Theme = {
     '--warning':              '#f5c853',
     '--warning-soft':         'rgba(245, 200, 83, 0.14)',
     '--warning-soft-border':  'rgba(245, 200, 83, 0.40)',
-    '--danger':               '#ff5577',
-    '--danger-soft':          'rgba(255, 85, 119, 0.16)',
-    '--danger-soft-border':   'rgba(255, 85, 119, 0.40)',
-    '--danger-focus-ring':    'rgba(255, 85, 119, 0.30)',
+    /* A11Y-CONTRAST: ztmaveno z #ff5577 (na --text-on-danger #fff5fa dávalo
+       jen 2.89:1) — #e3002d dává 4.58:1, ≥ WCAG AA 4.5:1. Stejný hue/sat. */
+    '--danger':               '#e3002d',
+    '--danger-soft':          'rgba(227, 0, 45, 0.16)',
+    '--danger-soft-border':   'rgba(227, 0, 45, 0.40)',
+    '--danger-focus-ring':    'rgba(227, 0, 45, 0.30)',
     '--info':                 '#c77dff',
     '--text-on-accent':       '#1a0a30',
     '--text-on-danger':       '#fff5fa',

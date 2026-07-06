@@ -1,0 +1,11 @@
+- Finding files
+Processed 2584 files (14.3s) (422 warnings)
+
+✖ Found 5 circular dependencies!
+
+1) features/world/chat/components/rail/Drd16ChatBestiePanel.tsx > features/world/chat/components/rail/Drd16ChatBestieEditModal.tsx
+2) features/world/pages/api/pages.types.ts > features/world/pages/api/usePageMeta.ts > features/world/pages/api/usePage.ts
+3) features/world/pages/WorldHeadlineAdminPage/WorldHeadlineAdminPage.tsx > features/world/pages/WorldHeadlineAdminPage/components/HeadlinePreview.tsx
+4) features/world/pages/WorldHeadlineAdminPage/WorldHeadlineAdminPage.tsx > features/world/pages/WorldHeadlineAdminPage/components/LastInfoSection.tsx
+5) features/world/tactical-map/components/token-panel/combatPanels.ts > features/world/tactical-map/components/token-panel/system-panels/FateCombatPanel.tsx
+

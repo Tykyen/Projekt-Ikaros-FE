@@ -1,0 +1,60 @@
+(node:51328) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:51328) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:51328) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+[31m[Nest] 51328  - [39m06. 07. 2026 0:15:16 [31m  ERROR[39m [38;5;3m[ExceptionFilter] [39m[31mError: boom — interní detail co nesmí ven[39m
+Error: boom — interní detail co nesmí ven
+    at ErrorProbeController.uncaught (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\test\error-contract.e2e-spec.ts:71:11)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.intercept (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:12:20)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:64
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:582:12)
+    at next (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:291:5)
+    at read (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:342:13)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:582:12)
+    at next (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:291:5)
+    at read (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\body-parser\lib\read.js:53:5)
+    at jsonParser (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\body-parser\lib\types\json.js:88:5)
+    at Layer.handleRequest (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:342:13)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:582:12)
+    at next (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:291:5)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\@nestjs\platform-express\adapters\express-adapter.js:34:17
+    at Layer.handleRequest (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:342:13)
+    at C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:582:12)
+    at next (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\router\index.js:186:3)
+    at app.handle (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\express\lib\application.js:177:15)
+    at Server.app (C:\Matrix\ProjektIkaros\Projekt-ikaros\backend\node_modules\express\lib\express.js:38:9)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+(node:44008) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connection listeners added to [Namespace]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'before'` instead.
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:44008) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+
+Test Suites: 8 failed, 12 passed, 20 total
+Tests:       73 failed, 61 passed, 134 total
+Snapshots:   0 total
+Time:        44.091 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

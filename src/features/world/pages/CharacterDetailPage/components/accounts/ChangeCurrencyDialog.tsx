@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import { Modal, Button } from '@/shared/ui';
+import { parseApiErrorCode } from '@/shared/api/client';
 import {
   convertAmount,
   formatCurrency,
@@ -58,10 +59,7 @@ export function ChangeCurrencyDialog({
           onDone();
         },
         onError: (err) => {
-          const e = err as {
-            response?: { data?: { code?: string; message?: string } };
-          };
-          if (e?.response?.data?.code === 'CURRENCY_RATE_MISSING')
+          if (parseApiErrorCode(err) === 'CURRENCY_RATE_MISSING')
             toast.error('Pro přepočet musí mít obě měny nastavený kurz.');
           else toast.error('Změna měny selhala.');
         },

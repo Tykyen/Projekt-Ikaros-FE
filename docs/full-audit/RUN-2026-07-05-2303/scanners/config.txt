@@ -1,0 +1,90 @@
+
+> projekt-ikaros-fe@0.0.0 audit:config
+> node scripts/prod-config-scan.mjs
+
+═══════════════════════════════════════════════════════════════
+ PRODUCTION CONFIG SCAN — M-ENV + M-FALLBACK
+═══════════════════════════════════════════════════════════════
+
+Kód čte: 43 env · example: 35 · deploy: 33 · compose: 40
+
+── (a) ČTENO V KÓDU, ALE NEPŘEDÁNO (deploy+compose) — prod použije fallback (10) ──
+  🔴 ANON_SESSION_TTL             src/modules/auth/auth.service.ts:669
+  🔴 EMBEDDING_CHUNK_OVERLAP      src/modules/search/embedding-search.service.ts:63
+  🔴 EMBEDDING_CHUNK_SIZE         src/modules/search/embedding-search.service.ts:62
+  🔴 EMBEDDING_GRANITE107_DIMENSION src/modules/search/embedding-search.service.ts:383
+  🔴 EMBEDDING_GRANITE107_SEQUENCE_LENGTH src/modules/search/embedding-search.service.ts:387
+  🔴 EMBEDDING_GRANITE278_DIMENSION src/modules/search/embedding-search.service.ts:405
+  🔴 EMBEDDING_GRANITE278_SEQUENCE_LENGTH src/modules/search/embedding-search.service.ts:409
+  🔴 EMBEDDING_MODEL_CACHE_DIR    src/modules/search/embedding-search.service.ts:58
+  🔴 PRESENCE_THRESHOLD_HOURS     src/modules/presence/presence.service.ts:14
+  🔴 THROTTLER_REDIS              src/common/throttler/throttler.config.ts:31
+
+── (b) PŘEDÁNO (deploy/compose), ALE NEČTENO V KÓDU — mrtvé/přejmenované (12) ──
+  🟡 BACKEND_HOST                 deploy:true compose:true
+  🟡 BACKEND_PORT                 deploy:true compose:true
+  🟡 CSP_HEADER_NAME              deploy:true compose:true
+  🟡 FRONTEND_INTERNAL            deploy:false compose:true
+  🟡 FRONTEND_PORT                deploy:true compose:true
+  🟡 HOST                         deploy:true compose:false
+  🟡 MEILI_MASTER_KEY             deploy:true compose:true
+  🟡 PRERENDER_HOST               deploy:false compose:true
+  🟡 SERVER_HOST                  deploy:true compose:false
+  🟡 SERVER_PORT                  deploy:true compose:false
+  🟡 SSH_PRIVATE_KEY              deploy:true compose:false
+  🟡 SSH_USER                     deploy:true compose:false
+
+── (c) V .env.example, ALE NEČTENO V KÓDU — zavádějící dokumentace (1) ──
+  🟡 TURNSTILE_SITE_KEY
+
+── (d) ČTENO V KÓDU, ALE CHYBÍ V .env.example — nezdokumentováno pro vývojáře (9) ──
+  🟠 ANON_SESSION_TTL             src/modules/auth/auth.service.ts:669
+  🟠 EMBEDDING_CHUNK_OVERLAP      src/modules/search/embedding-search.service.ts:63
+  🟠 EMBEDDING_CHUNK_SIZE         src/modules/search/embedding-search.service.ts:62
+  🟠 EMBEDDING_GRANITE107_DIMENSION src/modules/search/embedding-search.service.ts:383
+  🟠 EMBEDDING_GRANITE107_SEQUENCE_LENGTH src/modules/search/embedding-search.service.ts:387
+  🟠 EMBEDDING_GRANITE278_DIMENSION src/modules/search/embedding-search.service.ts:405
+  🟠 EMBEDDING_GRANITE278_SEQUENCE_LENGTH src/modules/search/embedding-search.service.ts:409
+  🟠 EMBEDDING_MODEL_CACHE_DIR    src/modules/search/embedding-search.service.ts:58
+  🟠 PRESENCE_THRESHOLD_HOURS     src/modules/presence/presence.service.ts:14
+
+── COMPOSE fail-fast (${VAR:?required}) — jen tyto mají pojistku (3) ──
+  JWT_REFRESH_SECRET, JWT_SECRET, MEILI_MASTER_KEY
+
+── M-FALLBACK: katalog dev defaultů (32) ──
+  ⚠️ VITE_API_URL             ?? "http://localhost:3000"  (src/shared/api/client.ts:12)
+  ⚠️ VITE_API_URL             ?? "http://localhost:3000"  (src/features/chat/api/socket.ts:7)
+  ⚠️ VITE_API_URL             ?? "http://localhost:3000"  (src/app/main.tsx:69)
+  ⚠️ BACKEND_BASE_URL         ?? "http://localhost:3000"  (src/modules/upload/upload.service.ts:572)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (src/modules/seo/seo.service.ts:84)
+  ⚠️ EMBEDDING_GRANITE107_ONNX_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_107/model.onnx"  (src/modules/search/embedding-search.service.ts:375)
+  ⚠️ EMBEDDING_GRANITE107_TOKENIZER_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_107/sentencepiece.bpe.model"  (src/modules/search/embedding-search.service.ts:379)
+  ⚠️ EMBEDDING_GRANITE278_ONNX_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_278/model.onnx"  (src/modules/search/embedding-search.service.ts:397)
+  ⚠️ EMBEDDING_GRANITE278_TOKENIZER_URL ?? "https://www.patrikzplzne.cz/data/matrix_embedding_models/onnx_granite_278/sentencepiece.bpe.model"  (src/modules/search/embedding-search.service.ts:401)
+  ⚠️ MEILI_HOST               ?? "http://localhost:7700"  (src/modules/search/meili-search.service.ts:31)
+  ⚠️ MEILI_API_KEY            ?? ""  (src/modules/search/meili-search.service.ts:32)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (src/modules/mailer/providers/smtp-mailer.provider.ts:43)
+  ⚠️ CLOUDINARY_CLOUD_NAME    ?? ""  (src/modules/images/images.controller.ts:13)
+  ⚠️ REDIS_URL                ?? "redis://localhost:6379"  (src/common/redis/redis.module.ts:20)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (src/common/config/origins.ts:10)
+  ⚠️ FRONTEND_URL             ?? "http://localhost:5173"  (src/common/config/origins.ts:20)
+     PORT                     ?? "3000"  (src/main.ts:123)
+     EMBEDDING_MODEL_CACHE_DIR ?? "data/model_cache"  (src/modules/search/embedding-search.service.ts:58)
+     EMBEDDING_CHUNK_SIZE     ?? "750"  (src/modules/search/embedding-search.service.ts:62)
+     EMBEDDING_CHUNK_OVERLAP  ?? "250"  (src/modules/search/embedding-search.service.ts:63)
+     EMBEDDING_GRANITE107_DIMENSION ?? "384"  (src/modules/search/embedding-search.service.ts:383)
+     EMBEDDING_GRANITE107_SEQUENCE_LENGTH ?? "128"  (src/modules/search/embedding-search.service.ts:387)
+     EMBEDDING_GRANITE278_DIMENSION ?? "768"  (src/modules/search/embedding-search.service.ts:405)
+     EMBEDDING_GRANITE278_SEQUENCE_LENGTH ?? "128"  (src/modules/search/embedding-search.service.ts:409)
+     PRESENCE_THRESHOLD_HOURS ?? "25"  (src/modules/presence/presence.service.ts:14)
+     SMTP_PORT                ?? "587"  (src/modules/mailer/providers/smtp-mailer.provider.ts:36)
+     MAIL_FROM                ?? "Projekt Ikaros <${user}>"  (src/modules/mailer/providers/smtp-mailer.provider.ts:40)
+     JWT_EXPIRES_IN           ?? "3d"  (src/modules/auth/auth.module.ts:40)
+     ANON_SESSION_TTL         ?? "14d"  (src/modules/auth/auth.service.ts:669)
+     JWT_REFRESH_TTL_DAYS     ?? "60"  (src/modules/auth/auth.service.ts:695)
+     PRESENCE_THRESHOLD_HOURS ?? "24"  (src/modules/admin/admin-stats.service.ts:42)
+     JWT_REFRESH_TTL_DAYS     ?? "60"  (src/common/utils/auth-cookie.ts:25)
+
+═══════════════════════════════════════════════════════════════
+ Legenda: (a)=riziko prod degrade  (d)=doc gap  ⚠️=localhost/http/prázdný fallback
+═══════════════════════════════════════════════════════════════

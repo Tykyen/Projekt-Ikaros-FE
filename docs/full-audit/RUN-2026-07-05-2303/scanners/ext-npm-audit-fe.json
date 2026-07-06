@@ -1,0 +1,159 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@vitest/browser": {
+      "name": "@vitest/browser",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1120010,
+          "name": "@vitest/browser",
+          "dependency": "@vitest/browser",
+          "title": "Vitest browser mode serves unsanitized otelCarrier query parameter as inline script",
+          "url": "https://github.com/advisories/GHSA-2h32-95rg-cppp",
+          "severity": "critical",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 9.6,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H"
+          },
+          "range": ">=4.0.17 <4.1.6"
+        },
+        {
+          "source": 1120810,
+          "name": "@vitest/browser",
+          "dependency": "@vitest/browser",
+          "title": "Vitest Browser: Exposed Browser Mode API Can Proxy CDP and Overwrite Config Files, Leading to RCE",
+          "url": "https://github.com/advisories/GHSA-g8mr-85jm-7xhm",
+          "severity": "critical",
+          "cwe": [
+            "CWE-749",
+            "CWE-862"
+          ],
+          "cvss": {
+            "score": 9.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": ">=4.0.0 <=4.1.7"
+        }
+      ],
+      "effects": [
+        "@vitest/browser-playwright"
+      ],
+      "range": "4.0.0 - 4.1.7",
+      "nodes": [
+        "node_modules/@vitest/browser"
+      ],
+      "fixAvailable": true
+    },
+    "@vitest/browser-playwright": {
+      "name": "@vitest/browser-playwright",
+      "severity": "critical",
+      "isDirect": true,
+      "via": [
+        "@vitest/browser"
+      ],
+      "effects": [],
+      "range": "<=4.0.0-beta.19 || 4.0.17 - 4.1.5",
+      "nodes": [
+        "node_modules/@vitest/browser-playwright"
+      ],
+      "fixAvailable": true
+    },
+    "esbuild": {
+      "name": "esbuild",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1120680,
+          "name": "esbuild",
+          "dependency": "esbuild",
+          "title": "esbuild allows arbitrary file read when running the development server on Windows",
+          "url": "https://github.com/advisories/GHSA-g7r4-m6w7-qqqr",
+          "severity": "low",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 2.5,
+            "vectorString": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": ">=0.27.3 <0.28.1"
+        }
+      ],
+      "effects": [],
+      "range": "0.27.3 - 0.28.0",
+      "nodes": [
+        "node_modules/esbuild"
+      ],
+      "fixAvailable": true
+    },
+    "qs": {
+      "name": "qs",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1119502,
+          "name": "qs",
+          "dependency": "qs",
+          "title": "qs has a remotely triggerable DoS: qs.stringify crashes with TypeError on null/undefined entries in comma-format arrays when encodeValuesOnly is set",
+          "url": "https://github.com/advisories/GHSA-q8mj-m7cp-5q26",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-476"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=6.11.1 <=6.15.1"
+        }
+      ],
+      "effects": [
+        "typed-rest-client"
+      ],
+      "range": "6.11.1 - 6.15.1",
+      "nodes": [
+        "node_modules/qs"
+      ],
+      "fixAvailable": true
+    },
+    "typed-rest-client": {
+      "name": "typed-rest-client",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "qs"
+      ],
+      "effects": [],
+      "range": ">=2.3.1",
+      "nodes": [
+        "node_modules/typed-rest-client"
+      ],
+      "fixAvailable": true
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 2,
+      "high": 0,
+      "critical": 2,
+      "total": 5
+    },
+    "dependencies": {
+      "prod": 195,
+      "dev": 628,
+      "optional": 85,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 823
+    }
+  }
+}

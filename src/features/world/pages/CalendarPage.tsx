@@ -368,6 +368,9 @@ export default function CalendarPage() {
   }
 
   function shift(delta: number) {
+    // Guard: prázdný months array by udělal `while` smyčky níže nekonečné
+    // (m by nikdy nekleslo pod 0 / nevešlo se pod length) → zamrzlý tab.
+    if (!displayConfig.months?.length) return;
     setCursor((c) => {
       let m = c.monthIndex + delta;
       let y = c.year;

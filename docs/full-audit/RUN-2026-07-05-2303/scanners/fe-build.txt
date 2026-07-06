@@ -1,0 +1,497 @@
+
+> projekt-ikaros-fe@0.0.0 build
+> node scripts/stamp-pwa-icons.mjs && tsc -b && vite build && node scripts/check-csp-hash.mjs
+
+✓ PWA ikony orazítkovány (cache-bust ?v=hash) v manifestu i index.html
+[33mBoth esbuild and oxc options were set. oxc options will be used and esbuild options will be ignored.[39m The following esbuild options were set: `{ drop: [ 'console', 'debugger' ] }`
+[36mvite v8.0.16 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming...✓ 5902 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2      7.50 kB
+dist/index.html                                                       8.44 kB │ gzip:   3.05 kB
+dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2           9.00 kB
+dist/assets/fraunces-vietnamese-wght-normal-CnvboYUG.woff2           11.57 kB
+dist/assets/jetbrains-mono-cyrillic-wght-normal-D73BlboJ.woff2       12.10 kB
+dist/assets/fraunces-vietnamese-wght-italic-BicUS2cM.woff2           12.94 kB
+dist/assets/crimson-pro-vietnamese-wght-normal-Djpar-EE.woff2        13.72 kB
+dist/assets/jetbrains-mono-latin-ext-wght-normal-DBQx-q_a.woff2      15.19 kB
+dist/assets/caveat-latin-ext-400-normal-D7hBUiug.woff2               18.60 kB
+dist/assets/caveat-latin-ext-600-normal-DDJRD6ps.woff2               19.63 kB
+dist/assets/caveat-latin-ext-400-normal-DtiRFvw0.woff                24.09 kB
+dist/assets/caveat-cyrillic-ext-400-normal-3iEGd-c5.woff2            24.22 kB
+dist/assets/caveat-latin-ext-600-normal-shBvSnoU.woff                25.13 kB
+dist/assets/caveat-cyrillic-ext-600-normal-DDEJyoof.woff2            25.72 kB
+dist/assets/caveat-cyrillic-ext-400-normal-Cg0RnRQ5.woff             29.72 kB
+dist/assets/caveat-cyrillic-ext-600-normal-BLVNc-Ct.woff             30.90 kB
+dist/assets/fraunces-latin-ext-wght-normal-Ca2vKHc0.woff2            33.58 kB
+dist/assets/fraunces-latin-wght-normal-ukD16Tqj.woff2                36.62 kB
+dist/assets/crimson-pro-latin-ext-wght-normal-4mBZvMWv.woff2         37.98 kB
+dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2          40.40 kB
+dist/assets/fraunces-latin-ext-wght-italic-BfTTTDIL.woff2            40.52 kB
+dist/assets/caveat-cyrillic-400-normal-9cDH9rLW.woff2                45.11 kB
+dist/assets/caveat-cyrillic-600-normal-Ba_MyzgW.woff2                45.50 kB
+dist/assets/fraunces-latin-wght-italic-Py8at3oI.woff2                45.65 kB
+dist/assets/crimson-pro-latin-wght-normal-C4R2PX-h.woff2             48.20 kB
+dist/assets/caveat-latin-400-normal-D6LQsQ_v.woff2                   48.83 kB
+dist/assets/caveat-latin-600-normal-zlTlWIYU.woff2                   51.22 kB
+dist/assets/caveat-cyrillic-400-normal-CebvvJET.woff                 53.09 kB
+dist/assets/caveat-cyrillic-600-normal-CqH0c_uj.woff                 53.42 kB
+dist/assets/caveat-latin-400-normal-BzhAQZkN.woff                    60.10 kB
+dist/assets/caveat-latin-600-normal-DUjB8dgm.woff                    62.54 kB
+dist/assets/generic-x1XGuNl0.css                                      0.00 kB │ gzip:   0.02 kB
+dist/assets/ComingSoonPage-CmYNY3xr.css                               0.10 kB │ gzip:   0.09 kB
+dist/assets/DiceBox3D-B-YmSr00.css                                    0.31 kB │ gzip:   0.23 kB
+dist/assets/WorldSettingsPage-BWDtD-FU.css                            0.33 kB │ gzip:   0.23 kB
+dist/assets/shared-BGiKcHAo.css                                       0.36 kB │ gzip:   0.23 kB
+dist/assets/HeadlineLinkTab-BKoU3cmD.css                              0.37 kB │ gzip:   0.22 kB
+dist/assets/RulesPage-so6fHktc.css                                    0.40 kB │ gzip:   0.23 kB
+dist/assets/decorations-D7DzjAci.css                                  0.47 kB │ gzip:   0.25 kB
+dist/assets/decorations-d4w-cYHj.css                                  0.49 kB │ gzip:   0.26 kB
+dist/assets/BasicInfoTab-Bq8EoWFs.css                                 0.55 kB │ gzip:   0.30 kB
+dist/assets/decorations-dm35_mFE.css                                  0.56 kB │ gzip:   0.31 kB
+dist/assets/PagePicker-0gOP8HlL.css                                   0.59 kB │ gzip:   0.30 kB
+dist/assets/decorations-CPraDSAm.css                                  0.61 kB │ gzip:   0.29 kB
+dist/assets/decorations-DPresNl1.css                                  0.62 kB │ gzip:   0.28 kB
+dist/assets/DeleteWorldTab-quX6mVMu.css                               0.63 kB │ gzip:   0.31 kB
+dist/assets/MembershipTab-DnS0KXom.css                                0.65 kB │ gzip:   0.35 kB
+dist/assets/decorations-CkSNlrwn.css                                  0.69 kB │ gzip:   0.29 kB
+dist/assets/decorations-SDq4L1qr.css                                  0.70 kB │ gzip:   0.36 kB
+dist/assets/decorations-DY19w6ij.css                                  0.72 kB │ gzip:   0.38 kB
+dist/assets/TermsPage-CVu70X3F.css                                    0.73 kB │ gzip:   0.37 kB
+dist/assets/decorations-CgsWDyfZ.css                                  0.75 kB │ gzip:   0.37 kB
+dist/assets/decorations-iSonYpzw.css                                  0.75 kB │ gzip:   0.38 kB
+dist/assets/decorations-ClPfeups.css                                  0.84 kB │ gzip:   0.39 kB
+dist/assets/ChatPage-CSCOFiIz.css                                     0.91 kB │ gzip:   0.43 kB
+dist/assets/SettingsPanel-P9xvMv97.css                                0.94 kB │ gzip:   0.50 kB
+dist/assets/WorldGmDiaryPage-aL8UGaNq.css                             0.99 kB │ gzip:   0.53 kB
+dist/assets/ThemeCustomEditor-VKtPkgY1.css                            1.02 kB │ gzip:   0.45 kB
+dist/assets/decorations-D7swgulJ.css                                  1.11 kB │ gzip:   0.42 kB
+dist/assets/WorldRoleChip-DKHmnKxF.css                                1.15 kB │ gzip:   0.45 kB
+dist/assets/AutoTOC-BRQD0cis.css                                      1.31 kB │ gzip:   0.54 kB
+dist/assets/useFriendshipMutations-Bnrmc-EW.css                       1.32 kB │ gzip:   0.46 kB
+dist/assets/FavoriteToggle-W1e696Gy.css                               1.37 kB │ gzip:   0.49 kB
+dist/assets/MapDefaultsTab-DUMyRHSL.css                               1.38 kB │ gzip:   0.54 kB
+dist/assets/GroupColorPicker-CrSQpxPn.css                             1.40 kB │ gzip:   0.50 kB
+dist/assets/AkjTab-aY2gQL_l.css                                       1.46 kB │ gzip:   0.57 kB
+dist/assets/help-D0s3Kox-.css                                         1.57 kB │ gzip:   0.57 kB
+dist/assets/ResetPasswordPage-gjfZRSTV.css                            1.58 kB │ gzip:   0.63 kB
+dist/assets/RejectReasonModal-MDqzxECy.css                            1.62 kB │ gzip:   0.58 kB
+dist/assets/CurrencyAmountInput-CkMovbDw.css                          1.70 kB │ gzip:   0.56 kB
+dist/assets/Drd16BestieForm-Zxu2uWy5.css                              1.70 kB │ gzip:   0.66 kB
+dist/assets/EntityStatbar-7vS0HWf3.css                                1.73 kB │ gzip:   0.60 kB
+dist/assets/useGmNotes-CtTnXafW.css                                   1.76 kB │ gzip:   0.64 kB
+dist/assets/IkarosEmotesAdminPage-CZSr90jv.css                        1.80 kB │ gzip:   0.71 kB
+dist/assets/WorldNewsPage-C755TypE.css                                1.82 kB │ gzip:   0.63 kB
+dist/assets/WorldDiarySchemaEditorPage-BPfJSGL8.css                   1.92 kB │ gzip:   0.72 kB
+dist/assets/GroupMembersPage-BzGImWRC.css                             2.05 kB │ gzip:   0.80 kB
+dist/assets/InputModal-C9azB_Aa.css                                   2.06 kB │ gzip:   0.68 kB
+dist/assets/SystemsHubPage-DKYy-t4R.css                               2.09 kB │ gzip:   0.74 kB
+dist/assets/MyCharacterPage-8bPRWeiB.css                              2.26 kB │ gzip:   0.78 kB
+dist/assets/ThemeTab-DP4Ltewg.css                                     2.28 kB │ gzip:   0.86 kB
+dist/assets/DiscussionsNewPage-Ddd9J7RB.css                           2.35 kB │ gzip:   0.74 kB
+dist/assets/NewsCard-CtLnrnhh.css                                     2.56 kB │ gzip:   0.77 kB
+dist/assets/CharacterTabsVisibilityTab-IIKjJWfr.css                   2.57 kB │ gzip:   0.82 kB
+dist/assets/NovinkyPage-DOqDv-8R.css                                  2.62 kB │ gzip:   0.80 kB
+dist/assets/HeroUploadCard-DbtiLNDg.css                               2.78 kB │ gzip:   0.97 kB
+dist/assets/AkcePage-CisLIwRH.css                                     2.90 kB │ gzip:   0.96 kB
+dist/assets/TvorbaHubPage-z8ZOoeF2.css                                2.91 kB │ gzip:   0.95 kB
+dist/assets/PjChatTab-CmIjPGuo.css                                    2.97 kB │ gzip:   0.86 kB
+dist/assets/EventsPage-DvID-3zk.css                                   3.10 kB │ gzip:   0.95 kB
+dist/assets/WeatherAtmosphere-DRGkfeMI.css                            3.11 kB │ gzip:   1.08 kB
+dist/assets/PagePicker-xaGFGcWK.css                                   3.22 kB │ gzip:   0.95 kB
+dist/assets/EntitySchemaForm-BEAMvLtF.css                             3.32 kB │ gzip:   1.00 kB
+dist/assets/WorldMembersPage-CUxbTq-e.css                             3.35 kB │ gzip:   1.03 kB
+dist/assets/FavoritesPage-CksaL82m.css                                3.55 kB │ gzip:   1.11 kB
+dist/assets/PillChips-BP8u9Wfx.css                                    3.65 kB │ gzip:   1.20 kB
+dist/assets/WorldNewsEditorModal-nNC9HNk5.css                         3.69 kB │ gzip:   1.20 kB
+dist/assets/ReviewsSection-BVtBbKrL.css                               3.77 kB │ gzip:   1.08 kB
+dist/assets/GalleryUploadPage-C9yl73x1.css                            3.79 kB │ gzip:   0.99 kB
+dist/assets/PageViewerPage-iDMIrDXv.css                               3.86 kB │ gzip:   1.26 kB
+dist/assets/GalleryDetailPage-BgEit9FU.css                            3.95 kB │ gzip:   1.06 kB
+dist/assets/WorldEntitySchemaEditorPage-Dr_kOeF1.css                  4.26 kB │ gzip:   1.10 kB
+dist/assets/ArticleEditorPage-Cq9Yr-rf.css                            4.29 kB │ gzip:   1.19 kB
+dist/assets/MembersTab-bqv1U1kT.css                                   4.47 kB │ gzip:   1.26 kB
+dist/assets/DiscussionsPage-Cr6Xxhw2.css                              4.65 kB │ gzip:   1.19 kB
+dist/assets/WorldEmotesAdminPage-1_sBFiBb.css                         4.74 kB │ gzip:   1.34 kB
+dist/assets/PublicUserProfilePage-DsECjT8W.css                        4.78 kB │ gzip:   1.23 kB
+dist/assets/MapPage-MeBscHa5.css                                      5.33 kB │ gzip:   1.46 kB
+dist/assets/SystemLandingPage-51VFjVkI.css                            5.45 kB │ gzip:   1.46 kB
+dist/assets/PageTemplatesTab-BdkraLax.css                             5.60 kB │ gzip:   1.39 kB
+dist/assets/CurrencyPage-BGYnULeV.css                                 6.05 kB │ gzip:   1.49 kB
+dist/assets/ShopPage-Cyxqeu0d.css                                     6.06 kB │ gzip:   1.50 kB
+dist/assets/PagesAdminPage-CbJOYlj-.css                               6.21 kB │ gzip:   1.41 kB
+dist/assets/PagesListPage-CneNLL0p.css                                6.26 kB │ gzip:   1.48 kB
+dist/assets/WorldsPage-CW9yYMFS.css                                   6.31 kB │ gzip:   1.58 kB
+dist/assets/DiarySchemaEditor-DCo3x3cd.css                            6.94 kB │ gzip:   1.79 kB
+dist/assets/IkarosEventCard-Dp5q65sD.css                              7.24 kB │ gzip:   1.70 kB
+dist/assets/maps-BamxbCC6.css                                         7.25 kB │ gzip:   1.72 kB
+dist/assets/DashboardPage-CENuYzOo.css                                7.29 kB │ gzip:   1.95 kB
+dist/assets/SoundsPage-DSIQAVUv.css                                   7.31 kB │ gzip:   1.90 kB
+dist/assets/CreateWorldPage-MMVSBZ6Z.css                              7.50 kB │ gzip:   2.06 kB
+dist/assets/VoiceKrcmaPage-CdtbVtkU.css                               7.56 kB │ gzip:   1.97 kB
+dist/assets/ArticlesPage-DbH_ZlU0.css                                 7.87 kB │ gzip:   1.76 kB
+dist/assets/CalendarConfigsPage-Byw_LQ78.css                          7.92 kB │ gzip:   1.88 kB
+dist/assets/CharactersPage-tVpGkjmv.css                               7.93 kB │ gzip:   1.85 kB
+dist/assets/CampPage-D_QEiC4y.css                                     7.98 kB │ gzip:   1.70 kB
+dist/assets/MailPage-b_rqzgBE.css                                     8.15 kB │ gzip:   1.88 kB
+dist/assets/help-CYeusSV6.css                                         8.46 kB │ gzip:   1.82 kB
+dist/assets/decorations-DdKhp97K.css                                  8.64 kB │ gzip:   2.08 kB
+dist/assets/ArticleDetailPage-mupzq4FM.css                            9.52 kB │ gzip:   2.26 kB
+dist/assets/GalleryPage-BBt-IboB.css                                 10.30 kB │ gzip:   2.41 kB
+dist/assets/fate-ZGjyjzKc.css                                        10.33 kB │ gzip:   2.30 kB
+dist/assets/WorldHeadlineAdminPage-CLUvVaUJ.css                      10.37 kB │ gzip:   1.88 kB
+dist/assets/EmoteUploadDialog-Cswl8Qhb.css                           11.25 kB │ gzip:   2.61 kB
+dist/assets/HelpPage-D3yzjXJF.css                                    11.29 kB │ gzip:   2.43 kB
+dist/assets/decorations-Ceds5ZL3.css                                 11.31 kB │ gzip:   2.38 kB
+dist/assets/ChatRoom-De_McImo.css                                    11.46 kB │ gzip:   2.34 kB
+dist/assets/DiscussionDetailPage-BAEHonXN.css                        12.05 kB │ gzip:   2.15 kB
+dist/assets/decorations-CymmOWIz.css                                 12.23 kB │ gzip:   2.32 kB
+dist/assets/decorations-DKQh6xl-.css                                 12.30 kB │ gzip:   2.68 kB
+dist/assets/WorldDashboardPage-D2-TKFIJ.css                          12.39 kB │ gzip:   2.90 kB
+dist/assets/InteractiveMapViewer-Bl_vexh1.css                        12.66 kB │ gzip:   2.94 kB
+dist/assets/decorations-D1fDqbLE.css                                 13.10 kB │ gzip:   2.57 kB
+dist/assets/decorations-D6-oo8_f.css                                 13.45 kB │ gzip:   2.58 kB
+dist/assets/news-CVc4ZkWi.css                                        13.51 kB │ gzip:   3.29 kB
+dist/assets/decorations-CIZCdIyG.css                                 13.75 kB │ gzip:   2.55 kB
+dist/assets/jad-BkyRHioL.css                                         13.83 kB │ gzip:   2.45 kB
+dist/assets/dnd5e-DJeRxATc.css                                       14.06 kB │ gzip:   2.45 kB
+dist/assets/TimelinePage-DyM0fBY3.css                                14.67 kB │ gzip:   3.18 kB
+dist/assets/BestiarPage-MjQh5_vL.css                                 15.28 kB │ gzip:   3.45 kB
+dist/assets/AdminChatPage-DglLzhVI.css                               15.40 kB │ gzip:   3.35 kB
+dist/assets/gurps-DwsLKbB9.css                                       15.65 kB │ gzip:   2.56 kB
+dist/assets/GameEventCard-D40gKJKj.css                               16.32 kB │ gzip:   3.19 kB
+dist/assets/pi-DgVBR88R.css                                          16.47 kB │ gzip:   3.97 kB
+dist/assets/coc-CJ7RANUt.css                                         16.62 kB │ gzip:   3.40 kB
+dist/assets/decorations-CxX5zlPk.css                                 17.01 kB │ gzip:   3.04 kB
+dist/assets/CalendarPage-C0VxaflT.css                                18.16 kB │ gzip:   3.70 kB
+dist/assets/PlatformAdminPage-BUeM54qT.css                           18.79 kB │ gzip:   3.66 kB
+dist/assets/matrix-Cjg-Y3gz.css                                      19.30 kB │ gzip:   4.29 kB
+dist/assets/shadowrun-CZhTCxVZ.css                                   19.67 kB │ gzip:   3.98 kB
+dist/assets/drd2-CIzccLlf.css                                        20.81 kB │ gzip:   3.98 kB
+dist/assets/drd16--Z-6eYcT.css                                       21.06 kB │ gzip:   4.40 kB
+dist/assets/ProfilePage-Bhho7Wzw.css                                 21.31 kB │ gzip:   4.40 kB
+dist/assets/decorations-DeObSPIy.css                                 21.69 kB │ gzip:   3.66 kB
+dist/assets/drdplus-SOqT6aSW.css                                     21.85 kB │ gzip:   4.62 kB
+dist/assets/decorations-BiY3dQtb.css                                 23.21 kB │ gzip:   3.94 kB
+dist/assets/drdh-BNyyH8ct.css                                        23.55 kB │ gzip:   4.31 kB
+dist/assets/decorations-Bf4B05Ix.css                                 23.65 kB │ gzip:   4.32 kB
+dist/assets/UsersPage-DNDSraUt.css                                   23.71 kB │ gzip:   3.95 kB
+dist/assets/decorations-D6MlRaff.css                                 24.10 kB │ gzip:   4.11 kB
+dist/assets/decorations-LN0DzOZd.css                                 24.11 kB │ gzip:   4.31 kB
+dist/assets/decorations-DvUEwj-S.css                                 24.33 kB │ gzip:   3.90 kB
+dist/assets/decorations-Cq46aSjB.css                                 24.41 kB │ gzip:   4.12 kB
+dist/assets/decorations-DQDrxuE4.css                                 24.81 kB │ gzip:   4.22 kB
+dist/assets/decorations-Cj7ZDiSL.css                                 24.83 kB │ gzip:   4.17 kB
+dist/assets/decorations-DR2CgiQg.css                                 25.35 kB │ gzip:   4.26 kB
+dist/assets/campaign-BVlROTsg.css                                    27.05 kB │ gzip:   5.40 kB
+dist/assets/chatItems-DK_nnto-.css                                   28.08 kB │ gzip:   5.28 kB
+dist/assets/decorations-DzWvfB_Y.css                                 28.83 kB │ gzip:   4.87 kB
+dist/assets/decorations-CLfO4yZM.css                                 29.77 kB │ gzip:   4.09 kB
+dist/assets/decorations-62hRbnRY.css                                 29.95 kB │ gzip:   4.21 kB
+dist/assets/PageEditorPage-BBg2nqeU.css                              45.47 kB │ gzip:   7.16 kB
+dist/assets/WorldWeatherPage-Ce8u4SS1.css                            45.67 kB │ gzip:   8.03 kB
+dist/assets/PageViewer-CoY5-zAJ.css                                  49.08 kB │ gzip:   9.51 kB
+dist/assets/index-DHrm90SQ.css                                      100.69 kB │ gzip:  21.14 kB
+dist/assets/WorldChatPage-DWrG2KsD.css                              156.54 kB │ gzip:  23.15 kB
+dist/assets/TacticalMapPage-CJ-SiHlc.css                            176.57 kB │ gzip:  23.46 kB
+dist/assets/buildSpawnToken-BV-INu_n.css                            377.64 kB │ gzip:  52.77 kB
+dist/assets/InventoryTab-CQvT7n72.css                             1,501.12 kB │ gzip: 216.43 kB
+dist/assets/drdplus-BdZmu7HW.js                                       0.06 kB │ gzip:   0.07 kB
+dist/assets/gurps-HKWPPug-.js                                         0.06 kB │ gzip:   0.07 kB
+dist/assets/shadowrun-BvOJHmoO.js                                     0.06 kB │ gzip:   0.07 kB
+dist/assets/webworkerAll-3J7g8QzD.js                                  0.06 kB │ gzip:   0.07 kB
+dist/assets/api-BXE0o4na.js                                           0.06 kB │ gzip:   0.07 kB
+dist/assets/worldMemberAvatar-BJaNPil-.js                             0.06 kB │ gzip:   0.07 kB
+dist/assets/BitmapFont-nTKN8KtP.js                                    0.07 kB │ gzip:   0.08 kB
+dist/assets/WebGLRenderer-CIu3ipRq.js                                 0.07 kB │ gzip:   0.09 kB
+dist/assets/CanvasRenderer-OgSNyc7Y.js                                0.07 kB │ gzip:   0.09 kB
+dist/assets/WebGPURenderer-DO3eosuz.js                                0.07 kB │ gzip:   0.09 kB
+dist/assets/check-BUrUQ5Df.js                                         0.12 kB │ gzip:   0.13 kB
+dist/assets/init-BbxrysSV.js                                          0.12 kB │ gzip:   0.12 kB
+dist/assets/chevron-down-C80nD0-W.js                                  0.12 kB │ gzip:   0.13 kB
+dist/assets/chevron-up-h3zsPrQE.js                                    0.12 kB │ gzip:   0.13 kB
+dist/assets/isWorldPlayer-D8CwSVLa.js                                 0.13 kB │ gzip:   0.13 kB
+dist/assets/navigation-BsCzAP5S.js                                    0.14 kB │ gzip:   0.15 kB
+dist/assets/StorylinesPage-3kVBktXZ.js                                0.15 kB │ gzip:   0.14 kB
+dist/assets/plus-DclIHKvS.js                                          0.15 kB │ gzip:   0.14 kB
+dist/assets/CampaignPage-CTNshDxL.js                                  0.15 kB │ gzip:   0.14 kB
+dist/assets/arrow-left-CMqEseQU.js                                    0.16 kB │ gzip:   0.16 kB
+dist/assets/clock-Dw7KVYq_.js                                         0.16 kB │ gzip:   0.16 kB
+dist/assets/DungeonBuilderPage-CZg_3Nza.js                            0.17 kB │ gzip:   0.16 kB
+dist/assets/reply-FmWGw0Y5.js                                         0.17 kB │ gzip:   0.16 kB
+dist/assets/useFriends-DXhhbny2.js                                    0.18 kB │ gzip:   0.17 kB
+dist/assets/useWorldMembers-Bq3XZ6vf.js                               0.19 kB │ gzip:   0.17 kB
+dist/assets/flame-D7SbXmIY.js                                         0.19 kB │ gzip:   0.18 kB
+dist/assets/undo-2-TuGuNEZM.js                                        0.20 kB │ gzip:   0.17 kB
+dist/assets/useArticleCategories-BrQ0XBY3.js                          0.20 kB │ gzip:   0.18 kB
+dist/assets/useGalleryCategories-TNq8FZvu.js                          0.20 kB │ gzip:   0.18 kB
+dist/assets/lock-open-BG4dVKnZ.js                                     0.20 kB │ gzip:   0.19 kB
+dist/assets/useUpdateWorld-zClm07ZQ.js                                0.20 kB │ gzip:   0.18 kB
+dist/assets/useUserLookup-lmn0knfj.js                                 0.20 kB │ gzip:   0.18 kB
+dist/assets/useUpdateMyWorldTheme-CcFJQT7z.js                         0.22 kB │ gzip:   0.20 kB
+dist/assets/folder-kFi8b9Y5.js                                        0.22 kB │ gzip:   0.18 kB
+dist/assets/bookmark-Be7waTTH.js                                      0.22 kB │ gzip:   0.19 kB
+dist/assets/upload-xNknxWah.js                                        0.22 kB │ gzip:   0.19 kB
+dist/assets/useUpdateWorldSettings-DJ-ivpOk.js                        0.22 kB │ gzip:   0.19 kB
+dist/assets/ellipsis-vertical-Ctq1BXvy.js                             0.23 kB │ gzip:   0.17 kB
+dist/assets/copy-CQ1Z5hEq.js                                          0.23 kB │ gzip:   0.21 kB
+dist/assets/message-circle-CnKif-7I.js                                0.23 kB │ gzip:   0.21 kB
+dist/assets/systemId-7kEmIvbp.js                                      0.23 kB │ gzip:   0.18 kB
+dist/assets/globe-BVOGLgQZ.js                                         0.23 kB │ gzip:   0.19 kB
+dist/assets/cloud-fog-BWZIKHRe.js                                     0.24 kB │ gzip:   0.20 kB
+dist/assets/arrow-up-down-CFfBhnwc.js                                 0.24 kB │ gzip:   0.19 kB
+dist/assets/useUploadImage-D5FHb9TT.js                                0.24 kB │ gzip:   0.21 kB
+dist/assets/compass-DBvphKmL.js                                       0.24 kB │ gzip:   0.21 kB
+dist/assets/archive-Pi6f3vSY.js                                       0.25 kB │ gzip:   0.21 kB
+dist/assets/flag-mEgQ8mXC.js                                          0.25 kB │ gzip:   0.21 kB
+dist/assets/useUploadImage-NlaFMw2F.js                                0.25 kB │ gzip:   0.21 kB
+dist/assets/calendar-BKvfdvog.js                                      0.25 kB │ gzip:   0.20 kB
+dist/assets/heart-CZClpNOU.js                                         0.25 kB │ gzip:   0.21 kB
+dist/assets/map-pin-CCwicPwv.js                                       0.25 kB │ gzip:   0.22 kB
+dist/assets/circle-user-DN1zMl-9.js                                   0.25 kB │ gzip:   0.20 kB
+dist/assets/usePersonaDirectory-DwHdnUNy.js                           0.25 kB │ gzip:   0.23 kB
+dist/assets/image-CjTpOj3v.js                                         0.26 kB │ gzip:   0.22 kB
+dist/assets/book-text-Dj9pew6F.js                                     0.26 kB │ gzip:   0.21 kB
+dist/assets/usePublicUserProfile-CEkFsGLo.js                          0.26 kB │ gzip:   0.23 kB
+dist/assets/pencil-BFzHEoTJ.js                                        0.27 kB │ gzip:   0.22 kB
+dist/assets/book-open-BNs4np3l.js                                     0.27 kB │ gzip:   0.20 kB
+dist/assets/browserAll-B0WVXtkb.js                                    0.28 kB │ gzip:   0.19 kB
+dist/assets/coins-oSIJR8FO.js                                         0.28 kB │ gzip:   0.22 kB
+dist/assets/layout-template-CTLY0wdT.js                               0.28 kB │ gzip:   0.19 kB
+dist/assets/send-BlxlI9U9.js                                          0.28 kB │ gzip:   0.23 kB
+dist/assets/smile-ClNhoppS.js                                         0.29 kB │ gzip:   0.21 kB
+dist/assets/hash-udqCFv_U.js                                          0.29 kB │ gzip:   0.19 kB
+dist/assets/folder-plus-DsXSb3EA.js                                   0.30 kB │ gzip:   0.22 kB
+dist/assets/user-x-TLQOu6zi.js                                        0.30 kB │ gzip:   0.23 kB
+dist/assets/MapDefaultsTab.module-jiViF7Wy.js                         0.30 kB │ gzip:   0.18 kB
+dist/assets/useEmailVerify-CHI1J8ZY.js                                0.30 kB │ gzip:   0.23 kB
+dist/assets/ResetPasswordPage.module-Cj5c3nE4.js                      0.31 kB │ gzip:   0.19 kB
+dist/assets/CharacterDetailRoute-BTcn0DKy.js                          0.31 kB │ gzip:   0.24 kB
+dist/assets/shared-D3XzkXAF.js                                        0.31 kB │ gzip:   0.28 kB
+dist/assets/refresh-cw-BfKfz52Z.js                                    0.31 kB │ gzip:   0.22 kB
+dist/assets/save-nMgVOftz.js                                          0.32 kB │ gzip:   0.22 kB
+dist/assets/bot-DXNasgD8.js                                           0.32 kB │ gzip:   0.23 kB
+dist/assets/trash-2-VXwu7KL-.js                                       0.32 kB │ gzip:   0.21 kB
+dist/assets/archive-restore-KIYYkfkv.js                               0.33 kB │ gzip:   0.24 kB
+dist/assets/newspaper-2h140Gqn.js                                     0.34 kB │ gzip:   0.24 kB
+dist/assets/getTextureBatchBindGroup-Bl-qnmK5.js                      0.34 kB │ gzip:   0.26 kB
+dist/assets/layout-grid-C5dTZxtw.js                                   0.34 kB │ gzip:   0.19 kB
+dist/assets/pin-BiZRAqpy.js                                           0.34 kB │ gzip:   0.23 kB
+dist/assets/scroll-text-nkw2tBKa.js                                   0.34 kB │ gzip:   0.23 kB
+dist/assets/layout-dashboard--FycqJ3m.js                              0.34 kB │ gzip:   0.20 kB
+dist/assets/crosshair-7-Xarjfb.js                                     0.35 kB │ gzip:   0.22 kB
+dist/assets/shield-alert-Cr0jxskI.js                                  0.35 kB │ gzip:   0.26 kB
+dist/assets/key-round-Dz0sneSC.js                                     0.35 kB │ gzip:   0.26 kB
+dist/assets/list-ordered-8FQvwpOR.js                                  0.35 kB │ gzip:   0.23 kB
+dist/assets/messages-square-DQ4ck7jA.js                               0.36 kB │ gzip:   0.25 kB
+dist/assets/music-CvmAWcFv.js                                         0.36 kB │ gzip:   0.25 kB
+dist/assets/images-RKoWV-1v.js                                        0.36 kB │ gzip:   0.27 kB
+dist/assets/pages.types-BROTfTnD.js                                   0.36 kB │ gzip:   0.28 kB
+dist/assets/grip-vertical-Dl8zLRSt.js                                 0.36 kB │ gzip:   0.19 kB
+dist/assets/droplets-BA4zXzwK.js                                      0.37 kB │ gzip:   0.28 kB
+dist/assets/useCreatePage-BkXf9Ztc.js                                 0.37 kB │ gzip:   0.25 kB
+dist/assets/ImageSource-mPNd6QBT.js                                   0.37 kB │ gzip:   0.25 kB
+dist/assets/calendar-clock-DC31BCNi.js                                0.37 kB │ gzip:   0.25 kB
+dist/assets/building-2-BKPTZHa4.js                                    0.38 kB │ gzip:   0.24 kB
+dist/assets/network-BumH1stw.js                                       0.38 kB │ gzip:   0.23 kB
+dist/assets/backpack-CkkilVU9.js                                      0.38 kB │ gzip:   0.23 kB
+dist/assets/cloud-sun-DPLjhJxY.js                                     0.38 kB │ gzip:   0.26 kB
+dist/assets/earth-D1fwi0y0.js                                         0.39 kB │ gzip:   0.26 kB
+dist/assets/clipboard-list-B20FEE9s.js                                0.40 kB │ gzip:   0.26 kB
+dist/assets/layers-C32cV-LK.js                                        0.41 kB │ gzip:   0.24 kB
+dist/assets/map-B1_DtQD-.js                                           0.42 kB │ gzip:   0.26 kB
+dist/assets/jsx-runtime-DsKLSDJq.js                                   0.42 kB │ gzip:   0.29 kB
+dist/assets/eye-off-DrfvoRBX.js                                       0.42 kB │ gzip:   0.27 kB
+dist/assets/tag-Be8c4ctI.js                                           0.45 kB │ gzip:   0.30 kB
+dist/assets/useCoarsePointer-sXptj1GF.js                              0.46 kB │ gzip:   0.28 kB
+dist/assets/useWorldPageTemplates-DZoyyUHD.js                         0.47 kB │ gzip:   0.34 kB
+dist/assets/calendar-days-Cf5duQHv.js                                 0.49 kB │ gzip:   0.26 kB
+dist/assets/formatDate-Ci3pDRug.js                                    0.51 kB │ gzip:   0.29 kB
+dist/assets/theater-CvJGyLA-.js                                       0.52 kB │ gzip:   0.26 kB
+dist/assets/showcaseSlides-BG7uJJ6m.js                                0.53 kB │ gzip:   0.26 kB
+dist/assets/swords-b3AoLeXJ.js                                        0.54 kB │ gzip:   0.28 kB
+dist/assets/useDeletePage-B01-xJzR.js                                 0.55 kB │ gzip:   0.28 kB
+dist/assets/drama-BMLfM5Z0.js                                         0.55 kB │ gzip:   0.32 kB
+dist/assets/relativeTime-CqKqKp5i.js                                  0.56 kB │ gzip:   0.33 kB
+dist/assets/systems-BG65FqYY.js                                       0.59 kB │ gzip:   0.32 kB
+dist/assets/characterTabVisibility-C9Yt8zBQ.js                        0.59 kB │ gzip:   0.40 kB
+dist/assets/user-minus-BklmzlFc.js                                    0.60 kB │ gzip:   0.39 kB
+dist/assets/HeadlineLinkTab-Dx1z_3Qp.js                               0.60 kB │ gzip:   0.44 kB
+dist/assets/pageTypeMeta-Pcg7IclB.js                                  0.60 kB │ gzip:   0.41 kB
+dist/assets/worldRoles-DBLy85nT.js                                    0.62 kB │ gzip:   0.37 kB
+dist/assets/useWorldLifecycle-B4kpWK47.js                             0.62 kB │ gzip:   0.33 kB
+dist/assets/user-cog-D-INM7xC.js                                      0.64 kB │ gzip:   0.33 kB
+dist/assets/SettingsPanel-BbDaDYyJ.js                                 0.67 kB │ gzip:   0.33 kB
+dist/assets/chunk-QTnfLwEv.js                                         0.69 kB │ gzip:   0.42 kB
+dist/assets/discussions-_Zs0ZCuc.js                                   0.72 kB │ gzip:   0.40 kB
+dist/assets/useBestiar-B5bXOYd_.js                                    0.72 kB │ gzip:   0.40 kB
+dist/assets/CanvasPool-DwM2K22d.js                                    0.75 kB │ gzip:   0.42 kB
+dist/assets/relativeEventDate-CHBaFH7t.js                             0.77 kB │ gzip:   0.41 kB
+dist/assets/api-C-9R-u_r.js                                           0.79 kB │ gzip:   0.44 kB
+dist/assets/FavoriteToggle-DX7UV0CO.js                                0.82 kB │ gzip:   0.50 kB
+dist/assets/GroupColorPicker-BExJ7FKb.js                              0.83 kB │ gzip:   0.48 kB
+dist/assets/ComingSoonPage-B3qLp5WN.js                                0.86 kB │ gzip:   0.55 kB
+dist/assets/useFavoritePages-DHtn8ght.js                              0.97 kB │ gzip:   0.57 kB
+dist/assets/gregorianDefault-A8wHKfFF.js                              0.98 kB │ gzip:   0.48 kB
+dist/assets/useWorldJoin-Cf-Gxx-e.js                                  1.02 kB │ gzip:   0.31 kB
+dist/assets/ThemeTab.module-BcPNOlvI.js                               1.06 kB │ gzip:   0.58 kB
+dist/assets/WorldGmDiaryPage-BJtkAUqO.js                              1.07 kB │ gzip:   0.54 kB
+dist/assets/Cache-DHEaa7_0.js                                         1.09 kB │ gzip:   0.55 kB
+dist/assets/PagePicker-DJl3BAdX.js                                    1.12 kB │ gzip:   0.70 kB
+dist/assets/useCharacterMutations-BHv2abme.js                         1.20 kB │ gzip:   0.38 kB
+dist/assets/useCalendarConfigs-C9CQWCMN.js                            1.22 kB │ gzip:   0.39 kB
+dist/assets/InputModal-GgNYmiih.js                                    1.28 kB │ gzip:   0.65 kB
+dist/assets/PillChips-CLOZLEa9.js                                     1.36 kB │ gzip:   0.70 kB
+dist/assets/buildEmoteUrl-_bwrH8pV.js                                 1.37 kB │ gzip:   0.58 kB
+dist/assets/soundEnums-BsgdOara.js                                    1.46 kB │ gzip:   0.86 kB
+dist/assets/WorldRoleChip-C2OReIx8.js                                 1.53 kB │ gzip:   0.75 kB
+dist/assets/RejectReasonModal-C0n5_-Zx.js                             1.56 kB │ gzip:   0.79 kB
+dist/assets/external-link-CWBRMDIJ.js                                 1.60 kB │ gzip:   0.90 kB
+dist/assets/RulesPage-DYBl1x9c.js                                     1.63 kB │ gzip:   0.89 kB
+dist/assets/gallery-B_HsXMdY.js                                       1.64 kB │ gzip:   0.76 kB
+dist/assets/useGmNotes-CMqJy5LA.js                                    1.67 kB │ gzip:   0.85 kB
+dist/assets/ChatPage-Bn9Wa8go.js                                      1.71 kB │ gzip:   0.95 kB
+dist/assets/AutoTOC-CUkQc9iR.js                                       1.85 kB │ gzip:   0.96 kB
+dist/assets/DeleteWorldTab-Ck7WBfto.js                                1.90 kB │ gzip:   0.96 kB
+dist/assets/SystemsHubPage-D1Kx5ktQ.js                                1.91 kB │ gzip:   0.90 kB
+dist/assets/ExportTab-G1sWdy-6.js                                     2.06 kB │ gzip:   1.22 kB
+dist/assets/IkarosEmotesAdminPage-DWJVrZf3.js                         2.14 kB │ gzip:   1.06 kB
+dist/assets/ChatCombatDefaultsTab-C4OzsTS-.js                         2.21 kB │ gzip:   1.08 kB
+dist/assets/tiles-Bam7kmjy.js                                         2.21 kB │ gzip:   1.00 kB
+dist/assets/AccessModeTab-D8B9zkO2.js                                 2.22 kB │ gzip:   1.19 kB
+dist/assets/EntityStatbar-CV5RST6M.js                                 2.27 kB │ gzip:   0.91 kB
+dist/assets/EmailChangeConfirmPage-DdvXoW5S.js                        2.28 kB │ gzip:   1.13 kB
+dist/assets/TvorbaHubPage-5cMwrvFY.js                                 2.32 kB │ gzip:   1.10 kB
+dist/assets/calendarColor-BgDQ9MWt.js                                 2.32 kB │ gzip:   1.18 kB
+dist/assets/articles-r8JZyxL0.js                                      2.34 kB │ gzip:   1.09 kB
+dist/assets/MyCharacterPage-DlHVPjux.js                               2.40 kB │ gzip:   1.17 kB
+dist/assets/EmailVerifyPage-BwjOoawu.js                               2.44 kB │ gzip:   1.16 kB
+dist/assets/CurrencyAmountInput-KPtyfRkn.js                           2.54 kB │ gzip:   1.27 kB
+dist/assets/useCharacterAccounts-CBZkGGnT.js                          2.72 kB │ gzip:   0.60 kB
+dist/assets/ThemeTab-TJTGgdeL.js                                      3.04 kB │ gzip:   1.36 kB
+dist/assets/useFriendshipMutations-vQ44-PrI.js                        3.05 kB │ gzip:   1.22 kB
+dist/assets/DiscussionsNewPage-p-8HTQRN.js                            3.06 kB │ gzip:   1.32 kB
+dist/assets/PagePicker-C0dFKil6.js                                    3.07 kB │ gzip:   1.37 kB
+dist/assets/youtubeId-D-9ZzRvv.js                                     3.15 kB │ gzip:   1.40 kB
+dist/assets/AkjTab-Dum6X0c9.js                                        3.28 kB │ gzip:   1.63 kB
+dist/assets/ThemeCustomEditor-BPGiMuSf.js                             3.34 kB │ gzip:   1.46 kB
+dist/assets/GroupMembersPage-BM0WxNvk.js                              3.35 kB │ gzip:   1.63 kB
+dist/assets/Drd16BestieForm-F1ow5meh.js                               3.49 kB │ gzip:   1.25 kB
+dist/assets/DicePresetResetLink-BEnr3Iut.js                           3.50 kB │ gzip:   1.76 kB
+dist/assets/MyThemeTab-CrBwHlOb.js                                    3.60 kB │ gzip:   1.52 kB
+dist/assets/ResetPasswordPage-IZhKIDkx.js                             3.63 kB │ gzip:   1.63 kB
+dist/assets/seo-BPGd_8xw.js                                           3.79 kB │ gzip:   1.53 kB
+dist/assets/WorldNewsPage-CfEItlE3.js                                 3.81 kB │ gzip:   1.71 kB
+dist/assets/MapDefaultsTab-BQ_6g3Lh.js                                3.87 kB │ gzip:   1.47 kB
+dist/assets/MembershipTab-CFTNwddk.js                                 3.89 kB │ gzip:   1.78 kB
+dist/assets/WorldMembersPage-D4FwVIz6.js                              3.99 kB │ gzip:   1.66 kB
+dist/assets/ReviewsSection-Cv3t3xGQ.js                                4.10 kB │ gzip:   1.57 kB
+dist/assets/HeroUploadCard-239pCw_6.js                                4.12 kB │ gzip:   1.77 kB
+dist/assets/systemLandings-DsxHDBc-.js                                4.43 kB │ gzip:   1.77 kB
+dist/assets/CharacterTabsVisibilityTab-D8efPVkb.js                    4.44 kB │ gzip:   1.78 kB
+dist/assets/EventsPage-D8y6nLSe.js                                    4.48 kB │ gzip:   1.86 kB
+dist/assets/AkcePage-5LJ6k2tf.js                                      4.58 kB │ gzip:   1.85 kB
+dist/assets/useGameEvents-PVK6em0H.js                                 4.58 kB │ gzip:   1.29 kB
+dist/assets/GalleryUploadPage-CiisWmKB.js                             4.70 kB │ gzip:   1.88 kB
+dist/assets/FavoritesPage-LbH1AVLx.js                                 4.82 kB │ gzip:   1.89 kB
+dist/assets/scenarioMeta-CcOuA2ML.js                                  4.97 kB │ gzip:   1.55 kB
+dist/assets/DiscussionsPage-DgfnlB9S.js                               5.00 kB │ gzip:   1.90 kB
+dist/assets/WorldEmotesAdminPage-CfxCt3cu.js                          5.14 kB │ gzip:   2.16 kB
+dist/assets/ArticleEditorPage-CDHfBqnc.js                             5.27 kB │ gzip:   2.24 kB
+dist/assets/canvasUtils-C3vrwwvU.js                                   5.68 kB │ gzip:   1.89 kB
+dist/assets/SystemLandingPage-BZ94KY5o.js                             5.70 kB │ gzip:   1.98 kB
+dist/assets/VoiceKrcmaPage-CtdKFSfj.js                                5.72 kB │ gzip:   2.17 kB
+dist/assets/NovinkyPage-eiuJMiAs.js                                   5.78 kB │ gzip:   2.28 kB
+dist/assets/PageViewerPage-D2MqcifL.js                                5.97 kB │ gzip:   2.24 kB
+dist/assets/GalleryDetailPage-ucqIUAUt.js                             6.06 kB │ gzip:   2.32 kB
+dist/assets/help-BqBfUqVF.js                                          6.07 kB │ gzip:   1.99 kB
+dist/assets/WeatherAtmosphere-BHRJ5Mco.js                             6.54 kB │ gzip:   2.31 kB
+dist/assets/WorldsPage-Cpe7jfKg.js                                    6.71 kB │ gzip:   2.76 kB
+dist/assets/NewsCard-mdkNEZL6.js                                      6.90 kB │ gzip:   2.70 kB
+dist/assets/TermsPage-DLabkO2i.js                                     7.01 kB │ gzip:   2.95 kB
+dist/assets/PjChatTab-D9r24YVZ.js                                     7.45 kB │ gzip:   2.62 kB
+dist/assets/react-2v2mEj6a.js                                         7.52 kB │ gzip:   2.87 kB
+dist/assets/PagesListPage-BbWctSG0.js                                 7.63 kB │ gzip:   3.04 kB
+dist/assets/DashboardPage-loCTw33O.js                                 7.91 kB │ gzip:   3.08 kB
+dist/assets/WorldEntitySchemaEditorPage-BQey9KiM.js                   7.98 kB │ gzip:   2.72 kB
+dist/assets/dist-CiIbcvOW.js                                          8.33 kB │ gzip:   3.38 kB
+dist/assets/ArticlesPage-D6zX0MJ2.js                                  8.36 kB │ gzip:   3.09 kB
+dist/assets/PagesAdminPage-Cmze81My.js                                8.59 kB │ gzip:   3.13 kB
+dist/assets/print-DXxVO772.js                                         8.67 kB │ gzip:   4.18 kB
+dist/assets/BasicInfoTab-D7mHo2lZ.js                                  8.76 kB │ gzip:   3.02 kB
+dist/assets/EntitySchemaForm-BcTxWo3D.js                              9.35 kB │ gzip:   2.85 kB
+dist/assets/help-ZWamExmq.js                                         10.17 kB │ gzip:   4.23 kB
+dist/assets/WorldSettingsPage-CK_9OM7Q.js                            10.27 kB │ gzip:   3.49 kB
+dist/assets/WorldDiarySchemaEditorPage-DcAvlrDu.js                   10.44 kB │ gzip:   4.05 kB
+dist/assets/MembersTab-Bz5RwFmI.js                                   10.55 kB │ gzip:   4.05 kB
+dist/assets/BufferResource-fioJJh-9.js                               10.56 kB │ gzip:   2.79 kB
+dist/assets/PageTemplatesTab-DgvqOmBu.js                             10.91 kB │ gzip:   4.24 kB
+dist/assets/MailPage-w5GlZBUD.js                                     10.96 kB │ gzip:   3.85 kB
+dist/assets/CharactersPage-rQwXuuDK.js                               11.03 kB │ gzip:   4.15 kB
+dist/assets/PublicUserProfilePage-CzNAG2NX.js                        11.12 kB │ gzip:   3.65 kB
+dist/assets/IkarosEventCard-DrGxAQ9F.js                              11.54 kB │ gzip:   4.17 kB
+dist/assets/ArticleDetailPage-DR0iviwH.js                            11.74 kB │ gzip:   4.16 kB
+dist/assets/GalleryPage-Dw2bfWdk.js                                  11.87 kB │ gzip:   4.34 kB
+dist/assets/WorldNewsEditorModal-B2rVE-H-.js                         12.16 kB │ gzip:   4.54 kB
+dist/assets/dicePayload-B9-Q6Y1X.js                                  12.88 kB │ gzip:   2.77 kB
+dist/assets/CurrencyPage-fq6PDfrE.js                                 12.92 kB │ gzip:   4.68 kB
+dist/assets/EmoteUploadDialog-5ZOIdt2Q.js                            13.21 kB │ gzip:   5.03 kB
+dist/assets/ChatRoom-DkfWEHe0.js                                     13.73 kB │ gzip:   5.04 kB
+dist/assets/maps-BfVS0T9N.js                                         14.47 kB │ gzip:   4.52 kB
+dist/assets/WorldHeadlineAdminPage-CVD7ZgL_.js                       14.75 kB │ gzip:   4.82 kB
+dist/assets/DiscussionDetailPage-BWL53DW1.js                         15.37 kB │ gzip:   4.72 kB
+dist/assets/SoundsPage-CAfPbD6m.js                                   15.40 kB │ gzip:   4.82 kB
+dist/assets/BestiarPage-C7-ApRIH.js                                  15.48 kB │ gzip:   5.35 kB
+dist/assets/CalendarConfigsPage-CyINH9Xv.js                          16.56 kB │ gzip:   4.87 kB
+dist/assets/WorldDashboardPage-CuakIWTc.js                           16.77 kB │ gzip:   5.63 kB
+dist/assets/presets-CUe3t5CL.js                                      18.08 kB │ gzip:   4.53 kB
+dist/assets/CreateWorldPage-CdB6Iz1y.js                              18.37 kB │ gzip:   6.89 kB
+dist/assets/DiarySchemaEditor-D9BSrQtt.js                            19.75 kB │ gzip:   6.52 kB
+dist/assets/GameEventCard-Cxiqy9fP.js                                23.33 kB │ gzip:   7.72 kB
+dist/assets/AdminChatPage-CzX3Ww4U.js                                23.85 kB │ gzip:   8.03 kB
+dist/assets/ShopPage-D6j2G-jr.js                                     25.23 kB │ gzip:   7.38 kB
+dist/assets/GCManagedHash-CVR23D5Q.js                                25.45 kB │ gzip:   8.72 kB
+dist/assets/CalendarPage-Dr0kco1R.js                                 26.18 kB │ gzip:   9.04 kB
+dist/assets/TimelinePage-B0Kihu-L.js                                 28.77 kB │ gzip:   9.96 kB
+dist/assets/UsersPage-N9B_e1oQ.js                                    33.19 kB │ gzip:   8.97 kB
+dist/assets/InteractiveMapViewer-B2uNKHaV.js                         33.64 kB │ gzip:  11.04 kB
+dist/assets/PlatformAdminPage-bEcV_emT.js                            36.28 kB │ gzip:  10.62 kB
+dist/assets/Filter-Cz2_ylAh.js                                       38.75 kB │ gzip:  11.06 kB
+dist/assets/FilterSystem-CmIF70Bu.js                                 39.39 kB │ gzip:  12.77 kB
+dist/assets/FederatedEventTarget-BGO4gsqR.js                         42.54 kB │ gzip:  11.07 kB
+dist/assets/sortable.esm-eREoLDns.js                                 44.32 kB │ gzip:  14.53 kB
+dist/assets/RenderTargetSystem-qyD8xyk3.js                           51.69 kB │ gzip:  14.45 kB
+dist/assets/GraphicsContext-GrKenn-k.js                              53.70 kB │ gzip:  17.33 kB
+dist/assets/ProfilePage-Bai_f1cp.js                                  55.91 kB │ gzip:  15.99 kB
+dist/assets/chatItems-AQTmE953.js                                    59.48 kB │ gzip:  20.99 kB
+dist/assets/Geometry-BFgXOlm-.js                                     62.35 kB │ gzip:  20.47 kB
+dist/assets/CampPage-DXkHq9T0.js                                     77.00 kB │ gzip:  30.99 kB
+dist/assets/PageViewer-Bg5LTZvK.js                                   88.55 kB │ gzip:  27.60 kB
+dist/assets/prop-types-CkfbjtwL.js                                   94.24 kB │ gzip:  30.82 kB
+dist/assets/WorldContext-CQxrLKQY.js                                 96.15 kB │ gzip:  31.94 kB
+dist/assets/PageEditorPage-BNP63Yoc.js                              110.23 kB │ gzip:  35.63 kB
+dist/assets/HelpPage-Cz-ZFrcz.js                                    122.23 kB │ gzip:  38.09 kB
+dist/assets/WorldChatPage-BJ5BrR7S.js                               164.77 kB │ gzip:  45.10 kB
+dist/assets/campaign-BCcg_cr-.js                                    174.67 kB │ gzip:  53.39 kB
+dist/assets/buildSpawnToken-B06uQ5zH.js                             224.96 kB │ gzip:  55.28 kB
+dist/assets/WorldWeatherPage-DH6ioQ4B.js                            292.03 kB │ gzip:  70.76 kB
+dist/assets/InventoryTab-DJ6reCkI.js                                362.93 kB │ gzip:  80.64 kB
+dist/assets/news-Tdervq4E.js                                        492.01 kB │ gzip: 153.54 kB
+dist/assets/TacticalMapPage-DLOOPxjb.js                             571.45 kB │ gzip: 163.80 kB
+dist/assets/DiceBox3D-u2mWCL4D.js                                   615.80 kB │ gzip: 157.59 kB
+dist/assets/index-DMLXVKia.js                                       868.92 kB │ gzip: 235.99 kB
+dist/assets/MapPage-BfvLsP6_.js                                   1,281.01 kB │ gzip: 339.71 kB
+
+[33m[33m[PLUGIN_TIMINGS] [0mYour build spent significant time in plugins. Here is a breakdown:
+  - vite:css (62%)
+  - vite:css-post (32%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 9.89s[39m
+check-csp-hash: OK — script-src 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28='

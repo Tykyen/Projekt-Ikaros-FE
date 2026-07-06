@@ -7,21 +7,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import axios from 'axios';
 import { Button, Spinner } from '@/shared/ui';
 import { useEmailVerify, useEmailVerifyResend } from '../api/useEmailVerify';
 import { accessTokenAtom } from '@/shared/store/authStore';
+import { parseApiErrorCode } from '@/shared/api/client';
 import s from './ResetPasswordPage.module.css';
 
 type State = 'verifying' | 'success' | 'failed';
-
-function extractCode(err: unknown): string | null {
-  if (axios.isAxiosError(err)) {
-    const data = err.response?.data as { code?: string } | undefined;
-    return data?.code ?? null;
-  }
-  return null;
-}
 
 function codeToMessage(code: string | null): string {
   switch (code) {
@@ -55,7 +47,7 @@ export default function EmailVerifyPage() {
       .mutateAsync(token)
       .then(() => setState('success'))
       .catch((err) => {
-        setErrorCode(extractCode(err));
+        setErrorCode(parseApiErrorCode(err));
         setState('failed');
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps

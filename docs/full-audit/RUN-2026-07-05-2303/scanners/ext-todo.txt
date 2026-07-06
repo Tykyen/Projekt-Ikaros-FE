@@ -1,0 +1,11 @@
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/profile/components/WorldsSection.tsx:9: * PJ badge: zatím TODO — vyžaduje WorldMembership read (přidá 5.3).
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/currencies/shared/convertAmount.spec.ts:30:    expect(convertAmount(1, 'XXX', 'ST', items)).toBeNull();
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/currencies/shared/convertAmount.spec.ts:86:    const result = formatCurrency(10, 'XXX', items);
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/currencies/shared/convertAmount.spec.ts:87:    expect(result).toBe('10 XXX');
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/currencies/utils/setAsBase.spec.ts:44:    expect(() => recomputeRatesForNewBase(fantasy, 'XXX')).toThrow(
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/currencies/utils/setAsBase.spec.ts:78:    const result = moveBaseToFront(fantasy, 'XXX');
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/pages/CharacterDetailPage/diary-systems/README.md:70:  TODO; raději rozdělit na menší samostatné iterace.
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/pages/WorldWeatherPage/modals/WeatherSetsModal.tsx:327:  const canDelete = !readOnly; // PJ+ — parent musí přepnout readOnly nebo nesvázat delete (TODO: jemnější role flag).
+c:/Matrix/ProjektIkaros/Projekt-ikaros-FE/src/features/world/shop/pricing.spec.ts:91:        { price: 30, discountPercent: 0, currencyCode: 'XXX' },
+c:/Matrix/ProjektIkaros/Projekt-ikaros/backend/src/modules/characters/characters.service.spec.ts:383:    // repository integration test (TODO).
+c:/Matrix/ProjektIkaros/Projekt-ikaros/backend/src/modules/maps/operations/map-operations.service.ts:667:            // TODO 10.2e-sync (postpone 8.x reload): volat

@@ -1,0 +1,4 @@
+# FE committed env:
+.env.example
+# BE committed env:
+.env.example

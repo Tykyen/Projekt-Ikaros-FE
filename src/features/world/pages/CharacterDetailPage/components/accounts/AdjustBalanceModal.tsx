@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import { Modal, Button, Input } from '@/shared/ui';
+import { parseApiError, parseApiErrorCode } from '@/shared/api/client';
 import {
   formatCurrency,
   getCurrencySymbol,
@@ -86,16 +87,13 @@ export function AdjustBalanceModal({
           onClose();
         },
         onError: (err) => {
-          const e = err as Error & {
-            response?: { data?: { code?: string; message?: string } };
-          };
-          const code = e?.response?.data?.code;
+          const code = parseApiErrorCode(err);
           if (code === 'PLAYER_ADJUST_DISABLED') {
             toast.error('PJ pro tento účet hráčův vklad/výběr nepovolil.');
           } else if (code === 'FORBIDDEN_ADJUST') {
             toast.error('Nemáš oprávnění.');
           } else {
-            toast.error(e?.response?.data?.message ?? 'Operace selhala.');
+            toast.error(parseApiError(err));
           }
         },
       },

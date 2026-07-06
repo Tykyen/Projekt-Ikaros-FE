@@ -9,6 +9,7 @@
  */
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { parseApiError } from '@/shared/api/client';
 import { Modal, Button } from '@/shared/ui';
 import { Drd16BestieForm } from '@/features/world/bestiar/components/Drd16BestieForm';
 import { systemEntitySchemaRegistry } from '../../../schemas/registry';
@@ -62,7 +63,7 @@ export function Drd16BestieTokenEditModal({
         onSuccess: () => onClose(),
         onError: (e) =>
           toast.error(
-            `Uložení selhalo: ${e instanceof Error ? e.message : 'chyba'}`,
+            `Uložení selhalo: ${parseApiError(e)}`,
           ),
       },
     );

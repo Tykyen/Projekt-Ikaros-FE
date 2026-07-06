@@ -11,6 +11,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { parseApiError } from '@/shared/api/client';
 import { useTokenUpdate } from '../../../hooks/useTokenUpdate';
 import { performSheetRoll } from '../../../utils/rollFromSheet';
 import type { MapToken } from '../../../types';
@@ -65,7 +66,7 @@ export function ShadowrunBestiePanel({
             {
               onError: (e) =>
                 toast.error(
-                  `Uložení selhalo: ${e instanceof Error ? e.message : 'chyba'}`,
+                  `Uložení selhalo: ${parseApiError(e)}`,
                 ),
             },
           );

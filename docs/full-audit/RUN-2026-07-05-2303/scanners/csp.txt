@@ -1,0 +1,5 @@
+
+> projekt-ikaros-fe@0.0.0 audit:csp
+> node scripts/check-csp-hash.mjs
+
+check-csp-hash: OK — script-src 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28='

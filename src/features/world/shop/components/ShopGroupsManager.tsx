@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { Button } from '@/shared/ui/Button/Button';
 import { Input } from '@/shared/ui/Input/Input';
+import { parseApiErrorCode } from '@/shared/api/client';
 import {
   useCreateShopGroup,
   useUpdateShopGroup,
@@ -95,11 +96,8 @@ export function ShopGroupsManager({
     deleteM.mutate(g.id, {
       onSuccess: () => toast.success(`Skupina „${g.name}" smazána.`),
       onError: (err) => {
-        const code = (
-          err as Error & { response?: { data?: { code?: string } } }
-        )?.response?.data?.code;
         toast.error(
-          code === 'CAMPAIGN_SHOPGROUP_NOT_EMPTY'
+          parseApiErrorCode(err) === 'CAMPAIGN_SHOPGROUP_NOT_EMPTY'
             ? 'Skupina obsahuje položky nebo podskupiny — nejdřív je přesuň.'
             : 'Smazání selhalo.',
         );

@@ -13,6 +13,7 @@ import clsx from 'clsx';
 // Světový obsah → content-image upload (PomocnyPJ+ není globální Admin, takže
 // admin-gated /upload/image vracel 403). Dialog je gated na world roli.
 import { useUploadImage } from '@/shared/api/useUploadImage';
+import { parseApiError, parseApiErrorCode } from '@/shared/api/client';
 import { useCreateEmote } from '../api/useCreateEmote';
 import { useCreateGlobalEmote } from '../api/useCreateGlobalEmote';
 import { useUpdateEmote } from '../api/useUpdateEmote';
@@ -225,15 +226,11 @@ export function EmoteUploadDialog(props: EmoteUploadDialogProps) {
       }
       onClose();
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { code?: string; message?: string } } };
-      const code = e?.response?.data?.code;
+      const code = parseApiErrorCode(err);
       if (code === 'EMOTE_SHORTCODE_TAKEN') {
         toast.error('Tenhle shortcode už existuje.');
       } else if (code === 'EMOTE_LIMIT_REACHED') {
-        toast.error(
-          e?.response?.data?.message ??
-            'Dosažen limit emotů. Smaž nepoužívané.',
-        );
+        toast.error(parseApiError(err));
       } else {
         toast.error(isEdit ? 'Úprava emote selhala.' : 'Nahrání emote selhalo.');
       }

@@ -83,6 +83,22 @@ nejmenší chyba**. Hloubka před rychlostí — běh **klidně dny**. Rychlost 
 | `anti-regression-plan` | `anti-regression-audit.md` (`AR-`) | `npm run audit:regression -- --ci` | META | **běží POSLEDNÍ** |
 | _(všechny)_ | — | — | — | `+teeth` (Stryker) ověří sílu testů |
 
+### Rozšířené kontroly (mimo 16 plánů — přidáno RUN 2026-07-05 po masivním úlovku)
+
+Tyto styly **nemají vlastní `-plan/` dir**, ale RUN 2026-07-05 doložil, že chytají třídy chyb, které 16 auditů míjí. Pouštěj je jako **paralelní scannery na pozadí** hned ve Fázi 0/A (rychlé, read-only) a nálezy klasifikuj do reportu jako `EXT-*`. Nikdy je netiše nevynechávej — chybí → `⏭️` do reportu.
+
+| # | Styl | Prefix | Jak spustit | Co chytá (doloženo RUN 07-05) |
+|---|---|---|---|---|
+| 17 | **a11y / přístupnost** | `A11Y-` | `npm run audit:contrast`; + ruční sweep `prefers-reduced-motion` guardů, ARIA role (listbox/option), focus | contrast on-danger <4.5:1 (kyberpunk/magie/mesic), reduced-motion gaps, ARIA `role=option` na `<button>` |
+| 18 | **secret / credential scan** | `SEC-EXT-` | grep na `BEGIN PRIVATE KEY`/`sk_live`/`AKIA`/`ghp_`/`AIza` ve `src/`; `git ls-files \| grep .env`; **`.github/workflows/`** na hardcoded email/token + `print`/`echo` PII do CI logu | CI workflow s reálným emailem natvrdo v gitu (`set-user-email.yml`), hromadný email dump do Actions logu (`export-ikaros-users.yml`) |
+| 19 | **dependency health** | `DEP-` | `npm audit --json` (FE+BE); `npx madge --circular --extensions ts,tsx src`; volitelně `npm outdated` | vitest-browser critical RCE (dev), js-yaml/qs DoS; circular deps (FE 5 / BE 12) |
+| 20 | **type-safety depth** | `TS-` | grep `import type` na DTO použité jako `@Body`/`@Param` (maže class-validator metadata!), `@ts-ignore`, `as any`, `!`-nonnull na security cestách | `import type` v `emotes.controller` → ValidationPipe 400 pro všechny (feature mrtvá) |
+| 21 | **bundle / prod-build** | `BUILD-` | `npm run build` → grep `dist/assets/*.js` na vlastní `console.*`; ověř `build.minify` (vite@8 default = `oxc`, ne `esbuild` → `esbuild.drop` je no-op!); blocking fonts | `console.*` v produkčním bundlu (esbuild.drop mrtvý po vite@8 upgradu) |
+| 22 | **injection surface** | `INJ-` | grep user-controlled `$regex`/`new RegExp` bez `escapeRegex()`; `$where`; Mongo operator injection z payloadu | ReDoS: neescapovaný regex v admin/public user-search + campaign search |
+| 23 | **dead-code / unused** | `DEAD-` | grep BE endpoint/service metody bez FE volajícího; nepoužité exporty; `_options` param nikde nečtený | campaign dashboard+QuickNote FE mrtvé, legacy finance subdoc, `resolvePref` export, dungeon-builder stub |
+
+> **Ponaučení RUN 07-05:** agenti oblastí si sami dělají pod-fan-out (1 oblast → 5 pod-agentů), což dramaticky prohloubí pokrytí — nech je. Nejvíc kritických děr bylo **cross-cutting** (WS `room:join user:` gate, cross-world IDOR vzor napříč campaign/maps/characters, elevation drift ve ~20 FE komponentách, favorites-leak vzor napříč articles/gallery/discussions) — hledej **opakující se vzor** přes moduly, ne jen izolovaný nález.
+
 ---
 
 ## Fáze A — Freshness / self-maintenance (plány MUSÍ sedět na HEAD)

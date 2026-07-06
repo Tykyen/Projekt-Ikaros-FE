@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { WorldRole } from '@/shared/types';
+import { parseApiError, parseApiErrorCode } from '@/shared/api/client';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
 import { useCopyEmote } from '../api/useCopyEmote';
 import type { WorldEmote } from '../lib/types';
@@ -48,14 +49,11 @@ export function CopyEmoteDialog({
       toast.success(`Emote :${emote.shortcode}: zkopírován.`);
       onClose();
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { code?: string; message?: string } } };
-      const code = e?.response?.data?.code;
+      const code = parseApiErrorCode(err);
       if (code === 'EMOTE_SHORTCODE_TAKEN') {
         toast.error('Shortcode už v cílovém světě existuje.');
       } else if (code === 'EMOTE_LIMIT_REACHED') {
-        toast.error(
-          e?.response?.data?.message ?? 'Cílový svět dosáhl limitu emotů.',
-        );
+        toast.error(parseApiError(err));
       } else {
         toast.error('Kopírování selhalo.');
       }

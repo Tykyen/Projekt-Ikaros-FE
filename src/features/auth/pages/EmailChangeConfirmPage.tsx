@@ -7,20 +7,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import axios from 'axios';
 import { Button, Spinner } from '@/shared/ui';
 import { useEmailChangeConfirm } from '../api/useEmailChangeConfirm';
+import { parseApiErrorCode } from '@/shared/api/client';
 import s from './ResetPasswordPage.module.css';
 
 type State = 'verifying' | 'success' | 'failed';
-
-function extractCode(err: unknown): string | null {
-  if (axios.isAxiosError(err)) {
-    const data = err.response?.data as { code?: string } | undefined;
-    return data?.code ?? null;
-  }
-  return null;
-}
 
 function codeToMessage(code: string | null): string {
   switch (code) {
@@ -57,7 +49,7 @@ export default function EmailChangeConfirmPage() {
         toast.success('E-mail byl úspěšně změněn.');
       })
       .catch((err) => {
-        setErrorCode(extractCode(err));
+        setErrorCode(parseApiErrorCode(err));
         setState('failed');
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps

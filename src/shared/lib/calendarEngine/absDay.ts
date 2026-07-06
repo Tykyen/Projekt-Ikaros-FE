@@ -181,6 +181,10 @@ export function daysInYear(config: CalendarConfig, year?: number): number {
  * Pro non-Gregorian s `leapYearRule` iteruje roky (per-year suma).
  */
 export function toAbsDay(date: FantasyDate, config: CalendarConfig): number {
+  // N-SHG-01 mirror (viz `daysInMonth`) — prázdné `months` by jinak vedlo
+  // k dělení nulou (yearLen=0 ve fast-pathi) nebo nekonvergující korekční
+  // smyčce v leap-aware větvi (fromAbsDay). Bez měsíců má smysl jen `day`.
+  if (!config.months || config.months.length === 0) return date.day - 1;
   if (isGregorianLike(config)) {
     const y = date.year;
     // Proleptic Gregorian: count leap days from year 0 (inclusive) up to y-1.
@@ -231,6 +235,13 @@ export function toAbsDay(date: FantasyDate, config: CalendarConfig): number {
  *   `toAbsDay(fromAbsDay(n, cfg), cfg) === n`.
  */
 export function fromAbsDay(absDay: number, config: CalendarConfig): FantasyDate {
+  // N-SHG-01 mirror (viz `daysInMonth`) — prázdné `months` by jinak vedlo
+  // k dělení nulou (yearLen=0 → Infinity/NaN year) nebo nekonečné korekční
+  // `while` smyčce v leap-aware větvi níže. Round-trip s `toAbsDay` guardem
+  // výše: `{year:0, monthIndex:0, day: absDay+1}` → `toAbsDay` vrátí `absDay`.
+  if (!config.months || config.months.length === 0) {
+    return { year: 0, monthIndex: 0, day: absDay + 1 };
+  }
   if (isGregorianLike(config)) {
     let year = Math.floor(absDay / 365.2425);
     while (toAbsDay({ year, monthIndex: 0, day: 1 }, config) > absDay) year--;

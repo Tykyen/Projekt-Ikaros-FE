@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { parseApiError } from '@/shared/api/client';
 import { bestiarQueryKey } from '@/features/world/bestiar/hooks/useBestiar';
 import type { BestiarResponse } from '@/features/world/bestiar/types';
 import { useTokenUpdate } from '../../../hooks/useTokenUpdate';
@@ -137,7 +138,7 @@ export function MatrixBestiePanel({
           notes: p.notes,
         },
       },
-      { onError: (e) => toast.error(`Uložení selhalo: ${e instanceof Error ? e.message : 'chyba'}`) },
+      { onError: (e) => toast.error(`Uložení selhalo: ${parseApiError(e)}`) },
     );
   }, [systemId, token.id, update]);
 

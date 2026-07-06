@@ -1,0 +1,40 @@
+          [33mwidth[39m=[32m"13"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<rect[39m
+            [33mheight[39m=[32m"11"[39m
+            [33mrx[39m=[32m"2"[39m
+            [33mry[39m=[32m"2"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mx[39m=[32m"3"[39m
+            [33my[39m=[32m"11"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M7 11V7a5 5 0 0 1 10 0v4"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [0m Soukromý svět[0m
+      [36m</span>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/features/ikaros/pages/DashboardPage/__tests__/WorldCard.spec.tsx:106:19
+    104|   it('anon (bez membership): CTA "Detail světa", žádný role chip', () …
+    105|     renderCard(makeWorld(), null);
+    106|     expect(screen.getByText(/Detail světa/)).toBeInTheDocument();
+       |                   ^
+    107|     expect(screen.queryByText(/Vstoupit do/)).toBeNull();
+    108|     expect(screen.queryByText(/Hráč/)).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 456 passed (457)
+      Tests  1 failed | 3485 passed (3486)
+   Start at  23:15:53
+   Duration  765.99s (transform 16.98s, setup 78.63s, import 124.57s, tests 72.61s, environment 405.07s)
+

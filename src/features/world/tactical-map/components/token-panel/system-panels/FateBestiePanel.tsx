@@ -8,6 +8,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { parseApiError } from '@/shared/api/client';
 import { useTokenUpdate } from '../../../hooks/useTokenUpdate';
 import { performSheetRoll } from '../../../utils/rollFromSheet';
 import type { MapToken } from '../../../types';
@@ -59,7 +60,7 @@ export function FateBestiePanel({
             { tokenId: token.id, patch: { systemStats: next } },
             {
               onError: (e) =>
-                toast.error(`Uložení selhalo: ${e instanceof Error ? e.message : 'chyba'}`),
+                toast.error(`Uložení selhalo: ${parseApiError(e)}`),
             },
           );
         }, SAVE_DEBOUNCE_MS);

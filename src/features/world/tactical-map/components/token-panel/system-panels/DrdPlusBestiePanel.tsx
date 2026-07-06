@@ -17,6 +17,7 @@
  */
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
+import { parseApiError } from '@/shared/api/client';
 import { performSheetRoll } from '../../../utils/rollFromSheet';
 import { useTokenUpdate } from '../../../hooks/useTokenUpdate';
 import { systemEntitySchemaRegistry } from '../../../schemas/registry';
@@ -155,7 +156,7 @@ export function DrdPlusBestiePanel({
         onSuccess: () => setEditing(false),
         onError: (e) =>
           toast.error(
-            `Uložení selhalo: ${e instanceof Error ? e.message : 'chyba'}`,
+            `Uložení selhalo: ${parseApiError(e)}`,
           ),
       },
     );

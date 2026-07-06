@@ -1,0 +1,40 @@
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s2[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient disconnected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s2[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s2[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient disconnected: s1[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[PresenceGateway] [39m[32mClient connected: s1[39m
+[33m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [33m   WARN[39m [38;5;3m[ThrottlerConfig] [39m[33mTHROTTLER_REDIS=1, ale REDIS_URL chybí → fallback in-memory.[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [32m    LOG[39m [38;5;3m[ThrottlerConfig] [39m[32mRedis throttler storage aktivní (multi-instance).[39m
+[33m[Nest] 50892  - [39m05. 07. 2026 23:16:08 [33m   WARN[39m [38;5;3m[ThrottlerConfig] [39m[33mRedis throttler nedostupný (ECONNREFUSED) → fallback in-memory.[39m
+[33m[Nest] 50892  - [39m05. 07. 2026 23:16:09 [33m   WARN[39m [38;5;3m[JwtAuthGuard] [39m[33mupdateLastSeen failed for user123: DB down[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:10 [32m    LOG[39m [38;5;3m[TrustedDevicesService] [39m[32mPassword changed (userId=u1) — revokuji důvěryhodná zařízení.[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:10 [32m    LOG[39m [38;5;3m[TrustedDevicesService] [39m[32mAccount hard-deleted (userId=u1) — revokuji důvěryhodná zařízení.[39m
+[31m[Nest] 52916  - [39m05. 07. 2026 23:16:13 [31m  ERROR[39m [38;5;3m[AccountCleanupCron] [39m[31mHard-cleanup selhal pro a: mongo down[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelPathResolver] [39m[32mModel cache hit: \tmp\model_cache\ea08dad4968b251127fb95d441c769c11b1b2e4b5f73d4af1de23a9b534066b5.onnx[39m
+[33m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [33m   WARN[39m [38;5;3m[AdminStatsService] [39m[33mStat metric "worlds.total" selhala, vracím 0 — worlds down[39m
+[33m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [33m   WARN[39m [38;5;3m[AdminStatsService] [39m[33mStat metric "content.articles" selhala, vracím 0 — articles down[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelRuntime[granite-107]] [39m[32mNačítám ONNX model...[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelRuntime[granite-107]] [39m[32mNačítám tokenizer...[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelRuntime[granite-107]] [39m[32mModelRuntime inicializován.[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelRuntime[granite-107]] [39m[32mNačítám ONNX model...[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelRuntime[granite-107]] [39m[32mNačítám tokenizer...[39m
+[32m[Nest] 50892  - [39m05. 07. 2026 23:16:15 [32m    LOG[39m [38;5;3m[ModelRuntime[granite-107]] [39m[32mModelRuntime inicializován.[39m
+[33m[Nest] 52916  - [39m05. 07. 2026 23:16:15 [33m   WARN[39m [38;5;3m[TotpCryptoService] [39m[33mTOTP_ENC_KEY není nastaven nebo nemá 32 B (base64) — 2FA setup bude fail-closed.[39m
+[33m[Nest] 52916  - [39m05. 07. 2026 23:16:15 [33m   WARN[39m [38;5;3m[TotpCryptoService] [39m[33mTOTP_ENC_KEY není nastaven nebo nemá 32 B (base64) — 2FA setup bude fail-closed.[39m
+
+Test Suites: 143 passed, 143 total
+Tests:       2353 passed, 2353 total
+Snapshots:   0 total
+Time:        24.154 s, estimated 62 s
+Ran all test suites.

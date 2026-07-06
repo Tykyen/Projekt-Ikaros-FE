@@ -1,5 +1,35 @@
 # Chybový deník — oblast: plný audit / kvalita
 
+## ✅ ŘEŠENÍ — plný audit RUN-2026-07-05 (28 oprav nasazeno) — 2026-07-06
+
+**Co zabralo.** Noční `plny-audit` na HEAD (FE 213d05f3 / BE fadecaec). Fáze B = 3 vlny agentů
+(1 agent = 1 oblast, sonnet), přičemž **agenti oblastí si sami udělali pod-fan-out** (1 oblast →
+až 5 pod-agentů přes background) — pokrytí se tím dramaticky prohloubilo, nechal jsem je. ~130
+nálezů napříč všemi 110 oblastmi + 7 rozšířených stylů (a11y/secret/dep/type/bundle/injection/dead).
+
+**Opravy = 3 dávky, delegované implementaci mechanicky dle přesné spec, git dělám sám.** BE dávka 1
+(7 bezpečnostních) a dávka 2 (21 IDOR/leaky/funkční) → **ověřeno tsc+lint+jest, commit+push na main**
+(`eca83da`, `13d7d32`). FE dávka 3 (30 souborů) → ověřeno, **necommit** (uživatel commituje FE ručně).
+
+**Proč správně.** Nejvíc kritických děr bylo **cross-cutting vzor**, ne izolovaný nález: WS
+`room:join user:` gate chyběl → odposlech cizích DM; **stejný IDOR vzor** napříč campaign (20 metod)/
+maps/characters; **stejný leak vzor** napříč articles/gallery/discussions favorites; elevation drift
+v ~20 FE komponentách. Oprava = najít vzor a projet všechny výskyty (agent doložil sesterský správný
+vzor u každého). Ke každé opravě pojistka G≥2 (kód + srovnání se sesterským vzorem + zelené testy).
+
+**Jak ověřeno.** Každá dávka: `npx tsc --noEmit` + `npm run lint:check` + cílené `jest --maxWorkers=2` /
+`vitest --project '!storybook'`; BE precommit hook (typecheck+lint) při commitu; META brána
+`audit:regression --ci` = EXIT 0 (žádná regrese, každý opravený důležitý nález má G≥2). Agenti dopsali
+i regresní testy pro dříve nekryté cesty (campaign IDOR, maps, transfer).
+
+**Zhodnocení — dobře:** delegování mechanické implementace dle přesné spec šetřilo kontext a nebylo
+míchání BE+FE (BE agenti sériově, pak FE); commit až po ověření (ne slepě); riskantní BE (soft-delete
+world guard, elevation governance, reserved-slug) vědomě ODLOŽENO na ráno místo nočního rizika.
+**Špatně / pozor:** BE e2e 73/134 fail = jen infra (lokální Mongo standalone ne replSet) — málem
+vypadalo jako 73 regresí; nutno číst PŘÍČINU, ne počet. FIX-7 push hijack řeší přes duplicate-key
+(500 místo 4xx) — funkční, ale ne elegantní. Necommitnutý FE balík (30 souborů) je velký na revizi —
+příště zvážit menší commity/dávky i u necommitovaného FE.
+
 ## CH-011 — gate v service volané i interně → 403 regrese chat kanálů — 2026-06-20
 
 **Co nefungovalo.** R-RUN-02 fix: přidal jsem world-gate (`accessMode` member-only)

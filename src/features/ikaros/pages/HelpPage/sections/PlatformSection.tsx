@@ -72,10 +72,11 @@ export function PlatformSection() {
         </Tool>
         <Tool icon={<Globe2 size={16} />} title="Přehled vesmírů" audience={{ kind: 'vse', label: 'Všichni' }}>
           <p>
-            Mřížka aktivních světů. Hledání podle názvu, filtr Vše / Veřejné / Mé
-            světy a řazení (datum vzniku / abeceda / volná místa). Kliknutím na
-            kartu otevřeš detail světa. Anonym vidí veřejné a otevřené světy,
-            přihlášený navíc své. Najdeš v{' '}
+            Mřížka <strong>všech</strong> aktivních světů (katalog). Hledání podle
+            názvu, filtr Vše / Veřejné / Mé světy a řazení (datum vzniku / abeceda
+            / volná místa). Veřejný svět otevřeš rovnou, otevřený přes žádost o
+            vstup; <strong>soukromý</strong> svět se ukazuje zamčený (🔒) — dovnitř
+            jen jeho členové. Najdeš v{' '}
             <Link to="/ikaros/vesmiry">Přehledu vesmírů</Link>.
           </p>
         </Tool>

@@ -1,0 +1,46 @@
+
+> projekt-ikaros-fe@0.0.0 audit:contrast
+> node scripts/audit-theme-contrast.mjs
+
+✓ africke
+✓ apokalypsa
+✓ arabsky-svet
+✓ bila
+✓ ctyri-zivly
+✓ cyberpunk
+✓ dark-fantasy
+✓ fantasy
+✓ historie
+✓ horor
+✓ hospoda
+✓ ikaros
+✓ indiane
+
+kyberpunk:
+  ✗ on-danger text: #fff5fa on #ff2050 = 3.53:1 (need ≥4.5)
+
+magie:
+  ✗ on-danger text: #fff5fa on #ff5577 = 2.89:1 (need ≥4.5)
+
+mesic:
+  ✗ on-danger text: #f4f8ff on #ff5577 = 2.89:1 (need ≥4.5)
+✓ moderni
+✓ modre-nebe
+✓ mystery
+✓ nemrtvi
+✓ pergamen
+✓ postapo
+✓ priroda
+✓ sci-fi
+✓ severske-runy
+✓ slunce
+✓ steampunk
+✓ temna-cerven
+✓ vesmir
+✓ vesmirna-bitva
+✓ vesmirna-lod
+✓ western
+✓ zlaty-standard
+
+
+3 contrast issue(s) found.

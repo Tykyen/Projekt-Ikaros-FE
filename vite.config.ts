@@ -16,4 +16,9 @@ export default defineConfig(({ mode }) => ({
   // PC-09: v produkčním buildu odstranit console.* a debugger z bundlu
   // (esbuild je jinak nechává). V dev ponecháno pro ladění.
   esbuild: mode === 'production' ? { drop: ['console', 'debugger'] } : {},
+  // vite@8 defaultuje minifikaci na 'oxc', kde esbuild.drop výše je no-op —
+  // console.*/debugger by přežily v produkčním bundlu. Vynutit esbuild minifier.
+  build: {
+    minify: 'esbuild',
+  },
 }));

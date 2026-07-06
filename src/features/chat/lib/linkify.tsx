@@ -17,8 +17,14 @@ import { Fragment, type ReactNode } from 'react';
  */
 const URL_RE = /https?:\/\/[^\s<]+[^\s<.,!?;:)\]}"'»]/gi;
 
-/** Bidi / zero-width řídicí znaky (vizuální přeuspořádání textu odkazu). */
-const UNSAFE_CHARS = /[​-‏‪-‮⁦-⁩]/;
+/**
+ * Bidi / zero-width řídicí znaky (vizuální přeuspořádání textu odkazu).
+ * Unicode escapy místo literálních znaků — literály padají na eslint
+ * `no-irregular-whitespace` (CI merge gate). Rozsahy: zero-width + RLM/LRM
+ * (U+200B–U+200F), bidi embedding/override (U+202A–U+202E), bidi izolace
+ * (U+2066–U+2069).
+ */
+const UNSAFE_CHARS = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069]/;
 
 /**
  * Odkaz nezobrazíme jako klikací, když může klamat cíl navigace (text = href):
