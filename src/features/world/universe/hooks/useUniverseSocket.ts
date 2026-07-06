@@ -35,14 +35,16 @@ export function useUniverseSocket(
 
   const clearStale = useCallback(() => setStaleFromRemote(false), []);
 
-  // room join + reconnect re-join
+  // reconnect refetch — `world:{id}` room join/leave (i re-join po reconnectu)
+  // drží výhradně `useWorldSocket` (WorldLayout, jediný vlastník W-7/W-9); tady
+  // se dřív dělal vlastní `room:join`/`room:leave`, ale bez ref-countingu →
+  // odchod z Universe mapy zavolal `room:leave` i za WorldLayout a vykopl
+  // dashboard z roomu (FIX-1). Zůstává jen `connect` listener, který po
+  // reconnectu refetchne zmeškaný `universe:updated` signál (S-RUN-03).
   useEffect(() => {
     if (!worldId) return;
     const socket = getSocket();
-    const room = `world:${worldId}`;
-    socket.emit('room:join', room);
     const onConnect = (): void => {
-      socket.emit('room:join', room);
       // S-RUN-03 — re-join sám nestačí: signál `universe:updated` zmeškaný
       // během výpadku je pryč → po reconnectu refetch (mimo edit mód, kde má
       // draft přednost a jen rozsvítíme badge „mapa byla mezitím změněna").
@@ -56,7 +58,6 @@ export function useUniverseSocket(
     };
     socket.on('connect', onConnect);
     return () => {
-      socket.emit('room:leave', room);
       socket.off('connect', onConnect);
     };
   }, [worldId, queryClient]);

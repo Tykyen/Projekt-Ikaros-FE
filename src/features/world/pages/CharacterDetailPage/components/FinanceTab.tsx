@@ -85,8 +85,10 @@ export function FinanceTab({
   onBackToProfil,
   onProvideSave,
 }: Props) {
-  const { worldId, userRole } = useWorldContext();
-  const isPJ = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  const { worldId, userRole, world } = useWorldContext();
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const isPJ =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
   const accountsQuery = useCharacterAccounts(worldId, page.slug);
   const currenciesQuery = useWorldCurrencies(worldId);
 

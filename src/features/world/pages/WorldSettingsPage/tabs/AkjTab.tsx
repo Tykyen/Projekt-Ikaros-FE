@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Spinner } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
@@ -11,6 +12,14 @@ import s from './AkjTab.module.css';
 export default function AkjTab() {
   const { world } = useWorldContext();
   const settingsQ = useWorldSettings(world?.id ?? '');
+  // FIX-5 companion — `AkjLevelEditor` teď resetuje svůj lokální state při
+  // změně `initial` reference (FIX-5). `?? []` by bez memoizace vytvořilo
+  // NOVÉ prázdné pole při KAŽDÉM re-renderu (dokud svět nemá žádné akjTypes
+  // uložené), což by reset spouštělo pořád dokola a mazalo rozepsané úpravy.
+  const akjTypes = useMemo(
+    () => settingsQ.data?.akjTypes ?? [],
+    [settingsQ.data?.akjTypes],
+  );
 
   if (!world) return null;
 
@@ -29,10 +38,7 @@ export default function AkjTab() {
       {settingsQ.isLoading ? (
         <Spinner center />
       ) : (
-        <AkjLevelEditor
-          worldId={world.id}
-          initial={settingsQ.data?.akjTypes ?? []}
-        />
+        <AkjLevelEditor worldId={world.id} initial={akjTypes} />
       )}
     </SettingsPanel>
   );

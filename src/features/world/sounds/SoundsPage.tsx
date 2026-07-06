@@ -7,6 +7,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
+import { toast } from 'sonner';
 import { Button, ConfirmDialog } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -32,14 +33,20 @@ import styles from './SoundsPage.module.css';
 type Tab = 'world' | 'global' | 'nominations';
 
 export default function SoundsPage(): React.ReactElement {
-  const { worldId, userRole } = useWorldContext();
+  const { worldId, userRole, world } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
 
+  // `isGlobalAdmin` je platformová role — správně řídí jen tab „Nominace"
+  // (platform-wide moderace mimo elevaci, §3.4 spec-world-admin-elevation).
   const isGlobalAdmin =
     currentUser?.role === UserRole.Superadmin ||
     currentUser?.role === UserRole.Admin;
+  // R-22 — world-scope práva (create/edit/import zvuků TOHOTO světa) musí jít
+  // přes `world.elevated`, ne holé `isGlobalAdmin` (de-elevated admin by viděl
+  // tlačítka, klik = 403).
+  const isElevatedHere = world?.elevated === true;
   const isPjInWorld =
-    isGlobalAdmin || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
+    isElevatedHere || (userRole !== null && userRole >= WorldRole.PomocnyPJ);
 
   const [tab, setTab] = useState<Tab>('world');
   const [filters, setFilters] = useState<SoundFilters>(EMPTY_FILTERS);
@@ -51,7 +58,12 @@ export default function SoundsPage(): React.ReactElement {
   const globalQuery = useGlobalSounds(tab === 'global');
   const mutations = useSoundMutations(worldId);
 
-  const player = useYoutubePlayer();
+  // FIX-7 — bez onError banner „Právě hraje" visí i po selhání videa
+  // (embedding zakázán / smazané / neplatné ID). Zavření náhledu + toast.
+  const player = useYoutubePlayer(() => {
+    setPreviewSound(null);
+    toast.error('Přehrání zvuku selhalo (video není dostupné).');
+  });
   const { effectiveVolume } = useSoundVolume();
 
   // Drž hlasitost přehrávače v souladu s uživatelským nastavením.

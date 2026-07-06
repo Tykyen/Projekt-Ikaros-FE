@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/features/chat/api/socket";
+import { useSocketReconnect } from "@/features/chat/api/useSocket";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import {
   useBroadcastWeather,
@@ -73,22 +74,19 @@ export function useMapWeather(): UseMapWeatherResult {
     });
   }, []);
 
-  // world-room join (+ re-join po reconnectu). `weather:updated` jde do
-  // `world:{worldId}` — hráč musí být v roomu, jinak event nedostane.
-  useEffect(() => {
+  // `weather:updated` jde do `world:{worldId}` — room join/leave (i re-join po
+  // reconnectu) drží výhradně `useWorldSocket` (WorldLayout, jediný vlastník
+  // W-7/W-9). FIX-1 — dřívější vlastní `room:join`/`room:leave` tady nebyl
+  // ref-counted → odchod z mapy zavolal `room:leave` i za WorldLayout a
+  // vykopl z roomu celý zbytek světa (dashboard přestal dostávat updates).
+  //
+  // FIX-5 — reconnect fallback: `weather:updated` zmeškaný během výpadku je
+  // pryč (žádný replay), takže po reconnectu refetchujeme `World` query, ať
+  // se `activeMapWeather` dorovná i bez dalšího live eventu.
+  useSocketReconnect(() => {
     if (!worldId) return;
-    const socket = getSocket();
-    const room = `world:${worldId}`;
-    socket.emit("room:join", room);
-    const onConnect = (): void => {
-      socket.emit("room:join", room);
-    };
-    socket.on("connect", onConnect);
-    return () => {
-      socket.emit("room:leave", room);
-      socket.off("connect", onConnect);
-    };
-  }, [worldId]);
+    void queryClient.invalidateQueries({ queryKey: ["worlds"] });
+  });
 
   // listener: patch World query cache (slug i id variant — match dle world.id)
   useEffect(() => {

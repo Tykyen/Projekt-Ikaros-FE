@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/shared/api/client';
+import { toast } from 'sonner';
+import { api, parseApiError } from '@/shared/api/client';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
 import type { MyWorldEntry } from '@/shared/types';
 
@@ -59,22 +60,35 @@ export function useChatPrefs(worldId: string) {
 
   const patchRef = useRef<ChatPrefsPatch>({});
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // FIX-3d — snapshot cache PŘED první optimistic úpravou v aktuální debounce
+  // dávce (`timerRef.current === null` = žádná dávka neběží). Když PATCH na
+  // konci dávky selže, vrátíme cache na tento stav (vzor `useChannelMutations`
+  // rollback), místo aby si klient nesynchronizovaně myslel, že se pořadí
+  // uložilo.
+  const snapshotRef = useRef<MyWorldEntry[] | undefined>(undefined);
 
-  // Unmount — flush pending debounce, ať se poslední změna neztratí.
+  // Unmount — flush pending debounce, ať se poslední změna neztratí. Cache
+  // (queryClient) přežívá unmount, takže rollback při chybě má pořád smysl.
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       const dto = patchRef.current;
       if (Object.keys(dto).length > 0) {
-        void api.patch(`/worlds/${worldId}/chat/my-prefs`, dto);
+        const snapshot = snapshotRef.current;
+        void api.patch(`/worlds/${worldId}/chat/my-prefs`, dto).catch(() => {
+          if (snapshot) qc.setQueryData(MY_WORLDS_KEY, snapshot);
+        });
         patchRef.current = {};
       }
     };
-  }, [worldId]);
+  }, [worldId, qc]);
 
   /** Optimistic zápis do `['worlds','my']` cache + naplánování debounced PATCH. */
   const apply = useCallback(
     (patch: ChatPrefsPatch) => {
+      if (timerRef.current === null) {
+        snapshotRef.current = qc.getQueryData<MyWorldEntry[]>(MY_WORLDS_KEY);
+      }
       qc.setQueryData<MyWorldEntry[]>(MY_WORLDS_KEY, (old) =>
         (old ?? []).map((e) =>
           e.world.id !== worldId
@@ -106,8 +120,15 @@ export function useChatPrefs(worldId: string) {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
         const dto = patchRef.current;
+        const snapshot = snapshotRef.current;
         patchRef.current = {};
-        mutate(dto);
+        timerRef.current = null;
+        mutate(dto, {
+          onError: (err) => {
+            if (snapshot) qc.setQueryData(MY_WORLDS_KEY, snapshot);
+            toast.error(`Uložení nastavení chatu selhalo: ${parseApiError(err)}`);
+          },
+        });
       }, DEBOUNCE_MS);
     },
     [qc, worldId, mutate],

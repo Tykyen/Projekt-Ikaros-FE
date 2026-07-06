@@ -8,7 +8,7 @@
  * Mount na `WorldWeatherPage`. Cleanup v `useSocketEvent` handle (off na unmount).
  */
 import { useQueryClient } from '@tanstack/react-query';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import type { WeatherGenerator, WeatherResult } from '@/shared/types';
 import { weatherGeneratorsKey } from './useWeatherGenerators';
 
@@ -22,6 +22,14 @@ interface WeatherUpdatedPayload {
 
 export function useWeatherWsSubscribe(worldId: string): void {
   const qc = useQueryClient();
+
+  // FIX-5 — reconnect fallback: `weather:updated` zmeškaný během výpadku je
+  // pryč (žádný replay) → po reconnectu refetch, ať karty generátorů dorovnají
+  // stav bez čekání na další live broadcast.
+  useSocketReconnect(() => {
+    if (!worldId) return;
+    void qc.invalidateQueries({ queryKey: weatherGeneratorsKey(worldId) });
+  });
 
   useSocketEvent<WeatherUpdatedPayload>('weather:updated', (event) => {
     if (!worldId || event.worldId !== worldId) return;

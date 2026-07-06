@@ -32,10 +32,13 @@ function getHandler(event: string) {
 beforeEach(() => vi.clearAllMocks());
 
 describe('useUniverseSocket', () => {
-  it('joinne world room a registruje listener', () => {
+  // FIX-1 — `world:{id}` room join/leave drží výhradně `useWorldSocket`
+  // (WorldLayout, jediný vlastník); tenhle hook už `room:join` sám nedělá
+  // (jinak by odchod z Universe mapy `room:leave`-oval i za WorldLayout).
+  it('registruje listener na universe:updated', () => {
     const { wrapper } = makeWrapper();
     renderHook(() => useUniverseSocket('w1', false), { wrapper });
-    expect(mockSocket.emit).toHaveBeenCalledWith('room:join', 'world:w1');
+    expect(mockSocket.emit).not.toHaveBeenCalledWith('room:join', expect.anything());
     expect(mockSocket.on).toHaveBeenCalledWith(
       'universe:updated',
       expect.any(Function),
@@ -92,8 +95,6 @@ describe('useUniverseSocket', () => {
     spy.mockClear();
     act(() => onConnect!());
     expect(spy).toHaveBeenCalledWith({ queryKey: universeQueryKey('w1') });
-    // re-join roomu po reconnectu zůstává
-    expect(mockSocket.emit).toHaveBeenCalledWith('room:join', 'world:w1');
   });
 
   it('S-RUN-03 — reconnect v edit módu (suspended) jen rozsvítí stale, neinvaliduje', () => {

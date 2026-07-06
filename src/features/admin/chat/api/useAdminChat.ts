@@ -201,8 +201,12 @@ export function useAdminChatRealtime(channelId: string | null): {
   }, [socket, channelId]);
 
   // Po reconnectu Socket.IO zahodí rooms → re-join.
+  // FIX-4 — re-join sám nedoplní zprávy zmeškané BĚHEM výpadku (žádný replay
+  // po WS reconnectu) → invaliduj historii dané konverzace (vzor `ChatRoom` C-05).
   useSocketReconnect(() => {
-    if (channelId) socket.emit('platform-chat:join', { channelId });
+    if (!channelId) return;
+    socket.emit('platform-chat:join', { channelId });
+    void qc.invalidateQueries({ queryKey: adminChatKeys.messages(channelId) });
   });
 
   useSocketEvent<ChatMessage>('platform-chat:message', (msg) => {

@@ -22,8 +22,14 @@ import s from './EventsPage.module.css';
  * při ručním `?view=archive` se replacuje na `upcoming`.
  */
 export default function EventsPage() {
-  const { worldId, userRole, loading: worldLoading } = useWorldContext();
-  const viewerRole = userRole ?? WorldRole.Zadatel;
+  const { worldId, userRole, world, loading: worldLoading } = useWorldContext();
+  // Elevation — nahozený admin dostává plnou PJ moc v tomto světě; `viewerRole`
+  // se předává i do `EventsToolbar`/`EventsList`/`GameEventCard`, takže OR
+  // stačí zavést tady jednou.
+  const isElevatedHere = world?.elevated === true;
+  const viewerRole = isElevatedHere
+    ? WorldRole.PJ
+    : (userRole ?? WorldRole.Zadatel);
   const settingsQ = useWorldSettings(worldId);
   const customGroups = settingsQ.data?.customGroups ?? [];
   const groupColors = settingsQ.data?.groupColors ?? {};

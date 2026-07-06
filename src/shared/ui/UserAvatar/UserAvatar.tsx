@@ -52,6 +52,15 @@ export function UserAvatar({
 }: Props) {
   const fallback = defaultUrl(defaultType, size);
   const [errored, setErrored] = useState(false);
+  // FIX-2 — `errored` se bez resyncu nikdy nevrátí zpět: jednou selhané
+  // src (starý/rozbitý avatar) natrvalo zafixuje fallback i po změně `src`
+  // na platnou URL (výměna avataru, přepnutí mezi uživateli v seznamu…).
+  // Adjustment-during-render (ne effect — vyhne se cascading re-renderu).
+  const [prevSrc, setPrevSrc] = useState(src);
+  if (src !== prevSrc) {
+    setPrevSrc(src);
+    setErrored(false);
+  }
   const url = !src || errored ? fallback : src;
   const px = sizePxMap[size];
   const effectiveAlt = deleted ? 'Smazaný účet' : alt;

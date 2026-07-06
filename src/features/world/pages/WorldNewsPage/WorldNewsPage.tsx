@@ -31,13 +31,18 @@ const LIMIT = 10;
  * archivaci a mazání. Předloha: globální `NovinkyPage`.
  */
 export default function WorldNewsPage() {
-  const { worldId, worldSlug, userRole, loading } = useWorldContext();
+  const { worldId, worldSlug, world, userRole, loading } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
 
+  // R-22 — world-scope gate MUSÍ jít přes `world.elevated`, ne holé
+  // `isGlobalAdmin` (de-elevated admin by viděl tlačítka, klik = 403).
+  // `isGlobalAdmin` zůstává jen pro globální novinky (worldId=null, platformová
+  // akce mimo elevaci — viz níže).
+  const isElevatedHere = world?.elevated === true;
   const isGlobalAdmin =
     currentUser?.role !== undefined && currentUser.role <= UserRole.Admin;
   const canManage =
-    isGlobalAdmin || (userRole ?? WorldRole.Zadatel) >= WorldRole.PomocnyPJ;
+    isElevatedHere || (userRole ?? WorldRole.Zadatel) >= WorldRole.PomocnyPJ;
 
   const [params, setParams] = useSearchParams();
   const scope: WorldNewsScope =

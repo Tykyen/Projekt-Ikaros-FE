@@ -177,17 +177,21 @@ export function DndCombatPanel({
     onRoll?.({ label, kind: 'mixed', mixed: dmg.mixed, modifier: dmg.modifier });
   };
 
+  // FIX-4 — clamp na [0, hpMax] (bez hpMax = jen dolní mez); mirror Coc/Gurps.
   const commitHp = (): void => {
     if (!canEdit) return;
     const cleaned = hpDraft.replace(/[^\d-]/g, '') || '0';
-    save({ dnd_hpCur: cleaned });
+    const parsed = parseInt(cleaned, 10) || 0;
+    const clamped = Math.max(0, Math.min(hpMaxNum || Infinity, parsed));
+    setHpDraft(String(clamped));
+    save({ dnd_hpCur: String(clamped) });
   };
   const adjustHp = (delta: number): void => {
     if (!canEdit) return;
     const cur = parseInt(hpDraft || '0', 10) || 0;
-    const next = String(cur + delta);
-    setHpDraft(next);
-    save({ dnd_hpCur: next });
+    const next = Math.max(0, Math.min(hpMaxNum || Infinity, cur + delta));
+    setHpDraft(String(next));
+    save({ dnd_hpCur: String(next) });
   };
 
   return (

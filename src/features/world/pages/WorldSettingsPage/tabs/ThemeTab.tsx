@@ -32,6 +32,30 @@ export default function ThemeTab() {
     world?.themeBackgroundUrl,
   );
 
+  // FIX-5 — bez resyncu zůstane editor na hodnotách z prvního mountu; když
+  // vzhled uloží jiný PJ mezitím, tenhle tab by ho příštím uložením přepsal.
+  // Sledujeme jednotlivá pole zvlášť (ne celý `world`), ať se nereseuje
+  // editor kvůli změně nesouvisejícího pole (např. počtu členů).
+  const [prevThemeId, setPrevThemeId] = useState(world?.themeId);
+  const [prevOverrides, setPrevOverrides] = useState(world?.themeOverrides);
+  const [prevBackgroundUrl, setPrevBackgroundUrl] = useState(
+    world?.themeBackgroundUrl,
+  );
+  if (world) {
+    if (world.themeId !== prevThemeId) {
+      setPrevThemeId(world.themeId);
+      setThemeId(world.themeId ?? DEFAULT_THEME_ID);
+    }
+    if (world.themeOverrides !== prevOverrides) {
+      setPrevOverrides(world.themeOverrides);
+      setOverrides(world.themeOverrides ?? {});
+    }
+    if (world.themeBackgroundUrl !== prevBackgroundUrl) {
+      setPrevBackgroundUrl(world.themeBackgroundUrl);
+      setBackgroundUrl(world.themeBackgroundUrl);
+    }
+  }
+
   const setPreview = useSetAtom(worldThemePreviewAtom);
 
   // Živý náhled — publikuje volbu editoru do náhledového atomu; `WorldLayout`

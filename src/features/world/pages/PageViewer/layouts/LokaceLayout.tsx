@@ -27,8 +27,10 @@ type PendingNav = { type: 'tab'; id: string } | { type: 'exit' };
  * žádné prázdné taby, žádné FE crashe.
  */
 export function LokaceLayout({ page }: { page: Page }) {
-  const { worldId, userRole } = useWorldContext();
-  const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  const { worldId, userRole, world } = useWorldContext();
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canEdit =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   // Character existuje jen pro Lokace po migraci 9.2 (auto-create v PagesService).
   // Slug Character = slug Page (sjednoceno 9.1).

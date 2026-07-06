@@ -1,8 +1,10 @@
 import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { api, apiClient } from '@/shared/api/client';
+import { toast } from 'sonner';
+import { api, apiClient, parseApiError } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
+import { anonSessionAtom } from '../store/anonSession';
 import { useSocketEvent } from './useSocket';
 import { getSocket } from './socket';
 import type {
@@ -61,13 +63,16 @@ const ROOM_PRESENCE_COUNTS_KEY = ['global-chat', 'room-presence-counts'] as cons
  */
 export function useRoomPresenceCounts(): RoomPresenceCounts | undefined {
   const qc = useQueryClient();
-  // N-30 — endpoint je za JwtAuthGuard; bez tohoto guardu anon (sidebar v public
-  // shellu) pálil 401 a badge se nenačetl. Presence počty potřebuje jen logged-in.
+  // N-30 — endpoint vyžaduje autentizaci; bez gatu anon (sidebar v public
+  // shellu) pálil 401 a badge se nenačetl.
+  // FIX-3 — BE guard je od 15.8 `GuestOrMemberGuard` (přijímá i host/guest
+  // token), ne původní čistý `JwtAuthGuard` — gate proto pustí i hosta.
   const token = useAtomValue(accessTokenAtom);
+  const anon = useAtomValue(anonSessionAtom);
   const query = useQuery({
     queryKey: ROOM_PRESENCE_COUNTS_KEY,
     queryFn: () => api.get<RoomPresenceCounts>('/global-chat/rooms/presence'),
-    enabled: !!token,
+    enabled: !!token || !!anon,
   });
   useSocketEvent<RoomPresenceCounts>('chat:rooms:presence', (counts) => {
     qc.setQueryData(ROOM_PRESENCE_COUNTS_KEY, counts);
@@ -93,6 +98,10 @@ export function useSendMessage(room: RoomKey) {
         `/global-chat/messages?room=${room}`,
         dto,
       ),
+    // FIX-4 — dřív tiché selhání (ChatInput smazal text i bez potvrzení odeslání).
+    onError: (err) => {
+      toast.error(`Zprávu se nepodařilo odeslat: ${parseApiError(err)}`);
+    },
   });
 }
 

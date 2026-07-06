@@ -157,6 +157,11 @@ export function useOptimisticSend({
         overrideAvatarUrl: message.overrideAvatarUrl,
         overridePageSlug: message.overridePageSlug,
         rpDate: message.rpDate,
+        // FIX-6 — dřív vynechané: retry hodu kostkou/mapy poslal jen holý text
+        // (BE by ho přestal detekovat jako `isDiceRoll` / ztratil mapRef odkaz).
+        dicePayload: message.dicePayload ?? undefined,
+        diceSkin: message.diceSkin ?? undefined,
+        mapRef: message.mapRef ?? undefined,
       };
       void submit(message.clientNonce, payload);
     },

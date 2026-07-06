@@ -22,6 +22,7 @@ import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Application as PixiApplication } from "pixi.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
+import axios from "axios";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import { WorldVoiceButton } from "@/features/voice/components/WorldVoiceButton";
 import { currentUserAtom } from "@/shared/store/authStore";
@@ -287,15 +288,25 @@ export function TacticalMapView(): React.ReactElement {
   // 10.2c — scene fetch + WS + cross-scene reassignment listener.
   // POZOR: `useMapScene` musí být před `useViewportPanZoom`, aby hook
   // dostal `scene.id` pro per-scéna LS klíče (10.2c-edit-5).
-  const { scene, emitSpotlight, emitPing, emitRuler, rollDice } = useMapScene(
-    worldId || null,
-    {
-      onSpotlight: triggerSpotlight,
-      onLiveDiceRoll: handleLiveDiceRoll,
-      onPing: addPing,
-      onRuler,
-    },
-  );
+  const {
+    scene,
+    isError: isMapSceneError,
+    error: mapSceneError,
+    emitSpotlight,
+    emitPing,
+    emitRuler,
+    rollDice,
+  } = useMapScene(worldId || null, {
+    onSpotlight: triggerSpotlight,
+    onLiveDiceRoll: handleLiveDiceRoll,
+    onPing: addPing,
+    onRuler,
+  });
+  // 403 (odebrán ze scény / nemá oprávnění) vs. jiná chyba (500, síť…) — obojí
+  // dřív vypadalo jako legitimní „no active scene" (viz `showEmptyState` níže).
+  const mapSceneErrorStatus = axios.isAxiosError(mapSceneError)
+    ? mapSceneError.response?.status
+    : undefined;
   useReassignmentListener(worldId || null);
 
   // 10.2j — bestie tokeny dotahují obrázek z bestiar cache (resolveTokenImage →
@@ -1575,8 +1586,14 @@ export function TacticalMapView(): React.ReactElement {
     ],
   );
 
-  // Empty state: world ready ale scéna chybí (hráč není přiřazený)
-  const showEmptyState = !loading && (!worldId || (!scene && !loading));
+  // Empty state: world ready ale scéna chybí (hráč není přiřazený). Rozlišujeme
+  // 403 (odebrán ze scény / bez oprávnění) a jinou chybu (500, síť…) od
+  // skutečně prázdného stavu — jinak by obě chyby tiše vypadaly jako "čekej,
+  // až tě PJ přiřadí" (FIX-1).
+  const showForbiddenState = !loading && isMapSceneError && mapSceneErrorStatus === 403;
+  const showMapErrorState = !loading && isMapSceneError && mapSceneErrorStatus !== 403;
+  const showEmptyState =
+    !loading && !isMapSceneError && (!worldId || !scene);
 
   // Hidden overlay jen pro hráče (PJ vidí scénu vždy).
   // 10.2n — efektivní skrytí: per-hráč override ?? per-scéna default.
@@ -1852,8 +1869,11 @@ export function TacticalMapView(): React.ReactElement {
         </div>
       )}
 
-      {showEmptyState && (
+      {(showEmptyState || showForbiddenState || showMapErrorState) && (
         <MapEmptyState
+          variant={
+            showForbiddenState ? "forbidden" : showMapErrorState ? "error" : "empty"
+          }
           isPJ={isPJ}
           worldId={worldId ?? undefined}
           currentUserId={currentUser?.id}

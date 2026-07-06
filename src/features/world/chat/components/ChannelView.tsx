@@ -285,6 +285,8 @@ export function ChannelView({
 
   // W-7 — re-join chat roomu + presence po reconnectu. Bez toho po výpadku sítě
   // přestanou chodit zprávy/typing/presence a hráč zmizí z PJ panelu přítomných.
+  // FIX-4 — re-join sám nedoplní zprávy zmeškané BĚHEM výpadku (žádný replay
+  // po WS reconnectu) → invaliduj historii (vzor `ChatRoom` C-05).
   useSocketReconnect(() => {
     const socket = getSocket();
     socket.emit('room:join', `chat:${channelId}`);
@@ -294,6 +296,7 @@ export function ChannelView({
       username: currentUser.username,
       avatarUrl: currentUser.avatarUrl,
     });
+    void qc.invalidateQueries({ queryKey: messagesKey });
   });
 
   useEffect(() => {

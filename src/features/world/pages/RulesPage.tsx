@@ -20,10 +20,12 @@ const RULES_SLUG = 'pravidla';
  */
 export default function RulesPage() {
   const navigate = useNavigate();
-  const { worldId, worldSlug, userRole } = useWorldContext();
+  const { worldId, worldSlug, userRole, world } = useWorldContext();
   const { data: page, isLoading, error } = usePage(worldId, RULES_SLUG);
   const createPage = useCreatePage(worldId, worldSlug);
-  const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canEdit =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   if (isLoading) return <Spinner center />;
 

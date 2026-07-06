@@ -14,15 +14,25 @@ function freshKey(): string {
   return `akj-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function sortedRows(initial: AkjType[]): AkjType[] {
+  return [...initial].sort((a, b) => a.level - b.level);
+}
+
 /**
  * 5.3d — editor AKJ úrovní. PJ/PomocnyPJ pojmenuje úrovně dle světa;
  * `level` řídí stupeň prověrky. Ukládá přes `useUpdateAkjTypes`.
  */
 export function AkjLevelEditor({ worldId, initial }: Props) {
   const mutation = useUpdateAkjTypes(worldId);
-  const [rows, setRows] = useState<AkjType[]>(() =>
-    [...initial].sort((a, b) => a.level - b.level),
-  );
+  const [rows, setRows] = useState<AkjType[]>(() => sortedRows(initial));
+  // FIX-5 — bez resyncu zůstanou `rows` na hodnotách z prvního mountu; když
+  // AKJ úrovně uloží jiný PJ mezitím, další „Uložit úrovně" tady jeho změnu
+  // tiše přepíše.
+  const [prevInitial, setPrevInitial] = useState(initial);
+  if (initial !== prevInitial) {
+    setPrevInitial(initial);
+    setRows(sortedRows(initial));
+  }
 
   function update(idx: number, patch: Partial<AkjType>) {
     setRows(rows.map((r, i) => (i === idx ? { ...r, ...patch } : r)));

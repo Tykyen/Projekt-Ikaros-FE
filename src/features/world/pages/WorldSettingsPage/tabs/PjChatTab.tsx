@@ -21,8 +21,10 @@ export default function PjChatTab() {
 
   if (!world) return null;
 
-  const isPJ = userRole === WorldRole.PJ;
-  const isLeader = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const isElevatedHere = world.elevated === true;
+  const isPJ = isElevatedHere || userRole === WorldRole.PJ;
+  const isLeader = isElevatedHere || (userRole ?? -1) >= WorldRole.PomocnyPJ;
   const mode = settingsQ.data?.pjChatPersona?.mode ?? 'unified';
 
   return (

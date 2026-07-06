@@ -26,7 +26,7 @@ import s from './GroupMembersPage.module.css';
  */
 export default function GroupMembersPage() {
   const { groupKey = '' } = useParams<{ groupKey: string }>();
-  const { worldId, worldSlug, userRole, loading } = useWorldContext();
+  const { worldId, worldSlug, userRole, world, loading } = useWorldContext();
   const membersQuery = useWorldMembers(worldId);
   const settingsQuery = useWorldSettings(worldId);
   const directoryQuery = useCharacterDirectory(worldId);
@@ -44,8 +44,10 @@ export default function GroupMembersPage() {
   const emblem = groupName ? groupImages[groupName] : undefined;
   // Znak může nahrát jen PJ (BE `updateSettings` = canAdminWorld ≥ PJ) a jen
   // pro reálnou skupinu (ne „Nezařazení", které kanál ani znak nemá). Var. B.
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
   const canEditEmblem =
-    groupName !== null && (userRole ?? -1) >= WorldRole.PJ;
+    groupName !== null &&
+    (world?.elevated === true || (userRole ?? -1) >= WorldRole.PJ);
 
   async function pickEmblem(file: File | undefined) {
     if (!file || !groupName) return;

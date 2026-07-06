@@ -2,7 +2,7 @@
  * 10.2d-prep-B — TanStack Query hook pro list bestií ve světě.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSocketEvent } from '@/features/chat';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat';
 import { listBestie } from '../api/bestiarApi';
 import type { BestiarResponse } from '../types';
 
@@ -22,6 +22,12 @@ export function useBestiar(
       predicate: (q) =>
         q.queryKey[0] === 'bestiar' && q.queryKey[2] === p.systemId,
     });
+  });
+  // FIX-5 — reconnect fallback: `bestiar:changed` zmeškaný během výpadku je
+  // pryč → po reconnectu invaliduj TUTO query (worldId+systemId), ať se
+  // bestiář dorovná bez čekání na další live event.
+  useSocketReconnect(() => {
+    void qc.invalidateQueries({ queryKey: bestiarQueryKey(worldId, systemId) });
   });
   return useQuery<BestiarResponse>({
     queryKey: bestiarQueryKey(worldId, systemId),

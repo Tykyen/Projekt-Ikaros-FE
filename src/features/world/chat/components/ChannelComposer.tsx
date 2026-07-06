@@ -480,19 +480,26 @@ export function ChannelComposer({
     // Validace mentions není potřeba — BE ignoruje neexistující.
     void extractMentionUsernames(t);
 
-    let attachments: ChatAttachment[] = [];
+    const attachments: ChatAttachment[] = [];
     if (picked.length > 0) {
       setUploading(true);
-      try {
-        attachments = await Promise.all(
-          picked.map((p) => onUploadAttachment(p.file)),
-        );
-      } catch {
-        toast.error('Nahrání přílohy selhalo, zkus to znovu');
-        setUploading(false);
-        return;
-      }
+      // FIX-4 — `allSettled` místo `all`: jeden neúspěšný soubor dřív zahodil
+      // celé odeslání (i rozepsaný text + ostatní úspěšně nahrané přílohy).
+      const results = await Promise.allSettled(
+        picked.map((p) => onUploadAttachment(p.file)),
+      );
       setUploading(false);
+      const failedNames: string[] = [];
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled') attachments.push(r.value);
+        else failedNames.push(picked[i].file.name);
+      });
+      if (failedNames.length > 0) {
+        toast.error(`Nepodařilo se nahrát: ${failedNames.join(', ')}`);
+      }
+      if (attachments.length === 0 && failedNames.length > 0 && !t) {
+        return; // všechny přílohy selhaly a není ani text — není co odeslat
+      }
     }
 
     const payload: ComposerSendPayload = {

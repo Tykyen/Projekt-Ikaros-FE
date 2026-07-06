@@ -33,7 +33,15 @@ export function NumberField({
         value={Number.isFinite(num) ? num : 0}
         min={field.min}
         max={field.max}
-        onChange={(e) => onChange(Number(e.target.value))}
+        onChange={(e) => {
+          // FIX-4 — clamp na schema min/max (BE i tak validuje, ale FE hodnota
+          // beze clampu na chvíli ukáže mimo-rozsah stav a odešle ho v patchi).
+          const raw = Number(e.target.value);
+          const n = Number.isFinite(raw) ? raw : 0;
+          onChange(
+            Math.min(field.max ?? Infinity, Math.max(field.min ?? -Infinity, n)),
+          );
+        }}
         disabled={disabled}
         aria-invalid={!!error}
         aria-label={field.label}

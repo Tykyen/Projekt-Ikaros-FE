@@ -38,7 +38,9 @@ export function AvatarUploader({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const previewSrc = previewUrl ?? currentUrl ?? fallbackUrl;
+  // FIX-2 — `??` neřeší `''` (BE po smazání avataru vrací prázdný string,
+  // ne null/undefined) → `<img src="">` by refetchovala aktuální stránku.
+  const previewSrc = previewUrl || currentUrl || fallbackUrl;
 
   // Cleanup object URLs při unmountu (memory leak prevention)
   useEffect(() => {

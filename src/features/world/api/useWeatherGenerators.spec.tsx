@@ -41,6 +41,13 @@ vi.mock('@/features/chat/api/useSocket', () => ({
     if (!socketHandlers[event]) socketHandlers[event] = [];
     socketHandlers[event].push(h);
   },
+  // FIX-5 — `useWeatherWsSubscribe` nově volá i `useSocketReconnect`
+  // (reconnect fallback). Registrujeme pod pseudo-eventem 'connect'.
+  useSocketReconnect: (handler: () => void) => {
+    const h: Handler = () => handler();
+    if (!socketHandlers.connect) socketHandlers.connect = [];
+    socketHandlers.connect.push(h);
+  },
 }));
 
 function emitSocket(event: string, data: unknown) {

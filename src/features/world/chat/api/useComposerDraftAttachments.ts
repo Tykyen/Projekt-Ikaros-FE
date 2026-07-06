@@ -25,6 +25,21 @@ export interface DraftAttachment {
 const store = new Map<string, DraftAttachment[]>();
 const keyOf = (worldId: string, channelId: string) => `${worldId}/${channelId}`;
 
+/**
+ * FIX-3 — in-memory store žije mimo komponentu → přežije i logout ve
+ * stejném tabu (žádný reload), takže by rozpracované přílohy uviděl další
+ * přihlášený na sdíleném zařízení. Volá se z `useAuth.ts` logout, vedle
+ * `qc.clear()` (vzor C-29). Revokuje blob URL náhledy (memory leak prevence).
+ */
+export function clearAllDraftAttachments(): void {
+  for (const attachments of store.values()) {
+    for (const a of attachments) {
+      if (a.previewUrl) URL.revokeObjectURL(a.previewUrl);
+    }
+  }
+  store.clear();
+}
+
 export function useComposerDraftAttachments(worldId: string, channelId: string) {
   const key = keyOf(worldId, channelId);
 

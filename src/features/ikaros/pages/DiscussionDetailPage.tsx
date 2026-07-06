@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
+import axios from 'axios';
 import {
   ArrowLeft,
   Lock,
@@ -46,23 +47,36 @@ export default function DiscussionDetailPage() {
   const { data: discussion, isLoading, error } = useDiscussion(id);
 
   if (isLoading) return <Spinner center />;
-  if (error || !discussion) return <UnavailableNotice id={id} />;
+  if (error || !discussion) {
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    return <UnavailableNotice id={id} status={status} />;
+  }
 
   return <DiscussionDetail discussion={discussion} />;
 }
 
-// ─── Diskuze není dostupná (404 / uzamčená) ────────────────────────────────
+// ─── Diskuze není dostupná (403 nemáš přístup / 404 neexistuje) ────────────
 
-function UnavailableNotice({ id }: { id: string | undefined }) {
+function UnavailableNotice({
+  id,
+  status,
+}: {
+  id: string | undefined;
+  status: number | undefined;
+}) {
   const requestJoin = useRequestJoin();
+  const isForbidden = status === 403;
   return (
     <div className={s.notice}>
-      <h1 className={s.noticeTitle}>Diskuze není dostupná</h1>
+      <h1 className={s.noticeTitle}>
+        {isForbidden ? 'Nemáš přístup k diskuzi' : 'Diskuze nenalezena'}
+      </h1>
       <p className={s.noticeText}>
-        Diskuze neexistuje, nebo je uzamčená a nemáš do ní přístup. Pokud je
-        uzamčená, můžeš požádat správce o přidání.
+        {isForbidden
+          ? 'Diskuze je uzamčená a nemáš do ní přístup. Můžeš požádat správce o přidání.'
+          : 'Diskuze neexistuje nebo byla smazána.'}
       </p>
-      {id && (
+      {isForbidden && id && (
         <button
           type="button"
           className={s.btnPrimary}

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import { api } from '@/shared/api/client';
 import { anonSessionAtom } from '@/features/chat/store/anonSession';
+import { reconnectSocket } from '@/features/chat/api/socket';
 import {
   accessTokenAtom,
   refreshTokenAtom,
@@ -13,6 +14,8 @@ import {
 } from '@/shared/store/authStore';
 import { isJwtValid } from '@/shared/lib/jwt';
 import { clearLastRoute } from '@/shared/lib/lastRoute';
+import { clearAllComposerSticky } from '@/features/world/chat/api/useComposerSticky';
+import { clearAllDraftAttachments } from '@/features/world/chat/api/useComposerDraftAttachments';
 import type {
   AuthResponse,
   LoginRequest,
@@ -49,6 +52,10 @@ export function useLogin() {
       store.set(currentUserAtom, result.user);
       // 15.8 — host→člen: zahodit guest session (naskočí členský chat).
       store.set(anonSessionAtom, null);
+      // FIX-6 — socket běžel dál pod guest tokenem (handshake se neobnoví
+      // sám); bez reconnectu by per-user WS pushe (whisper, notifikace…)
+      // nedošly, dokud by nenastal jiný reconnect z jiného důvodu.
+      reconnectSocket();
       store.set(loginModalOpenAtom, false);
       // Pokud byl spuštěný pending logout, zruš ho — uživatel se přihlásil znovu
       store.set(pendingLogoutAtom, null);
@@ -74,6 +81,8 @@ export function useLoginTotp() {
       store.set(currentUserAtom, result.user);
       // 15.8 — host→člen: zahodit guest session (naskočí členský chat).
       store.set(anonSessionAtom, null);
+      // FIX-6 — viz useLogin: bez reconnectu socket zůstane pod guest tokenem.
+      reconnectSocket();
       store.set(loginModalOpenAtom, false);
       store.set(pendingLogoutAtom, null);
     },
@@ -99,6 +108,8 @@ export function useRegister() {
       store.set(currentUserAtom, user);
       // 15.8 — host→člen: zahodit guest session.
       store.set(anonSessionAtom, null);
+      // FIX-6 — viz useLogin: bez reconnectu socket zůstane pod guest tokenem.
+      reconnectSocket();
       store.set(registerModalOpenAtom, false);
       store.set(pendingLogoutAtom, null);
     },
@@ -129,6 +140,11 @@ export function useLogout() {
       store.set(pendingLogoutAtom, null);
       // C-29 — vyčisti RQ cache (jinak osobní data přežijí pro dalšího uživatele).
       qc.clear();
+      // FIX-3 — composer draft/NPC maska/RP datum (localStorage) + rozpracované
+      // přílohy (in-memory) jsou per zařízení, ne per uživatel → na sdíleném
+      // PC by je viděl další přihlášený. Stejná hygiena jako qc.clear() (C-29).
+      clearAllComposerSticky();
+      clearAllDraftAttachments();
       // Hygiena — ať PWA cold open po odhlášení nevede na starou/cizí route.
       clearLastRoute();
     }, LOGOUT_UNDO_MS);

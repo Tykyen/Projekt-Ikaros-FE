@@ -26,13 +26,15 @@ interface Props {
  * Empty state: pokud `page.videos` = [], placeholder + (PomocnyPJ+) edit shortcut.
  */
 export function ObrazovkaLayout({ page }: Props) {
-  const { worldSlug, userRole } = useWorldContext();
+  const { worldSlug, userRole, world } = useWorldContext();
   const sortedVideos = useMemo(() => page.videos, [page.videos]);
   const [activeId, setActiveId] = useState<string | null>(
     sortedVideos[0]?.id ?? null,
   );
   const active = sortedVideos.find((v) => v.id === activeId) ?? sortedVideos[0];
-  const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canEdit =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   if (sortedVideos.length === 0) {
     return (

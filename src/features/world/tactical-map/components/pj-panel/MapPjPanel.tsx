@@ -12,9 +12,10 @@
  */
 import { useCallback, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
-import { api, apiClient } from '@/shared/api/client';
+import { api, apiClient, parseApiError } from '@/shared/api/client';
 import { ConfirmDialog } from '@/shared/ui';
 import { postWorldOperation } from '../../api/worldOpsApi';
 import { postMapOperation } from '../../api/mapApi';
@@ -126,12 +127,18 @@ export function MapPjPanel({
   );
   const queryClient = useQueryClient();
   const { scenes: activeScenes } = useActiveScenes(worldId, expanded);
-  const { userRole } = useWorldContext();
+  const { userRole, world } = useWorldContext();
   const systemId = useResolvedSystemId() || null;
   // R-17 — tvorba/aktivace/mazání scény je na BE PJ(5) (`maps.assertCanManage`).
   // Panel se zobrazuje PomocnyPJ+, ale scene-create akce gatujeme na PJ, ať
   // PomocnyPJ nevidí tlačítka, co skončí 403. (Přiřazení/edit scény = PomocnyPJ.)
-  const isPjStrict = (userRole ?? -1) >= WorldRole.PJ;
+  // N-16 / R-AUDIT + elevation — mirror TacticalMapView.isPJ: owner-bypass +
+  // world.elevated, ne jen holá world role.
+  const isElevatedHere = world?.elevated === true;
+  const isPjStrict =
+    world?.ownerId === currentUserId ||
+    isElevatedHere ||
+    (userRole ?? -1) >= WorldRole.PJ;
 
   const mutation = useMutation({
     mutationFn: (op: WorldOperation) => postWorldOperation(worldId, op),
@@ -141,6 +148,9 @@ export function MapPjPanel({
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
       // C-25 — PJ list aktivních scén (REST fallback k WS).
       void queryClient.invalidateQueries({ queryKey: activeScenesQueryKey(worldId) });
+    },
+    onError: (err) => {
+      toast.error(`Přepnutí scény selhalo: ${parseApiError(err)}`);
     },
   });
 
@@ -172,7 +182,8 @@ export function MapPjPanel({
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
       setPendingDeactivateId(null);
     },
-    onError: () => {
+    onError: (err) => {
+      toast.error(`Deaktivace scény selhala: ${parseApiError(err)}`);
       setPendingDeactivateId(null);
     },
   });
@@ -311,6 +322,7 @@ export function MapPjPanel({
               scenes={activeScenes}
               currentSceneId={currentScene?.id ?? null}
               onSwitch={handleSwitchSelf}
+              switchDisabled={mutation.isPending}
               onEdit={setEditingScene}
               onDeactivate={setPendingDeactivateId}
               onClear={setPendingClearScene}
@@ -514,13 +526,18 @@ export function MapPjPanel({
           scene={pendingClearScene}
           onClose={() => setPendingClearScene(null)}
           onConfirm={async () => {
-            await postMapOperation(pendingClearScene.id, {
-              type: 'scene.tokens.clear',
-            });
-            // Refetch pro jistotu (WS broadcast by měl stačit, ale belt-and-suspenders).
-            void queryClient.invalidateQueries({
-              queryKey: mapSceneQueryKey(worldId),
-            });
+            try {
+              await postMapOperation(pendingClearScene.id, {
+                type: 'scene.tokens.clear',
+              });
+              // Refetch pro jistotu (WS broadcast by měl stačit, ale belt-and-suspenders).
+              void queryClient.invalidateQueries({
+                queryKey: mapSceneQueryKey(worldId),
+              });
+            } catch (err) {
+              toast.error(`Vyčištění scény selhalo: ${parseApiError(err)}`);
+              throw err; // ClearSceneDialog nechá dialog otevřený pro retry.
+            }
           }}
         />
       )}

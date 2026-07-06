@@ -41,8 +41,28 @@ const EMPTY: ComposerStickyState = {
   draft: '',
 };
 
+const STORAGE_PREFIX = 'ikaros.chatComposer.';
+
 function storageKey(worldId: string, channelId: string): string {
-  return `ikaros.chatComposer.${worldId}.${channelId}`;
+  return `${STORAGE_PREFIX}${worldId}.${channelId}`;
+}
+
+/**
+ * FIX-3 — klíč je per (worldId × channelId), NE per uživatel → na sdíleném
+ * zařízení by draft/NPC maska/RP datum přežily logout a viděl by je další
+ * přihlášený. Volá se z `useAuth.ts` logout, vedle `qc.clear()` (vzor C-29).
+ */
+export function clearAllComposerSticky(): void {
+  try {
+    const toRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k?.startsWith(STORAGE_PREFIX)) toRemove.push(k);
+    }
+    for (const k of toRemove) localStorage.removeItem(k);
+  } catch {
+    // localStorage nedostupné (private mode) — no-op.
+  }
 }
 
 function read(worldId: string, channelId: string): ComposerStickyState {

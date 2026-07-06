@@ -26,12 +26,20 @@ interface ChatInputProps {
   currentUserId: string;
   /** Zpráva, na kterou se právě odpovídá (4.3a); `null` = běžná zpráva. */
   replyTo: ChatMessage | null;
-  onSendPublic: (text: string, attachments: ChatAttachment[]) => void;
+  /**
+   * FIX-4 — vrací, zda se odeslání skutečně povedlo (`true`/`Promise<true>`).
+   * `send()` na `false` NEmaže rozepsaný text/přílohy, ať uživatel o ně
+   * nepřijde při selhání (dřív se mazaly hned, bez čekání na výsledek).
+   */
+  onSendPublic: (
+    text: string,
+    attachments: ChatAttachment[],
+  ) => boolean | Promise<boolean>;
   onSendWhisper: (
     toUserId: string,
     text: string,
     attachments: ChatAttachment[],
-  ) => void;
+  ) => boolean | Promise<boolean>;
   /** Nahrání jedné přílohy na Cloudinary (4.3b) — volá se při odeslání. */
   onUploadAttachment: (file: File) => Promise<ChatAttachment>;
   onTypingStart: () => void;
@@ -161,11 +169,18 @@ export function ChatInput({
       setUploading(false);
     }
 
-    if (effectiveTarget === 'all') onSendPublic(t, attachments);
-    else onSendWhisper(effectiveTarget, t, attachments);
-    setText('');
-    clearPicked();
-    stopTyping();
+    // FIX-4 — čekáme na výsledek, ať víme, jestli smazat rozepsanou zprávu.
+    // Chybový toast řeší volající (mutation onError / disconnected-check);
+    // tady jen text/přílohy necháme na místě pro retry.
+    const ok =
+      effectiveTarget === 'all'
+        ? await onSendPublic(t, attachments)
+        : await onSendWhisper(effectiveTarget, t, attachments);
+    if (ok) {
+      setText('');
+      clearPicked();
+      stopTyping();
+    }
   };
 
   const isWhisper = effectiveTarget !== 'all';

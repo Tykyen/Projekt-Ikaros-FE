@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -66,6 +66,7 @@ export default function BasicInfoTab() {
     watch,
     setValue,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<BasicInfoForm>({
     resolver: zodResolver(basicInfoSchema),
@@ -87,6 +88,32 @@ export default function BasicInfoTab() {
       diceVisibility: world?.diceVisibility ?? DEFAULT_DICE_VISIBILITY,
     },
   });
+
+  // FIX-5 — `defaultValues` se aplikují jen při prvním mountu; bez resyncu
+  // formulář zůstane na hodnotách odsud i když základní info uloží jiný PJ
+  // mezitím → další „Uložit změny" tady jeho změnu tiše přepíše. RHF `reset()`
+  // v efektu je tady idiomatičtější než render-time state adjust (vyčistí
+  // i dirty/touched příznaky).
+  useEffect(() => {
+    if (!world) return;
+    reset({
+      name: world.name,
+      description: world.description ?? "",
+      genre: genreInList
+        ? world.genre!
+        : world.genre
+          ? GENRE_CUSTOM_LABEL
+          : "",
+      customGenre: genreInList ? "" : (world.genre ?? ""),
+      system: systemInList ? world.system : SYSTEM_CUSTOM_ID,
+      customSystem: systemInList ? "" : (world.system ?? ""),
+      dice: world.dice ?? [],
+      maxPlayers: world.maxPlayers ?? null,
+      playersWanted: world.playersWanted ?? "",
+      imageUrl: world.imageUrl ?? "",
+      diceVisibility: world.diceVisibility ?? DEFAULT_DICE_VISIBILITY,
+    });
+  }, [world, genreInList, systemInList, reset]);
 
   if (!world) return null;
 

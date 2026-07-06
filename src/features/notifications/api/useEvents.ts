@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat';
+import { mailKeys } from '@/features/ikaros/api/useMail';
 import type { IkarosMessage } from '@/shared/types';
 
 const PAGE_SIZE = 30;
@@ -31,7 +33,7 @@ export function useEvents(enabled = true) {
     void qc.invalidateQueries({ queryKey: eventsKeys.all });
   });
 
-  return useInfiniteQuery({
+  const query = useInfiniteQuery({
     queryKey: eventsKeys.all,
     queryFn: ({ pageParam }) =>
       api.get<IkarosMessage[]>('/ikaros-messages/inbox', {
@@ -45,4 +47,37 @@ export function useEvents(enabled = true) {
     enabled: !!token && enabled,
     staleTime: 30_000,
   });
+
+  // FIX-1 — BE nemá bulk „mark all read"; `GET /ikaros-messages/:id` označí
+  // JEDNU zprávu přečtenou (vzor `useMessageDetail` v Poště). Bez tohohle
+  // badge „Události" (unread-count.systemUnread) nikdy nespadne na 0 — záložka
+  // zprávy jen zobrazovala, nikdy je neotevřela jednotlivě.
+  //
+  // `query.data` je react-query InfiniteData — stabilní reference, dokud se
+  // obsah fakticky nezmění (structuralSharing) → efekt neběží na každý
+  // re-render, jen když přibude nová/jiná stránka.
+  const data = query.data;
+  useEffect(() => {
+    if (!enabled || !token || !data) return;
+    const unreadIds = data.pages
+      .flat()
+      .filter((m) => !m.isRead)
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+
+    let cancelled = false;
+    void Promise.allSettled(
+      unreadIds.map((id) => api.get<IkarosMessage>(`/ikaros-messages/${id}`)),
+    ).then(() => {
+      if (cancelled) return;
+      // Refetch feedu (isRead:true → zmizí tečka) + badge zvonku/Pošty.
+      void qc.invalidateQueries({ queryKey: eventsKeys.all });
+      void qc.invalidateQueries({ queryKey: mailKeys.unread });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [data, enabled, token, qc]);
+
+  return query;
 }

@@ -73,7 +73,9 @@ export default function TimelinePage() {
   >(null);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
 
-  const canWrite = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const isElevatedHere = world?.elevated === true;
+  const canWrite = isElevatedHere || (userRole ?? -1) >= WorldRole.PomocnyPJ;
   const hasEvents = (eventsQuery.data?.pages?.[0]?.events.length ?? 0) > 0;
   const deleteMutation = useDeleteTimelineEvent(worldId);
 

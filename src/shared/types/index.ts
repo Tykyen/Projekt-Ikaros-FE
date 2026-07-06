@@ -229,7 +229,7 @@ export type AdminAuditAction =
   | 'IKAROS_NEWS_DELETE';
 
 /** D-067 — typ cílové entity audit záznamu. */
-export type AuditTargetType = 'user' | 'ikaros-news';
+export type AuditTargetType = 'user' | 'ikaros-news' | 'world';
 
 export interface AdminAuditLogEntry {
   id: string;

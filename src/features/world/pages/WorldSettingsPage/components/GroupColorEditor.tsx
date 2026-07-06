@@ -22,6 +22,20 @@ interface Props {
 /** Výchozí barva nové skupiny (datová hodnota, ne designový token). */
 const DEFAULT_COLOR = '#888888'; // lint-colors-ignore
 
+// Defenzivní fallback — settings v cache může být starý záznam bez
+// customGroups/groupColors (před introduction polí) nebo fresh-empty
+// object z MembersTab fallbacku. Hlavně neházet `.map of undefined`.
+function buildRows(settings: WorldSettings): GroupRow[] {
+  const groups = settings.customGroups ?? [];
+  const colors = settings.groupColors ?? {};
+  const images = settings.groupImages ?? {};
+  return groups.map((name) => ({
+    name,
+    color: colors[name] ?? DEFAULT_COLOR,
+    image: images[name],
+  }));
+}
+
 /**
  * 5.3c — správa skupin světa a jejich barev. Gated na PJ+ (ukládá přes
  * `PUT /worlds/:worldId/settings`). Barva odlišuje skupinu v chatu/seznamech.
@@ -30,19 +44,16 @@ export function GroupColorEditor({ worldId, settings }: Props) {
   const mutation = useUpdateWorldSettings(worldId);
   const uploadImage = useUploadImage();
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
-  const [rows, setRows] = useState<GroupRow[]>(() => {
-    // Defenzivní fallback — settings v cache může být starý záznam bez
-    // customGroups/groupColors (před introduction polí) nebo fresh-empty
-    // object z MembersTab fallbacku. Hlavně neházet `.map of undefined`.
-    const groups = settings.customGroups ?? [];
-    const colors = settings.groupColors ?? {};
-    const images = settings.groupImages ?? {};
-    return groups.map((name) => ({
-      name,
-      color: colors[name] ?? DEFAULT_COLOR,
-      image: images[name],
-    }));
-  });
+  const [rows, setRows] = useState<GroupRow[]>(() => buildRows(settings));
+  // FIX-5 — bez resyncu zůstanou `rows` na hodnotách z prvního mountu; když
+  // skupiny uloží jiný PJ mezitím, další „Uložit skupiny" tady jeho změnu
+  // tiše přepíše. `settings` je react-query data (structuralSharing) →
+  // reference se mění jen při faktické změně obsahu.
+  const [prevSettings, setPrevSettings] = useState(settings);
+  if (settings !== prevSettings) {
+    setPrevSettings(settings);
+    setRows(buildRows(settings));
+  }
   const [newName, setNewName] = useState('');
 
   async function pickImage(idx: number, file: File | undefined) {

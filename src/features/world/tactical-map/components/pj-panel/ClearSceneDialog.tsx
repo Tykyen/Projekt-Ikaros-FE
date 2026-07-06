@@ -39,6 +39,9 @@ export function ClearSceneDialog({
     try {
       await onConfirm();
       onClose();
+    } catch {
+      // Chybu už toastuje volající (`onConfirm`) — dialog necháme otevřený
+      // pro retry, jen ukončíme "Čistím…" stav.
     } finally {
       setPending(false);
     }

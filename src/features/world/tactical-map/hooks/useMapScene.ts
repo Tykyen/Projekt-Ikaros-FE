@@ -92,6 +92,12 @@ export function useMapScene(
 ): UseMapSceneResult {
   const queryClient = useQueryClient();
   const lastSeqRef = useRef<number>(0);
+  // FIX-7 — souběžný catch-up (gap-detection v `onOperation` + forced catch-up
+  // po reconnectu v `onReconnect`) mohl doběhnout v jiném pořadí, než byl
+  // spuštěný, a ten pomalejší (staršího `fromSeq`) by přepsal cache novějším
+  // klientem už aplikovaným stavem. Sdílený in-flight guard: běžící catch-up
+  // se nespouští znovu, další trigger (další event / reconnect) ho dožene.
+  const catchUpInFlightRef = useRef(false);
   const onLiveDiceRoll = options?.onLiveDiceRoll;
 
   const query = useQuery<MapScene | null>({
@@ -171,17 +177,27 @@ export function useMapScene(
         }
       } else if (payload.seqNumber > expectedSeq) {
         // Gap — chyběla mi 1+ ops (WS reorder, krátký disconnect, etc.)
+        // FIX-7 — přeskoč, pokud už jiný catch-up běží (viz `catchUpInFlightRef`).
+        if (catchUpInFlightRef.current) return;
+        catchUpInFlightRef.current = true;
         try {
           const result = await catchUpScene(scene, lastSeqRef.current);
           if (result === "too-big") {
             void query.refetch();
             return;
           }
-          lastSeqRef.current = result.lastSeqNumber;
-          queryClient.setQueryData(mapSceneQueryKey(worldId), result);
+          const prevSeq = lastSeqRef.current;
+          lastSeqRef.current = Math.max(lastSeqRef.current, result.lastSeqNumber);
+          // Nezapisovat cache, pokud dohnaný stav není novější než to, co už
+          // máme (souběžný reconnect catch-up mohl mezitím doběhnout dřív).
+          if (result.lastSeqNumber > prevSeq) {
+            queryClient.setQueryData(mapSceneQueryKey(worldId), result);
+          }
         } catch (err) {
           console.error("[useMapScene] catch-up failed", err);
           void query.refetch();
+        } finally {
+          catchUpInFlightRef.current = false;
         }
       }
       // payload.seqNumber < expectedSeq → duplicate/stale, ignorujeme
@@ -196,17 +212,25 @@ export function useMapScene(
    */
   const onReconnect = useCallback(async (): Promise<void> => {
     if (!worldId || !scene) return;
+    // FIX-7 — přeskoč, pokud gap-detection v `onOperation` už catch-up dělá.
+    if (catchUpInFlightRef.current) return;
+    catchUpInFlightRef.current = true;
     try {
       const result = await catchUpScene(scene, lastSeqRef.current);
       if (result === "too-big") {
         void query.refetch();
         return;
       }
-      lastSeqRef.current = result.lastSeqNumber;
-      queryClient.setQueryData(mapSceneQueryKey(worldId), result);
+      const prevSeq = lastSeqRef.current;
+      lastSeqRef.current = Math.max(lastSeqRef.current, result.lastSeqNumber);
+      if (result.lastSeqNumber > prevSeq) {
+        queryClient.setQueryData(mapSceneQueryKey(worldId), result);
+      }
     } catch (err) {
       console.error("[useMapScene] reconnect catch-up failed", err);
       void query.refetch();
+    } finally {
+      catchUpInFlightRef.current = false;
     }
   }, [worldId, scene, queryClient, query]);
 

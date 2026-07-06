@@ -41,7 +41,7 @@ function normalize(str: string): string {
  * stránka".
  */
 export default function PagesListPage() {
-  const { worldId, worldSlug, userRole, loading } = useWorldContext();
+  const { worldId, worldSlug, userRole, world, loading } = useWorldContext();
   const { data: directory = [], isLoading } = usePagesDirectory(worldId);
   const favorites = useFavoritePages(worldId);
 
@@ -49,7 +49,9 @@ export default function PagesListPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [sort, setSort] = useState<SortValue>('order');
 
-  const canCreate = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canCreate =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   // Osobní oblíbené v uživatelově pořadí (read-only; reorder je na dashboardu).
   const favoriteEntries = useMemo(() => {

@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button, EmptyState as SharedEmptyState } from '@/shared/ui';
-import { WorldRole, type WorldMembership } from '@/shared/types';
+import { WorldRole, type World, type WorldMembership } from '@/shared/types';
 import { usePersonaDirectory } from '../api/usePersonaDirectory';
 import { useWorldMembers } from '../../api/useWorldMembers';
 import { useWorldSettings } from '../../api/useWorldSettings';
@@ -33,6 +33,8 @@ interface Props {
   worldId: string;
   worldSlug: string;
   userRole: WorldRole | null;
+  /** Elevation (`world.elevated`) — volitelný, chybí-li, chová se jako de-elevated. */
+  world?: World | null;
 }
 
 interface MemberMeta {
@@ -114,7 +116,12 @@ function buildGroupBuckets(
  * fulltext hledání, oblíbené, volitelné seskupení PC dle herních skupin.
  * URL state: `?q=&filter=&group=&create=`.
  */
-export function CharacterDirectory({ worldId, worldSlug, userRole }: Props) {
+export function CharacterDirectory({
+  worldId,
+  worldSlug,
+  userRole,
+  world,
+}: Props) {
   // 9.1 — Pages directory s filterem type ∈ {PostavaHrace, NPC}. Sjednoceno
   // s Page entity; nové postavy z wizardu se objevují ihned (legacy
   // useCharacterDirectory by je nevracel).
@@ -152,7 +159,11 @@ export function CharacterDirectory({ worldId, worldSlug, userRole }: Props) {
     navigate(`${base}${typeParam}`);
   }
 
-  const canManage = userRole !== null && userRole >= WorldRole.PJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  // R-RUN-4 (bug-audit) — práh zůstává PJ (create postavy), NEsnižováno na
+  // PomocnyPJ zde; to je samostatná otevřená otázka, ne elevation drift.
+  const canManage =
+    world?.elevated === true || (userRole !== null && userRole >= WorldRole.PJ);
   // 9.1 — `?create=1` deep-link odstraněn; MyCharacterPage naviguje rovnou
   // na `/nova-stranka?type=PostavaHrace`. CreateCharacterModal už neexistuje.
 

@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 import { Input, UserAvatar } from '@/shared/ui';
 import { EditCard } from './EditCard';
 import { AvatarUploader } from './AvatarUploader';
@@ -9,6 +10,7 @@ import {
   useUploadCharacterAvatar,
   useDeleteCharacterAvatar,
 } from '@/features/profile/api/useProfile';
+import { parseApiError } from '@/shared/api/client';
 import { characterSchema, type CharacterForm } from '../lib/profileSchemas';
 import styles from './ProfileSections.module.css';
 
@@ -43,11 +45,15 @@ export function CharacterSection({
 
   async function onSave() {
     const values = form.getValues();
-    await update.mutateAsync({
-      characterName: values.characterName ?? '',
-      characterBio: values.characterBio ?? '',
-    });
-    setEditing(false);
+    try {
+      await update.mutateAsync({
+        characterName: values.characterName ?? '',
+        characterBio: values.characterBio ?? '',
+      });
+      setEditing(false);
+    } catch (err) {
+      toast.error(parseApiError(err));
+    }
   }
 
   function onCancel() {

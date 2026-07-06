@@ -23,14 +23,19 @@ interface Props {
  * (stránka s archivem a správou), ne na `/kalendar`.
  */
 export function EventsColumn({ worldId }: Props) {
-  const { worldSlug, userRole } = useWorldContext();
+  const { worldSlug, userRole, world } = useWorldContext();
   const { data, isLoading } = useWorldGameEvents(worldId, 3);
   const events = data ?? [];
   const settingsQ = useWorldSettings(worldId);
   const customGroups = settingsQ.data?.customGroups ?? [];
   const groupColors = settingsQ.data?.groupColors ?? {};
 
-  const viewerRole = userRole ?? WorldRole.Zadatel;
+  // Elevation — nahozený admin dostává plnou PJ moc v tomto světě; `viewerRole`
+  // se pak předává i do `GameEventCard` (canManage), takže OR stačí zavést tady.
+  const isElevatedHere = world?.elevated === true;
+  const viewerRole = isElevatedHere
+    ? WorldRole.PJ
+    : (userRole ?? WorldRole.Zadatel);
   const canCreate = viewerRole >= WorldRole.PomocnyPJ;
   const [createOpen, setCreateOpen] = useState(false);
 

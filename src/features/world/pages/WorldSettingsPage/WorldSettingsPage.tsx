@@ -236,18 +236,24 @@ const TABS: SettingsTab[] = [
 ];
 
 /**
- * 5.3 — Nastavení světa. Tabová stránka; viditelnost tabů řízena JEN skutečnou
- * world rolí (R-20 — platform Admin tu nemá governance moc). Aktivní tab drží URL hash.
+ * 5.3 — Nastavení světa. Tabová stránka; viditelnost tabů řízena skutečnou
+ * world rolí, NEBO elevací (`world.elevated` — nahodil-li si platform Admin
+ * plnou moc v tomto světě). Aktivní tab drží URL hash.
  */
 export default function WorldSettingsPage() {
   const { world, userRole, loading } = useWorldContext();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // R-20 (role-audit) — platformový Admin/Superadmin NEMÁ governance moc ve světě
-  // → settings taby řídí JEN skutečná world role (admin bez staff role = žádný
-  // tab). Admin pojistka (obnova opuštěného světa) žije v Admin panelu, ne tady.
-  const effectiveRole: WorldRole = userRole ?? WorldRole.Zadatel;
+  // R-20 (role-audit, 2026-06-13) — platformový Admin/Superadmin NEMÁ governance
+  // moc ve světě natvrdo. Od 2026-06-21 to nahradila elevace (docs/glossary/
+  // elevation.md): de-elevated admin = žádný tab (jako dřív), po vědomém
+  // nahození (`world.elevated`) dostane plnou PJ moc — jinak by BE
+  // `worldAdminBypass` akci povolil, ale FE by neukázal žádný tab (prázdno).
+  const isElevatedHere = world?.elevated === true;
+  const effectiveRole: WorldRole = isElevatedHere
+    ? WorldRole.PJ
+    : (userRole ?? WorldRole.Zadatel);
 
   const visibleTabs = useMemo(
     () =>

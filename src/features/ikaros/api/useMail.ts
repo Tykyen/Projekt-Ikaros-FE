@@ -134,6 +134,10 @@ export function useDeleteMessage() {
       qc.setQueryData(mailKeys.inbox, removeFromPages);
       qc.setQueryData(mailKeys.sent, removeFromPages);
       void qc.invalidateQueries({ queryKey: mailKeys.unread });
+      // FIX-5 — bez tohohle zůstává smazaná zpráva „duch" v otevřeném vlákně
+      // (`useConversation` cache). Prefix match invaliduje bez ohledu na
+      // konkrétní conversationId (tady po smazání nemáme).
+      void qc.invalidateQueries({ queryKey: ['mail', 'conversation'] });
     },
   });
 }

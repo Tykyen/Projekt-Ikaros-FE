@@ -21,8 +21,9 @@ vi.mock('@/features/world/context/WorldContext', () => ({
 }));
 
 const setQueriesData = vi.fn();
+const invalidateQueries = vi.fn();
 vi.mock('@tanstack/react-query', () => ({
-  useQueryClient: () => ({ setQueriesData }),
+  useQueryClient: () => ({ setQueriesData, invalidateQueries }),
 }));
 
 beforeEach(() => {
@@ -59,13 +60,30 @@ describe('useMapWeather (10.2i)', () => {
     expect(clearMutate).toHaveBeenCalledTimes(1);
   });
 
-  it('joinne world room a registruje weather:updated listener', () => {
+  // FIX-1 — `world:{id}` room join/leave drží výhradně `useWorldSocket`
+  // (WorldLayout, jediný vlastník); tenhle hook už `room:join`/`room:leave`
+  // sám nedělá (jinak by odchod z mapy `room:leave`-oval i za WorldLayout a
+  // vykopl dashboard z roomu).
+  it('registruje weather:updated listener (room drží useWorldSocket)', () => {
     renderHook(() => useMapWeather());
-    expect(mockSocket.emit).toHaveBeenCalledWith('room:join', 'world:w1');
+    expect(mockSocket.emit).not.toHaveBeenCalledWith('room:join', expect.anything());
     expect(mockSocket.on).toHaveBeenCalledWith(
       'weather:updated',
       expect.any(Function),
     );
+  });
+
+  // FIX-5 — reconnect fallback: `weather:updated` zmeškaný během výpadku je
+  // pryč (žádný replay) → po reconnectu refetch World query.
+  it('reconnect (connect) → invaliduje ["worlds"]', () => {
+    renderHook(() => useMapWeather());
+    const onConnect = mockSocket.on.mock.calls.find((c) => c[0] === 'connect')?.[1] as
+      | (() => void)
+      | undefined;
+    expect(onConnect).toBeDefined();
+    invalidateQueries.mockClear();
+    act(() => onConnect!());
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['worlds'] });
   });
 
   it('weather:updated patchne World cache; weather:null → activeMapWeather null', () => {

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import { emoteKeys } from './useWorldEmotes';
 import type { WorldEmote } from '../lib/types';
 
@@ -54,6 +54,12 @@ export function useGlobalEmotes() {
   useSocketEvent<WorldEmote>('emote:created-global', onCreated);
   useSocketEvent<{ emoteId: string }>('emote:deleted-global', onDeleted);
   useSocketEvent<WorldEmote>('emote:updated-global', onUpdated);
+
+  // FIX-5 — reconnect fallback: `emote:*-global` zmeškané během výpadku jsou
+  // pryč → po reconnectu refetch, ať se sada globálních emotů dorovná.
+  useSocketReconnect(() => {
+    void qc.invalidateQueries({ queryKey: emoteKeys.global });
+  });
 
   return query;
 }

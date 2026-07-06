@@ -1,8 +1,10 @@
 ﻿import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 import { EditCard } from './EditCard';
 import { useUpdateProfile } from '@/features/profile/api/useProfile';
+import { parseApiError } from '@/shared/api/client';
 import { bioSchema, type BioForm } from '../lib/profileSchemas';
 import styles from './ProfileSections.module.css';
 
@@ -20,8 +22,12 @@ export function BioSection({ bio }: Props) {
 
   async function onSave() {
     const values = form.getValues();
-    await update.mutateAsync({ bio: values.bio ?? '' });
-    setEditing(false);
+    try {
+      await update.mutateAsync({ bio: values.bio ?? '' });
+      setEditing(false);
+    } catch (err) {
+      toast.error(parseApiError(err));
+    }
   }
 
   function onCancel() {

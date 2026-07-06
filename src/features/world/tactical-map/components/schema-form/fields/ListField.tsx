@@ -40,6 +40,13 @@ export function ListField({
     onChange(items.map((it, i) => (i === idx ? { ...it, [key]: val } : it)));
   };
 
+  // FIX-4 — clamp number sub-fields na jejich min/max (mirror NumberField).
+  function clampNumber(raw: string, min?: number, max?: number): number {
+    const n = Number(raw);
+    const v = Number.isFinite(n) ? n : 0;
+    return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, v));
+  }
+
   return (
     <div className={styles.listField}>
       <div className={styles.listHeader}>
@@ -84,12 +91,14 @@ export function ListField({
                   type={sub.type === 'number' ? 'number' : 'text'}
                   className={styles.input}
                   value={(item[sub.key] as string | number | undefined) ?? ''}
+                  min={sub.type === 'number' ? sub.min : undefined}
+                  max={sub.type === 'number' ? sub.max : undefined}
                   onChange={(e) =>
                     handleUpdateItem(
                       idx,
                       sub.key,
                       sub.type === 'number'
-                        ? Number(e.target.value)
+                        ? clampNumber(e.target.value, sub.min, sub.max)
                         : e.target.value,
                     )
                   }

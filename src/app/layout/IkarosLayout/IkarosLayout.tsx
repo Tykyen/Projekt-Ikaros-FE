@@ -28,6 +28,7 @@ import { useAccountTransferNotifications } from '@/features/world/pages/api/useA
 import { usePresenceHeartbeat } from '@/features/chat/api/usePresenceHeartbeat';
 import { useRoomPresenceCounts } from '@/features/chat/api/useGlobalChat';
 import { myRoomsAtom } from '@/features/chat/store/roomsStore';
+import { anonSessionAtom } from '@/features/chat/store/anonSession';
 import type { RoomKey } from '@/features/chat/lib/types';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
 import { useUnreadCount } from '@/features/ikaros/api/useMail';
@@ -794,6 +795,11 @@ export function IkarosLayout() {
   useFocusTrap({ active: drawerOpen, containerRef: leftDrawerRef });
   useFocusTrap({ active: rightDrawerOpen, containerRef: rightDrawerRef });
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  // FIX-3 — host (guest session, 15.8) taky musí posílat heartbeat, jinak ho
+  // BE po 60 min nečinnosti vyhodí z Putyky (heartbeat dřív jel jen pro
+  // členy — `isAuthenticated` = `accessTokenAtom != null`).
+  const anon = useAtomValue(anonSessionAtom);
+  const isPresent = isAuthenticated || !!anon;
   // Hospoda (`/chat*`) běží bez pravého panelu — viz spec-chat-hide-right-panel.
   const pathname = useLocation().pathname;
   const isChat = pathname.startsWith('/chat');
@@ -839,7 +845,8 @@ export function IkarosLayout() {
   useFriendshipsSocket();
   useWorldAccessSocket();
   // 4.2d §4 — chat heartbeat běží globálně: presence drží i mimo `ChatRoom`.
-  usePresenceHeartbeat(isAuthenticated);
+  // FIX-3 — gate na member NEBO host (anon), ne jen člen.
+  usePresenceHeartbeat(isPresent);
   // Presence self-detection (varianta A): BE pošle tomuto socketu jeho reálné
   // místnosti → nav odečítá „mě" dle serveru, ne dle efemérního klientského
   // stavu. Opravuje „vidím se v Putyce, kam jsem nešel" (socket tam zůstal).

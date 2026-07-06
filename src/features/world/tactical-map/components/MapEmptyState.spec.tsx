@@ -163,6 +163,34 @@ describe('MapEmptyState', () => {
     expect(screen.getByText('👤')).toBeInTheDocument();
   });
 
+  // FIX-1 — 403 (odebrán ze scény / bez oprávnění) a jiná chyba (500, síť…)
+  // musí být rozlišené od skutečně prázdného stavu, jinak obojí vypadá jako
+  // legitimní „Vyčkej, až tě PJ přiřadí".
+  it('variant="forbidden" — hláška o chybějícím přístupu, žádné PJ akce', () => {
+    const Wrapper = makeWrapper();
+    render(
+      <MapEmptyState variant="forbidden" isPJ worldId="w1" currentUserId="pj1" />,
+      { wrapper: Wrapper },
+    );
+    expect(screen.getByText(/Nemáš přístup ke scéně/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Vytvořit první scénu/i)).not.toBeInTheDocument();
+  });
+
+  it('variant="error" — hláška o chybě načtení, žádné PJ akce ani karty postav', () => {
+    mockDirectory.mockReturnValue({
+      data: [
+        { id: 'c1', slug: 'c1', name: 'Aragorn', isNpc: false, userId: 'h1' },
+      ],
+      isLoading: false,
+    });
+    const Wrapper = makeWrapper();
+    render(<MapEmptyState variant="error" worldId="w1" currentUserId="h1" />, {
+      wrapper: Wrapper,
+    });
+    expect(screen.getByText(/Nepodařilo se načíst scénu/i)).toBeInTheDocument();
+    expect(screen.queryByText('Aragorn')).not.toBeInTheDocument();
+  });
+
   // C-25 — po vytvoření scény (PJ CTA) musí mutace invalidovat list aktivních
   // scén (REST fallback k WS), jinak PJ orchestrátor ukazuje prázdno.
   it('C-25 — "Vytvořit první scénu" invaliduje activeScenes list', async () => {

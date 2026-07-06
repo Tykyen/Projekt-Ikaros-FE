@@ -22,7 +22,14 @@ export interface YoutubePlayerHandle {
   isPlaying: boolean;
 }
 
-export function useYoutubePlayer(): YoutubePlayerHandle {
+/**
+ * FIX-7 — `onError` volitelný callback (video nedostupné/embedding zakázané/
+ * neplatné ID). Bez tohohle YT přehrávač na chybu jen tiše zmlkne — `isPlaying`
+ * zůstane `true`/stav se nezmění, takže banner „Právě hraje" visí dál, i když
+ * nic reálně nehraje. Konzument (SoundsPage) na callback reaguje smazáním
+ * `previewSound` (banner zmizí) + toastem.
+ */
+export function useYoutubePlayer(onError?: () => void): YoutubePlayerHandle {
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const readyRef = useRef(false);
@@ -30,6 +37,12 @@ export function useYoutubePlayer(): YoutubePlayerHandle {
   const pendingRef = useRef<{ ids: string[]; loop: boolean } | null>(null);
   const volumeRef = useRef(60);
   const [isPlaying, setIsPlaying] = useState(false);
+  // Ref (ne přímo `onError`) — mount efekt initu playeru běží jen jednou
+  // ([] deps), ale chceme vždy volat AKTUÁLNÍ callback z posledního renderu.
+  const onErrorRef = useRef(onError);
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   // Deklarováno před init-effektem, který ji volá v onReady (R19: žádný
   // access-before-declared). Closure nad stabilními refy → není potřeba useCallback.
@@ -77,6 +90,13 @@ export function useYoutubePlayer(): YoutubePlayerHandle {
           onStateChange: (e: any) => {
             // 1 = playing, 0 = ended, 2 = paused.
             setIsPlaying(e.data === 1);
+          },
+          // FIX-7 — 2 = neplatný parametr, 5 = HTML5 chyba, 100 = video
+          // nenalezeno, 101/150 = embedding zakázán vlastníkem.
+          onError: () => {
+            pendingRef.current = null;
+            setIsPlaying(false);
+            onErrorRef.current?.();
           },
         },
       });

@@ -35,7 +35,9 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
   const { worldSlug, worldId, world, userRole } = useWorldContext();
   const favorites = useFavoritePages(worldId);
   const isFavorite = favorites.isFavorite(page.slug);
-  const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canEdit =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
   // Postava/NPC mají vlastní tlačítko tisku v PostavaLayout (s volbou kalendáře)
   // → hlavičkové 🖨 tam skryjeme, ať nejsou dvě.
   const isCharacterPage = page.type === 'Postava hráče' || page.type === 'NPC';

@@ -63,13 +63,17 @@ type PendingNav = { type: 'tab'; id: string } | { type: 'exit' };
  * subdoc taby skryjeme a ukážeme jen Bio.
  */
 export function PostavaLayout({ page }: Props) {
-  const { worldId, worldSlug, userRole } = useWorldContext();
+  const { worldId, worldSlug, userRole, world } = useWorldContext();
   const currentUser = useAtomValue(currentUserAtom);
 
   const isPC = page.type === 'Postava hráče';
   const isOwner =
     isPC && !!page.ownerUserId && page.ownerUserId === currentUser?.id;
-  const canSeePrivate = (userRole ?? -1) >= WorldRole.PomocnyPJ || isOwner;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canSeePrivate =
+    world?.elevated === true ||
+    (userRole ?? -1) >= WorldRole.PomocnyPJ ||
+    isOwner;
   const canEdit = canSeePrivate;
 
   // Načti Character entity (jen pokud Page má characterRef). Slug Character

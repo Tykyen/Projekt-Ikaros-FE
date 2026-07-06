@@ -8,6 +8,7 @@ import { ThemeCustomEditor } from '@/features/world/pages/WorldSettingsPage/comp
 import { themeAtom, platformThemePreviewAtom } from '@/themes/state';
 import { Button } from '@/shared/ui';
 import { useUpdateProfile } from '@/features/profile/api/useProfile';
+import { parseApiError } from '@/shared/api/client';
 import { DEFAULT_CHAT_COLOR } from '@/features/profile/lib/chatColor';
 import type { User, UserThemeSettings } from '@/shared/types';
 import styles from './ProfileSections.module.css';
@@ -60,8 +61,12 @@ export function AppearanceSection({ user }: Props) {
       toast.error('Zadej úplnou barvu ve formátu #RRGGBB.');
       return;
     }
-    await update.mutateAsync({ chatColor: color });
-    setEditingColor(false);
+    try {
+      await update.mutateAsync({ chatColor: color });
+      setEditingColor(false);
+    } catch (err) {
+      toast.error(parseApiError(err));
+    }
   }
   function cancelColor() {
     setColor(chatColor);

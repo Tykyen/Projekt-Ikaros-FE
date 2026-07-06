@@ -60,7 +60,9 @@ export function PageViewer({ page }: Props) {
   const { worldId, worldSlug, world, userRole } = useWorldContext();
   const containerRef = useRef<HTMLElement>(null);
   const favorites = useFavoritePages(worldId);
-  const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canEdit =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);

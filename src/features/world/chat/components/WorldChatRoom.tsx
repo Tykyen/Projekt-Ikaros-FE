@@ -35,7 +35,7 @@ import s from './WorldChatRoom.module.css';
 
 /** Orchestrátor světového chatu — sidebar + konverzace + presence panel. */
 export function WorldChatRoom() {
-  const { worldId, userRole } = useWorldContext();
+  const { worldId, userRole, world } = useWorldContext();
   const user = useAtomValue(currentUserAtom);
   const qc = useQueryClient();
 
@@ -63,8 +63,10 @@ export function WorldChatRoom() {
     [worldEmotesQ.data, globalEmotesQ.data],
   );
 
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
   const isManager =
-    userRole !== null && userRole >= WorldRole.PomocnyPJ;
+    world?.elevated === true ||
+    (userRole !== null && userRole >= WorldRole.PomocnyPJ);
 
   const storeKey = `wchat:active:${worldId}`;
   const membersKey = `wchat:members:${worldId}`;

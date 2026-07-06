@@ -15,6 +15,8 @@ interface Props {
   /** ID aktuálně focused scény (highlight v listu). */
   currentSceneId: string | null;
   onSwitch: (sceneId: string) => void;
+  /** FIX-3 — true během probíhajícího `member.assignToScene` (switch mutation). */
+  switchDisabled?: boolean;
   /** PJ-only — pokud poskytnuto, ukáže ⚙ tlačítko vedle každé scény. */
   onEdit?: (scene: MapScene) => void;
   /**
@@ -34,6 +36,7 @@ export function ActiveScenesList({
   scenes,
   currentSceneId,
   onSwitch,
+  switchDisabled,
   onEdit,
   onDeactivate,
   onClear,
@@ -55,6 +58,7 @@ export function ActiveScenesList({
               type="button"
               className={`${styles.item} ${isCurrent ? styles.current : ''}`}
               onClick={() => onSwitch(scene.id)}
+              disabled={switchDisabled}
               aria-current={isCurrent ? 'true' : undefined}
             >
               <span className={styles.name}>

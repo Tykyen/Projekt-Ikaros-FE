@@ -49,6 +49,14 @@ export default function AccessModeTab() {
   const [mode, setMode] = useState<World['accessMode']>(
     world?.accessMode ?? 'private',
   );
+  // FIX-5 — bez resyncu zůstane `mode` na hodnotě z prvního mountu; když
+  // accessMode změní jiný PJ (nebo tenhle tab zůstane otevřený dlouho),
+  // další „Uložit" tady tiše přepíše jeho změnu. Vzor MapDefaultsTab.
+  const [prevAccessMode, setPrevAccessMode] = useState(world?.accessMode);
+  if (world && world.accessMode !== prevAccessMode) {
+    setPrevAccessMode(world.accessMode);
+    setMode(world.accessMode);
+  }
   const [confirmClosed, setConfirmClosed] = useState(false);
 
   if (!world) return null;

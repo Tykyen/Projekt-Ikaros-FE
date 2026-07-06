@@ -32,9 +32,11 @@ function describeShielded(req: ShieldedRequirement): string {
  */
 export function AccessDenied({ slug }: Props) {
   const navigate = useNavigate();
-  const { worldSlug, worldId, userRole } = useWorldContext();
+  const { worldSlug, worldId, userRole, world } = useWorldContext();
   const { data: meta } = usePageMeta(worldId, slug);
-  const canEdit = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canEdit =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
   const hasShielded =
     meta?.shieldedBy !== undefined && meta.shieldedBy.length > 0;
 

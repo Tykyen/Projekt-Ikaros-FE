@@ -16,8 +16,10 @@ interface Props {
  */
 export function PageNotFound({ slug }: Props) {
   const navigate = useNavigate();
-  const { worldSlug, userRole } = useWorldContext();
-  const canCreate = (userRole ?? -1) >= WorldRole.PomocnyPJ;
+  const { worldSlug, userRole, world } = useWorldContext();
+  // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  const canCreate =
+    world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
 
   return (
     <div className={s.wrap} role="alert">

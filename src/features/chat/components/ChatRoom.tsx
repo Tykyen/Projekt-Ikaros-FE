@@ -11,6 +11,7 @@ import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { Users, X, LogOut } from 'lucide-react';
 import clsx from 'clsx';
+import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { anonSessionAtom } from '../store/anonSession';
 import type { User } from '@/shared/types';
@@ -356,22 +357,42 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
   }, []);
 
   // ── Akce ──────────────────────────────────────────────────────────────
-  const sendPublic = (text: string, attachments: ChatAttachment[]) => {
-    sendMutation.mutate({
-      content: text,
-      color: user?.chatColor,
-      replyToId: replyTo?.id,
-      attachments,
-    });
-    setReplyTo(null);
+  // FIX-4 — `mutateAsync` + návratová hodnota, ať `ChatInput.send()` ví, jestli
+  // smí smazat rozepsaný text/přílohy (jen po skutečném úspěchu). Toast na
+  // chybu řeší `useSendMessage` (onError), tady jen signalizujeme selhání.
+  const sendPublic = async (
+    text: string,
+    attachments: ChatAttachment[],
+  ): Promise<boolean> => {
+    try {
+      await sendMutation.mutateAsync({
+        content: text,
+        color: user?.chatColor,
+        replyToId: replyTo?.id,
+        attachments,
+      });
+      setReplyTo(null);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
+  // FIX-4 — whisper jde přes holý socket.emit bez ack; jediná ověřitelná chyba
+  // je odpojený socket (dřív tiché zahození zprávy). Reálný BE-side reject se
+  // takto nezachytí (žádný ack v protokolu), ale disconnected-case je hlavní
+  // pozorovaný symptom tichého selhání.
   const sendWhisper = (
     toUserId: string,
     text: string,
     attachments: ChatAttachment[],
-  ) => {
-    getSocket().emit('ikaros:whisper', {
+  ): boolean => {
+    const socket = getSocket();
+    if (!socket.connected) {
+      toast.error('Nejsi připojen k chatu — zpráva nebyla odeslána.');
+      return false;
+    }
+    socket.emit('ikaros:whisper', {
       toUserId,
       content: text,
       color: user?.chatColor,
@@ -380,6 +401,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
       attachments,
     });
     setReplyTo(null);
+    return true;
   };
 
   const emitTyping = (isTyping: boolean) => {

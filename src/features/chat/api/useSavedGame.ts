@@ -7,7 +7,8 @@
  * `chat:room:startHere` (+ `chat:room:environment` pro styl/lokaci).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/shared/api/client';
+import { toast } from 'sonner';
+import { api, parseApiError } from '@/shared/api/client';
 import { useSocketEvent } from './useSocket';
 import { chatQueryKeys } from './useGlobalChat';
 import type { CampSavedGame, RoomKey, StartHere, StartHereEvent } from '../lib/types';
@@ -38,6 +39,9 @@ export function useSaveGame(room: RoomKey) {
     onSuccess: (data) => {
       qc.setQueryData(SAVED_GAME_KEY, data);
     },
+    onError: (err) => {
+      toast.error(`Uložení hry selhalo: ${parseApiError(err)}`);
+    },
   });
 }
 
@@ -50,6 +54,9 @@ export function useLoadGame() {
   return useMutation({
     mutationFn: () =>
       api.post<CampSavedGame>('/global-chat/saved-game/load'),
+    onError: (err) => {
+      toast.error(`Načtení hry selhalo: ${parseApiError(err)}`);
+    },
   });
 }
 
@@ -62,6 +69,9 @@ export function useDeleteSavedGame() {
     mutationFn: () => api.delete('/global-chat/saved-game'),
     onSuccess: () => {
       qc.setQueryData(SAVED_GAME_KEY, null);
+    },
+    onError: (err) => {
+      toast.error(`Smazání uložené hry selhalo: ${parseApiError(err)}`);
     },
   });
 }

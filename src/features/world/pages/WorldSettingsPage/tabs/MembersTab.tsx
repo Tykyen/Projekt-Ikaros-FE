@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
@@ -50,6 +50,29 @@ export default function MembersTab() {
     );
   }
 
+  // FIX-5 companion — pokud svět ještě nikdy neuložil `WorldSettings` (BE
+  // vrací null), nabídneme PJ prázdný editor (první „Uložit" vytvoří záznam
+  // přes PUT). `useMemo` (ne holý object literal) je tu nutný: `GroupColorEditor`
+  // teď resetuje svůj lokální state při změně `settings` reference (FIX-5) —
+  // bez memoizace by fallback object dostal NOVOU referenci (`new Date()...`)
+  // při KAŽDÉM re-renderu MembersTab a reset by mazal rozepsané úpravy skupin
+  // i bez jakékoli skutečné změny dat.
+  const editorSettings = useMemo<WorldSettings>(
+    () =>
+      settingsQ.data ?? {
+        id: '',
+        worldId: world?.id ?? '',
+        hiddenNavItems: [],
+        customGroups: [],
+        groupColors: {},
+        akjTypes: [],
+        hideDefaultWeather: false,
+        timelineCalendarSlug: null,
+        updatedAt: new Date().toISOString(),
+      },
+    [settingsQ.data, world?.id],
+  );
+
   if (!world) return null;
 
   // R-20 (role-audit) — platform Admin nemá governance moc; viewerRole = skutečná
@@ -86,25 +109,8 @@ export default function MembersTab() {
     (c) => !c.isNpc && c.kind !== 'location',
   );
 
-  const settings = settingsQ.data ?? null;
-  const customGroups = settings?.customGroups ?? [];
-  const akjTypes = settings?.akjTypes ?? [];
-
-  // Pokud svět ještě nikdy neuložil `WorldSettings` (BE vrací null), nabídneme
-  // PJ prázdný editor — první „Uložit" vytvoří záznam přes PUT. Bez tohoto
-  // fallbacku by se panel „Skupiny a barvy" nikdy nezobrazil a PJ nemá kde
-  // skupiny založit.
-  const editorSettings: WorldSettings = settings ?? {
-    id: '',
-    worldId: world.id,
-    hiddenNavItems: [],
-    customGroups: [],
-    groupColors: {},
-    akjTypes: [],
-    hideDefaultWeather: false,
-    timelineCalendarSlug: null,
-    updatedAt: new Date().toISOString(),
-  };
+  const customGroups = editorSettings.customGroups ?? [];
+  const akjTypes = editorSettings.akjTypes ?? [];
 
   return (
     <>

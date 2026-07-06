@@ -19,12 +19,21 @@ export default function PageEditorPage() {
   const { slug } = useParams<{ slug?: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = !!slug;
-  const { worldId, worldSlug, userRole, loading: worldLoading } = useWorldContext();
+  const {
+    worldId,
+    worldSlug,
+    userRole,
+    world,
+    loading: worldLoading,
+  } = useWorldContext();
 
   if (worldLoading) return <PageEditorSkeleton />;
 
-  // Permission guard
-  if ((userRole ?? -1) < WorldRole.PomocnyPJ) {
+  // Permission guard — elevation (`world.elevated`) obchází membership stejně
+  // jako BE `worldAdminBypass`, jinak by nahozený admin dostal hard redirect
+  // pryč z editoru, přestože BE zápis povolí.
+  const isElevatedHere = world?.elevated === true;
+  if (!isElevatedHere && (userRole ?? -1) < WorldRole.PomocnyPJ) {
     return <Navigate to={`/svet/${worldSlug}`} replace />;
   }
 

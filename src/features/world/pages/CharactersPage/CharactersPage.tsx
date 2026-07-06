@@ -7,13 +7,14 @@ import { CharacterDirectory } from './CharacterDirectory';
  * Tenká routing vrstva — světový kontext (worldId/slug/role) přepošle prezenteru.
  */
 export default function CharactersPage() {
-  const { worldId, worldSlug, userRole, loading } = useWorldContext();
+  const { worldId, worldSlug, userRole, world, loading } = useWorldContext();
   if (loading) return <Spinner center />;
   return (
     <CharacterDirectory
       worldId={worldId}
       worldSlug={worldSlug}
       userRole={userRole}
+      world={world}
     />
   );
 }

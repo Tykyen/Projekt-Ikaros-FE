@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
-import { useSocketEvent } from '@/features/chat/api/useSocket';
+import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import type { WorldEmote } from '../lib/types';
 
 /** Cache klíče pro custom emoty. Sjednoceno, ať lze invalidovat zvenčí. */
@@ -65,6 +65,13 @@ export function useWorldEmotes(worldId: string | null) {
   useSocketEvent<WorldEmote>('emote:created', onCreated);
   useSocketEvent<{ emoteId: string }>('emote:deleted', onDeleted);
   useSocketEvent<WorldEmote>('emote:updated', onUpdated);
+
+  // FIX-5 — reconnect fallback: `emote:*` zmeškané během výpadku jsou pryč →
+  // po reconnectu refetch, ať se sada emotů dorovná bez dalšího live eventu.
+  useSocketReconnect(() => {
+    if (!worldId) return;
+    void qc.invalidateQueries({ queryKey: emoteKeys.world(worldId) });
+  });
 
   // Připojení k world room — pokud konzument není uvnitř WorldChatRoom,
   // musí si zařídit `room:join` sám (admin stránka). Nech to na konzumentovi
