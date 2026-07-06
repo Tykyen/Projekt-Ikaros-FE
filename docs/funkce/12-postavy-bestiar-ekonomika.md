@@ -401,6 +401,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 **Kdo (BE):**
 - `findShopItems`/`findShopGroups` scope dle role: PJ vidí vše; PomocnyPJ svoje+sdílené; hráč svoje+sdílené (děleno klientsky na vrstvy). (`shop/api.ts:24-26`)
 - `createShopGroup` vyžaduje PomocnyPJ+ (`campaign.controller.ts:637-641`).
+- `createShopItem` vyžaduje PomocnyPJ+ (`campaign.controller.ts:634`) — **✅ OPRAVENO 2026-07-05 (SEC-12, RUN-2026-07-05):** BE gate dřív chyběl úplně (jen FE `canManage` schovávalo tlačítko), takže i Hráč mohl API voláním založit položku obchodu. `isShared` (sdílení napříč vlastníky) je navíc od SEC-13 gated i na `updateShopItem`/`updateShopGroup`/`updateSubject`/… (`resolveIsShared`, dřív jen na create) — nízká role si přes PUT nemohla propašovat `isShared:true`.
 - `purchase`: hráč smí kupovat jen své postavě (`NOT_YOUR_CHARACTER`); staff komukoli. Účet musí patřit postavě a být v daném světě. (`campaign-purchase.service.ts:99-126`)
 
 **Co jde dělat (vše):**

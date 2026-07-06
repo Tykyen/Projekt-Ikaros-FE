@@ -150,9 +150,9 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **Kód:** FE `WorldNewsPage.tsx`; BE `world-news.controller.ts`, `world-news.service.ts`.
 
 ### Kdo publikuje / viditelnost
-- **Čtení (`scope=active`):** veřejné — `GET /world-news` má `OptionalJwtAuthGuard`, aktivní novinky vidí kdokoli (i anonym), `assertCanReadScope` propustí active bez kontroly (`world-news.service.ts:256-268`).
+- **Čtení (`scope=active`):** veřejné, ale JEN pro **public/open** svět (nebo globální novinky bez `worldId`) — `GET /world-news` má `OptionalJwtAuthGuard`, `assertCanReadScope` → `assertCanReadActiveWorldScoped` (`world-news.service.ts:338-360`). **✅ OPRAVENO 2026-07-05 (SEC-10/FIX-22, RUN-2026-07-05):** world-scoped `scope=active` novinky dřív žádný `accessMode` gate neměly — obsah **privátního** světa (titulek, text, obrázek) unikal komukoli anonymnímu, kdo znal `worldId`. Teď: `private` svět → jen člen nebo elevovaný platform Admin+ (jinak 403 `WORLD_NEWS_FORBIDDEN`); `public`/`open` zůstává čitelné i pro anonyma (katalog světů = záměrně veřejný, mění se jen obsah privátních novinek).
 - **Archiv (`scope=archived`/`all`):** vyžaduje přihlášení + write oprávnění (PomocnyPJ+ / Admin).
-- **Zápis (create/update/delete/archive/unarchive):** `assertCanWrite` (`world-news.service.ts:278-314`):
+- **Zápis (create/update/delete/archive/unarchive):** `assertCanWrite` (`world-news.service.ts:370-410`):
   - platform Admin/Superadmin vždy;
   - `worldId === null` (globální novinka) → **jen** Admin/Superadmin;
   - `worldId !== null` → Admin/Sa **nebo** world membership **PomocnyPJ+**.
@@ -161,7 +161,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **`createdBy`** je interní audit field, nikdy se nevrací v API (`toPublic` ho stripuje, `world-news.controller.ts:29-37`).
 - **Globální novinky v UI světa:** PJ světa je needituje — FE `canManage && (isGlobalAdmin || news.worldId !== null)` (`WorldNewsPage.tsx:155-156`).
 - **Stav:** ✅
-- **Kód:** FE `WorldNewsPage.tsx`; BE `world-news.service.ts:256-314`.
+- **Kód:** FE `WorldNewsPage.tsx`; BE `world-news.service.ts:309-410`.
 
 ### Pole novinky / co jde nastavit
 DTO `create-world-news.dto.ts`: `title` (≤200), `content` (≤10000), `date` (ISO UTC), `type` (`info` | `alert` | `system`), `link` (URL s protokolem) nebo interní `linkPageSlug` (priorita), hero obrázek (`imageUrl` + focal X/Y + zoom 25–400 + fit cover/contain), fantasy datum (`calendarConfigId` + `calendarDate` = FantasyDate). Archivace přes `POST /:id/archive` a `/unarchive` (idempotentní). Limit listu 200, default 50.

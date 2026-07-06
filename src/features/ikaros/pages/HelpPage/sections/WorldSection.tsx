@@ -646,8 +646,9 @@ export function WorldSection() {
         </Tool>
         <Tool icon={<Coins size={16} />} title="Obchod" audience={{ kind: 'vse', label: 'Členové' }} accent="success">
           <p>
-            Obchod světa s kartami zboží. PJ zakládá položky, typy/skupiny a slevy;
-            ceny v měnách světa, každý je vidí ve své preferované měně. Hráč nakupuje
+            Obchod světa s kartami zboží. Zakládat položky, typy/skupiny a slevy smí
+            PJ i Pomocný PJ; ceny v měnách světa, každý je vidí ve své preferované
+            měně. Hráč nakupuje
             své postavě (peněženka se zůstatkem před/po), PJ komukoli. Nákup přibude do
             výbavy a odečte z účtu; panel „Nákupy" umí vrácení.
           </p>

@@ -143,7 +143,7 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
 ### Tab Smazané světy (recovery)
 - **Co to je:** seznam soft-smazaných světů s možností obnovy do 30 dní.
 - **Kde:** `components/DeletedWorldsTab/DeletedWorldsTab.tsx`. Data `useDeletedWorlds`, akce `POST /worlds/:id/restore`.
-- **Kdo:** FE RoleGuard (Superadmin/Admin). BE = worlds modul (restore je jediná pojistka, kde platform admin smí zasáhnout do světa, viz R-20 governance — obnova opuštěného světa + dosazení PJ).
+- **Kdo:** FE RoleGuard (Superadmin/Admin). BE = worlds modul — restore je jediná admin pojistka, která funguje **bez elevace** (obnova opuštěného světa + dosazení PJ); ostatní zásahy do světa (nastavení/mazání/členové/kalendář) vyžadují od FIX-19 aktivní elevaci pro daný svět, viz kap. 09 sekce I.
 - **Co jde dělat:** Obnovit svět (vrátí stránky/postavy/chat, vlastník zase získá přístup). Zobrazuje zbývající dny do trvalého smazání cronem (zvýraznění ≤ 5 dní).
 - **Hranice:** po 30 dnech cron svět trvale smaže (hard delete ~40 kolekcí). Z tohoto tabu nelze trvale smazat ručně.
 - **Stav:** ✅
@@ -256,6 +256,7 @@ Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organ
 - **Stav:** ⚠️ **STUB.** FE stránka je doslova `<div>[stub] Dungeon builder</div>` (`DungeonBuilderPage.tsx:2`).
 - **Hranice:** FE žádná funkčnost.
 - **Zvláštnosti / BE pozadí:** BE modul `dungeon-maps` EXISTUJE a je funkční, ale je **per-world PJ tool, NE platform-admin nástroj.** Endpointy `/dungeon-maps` (`dungeon-maps.controller.ts`) gatuje `assertCanManage`: `role <= Admin` projde (platform admin bypass), jinak musí být PJ daného světa (`NOT_WORLD_PJ`). Umí CRUD dungeonu + export jako MapTemplate / MapScene. Tento BE modul ale FE stub stránka nepoužívá — jsou rozpojené.
+  - **✅ OPRAVENO 2026-07-05 (SEC-25, RUN-2026-07-05):** create/update DTO (`create-dungeon-map.dto.ts`, `update-dungeon-map.dto.ts`) postrádaly class-validator dekorátory → `ValidationPipe` je nedokázal validovat, endpointy vracely 400 na každý pokus. `exportTemplate`/`export-scene` k tomu padaly 500 (chybějící `ownerId`). Modul byl tedy fakticky nepoužitelný, i když existoval a vypadal hotově — teď reálně funguje.
 - **Kód:** FE `pages/DungeonBuilderPage.tsx` (stub), BE `modules/dungeon-maps/dungeon-maps.controller.ts` (funkční, ale jinde napojený).
 
 ---
@@ -269,6 +270,7 @@ Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organ
   - `GET /emotes/global` (čte každý přihlášený), `POST /emotes/global` (Admin+), `PATCH /emotes/global/:id` (Admin+), `DELETE /emotes/global/:id` (Admin+).
 - **Hranice:** limit globálních emotů `EMOTE_LIMIT_GLOBAL = 200` (FE konstanta). Mazání bez soft-delete (potvrzení jen přes `confirm()`).
 - **Zvláštnosti:** per-world emoty jsou jiná věc (PJ světa, `POST /emotes/:worldId`); admin globální emoty vidí všichni uživatelé ve všech světech. Real-time broadcast přes `emotes.gateway.ts`.
+- **✅ OPRAVENO 2026-07-05 (SEC-11, RUN-2026-07-05):** create/update/copy DTO byly importované přes `import type` → class-validator metadata chyběla, `POST`/`PATCH /emotes/global` i per-svět vracely 400 na každý pokus (vytváření/úprava emotů bylo úplně nefunkční, přestože stránka vypadala hotová). Teď skutečný `import` — funguje.
 - **Stav:** ✅
 - **Kód:** FE `IkarosEmotesAdminPage.tsx` + `features/world/chat/emotes/*` (sdílené komponenty/hooky), BE `modules/emotes/emotes.controller.ts`.
 

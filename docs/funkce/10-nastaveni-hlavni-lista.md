@@ -4,7 +4,7 @@ Hloubková, kódem ověřená inventura. FE = `Projekt-ikaros-FE`, BE = `Projekt
 
 Světové role (číselně, **nižší = vyšší moc** ve world enumu naopak — pozor, FE `WorldRole` má Zadatel nejníž a PJ nejvýš): Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ. Platformové role (UserRole, nižší číslo = vyšší): Superadmin(1) < Admin(2).
 
-Klíčové pravidlo **R-20** (ověřeno v kódu): platformový Admin/Superadmin **NEMÁ governance moc uvnitř světa** — settings/mazání/předání řídí jen skutečná world role. Jediná admin pojistka je obnova (restore) opuštěného soft-smazaného světa.
+Klíčové pravidlo (R-20, doplněno elevací 2026-06-21 a FIX-19 2026-07-05 — ověřeno v kódu): platformový Admin/Superadmin **BEZ aktivní elevace** nemá governance moc uvnitř světa (settings/mazání řídí jen skutečná world role). **S aktivní elevací** (per-svět toggle, kap. 09 sekce I) MÁ plnou PJ governance moc přes `canAdminWorld` (settings, mazání, šablona deníku) a `canManageMembers`/`canEditWorldData` (členové, AKJ, skupiny, vzhled) — do 2026-07-05 tuhle bránu elevace ještě nepokrývala (FIX-19), i s aktivním "Admin režimem" skončila mutace 403. Jediná výjimka, kterou elevace neobchází, je **předání světa** (`transferOwnership`, striktně jen skutečný vlastník) a **obnova** (restore) opuštěného soft-smazaného světa (jen Admin/Superadmin, i bez elevace — je to platformová akce mimo world runtime).
 
 ---
 
@@ -13,7 +13,7 @@ Klíčové pravidlo **R-20** (ověřeno v kódu): platformový Admin/Superadmin 
 ### Přehled — tabová stránka
 - **Co to je:** stránka `/svet/:slug/nastaveni`. Tabová, aktivní tab drží URL hash (`#vzhled` atd.).
 - **Kde:** FE `src/features/world/pages/WorldSettingsPage/WorldSettingsPage.tsx`. Vstup z hlavičky světa přes ozubené kolečko (`WorldLayout.tsx:520`).
-- **Kdo (FE):** route `memberOnly(p(WorldSettingsPage))` — vyžaduje členství (Čtenář+). Viditelnost jednotlivých tabů řídí **jen skutečná world role** (`effectiveRole = userRole ?? Zadatel`), platform Admin bez world membershipu nevidí žádný PJ tab (R-20, `WorldSettingsPage.tsx:194-208`).
+- **Kdo (FE):** route `memberOnly(p(WorldSettingsPage))` — vyžaduje členství (Čtenář+). Viditelnost tabů řídí `effectiveRole` = `PJ` při aktivní elevaci (`world.elevated`) **jinak** skutečná world role (`WorldSettingsPage.tsx:253-256`) — platform Admin bez world membershipu a bez elevace nevidí žádný PJ tab; s elevací vidí a smí totéž co PJ (FIX-19, kap. 09 sekce I).
 - **Kdo (BE):** každý tab volá jiný endpoint s vlastním guardem (viz níže). Nejde o jeden monolit.
 - **Hranice:** tab se zobrazí jen když `effectiveRole >= minRole` a (volitelně) `world.system === minSystem`.
 - **Stav:** ✅
@@ -128,8 +128,9 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 - **Co jde dělat:** nahrát/upravit/smazat emote, zkopírovat z jiného světa.
 - **Kdo (FE):** PomocnyPJ+. **Kdo (BE):** modul emotů (membership guard PomocnyPJ+).
 - **Zvláštnost:** dřív orphan route `/admin/emotes` (N-03), kanonický přístup je teď tato záložka.
+- **✅ OPRAVENO 2026-07-05 (SEC-11, RUN-2026-07-05):** `import type` na `CreateEmoteDto`/`UpdateEmoteDto`/`CopyEmoteDto` (`emotes.controller.ts`) mazal class-validator reflection metadata → **každý** upload/úprava/kopie emote (globální i světový) vracel 400, i když UI vypadalo funkčně. Teď `import` (ne `import type`) — vytváření/úprava/kopírování reálně funguje.
 - **Stav:** ✅
-- **Kód:** FE `pages/WorldEmotesAdminPage/WorldEmotesAdminPage.tsx`.
+- **Kód:** FE `pages/WorldEmotesAdminPage/WorldEmotesAdminPage.tsx`. BE `modules/emotes/emotes.controller.ts`.
 
 ### Tab Kalendáře
 - **Co to je:** multi-config kalendáře světa (9.2b). Reuse `CalendarConfigsPage`.
@@ -173,10 +174,10 @@ Tabulka tabů (FE `TABS` pole, `WorldSettingsPage.tsx:65-183`):
 ### Tab Smazat svět (soft-delete)
 - **Co to je:** soft-delete světa s 30denním recovery oknem.
 - **Co jde dělat:** smazat svět (dvojí potvrzení). Data zůstávají; obnovit do 30 dní může **jen administrátor**, po 30 dnech cron hard-delete (`world-cleanup.cron.ts`).
-- **Kdo (FE):** tab PJ. **Kdo (BE):** `softDelete` → `canAdminWorld` = **PJ membership** (`worlds.service.ts:1555-1587`). **Obnova** (`POST /worlds/:id/restore`) → jen Admin/Superadmin, do 30 dní (`worlds.service.ts:1598+`).
-- **⚠️ Nesoulad:** FE texty (`DeleteWorldTab.tsx:11`, route komentář) tvrdí „PJ vlastník **i Admin**" může mazat, ale BE `canAdminWorld` platform Admina záměrně nepouští (R-20). Viz Nesrovnalosti.
-- **Stav:** ✅ (s textovou nepřesností)
-- **Kód:** FE `tabs/DeleteWorldTab.tsx`; BE `worlds.service.ts:1555`, `worlds.controller.ts:200-227`.
+- **Kdo (FE):** tab PJ. **Kdo (BE):** `softDelete` → `canAdminWorld` = **PJ membership NEBO elevovaný platform Admin/Superadmin** (FIX-19, RUN-2026-07-05 — `worlds.service.ts:1770-1811`). **Obnova** (`POST /worlds/:id/restore`) → jen Admin/Superadmin, do 30 dní, bez elevace (`worlds.service.ts:1813+`).
+- **✅ VYŘEŠENO 2026-07-05 (FIX-19):** FE text „PJ vlastník i Admin" (`DeleteWorldTab.tsx:11`) je teď přesný pro **elevovaného** Admina — dřív `canAdminWorld` elevaci vůbec nečetl (dead parametr), takže i s aktivním "Admin režimem" mazání spadlo na 403.
+- **Stav:** ✅
+- **Kód:** FE `tabs/DeleteWorldTab.tsx`; BE `worlds.service.ts:1770`, `worlds.controller.ts:200-227`.
 
 ---
 
@@ -280,7 +281,7 @@ FE `WorldSettingsPage/tabs/ExportTab.tsx`; BE `modules/world-export/{world-expor
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. ✅ OPRAVENO 2026-06-18 (JSDoc komentář) — **Mazání světa — FE text vs. BE realita.** `DeleteWorldTab.tsx` (a route komentář `WorldSettingsPage.tsx:176`) říká, že mazat smí „PJ vlastník i Admin", ale BE `softDelete` → `canAdminWorld` pouští **jen world PJ membership**, platform Admin je R-20 záměrně vyloučen. Platform Admin tlačítko sice na FE neuvidí (tab gate PJ), ale text mate. Doporučení: sjednotit text na „jen PJ světa".
+1. ✅ VYŘEŠENO 2026-07-05 (FIX-19, RUN-2026-07-05) — **Mazání světa — FE text vs. BE realita.** `DeleteWorldTab.tsx` (a route komentář `WorldSettingsPage.tsx:176`) říká, že mazat smí „PJ vlastník i Admin". Do 2026-06-18 šlo o špatný text (BE Admina vůbec nepouštěl); po zavedení elevace (2026-06-21) FE tab elevovanému Adminovi ukazoval, ale `canAdminWorld` elevaci ještě nečetl → mazání spadlo na 403 i s aktivním "Admin režimem". Teď `canAdminWorld` čte `worldAdminBypass` — text je pravdivý pro **elevovaného** Admina/Superadmina.
 2. **`getSettings` (interní) vs. `getSettingsForRequester` (REST).** `ensureWorldChat`/persona čtou přes interní `getSettings` (plný objekt) — REST GET prochází filtrem. Konzistentní, ale dva čtecí vstupy = riziko driftu při přidání citlivého pole (přidat ho i do `toPublicSettings`). K ověření při dalších settings polích.
 3. **`hideDefaultWeather` / `currencies` v DTO, ale bez vlastního UI tabu v Nastavení.** Currencies řeší Převodník měn, počasí svůj modul — v Nastavení nemají záložku. Není bug, jen nejednotnost „vše v Nastavení".
 4. **Vlastní navigace nevaliduje cíl odkazu proti reálným routám.** `to` je volný string (max 512). Odkaz na neexistující world routu projde a vede na 404/catch-all. Zvážit validaci/varování v `LinkTargetEditor`.

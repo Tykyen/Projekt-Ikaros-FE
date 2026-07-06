@@ -2,7 +2,7 @@
 
 > **Účel:** Hloubková, **kódem ověřená** inventura všeho, co platforma dnes umí. Slouží jako podklad pro budoucí uživatelský průvodce (návody) a pro strategii rozšiřování. Každé tvrzení bylo ověřeno přímo ve zdrojovém kódu FE i BE — ne odhadem.
 >
-> **Snímek k:** 2026-07-05 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
+> **Snímek k:** 2026-07-06 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
 >
 > ⚠️ Toto je stav kódu, ne marketingový popis. Kde se název funkce rozchází s realitou, je to označeno v sekci „Nesrovnalosti & dluhy" na konci každé kapitoly.
 
@@ -59,7 +59,7 @@ Každá funkce má jednotnou strukturu:
 | PomocnyPJ | 4 | Pomocný vypravěč — většina správy obsahu (stránky, kalendáře, chat, postavy). |
 | PJ | 5 | Vypravěč = vlastník světa; plná governance (nastavení, mazání, předání, role). |
 
-> **Elevation (2026-06-21, nahradila R-20):** platformový Admin/Superadmin má world pravomoci **uspané** — chová se jako hráč, dokud si je per-svět vědomě **nenahodí** (toggle „Aktivovat admina" v hlavičce světa). Elevated = plná moc PJ v tom světě; de-elevated = jako nečlen/člen. BE-enforced (`world_elevations` + `worldAdminBypass` napříč ~45 branami), audit, logout skládá. Výjimka mimo elevaci = obnova opuštěného světa. Detail viz kap. 09.
+> **Elevation (2026-06-21, nahradila R-20; governance mezera dozavřena 2026-07-05 FIX-19):** platformový Admin/Superadmin má world pravomoci **uspané** — chová se jako hráč, dokud si je per-svět vědomě **nenahodí** (toggle „Aktivovat admina" v hlavičce světa). Elevated = plná moc PJ v tom světě (nastavení, mazání, členové, kalendář — do 2026-07-05 tohle `canAdminWorld` ignoroval, elevovaný admin dostával 403 i s aktivním "Admin režimem"); de-elevated = jako nečlen/člen. BE-enforced (`world_elevations` + `worldAdminBypass` napříč ~45 branami), audit, logout skládá. Výjimka mimo elevaci = předání světa (striktně vlastník) a obnova opuštěného světa. Detail viz kap. 09.
 
 ---
 

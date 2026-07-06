@@ -206,6 +206,7 @@
 - **Zvláštnosti:**
   - Hold = 30 dní (`DELETION_HOLD_DAYS`).
   - **Pozn. nesrovnalost:** JSDoc cronu tvrdí „Běží 1× za hodinu", reálný `@Cron('0 3 * * *')` = denně 03:00 Europe/Prague.
+  - **✅ ODSTRANĚNO 2026-07-05 (N-RUN-07, RUN-2026-07-05):** legacy `DELETE /users/:id` (hard-delete bez holdu, jen self nebo Admin, `users.controller.ts`) obcházel celý tenhle 30denní flow — FE ho nikdy nevolal, ale jako přímé API volání šlo smazat účet okamžitě bez reaktivačního okna. Endpoint smazán; **jediná** cesta ke smazání účtu je teď `POST /users/me/deletion-request` výše.
 - **Stav:** ✅ funguje (s přiznanými dluhy D-034b a chybějícím reminderem).
 - **Kód:** FE `AccountSection.tsx:23`, `DeleteAccountModal.tsx:28`, `ReactivateAccountModal.tsx:37`, BE `users.controller.ts:321`, `users.service.ts:697`, `common/guards/jwt-auth.guard.ts:24`, `services/account-cleanup.cron.ts:22`.
 

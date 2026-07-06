@@ -47,6 +47,7 @@ Kapitola pokrývá platformový kalendář globálních akcí a osobní záložk
   - **Toggly žijí v modulu daného obsahu**, ne v centrálním "favorites" modulu:
     - Diskuze: `GET /ikaros-discussions/my-favorites`, `POST /ikaros-discussions/:id/toggle-favorite`, `POST /:id/toggle-pin` (limit + kontrola NOT_FAVORITE → 409 `PIN_LIMIT` / `NOT_FAVORITE`).
     - Články a Galerie mají analogické endpointy (FE hooky `useMyFavoriteArticles/Gallery`, `useTogglePinArticle/Gallery`).
+  - **✅ OPRAVENO 2026-07-05 (SEC-22/FIX-9, RUN-2026-07-05):** `my-favorites` (Diskuze i Galerie) dřív vracelo položky **bez ohledu na stav** — pokud sis oblíbil diskuzi/obrázek, který mezitím zůstal `Draft`/`Pending`/byl zamítnut (nebo šlo o cizí neschválený obsah, na který ses dostal oblíbením), viděl jsi ho dál v `/ikaros/oblibene`. Teď `findMyFavorites` filtruje viditelnost stejně jako běžné čtení (`Published` každý, `Pending` navíc admin, `Draft`/`Rejected` jen autor) — cizí neschválený obsah se přes oblíbené už nezobrazí.
   - Stav připnutí FE čte z `currentUser.pinnedXIds` (pole na uživateli), oblíbené z `GET …/my-favorites`.
 - **Záložky uvnitř světů (samostatné, nesouvisí s touto stránkou):**
   - `favoriteCharacters: Map<worldId, slug[]>` — oblíbené postavy per svět (sdíleno napříč zařízeními, nahradilo localStorage).

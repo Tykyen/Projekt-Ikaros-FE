@@ -65,6 +65,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - **Cursor pagination** (infinite scroll, `useInfiniteTimelineEvents`, default sort `desc` = nejnovější rok nahoře, v rámci roku ASC). Filtry v URL: `fromYear`, `toYear`, `q` (fulltext title+text), `sort`.
   - **Year scrubber** (sidebar / drawer) z agregátu `{year, count}` (`year-counts`).
   - **Přidat/upravit/smazat událost** (PomocnyPJ+) přes `TimelineEventModal` + `ConfirmDialog`. Pole: rok/měsíc/den/hodina, název, rich-text text, obrázek (focal point), odkaz, `pageSlug` (vazba na stránku), **celestial overrides** (ruční přepis fáze nebeského tělesa pro daný den).
+  - **✅ OPRAVENO 2026-07-05 (FUNC-02, RUN-2026-07-05) — „odstranit obrázek".** Nastavení `imageUrl` na prázdno v editoru se dřív na BE neprojevilo (update ho tiše ignoroval) — obrázek zůstal viset i po „smazání". Teď `imageUrl: null` v těle requestu obrázek reálně smaže a uklidí storage (event `media.orphaned`), stejně jako u ostatních modulů s obrázkem (game-events/world-news).
   - **Nebeské stavy** se počítají read-time z aktivního configu (`calculateCelestialStates`) — lunární fáze u událostí.
   - **Konverze data** mezi kalendáři světa (`DateConversionPopup`).
 - **Hranice / co neumí:**
