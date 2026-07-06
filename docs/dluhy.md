@@ -10,6 +10,15 @@
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
+### D-062 — Token portréty PC/NPC na taktické mapě deformované (roztažení na čtverec)
+**Soubor:** `src/features/world/tactical-map/TacticalMapView.tsx:871` (`resolveTokenImageCrop`) + `components/tokens/TokenSprite.tsx:73-75` (`getSpriteTransform` no-crop větev) + `types.ts:162-171` (`characterData`)
+**Problém:** `resolveTokenImageCrop` vrací `undefined` pro token s `characterData.imageUrl` (tj. každý PC/NPC s portrétem) → padne do no-crop větve `getSpriteTransform`, která vrací `{width:diameter, height:diameter}` → `scale.x ≠ scale.y` pro nečtvercovou texturu = **roztažení na čtverec, zdeformovaný obličej**. Bestie naopak dostávají cover-fit + focal a jsou v pořádku. Typ `characterData` nemá `focalX/focalY/zoom/fit`, takže mapa nemá čeho se chytit. Ověřeno adversariálně (CONFIRMED, 2026-07-06).
+**Dopad:** Střední — portréty postav (nejčastější tokeny) vypadají zdeformovaně a opticky nevycentrovaně; PJ si toho všímá při hře.
+**Řešení:** Dát PC/NPC tokenům stejný **cover-fit + volitelné ohnisko** jako bestie — rozšířit `characterData` o `focalX/focalY/zoom/fit` (zrcadlo FE↔BE), nebo minimálně vynutit cover-fit bez deformace v no-crop větvi (uniformní scale místo width=height). Sekundárně (kosmetika, neblokuje): stagger 2+ tokenů na jednom hexu je fixních 12 px a nereaguje na zoom (`utils/tokenStaggerOffset.ts`); pointy-top hex nechává nad/pod tokenem svislou mezeru (opticky „plave"); dokumentace/komentáře tvrdí flat-top, ale matematika je pointy-top (`hexUtils.ts`).
+**Kdy:** Samostatně, ideálně před/vedle 17.10 (nesouvisí s panely). Náklad malý.
+
+---
+
 ### D-R-AUDIT-CREATE-TX — create() světa není transakční (poloprázdný svět při seed-failu)
 **Soubor:** `backend/src/modules/worlds/worlds.service.ts:425-481` — `create()`
 **Problém:** Netransakční řetěz ~7 kroků (world → PJ membership → měny → počasí → kalendář → diarySchema → verze) bez rollbacku. Když spadne krok PO membershipu, HTTP vrátí 500, ale svět+membership už persistují → poloprázdný svět + matoucí chyba. Kontrast: `approveAccessRequest` transakci MÁ (D-061).

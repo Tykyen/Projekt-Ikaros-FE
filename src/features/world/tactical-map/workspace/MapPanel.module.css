@@ -1,0 +1,90 @@
+/**
+ * 17.10 A1 — vzhled sdíleného shellu `<MapPanel>`. Beze změny grafiky: používá
+ * mapové tokeny `--map-ui-*` (fialové synthwave). Layout-transparentní obal —
+ * obsah panelu se vkládá do `.body` beze změny.
+ */
+.panel {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
+  border-radius: 12px;
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  color: var(--map-toolbar-text);
+  box-shadow: var(--shadow-lg, 0 8px 28px rgb(var(--map-ui-shadow-rgb) / 0.5));
+  overflow: hidden;
+}
+
+/* Sbalený = jen hlavička (roleta). */
+.collapsed {
+  width: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 12px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.1);
+  border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+}
+.collapsed .header {
+  border-bottom: none;
+}
+
+.icon {
+  flex: none;
+  line-height: 1;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--map-ui-accent-solid, currentColor);
+}
+
+.action {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+.action:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
+}
+
+/* „?" nápověda — kulaté zvýraznění (Orchestrace, Efekty). */
+.help {
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.45);
+  border-radius: 50%;
+  color: var(--map-ui-accent-solid, currentColor);
+  font-weight: 700;
+}
+
+.close:hover {
+  background: rgb(var(--map-ui-danger-rgb, 255 80 96) / 0.75);
+  color: #fff;
+}
+
+.body {
+  overflow: auto;
+}
+
+/* Chrome varianta (lišta nástrojů) — jemně jiný akcent hlavičky. */
+.chrome .header {
+  background: rgb(var(--map-ui-accent-rgb) / 0.12);
+}

@@ -82,7 +82,7 @@
 | Vrstva | Stav | Detail |
 |---|---|---|
 | +e2e | ✅ **135/135** | 73 failů nebyl replSet ale 2 harness bugy (WorldElevationsModule v selective modulech + neplatný MONGOMS_LAUNCH_TIMEOUT); + 2 testy opraveny na R-20/deterministicky. `proof/e2e-result.txt` |
-| +teeth (Stryker) | ✅ **odblokováno** | RC-CC1 opraveno (configFile→jest.config.ts) + Windows tempDir bug; dry-run 513 testů OK, scoped běh 60 % skóre. Plný běh = hodiny (`npx stryker run`). `proof/stryker-*.log` |
+| +teeth (Stryker) | ✅ **dokončeno** | RC-CC1 + Windows tempDir opraveno; **plný běh 110 min → mutation skóre 44 % (63 % v pokrytém kódu)**: 1353 killed / 797 survived / 910 no-coverage / 0 errors. Diagnóza: testy chytí ~⅔ mutací v testovaném kódu; 910 mutantů = kód bez testů + 797 survived = slabší asserce → prostor pro silnější/více testů (dluh kvality testů, ne bug). `proof/stryker-full.log` |
 | +formal (TLC) | ✅ **oba modely** | MapReconnect: counterexample dle očekávání (fix drží); money (dopsán `money.cfg`): NoOverdraft drží, 220 stavů. `proof/tlc-*.txt` |
 | +db | ✅ **seed-proof** / ⏭️ prod | Seed s daty + záměrné orphany (`proof/seed-min.mjs`) → scan **detekoval** orphan (`characters.worldId`, 1/1) = **tooling funguje**. Odhalil 2 mezery ve scan skriptech: channelreadstatus (=CD-RUN-11, v kódu opraveno) + **DB-SCAN-01 nový**: scan neověřuje `campaignPurchases.accountId/shopItemId` FK. Reálný prod scan (historické orphany) chce tvůj souhlas. `proof/db-*-result.txt` |
 

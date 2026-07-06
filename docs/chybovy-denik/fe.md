@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### CH-058 — jotai `atomWithStorage` v testovacím `createStore()` nehydratuje localStorage synchronně · 2026-07-06
+**Kontext:** unit test `workspaceStore` (17.10 A1) — merge test měl ověřit, že neúplný localStorage se doplní defaultem; četl jsem `store.get(workspaceAtom)` po `localStorage.setItem`.
+**Co jsem udělal špatně:** spolehl jsem na `atomWithStorage(..., { getOnInit: true })`, že v `createStore()` synchronně načte localStorage při prvním `get` (bez subscribe).
+**Proč to nefungovalo:** `getOnInit` nepomohl — `store.get` bez aktivní subscription vrátil default `{}` (hydratace sync storage nastává až při `sub`/mount) → merge vrátil default, test čekal `'open'`, dostal `'collapsed'`. V reálné appce (default store + mount) hydratace proběhne; holý `createStore().get` v testu ji nevyvolá.
+**Poučení:** logiku závislou na uloženém stavu vytáhni do **čisté funkce** (`mergeWorkspace(raw)`) a testuj ji přímo; persistenci ověř zvlášť zápisem (`store.set` → čtení `localStorage`), ne čtením přes `store.get` spoléhajícím na hydrataci. (Souvisí [[project_fe_test_precommit]].)
+**Příznak cyklení:** test čte přes `store.get(atomWithStorage-derived)` a čeká uloženou hodnotu, dostává default → neladit `getOnInit`/storage, přepnout na test čisté funkce.
+
+---
+
 ### ✅ ŘEŠENÍ — presence: „vidím se v Putyce, kam jsem nešel" = self-detekce z BE, ne z efemérního klienta · 2026-07-05
 **Co nakonec zabralo (varianta A):** BE gateway po každé změně presence pošle SVÉMU socketu `chat:my-rooms` (pole jeho místností); FE (`IkarosLayout` root, ne sidebar co na mobilu unmountuje) to poslouchá a plní `myRoomsAtom` → nav `othersInRoom = counts − (jsem tam dle BE ? 1 : 0)`. Sebeodečet tak stojí na realitě serveru, ne na klientském stavu, co reload/nová session vynuluje.
 **Proč to je správně (a ne hádání):** kořen = chat místnost se při navigaci NEopouští (záměr 4.2d — leave jen tlačítkem/timeoutem), takže socket zůstane v Putyce i po přechodu do Campu; `counts[hospoda]=1` byl uživatelův **vlastní** socket, ale klientský `myRooms` ho tam „neviděl" → odečet selhal a vypadalo to jako cizí přítomnost. Druhá příčina se stejným projevem (multi-tab) uživatel **vyloučil** (potvrdil 1 okno) → zúžení symptomu předešlo opravě špatné příčiny.

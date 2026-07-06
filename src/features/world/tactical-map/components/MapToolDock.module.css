@@ -14,7 +14,9 @@
      `padding-right` drží scrollbar mimo pravou hranu docků. */
   top: 20px;
   bottom: 20px;
-  right: calc(12px + var(--map-dock-width, 0px));
+  /* 17.10 A1 — čte generalizovanou rezervaci pravého okraje; fallback na
+     starý --map-dock-width, dokud ho zapisovači nenahradí. */
+  right: calc(12px + var(--map-inset-right, var(--map-dock-width, 0px)));
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -24,7 +26,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
-  z-index: 100;
+  z-index: var(--z-map-tool-panel, 100);
   transition: right 0.12s ease;
   pointer-events: none;
 }
@@ -107,7 +109,7 @@
     top: 12px;
     bottom: 12px;
     /* 4px + 8px padding-right = ~12px jako dřív */
-    right: calc(4px + var(--map-dock-width, 0px));
+    right: calc(4px + var(--map-inset-right, var(--map-dock-width, 0px)));
   }
   .dock {
     width: 200px;

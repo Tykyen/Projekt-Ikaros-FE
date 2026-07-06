@@ -24,6 +24,29 @@
   /* Disable text selection během drag */
   user-select: none;
   -webkit-user-select: none;
+
+  /* 17.10 A1 — centrální z-index škála (zrcadlo workspace/zLayers.ts).
+     Dědí se do dětí .viewport; prvky mimo (portály) drží fallback v místě užití. */
+  --z-map-atmosphere: 2;
+  --z-map-initiative: 20;
+  --z-map-corner: 30;
+  --z-map-overlay-locked: 40;
+  --z-map-overlay-hidden: 50;
+  --z-map-banner: 50;
+  --z-map-notebook: 60;
+  --z-map-panel: 90;
+  --z-map-tool-panel: 100;
+  --z-map-flyout: 100;
+  --z-map-token-backdrop: 399;
+  --z-map-token-panel: 400;
+  --z-map-modal: 1000;
+
+  /* 17.10 A1 — rezervace okrajů (generalizace --map-dock-width). Panely u
+     okrajů čtou tyto proměnné, aby se nepřetlačovaly. Zapisují je dokovaná
+     karta (pravý okraj) apod. Default 0 = nic nerezervováno. */
+  --map-inset-right: 0px;
+  --map-inset-top: 0px;
+  --map-inset-bottom-left: 0px;
 }
 
 .canvasWrapper {
@@ -38,14 +61,16 @@
   position: absolute;
   top: 12px;
   left: 12px;
-  z-index: 30;
+  z-index: var(--z-map-corner, 30);
   pointer-events: none;
 }
 .weatherSlot {
   position: absolute;
   top: 12px;
-  right: 12px;
-  z-index: 30;
+  /* 17.10 A1 — čte rezervaci pravého okraje → dokovaná karta odsune počasí
+     (strukturálně řeší kolizi #2: počasí × pravá lišta). */
+  right: calc(12px + var(--map-inset-right, 0px));
+  z-index: var(--z-map-corner, 30);
   pointer-events: none;
   /* 10.2j — sloupec: panel počasí + tlačítko deníku pod ním. */
   display: flex;
@@ -94,7 +119,7 @@
   /* 10.2o — strop výšky: logy + orchestrace se nikdy nevytlačí za horní okraj.
      Panel uvnitř se smrští (flex) a jeho tělo scrolluje místo ořezávání. */
   max-height: calc(100svh - var(--header-h, 60px) - 40px);
-  z-index: 90;
+  z-index: var(--z-map-panel, 90);
   display: flex;
   flex-direction: column;
   gap: 8px;

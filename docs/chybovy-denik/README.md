@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-058.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-059.**
 
 ## Jak je deník členěný
 
@@ -220,3 +220,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](audit.md#-řešení--audit-přístupových-práv-26-agentů--6-ověřených-oprav-idor--počítadlo--orchestrace--2026-07-05) | audit/BE+FE | audit práv (26 agentů/63 controllerů) + 6 oprav: 4 HIGH IDOR (deník by-user, pages/data, bestiae, favorites) + admin počítadlo (`findAll`=discovery filtr→`countAll`) + orchestrace owner-bypass (isPJ/guard) + matrix-seed owner membership; **každý nález ověřen čtením před patchem** (chytil rozbitý bestiae spec) | — (BE 140+ jest/tsc/lint + FE tsc-b/eslint ✓; ⚠️ BE restart + FE deploy; zbývá MEDIUM+Vesmíry#3) |
 | [CH-057](proces.md#ch-057--chybná-diagnóza-owner-nevidí-orchestraci--de-elevovaný-admin-nahoď-se-byl-to-majitel--2026-07-05) | proces | z tlačítka „Aktivovat admina" jsem usoudil de-elevovaného nečlena-admina („nahoď se"), ale byl to MAJITEL (má PJ z create, elevaci nepotřebuje); kořen = isPJ bez owner-bypass + matrix-seed bez membershipu | navrhuju „nahoď se/je správně", uživatel opáčí „ale je to majitel" |
 | [✅ ŘEŠENÍ](fe.md#-řešení--177-rodokmeny-nový-typ-stránky-strom-rodiny-febe-kolize-názvu-řešena-polem--2026-07-06) | fe+be | 17.7 Rodokmeny = nový typ stránky (strom rodiny); kolize se starým „Rodokmen"→Zoom řešena polem `familyTree`; motiv dědí `--theme-*`; sdílený canvas + tidy-tree auto-layout; 4 agenti průzkum před kódem = 0 drift | — (BE typecheck+jest ✓, FE build ✓; ⚠️ BE restart + živý touch/motiv) |
+| [CH-058](fe.md#ch-058--jotai-atomwithstorage-v-testovacím-createstore-nehydratuje-localstorage-synchronně--2026-07-06) | fe/test | jotai `atomWithStorage` v testovacím `createStore().get` nehydratuje localStorage (getOnInit nepomohl) → merge vrací default; testuj čistou funkci `mergeWorkspace`, ne přes `store.get` | test čeká uloženou hodnotu z `store.get`, dostává default |

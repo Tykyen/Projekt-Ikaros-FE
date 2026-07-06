@@ -71,12 +71,14 @@ export function TokenInfoPanel({ open, header, children }: Props): React.ReactEl
   // doleva vedle deníku a zůstaly viditelné. Cleanup → 0px (zavřeno / drag).
   useEffect(() => {
     const root = document.documentElement;
-    if (open && mode === 'dock') {
-      root.style.setProperty('--map-dock-width', `${layout.width}px`);
-    } else {
-      root.style.setProperty('--map-dock-width', '0px');
-    }
+    // 17.10 A1 — rezervace pravého okraje. Nový název `--map-inset-right`
+    // (generalizace); `--map-dock-width` zůstává jako dočasný alias, dokud ho
+    // čtenáři (.stack) nepustí. Obě nesou stejnou hodnotu.
+    const width = open && mode === 'dock' ? `${layout.width}px` : '0px';
+    root.style.setProperty('--map-inset-right', width);
+    root.style.setProperty('--map-dock-width', width);
     return () => {
+      root.style.setProperty('--map-inset-right', '0px');
       root.style.setProperty('--map-dock-width', '0px');
     };
   }, [open, mode, layout.width]);
