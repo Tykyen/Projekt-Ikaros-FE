@@ -1738,3 +1738,21 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Klíčové rozhodnutí (změna proti zadání dluhu):** dluh chtěl „migraci deníkových listů na `IconButton`". Průzkumný agent našel **0 prázdných icon-only tlačítek** (všechna už mají aria-label) → migrace NENÍ a11y oprava, jen kosmetika, a `IconButton .iconBtn` je ghost styl → přebarvila by tlačítka napříč 8 skiny bez živé kontroly (uživatel pryč). **Nezískal jsem nic za velké riziko → vědomě neudělal**, zapsáno jako nízkoprio dluh. Stejně storybook axe `todo`→`error`: zjištěno, že storybook testy jsou mimo CI (D-033) → přepnutí by byl no-op, nechal `todo` s vysvětlením v kódu.
 **Jak ověřeno:** `npm run build` (tsc-b + vite + CSP) exit 0; `KebabMenu.spec` 8/8; jsx-a11y aktivní ověřeno `eslint --print-config` (34 pravidel na eslint 10 přes `--legacy-peer-deps`).
 **Zhodnocení:** DOBŘE — hlavní kořen (chybějící scope, ne CSS) i rozsah (0 defektů → nemigrovat) chyceny čtením/auditem před prací, ne cyklením. ŠPATNĚ (viz CH-056): dvě vlastní tooling chyby cestou (legacy-peer-deps sebral testing-library, `$TMPDIR` maskoval build) mě stály dva zbytečné běhy — falešná „zelená" z maskovaného exit statusu.
+
+---
+
+## ✅ ŘEŠENÍ — 17.7 Rodokmeny: nový typ stránky (strom rodiny) FE+BE, kolize názvu řešena polem — 2026-07-06
+
+**Kontext:** Nová featura na žádost uživatele — vizuální strom rodiny jako nový typ wiki stránky „Rodokmen". Design-first (HTML mock → 12 motivů → editor → schválení), pak spec 17.7 → plná implementace FE+BE.
+
+**Co zabralo:**
+- **Kolize názvu typu** (hlavní past): starý „Rodokmen" (velký obrázek) byl týž den přejmenován na „Zoom" s read-time `normalizePageType('Rodokmen')→'Zoom'`. Nový „Rodokmen" (strom) má stejný string. Rozlišeno **přítomností pole `familyTree`**: `normalizePageType(type, hasFamilyTree)` → legacy bez familyTree = Zoom, nový s familyTree = Rodokmen. Bez DB migrace. 3 BE mappery projektují `familyTree:1`; service vytvoří `familyTree` JEN pro typ Rodokmen (schema bez defaultu).
+- **4 průzkumní agenti PŘED kódem** (PageEditor / BE schema / theme tokeny / upload+picker) = nulový FE↔BE drift, přesné reuse vzorů (galleryImages/table).
+- **Motiv dědí `--theme-*`** (ne 12 hardcoded palet jako v HTML mocku): rodokmen žije uvnitř WorldLayout, kde `applyTheme` píše `--theme-*` na `:root` → CSS module jen konzumuje `--theme-surface/accent/border/text`. Radikálně méně kódu než mock, převléká se automaticky.
+- **Sdílený `FamilyTreeCanvas`** (pan/zoom + spojnice měřené z DOM + uzly) pro náhled i editor; `geometry.ts` = spojnice + **auto-layout „Srovnat"** (tidy-tree: generace hloubkou, manželské bloky, cursor-based bez překryvů, centrování rodičů nad dětmi).
+
+**Proč to je správně:** rozlišení polem `familyTree` je bezpečné bez migrace (BE nemá runner) a idempotentní; reuse motivových tokenů = konzistence s deníkem/chatem/mapou (vzor 16.1d/16.2c) místo paralelní palety.
+
+**Jak ověřeno:** BE typecheck exit 0 · FE `npm run build` (tsc-b+vite+CSP) exit 0 · BE jest pages exit 0 · FE vitest pages (dobíhá). ⚠️ Živě čeká: touch pan/zoom na mobilu, motiv-převlékání napříč 12 motivy, BE restart (nové pole).
+
+**Zhodnocení:** DOBŘE — kolize chycena a prokomunikována PŘED kódem (ne po regresní chybě); agentní průzkum zabránil driftu na velké FE↔BE ploše; design-first mock ušetřil cyklení na vzhledu. Reziduum: auto-layout ignoruje sekundární sňatky (v1 vědomě), pinch-zoom na mobilu chybí (jen tlačítka+1prst pan).

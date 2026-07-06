@@ -56,6 +56,13 @@ export function detectLostData(
       });
     }
   }
+  // 17.7 — přepnutí z Rodokmenu skryje strom (data v BE zůstanou).
+  if (nextType !== 'Rodokmen' && state.familyTree.people.length > 0) {
+    lost.push({
+      feature: 'osoby v rodokmenu',
+      count: state.familyTree.people.length,
+    });
+  }
 
   return lost;
 }

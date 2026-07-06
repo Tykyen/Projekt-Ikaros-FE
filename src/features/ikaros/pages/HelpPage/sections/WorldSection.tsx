@@ -181,6 +181,18 @@ export function WorldSection() {
             prázdného textu, takže ti nikdy nepřepíše, co už máš napsané.
           </p>
         </Tool>
+        <Tool icon={<Network size={16} />} title="Rodokmen — strom rodiny" audience={{ kind: 'pjasst', label: 'Pomocný PJ+' }} accent="corrector">
+          <p>
+            Stránka typu <strong>Rodokmen</strong> je vizuální strom rodiny. Každá
+            osoba má fotku, jméno, data (narození–úmrtí) a volitelný odkaz na svou
+            stránku — klik na osobu pak přeskočí na její profil. V{' '}
+            <strong>Úpravách</strong> klikneš na osobu, doplníš údaje a tlačítky{' '}
+            <strong>Partner / Dítě / Rodič</strong> přidáš příbuzné. Uzly táhneš
+            myší, tlačítko <strong>Srovnat</strong> je poskládá automaticky. Vzhled
+            se řídí motivem světa. Osoby nemusí mít vlastní stránku (fungují i
+            předci jen se jménem a fotkou).
+          </p>
+        </Tool>
         <Tool icon={<FileText size={16} />} title="Index a Správa stránek" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="corrector">
           <p>
             <strong>Index stránek</strong> = přehled encyklopedie s kartami, hledáním,

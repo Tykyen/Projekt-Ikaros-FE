@@ -1,0 +1,78 @@
+=== TYPE (bsonType per FK pole) ===
+  custom_emotes.worldId → (prázdné)
+  custom_emotes.createdBy → (prázdné)
+  pages.worldId → (prázdné)
+  characters.worldId → string:3
+  worldmemberships.worldId → string:2
+  worldmemberships.userId → string:2
+  worlds.ownerId → string:1
+  chatmessages.senderId → (prázdné)
+
+=== OR / RR / DUP / INV / CARD / STATE / SET / TEMP ===
+┌─────────┬──────────────────────────────────────────────────────────┬───────┬─────────────────┐
+│ (index) │ label                                                    │ count │ finding         │
+├─────────┼──────────────────────────────────────────────────────────┼───────┼─────────────────┤
+│ 0       │ 'pages.worldId ∉ worlds'                                 │ 0     │ 'OR'            │
+│ 1       │ 'characters.worldId ∉ worlds'                            │ 1     │ 'OR'            │
+│ 2       │ 'chatchannels.worldId ∉ worlds'                          │ 0     │ 'OR'            │
+│ 3       │ 'chatgroups.worldId ∉ worlds'                            │ 0     │ 'OR'            │
+│ 4       │ 'chatmessages.worldId ∉ worlds'                          │ 0     │ 'OR'            │
+│ 5       │ 'mapScenes.worldId ∉ worlds'                             │ 0     │ 'OR'            │
+│ 6       │ 'worldMapEntries.worldId ∉ worlds'                       │ 0     │ 'OR'            │
+│ 7       │ 'worldMapFolders.worldId ∉ worlds'                       │ 0     │ 'OR'            │
+│ 8       │ 'game_events.worldId ∉ worlds'                           │ 0     │ 'OR'            │
+│ 9       │ 'timeline_events.worldId ∉ worlds'                       │ 0     │ 'OR'            │
+│ 10      │ 'worldnews.worldId ∉ worlds'                             │ 0     │ 'OR'            │
+│ 11      │ 'worldsettings.worldId ∉ worlds'                         │ 0     │ 'OR'            │
+│ 12      │ 'worldmemberships.worldId ∉ worlds'                      │ 0     │ 'OR'            │
+│ 13      │ 'custom_emotes.worldId ∉ worlds'                         │ 0     │ 'OR'            │
+│ 14      │ 'sounds.worldId ∉ worlds'                                │ 0     │ 'OR'            │
+│ 15      │ 'world_currencies.worldId ∉ worlds'                      │ 0     │ 'OR'            │
+│ 16      │ 'bestiae.worldId ∉ worlds'                               │ 0     │ 'OR'            │
+│ 17      │ 'world_calendar_configs.worldId ∉ worlds'                │ 0     │ 'OR'            │
+│ 18      │ 'world_gm_notes.worldId ∉ worlds'                        │ 0     │ 'OR'            │
+│ 19      │ 'world_page_templates.worldId ∉ worlds'                  │ 0     │ 'OR'            │
+│ 20      │ 'scheduledMessages.worldId ∉ worlds'                     │ 0     │ 'OR'            │
+│ 21      │ 'campaignSubjects.worldId ∉ worlds'                      │ 0     │ 'OR'            │
+│ 22      │ 'campaignScenarios.worldId ∉ worlds'                     │ 0     │ 'OR'            │
+│ 23      │ 'campaignShopGroups.worldId ∉ worlds'                    │ 0     │ 'OR'            │
+│ 24      │ 'campaignShopItems.worldId ∉ worlds'                     │ 0     │ 'OR'            │
+│ 25      │ 'campaignPurchases.worldId ∉ worlds'                     │ 0     │ 'OR'            │
+│ 26      │ 'world_weather_generators.worldId ∉ worlds'              │ 0     │ 'OR'            │
+│ 27      │ 'universeMaps.worldId ∉ worlds'                          │ 0     │ 'OR'            │
+│ 28      │ 'character_diaries.characterId ∉ characters'             │ 0     │ 'OR/CD-09'      │
+│ 29      │ 'character_calendars.characterId ∉ characters'           │ 0     │ 'OR/CD-09'      │
+│ 30      │ 'character_finances.characterId ∉ characters'            │ 0     │ 'OR/CD-09'      │
+│ 31      │ 'character_inventories.characterId ∉ characters'         │ 0     │ 'OR/CD-09'      │
+│ 32      │ 'character_notes.characterId ∉ characters'               │ 0     │ 'OR/CD-09'      │
+│ 33      │ 'character_accounts.characterId ∉ characters'            │ 0     │ 'OR/CD-09'      │
+│ 34      │ 'chatmessages.channelId ∉ chatchannels'                  │ 0     │ 'OR'            │
+│ 35      │ 'membership.currentSceneId ∉ mapScenes'                  │ 0     │ 'RR/CD-04'      │
+│ 36      │ 'membership.characterPath ∉ characters.slug'             │ 0     │ 'RR/K-DI2'      │
+│ 37      │ 'worlds.ownerId ∉ users'                                 │ 0     │ 'RR'            │
+│ 38      │ 'worldnews.linkPageSlug ∉ pages.slug'                    │ 0     │ 'RR/K-DI2'      │
+│ 39      │ 'timeline.pageSlug ∉ pages.slug'                         │ 0     │ 'RR/K-DI2'      │
+│ 40      │ 'campaignSubjects.linkedPageSlug ∉ pages.slug'           │ 0     │ 'RR/K-DI2'      │
+│ 41      │ 'campaignSubjects.linkedCharacterSlug ∉ characters.slug' │ 0     │ 'RR'            │
+│ 42      │ 'worldsettings.timelineCalendarSlug ∉ calendar.slug'     │ 0     │ 'RR/K-DI7'      │
+│ 43      │ 'character.preferredCalendarConfigId ∉ calendar'         │ 0     │ 'RR/K-DI7'      │
+│ 44      │ 'favoritePageSlugs ∉ pages.slug'                         │ 0     │ 'RR/CD-08'      │
+│ 45      │ 'worldMapFolders.parentId ∉ worldMapFolders'             │ 0     │ 'RR/SET/K-DI12' │
+│ 46      │ 'campaignShopGroups.parentId ∉ campaignShopGroups'       │ 0     │ 'RR/SET/K-DI12' │
+│ 47      │ 'DUP membership {userId,worldId}'                        │ 0     │ 'DUP/IDX'       │
+│ 48      │ 'DUP characters {worldId,slug}'                          │ 0     │ 'DUP/IDX'       │
+│ 49      │ 'DUP pages {worldId,slug}'                               │ 0     │ 'DUP/IDX'       │
+│ 50      │ 'DUP weather generator {worldId,name}'                   │ 0     │ 'DUP/K-DI3'     │
+│ 51      │ 'CARD character_diaries: >1 na postavu'                  │ 0     │ 'CARD/K-DI11'   │
+│ 52      │ 'CARD character_finances: >1 na postavu'                 │ 0     │ 'CARD/K-DI11'   │
+│ 53      │ 'CARD character_inventories: >1 na postavu'              │ 0     │ 'CARD/K-DI11'   │
+│ 54      │ 'CARD character_notes: >1 na postavu'                    │ 0     │ 'CARD/K-DI11'   │
+│ 55      │ 'STATE characters isNpc=true ∧ userId set'               │ 0     │ 'STATE/K-DI14'  │
+│ 56      │ 'STATE worlds deletedAt ∧ isActive=true'                 │ 0     │ 'STATE/K-DI14'  │
+│ 57      │ 'SET friendship requester==recipient'                    │ 0     │ 'SET'           │
+│ 58      │ 'SET relationship subjectA==subjectB'                    │ 0     │ 'SET'           │
+│ 59      │ 'TEMP createdAt > updatedAt (pages)'                     │ 0     │ 'TEMP'          │
+└─────────┴──────────────────────────────────────────────────────────┴───────┴─────────────────┘
+
+Nálezů s count>0: 1 | chyb dotazu: 0
+🐛 Nekonzistence nalezeny — potvrzuje DI-xx reálnými daty. ⚠️ Nejdřív ověř TYPE blok (false-negative).

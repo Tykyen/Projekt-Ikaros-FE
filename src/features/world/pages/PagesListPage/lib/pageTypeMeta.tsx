@@ -4,6 +4,7 @@ import {
   List,
   Images,
   Maximize2,
+  Network,
   Monitor,
   FileText,
   User,
@@ -19,6 +20,7 @@ export const PAGE_TYPE_ICON: Record<PageType, LucideIcon> = {
   Seznam: List,
   Galerie: Images,
   Zoom: Maximize2,
+  Rodokmen: Network,
   Obrazovka: Monitor,
   Ostatní: FileText,
   // 9.1 — sjednocení Character → Page přidalo 2 nové typy.

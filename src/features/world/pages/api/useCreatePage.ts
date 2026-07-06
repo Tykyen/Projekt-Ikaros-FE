@@ -4,6 +4,7 @@ import { pagesQueryKey } from './usePage';
 import type {
   AccessRequirement,
   AkjTab,
+  FamilyTree,
   GalleryImage,
   InstructionalVideo,
   MenuItem,
@@ -42,6 +43,8 @@ export interface CreatePageInput {
   ownerUserId?: string;
   /** AKJ chráněné záložky (spec-akj-protected-tabs). */
   akjTabs?: AkjTab[];
+  /** 17.7 — vizuální rodokmen (jen typ Rodokmen). */
+  familyTree?: FamilyTree;
 }
 
 /**

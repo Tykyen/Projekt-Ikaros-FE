@@ -1,0 +1,107 @@
+=== TYPE (bsonType per FK pole; MIX = false-negative riziko) ===
+  custom_emotes.worldId → (prázdné)
+  custom_emotes.createdBy → (prázdné)
+  pages.worldId → (prázdné)
+  characters.worldId → string:3
+  worldmemberships.worldId → string:2
+  worldmemberships.userId → string:2
+  worlds.ownerId → string:1
+  chatmessages.senderId → (prázdné)
+  channelreadstatus.channelId → string:2
+  campaignPurchases.accountId → string:2
+  campaignPurchases.shopItemId → string:2
+  campaignRelationships.subjectAId → (prázdné)
+  mapScenes.templateId → (prázdné)
+
+=== FK / OR / RR / DUP / INV / CARD / STATE / SET / TEMP ===
+┌─────────┬──────────────────────────────────────────────────────────┬───────┬──────────────────────┐
+│ (index) │ label                                                    │ count │ finding              │
+├─────────┼──────────────────────────────────────────────────────────┼───────┼──────────────────────┤
+│ 0       │ 'pages.worldId ∉ worlds'                                 │ 0     │ 'OR/CD-06'           │
+│ 1       │ 'characters.worldId ∉ worlds'                            │ 1     │ 'OR/CD-06'           │
+│ 2       │ 'chatchannels.worldId ∉ worlds'                          │ 0     │ 'OR/CD-06'           │
+│ 3       │ 'chatgroups.worldId ∉ worlds'                            │ 0     │ 'OR/CD-06'           │
+│ 4       │ 'chatmessages.worldId ∉ worlds'                          │ 0     │ 'OR/CD-06'           │
+│ 5       │ 'mapScenes.worldId ∉ worlds'                             │ 0     │ 'OR/CD-06'           │
+│ 6       │ 'worldMaps.worldId ∉ worlds'                             │ 0     │ 'OR/CD-06'           │
+│ 7       │ 'worldMapEntries.worldId ∉ worlds'                       │ 0     │ 'OR/CD-06'           │
+│ 8       │ 'worldMapFolders.worldId ∉ worlds'                       │ 0     │ 'OR/CD-06'           │
+│ 9       │ 'game_events.worldId ∉ worlds'                           │ 0     │ 'OR/CD-06'           │
+│ 10      │ 'timeline_events.worldId ∉ worlds'                       │ 0     │ 'OR/CD-06'           │
+│ 11      │ 'worldnews.worldId ∉ worlds'                             │ 0     │ 'OR/CD-06'           │
+│ 12      │ 'worldsettings.worldId ∉ worlds'                         │ 0     │ 'OR/CD-06'           │
+│ 13      │ 'worldmemberships.worldId ∉ worlds'                      │ 0     │ 'OR/CD-06'           │
+│ 14      │ 'custom_emotes.worldId ∉ worlds'                         │ 0     │ 'OR/CD-06'           │
+│ 15      │ 'sounds.worldId ∉ worlds'                                │ 0     │ 'OR/CD-06'           │
+│ 16      │ 'world_currencies.worldId ∉ worlds'                      │ 0     │ 'OR/CD-06'           │
+│ 17      │ 'bestiae.worldId ∉ worlds'                               │ 0     │ 'OR/CD-06'           │
+│ 18      │ 'world_calendar_configs.worldId ∉ worlds'                │ 0     │ 'OR/CD-06'           │
+│ 19      │ 'world_gm_notes.worldId ∉ worlds'                        │ 0     │ 'OR/CD-06'           │
+│ 20      │ 'world_page_templates.worldId ∉ worlds'                  │ 0     │ 'OR/CD-06'           │
+│ 21      │ 'scheduledMessages.worldId ∉ worlds'                     │ 0     │ 'OR/CD-06'           │
+│ 22      │ 'campaignSubjects.worldId ∉ worlds'                      │ 0     │ 'OR/CD-06'           │
+│ 23      │ 'campaignScenarios.worldId ∉ worlds'                     │ 0     │ 'OR/CD-06'           │
+│ 24      │ 'campaignShopGroups.worldId ∉ worlds'                    │ 0     │ 'OR/CD-06'           │
+│ 25      │ 'campaignShopItems.worldId ∉ worlds'                     │ 0     │ 'OR/CD-06'           │
+│ 26      │ 'campaignPurchases.worldId ∉ worlds'                     │ 0     │ 'OR/CD-06'           │
+│ 27      │ 'campaignRelationships.worldId ∉ worlds'                 │ 0     │ 'OR/CD-06'           │
+│ 28      │ 'world_weather_generators.worldId ∉ worlds'              │ 0     │ 'OR/CD-06'           │
+│ 29      │ 'universeMaps.worldId ∉ worlds'                          │ 0     │ 'OR/CD-06'           │
+│ 30      │ 'character_diaries.characterId ∉ characters'             │ 0     │ 'OR/CD-09'           │
+│ 31      │ 'character_calendars.characterId ∉ characters'           │ 0     │ 'OR/CD-09'           │
+│ 32      │ 'character_finances.characterId ∉ characters'            │ 0     │ 'OR/CD-09'           │
+│ 33      │ 'character_inventories.characterId ∉ characters'         │ 0     │ 'OR/CD-09'           │
+│ 34      │ 'character_notes.characterId ∉ characters'               │ 0     │ 'OR/CD-09'           │
+│ 35      │ 'character_accounts.characterId ∉ characters'            │ 0     │ 'OR/CD-09'           │
+│ 36      │ 'chatmessages.channelId ∉ chatchannels'                  │ 0     │ 'OR'                 │
+│ 37      │ 'channelreadstatus.channelId ∉ chatchannels'             │ 1     │ 'OR/CD-RUN-11'       │
+│ 38      │ 'campaignPurchases.accountId ∉ character_accounts'       │ 1     │ 'RR/DI-RUN/ORPHAN-3' │
+│ 39      │ 'campaignPurchases.shopItemId ∉ campaignShopItems'       │ 1     │ 'RR/DI-RUN/ORPHAN-3' │
+│ 40      │ 'campaignRelationships.subjectAId ∉ campaignSubjects'    │ 0     │ 'RR/DI-RUN-09'       │
+│ 41      │ 'campaignRelationships.subjectBId ∉ campaignSubjects'    │ 0     │ 'RR/DI-RUN-10'       │
+│ 42      │ 'mapScenes.templateId ∉ mapTemplates'                    │ 0     │ 'RR/DI-RUN-11'       │
+│ 43      │ 'worldmemberships.currentSceneId ∉ mapScenes'            │ 0     │ 'RR/CD-04'           │
+│ 44      │ 'worldmemberships.characterPath ∉ characters.slug'       │ 0     │ 'RR/K-DI2'           │
+│ 45      │ 'worlds.ownerId ∉ users'                                 │ 0     │ 'RR'                 │
+│ 46      │ 'worldnews.linkPageSlug ∉ pages.slug'                    │ 0     │ 'RR/K-DI2'           │
+│ 47      │ 'timeline_events.pageSlug ∉ pages.slug'                  │ 0     │ 'RR/K-DI2'           │
+│ 48      │ 'campaignSubjects.linkedPageSlug ∉ pages.slug'           │ 0     │ 'RR/K-DI2'           │
+│ 49      │ 'campaignSubjects.linkedCharacterSlug ∉ characters.slug' │ 0     │ 'RR'                 │
+│ 50      │ 'worldsettings.timelineCalendarSlug ∉ calendar.slug'     │ 0     │ 'RR/K-DI7'           │
+│ 51      │ 'characters.preferredCalendarConfigId ∉ calendar'        │ 0     │ 'RR/K-DI7'           │
+│ 52      │ 'worldMapFolders.parentId ∉ worldMapFolders'             │ 0     │ 'RR/SET/K-DI12'      │
+│ 53      │ 'campaignShopGroups.parentId ∉ campaignShopGroups'       │ 0     │ 'RR/SET/K-DI12'      │
+│ 54      │ 'users.favoritePageSlugs ∉ pages.slug'                   │ 0     │ 'RR/CD-08'           │
+│ 55      │ 'DUP worldmemberships {userId,worldId}'                  │ 0     │ 'DUP/IDX'            │
+│ 56      │ 'DUP characters {worldId,slug}'                          │ 0     │ 'DUP/IDX'            │
+│ 57      │ 'DUP pages {worldId,slug}'                               │ 0     │ 'DUP/IDX'            │
+│ 58      │ 'DUP world_weather_generators {worldId,name}'            │ 0     │ 'DUP/K-DI3'          │
+│ 59      │ 'DUP channelreadstatus {userId,channelId}'               │ 0     │ 'DUP/IDX'            │
+│ 60      │ 'CARD character_diaries: >1 na postavu'                  │ 0     │ 'CARD/K-DI11'        │
+│ 61      │ 'CARD character_finances: >1 na postavu'                 │ 0     │ 'CARD/K-DI11'        │
+│ 62      │ 'CARD character_inventories: >1 na postavu'              │ 0     │ 'CARD/K-DI11'        │
+│ 63      │ 'CARD character_notes: >1 na postavu'                    │ 0     │ 'CARD/K-DI11'        │
+│ 64      │ 'STATE characters isNpc=true ∧ userId set'               │ 0     │ 'STATE/K-DI14'       │
+│ 65      │ 'STATE worlds deletedAt ∧ isActive=true'                 │ 0     │ 'STATE/K-DI14'       │
+│ 66      │ 'SET friendship requester==recipient'                    │ 0     │ 'SET'                │
+│ 67      │ 'SET relationship subjectA==subjectB'                    │ 0     │ 'SET'                │
+│ 68      │ 'TEMP pages createdAt > updatedAt'                       │ 0     │ 'TEMP'               │
+└─────────┴──────────────────────────────────────────────────────────┴───────┴──────────────────────┘
+
+=== BLOB (informativní — kolik dokumentů drží neprázdný blob URL) ===
+TODO: skutečný Cloudinary-orphan check vyžaduje Cloudinary Admin API (mimo tento read-only DB sken).
+┌─────────┬───────────┬────────────┬──────────────┐
+│ (index) │ coll      │ field      │ docsWithBlob │
+├─────────┼───────────┼────────────┼──────────────┤
+│ 0       │ 'bestiae' │ 'imageUrl' │ 1            │
+└─────────┴───────────┴────────────┴──────────────┘
+
+=== SOUHRN: KOLEKCE.pole → počet orphanů (jen count>0) ===
+  🐛 characters.worldId ∉ worlds → 1   [OR/CD-06]
+  🐛 channelreadstatus.channelId ∉ chatchannels → 1   [OR/CD-RUN-11]
+  🐛 campaignPurchases.accountId ∉ character_accounts → 1   [RR/DI-RUN/ORPHAN-3]
+  🐛 campaignPurchases.shopItemId ∉ campaignShopItems → 1   [RR/DI-RUN/ORPHAN-3]
+
+CELKEM orphanů (součet count>0): 4
+Hran s nálezem: 4 | čistých hran: 65 | chyb dotazu: 0
+🐛 Nekonzistence nalezeny — potvrzuje DI-xx / CD-xx reálnými daty. ⚠️ Ověř TYPE blok výše (MIX = false-negative).

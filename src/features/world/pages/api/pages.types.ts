@@ -13,10 +13,12 @@ export const PAGE_TYPES = {
   Noviny: 'Noviny',
   Seznam: 'Seznam',
   Galerie: 'Galerie',
-  // Dříve „Rodokmen" — layout velkého zoomovatelného obrázku. Přejmenováno na
-  // „Zoom", název „Rodokmen" se uvolnil pro budoucí typ strom rodiny. BE
-  // normalizuje legacy dokumenty (type='Rodokmen') na 'Zoom' při čtení.
+  // „Zoom" = velký zoomovatelný obrázek (dříve „Rodokmen"). BE mapuje legacy
+  // dokumenty type='Rodokmen' BEZ familyTree na 'Zoom' při čtení.
   Zoom: 'Zoom',
+  // 17.7 — vizuální strom rodiny. Sdílí jméno se starým typem, odlišen polem
+  // `familyTree` (BE normalizePageType). Legacy velký obrázek → Zoom.
+  Rodokmen: 'Rodokmen',
   Obrazovka: 'Obrazovka',
   Ostatni: 'Ostatní',
   // 9.1 — sjednocení Character → Page. PC = má `ownerUserId`, NPC = bez.
@@ -37,9 +39,8 @@ export const ALL_PAGE_TYPES: PageType[] = Object.values(PAGE_TYPES);
  */
 export function resolvePageTypeFromUrl(token: string): PageType | undefined {
   if (!token) return undefined;
-  // Legacy: typ „Rodokmen" přejmenován na „Zoom" — starý odkaz `?type=Rodokmen`
-  // (bookmark) přesměruj na nový typ místo pádu do undefined.
-  if (token === 'Rodokmen') return PAGE_TYPES.Zoom;
+  // Pozn.: „Rodokmen" je od 17.7 zase platný typ (strom rodiny), takže projde
+  // běžnou cestou níže. Legacy velký-obrázek data řeší BE normalizePageType.
   if ((ALL_PAGE_TYPES as readonly string[]).includes(token)) {
     return token as PageType;
   }
@@ -95,6 +96,37 @@ export interface GalleryImage {
   url: string;
   caption?: string;
   order: number;
+}
+
+/**
+ * 17.7 — uzel vizuálního rodokmenu. Volná data (jméno/foto/datum) + volitelný
+ * odkaz na stránku postavy (`pageSlug`; klik → navigace). Datum je volný text
+ * („1502" i „3. 4. 1502"). Pozice `x,y` je tažená / srovnaná auto-layoutem.
+ */
+export interface FamilyPerson {
+  id: string;
+  name: string;
+  sub?: string;
+  born?: string;
+  died?: string;
+  imageUrl?: string;
+  color?: string;
+  pageSlug?: string;
+  x: number;
+  y: number;
+}
+
+/** 17.7 — svazek: partneři A(+B) a jejich potomci. `bId` prázdné = samoživitel. */
+export interface FamilyUnion {
+  id: string;
+  aId: string;
+  bId?: string;
+  childIds: string[];
+}
+
+export interface FamilyTree {
+  people: FamilyPerson[];
+  unions: FamilyUnion[];
 }
 
 export interface InstructionalVideo {
@@ -172,6 +204,9 @@ export interface Page {
   imageZoom?: number | null;
   imageFit?: 'cover' | 'contain' | null;
   table?: PageTable;
+  /** 17.7 — vizuální rodokmen. Přítomnost odlišuje nový typ „Rodokmen" od
+   *  legacy (velký obrázek → Zoom). */
+  familyTree?: FamilyTree;
   sections: PageSection[];
   galleryImages: GalleryImage[];
   videos: InstructionalVideo[];

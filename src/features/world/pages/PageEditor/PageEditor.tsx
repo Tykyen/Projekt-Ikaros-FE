@@ -18,6 +18,7 @@ import { MenuPanel } from './panels/MenuPanel';
 import { CustomDataPanel } from './panels/CustomDataPanel';
 import { AkjTabsPanel } from './panels/AkjTabsPanel';
 import { PostavaPanel } from './panels/PostavaPanel';
+import { FamilyTreeEditor } from './panels/FamilyTreeEditor';
 import { TypeSwitchWarningModal } from './components/TypeSwitchWarningModal';
 import { LivePreviewPane } from './components/LivePreviewPane';
 import { ConflictModal } from './components/ConflictModal';
@@ -219,6 +220,9 @@ export function PageEditor({
             // 9.1 — PC/NPC pole; pro ostatní typy zůstanou prázdné/undefined.
             ownerUserId: state.ownerUserId || undefined,
             akjTabs: state.akjTabs,
+            // 17.7 — rodokmen jen pro typ Rodokmen (BE ho jinak ignoruje).
+            familyTree:
+              state.type === 'Rodokmen' ? state.familyTree : undefined,
           },
         });
         clearLocalDraft();
@@ -249,6 +253,8 @@ export function PageEditor({
           // 9.1 — PC/NPC pole; pro ostatní typy zůstanou prázdné/undefined.
           ownerUserId: state.ownerUserId || undefined,
           akjTabs: state.akjTabs,
+          // 17.7 — rodokmen jen pro typ Rodokmen (BE ho jinak ignoruje).
+          familyTree: state.type === 'Rodokmen' ? state.familyTree : undefined,
         });
         clearLocalDraft();
         toast.success('Stránka vytvořena');
@@ -300,6 +306,8 @@ export function PageEditor({
           // 9.1 — PC/NPC pole.
           ownerUserId: state.ownerUserId || undefined,
           akjTabs: state.akjTabs,
+          // 17.7 — rodokmen jen pro typ Rodokmen (BE ho jinak ignoruje).
+          familyTree: state.type === 'Rodokmen' ? state.familyTree : undefined,
           // expectedUpdatedAt vynechán — vědomé přepsání z režimu tvorby.
         },
       });
@@ -360,6 +368,8 @@ export function PageEditor({
           menu: state.menu,
           customData: state.customData,
           accessRequirements: state.accessRequirements,
+          // 17.7 — rodokmen jen pro typ Rodokmen.
+          familyTree: state.type === 'Rodokmen' ? state.familyTree : undefined,
           // expectedUpdatedAt vynechán = bez concurrency check
         },
       });
@@ -455,6 +465,14 @@ export function PageEditor({
             <CustomDataPanel
               customData={state.customData}
               onChange={(customData) => setField('customData', customData)}
+            />
+          )}
+
+          {state.type === 'Rodokmen' && (
+            <FamilyTreeEditor
+              worldId={worldId}
+              familyTree={state.familyTree}
+              onChange={(tree) => setField('familyTree', tree)}
             />
           )}
 

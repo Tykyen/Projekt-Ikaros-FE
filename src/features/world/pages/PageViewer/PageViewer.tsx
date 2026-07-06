@@ -16,6 +16,7 @@ import { NovinyLayout } from './layouts/NovinyLayout';
 import { SeznamLayout } from './layouts/SeznamLayout';
 import { GalerieLayout } from './layouts/GalerieLayout';
 import { ZoomLayout } from './layouts/ZoomLayout';
+import { FamilyTreeLayout } from './layouts/FamilyTreeLayout';
 import { ObrazovkaLayout } from './layouts/ObrazovkaLayout';
 import { PostavaLayout } from './layouts/PostavaLayout';
 import { RulebookHub } from './layouts/RulebookHub';
@@ -48,6 +49,7 @@ const LAYOUTS: Record<PageType, React.ComponentType<{ page: Page }>> = {
   Seznam: SeznamLayout,
   Galerie: GalerieLayout,
   Zoom: ZoomLayout,
+  Rodokmen: FamilyTreeLayout,
   Obrazovka: ObrazovkaLayout,
   Ostatní: OstatniLayout,
   // 9.1 — sjednocení Character → Page

@@ -2,6 +2,7 @@ import { useReducer, useCallback } from 'react';
 import type {
   AccessRequirement,
   AkjTab,
+  FamilyTree,
   GalleryImage,
   InstructionalVideo,
   MenuItem,
@@ -44,6 +45,8 @@ export interface PageEditorFormState {
   ownerUserId: string;
   /** AKJ chráněné záložky (spec-akj-protected-tabs). */
   akjTabs: AkjTab[];
+  /** 17.7 — vizuální rodokmen (jen typ Rodokmen). */
+  familyTree: FamilyTree;
 }
 
 export const INITIAL_PAGE_STATE: PageEditorFormState = {
@@ -68,6 +71,7 @@ export const INITIAL_PAGE_STATE: PageEditorFormState = {
   expectedUpdatedAt: null,
   ownerUserId: '',
   akjTabs: [],
+  familyTree: { people: [], unions: [] },
 };
 
 export function pageToFormState(page: Page): PageEditorFormState {
@@ -101,6 +105,7 @@ export function pageToFormState(page: Page): PageEditorFormState {
     // do editoru ani uložení nepatří; jinak PATCH spadne na forbidNonWhitelisted
     // („akjTabs.N.property locked should not exist"). Strip při načtení.
     akjTabs: (page.akjTabs ?? []).map(({ locked: _locked, ...t }) => t),
+    familyTree: page.familyTree ?? { people: [], unions: [] },
   };
 }
 

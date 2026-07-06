@@ -19,7 +19,8 @@ Definováno v `PAGE_TYPES` (`backend/src/modules/pages/interfaces/page.interface
 - `Noviny` — `customData` (metadata novin).
 - `Seznam` — `menu[]` (rozcestník odkazů). Pro matrix systém speciálně slug `pravidla`/`magicka-pravidla` → `RulebookHub` layout.
 - `Galerie` — `galleryImages[]`.
-- `Zoom` — `ZoomLayout` (velký zoomovatelný hlavní obrázek; dříve typ „Rodokmen", přejmenováno; legacy dokumenty s `type='Rodokmen'` normalizuje `normalizePageType()` při čtení). Název „Rodokmen" je nově rezervovaný pro budoucí typ strom rodiny.
+- `Zoom` — `ZoomLayout` (velký zoomovatelný hlavní obrázek; dříve se typ jmenoval „Rodokmen", přejmenováno v 7.x). Legacy dokumenty `type='Rodokmen'` **bez** `familyTree` normalizuje `normalizePageType()` na Zoom při čtení.
+- `Rodokmen` — 17.7 vizuální **strom rodiny** (`familyTree: {people[], unions[]}`, `FamilyTreeLayout`). Osoby = volná data (jméno/foto/datum) + volitelný odkaz na stránku (`pageSlug`, klik→navigace); svazky = partneři A(+B)+děti. Editor v `PageEditor` (drag + „Srovnat" auto-layout). Vzhled dědí z motivu světa (`--theme-*`). Sdílí jméno s legacy typem — odlišen přítomností `familyTree` (`normalizePageType(type, hasFamilyTree)`).
 - `Obrazovka` — `videos[]` (YouTube).
 - `Ostatní` — default/fallback layout.
 - `Postava hráče` — má `ownerUserId` + `characterRef` → Character `kind:'persona'` (5 subdoců).
@@ -86,7 +87,7 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 - BE: `findBySlug` projde 3 branami: `assertCanViewWorld` (R-09b — privátní svět jen pro členy/Admin+), `assertAccess` (page-level), `filterAkjTabsForViewer` (per-záložka). 403/404 dle auth-leak-policy.
 
 ### Co jde dělat (VŠE)
-- Render přes 8 layoutů (`LAYOUTS` mapa, `PageViewer.tsx:45`): Lokace, Noviny, Seznam, Galerie, Zoom, Obrazovka, Ostatní, Postava/NPC.
+- Render přes 9 layoutů (`LAYOUTS` mapa, `PageViewer.tsx:45`): Lokace, Noviny, Seznam, Galerie, Zoom, Rodokmen, Obrazovka, Ostatní, Postava/NPC.
 - AKJ záložková lišta — flat typy přes `WithAkjTabs`, Lokace/Postava/NPC řeší vlastní lištu (`handlesOwnAkjTabs`, řádek 126).
 - Read-time minuty (220 slov/min z `plainText`), kromě Galerie.
 - Hash deeplink (`#anchor` → scroll), AutoTOC injekce `id` na h2/h3.
