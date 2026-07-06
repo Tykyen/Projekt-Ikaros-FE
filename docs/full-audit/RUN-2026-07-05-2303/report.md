@@ -78,13 +78,13 @@
 | seed-scenario | 1 | (e2e harness ⏭️ replSet) | — |
 | anti-regression | 7 | META brána — spustit v Fázi D | — |
 
-## Proof-vrstvy (Fáze C) — stav
-| Vrstva | Stav | Jak odblokovat |
+## Proof-vrstvy (Fáze C) — stav (finální, po odblokování)
+| Vrstva | Stav | Detail |
 |---|---|---|
-| +e2e | ⏭️ 73/134 fail = infra | lokální Mongo standalone → `docker run mongo --replSet` nebo MongoMemoryReplSet |
-| +db | ⏭️ EMPTY / prod | seed lokální DB, nebo explicitní souhlas s prod read-only |
-| +teeth (Stryker) | ⏭️ blokováno | opravit `backend/stryker.conf.json` jest.configFile (RC-CC1) |
-| +formal (TLC) | dostupné, nepouštěno | `java -jar c:/tmp/tla2tools.jar` na `.tla` modely |
+| +e2e | ✅ **135/135** | 73 failů nebyl replSet ale 2 harness bugy (WorldElevationsModule v selective modulech + neplatný MONGOMS_LAUNCH_TIMEOUT); + 2 testy opraveny na R-20/deterministicky. `proof/e2e-result.txt` |
+| +teeth (Stryker) | ✅ **odblokováno** | RC-CC1 opraveno (configFile→jest.config.ts) + Windows tempDir bug; dry-run 513 testů OK, scoped běh 60 % skóre. Plný běh = hodiny (`npx stryker run`). `proof/stryker-*.log` |
+| +formal (TLC) | ✅ **oba modely** | MapReconnect: counterexample dle očekávání (fix drží); money (dopsán `money.cfg`): NoOverdraft drží, 220 stavů. `proof/tlc-*.txt` |
+| +db | ⏭️ **seed/prod** | lokální DB prázdná, dev seed neexistuje; scan tooling ověřen (`proof/integrity-scan.mjs`/`orphan-scan.mjs`). Reálný scan chce nový seed skript nebo prod read-only (tvůj souhlas) |
 
 ## Doporučené pořadí dořešení (ráno)
 1. **Ověřit deploy dávek 1+2** (GitHub Actions prošel? BE restart?).

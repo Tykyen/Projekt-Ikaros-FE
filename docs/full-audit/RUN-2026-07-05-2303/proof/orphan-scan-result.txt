@@ -1,0 +1,33 @@
+┌─────────┬──────────────────────────────────────────────────┬─────────┬────────────┐
+│ (index) │ label                                            │ orphans │ finding    │
+├─────────┼──────────────────────────────────────────────────┼─────────┼────────────┤
+│ 0       │ 'pages.worldId ∉ worlds'                         │ 0       │ 'OR/CD-06' │
+│ 1       │ 'characters.worldId ∉ worlds'                    │ 0       │ 'OR/CD-06' │
+│ 2       │ 'chatchannels.worldId ∉ worlds'                  │ 0       │ 'OR/CD-06' │
+│ 3       │ 'chatgroups.worldId ∉ worlds'                    │ 0       │ 'OR/CD-06' │
+│ 4       │ 'chatmessages.worldId ∉ worlds'                  │ 0       │ 'OR/CD-06' │
+│ 5       │ 'mapScenes.worldId ∉ worlds'                     │ 0       │ 'OR/CD-06' │
+│ 6       │ 'worldMaps.worldId ∉ worlds'                     │ 0       │ 'OR/CD-06' │
+│ 7       │ 'game_events.worldId ∉ worlds'                   │ 0       │ 'OR/CD-06' │
+│ 8       │ 'timeline_events.worldId ∉ worlds'               │ 0       │ 'OR/CD-06' │
+│ 9       │ 'worldnews.worldId ∉ worlds'                     │ 0       │ 'OR/CD-06' │
+│ 10      │ 'worldsettings.worldId ∉ worlds'                 │ 0       │ 'OR/CD-06' │
+│ 11      │ 'worldmemberships.worldId ∉ worlds'              │ 0       │ 'OR/CD-06' │
+│ 12      │ 'custom_emotes.worldId ∉ worlds'                 │ 0       │ 'OR/CD-06' │
+│ 13      │ 'sounds.worldId ∉ worlds'                        │ 0       │ 'OR/CD-06' │
+│ 14      │ 'world_currencies.worldId ∉ worlds'              │ 0       │ 'OR/CD-06' │
+│ 15      │ 'bestiae.worldId ∉ worlds'                       │ 0       │ 'OR/CD-06' │
+│ 16      │ 'character_diaries.characterId ∉ characters'     │ 0       │ 'OR/CD-09' │
+│ 17      │ 'character_calendars.characterId ∉ characters'   │ 0       │ 'OR/CD-09' │
+│ 18      │ 'character_finances.characterId ∉ characters'    │ 0       │ 'OR/CD-09' │
+│ 19      │ 'character_inventories.characterId ∉ characters' │ 0       │ 'OR/CD-09' │
+│ 20      │ 'character_notes.characterId ∉ characters'       │ 0       │ 'OR/CD-09' │
+│ 21      │ 'character_accounts.characterId ∉ characters'    │ 0       │ 'OR/CD-09' │
+│ 22      │ 'membership.currentSceneId ∉ mapScenes'          │ 0       │ 'DR/CD-04' │
+│ 23      │ 'membership.characterPath ∉ characters.slug'     │ 0       │ 'DR'       │
+│ 24      │ 'worlds.ownerId ∉ users'                         │ 0       │ 'DR'       │
+│ 25      │ 'favoritePageSlugs ∉ pages.slug'                 │ 0       │ 'OR/CD-08' │
+└─────────┴──────────────────────────────────────────────────┴─────────┴────────────┘
+
+CELKEM osiřelých/dangling: 0
+✅ Žádné orphans — cascade je v praxi čistá (přesto kód chybí cleanup → riziko do budoucna).

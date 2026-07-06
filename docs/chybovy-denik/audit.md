@@ -30,6 +30,30 @@ vypadalo jako 73 regresí; nutno číst PŘÍČINU, ne počet. FIX-7 push hijack
 (500 místo 4xx) — funkční, ale ne elegantní. Necommitnutý FE balík (30 souborů) je velký na revizi —
 příště zvážit menší commity/dávky i u necommitovaného FE.
 
+## CH-058 — změna sdíleného guardu ověřena jen cíleným jest → regrese v neauditovaném konzumentovi — 2026-07-06
+
+**Co nefungovalo.** V opravné dávce 4c (FIX-46) jsem změnil `RolesGuard.canActivate` z bare
+`return false` na explicitní `throw new ForbiddenException({code:'INSUFFICIENT_ROLE'})`. Po dávce jsem
+spustil `jest --maxWorkers=2 common users world-currencies upload ikaros-articles ikaros-messages
+mailer push campaign character-subdocs pages` — zeleno, commitnul (`f421f7a`) a pushnul. Jenže
+`global-chat.controller.spec.ts` má vlastní test `RolesGuard`, který očekával starý `false` kontrakt →
+zůstal červený na main. Odhalil ho až následující agent (2 odložené BE) při plném jest běhu.
+
+**Proč.** `RolesGuard` je **sdílený** napříč ~5 controllery (admin, global-chat, admin-tasks,
+platform-chat, platform-documents). Cílený `jest <moduly>` po jeho změně neběžel na všech
+konzumentech. BE precommit hook = jen typecheck+lint (ne jest), takže commit prošel s červeným testem.
+
+**Jak jsem to našel.** Agent 2-odložených-BE nahlásil „pre-existing fail" po plném `jest` (146 suites,
+2441/2442). `git stash` ukázal, že fail je na HEAD i bez jeho změn → dohledal jsem, že HEAD už obsahuje
+mou dávku 4c, která `RolesGuard` změnila. Tedy ne pre-existing, ale moje regrese o commit dřív.
+
+**Oprava.** Upravit asserci v `global-chat.controller.spec.ts` na očekávanou `ForbiddenException`.
+
+**Příznak cyklení / poučení.** Po změně **sdíleného** guardu/pipe/filtru/interceptoru spusť **plný**
+`jest --maxWorkers=2` (ne jen cílené moduly dávky) — sdílená komponenta má konzumenty mimo editované
+moduly. „Cílený jest zelený" ≠ „nic jsem nerozbil", když měníš cross-cutting kód. (Souvisí s CH-011:
+sdílená metoda/gate = zgrepuj/otestuj VŠECHNY konzumenty.)
+
 ## CH-011 — gate v service volané i interně → 403 regrese chat kanálů — 2026-06-20
 
 **Co nefungovalo.** R-RUN-02 fix: přidal jsem world-gate (`accessMode` member-only)
