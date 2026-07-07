@@ -82,7 +82,25 @@ export function InitiativeBarItem({
       }}
       title={name}
     >
-      <div className={styles.avatarWrap} style={{ borderColor }}>
+      {/* 17.10 A4 — klik na portrét otevře kartu postavy (jako klik na token
+          na mapě); stopPropagation, ať nespustí pan+select z item onClick. */}
+      <div
+        className={styles.avatarWrap}
+        style={{ borderColor }}
+        role="button"
+        tabIndex={0}
+        aria-label={`Otevřít kartu: ${name}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpenInfo(token.id);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.stopPropagation();
+            onOpenInfo(token.id);
+          }
+        }}
+      >
         {resolvedImage ? (
           <img className={styles.avatar} src={resolvedImage} alt={name} />
         ) : (

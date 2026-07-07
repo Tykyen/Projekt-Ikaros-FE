@@ -15,6 +15,12 @@ export interface KebabMenuItem {
 interface KebabMenuProps {
   /** Element, ke kterému se popover přiblíží. Pokud null/undefined a `open=true`, popover se ukáže na bottom-sheet pozici (mobile fallback). */
   anchor: HTMLElement | null;
+  /**
+   * 17.10 A5 — alternativa k `anchor`: pozice popoveru přímo z bodu (kurzor
+   * při pravém kliku na mapě). Má přednost před `anchor`. Desktop only
+   * (mobil = bottom-sheet jako dosud).
+   */
+  anchorPoint?: { x: number; y: number };
   open: boolean;
   onClose: () => void;
   items: KebabMenuItem[];
@@ -35,6 +41,7 @@ const MENU_GAP_PX = 6;
  */
 export function KebabMenu({
   anchor,
+  anchorPoint,
   open,
   onClose,
   items,
@@ -55,6 +62,7 @@ export function KebabMenu({
     if (!open) return;
     const first = items.findIndex((it) => !it.disabled);
     const idx = first === -1 ? 0 : first;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- inicializace fokusu při otevření menu (řízeno externím `open`), ne cascading render
     setActiveIndex(idx);
     itemRefs.current[idx]?.focus();
   }, [open, items]);
@@ -96,7 +104,21 @@ export function KebabMenu({
     const update = () => {
       const mobile = window.innerWidth <= MOBILE_BREAKPOINT_PX;
       setIsMobile(mobile);
-      if (mobile || !anchor) {
+      if (mobile) {
+        setCoords(null);
+        return;
+      }
+      // 17.10 A5 — pozice z bodu (kurzor) má přednost před anchor rectem.
+      if (anchorPoint) {
+        const left = Math.max(
+          8,
+          Math.min(anchorPoint.x, window.innerWidth - MENU_WIDTH_PX - 8),
+        );
+        const top = Math.max(8, Math.min(anchorPoint.y, window.innerHeight - 60));
+        setCoords({ top, left });
+        return;
+      }
+      if (!anchor) {
         setCoords(null);
         return;
       }
@@ -116,7 +138,7 @@ export function KebabMenu({
       window.removeEventListener('resize', update);
       window.removeEventListener('scroll', update, true);
     };
-  }, [open, anchor]);
+  }, [open, anchor, anchorPoint]);
 
   useEffect(() => {
     if (!open) return;
@@ -147,12 +169,16 @@ export function KebabMenu({
 
   return createPortal(
     <>
-      {isMobile && <div className={s.scrim} onClick={onClose} />}
+      {isMobile && (
+         
+        <div className={s.scrim} onClick={onClose} aria-hidden="true" />
+      )}
       <div
         ref={menuRef}
         className={clsx(s.menu, isMobile && s.menuMobile)}
         style={style}
         role="menu"
+        tabIndex={-1}
         aria-label={ariaLabel}
         onKeyDown={onMenuKeyDown}
       >

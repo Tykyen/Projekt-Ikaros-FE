@@ -324,6 +324,7 @@ export function MapPjPanel({
                 <input
                   ref={uvttInputRef}
                   type="file"
+                  aria-label="Vybrat soubor UVTT / .dd2vtt k importu"
                   accept=".dd2vtt,.uvtt,.df2vtt,.json"
                   hidden
                   onChange={handleUvttFile}

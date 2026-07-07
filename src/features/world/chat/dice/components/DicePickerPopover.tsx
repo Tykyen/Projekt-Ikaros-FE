@@ -30,6 +30,8 @@ import {
   resolveDiceKeys,
 } from '../lib/worldDiceCatalog';
 import { materialPreviewUrl } from '../lib/dice3dMaterials';
+import { createPortal } from 'react-dom';
+import { useAnchoredPosition } from '@/shared/ui/LinkPicker/useAnchoredPosition';
 import styles from './DicePickerPopover.module.css';
 
 export interface DiceRollResult {
@@ -64,6 +66,13 @@ interface DicePickerPopoverProps {
    * popover neutekl mimo pravý okraj obrazovky.
    */
   align?: 'left' | 'right';
+  /**
+   * 17.10 A3 — renderovat přes Portal do `body` s anchored `position:fixed`
+   * pozicí (mimo klipující `.stack` na mapě → řeší ořez popoveru). Clamp do
+   * viewportu + flip nahoru řeší `useAnchoredPosition`. Chat nechává inline
+   * (default false).
+   */
+  portal?: boolean;
 }
 
 /**
@@ -92,6 +101,7 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
   onOpenPoolPrompt,
   onRoll,
   align = 'left',
+  portal = false,
 }) => {
   const popoverRef = useRef<HTMLDivElement>(null);
   const [label, setLabel] = useState('');
@@ -121,6 +131,9 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
       document.removeEventListener('keydown', keyHandler);
     };
   }, [open, onClose, anchorRef]);
+
+  // 17.10 A3 — v portal módu spočítej fixed pozici (mimo klipující .stack).
+  const anchoredPos = useAnchoredPosition(anchorRef, popoverRef, open && portal);
 
   if (!open) return null;
 
@@ -160,11 +173,23 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
     onClose();
   };
 
-  return (
+  const node = (
     <div
       className={`${styles.popover} ${align === 'right' ? styles.alignRight : ''}`}
       ref={popoverRef}
       role="dialog"
+      style={
+        portal
+          ? {
+              position: 'fixed',
+              left: anchoredPos?.left ?? 0,
+              top: anchoredPos?.top ?? 0,
+              margin: 0,
+              // dokud není změřeno, neblikni na (0,0)
+              visibility: anchoredPos ? 'visible' : 'hidden',
+            }
+          : undefined
+      }
     >
       <div className={styles.header}>
         <span className={styles.headerTitle}>Hod kostkou</span>
@@ -292,10 +317,12 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
               </div>
 
               <div className={styles.inputs}>
+                {/* eslint-disable-next-line jsx-a11y/label-has-for -- label obaluje input (nesting); label-has-for je deprecated, nesting je platný a11y vzor */}
                 <label className={styles.inputRow}>
                   <span className={styles.inputLabel}>Popis</span>
                   <input
                     type="text"
+                    aria-label="Popis hodu"
                     value={label}
                     onChange={(e) => setLabel(e.target.value)}
                     maxLength={64}
@@ -303,12 +330,14 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
                     className={styles.input}
                   />
                 </label>
+                {/* eslint-disable-next-line jsx-a11y/label-has-for -- label obaluje input (nesting); label-has-for je deprecated, nesting je platný a11y vzor */}
                 <label className={`${styles.inputRow} ${styles.inputRowMod}`}>
                   <span className={styles.inputLabel}>
                     <Sliders size={12} aria-hidden="true" /> Mod
                   </span>
                   <input
                     type="text"
+                    aria-label="Modifikátor hodu"
                     value={modifier}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -325,6 +354,8 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
       )}
     </div>
   );
+
+  return portal ? createPortal(node, document.body) : node;
 };
 
 /**

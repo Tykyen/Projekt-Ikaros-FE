@@ -67,6 +67,7 @@ export function MapPanel({
       className={cx(styles.panel, styles[variant], collapsed && styles.collapsed)}
       aria-label={title}
     >
+      {/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-tabindex -- hlavička je button-like: když collapsible má role=button + onKeyDown + aria-expanded (nelze <button>, obsahuje vnořená tlačítka) */}
       <header
         className={styles.header}
         onClick={collapsible ? toggleCollapse : undefined}
@@ -138,6 +139,7 @@ export function MapPanel({
           </span>
         )}
       </header>
+      {/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
       {!collapsed && <div className={styles.body}>{children}</div>}
     </section>
   );

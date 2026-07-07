@@ -79,6 +79,7 @@ export function DiceRollButton({
         onOpenPoolPrompt={(kind) => setPoolPrompt(kind)}
         onRoll={handleRoll}
         align="right"
+        portal
       />
 
       {poolPrompt && (

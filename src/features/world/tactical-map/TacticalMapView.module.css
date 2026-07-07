@@ -113,7 +113,8 @@
 .bottomLeftStack {
   position: absolute;
   left: 20px;
-  bottom: 20px;
+  /* 17.10 A2 — posun nad spodní lištu „Zmenšené" (--map-inset-bottom). */
+  bottom: calc(20px + var(--map-inset-bottom, 0px));
   width: 320px;
   max-width: calc(100vw - 24px);
   /* 10.2o — strop výšky: logy + orchestrace se nikdy nevytlačí za horní okraj.

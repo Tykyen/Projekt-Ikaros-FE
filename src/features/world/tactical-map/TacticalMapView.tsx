@@ -83,6 +83,7 @@ import { DiceLogPanel } from "./components/dice/DiceLogPanel";
 import { MapDock, type DockPanelMeta } from "./workspace/MapDock";
 import { MapTidyButton } from "./workspace/MapTidyButton";
 import { useMapWorkspace } from "./workspace/workspaceStore";
+import { KebabMenu, type KebabMenuItem } from "@/shared/ui/KebabMenu/KebabMenu";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import { DiceRollButton } from "./components/dice/DiceRollButton";
 import { AmbientSoundPanel } from "./components/sound/AmbientSoundPanel";
@@ -183,6 +184,7 @@ const DOCK_META: readonly DockPanelMeta[] = [
   { id: "tools-fog", title: "Mlha", icon: "🌫️" },
   { id: "tools-view", title: "Zobrazení", icon: "🖥️" },
   { id: "tools-ambient", title: "Ambient", icon: "🎵" },
+  { id: "token-card", title: "Karta", icon: "👤" },
 ];
 
 export function TacticalMapView(): React.ReactElement {
@@ -526,6 +528,12 @@ export function TacticalMapView(): React.ReactElement {
   // token = SELECT. Klik na 'i' = OPEN MODAL.
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
   const [openedTokenId, setOpenedTokenId] = useState<string | null>(null);
+  // 17.10 A5 — kontextové menu (pravý klik na token/mapu) u kurzoru.
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    tokenId?: string;
+  } | null>(null);
 
   // 10.2d — permission gate pro drag.
   const mySlugs = useMyCharacterSlugs(worldId || null, currentUser?.id ?? null);
@@ -1628,11 +1636,51 @@ export function TacticalMapView(): React.ReactElement {
   const canDraw = isPJ || (scene?.config.allowPlayerDrawing ?? false);
   const drawingActive = canDraw && drawingTool.activeKind !== null;
 
+  // 17.10 A5 — pravý klik: hit-test hexu pod kurzorem → token vs. prázdná mapa.
+  const handleContextMenu = (e: React.MouseEvent): void => {
+    if (!scene || !viewportRef.current) return;
+    e.preventDefault();
+    const rect = viewportRef.current.getBoundingClientRect();
+    const hex = screenToHex(e.clientX, e.clientY, rect, panZoom, scene.config);
+    const token = scene.tokens.find((t) => t.q === hex.q && t.r === hex.r);
+    setContextMenu({ x: e.clientX, y: e.clientY, tokenId: token?.id });
+  };
+
+  const contextItems: KebabMenuItem[] = contextMenu?.tokenId
+    ? [
+        {
+          key: "open",
+          label: "Otevřít kartu",
+          icon: "📜",
+          onClick: () => {
+            const tid = contextMenu?.tokenId;
+            if (tid) {
+              setOpenedTokenId(tid);
+              setPanelState("token-card", "open");
+            }
+            setContextMenu(null);
+          },
+        },
+      ]
+    : [
+        {
+          key: "measure",
+          label: "Změřit vzdálenost",
+          icon: "📏",
+          onClick: () => {
+            setRulerActive(true);
+            setContextMenu(null);
+          },
+        },
+      ];
+
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- viewport je event-capture plocha nad PixiJS canvasem (pan/zoom/klik na figurky řeší canvas), ne interaktivní DOM prvek
     <div
       ref={viewportRef}
       className={styles.viewport}
       data-testid="tactical-map-viewport"
+      onContextMenu={handleContextMenu}
       onDragOver={isPJ ? handleViewportDragOver : undefined}
       onDrop={isPJ ? handleViewportDrop : undefined}
       onClick={
@@ -1909,6 +1957,7 @@ export function TacticalMapView(): React.ReactElement {
       {openedTokenId &&
         scene &&
         worldId &&
+        workspace["token-card"].state !== "minimized" &&
         (() => {
           const openedToken = scene.tokens.find((t) => t.id === openedTokenId);
           if (!openedToken) return null;
@@ -1933,6 +1982,7 @@ export function TacticalMapView(): React.ReactElement {
               // prvního (musel se zavřít a otevřít znovu).
               key={openedToken.id}
               open
+              onMinimize={() => setPanelState("token-card", "minimized")}
               header={{
                 // Bestie token nemá characterData (není Page) → dotáhni obrázek
                 // z bestiar cache přes templateId (snapshot šablony).
@@ -2362,6 +2412,18 @@ export function TacticalMapView(): React.ReactElement {
       {/* 17.10 A2 — spodní lišta „Zmenšené": čipy minimalizovaných panelů
           (klik = nahodí). Sama se skryje, když není nic minimalizované. */}
       <MapDock panels={DOCK_META} />
+
+      {/* 17.10 A5 — kontextové menu pravého kliku (token / mapa) u kurzoru. */}
+      <KebabMenu
+        anchor={null}
+        anchorPoint={
+          contextMenu ? { x: contextMenu.x, y: contextMenu.y } : undefined
+        }
+        open={contextMenu !== null}
+        onClose={() => setContextMenu(null)}
+        items={contextItems}
+        ariaLabel="Akce na mapě"
+      />
     </div>
   );
 }

@@ -13,7 +13,8 @@
      headerem, takže stack nikdy nezaleze pod horní lištu.
      `padding-right` drží scrollbar mimo pravou hranu docků. */
   top: 20px;
-  bottom: 20px;
+  /* 17.10 A2 — posun nad spodní lištu „Zmenšené" (--map-inset-bottom). */
+  bottom: calc(20px + var(--map-inset-bottom, 0px));
   /* 17.10 A1 — čte generalizovanou rezervaci pravého okraje; fallback na
      starý --map-dock-width, dokud ho zapisovači nenahradí. */
   right: calc(12px + var(--map-inset-right, var(--map-dock-width, 0px)));

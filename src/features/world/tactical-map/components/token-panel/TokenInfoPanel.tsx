@@ -40,23 +40,28 @@ interface Props {
   open: boolean;
   header: TokenInfoPanelHeaderProps;
   children: ReactNode;
+  /** 17.10 A4 — minimalizace karty do spodní lišty (parent řídí mount). */
+  onMinimize?: () => void;
 }
 
-// 'overlay' záměrně není v toggle — na desktopu nedává smysl ručně vystředit
-// deník, na mobilu se force-uje automaticky (usePanelMode). Viz user feedback.
-const MODE_ORDER: PanelMode[] = ['dock', 'drag'];
+// 17.10 A4 — karta má jen 2 módy: 📌 ukotvit vpravo (dock) ↔ 🪟 plovoucí okno
+// na pevné pozici (overlay). Drag (volné přetahování) VYŘAZEN (rozhodnutí
+// 2026-07-06) — mode 'drag' zůstává v typu, ale NENÍ v MODE_ORDER, takže se
+// nikdy nenastaví a drag handlery v headeru (mode === 'drag' ? …) zůstanou
+// nečinné (žádné volné přetahování).
+const MODE_ORDER: PanelMode[] = ['dock', 'overlay'];
 const MODE_ICON: Record<PanelMode, string> = {
   dock: '📌',
   drag: '🪟',
-  overlay: '🗖',
+  overlay: '🪟',
 };
 const MODE_LABEL: Record<PanelMode, string> = {
   dock: 'Ukotvit k pravému okraji',
   drag: 'Volně přesouvat',
-  overlay: 'Vystředit',
+  overlay: 'Plovoucí okno',
 };
 
-export function TokenInfoPanel({ open, header, children }: Props): React.ReactElement | null {
+export function TokenInfoPanel({ open, header, children, onMinimize }: Props): React.ReactElement | null {
   const { mode, setMode } = usePanelMode();
   const layout = usePanelLayout();
   // 16.2c-F3 — chrome panelu (badge BODY OSUDU, mode toggle/📌, close, identity)
@@ -110,8 +115,10 @@ export function TokenInfoPanel({ open, header, children }: Props): React.ReactEl
     <>
       {/* Overlay mode má backdrop (klik = close) */}
       {mode === 'overlay' && (
+         
         <div
           className={styles.overlayBackdrop}
+          aria-hidden="true"
           onClick={header.onClose}
         />
       )}
@@ -163,6 +170,20 @@ export function TokenInfoPanel({ open, header, children }: Props): React.ReactEl
               </button>
             ))}
           </div>
+
+          {/* 17.10 A4 — minimalizace karty do spodní lišty „Zmenšené" */}
+          {onMinimize && (
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onMinimize}
+              data-no-drag
+              aria-label="Zmenšit do lišty"
+              title="Zmenšit do lišty"
+            >
+              —
+            </button>
+          )}
 
           {/* Close */}
           <button
