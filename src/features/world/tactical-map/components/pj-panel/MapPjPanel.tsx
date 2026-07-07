@@ -49,6 +49,8 @@ interface Props {
    * kde se zachytává klik na hex a provádí `token.add`.
    */
   onStartPlacement: (payload: SpawnPayload, multi: boolean) => void;
+  /** 17.10 A2 — minimalizace panelu do spodní lišty (parent řídí mount). */
+  onMinimize?: () => void;
 }
 
 const PJ_PANEL_OPEN_KEY = 'ikr-map-pj-panel-open';
@@ -58,6 +60,7 @@ export function MapPjPanel({
   currentScene,
   currentUserId,
   onStartPlacement,
+  onMinimize,
 }: Props): React.ReactElement {
   // 10.2j — persistované sbalení (default zavřeno po refreshi, stejně jako log
   // hodů). Otevřeno jen pokud uživatel explicitně rozbalil (uloženo "1").
@@ -252,6 +255,20 @@ export function MapPjPanel({
         }}
       >
         <span className={styles.title}>⚙ Orchestrace</span>
+        {onMinimize && (
+          <button
+            type="button"
+            className={styles.minBtn}
+            aria-label="Zmenšit do lišty"
+            title="Zmenšit do lišty"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMinimize();
+            }}
+          >
+            —
+          </button>
+        )}
         <span className={`${styles.chevron} ${expanded ? styles.chevronOpen : ''}`}>
           ▾
         </span>

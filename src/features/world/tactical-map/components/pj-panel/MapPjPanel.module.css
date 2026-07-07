@@ -52,6 +52,24 @@
   user-select: none;
 }
 
+/* 17.10 A2 — tlačítko „—" (minimalizace do spodní lišty); margin-left drží
+   title vlevo, „—" + chevron u sebe vpravo (hlavička je space-between). */
+.minBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: rgb(var(--map-ui-accent-rgb) / 0.8);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.minBtn:hover {
+  color: var(--map-toolbar-text);
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
+}
+
 .title {
   font-size: 12px;
   font-weight: 700;

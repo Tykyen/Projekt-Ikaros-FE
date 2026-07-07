@@ -80,6 +80,9 @@ import { MapWeatherAtmosphere } from "./components/weather/MapWeatherAtmosphere"
 import { StoryMapPill } from "./components/StoryMapPill";
 import { useMapWeather } from "./hooks/useMapWeather";
 import { DiceLogPanel } from "./components/dice/DiceLogPanel";
+import { MapDock, type DockPanelMeta } from "./workspace/MapDock";
+import { MapTidyButton } from "./workspace/MapTidyButton";
+import { useMapWorkspace } from "./workspace/workspaceStore";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import { DiceRollButton } from "./components/dice/DiceRollButton";
 import { AmbientSoundPanel } from "./components/sound/AmbientSoundPanel";
@@ -171,12 +174,25 @@ function effectCoversHex(
   return e.hexes.some((h) => h.q === q && h.r === r);
 }
 
+// 17.10 A2 — metadata čipů spodní lišty „Zmenšené" (registr drží jen stav).
+// Zatím herní panely; nástroje/počasí přibudou po restrukturalizaci hlaviček.
+const DOCK_META: readonly DockPanelMeta[] = [
+  { id: "dice-log", title: "Hody", icon: "🎲" },
+  { id: "pj", title: "Orchestrace", icon: "⚙" },
+  { id: "tools-effects", title: "Efekty & kreslení", icon: "🎨" },
+  { id: "tools-fog", title: "Mlha", icon: "🌫️" },
+  { id: "tools-view", title: "Zobrazení", icon: "🖥️" },
+  { id: "tools-ambient", title: "Ambient", icon: "🎵" },
+];
+
 export function TacticalMapView(): React.ReactElement {
   const { worldId, world, userRole, loading, character } = useWorldContext();
   // Canonical systemId přes sdílený hook (D-SYSTEMID-HOOK) — žádný ruční
   // resolveSystemId(world?.system) roztroušený po komponentách.
   const worldSystemId = useResolvedSystemId() || "drd2";
   const currentUser = useAtomValue(currentUserAtom);
+  // 17.10 A2 — registr workspace panelů (minimalizace do spodní lišty).
+  const { workspace, setPanelState } = useMapWorkspace();
   const viewportRef = useRef<HTMLDivElement>(null);
   const theme = useMapTheme();
   const { width, height } = useViewportSize(viewportRef);
@@ -2139,6 +2155,8 @@ export function TacticalMapView(): React.ReactElement {
           Kreslení na mapu (efekty, PJ) vs ovládání zobrazení (zoom). Naskládané
           ve stacku — odsazují se doleva od otevřeného deníku. */}
       <MapDockStack>
+        {/* 17.10 A2.3 — Uklidit/Vrátit (nad nástroji; kostky = výjimka). */}
+        <MapTidyButton panels={DOCK_META} />
         {scene && currentUser && worldId && (
           <DiceRollButton
             worldId={worldId}
@@ -2152,12 +2170,14 @@ export function TacticalMapView(): React.ReactElement {
         )}
         {/* 15.4 — kreslení je SOUČÁSTÍ docku Efekty (PJ efekty + kresby; hráč
             jen kresby, když scéna povolí). */}
-        {scene && (isPJ || canDraw) && (
-          <MapToolDock
-            title="🎨 Efekty & kreslení"
-            storageKey="effects"
-            defaultCollapsed
-          >
+        {scene &&
+          (isPJ || canDraw) &&
+          workspace["tools-effects"].state !== "minimized" && (
+            <MapToolDock
+              title="🎨 Efekty & kreslení"
+              storageKey="effects"
+              defaultCollapsed
+            >
             {isPJ && (
               <EffectsPalette
                 tool={effectTool}
@@ -2178,7 +2198,7 @@ export function TacticalMapView(): React.ReactElement {
             )}
           </MapToolDock>
         )}
-        {isPJ && scene && (
+        {isPJ && scene && workspace["tools-fog"].state !== "minimized" && (
           <MapToolDock title="🌫️ Mlha" storageKey="fog" defaultCollapsed>
             <FogPalette
               tool={fogTool}
@@ -2190,27 +2210,27 @@ export function TacticalMapView(): React.ReactElement {
           </MapToolDock>
         )}
         {/* 15.3 — měření (pravítko) je SOUČÁSTÍ docku Zobrazení (hráč i PJ). */}
-        <MapToolDock title="🖥️ Zobrazení" storageKey="view" defaultCollapsed>
-          <MapZoomControls
-            zoom={panZoom.zoom}
-            onZoomIn={() => panZoom.setZoom(panZoom.zoom + 0.1)}
-            onZoomOut={() => panZoom.setZoom(panZoom.zoom - 0.1)}
-            onReset={panZoom.resetZoom}
-            fullscreenTargetRef={viewportRef}
-          />
-          {scene && (
-            <div className={styles.dockDivider}>📏 Měření</div>
-          )}
-          {scene && (
-            <MapMeasureControls
-              active={rulerActive}
-              onToggle={() => setRulerActive((v) => !v)}
+        {workspace["tools-view"].state !== "minimized" && (
+          <MapToolDock title="🖥️ Zobrazení" storageKey="view" defaultCollapsed>
+            <MapZoomControls
+              zoom={panZoom.zoom}
+              onZoomIn={() => panZoom.setZoom(panZoom.zoom + 0.1)}
+              onZoomOut={() => panZoom.setZoom(panZoom.zoom - 0.1)}
+              onReset={panZoom.resetZoom}
+              fullscreenTargetRef={viewportRef}
             />
-          )}
-        </MapToolDock>
+            {scene && <div className={styles.dockDivider}>📏 Měření</div>}
+            {scene && (
+              <MapMeasureControls
+                active={rulerActive}
+                onToggle={() => setRulerActive((v) => !v)}
+              />
+            )}
+          </MapToolDock>
+        )}
         {/* 10.2n — ambient ovládání (PJ) pod Zobrazením v pravém dolním stacku.
             Vlastní sbalitelná hlavička (· vysílá indikátor) + cyan sound-accent. */}
-        {isPJ && scene && (
+        {isPJ && scene && workspace["tools-ambient"].state !== "minimized" && (
           <AmbientSoundPanel scene={scene} onBroadcast={broadcastSounds} />
         )}
       </MapDockStack>
@@ -2306,20 +2326,22 @@ export function TacticalMapView(): React.ReactElement {
         // dědičnost --dd-*/--mx-*). display:contents = nemění layout stacku.
         <DiarySkinScope worldId={worldId} style={{ display: "contents" }}>
           <div className={styles.bottomLeftStack}>
-            {scene && (
+            {scene && workspace["dice-log"].state !== "minimized" && (
               <DiceLogPanel
                 rolls={scene.diceRolls ?? []}
                 viewer={{ userId: currentUser.id, isPj: isPJ }}
                 visibility={world?.diceVisibility}
                 sceneId={scene.id}
+                onMinimize={() => setPanelState("dice-log", "minimized")}
               />
             )}
-            {isPJ && (
+            {isPJ && workspace["pj"].state !== "minimized" && (
               <MapPjPanel
                 worldId={worldId}
                 currentScene={scene}
                 currentUserId={currentUser.id}
                 onStartPlacement={placement.start}
+                onMinimize={() => setPanelState("pj", "minimized")}
               />
             )}
           </div>
@@ -2336,6 +2358,10 @@ export function TacticalMapView(): React.ReactElement {
           onDone={() => setDiceOverlay(null)}
         />
       </DiarySkinScope>
+
+      {/* 17.10 A2 — spodní lišta „Zmenšené": čipy minimalizovaných panelů
+          (klik = nahodí). Sama se skryje, když není nic minimalizované. */}
+      <MapDock panels={DOCK_META} />
     </div>
   );
 }

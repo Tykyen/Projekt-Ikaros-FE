@@ -26,11 +26,17 @@ describe('MapPanel', () => {
     expect(screen.getByText('OBSAH PANELU')).toBeInTheDocument();
   });
 
-  it('sbalení (—) skryje obsah, ponechá hlavičku', () => {
+  it('klik na hlavičku sbalí obsah (hlavička zůstane)', () => {
     renderPanel();
-    fireEvent.click(screen.getByRole('button', { name: 'Sbalit' }));
+    fireEvent.click(screen.getByText('Hody'));
     expect(screen.queryByText('OBSAH PANELU')).not.toBeInTheDocument();
     expect(screen.getByText('Hody')).toBeInTheDocument();
+  });
+
+  it('„—" minimalizuje panel (zmizí celý → řeší <MapDock>)', () => {
+    const { container } = renderPanel();
+    fireEvent.click(screen.getByRole('button', { name: 'Zmenšit do lišty' }));
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('„?" se zobrazí jen s onHelp a volá callback', () => {

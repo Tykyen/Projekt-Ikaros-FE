@@ -4,6 +4,23 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 17.10 A1+A2 workspace panelů taktické mapy (jotai registr + shell + MapDock + minimalizace) · 2026-07-07
+**Co nakonec zabralo:** Nová vrstva `tactical-map/workspace/` — `zLayers` (z-index škála 1:1 do `--z-map-*`), `--map-inset-right` (generalizace `--map-dock-width`, strukturálně řeší kolizi počasí×pravá lišta), `useMapWorkspace` jotai registr (open/collapsed/minimized/floating + fokus + persist `ikr-map-workspace-v1`), `<MapPanel>` shell (hlavička: „—" minimize / klik = collapse / „?"/„📌"/„✕"), `<MapDock>` spodní lišta čipů, `<MapTidyButton>` (Uklidit/Vrátit). Herní panely (Hody, Orchestrace) napojené individuálním „—"; nástroje (efekty/mlha/zobrazení/ambient) gatované přes registr + hromadné Uklidit.
+**Proč to je správně (a ne další variace):** (1) minimalizační GATE v parentu (`TacticalMapView` podmíněný render), NE `return null` uvnitř panelu → neporušuje rules-of-hooks; (2) panely s hlavičkou jako `<button>` (nástroje/počasí/ambient) jsem NErestrukturalizoval (button-in-button) ale gatoval + Uklidit → 0 rizika regrese sbalování bez runtime; (3) kostky = výjimka automaticky (nejsou registrovaný panel); (4) merge vytažen do čisté funkce `mergeWorkspace` ([CH-058]); (5) barvy herních panelů = deníkový skin, ne fialové ([CH-059]).
+**Jak ověřeno:** `npm run build` (tsc -b) exit 0 (3×), vitest workspace **17/17** (store 7 + MapPanel 6 + MapDock 3), eslint 0 errors (5 a11y warnings = existující vzor div-hlavičky). **Runtime NEověřeno mnou (browser v session zakázán)** — sbalování / minimalizace / Uklidit / dock čeká test uživatele v appce po deployi.
+**Zhodnocení:** dobře — bezpečná dekompozice po build-ověřitelných krocích (A1 infra → A2.1 shell → A2.2 panely → A2.3 Uklidit), aditivní zásahy do produkčních panelů, změna přístupu u button-hlaviček předešla naslepé regresi. Zbývá: individuální „—" + počasí (restrukturalizace button-hlaviček s runtime), karta jako okno bez dragu (A4), pravý klik (A5), `funkce`/`napoveda` po runtime potvrzení.
+
+---
+
+### CH-059 — přepsal jsem spec/handoff/náhled na „herní panely fialové" dle agentní analýzy kódu; realita (screenshot) = hnědý pergamen · 2026-07-06
+**Kontext:** 17.10 — barva herních panelů (Hody/Orchestrace/karta) na taktické mapě; laděl jsem náhled + upravoval spec/handoff.
+**Co jsem udělal špatně:** subagent analyzoval kód a tvrdil, že Hody/Orchestrace běží na `--map-ui-*` (fialové synthwave). Vzal jsem to jako fakt a „opravil" spec/handoff + náhled z hnědé (původní handoff) na fialovou — včetně formulace „dřívější hnědé bylo mylné".
+**Proč to nefungovalo:** herní panely nesou `DiarySkinScope` / **deníkový skin světa** (Matrix svět = pergamen `--dd-embed-*`), který agent nezohlednil. Uživatel poslal screenshot běžící appky → panely jsou HNĚDÉ. Původní handoff měl pravdu, moje korekce ji zbořila.
+**Poučení:** vizuální tvrzení (barvy, skiny) **NEopírej o agentní analýzu kódu** — vyžádej si screenshot běžícího stavu PŘED úpravou spec/předlohy. „Běží na tokenu X" z agenta = hypotéza, ne render. (Souvisí [[feedback_screenshot_collaboration]], [[feedback_listen_user_observations]].)
+**Příznak cyklení:** měním „závaznou předlohu"/spec kvůli barvě na základě čtení kódu, ne screenshotu; uživatel opáčí screenshotem, že je to jinak.
+
+---
+
 ### CH-058 — jotai `atomWithStorage` v testovacím `createStore()` nehydratuje localStorage synchronně · 2026-07-06
 **Kontext:** unit test `workspaceStore` (17.10 A1) — merge test měl ověřit, že neúplný localStorage se doplní defaultem; četl jsem `store.get(workspaceAtom)` po `localStorage.setItem`.
 **Co jsem udělal špatně:** spolehl jsem na `atomWithStorage(..., { getOnInit: true })`, že v `createStore()` synchronně načte localStorage při prvním `get` (bez subscribe).

@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-059.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-060.**
 
 ## Jak je deník členěný
 
@@ -221,3 +221,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-057](proces.md#ch-057--chybná-diagnóza-owner-nevidí-orchestraci--de-elevovaný-admin-nahoď-se-byl-to-majitel--2026-07-05) | proces | z tlačítka „Aktivovat admina" jsem usoudil de-elevovaného nečlena-admina („nahoď se"), ale byl to MAJITEL (má PJ z create, elevaci nepotřebuje); kořen = isPJ bez owner-bypass + matrix-seed bez membershipu | navrhuju „nahoď se/je správně", uživatel opáčí „ale je to majitel" |
 | [✅ ŘEŠENÍ](fe.md#-řešení--177-rodokmeny-nový-typ-stránky-strom-rodiny-febe-kolize-názvu-řešena-polem--2026-07-06) | fe+be | 17.7 Rodokmeny = nový typ stránky (strom rodiny); kolize se starým „Rodokmen"→Zoom řešena polem `familyTree`; motiv dědí `--theme-*`; sdílený canvas + tidy-tree auto-layout; 4 agenti průzkum před kódem = 0 drift | — (BE typecheck+jest ✓, FE build ✓; ⚠️ BE restart + živý touch/motiv) |
 | [CH-058](fe.md#ch-058--jotai-atomwithstorage-v-testovacím-createstore-nehydratuje-localstorage-synchronně--2026-07-06) | fe/test | jotai `atomWithStorage` v testovacím `createStore().get` nehydratuje localStorage (getOnInit nepomohl) → merge vrací default; testuj čistou funkci `mergeWorkspace`, ne přes `store.get` | test čeká uloženou hodnotu z `store.get`, dostává default |
+| [CH-059](fe.md#ch-059--přepsal-jsem-spechandoffnáhled-na-herní-panely-fialové-dle-agentní-analýzy-kódu-realita-screenshot--hnědý-pergamen--2026-07-06) | fe/proces | „opravil" jsem spec/náhled herních panelů na fialové dle agentní analýzy; screenshot = hnědý pergamen (deníkový skin); u barev vyžádat screenshot, ne věřit analýze kódu | měním předlohu/spec kvůli barvě z kódu, uživatel opáčí screenshotem |
+| [✅ ŘEŠENÍ](fe.md#-řešení--1710-a1a2-workspace-panelů-taktické-mapy-jotai-registr--shell--mapdock--minimalizace--2026-07-07) | fe | 17.10 A1+A2: workspace vrstva (zLayers z-index + inset/fix počasí + useMapWorkspace registr + MapPanel shell + MapDock + Uklidit); herní panely individuální „—", nástroje gate+Uklidit (button-hlavičky nerestrukturalizovány = 0 riziko); gate v parentu ne return null; build 3× + 17 testů; runtime čeká uživatele | — |

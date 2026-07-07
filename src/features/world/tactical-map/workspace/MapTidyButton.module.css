@@ -1,0 +1,25 @@
+/**
+ * 17.10 A2.3 — „Uklidit / Vrátit" tlačítko. Fialový chrome (`--map-ui-*`),
+ * pilulka. Sedí v pravém dolním stacku nad nástroji (zarovnané doprava).
+ */
+.tidy {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
+  color: var(--map-toolbar-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+.tidy:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.3);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.9);
+}

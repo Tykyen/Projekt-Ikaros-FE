@@ -65,6 +65,25 @@
   gap: 6px;
 }
 
+/* 17.10 A2 — tlačítko „—" (minimalizace do spodní lišty). */
+.minBtn {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: rgb(var(--map-ui-accent-rgb) / 0.8);
+  cursor: pointer;
+  border-radius: 4px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.minBtn:hover {
+  color: var(--map-toolbar-text);
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
+}
+
 .clear {
   background: none;
   border: none;

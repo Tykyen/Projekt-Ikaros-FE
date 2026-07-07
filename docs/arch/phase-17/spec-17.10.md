@@ -50,7 +50,7 @@ Zdroj pravdy pro chování/layout: `c:\tmp\17.10-takticka-mapa-plna.html` (věrn
 3. **„Uklidit mapu" = zavřít úplně vše** (toggle Uklidit ↔ Vrátit panely). Do spodní lišty `<MapDock>` padají minimalizované panely; **nástroje jednotlivě** (4 čipy: Efekty & kreslení, Mlha, Zobrazení, Ambient), **NE** jeden souhrnný čip „Nástroje". Když nezůstane žádný otevřený nástroj, zmizí i hlavička lišty nástrojů.
 4. **Kostky = výjimka, zůstávají vždy dostupné.** Ikona 🎲 nemizí s lištou nástrojů ani po „Uklidit"; drží se vpravo dole a neminimalizuje se.
 5. **Pravá lišta nástrojů zaražená k DOLNÍ hraně** (`justify-content:flex-end` / `first-child margin-top:auto`), roste nahoru.
-6. **Paleta = věrná realitě, beze změny grafiky.** Chrome i herní panely (Hody, Orchestrace, karta) jsou **fialové synthwave** (`--map-ui-*`, motiv „ikaros"). **Pergamen (hnědá + zlatá) jen deník a banner „Hra zastavena"** — nerozlévat na ostatní panely.
+6. **Paleta = věrná realitě, beze změny grafiky.** **Chrome** (bojová lišta, nástroje, počasí) = **fialové synthwave** (`--map-ui-*`). **Herní panely** (Hody, Orchestrace, karta) **dědí DENÍKOVÝ SKIN světa** (`DiarySkinScope` / `--dd-embed-*`) — v Matrix světě **hnědý pergamen** (ověřeno screenshotem 2026-07-06), jinde jiný; **NEJSOU pevně fialové**. Nepřebarvovat herní panely na chrome. (Dřívější tvrzení „vše synthwave" bylo chybné — opřené o analýzu kódu, ne screenshot.)
 7. **Kontextové „?" nápovědy uvnitř panelů** (Orchestrace, Efekty & kreslení; dnes v kódu **chybí** → přidat), **NE** globální nápověda. Realizovat jako volitelná akce `help` ve `<MapPanel>` shellu (vedle složit/zavřít); otevře kontextový popis funkcí panelu.
 
 ## Token deformace — samostatný bug (nález #3, mimo 17.10)
@@ -58,7 +58,7 @@ Netýká se panelů; eviduje se do `docs/dluhy.md`. Oprava: PC/NPC tokeny dostan
 Sekundárně (kosmetika, neblokuje): pointy-top vepsaná kružnice nechává svislou mezeru; stagger 2+ tokenů fixních 12 px (nereaguje na zoom); dokumentace tvrdí flat-top, matematika je pointy-top.
 
 ## Zachování motivu
-`<MapPanel>` shell dědí `--map-ui-*` / `--theme-*`. **Oprava dřívějšího tvrzení (2026-07-06):** výchozí motiv světa je **„ikaros" (fialové synthwave)**, ne „matrix" (to je herní *systém*, ne motiv). Chrome i herní panely jsou defaultně **fialové**; hnědý pergamen je jen deník + lock banner. Žádné nové barvy; jen struktura obalu + chování. (Detaily viz „Závazná UX rozhodnutí".)
+`<MapPanel>` shell **musí držet rozdíl chrome vs. herní panel**: chrome (nástroje, bojová lišta, počasí) nese `--map-ui-*` (fialové synthwave); herní panely (Hody/Orchestrace/karta) nesou **deníkový skin** (`data-diary-skin` / `DiarySkinScope`), v Matrix světě **hnědý pergamen**. **Oprava (2026-07-06, ověřeno screenshotem):** herní panely NEJSOU pevně fialové — dědí skin světa. „matrix" je herní *systém* (řídí obsah), motiv světa je „ikaros" (chrome), deníkový skin (pergamen) barví herní panely. Žádné nové barvy; jen struktura obalu + chování.
 
 ## Návrh (frontend-design)
 - **Plný interaktivní náhled (ZÁVAZNÁ předloha, 2026-07-06):** `c:\tmp\17.10-takticka-mapa-plna.html` — kompletní replika UI (všechny panely s reálným obsahem + všechny pohyby), věrná realitě (motiv „ikaros" synthwave), s přepínačem palety synth↔pergamen a demo přepínači overlayů. **Zdroj pravdy pro chování/layout.**

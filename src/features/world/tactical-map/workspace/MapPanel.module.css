@@ -26,6 +26,13 @@
   padding: 8px 10px 8px 12px;
   background: rgb(var(--map-ui-accent-rgb) / 0.1);
   border-bottom: 1px solid rgb(var(--map-ui-accent-rgb) / 0.15);
+  cursor: pointer;
+}
+
+.chevron {
+  flex: none;
+  opacity: 0.7;
+  font-size: 11px;
 }
 .collapsed .header {
   border-bottom: none;

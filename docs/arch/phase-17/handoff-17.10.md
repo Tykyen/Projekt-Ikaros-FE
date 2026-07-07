@@ -46,7 +46,7 @@ Kořen = **neexistuje sdílený správce panelů**; 3 nezávislé rohové systé
 - **Spodní lišta „Zmenšené":** kam padají minimalizované; **flex-wrap na víc řádků**; klik na čip nahodí; „✕" na čipu zahodí.
 - **Karta postavy/nestvůry:** plovoucí okno na **pevné pozici** (BEZ dragu — rozhodnutí 2026-07-06) NEBO **dock mód** (📌 ukotvit v boku, plná výška, **vlastní posuvník**); přepíná se jen 📌↔🪟. Dock mód **odsune nástroje/pravítko** (rezervace pravého okraje vč. scrollbaru). Minimalizovatelná do lišty.
 - **Pravý klik** na token → menu (Otevřít kartu / Upravit životy / Přidat do iniciativy / Skrýt hráčům / Odebrat). Na mapu → (Umístit token / Změřit / Odkrýt mlhu).
-- **Motiv (OPRAVENO 2026-07-06):** realita = **fialové synthwave** (motiv světa „ikaros") pro chrome i herní panely. „matrix" je herní *systém*, ne motiv světa. **Hnědý pergamen jen deník + banner „Hra zastavena".** Beze změny grafiky = držet tuto realitu (dřívější „hnědé herní panely" bylo mylné).
+- **Motiv (ZNOVU OPRAVENO 2026-07-06 dle screenshotu):** **chrome** (bojová lišta, nástroje, počasí) = **fialové synthwave** (`--map-ui-*`). **Herní panely** (Hody, Orchestrace, karta) = **deníkový skin světa** — v Matrix světě **hnědý pergamen** (screenshot potvrdil). Původní rozlišení „chrome fialový + herní panely hnědý skin" bylo **správné**; mezi-korekce na „vše synthwave" chybná (analýza kódu místo screenshotu).
 
 ## Doporučený první krok v nové konverzaci
 1. Otevři náhled `c:\tmp\17.10-takticka-mapa-plna.html` jako předlohu.

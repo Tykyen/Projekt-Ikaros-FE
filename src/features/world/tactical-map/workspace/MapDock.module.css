@@ -1,0 +1,57 @@
+/**
+ * 17.10 A2 — spodní lišta „Zmenšené" (`<MapDock>`). Fialový chrome
+ * (`--map-ui-*`), flex-wrap na víc řádků, zaražená k dolní hraně viewportu.
+ */
+.dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-map-tool-panel, 100);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: linear-gradient(
+    0deg,
+    rgb(var(--map-ui-panel-deep-rgb, 10 8 32) / 0.97),
+    rgb(var(--map-ui-panel-deep-rgb, 10 8 32) / 0.75)
+  );
+  border-top: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  pointer-events: auto;
+}
+
+.label {
+  font-size: 10.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--map-ui-text-muted, #94a3b8);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--map-toolbar-text);
+  background: rgb(var(--map-ui-accent-rgb) / 0.14);
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.35);
+  transition: transform 0.1s ease;
+}
+.chip:hover {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
+  transform: translateY(-1px);
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.25);
+}

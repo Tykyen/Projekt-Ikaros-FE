@@ -54,13 +54,36 @@ export function MapPanel({
   if (state === 'minimized') return null;
 
   const collapsed = state === 'collapsed';
+  const toggleCollapse = (): void => setPanelState(id, collapsed ? 'open' : 'collapsed');
+  const minimize = (): void => setPanelState(id, 'minimized');
+  // Akce v hlavičce nesmí spustit collapse (klik na hlavičku) → stopPropagation.
+  const stop = (fn: () => void) => (e: React.MouseEvent): void => {
+    e.stopPropagation();
+    fn();
+  };
 
   return (
     <section
       className={cx(styles.panel, styles[variant], collapsed && styles.collapsed)}
       aria-label={title}
     >
-      <header className={styles.header}>
+      <header
+        className={styles.header}
+        onClick={collapsible ? toggleCollapse : undefined}
+        role={collapsible ? 'button' : undefined}
+        tabIndex={collapsible ? 0 : undefined}
+        aria-expanded={collapsible ? !collapsed : undefined}
+        onKeyDown={
+          collapsible
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleCollapse();
+                }
+              }
+            : undefined
+        }
+      >
         {icon != null && (
           <span className={styles.icon} aria-hidden="true">
             {icon}
@@ -71,30 +94,27 @@ export function MapPanel({
           <button
             type="button"
             className={cx(styles.action, styles.help)}
-            onClick={onHelp}
+            onClick={stop(onHelp)}
             title={`Nápověda: ${title}`}
             aria-label={`Nápověda: ${title}`}
           >
             ?
           </button>
         )}
-        {collapsible && (
-          <button
-            type="button"
-            className={styles.action}
-            onClick={() => setPanelState(id, collapsed ? 'open' : 'collapsed')}
-            title={collapsed ? 'Rozbalit' : 'Sbalit'}
-            aria-label={collapsed ? 'Rozbalit' : 'Sbalit'}
-            aria-expanded={!collapsed}
-          >
-            —
-          </button>
-        )}
+        <button
+          type="button"
+          className={styles.action}
+          onClick={stop(minimize)}
+          title="Zmenšit do lišty"
+          aria-label="Zmenšit do lišty"
+        >
+          —
+        </button>
         {onDock && (
           <button
             type="button"
             className={styles.action}
-            onClick={onDock}
+            onClick={stop(onDock)}
             title="Ukotvit k okraji"
             aria-label="Ukotvit k okraji"
           >
@@ -105,12 +125,17 @@ export function MapPanel({
           <button
             type="button"
             className={cx(styles.action, styles.close)}
-            onClick={onClose}
+            onClick={stop(onClose)}
             title="Zavřít"
             aria-label="Zavřít"
           >
             ✕
           </button>
+        )}
+        {collapsible && (
+          <span className={styles.chevron} aria-hidden="true">
+            {collapsed ? '▸' : '▾'}
+          </span>
         )}
       </header>
       {!collapsed && <div className={styles.body}>{children}</div>}

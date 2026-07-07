@@ -29,6 +29,8 @@ interface DiceLogPanelProps {
   viewer: { userId: string; isPj: boolean };
   visibility: WorldDiceVisibility | undefined;
   sceneId: string;
+  /** 17.10 A2 — minimalizace do spodní lišty (parent řídí mount dle registru). */
+  onMinimize?: () => void;
 }
 
 const CLEAR_KEY_PREFIX = "ikr-map-dice-cleared-";
@@ -235,6 +237,7 @@ export function DiceLogPanel({
   viewer,
   visibility,
   sceneId,
+  onMinimize,
 }: DiceLogPanelProps): React.ReactElement {
   const clearKey = sceneId ? CLEAR_KEY_PREFIX + sceneId : "";
   const [clearedBefore, setClearedBefore] = useState<string>(() =>
@@ -296,6 +299,20 @@ export function DiceLogPanel({
           >
             ✕
           </button>
+          {onMinimize && (
+            <button
+              type="button"
+              className={styles.minBtn}
+              aria-label="Zmenšit do lišty"
+              title="Zmenšit do lišty"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMinimize();
+              }}
+            >
+              —
+            </button>
+          )}
           <span
             className={`${styles.chevron} ${open ? styles.chevronOpen : ""}`}
             aria-hidden
