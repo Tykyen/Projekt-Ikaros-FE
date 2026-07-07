@@ -46,11 +46,25 @@ export function MapDock({
   // 17.10 A2 fix — vystav výšku lišty jako --map-inset-bottom, aby se panely
   // dole (Hody/Orchestrace vlevo, nástroje/kostky vpravo) posunuly nad ni a
   // lišta je nepřekrývala. Prázdná lišta = 0.
+  // 17.10 fix2 — výška se mění i BEZ změny počtu čipů: při otevřeném deníku je
+  // lišta užší (ustupuje mu) a zalomí se na víc řad. `[total]` to nechytí →
+  // ResizeObserver přeměří při každé změně výšky (jinak „Kostka" leze pod lištu).
   useLayoutEffect(() => {
+    const el = ref.current;
     const root = document.documentElement;
-    const h = total > 0 ? (ref.current?.offsetHeight ?? 0) : 0;
-    root.style.setProperty('--map-inset-bottom', `${h}px`);
-    return () => root.style.setProperty('--map-inset-bottom', '0px');
+    if (total === 0 || !el) {
+      root.style.setProperty('--map-inset-bottom', '0px');
+      return;
+    }
+    const apply = () =>
+      root.style.setProperty('--map-inset-bottom', `${el.offsetHeight}px`);
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.setProperty('--map-inset-bottom', '0px');
+    };
   }, [total]);
 
   if (total === 0) return null;

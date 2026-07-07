@@ -113,16 +113,9 @@ export function TokenInfoPanel({ open, header, children, onMinimize }: Props): R
 
   return (
     <>
-      {/* Overlay mode má backdrop (klik = close) */}
-      {mode === 'overlay' && (
-         
-        <div
-          className={styles.overlayBackdrop}
-          aria-hidden="true"
-          onClick={header.onClose}
-        />
-      )}
-
+      {/* 17.10 — overlay = PLOVOUCÍ okno nad viditelnou mapou, BEZ ztmavovacího
+          backdropu (dřív modal-like dim přes celou mapu → mapa šedá). Mapa pod
+          kartou zůstává vidět i interaktivní; karta se zavírá přes ✕ v hlavičce. */}
       <aside
         className={wrapperClass}
         style={wrapperStyle}
