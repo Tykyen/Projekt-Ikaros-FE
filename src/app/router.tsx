@@ -95,6 +95,8 @@ const WorldGmDiaryPage   = lazy(() => import('@/features/world/pages/WorldGmDiar
 const CalendarConfigsPage = lazy(() => import('@/features/world/pages/CalendarConfigsPage/CalendarConfigsPage'));
 const WorldHeadlineAdminPage = lazy(() => import('@/features/world/pages/WorldHeadlineAdminPage'));
 const GroupMembersPage   = lazy(() => import('@/features/world/pages/GroupMembersPage'));
+// 17.11 — pop-out karta tokenu do samostatného okna (mimo WorldLayout = bez menu).
+const TokenCardPopoutPage = lazy(() => import('@/features/world/pages/TokenCardPopoutPage'));
 
 // ── Suspense wrapper ──────────────────────────────────────────────────────
 function p(Comp: LazyExoticComponent<ComponentType>) {
@@ -377,6 +379,15 @@ export const router = createBrowserRouter([
       // Wiki stránky — catch-all (musí být poslední)
       { path: ':slug', element: memberOnly(p(PageViewerPage)) },
     ],
+  },
+
+  // 17.11 — pop-out karta tokenu: standalone okno (druhý monitor), MIMO
+  // WorldLayout (bez horního menu). Statický `karta-tokenu` je specifičtější než
+  // wiki catch-all `:slug` uvnitř `/svet/:worldSlug` → vyhrává matching.
+  {
+    path: '/svet/:worldSlug/karta-tokenu',
+    element: p(TokenCardPopoutPage),
+    errorElement: <ErrorPage />,
   },
 
   // 404

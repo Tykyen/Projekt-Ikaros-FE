@@ -33,6 +33,8 @@ export interface TokenInfoPanelHeaderProps {
   badge?: ReactNode;
   /** Volitelné rychlé akce vpravo (např. Odstranit z mapy). */
   actions?: ReactNode;
+  /** 17.11 — když je zadáno, hlavička ukáže 🔗 „Otevřít v samostatném okně". */
+  popoutHref?: string;
   onClose: () => void;
 }
 
@@ -163,6 +165,28 @@ export function TokenInfoPanel({ open, header, children, onMinimize }: Props): R
               </button>
             ))}
           </div>
+
+          {/* 17.11 — pop-out karty do samostatného okna (druhý monitor). Jméno
+              okna = href → stejný token refokusuje své okno, různé tokeny mají
+              každý vlastní (víc karet na víc monitorů). */}
+          {header.popoutHref && (
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={() =>
+                window.open(
+                  header.popoutHref,
+                  header.popoutHref,
+                  'popup=yes,width=460,height=820',
+                )
+              }
+              data-no-drag
+              aria-label="Otevřít kartu v samostatném okně"
+              title="Otevřít v samostatném okně (druhý monitor)"
+            >
+              🔗
+            </button>
+          )}
 
           {/* 17.10 A4 — minimalizace karty do spodní lišty „Zmenšené" */}
           {onMinimize && (

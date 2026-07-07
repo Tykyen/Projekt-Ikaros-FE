@@ -1834,3 +1834,17 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** Potřetí ladím „kostky popover se nezobrazí" bez změření reálného boxu elementu.
 
 ---
+
+### ✅ ŘEŠENÍ — 17.11 P1-P3 pop-out karty tokenu do samostatného okna (druhý monitor) · 2026-07-07
+**Kontext:** Uživatel chtěl kartu postavy/nestvůry v samostatném OS okně (`window.open`) na druhém monitoru, zatímco na hlavním vidí mapu. Věrná kompaktní karta vč. bestií + hody do mapy. Fázováno P1 (PC/NPC) → P2 (bestie) → P3 (hody sync). Spec 17.11.
+**Co zabralo:**
+- **Precedent `DiaryRollPanel`** (chat rail): combat panely (`COMBAT_PANELS`) čtou/píšou deník JEN přes `characterSlug` (sceneId nepoužit) → PC/NPC kartu lze poskládat jen z URL (`worldSlug`+`slug`), bez map stavu. Mini-token stačí.
+- **Standalone route** `/svet/:worldSlug/karta-tokenu` (top-level, MIMO WorldLayout = bez menu); statický segment přebíjí wiki catch-all `:slug`. Okno si sestaví `WorldContext` + `applyTheme` + `DiarySkinScope` samo z `worldSlug` (nové okno nesdílí React strom; auth OK — JWT v `localStorage` sdílený mezi okny).
+- **Bestie (P2):** nemají slug → URL `scene+token`; okno fetchne scénu (`getMapScene`) → realToken → `TokenSystemSheet` (routuje per-systém panel, má reálný sceneId → save statbloku funguje).
+- **Hody (P3):** `BroadcastChannel` per svět (`mapRollChannel` modul). Okno spočítá `dicePayload` (`performSheetRoll`) a postMessne `MapRollRequest`; mapa poslouchá (přes ref, ne re-subscribe) → `mapDice.roll` → 3D overlay + log.
+- Tlačítko 🔗 v hlavičce `TokenInfoPanel` (`window.open` s name = href → stejný token refokusuje své okno, různé tokeny každý vlastní → víc karet na víc monitorů).
+**Proč to je správně:** reuse combat panel registry (žádná duplicitní karta) + reuse pop-out vzoru (`VoiceKrcmaRoom`). Kanál per svět izoluje hody. Ref-pattern pro listener (mapDice je nový objekt každý render → jinak re-subscribe každý render).
+**Jak ověřeno:** `npm run build` exit 0 (opakovaně), eslint 0 warnings. ⚠️ Runtime NEověřeno (browser zakázán): pop-out okno, motiv v okně, hody přes kanál do overlaye, bestie fetch scény, víc oken naráz.
+**Zhodnocení:** DOBŘE — 2 průzkumní agenti PŘED kódem (feasibility + impl detaily) zabránili driftu na velké ploše (route+providery+kanál+bestie); precedent `DiaryRollPanel` ušetřil rekonstrukci tokenu. Reziduum: PC/NPC v okně je STATICKÉ vůči mapě (bez WS live sync HP); `canEdit=true` (BE enforcuje, FE nezpřísňuje dle role); `funkce`/`napoveda` čeká runtime ověření.
+
+---

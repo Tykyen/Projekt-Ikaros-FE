@@ -1,0 +1,68 @@
+/* 17.11 P1 — pop-out karta v samostatném okně. Dědí motiv světa (--theme-*)
+   aplikovaný přes applyTheme na <html>; deníkový skin karty řeší DiarySkinScope. */
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-bg, #0a0814);
+  color: var(--theme-text, #e5e7eb);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--theme-border, rgb(120 100 255 / 0.2));
+  background: var(--theme-surface-strong, rgb(20 16 50 / 0.94));
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--theme-surface-2, rgb(30 24 60 / 0.9));
+  border: 1px solid var(--theme-border, rgb(120 100 255 / 0.25));
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatarFallback {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--theme-heading, #cbd5e1);
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--theme-heading, #f1f5f9);
+  font-family: var(--font-display, inherit);
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.state {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--theme-text-muted, #94a3b8);
+  background: var(--theme-bg, #0a0814);
+}

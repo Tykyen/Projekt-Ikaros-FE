@@ -88,6 +88,10 @@ import { DiceLogPanel } from "./components/dice/DiceLogPanel";
 import { MapDock, type DockPanelMeta } from "./workspace/MapDock";
 import { MapTidyButton } from "./workspace/MapTidyButton";
 import { useMapWorkspace } from "./workspace/workspaceStore";
+import {
+  mapRollChannelName,
+  type MapRollMessage,
+} from "./mapRollChannel";
 import { KebabMenu, type KebabMenuItem } from "@/shared/ui/KebabMenu/KebabMenu";
 import { DiarySkinScope } from "@/features/world/pages/CharacterDetailPage/diary-systems/DiarySkinScope";
 import { DiceRollButton } from "./components/dice/DiceRollButton";
@@ -534,6 +538,22 @@ export function TacticalMapView(): React.ReactElement {
     triggerOverlay,
     getSkin,
   });
+
+  // 17.11 P3 — hody z pop-out oken karet (BroadcastChannel per svět) → spusť
+  // 3D overlay + zapiš do map dice logu. `mapDice.roll` přes ref (mapDice je
+  // nový objekt každý render → kanál by se jinak re-subscriboval každý render).
+  const mapDiceRollRef = useRef(mapDice.roll);
+  useEffect(() => {
+    mapDiceRollRef.current = mapDice.roll;
+  });
+  useEffect(() => {
+    if (!worldId || typeof BroadcastChannel === "undefined") return;
+    const ch = new BroadcastChannel(mapRollChannelName(worldId));
+    ch.onmessage = (e: MessageEvent<MapRollMessage>) => {
+      if (e.data?.type === "map-roll") mapDiceRollRef.current(e.data.payload);
+    };
+    return () => ch.close();
+  }, [worldId]);
 
   // 10.2d — selection state (UI-only, lokální).
   // 10.2c-edit-9e — rozděleno na 2 nezávislé states:
@@ -2016,6 +2036,20 @@ export function TacticalMapView(): React.ReactElement {
                       undefined)
                     : undefined),
                 name: displayName,
+                // 17.11 — pop-out karty do samostatného okna (druhý monitor).
+                // Bestie (templateId / characterId `bestie:`) nemá slug → jede
+                // přes scene+token (fetch scény v okně); postava/NPC přes slug.
+                // `token` param u obou = přiřazení hodu z okna zpět na map token.
+                popoutHref: !world?.slug
+                  ? undefined
+                  : openedToken.templateId ||
+                      openedToken.characterId?.startsWith?.("bestie:")
+                    ? `/svet/${world.slug}/karta-tokenu?scene=${scene.id}&token=${openedToken.id}`
+                    : openedToken.characterSlug
+                      ? `/svet/${world.slug}/karta-tokenu?slug=${encodeURIComponent(
+                          openedToken.characterSlug,
+                        )}&npc=${openedToken.isNpc ? 1 : 0}&token=${openedToken.id}`
+                      : undefined,
                 badge:
                   fatePoints !== null ? (
                     <>
