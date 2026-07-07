@@ -52,6 +52,9 @@ export function useAnchoredPosition(
       if (spaceBelow < h + gap && spaceAbove > spaceBelow) {
         top = a.top - h - gap; // flip nahoru
       }
+      // 17.10 A3 — dolní clamp: popover nikdy nepřeteče spodní hranu viewportu
+      // (na nízkém okně jinak zůstal jeho spodek/obsah mimo obrazovku).
+      top = Math.min(top, window.innerHeight - h - margin);
       top = Math.max(margin, top);
 
       setPos({ left, top });

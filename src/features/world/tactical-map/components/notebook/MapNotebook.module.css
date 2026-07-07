@@ -39,7 +39,13 @@
 /* ── Overlay ────────────────────────────────────────────────────────── */
 .backdrop {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  /* 17.10 — nech vpravo místo pro dokovanou kartu tokenu (--map-inset-right,
+     nastavuje TokenInfoPanel v dock módu), ať boční karta při otevřeném deníku
+     nezmizí za backdrop. */
+  right: var(--map-inset-right, 0px);
   z-index: 60;
   display: flex;
   align-items: center;

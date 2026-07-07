@@ -4,6 +4,23 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 17.10 reorganizace horní oblasti mapy + runtime fixy · 2026-07-07
+**Co nakonec zabralo (dle runtime feedbacku uživatele):** (1) bojová lišta (`InitiativeBar`) sbalitelná — lokální collapse + „Zobrazit bojovou lištu" + vystavuje výšku jako `--map-inset-top`; (2) utility (počasí/deník/příběhová mapa/telefon) překlopeny z `weatherSlot` sloupce vpravo na vodorovný ŘÁDEK pod lištou, který čte `--map-inset-top` (jezdí se sbalením); (3) nápověda „?" přesunuta z pravého slotu do bojové lišty (`InitiativeBar` prop `onHelp`, sdílí `helpOpen`+modal); (4) počasí + deník minimalizovatelné do `MapDock` (PanelId `notebook` přidán, gate + DOCK_META + „—"; příběhová mapa+telefon zůstávají trvale). + fixy: kostky-flyout dolní clamp+max-height (ořez na nízkém okně), deník-backdrop rezervuje `--map-inset-right` (nepřekryje dokovanou kartu), regrese karty ([CH-060]).
+**Proč to je správně:** posun řádku přes CSS var `--map-inset-top` (InitiativeBar `useLayoutEffect` vystaví výšku) = řádek jezdí deklarativně, bez JS layout dopočtů; button-in-button u počasí řešen „—" jako sourozenec pilulky (obalení do `.pillRow`); PanelId `notebook` = deník minimalizace přes stejný vzor jako ostatní panely.
+**Jak ověřeno:** `npm run build` (tsc -b) exit 0 (4× přes body), vitest workspace **17/17** (PanelId notebook nerozbil), eslint 0 errors/0 warnings v dotčených. **Runtime NEověřeno mnou (browser zakázán)** — sbalování lišty, jezdící řádek, nápověda, minimalizace počasí/deníku čekají test uživatele.
+**Zhodnocení:** dobře — feedback-driven po malých build-ověřitelných krocích (uživatel deployuje+testuje průběžně). Riziko: horní layout naslepo (weatherSlot column→row + `--map-inset-top` posun) je nejrizikovější, čeká runtime potvrzení. Lekce (znovu): panel gated na registru + externí trigger nutně resetuje stav ([CH-060]).
+
+---
+
+### CH-060 — A4 gate karty na registru způsobil regresi: klik na „i" po minimalizaci/Uklidit přestal otevírat kartu · 2026-07-07
+**Kontext:** 17.10 A4 — karta tokenu (`TokenInfoPanel`) gated v `TacticalMapView` přes `workspace["token-card"].state !== "minimized"` (aby minimalizovaná karta byla jen čip v `MapDock`).
+**Co jsem udělal špatně:** otevření karty klikem na „i" volalo jen `setOpenedTokenId(id)`, ale NEresetovalo `token-card` stav v registru. Po „Uklidit" (minimizeAll) nebo minimalizaci karty („—") zůstal `token-card` = `minimized` **persistovaný v localStorage** → gate kartu skryl, i když `openedTokenId` byl nastaven.
+**Proč to nefungovalo:** dva zdroje pravdy o viditelnosti karty (externí `openedTokenId` + registr `token-card.state`) se rozešly; gate četl registr, klik nastavoval jen `openedTokenId`. Persistovaný `minimized` v LS držel kartu skrytou i po reloadu → uživatel nahlásil „klik na i přestal otevírat deník v boku".
+**Poučení:** když panel gatuju na registru A otevírám ho z externího triggeru (`openedTokenId`), otevírací akce MUSÍ zároveň resetovat registr (`setPanelState("token-card","open")`) — jinak persistovaný `minimized` blokuje. Fix = `openTokenCard` helper (setOpenedTokenId + setPanelState open) předaný do všech `onOpenInfo`.
+**Příznak cyklení:** „klik na i / token přestal otevírat kartu" po použití Uklidit/minimalizace; `openedTokenId` set, ale karta neviditelná.
+
+---
+
 ### ✅ ŘEŠENÍ — 17.10 A3–A5 taktická mapa (kostky-flyout / karta-okno bez dragu / pravý klik) · 2026-07-07
 **Co nakonec zabralo:** A3 = kostkový flyout `DicePickerPopover` přes **Portal + reuse `useAnchoredPosition`** (opt-in prop `portal`, chat beze změny) → řeší ořez v klipujícím `.stack`; + fix `--map-inset-bottom` (spodní lišta „Zmenšené" vystaví svou výšku → panely dole se posunou nad ni). A4 = karta bez dragu vyřazením `'drag'` z `MODE_ORDER` (dock ↔ 🪟 plovoucí=overlay), minimalizace do registru (`token-card` gate v parentu + „—" v headeru + DOCK_META), portrét v iniciativě otevírá kartu. A5 = pravý klik: `KebabMenu` rozšířen o `anchorPoint {x,y}`, `onContextMenu` na viewportu → `screenToHex` hit-test → token menu (Otevřít kartu) / mapa menu (Změřit).
 **Proč to je správně (a ne další variace):** (1) A3 opt-in portal = 0 dopadu na chat; (2) A4 drag vyřazen z `MODE_ORDER`, ne mazán z hooku → minimální zásah, mrtvý drag kód neškodí; (3) A5 jeden vstup `onContextMenu` na DOM viewportu + hit-test dle hexu (ne PixiJS `rightclick` → žádný federated/DOM konflikt); reuse `KebabMenu` (portál, roving-tabindex).

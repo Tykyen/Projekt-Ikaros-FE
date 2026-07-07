@@ -12,6 +12,29 @@
   pointer-events: auto;
 }
 
+/* 17.10 — řádek: pilulka + „—" (minimalizace počasí do spodní lišty). */
+.pillRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.minBtn {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
+  background: rgb(var(--map-ui-panel-deep-rgb) / 0.7);
+  color: var(--map-toolbar-text);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.minBtn:hover {
+  border-color: var(--map-ui-accent-solid, currentColor);
+}
+
 /* ── Pecka (zavřený stav) ─────────────────────────────────────────────────── */
 .pill {
   display: inline-flex;

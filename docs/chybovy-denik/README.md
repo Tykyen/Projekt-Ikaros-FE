@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-060.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-061.**
 
 ## Jak je deník členěný
 
@@ -224,3 +224,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-059](fe.md#ch-059--přepsal-jsem-spechandoffnáhled-na-herní-panely-fialové-dle-agentní-analýzy-kódu-realita-screenshot--hnědý-pergamen--2026-07-06) | fe/proces | „opravil" jsem spec/náhled herních panelů na fialové dle agentní analýzy; screenshot = hnědý pergamen (deníkový skin); u barev vyžádat screenshot, ne věřit analýze kódu | měním předlohu/spec kvůli barvě z kódu, uživatel opáčí screenshotem |
 | [✅ ŘEŠENÍ](fe.md#-řešení--1710-a1a2-workspace-panelů-taktické-mapy-jotai-registr--shell--mapdock--minimalizace--2026-07-07) | fe | 17.10 A1+A2: workspace vrstva (zLayers z-index + inset/fix počasí + useMapWorkspace registr + MapPanel shell + MapDock + Uklidit); herní panely individuální „—", nástroje gate+Uklidit (button-hlavičky nerestrukturalizovány = 0 riziko); gate v parentu ne return null; build 3× + 17 testů; runtime čeká uživatele | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--1710-a3a5-taktická-mapa-kostky-flyout--karta-okno-bez-dragu--pravý-klik--2026-07-07) | fe | 17.10 A3–A5: kostky portál (reuse useAnchoredPosition, opt-in) + inset-bottom fix lišty; karta bez dragu (MODE_ORDER dock↔overlay) + minimalizace + portrét→karta; pravý klik (KebabMenu anchorPoint + screenToHex hit-test); build 5× + 25 testů; A5 akce=2 napojené, zbytek follow-up; runtime čeká | — |
+| [CH-060](fe.md#ch-060--a4-gate-karty-na-registru-způsobil-regresi-klik-na-i-po-minimalizaciuklidit-přestal-otevírat-kartu--2026-07-07) | fe | A4 gate karty `token-card.state !== minimized` + klik na „i" nastavil jen openedTokenId → po Uklidit/min. zůstal minimized v LS → karta skrytá; otevírací akce musí resetovat registr (openTokenCard) | klik na i/token neotvírá kartu po Uklidit; openedTokenId set, karta neviditelná |
+| [✅ ŘEŠENÍ](fe.md#-řešení--1710-reorganizace-horní-oblasti-mapy--runtime-fixy--2026-07-07) | fe | 17.10 reorganizace horní oblasti: bojová lišta sbalitelná (--map-inset-top) + utility řádek pod ní (weatherSlot column→row, jezdí s lištou) + nápověda k liště + počasí/deník min do MapDock (PanelId notebook); + fixy kostky/deník-karta/regrese; build 4× + 17 testů; runtime čeká | — |

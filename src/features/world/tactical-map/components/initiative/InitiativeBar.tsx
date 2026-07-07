@@ -13,7 +13,7 @@
  *
  * Plán: docs/arch/phase-10/plan-10.2f.md (f-1/F).
  */
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useCombat } from '../../hooks/useCombat';
 import { useTokenUpdate } from '../../hooks/useTokenUpdate';
 import { isPcToken } from '../../utils/isPcToken';
@@ -21,6 +21,7 @@ import { effectivelyRevealed, isTokenHiddenByFog } from '../fog/fogUtils';
 import { InitiativeBarItem } from './InitiativeBarItem';
 import { InitiativeControls } from './InitiativeControls';
 import type { MapScene, MapToken } from '../../types';
+import { WorldHelpButton } from '@/features/world/help';
 import styles from './InitiativeBar.module.css';
 
 interface Props {
@@ -35,6 +36,8 @@ interface Props {
   onOpenInfo: (tokenId: string) => void;
   /** Resolvuje obrázek tokenu (bestie z bestiáře přes templateId). */
   resolveTokenImage?: (token: MapToken) => string | undefined;
+  /** 17.10 — nápověda k mapě (přesunuta sem vedle „Zahájit boj"). */
+  onHelp?: () => void;
 }
 
 export function InitiativeBar({
@@ -46,6 +49,7 @@ export function InitiativeBar({
   onItemClick,
   onOpenInfo,
   resolveTokenImage,
+  onHelp,
 }: Props): React.ReactElement | null {
   const combat = useCombat(scene, worldId);
   const tokenUpdate = useTokenUpdate(scene.id, worldId);
@@ -70,14 +74,72 @@ export function InitiativeBar({
     isPj ? combat.bench : combat.bench.filter(isPcToken)
   ).filter((t) => !isFogHidden(t));
 
+  // 17.10 — sbalení bojové lišty (roleta) + vystavení její výšky jako
+  // --map-inset-top, aby se pod ní ležící utility řádek (weatherSlot) posouval
+  // nahoru/dolů podle sbalení. Cleanup → 0 (např. když lišta zmizí bez tokenů).
+  const barRef = useRef<HTMLDivElement>(null);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ikr-map-initbar-collapsed') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const toggleCollapsed = (): void => {
+    setCollapsed((c) => {
+      const next = !c;
+      try {
+        localStorage.setItem('ikr-map-initbar-collapsed', next ? '1' : '0');
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty(
+      '--map-inset-top',
+      `${barRef.current?.offsetHeight ?? 0}px`,
+    );
+    return () => root.style.setProperty('--map-inset-top', '0px');
+  });
+
   // Empty = lišta skrytá (pro danou roli není co zobrazit).
   if (visibleCombatants.length === 0 && visibleBench.length === 0) return null;
 
   const canEditInit = (token: MapToken): boolean =>
     isPj || myCharacterSlugs.includes(token.characterSlug);
 
+  if (collapsed) {
+    return (
+      <div
+        ref={barRef}
+        className={`${styles.bar} ${styles.collapsed}`}
+        role="region"
+        aria-label="Iniciativa"
+      >
+        <button
+          type="button"
+          className={styles.reopen}
+          onClick={toggleCollapsed}
+        >
+          ⚔ Zobrazit bojovou lištu ▾
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.bar} role="region" aria-label="Iniciativa">
+    <div
+      ref={barRef}
+      className={styles.bar}
+      role="region"
+      aria-label="Iniciativa"
+    >
+      {onHelp && (
+        <WorldHelpButton label="Nápověda k mapě" onClick={onHelp} />
+      )}
       {isPj && (
         <InitiativeControls
           isActive={combat.isActive}
@@ -138,6 +200,16 @@ export function InitiativeBar({
           />
         ))}
       </div>
+
+      <button
+        type="button"
+        className={styles.collapseBtn}
+        onClick={toggleCollapsed}
+        title="Sbalit bojovou lištu"
+        aria-label="Sbalit bojovou lištu"
+      >
+        ▲
+      </button>
     </div>
   );
 }

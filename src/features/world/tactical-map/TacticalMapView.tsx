@@ -102,7 +102,7 @@ import { useResolvedSystemId } from "@/features/world/useResolvedSystemId";
 import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
 import { MapNotebookButton } from "./components/notebook/MapNotebookButton";
 import { MapNotebookOverlay } from "./components/notebook/MapNotebookOverlay";
-import { WorldHelpButton, WorldHelpModal, TacticalMapHelp } from "@/features/world/help";
+import { WorldHelpModal, TacticalMapHelp } from "@/features/world/help";
 import { useGmNotes, useUpdateGmNotes } from "./api/useGmNotes";
 import { useCharacterNotes } from "@/features/world/pages/api/useCharacterSubdocs";
 import { useUpdateCharacterNotes } from "@/features/world/pages/api/useCharacterMutations";
@@ -185,6 +185,8 @@ const DOCK_META: readonly DockPanelMeta[] = [
   { id: "tools-view", title: "Zobrazení", icon: "🖥️" },
   { id: "tools-ambient", title: "Ambient", icon: "🎵" },
   { id: "token-card", title: "Karta", icon: "👤" },
+  { id: "weather", title: "Počasí", icon: "⛅" },
+  { id: "notebook", title: "Deník", icon: "✎" },
 ];
 
 export function TacticalMapView(): React.ReactElement {
@@ -534,6 +536,16 @@ export function TacticalMapView(): React.ReactElement {
     y: number;
     tokenId?: string;
   } | null>(null);
+  // 17.10 A4 fix — otevření karty (klik na „i"/token, pravý klik) VŽDY zruší
+  // případný `minimized` stav token-card v registru; jinak gate kartu skryje
+  // (po „Uklidit" / minimalizaci karty přestal klik na „i" otevírat deník v boku).
+  const openTokenCard = useCallback(
+    (tokenId: string): void => {
+      setOpenedTokenId(tokenId);
+      setPanelState("token-card", "open");
+    },
+    [setPanelState],
+  );
 
   // 10.2d — permission gate pro drag.
   const mySlugs = useMyCharacterSlugs(worldId || null, currentUser?.id ?? null);
@@ -1849,7 +1861,7 @@ export function TacticalMapView(): React.ReactElement {
                       })
                     }
                     onSelect={setSelectedTokenId}
-                    onOpenInfo={setOpenedTokenId}
+                    onOpenInfo={openTokenCard}
                     onTokenPointerDown={handleTokenPointerDown}
                   />
                 )}
@@ -2179,7 +2191,8 @@ export function TacticalMapView(): React.ReactElement {
           isPj={isPJ}
           myCharacterSlugs={mySlugs}
           resolveTokenImage={resolveTokenImage}
-          onOpenInfo={setOpenedTokenId}
+          onOpenInfo={openTokenCard}
+          onHelp={() => setHelpOpen(true)}
           onItemClick={(token) => {
             const p = getGridAdapter(scene.config.gridType).toPixel(
               token.q,
@@ -2298,32 +2311,44 @@ export function TacticalMapView(): React.ReactElement {
 
       {/* 10.2i — počasí na mapě (pravý horní roh, otvírací). */}
       <div className={styles.weatherSlot}>
-        <MapWeatherPanel
-          weather={weather.weather}
-          isPJ={isPJ}
-          fxEnabled={weather.fxEnabled}
-          toggleFx={weather.toggleFx}
-          setWeather={weather.setWeather}
-          clearWeather={weather.clearWeather}
-          isMutating={weather.isMutating}
-        />
+        {workspace["weather"].state !== "minimized" && (
+          <MapWeatherPanel
+            weather={weather.weather}
+            isPJ={isPJ}
+            fxEnabled={weather.fxEnabled}
+            toggleFx={weather.toggleFx}
+            setWeather={weather.setWeather}
+            clearWeather={weather.clearWeather}
+            isMutating={weather.isMutating}
+            onMinimize={() => setPanelState("weather", "minimized")}
+          />
+        )}
         {/* 16.5b — příběhová mapa propojená s aktivní scénou (jen když existuje
             a je přístupná; jinak vrací null). */}
         <StoryMapPill worldId={worldId} sceneId={scene?.id ?? null} />
         {/* 10.2j — poznámkový blok (pod počasím, ve společném sloupci, aby se
             držel i při rozbaleném panelu počasí). PJ = deník napříč světem,
             hráč = poznámky jeho postavy. Hráč bez postavy → skryto. */}
-        {hasNotebook && (
-          <MapNotebookButton
-            label={isPJ ? "Deník" : "Poznámky"}
-            onClick={() => setNotebookOpen(true)}
-          />
+        {hasNotebook && workspace["notebook"].state !== "minimized" && (
+          <span className={styles.notebookRow}>
+            <MapNotebookButton
+              label={isPJ ? "Deník" : "Poznámky"}
+              onClick={() => setNotebookOpen(true)}
+            />
+            <button
+              type="button"
+              className={styles.notebookMin}
+              onClick={() => setPanelState("notebook", "minimized")}
+              title="Zmenšit deník do lišty"
+              aria-label="Zmenšit deník do lišty"
+            >
+              —
+            </button>
+          </span>
         )}
         {/* 10.2n — „co hraje" (ambient přehrávač) pod lištou s deníkem/počasím.
             Sám se skryje, když nic nehraje (vrací null). */}
         {scene && <SceneSoundPlayer scene={scene} />}
-        {/* 13.6 — in-situ nápověda (cheat-sheet ovládání mapy, role-aware). */}
-        <WorldHelpButton label="Nápověda k mapě" onClick={() => setHelpOpen(true)} />
         {/* 17.6 — připojit se k hlasovému hovoru světa (sdílený s chatem). */}
         <WorldVoiceButton worldId={worldId} />
       </div>

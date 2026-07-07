@@ -185,6 +185,10 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
               left: anchoredPos?.left ?? 0,
               top: anchoredPos?.top ?? 0,
               margin: 0,
+              // 17.10 A3 — na nízkém okně omez výšku a scrolluj uvnitř, jinak
+              // se grid kostek ořízne spodní hranou.
+              maxHeight: 'calc(100vh - 16px)',
+              overflowY: 'auto',
               // dokud není změřeno, neblikni na (0,0)
               visibility: anchoredPos ? 'visible' : 'hidden',
             }

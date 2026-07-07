@@ -20,6 +20,7 @@ export type PanelId =
   | 'dice-log'
   | 'pj'
   | 'weather'
+  | 'notebook'
   | 'token-card';
 
 export type PanelUiState = 'open' | 'collapsed' | 'minimized' | 'floating';
@@ -38,6 +39,7 @@ export const PANEL_IDS: readonly PanelId[] = [
   'dice-log',
   'pj',
   'weather',
+  'notebook',
   'token-card',
 ];
 

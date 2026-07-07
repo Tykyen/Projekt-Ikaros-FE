@@ -44,6 +44,8 @@ interface Props {
   setWeather: (generatorId: string) => void;
   clearWeather: () => void;
   isMutating: boolean;
+  /** 17.10 — minimalizace počasí do spodní lišty „Zmenšené" (parent řídí mount). */
+  onMinimize?: () => void;
 }
 
 export function MapWeatherPanel({
@@ -54,6 +56,7 @@ export function MapWeatherPanel({
   setWeather,
   clearWeather,
   isMutating,
+  onMinimize,
 }: Props): React.ReactElement | null {
   const [open, setOpen] = useState(false);
   const { worldId } = useWorldContext();
@@ -70,20 +73,33 @@ export function MapWeatherPanel({
 
   return (
     <div className={`${styles.panel} ${open ? styles.open : ""}`}>
-      <button
-        type="button"
-        className={styles.pill}
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        title={weather ? weather.generatorName : "Počasí na mapě"}
-      >
-        <Icon className={styles.pillIcon} size={18} />
-        <span className={styles.pillTemp}>{temp}</span>
-        <ChevronDown
-          className={`${styles.chev} ${open ? styles.chevOpen : ""}`}
-          size={14}
-        />
-      </button>
+      <div className={styles.pillRow}>
+        <button
+          type="button"
+          className={styles.pill}
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          title={weather ? weather.generatorName : "Počasí na mapě"}
+        >
+          <Icon className={styles.pillIcon} size={18} />
+          <span className={styles.pillTemp}>{temp}</span>
+          <ChevronDown
+            className={`${styles.chev} ${open ? styles.chevOpen : ""}`}
+            size={14}
+          />
+        </button>
+        {onMinimize && (
+          <button
+            type="button"
+            className={styles.minBtn}
+            onClick={onMinimize}
+            title="Zmenšit počasí do lišty"
+            aria-label="Zmenšit počasí do lišty"
+          >
+            —
+          </button>
+        )}
+      </div>
 
       {open && (
         <div className={styles.body}>
@@ -164,8 +180,14 @@ export function MapWeatherPanel({
             </div>
           )}
 
+          {/* eslint-disable-next-line jsx-a11y/label-has-for -- label obaluje input (nesting); label-has-for je deprecated, nesting je platný a11y vzor */}
           <label className={styles.fxRow}>
-            <input type="checkbox" checked={fxEnabled} onChange={toggleFx} />
+            <input
+              type="checkbox"
+              aria-label="Vizuální efekty počasí"
+              checked={fxEnabled}
+              onChange={toggleFx}
+            />
             <Sparkles size={13} />
             Vizuální efekty
           </label>
