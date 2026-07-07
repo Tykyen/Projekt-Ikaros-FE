@@ -184,7 +184,6 @@ const DOCK_META: readonly DockPanelMeta[] = [
   { id: "tools-fog", title: "Mlha", icon: "🌫️" },
   { id: "tools-view", title: "Zobrazení", icon: "🖥️" },
   { id: "tools-ambient", title: "Ambient", icon: "🎵" },
-  { id: "token-card", title: "Karta", icon: "👤" },
   { id: "weather", title: "Počasí", icon: "⛅" },
   { id: "notebook", title: "Deník", icon: "✎" },
 ];
@@ -1969,7 +1968,6 @@ export function TacticalMapView(): React.ReactElement {
       {openedTokenId &&
         scene &&
         worldId &&
-        workspace["token-card"].state !== "minimized" &&
         (() => {
           const openedToken = scene.tokens.find((t) => t.id === openedTokenId);
           if (!openedToken) return null;
@@ -1994,7 +1992,6 @@ export function TacticalMapView(): React.ReactElement {
               // prvního (musel se zavřít a otevřít znovu).
               key={openedToken.id}
               open
-              onMinimize={() => setPanelState("token-card", "minimized")}
               header={{
                 // Bestie token nemá characterData (není Page) → dotáhni obrázek
                 // z bestiar cache přes templateId (snapshot šablony).

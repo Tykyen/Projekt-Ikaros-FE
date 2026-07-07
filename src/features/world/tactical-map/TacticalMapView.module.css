@@ -40,13 +40,11 @@
   --z-map-token-backdrop: 399;
   --z-map-token-panel: 400;
   --z-map-modal: 1000;
-
-  /* 17.10 A1 — rezervace okrajů (generalizace --map-dock-width). Panely u
-     okrajů čtou tyto proměnné, aby se nepřetlačovaly. Zapisují je dokovaná
-     karta (pravý okraj) apod. Default 0 = nic nerezervováno. */
-  --map-inset-right: 0px;
-  --map-inset-top: 0px;
-  --map-inset-bottom-left: 0px;
+  /* 17.10 — POZOR: rezervace okrajů (--map-inset-right/-top/-bottom) se ZDE
+     NEdefinuje. Zapisují je dynamicky InitiativeBar (top) a TokenInfoPanel
+     (right) na <html>; lokální default v .viewport by je STÍNIL (čte se
+     nejbližší předek) → panely by nikdy neviděly skutečnou hodnotu. Konzumenti
+     mají fallback `var(--map-inset-*, 0px)`. */
 }
 
 .canvasWrapper {

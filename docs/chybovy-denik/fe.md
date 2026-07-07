@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### CH-061 — A1 rezervace okrajů (--map-inset-*) nefungovala: default v `.viewport` STÍNIL dynamickou hodnotu z `<html>` · 2026-07-07
+**Kontext:** 17.10 A1/reorganizace — panely u okrajů (weatherSlot řádek pod lištou, dokovaná karta odsun) čtou CSS var `--map-inset-top/-right`; zapisují je `InitiativeBar` (top) a `TokenInfoPanel` (right) na `document.documentElement` (`<html>`).
+**Co jsem udělal špatně:** v A1 jsem přidal `--map-inset-right/-top/-bottom-left: 0px` jako DEFAULT přímo do `.viewport` (aby var „měl hodnotu"). Ale `.viewport` je předek konzumentů (`weatherSlot`, `.stack`) → CSS custom property se resolvuje z NEJBLIŽŠÍHO předka = `.viewport` (0px), NE z `<html>` (kam se zapisuje skutečná hodnota).
+**Proč to nefungovalo:** konzumenti vždy viděli `0px` (stíněno `.viewport`), takže řádek zůstal nahoře „v" liště místo pod ní a karta neodsunula boční obsah. Uživatel objevil: „utility jsou v liště, ne pod ní" + „karta nehýbá s bočním panelem". Build/tsc/eslint slepé (validní CSS).
+**Poučení:** CSS var, kterou zapisuješ dynamicky na `<html>` přes `setProperty`, **NEdefinuj jako default v žádném předku konzumenta** — stínila by ji. Spolehni na fallback `var(--x, 0px)` přímo v místě užití. Default v předku = tichá past („var má hodnotu", ale špatnou).
+**Příznak cyklení:** „rezervace okraje / --map-inset nefunguje, ač `setProperty` běží"; panel ignoruje dynamickou hodnotu a drží default.
+
+---
+
 ### ✅ ŘEŠENÍ — 17.10 reorganizace horní oblasti mapy + runtime fixy · 2026-07-07
 **Co nakonec zabralo (dle runtime feedbacku uživatele):** (1) bojová lišta (`InitiativeBar`) sbalitelná — lokální collapse + „Zobrazit bojovou lištu" + vystavuje výšku jako `--map-inset-top`; (2) utility (počasí/deník/příběhová mapa/telefon) překlopeny z `weatherSlot` sloupce vpravo na vodorovný ŘÁDEK pod lištou, který čte `--map-inset-top` (jezdí se sbalením); (3) nápověda „?" přesunuta z pravého slotu do bojové lišty (`InitiativeBar` prop `onHelp`, sdílí `helpOpen`+modal); (4) počasí + deník minimalizovatelné do `MapDock` (PanelId `notebook` přidán, gate + DOCK_META + „—"; příběhová mapa+telefon zůstávají trvale). + fixy: kostky-flyout dolní clamp+max-height (ořez na nízkém okně), deník-backdrop rezervuje `--map-inset-right` (nepřekryje dokovanou kartu), regrese karty ([CH-060]).
 **Proč to je správně:** posun řádku přes CSS var `--map-inset-top` (InitiativeBar `useLayoutEffect` vystaví výšku) = řádek jezdí deklarativně, bez JS layout dopočtů; button-in-button u počasí řešen „—" jako sourozenec pilulky (obalení do `.pillRow`); PanelId `notebook` = deník minimalizace přes stejný vzor jako ostatní panely.
