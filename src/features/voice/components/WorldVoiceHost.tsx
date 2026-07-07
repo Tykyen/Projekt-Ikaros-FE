@@ -6,7 +6,7 @@
  * svět. Jitsi iframe žije tady (odchod ze stránky ho neodmountuje); tlačítka
  * ve světovém chatu a na mapě jen togglují session atom.
  */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import {
   Mic,
@@ -22,21 +22,32 @@ import { currentUserAtom } from '@/shared/store/authStore';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useVoice } from '../useVoice';
 import { jitsiRoomName } from '../config';
-import { worldVoiceSessionAtom } from '../store';
+import {
+  worldVoiceSessionAtom,
+  worldVoiceMinimizedAtom,
+  worldVoiceDockedAtom,
+} from '../store';
 import s from './WorldVoiceHost.module.css';
 
 export function WorldVoiceHost() {
   const { worldId, character } = useWorldContext();
   const user = useAtomValue(currentUserAtom);
   const [session, setSession] = useAtom(worldVoiceSessionAtom);
-  const [minimized, setMinimized] = useState(false);
+  const [minimized, setMinimized] = useAtom(worldVoiceMinimizedAtom);
+  // 17.10 — když je mapa mountnutá a hovor sbalený, plovoucí pruh se skryje a
+  // jeho místo převezme čip v liště „Zmenšené" (renderuje TacticalMapView).
+  const docked = useAtomValue(worldVoiceDockedAtom);
 
   const active = !!worldId && session?.worldId === worldId;
 
   const voice = useVoice({
     roomName: jitsiRoomName(`world-${worldId}`),
     displayName: character?.name ?? user?.username,
-    onLeft: () => setSession(null),
+    // Konec hovoru → zavři session i sbalený stav (příští hovor začne rozbalený).
+    onLeft: () => {
+      setSession(null);
+      setMinimized(false);
+    },
   });
 
   // Aktivace session → připojit (containerRef je v DOM, protože panel se renderuje).
@@ -48,7 +59,12 @@ export function WorldVoiceHost() {
   if (!active) return null;
 
   return (
-    <div className={s.host} data-min={minimized || undefined}>
+    <div
+      className={s.host}
+      data-min={minimized || undefined}
+      data-docked={(minimized && docked) || undefined}
+      aria-hidden={(minimized && docked) || undefined}
+    >
       {/* 17.10 — když je hovor sbalený, je celý pruh klikací = spolehlivé
           obnovení (malé „⤢" samo mohl překrývat Jitsi iframe → „nereaguje"). */}
       <header

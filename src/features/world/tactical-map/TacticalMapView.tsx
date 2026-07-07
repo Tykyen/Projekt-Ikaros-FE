@@ -21,10 +21,15 @@ import { Application, extend } from "@pixi/react";
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Application as PixiApplication } from "pixi.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import axios from "axios";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import { WorldVoiceButton } from "@/features/voice/components/WorldVoiceButton";
+import {
+  worldVoiceSessionAtom,
+  worldVoiceMinimizedAtom,
+  worldVoiceDockedAtom,
+} from "@/features/voice/store";
 import { currentUserAtom } from "@/shared/store/authStore";
 import { InputModal } from "@/features/admin/chat/components/InputModal";
 import { WorldRole } from "@/shared/types";
@@ -196,6 +201,15 @@ export function TacticalMapView(): React.ReactElement {
   const currentUser = useAtomValue(currentUserAtom);
   // 17.10 A2 — registr workspace panelů (minimalizace do spodní lišty).
   const { workspace, setPanelState } = useMapWorkspace();
+  // 17.10 — sbalený hovor jako čip v liště „Zmenšené". `docked` signál řekne
+  // WorldVoiceHostu, ať skryje plovoucí pruh (čip ho na mapě zastoupí).
+  const voiceSession = useAtomValue(worldVoiceSessionAtom);
+  const [voiceMinimized, setVoiceMinimized] = useAtom(worldVoiceMinimizedAtom);
+  const setVoiceDocked = useSetAtom(worldVoiceDockedAtom);
+  useEffect(() => {
+    setVoiceDocked(true);
+    return () => setVoiceDocked(false);
+  }, [setVoiceDocked]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const theme = useMapTheme();
   const { width, height } = useViewportSize(viewportRef);
@@ -2426,7 +2440,21 @@ export function TacticalMapView(): React.ReactElement {
 
       {/* 17.10 A2 — spodní lišta „Zmenšené": čipy minimalizovaných panelů
           (klik = nahodí). Sama se skryje, když není nic minimalizované. */}
-      <MapDock panels={DOCK_META} />
+      <MapDock
+        panels={DOCK_META}
+        extraChips={
+          voiceSession?.worldId === worldId && voiceMinimized
+            ? [
+                {
+                  key: "voice",
+                  title: "Hovor",
+                  icon: "📞",
+                  onClick: () => setVoiceMinimized(false),
+                },
+              ]
+            : []
+        }
+      />
 
       {/* 17.10 A5 — kontextové menu pravého kliku (token / mapa) u kurzoru. */}
       <KebabMenu

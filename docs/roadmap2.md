@@ -585,10 +585,11 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **Otevřené otázky:** Začít pouze odkazem, nebo rovnou embed? Má být výchozí místnost per svět, nebo per scéna? Má být kamera výchozí, nebo má hráč vstupovat nejdřív s vypnutou kamerou? Má se později řešit self-host Jitsi?
 
-### - [x] 17.7 Rodokmeny — [C2 · dopad nízký · náklad střední] 🔁 (volitelné)
+### - [ ] 17.7 Rodokmeny — [C2 · dopad nízký · náklad střední] 🔁 (volitelné)
 **Cíl:** Vizuální strom „rodič → dítě / sňatek".
 **Proč:** World Anvil i Kanka to mají; fanoušci ság to milují. Naše Pavučina umí obecné vztahy, ne dedikovaný strom.
-**Hotovo (2026-07):** Samostatná featura = nový typ stránky **Rodokmen** (`Page.familyTree`), NE pohled nad Pavučinou (osoby = volná data + volitelný odkaz na stránku, aby fungovali i předci bez stránky). Strom (osoby+svazky), pan/zoom, klik→stránka, editor s drag + „Srovnat" (auto-layout), vzhled dědí z motivu světa. Spec `docs/arch/phase-17/spec-17.7.md`. Kolize se starým typem „Rodokmen" (→ Zoom) řešena polem `familyTree`.
+**Návrh přípravy:** speciální layout nad existujícími `CampaignRelationship` (typy rodič/potomek/choť). Nižší priorita.
+**Otevřené otázky:** Samostatná featura, nebo jen nový pohled v Pavučině?
 
 ### - [x] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
 **Cíl:** Ovládání z klávesnice + popisky pro čtečky u ikonových tlačítek.

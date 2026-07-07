@@ -184,6 +184,11 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
               position: 'fixed',
               left: anchoredPos?.left ?? 0,
               top: anchoredPos?.top ?? 0,
+              // 17.10 (CH-063) — MUSÍ přebít `.popover { bottom: calc(100%+8px) }`
+              // a `.alignRight { right: 0 }` z CSS. Bez toho `fixed` + top + bottom
+              // dá ZÁPORNOU výšku → popover zkolabuje na 0px → neviditelný.
+              right: 'auto',
+              bottom: 'auto',
               margin: 0,
               // 17.10 A3 — na nízkém okně omez výšku a scrolluj uvnitř, jinak
               // se grid kostek ořízne spodní hranou.

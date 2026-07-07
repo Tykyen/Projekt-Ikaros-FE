@@ -19,6 +19,19 @@
 .host[data-min] {
   width: 220px;
 }
+/* 17.10 — na mapě hostuje sbalený hovor čip v liště „Zmenšené"; tady plovoucí
+   pruh schovej, ale Jitsi iframe nech mountnutý (hovor běží). Off-screen 1×1
+   místo display:none (to může pauznout audio/video track). */
+.host[data-docked] {
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
 
 .bar {
   display: flex;

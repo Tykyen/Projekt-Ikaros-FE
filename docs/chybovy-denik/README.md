@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-063.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-064.**
 
 ## Jak je deník členěný
 
@@ -228,3 +228,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--1710-reorganizace-horní-oblasti-mapy--runtime-fixy--2026-07-07) | fe | 17.10 reorganizace horní oblasti: bojová lišta sbalitelná (--map-inset-top) + utility řádek pod ní (weatherSlot column→row, jezdí s lištou) + nápověda k liště + počasí/deník min do MapDock (PanelId notebook); + fixy kostky/deník-karta/regrese; build 4× + 17 testů; runtime čeká | — |
 | [CH-061](fe.md#ch-061--a1-rezervace-okrajů---map-inset--nefungovala-default-v-viewport-stínil-dynamickou-hodnotu-z-html--2026-07-07) | fe/css | A1 `--map-inset-*` default v `.viewport` STÍNIL dynamickou hodnotu z `<html>` (setProperty) → řádek/karta viděly 0px; var psaná na html NEdefinovat jako default v předku, jen fallback `var(x,0)` | rezervace/inset nefunguje, ač setProperty běží; panel drží default |
 | [CH-062](fe.md#ch-062--kostky-nejsou-vidět-vůbec-opravoval-jsem-popover-ale-nečitelné-bylo-tlačítko--2026-07-07) | fe/css | Kostky „nejsou vidět" — 2× jsem řešil `DicePickerPopover` visibility, ale nečitelné bylo samotné TLAČÍTKO (holá ikona na tmavém terči splynula); řeš vzhled triggeru, ne popupu; zjisti co uživatel VIDÍ (screenshot) | podruhé sahám k „kostky=popover visibility" bez ověření, že vidím spouštěč |
+| [CH-063](fe.md#ch-063--kostky-popover-se-neotevíral-portal-přebil-jen-topleft-ne-bottomright-z-css--nulová-výška--2026-07-07) | fe/css | Portal popover: inline přepsal jen top/left, ale CSS `bottom:calc(100%+8px)`+`right:0` zůstaly → fixed+top+bottom = ZÁPORNÁ výška → 0px, „v DOM ale neviditelný"; při portal-override vynuluj všechny 4 pozice; měř rect ne visibility | potřetí ladím „popover se nezobrazí" bez změření boxu |

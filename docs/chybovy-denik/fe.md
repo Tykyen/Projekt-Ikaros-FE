@@ -1825,3 +1825,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** Podruhé/potřetí sahám k „kostky = DicePickerPopover visibility" bez toho, abych ověřil, že uživatel vůbec vidí spouštěcí tlačítko.
 
 ---
+
+### CH-063 — Kostky popover se „neotevíral": portal přebil jen top/left, ne bottom/right z CSS → nulová výška · 2026-07-07
+**Kontext:** Klik na „Kostka" na mapě neotevřel `DicePickerPopover` (uživatel: „nejde otevřít"). Řešil jsem to už 2× (portal, `visibility:hidden`) — cyklení, potřetí.
+**Co jsem udělal špatně:** V portal módu jsem inline stylem nastavil jen `position:fixed` + `top` + `left`, ale nechal aktivní `.popover { bottom: calc(100%+8px) }` a `.alignRight { right: 0 }` z CSS.
+**Proč to nefungovalo:** `position:fixed` + `top:X` + `bottom:calc(100%+8px)` + `height:auto` → výška = 100vh − X − (100vh+8) = ZÁPORNÁ → popover zkolabuje na 0px. Je v DOM, „otevřený", ale má nulovou velikost = neviditelný. Předchozí pokusy (portal, visibility) tenhle CSS konflikt neřešily.
+**Poučení:** Když inline-override pozicuje portál a přebíjí CSS, vynuluj VŠECHNY 4 pozicové props (top/right/bottom/left), ne jen ty, co nastavuješ — zbylé dvě z CSS deformují box. Symptom „prvek je v DOM, ale nevidím ho" → měř computed height / getBoundingClientRect, ne jen visibility/z-index.
+**Příznak cyklení:** Potřetí ladím „kostky popover se nezobrazí" bez změření reálného boxu elementu.
+
+---
