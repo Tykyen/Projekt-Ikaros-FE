@@ -1816,3 +1816,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Jak ověřeno:** BE typecheck exit 0 · FE `npm run build` (tsc-b+vite+CSP) exit 0 · BE jest pages exit 0 · FE vitest pages (dobíhá). ⚠️ Živě čeká: touch pan/zoom na mobilu, motiv-převlékání napříč 12 motivy, BE restart (nové pole).
 
 **Zhodnocení:** DOBŘE — kolize chycena a prokomunikována PŘED kódem (ne po regresní chybě); agentní průzkum zabránil driftu na velké FE↔BE ploše; design-first mock ušetřil cyklení na vzhledu. Reziduum: auto-layout ignoruje sekundární sňatky (v1 vědomě), pinch-zoom na mobilu chybí (jen tlačítka+1prst pan).
+
+### CH-062 — Kostky „nejsou vidět vůbec": opravoval jsem popover, ale nečitelné bylo TLAČÍTKO · 2026-07-07
+**Kontext:** Uživatel 3× po sobě hlásil „kostky nejsou vidět". Jde o `DiceRollButton` (vlastní hod) v pravém dolním `MapDockStack`, mezi „Uklidit" a „Efekty".
+**Co jsem udělal špatně:** Dvakrát jsem sáhl k `DicePickerPopover` (výběr PO kliku) — řešil visibility/portal/`visibility:hidden`. Jenže uživatel neviděl samotné **tlačítko**: bylo 36px holá `Dices` ikona na tmavém terči (`--map-toolbar-bg-solid` ~#0a0814) + jen 0.18 obrys → splynulo s mapou a četlo se jako „zámek". Jel jsem podle své hypotézy (popover), ne podle toho, co uživatel reálně vidí.
+**Proč to nefungovalo:** Opravoval jsem jinou vrstvu (popover) než symptom (tlačítko na mapě nečitelné). Popover se ani neukáže, dokud tlačítko nenajdeš a neklikneš.
+**Poučení:** Když uživatel opakuje „nevidím X", nejdřív zjisti CO PŘESNĚ nevidí (trigger vs. jeho obsah) — screenshotem, ne statickou analýzou (viz CH-059). Vzhled tlačítka = řeš na tlačítku, ne na jeho popupu. Fix: pilulka „🎲 Kostka" s fialovou výplní jako `MapTidyButton` (vysoký kontrast + text).
+**Příznak cyklení:** Podruhé/potřetí sahám k „kostky = DicePickerPopover visibility" bez toho, abych ověřil, že uživatel vůbec vidí spouštěcí tlačítko.
+
+---

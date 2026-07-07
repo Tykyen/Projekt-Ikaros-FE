@@ -68,6 +68,13 @@
 }
 .body[data-min] {
   height: 0;
+  /* 17.10 — Jitsi iframe nesmí brát klik, když je hovor sbalený (jinak
+     překryje obnovení v hlavičce → „⤢ nejde rozkliknout na větší"). */
+  pointer-events: none;
+}
+/* 17.10 — sbalený pruh je celý klikací (obnoví hovor). */
+.host[data-min] .bar {
+  cursor: pointer;
 }
 .jitsi {
   width: 100%;

@@ -2308,34 +2308,39 @@ export function TacticalMapView(): React.ReactElement {
 
       {/* 10.2i — počasí na mapě (pravý horní roh, otvírací). */}
       <div className={styles.weatherSlot}>
-        {workspace["weather"].state !== "minimized" && (
-          <MapWeatherPanel
-            weather={weather.weather}
-            isPJ={isPJ}
-            fxEnabled={weather.fxEnabled}
-            toggleFx={weather.toggleFx}
-            setWeather={weather.setWeather}
-            clearWeather={weather.clearWeather}
-            isMutating={weather.isMutating}
-          />
-        )}
-        {/* 16.5b — příběhová mapa propojená s aktivní scénou (jen když existuje
-            a je přístupná; jinak vrací null). */}
-        <StoryMapPill worldId={worldId} sceneId={scene?.id ?? null} />
-        {/* 10.2j — poznámkový blok (pod počasím, ve společném sloupci, aby se
-            držel i při rozbaleném panelu počasí). PJ = deník napříč světem,
-            hráč = poznámky jeho postavy. Hráč bez postavy → skryto. */}
-        {hasNotebook && workspace["notebook"].state !== "minimized" && (
-          <MapNotebookButton
-            label={isPJ ? "Deník" : "Poznámky"}
-            onClick={() => setNotebookOpen(true)}
-          />
-        )}
-        {/* 10.2n — „co hraje" (ambient přehrávač) pod lištou s deníkem/počasím.
-            Sám se skryje, když nic nehraje (vrací null). */}
-        {scene && <SceneSoundPlayer scene={scene} />}
-        {/* 17.6 — připojit se k hlasovému hovoru světa (sdílený s chatem). */}
-        <WorldVoiceButton worldId={worldId} />
+        {/* 17.10 — NALEVO: počasí + deník (+ ambient přehrávač). */}
+        <div className={styles.slotLeft}>
+          {workspace["weather"].state !== "minimized" && (
+            <MapWeatherPanel
+              weather={weather.weather}
+              isPJ={isPJ}
+              fxEnabled={weather.fxEnabled}
+              toggleFx={weather.toggleFx}
+              setWeather={weather.setWeather}
+              clearWeather={weather.clearWeather}
+              isMutating={weather.isMutating}
+            />
+          )}
+          {/* 10.2j — poznámkový blok. PJ = deník napříč světem, hráč = poznámky
+              jeho postavy. Hráč bez postavy → skryto. */}
+          {hasNotebook && workspace["notebook"].state !== "minimized" && (
+            <MapNotebookButton
+              label={isPJ ? "Deník" : "Poznámky"}
+              onClick={() => setNotebookOpen(true)}
+            />
+          )}
+          {/* 10.2n — „co hraje" (ambient přehrávač). Sám se skryje, když nic
+              nehraje (vrací null). */}
+          {scene && <SceneSoundPlayer scene={scene} />}
+        </div>
+        {/* 17.10 — NAPRAVO: hovor + mapa. */}
+        <div className={styles.slotRight}>
+          {/* 17.6 — připojit se k hlasovému hovoru světa (sdílený s chatem). */}
+          <WorldVoiceButton worldId={worldId} />
+          {/* 16.5b — příběhová mapa propojená s aktivní scénou (jen když existuje
+              a je přístupná; jinak vrací null). */}
+          <StoryMapPill worldId={worldId} sceneId={scene?.id ?? null} />
+        </div>
       </div>
 
       {/* 13.6 — modal s nápovědou k taktické mapě. */}

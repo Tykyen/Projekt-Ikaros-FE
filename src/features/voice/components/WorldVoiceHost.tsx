@@ -49,13 +49,34 @@ export function WorldVoiceHost() {
 
   return (
     <div className={s.host} data-min={minimized || undefined}>
-      <header className={s.bar}>
+      {/* 17.10 — když je hovor sbalený, je celý pruh klikací = spolehlivé
+          obnovení (malé „⤢" samo mohl překrývat Jitsi iframe → „nereaguje"). */}
+      <header
+        className={s.bar}
+        onClick={minimized ? () => setMinimized(false) : undefined}
+        role={minimized ? 'button' : undefined}
+        tabIndex={minimized ? 0 : undefined}
+        aria-label={minimized ? 'Rozbalit hovor' : undefined}
+        onKeyDown={
+          minimized
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setMinimized(false);
+                }
+              }
+            : undefined
+        }
+      >
         <span className={s.dot} aria-hidden />
         <span className={s.label}>Hovor světa</span>
         <button
           type="button"
           className={s.min}
-          onClick={() => setMinimized((m) => !m)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setMinimized((m) => !m);
+          }}
           aria-label={minimized ? 'Rozbalit hovor' : 'Sbalit hovor'}
         >
           {minimized ? <Maximize2 size={14} /> : <Minus size={14} />}

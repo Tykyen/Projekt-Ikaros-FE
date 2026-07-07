@@ -53,11 +53,12 @@ export function DiceRollButton({
         type="button"
         className={`${styles.btn} ${pickerOpen ? styles.active : ""}`}
         onClick={() => setPickerOpen((v) => !v)}
-        title="Vlastní hod"
-        aria-label="Vlastní hod"
+        title="Hod kostkou"
+        aria-label="Hod kostkou"
         aria-pressed={pickerOpen}
       >
-        <Dices size={18} aria-hidden="true" />
+        <Dices size={16} aria-hidden="true" />
+        Kostka
       </button>
 
       <DicePickerPopover

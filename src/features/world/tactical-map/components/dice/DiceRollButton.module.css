@@ -9,16 +9,22 @@
   display: inline-flex;
 }
 
+/* 17.10 (CH-062) — pilulka s textem „Kostka" + fialová výplň, shodný chrome
+   jako „Uklidit" (MapTidyButton). Původní 36px holá ikona na tmavém terči
+   splývala s mapou → uživatel kostky „neviděl vůbec". */
 .btn {
-  width: 36px;
-  height: 36px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  border: 1px solid var(--accent, rgb(var(--map-ui-accent-rgb) / 0.18));
-  background: var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-rgb) / 0.94));
-  color: var(--map-toolbar-text, rgb(var(--map-ui-text-on-dark-rgb) / 0.9));
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
+  color: var(--map-toolbar-text);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -28,12 +34,8 @@
 }
 
 .btn:hover {
-  border-color: var(--accent, rgb(var(--map-ui-accent-rgb) / 0.4));
-  background: color-mix(
-    in srgb,
-    var(--accent, rgb(var(--map-ui-accent-rgb) / 1)) 14%,
-    var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-rgb) / 0.94))
-  );
+  background: rgb(var(--map-ui-accent-rgb) / 0.3);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.9);
 }
 
 .btn:disabled {
@@ -42,11 +44,7 @@
 }
 
 .active {
-  border-color: var(--accent, var(--map-ui-accent-solid));
-  color: var(--accent, var(--map-ui-accent-solid));
-  background: color-mix(
-    in srgb,
-    var(--accent, var(--map-ui-accent-solid)) 18%,
-    var(--map-toolbar-bg-solid, rgb(var(--map-ui-panel-rgb) / 0.94))
-  );
+  background: rgb(var(--map-ui-accent-rgb) / 0.35);
+  border-color: var(--map-ui-accent-solid);
+  color: var(--map-ui-accent-solid);
 }

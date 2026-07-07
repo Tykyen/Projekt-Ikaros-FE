@@ -31,10 +31,10 @@ export function StoryMapPill({ worldId, sceneId }: Props) {
         type="button"
         className={s.pill}
         onClick={() => setOpen(true)}
-        title={`Otevřít příběhovou mapu „${map.title}"`}
+        title={`Otevřít mapu „${map.title}"`}
       >
         <MapPinned size={16} aria-hidden className={s.glow} />
-        Příběhová mapa
+        Mapa
       </button>
       {open && (
         <InteractiveMapViewer
