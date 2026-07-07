@@ -137,9 +137,6 @@ export function InitiativeBar({
       role="region"
       aria-label="Iniciativa"
     >
-      {onHelp && (
-        <WorldHelpButton label="Nápověda k mapě" onClick={onHelp} />
-      )}
       {isPj && (
         <InitiativeControls
           isActive={combat.isActive}
@@ -201,6 +198,9 @@ export function InitiativeBar({
         ))}
       </div>
 
+      {onHelp && (
+        <WorldHelpButton label="Nápověda k mapě" onClick={onHelp} />
+      )}
       <button
         type="button"
         className={styles.collapseBtn}

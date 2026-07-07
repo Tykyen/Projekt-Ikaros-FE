@@ -2317,7 +2317,6 @@ export function TacticalMapView(): React.ReactElement {
             setWeather={weather.setWeather}
             clearWeather={weather.clearWeather}
             isMutating={weather.isMutating}
-            onMinimize={() => setPanelState("weather", "minimized")}
           />
         )}
         {/* 16.5b — příběhová mapa propojená s aktivní scénou (jen když existuje
@@ -2327,21 +2326,10 @@ export function TacticalMapView(): React.ReactElement {
             držel i při rozbaleném panelu počasí). PJ = deník napříč světem,
             hráč = poznámky jeho postavy. Hráč bez postavy → skryto. */}
         {hasNotebook && workspace["notebook"].state !== "minimized" && (
-          <span className={styles.notebookRow}>
-            <MapNotebookButton
-              label={isPJ ? "Deník" : "Poznámky"}
-              onClick={() => setNotebookOpen(true)}
-            />
-            <button
-              type="button"
-              className={styles.notebookMin}
-              onClick={() => setPanelState("notebook", "minimized")}
-              title="Zmenšit deník do lišty"
-              aria-label="Zmenšit deník do lišty"
-            >
-              —
-            </button>
-          </span>
+          <MapNotebookButton
+            label={isPJ ? "Deník" : "Poznámky"}
+            onClick={() => setNotebookOpen(true)}
+          />
         )}
         {/* 10.2n — „co hraje" (ambient přehrávač) pod lištou s deníkem/počasím.
             Sám se skryje, když nic nehraje (vrací null). */}
