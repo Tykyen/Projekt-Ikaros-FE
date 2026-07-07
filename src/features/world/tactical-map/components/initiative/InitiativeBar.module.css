@@ -2,7 +2,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
+  /* 17.10 — ustup dokovanému deníku vpravo (jeho šířka = --map-inset-right),
+     ať ho karta plné výšky nepřekrývá. */
+  right: var(--map-inset-right, 0px);
   z-index: 20;
   display: flex;
   align-items: center;

@@ -5,7 +5,9 @@
 .dock {
   position: absolute;
   left: 0;
-  right: 0;
+  /* 17.10 — ustup dokovanému deníku vpravo (--map-inset-right = šířka karty),
+     ať zmenšená lišta neleze pod kartu plné výšky. */
+  right: var(--map-inset-right, 0px);
   bottom: 0;
   z-index: var(--z-map-tool-panel, 100);
   display: flex;

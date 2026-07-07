@@ -31,12 +31,12 @@
 /* ── DOCK MODE — fixed right side, full height MINUS world top nav ── */
 .modeDock {
   position: fixed;
-  /* 17.10 — karta ustoupí horní bojové liště i dolní „Zmenšené" liště, ať je
-     nepřekrývá. --map-inset-top vystavuje InitiativeBar, --map-inset-bottom
-     MapDock; top+bottom (místo height) odvodí výšku mezi oběma lištami. */
-  top: calc(var(--header-h, 56px) + var(--map-inset-top, 0px));
+  /* 17.10 — deník je PLNÁ výška vpravo (přes celou pravou stranu, i tam kde je
+     bojová/„Zmenšené" lišta). Ty se mu naopak vyhnou zprava přes
+     --map-inset-right (šířku karty vystavuje TokenInfoPanel na <html>). */
+  top: var(--header-h, 56px);
   right: 0;
-  bottom: var(--map-inset-bottom, 0px);
+  bottom: 0;
   border-right: none;
   border-top: none;
   border-bottom: none;
