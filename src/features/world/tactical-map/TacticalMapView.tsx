@@ -56,6 +56,13 @@ import {
 import { getGridAdapter, type GridAdapter } from "./grid";
 import { computeVisionReveal } from "./vision/raycast";
 import { MapZoomControls } from "./components/MapZoomControls";
+import { StreamModeControls } from "./components/StreamModeControls";
+import {
+  streamActiveAtom,
+  streamBgAtom,
+  streamKeepAtom,
+  STREAM_CHROMA,
+} from "./stream/streamMode";
 import { MapMeasureControls } from "./components/MapMeasureControls";
 import { MapDrawingControls } from "./components/MapDrawingControls";
 import { MapDrawingLayer } from "./components/MapDrawingLayer";
@@ -439,15 +446,64 @@ export function TacticalMapView(): React.ReactElement {
     app.renderer.resize(width, height);
   }, [width, height]);
 
+  // 17.9 — stream režim (OBS). active = runtime; bg/keep persistované.
+  const streamActive = useAtomValue(streamActiveAtom);
+  const streamBg = useAtomValue(streamBgAtom);
+  const streamKeep = useAtomValue(streamKeepAtom);
+  const setStreamActive = useSetAtom(streamActiveAtom);
+
+  // 17.9 — pozadí PIXI canvasu řídíme imperativně (prop `background` se po initu
+  // nepřekresluje, viz resize výše). Mimo stream = theme.canvasBg; ve streamu =
+  // chroma barva, „průhledné" = alpha 0 (prosvítá DOM pozadí viewportu).
+  useEffect(() => {
+    const bg = appRef.current?.renderer?.background;
+    if (!bg) return;
+    if (streamActive) {
+      bg.color = STREAM_CHROMA[streamBg];
+      bg.alpha = streamBg === "transparent" ? 0 : 1;
+    } else {
+      bg.color = theme.canvasBg;
+      bg.alpha = 1;
+    }
+  }, [streamActive, streamBg, theme.canvasBg]);
+
+  const startStreamMode = useCallback(() => {
+    setStreamActive(true);
+    void viewportRef.current?.requestFullscreen?.().catch(() => {
+      /* fullscreen odmítnut — stream jede i bez něj (exit přes Esc/tlačítko) */
+    });
+  }, [setStreamActive]);
+
+  const exitStreamMode = useCallback(() => {
+    setStreamActive(false);
+    if (document.fullscreenElement)
+      void document.exitFullscreen().catch(() => {});
+  }, [setStreamActive]);
+
+  // 17.9 — Escape ukončí stream i mimo fullscreen (fallback, když fullscreen
+  // odmítnut). Ve fullscreenu Escape spolkne prohlížeč → řeší onFsChange níže.
+  useEffect(() => {
+    if (!streamActive) return;
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") exitStreamMode();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [streamActive, exitStreamMode]);
+
   // Fullscreen flag — měníme přes fullscreenchange event.
   const [isFullscreen, setIsFullscreen] = useState(false);
   useEffect(() => {
     const el = viewportRef.current;
-    const onFsChange = (): void =>
-      setIsFullscreen(document.fullscreenElement === el);
+    const onFsChange = (): void => {
+      const fs = document.fullscreenElement === el;
+      setIsFullscreen(fs);
+      // 17.9 — opuštění fullscreenu (Esc/F11) ukončí i stream režim.
+      if (!fs) setStreamActive(false);
+    };
     document.addEventListener("fullscreenchange", onFsChange);
     return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, []);
+  }, [setStreamActive]);
 
   // Auto-fit mapy ve fullscreenu. Spustí se při KAŽDÉ změně rozměru viewportu
   // (vstup do fullscreenu 800→1080, pozdější resize / zavření devtools). Bere
@@ -1783,6 +1839,8 @@ export function TacticalMapView(): React.ReactElement {
         handleViewportPointerUpAll(e);
       }}
       data-placement-active={placement.state.active ? "true" : undefined}
+      data-stream-mode={streamActive ? "true" : undefined}
+      data-stream-bg={streamActive ? streamBg : undefined}
     >
       {/* PIXI v8 Application init je async — pokud se mountne bez scény
           (jen podle rozměrů) a scéna dorazí teprve během initu, @pixi/react
@@ -2227,8 +2285,9 @@ export function TacticalMapView(): React.ReactElement {
         })()}
 
       {/* 10.2f — iniciativní lišta (horní full-width). Klik na bojovníka
-          = pan-to-token + select; lišta se sama skryje když nikdo není v boji. */}
-      {scene && worldId && (
+          = pan-to-token + select; lišta se sama skryje když nikdo není v boji.
+          17.9 — ve stream režimu skrytá, pokud si ji streamer nenechá. */}
+      {scene && worldId && (!streamActive || streamKeep.initiative) && (
         <InitiativeBar
           scene={scene}
           worldId={worldId}
@@ -2262,6 +2321,8 @@ export function TacticalMapView(): React.ReactElement {
       {/* 10.2g — dva oddělené sbalitelné docky vpravo dole (solid pozadí).
           Kreslení na mapu (efekty, PJ) vs ovládání zobrazení (zoom). Naskládané
           ve stacku — odsazují se doleva od otevřeného deníku. */}
+      {/* 17.9 — celý stack nástrojových docků je UI chrome → ve stream režimu skryt. */}
+      <div className={styles.chromeWrap} data-map-chrome>
       <MapDockStack>
         {/* 17.10 A2.3 — Uklidit/Vrátit (nad nástroji; kostky = výjimka). */}
         <MapTidyButton panels={DOCK_META} />
@@ -2334,6 +2395,9 @@ export function TacticalMapView(): React.ReactElement {
                 onToggle={() => setRulerActive((v) => !v)}
               />
             )}
+            {/* 17.9 — Streamer overlay (OBS režim). */}
+            <div className={styles.dockDivider}>🎥 Stream (OBS)</div>
+            <StreamModeControls onStart={startStreamMode} />
           </MapToolDock>
         )}
         {/* 10.2n — ambient ovládání (PJ) pod Zobrazením v pravém dolním stacku.
@@ -2342,6 +2406,7 @@ export function TacticalMapView(): React.ReactElement {
           <AmbientSoundPanel scene={scene} onBroadcast={broadcastSounds} />
         )}
       </MapDockStack>
+      </div>
 
       {/* 10.2i — vizuální atmosféra počasí (DOM overlay nad canvasem, pod UI). */}
       <MapWeatherAtmosphere
@@ -2350,12 +2415,12 @@ export function TacticalMapView(): React.ReactElement {
       />
 
       {/* 10.2i — stav WS spojení (levý horní roh). */}
-      <div className={styles.connectionBadgeSlot}>
+      <div className={styles.connectionBadgeSlot} data-map-chrome>
         <MapConnectionBadge />
       </div>
 
       {/* 10.2i — počasí na mapě (pravý horní roh, otvírací). */}
-      <div className={styles.weatherSlot}>
+      <div className={styles.weatherSlot} data-map-chrome>
         {/* 17.10 — NALEVO: počasí + deník (+ ambient přehrávač). */}
         <div className={styles.slotLeft}>
           {workspace["weather"].state !== "minimized" && (
@@ -2439,7 +2504,9 @@ export function TacticalMapView(): React.ReactElement {
         // dědičnost --dd-*/--mx-*). display:contents = nemění layout stacku.
         <DiarySkinScope worldId={worldId} style={{ display: "contents" }}>
           <div className={styles.bottomLeftStack}>
-            {scene && workspace["dice-log"].state !== "minimized" && (
+            {scene &&
+              workspace["dice-log"].state !== "minimized" &&
+              (!streamActive || streamKeep.diceLog) && (
               <DiceLogPanel
                 rolls={scene.diceRolls ?? []}
                 viewer={{ userId: currentUser.id, isPj: isPJ }}
@@ -2448,7 +2515,7 @@ export function TacticalMapView(): React.ReactElement {
                 onMinimize={() => setPanelState("dice-log", "minimized")}
               />
             )}
-            {isPJ && workspace["pj"].state !== "minimized" && (
+            {isPJ && workspace["pj"].state !== "minimized" && !streamActive && (
               <MapPjPanel
                 worldId={worldId}
                 currentScene={scene}
@@ -2472,8 +2539,24 @@ export function TacticalMapView(): React.ReactElement {
         />
       </DiarySkinScope>
 
+      {/* 17.9 — únikové tlačítko stream režimu (roh, klidově skoro průhledné,
+          na hover plné). Zůstává viditelné i ve stream režimu (bez chrome markeru). */}
+      {streamActive && (
+        <button
+          type="button"
+          className={styles.streamExit}
+          onClick={exitStreamMode}
+          aria-label="Ukončit stream režim"
+          title="Ukončit stream režim (Esc)"
+        >
+          ✕ Ukončit stream
+        </button>
+      )}
+
       {/* 17.10 A2 — spodní lišta „Zmenšené": čipy minimalizovaných panelů
-          (klik = nahodí). Sama se skryje, když není nic minimalizované. */}
+          (klik = nahodí). Sama se skryje, když není nic minimalizované.
+          17.9 — UI chrome → ve stream režimu skryto. */}
+      <div className={styles.chromeWrap} data-map-chrome>
       <MapDock
         panels={DOCK_META}
         extraChips={
@@ -2489,6 +2572,7 @@ export function TacticalMapView(): React.ReactElement {
             : []
         }
       />
+      </div>
 
       {/* 17.10 A5 — kontextové menu pravého kliku (token / mapa) u kurzoru. */}
       <KebabMenu

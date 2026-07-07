@@ -172,7 +172,7 @@ export function TokenInfoPanel({ open, header, children, onMinimize }: Props): R
           {header.popoutHref && (
             <button
               type="button"
-              className={styles.closeBtn}
+              className={`${styles.closeBtn} ${styles.popoutBtn}`}
               onClick={() =>
                 window.open(
                   header.popoutHref,

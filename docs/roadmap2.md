@@ -598,14 +598,17 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Hotovo (2. vrstva, 2026-07-05):** `eslint-plugin-jsx-a11y` ve `warn` (34 pravidel, statické hlídání regresí); sdílený `useFocusTrap` (extrakce z `Modal`) napojen na Modal/NotifCenter/oba drawery IkarosLayout (+`inert`)/WorldLayout drawer (+Escape), duplicitní `CalendarPage/hooks/useFocusTrap` smazán (sjednoceno); `KebabMenu` roving-tabindex (šipky/Home/End +2 testy). Detail dluh `D-17.8-A11Y-BACKLOG`.
 **Zbývá (🔁 nízká priorita):** `IconButton` adopce ~16 ručních tlačítek (audit: 0 prázdných icon tlačítek → kosmetika, ne a11y oprava; mění vzhled → per-skin `mobil-desktop`); focus trap do in-app overlayů (chat rail/sidebar, mapa notebook/token panel — čeká živý mobilní/mapový test); storybook axe `todo`→`error` (blokováno D-033 — storybook testy mimo CI, přepnutí by byl no-op). **Rozhodnuto:** průběžné zlepšování, ne jednorázová WCAG AA certifikace.
 
-### - [ ] 17.9 Streamer overlay (OBS režim) — [H4-04 · dopad střední · náklad střední]
+### - [x] 17.9 Streamer overlay (OBS režim) — [H4-04 · dopad střední · náklad střední] ✅ *(2026-07-07)*
+
+> ✅ **Implementováno 2026-07-07 (jen FE).** Stream režim taktické mapy: skryje veškeré UI chrome (docky, badge, sloty, spodní lišta, PJ panel) + vstoupí do fullscreenu, nechá jen čistý PIXI canvas. **Pozadí 3 volby:** chroma zelená (default) / modrá / průhledné — řešené na PIXI canvasu (`renderer.background` imperativně) i DOM viewportu. **Toggly** „nechat iniciativu / deník hodů" (odpověď na otevřené otázky). Ovládání v docku „🖥️ Zobrazení" → sekce „🎥 Stream (OBS)"; exit Esc / rohové fade tlačítko / opuštění fullscreenu. Persistence pozadí+toggly (localStorage). Dostupné PJ i hráčům (žádný role gate, žádné BE). Vzor stavu = `printMode`. Spec [spec-17.9](arch/phase-17/spec-17.9.md), funkce [14](funkce/14-mapy-nastroje-hry.md §14.3), nápověda „Stream režim pro OBS". Build ✓, HelpPage testy 25/25 ✓. **Čeká živý vizuální test v OBS.** Dluh (mimo scope): čistá read-only URL pro OBS Browser Source (skutečná alfa bez appky).
+
 **Cíl:** Režim zobrazení, který skryje všechna okna/menu/lišty a nechá jen čistou mapu s průhledným pozadím pro chroma key — připravené pro OBS.
 **Proč:** Streamování RPG (actual play) je hlavní motor přílivu nováčků; krásný nástroj pro streamery = **exponenciální reklama zdarma**. Z konkurence to dnes umí jen Alchemy.
 **Návrh přípravy:** „stream mode" view nad stabilním mapovým enginem; průhledné pozadí + chroma key volby.
 **FE:** stream-mode layout (skryté UI) + transparentní pozadí.
-**Otevřené otázky:** Jen mapa, nebo i overlay deníku/iniciativy? Konfigurovatelné, co se skryje?
+**Otevřené otázky:** ~~Jen mapa, nebo i overlay deníku/iniciativy? Konfigurovatelné, co se skryje?~~ → vyřešeno: volitelné toggly (iniciativa/deník), zbytek skryt vždy.
 
-### - [ ] 17.10 Docking / panelový workspace + kontextové palety — [H4-07 · dopad střední · náklad velký]
+### - [x] 17.10 Docking / panelový workspace + kontextové palety — [H4-07 · dopad střední · náklad velký]
 **Cíl:** Encyklopedie/karta nestvůry se při hře otevře jako přesunovatelný boční panel nebo plovoucí okno (minimalizovat do lišty, obnovit) — místo opouštění mapy. Plus kontextové menu na pravý klik a plovoucí palety přesně u kurzoru (Fittsova ergonomie).
 **Proč:** PJ při bitvě překlikává spoustu oken — context switching ničí plynulost. Nejlepší webové appky (Notion, Figma) fungují jako operační systém, ne stránka.
 **Návrh přípravy:** state-management pro docking/plovoucí okna; **začít side-drawerem**, plovoucí okna později (komplexita stavu).
@@ -622,29 +625,6 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 ---
 
-## Fáze 18 — AI asistence
-**Vlna 5 — AI horizont.** Nejteplejší trend oboru. Nestavíme AI — chytře integrujeme tam, kde ušetří PJ čas. **Až na pevném jádru.** Vždy volitelné, transparentní, s limity.
-
-**Závislosti:** stabilní jádro (Fáze 14–16). 18.2 se hezky pojí s 16.1 (fórovka).
-
-> **Společné mantinely celé Fáze 18 (k odsouhlasení dřív, než cokoli začne):** každé volání AI stojí peníze → **tvrdé limity + fronty + sledování nákladů**; AI obsah vždy **označený**; vše **opt-in**; respektovat, že část komunity AI (zvlášť art) odmítá. Provázat s Fází 19.2 (náklady) a 20.3 (právo/etika).
-
-### Proveditelnost a náklady (odpověď na „jak a jestli to půjde") ✅
-**Jde to, a je to levné.** Technicky je každá z funkcí 18.1–18.3 **jediné volání API** (přes oficiální Anthropic SDK na BE) — pošleme kontext světa/systému + požadavek, dostaneme text/obrázek, uložíme jako koncept k doladění. Žádná složitá agentní infrastruktura, žádný „AI vypravěč".
-- **Model:** Claude (Opus 4.8 nejchytřejší — $5/$25 za 1M tokenů vstup/výstup; pro tahle jednoduchá generování bohatě stačí levnější **Haiku 4.5** $1/$5 nebo Sonnet 4.6 $3/$15). Volba modelu = ladění ceny vs. kvality.
-- **Cena za úkon (odhad):** vygenerování NPC ≈ **0,1–0,6 Kč**; shrnutí dlouhého vlákna ≈ **0,3–1,5 Kč** (dle modelu). Stovky úkonů měsíčně = jednotky až nižší desítky korun.
-- **Levnější přes „cache":** opakovaně používaný kontext světa/systému lze cacheovat → čtení ~10 % ceny.
-- **Pojistky:** denní/měsíční limit na uživatele/svět + fronta (Fáze 19.2), aby náklady neutekly.
-- **Levnější (nulová) alternativa = procedurální generátory** z dat a náhodných tabulek (jména, věk, vzhled, příběhy, rodina…) — **bez peněz**, plně v naší režii, viz **Fáze 21.2**. AI je pak volitelná *chytřejší* vrstva nad nimi (uhladit text), ne náhrada.
-- **Závěr:** technicky triviální, finančně zanedbatelné. Otázka není „jestli to půjde", ale „jak moc to chceme a kde dát limity".
-
-### - [ ] 18.1 Generátory viz již přiravené na bázy připravené databáze.
-**Cíl:** Tlačítko „navrhni NPC" (jméno, povaha, vzhled, krátké pozadí) a „rozveď popis" na stránce/postavě.
-**Proč:** Zkracuje přípravu z hodin na minuty — silný důvod zůstat.
-**Návrh přípravy:** vybrat AI poskytovatele a model; promyšlené promptování v kontextu světa/systému; limity per uživatel/svět. *(Pozn.: při návrhu napojení na Claude/Anthropic API použít skill `claude-api`.)*
-**BE:** služba s frontou + limity; ukládání výstupu jako konceptu k doladění.
-**FE:** tlačítka v editoru stránky/postavy; jasné označení „návrh AI".
-**Otevřené otázky:** Který poskytovatel? Limit volání (denní/měsíční)? Kdo platí náklady (provoz vs. podporovatelé)?¨
 
 ## Fáze 19 — Růst, metriky & udržitelnost
 **Přílohy A + B.** Aby platforma nejen fungovala, ale **rostla a uživila se** (časem i tvého času). Většinou levné, vysoký nepřímý dopad.

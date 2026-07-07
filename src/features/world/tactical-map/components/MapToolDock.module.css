@@ -108,11 +108,27 @@
 @media (max-width: 768px) {
   .stack {
     top: 12px;
-    bottom: 12px;
+    /* 17.10 — i na mobilu ustup liště „Zmenšené" (--map-inset-bottom), jinak
+       sbalené docky/Kostka přerostou pod ni. */
+    bottom: calc(12px + var(--map-inset-bottom, 0px));
     /* 4px + 8px padding-right = ~12px jako dřív */
     right: calc(4px + var(--map-inset-right, var(--map-dock-width, 0px)));
   }
   .dock {
     width: 200px;
+  }
+}
+
+/* 375px — pravý dock (nástroje/Kostka/Uklidit) NAHORU pod bojovou lištu, ať se
+   nepřekrývá s levým dolním stackem (Hody/log/Orchestrace, plná šířka @480).
+   Roste odshora (zrušen margin-top:auto), max výška ať nezakryje celou mapu. */
+@media (max-width: 480px) {
+  .stack {
+    top: calc(var(--map-inset-top, 0px) + 12px);
+    bottom: auto;
+    max-height: 62vh;
+  }
+  .stack > *:first-child {
+    margin-top: 0;
   }
 }

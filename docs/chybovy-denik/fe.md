@@ -1848,3 +1848,17 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** DOBŘE — 2 průzkumní agenti PŘED kódem (feasibility + impl detaily) zabránili driftu na velké ploše (route+providery+kanál+bestie); precedent `DiaryRollPanel` ušetřil rekonstrukci tokenu. Reziduum: PC/NPC v okně je STATICKÉ vůči mapě (bez WS live sync HP); `canEdit=true` (BE enforcuje, FE nezpřísňuje dle role); `funkce`/`napoveda` čeká runtime ověření.
 
 ---
+
+### ✅ ŘEŠENÍ — 17.9 Streamer overlay (OBS režim): skrytí UI chrome + chroma pozadí nad taktickou mapou · 2026-07-07
+**Kontext:** Stream režim mapy pro OBS — skrýt veškeré UI, nechat čistý canvas s pozadím pro chroma key. Jen FE, žádné BE.
+**Co zabralo:**
+- **Vzor `printMode` (14.7a)** — globální jotai atom + hook, komponenty reagují. Stream mode = jeho zrcadlo (skrýt viditelné místo rozbalit skryté). `active` runtime atom, `bg`+`keep` `atomWithStorage` (persistence preferencí).
+- **Dva plány pozadí, obojí nutné:** PIXI canvas MÁ vlastní pozadí (`<Application background>`) A `.viewport` má DOM `background: var(--map-canvas-bg)`, co prosvítá skrz průhledný canvas. Chroma režim řeší oba — PIXI přes `renderer.background.color/.alpha`, DOM přes `[data-stream-bg]` CSS.
+- **PIXI background imperativně, ne propem:** `<Application>` prop `background` se po async initu NEpřekresluje (stejná past jako `resize` — už zdokumentováno v kódu na řádku „nepřekresluje canvas při změně width/height"). Řídím přes `appRef.current.renderer.background` v `useEffect`.
+- **Marker `data-map-chrome` + `display:contents` wrapper:** rozptýlené panely (docky, spodní lišta) obaleny `.chromeWrap{display:contents}` (nemá vlastní box → nemění layout), skrytí přes `.viewport[data-stream-mode] [data-map-chrome]{display:none}`. Specificita `(0,2,0)` přebije `contents`/`flex` `(0,1,0)` BEZ `!important` — proto CSS třída, ne inline `style={{display:'contents'}}` (ta by měla vyšší prioritu a vynutila `!important`).
+- **Exit robustně 3 cestami:** Esc keydown (fallback mimo fullscreen), rohové fade tlačítko, a `fullscreenchange`→ opuštění fullscreenu vypne i stream (Esc ve fullscreenu spolkne prohlížeč pro exit fs → chytím přes fs event).
+**Proč to je správně:** reuse zavedeného `printMode` vzoru; imperativní background je konzistentní s existujícím resize workaroundem (ne nový hack); toggly iniciativa/deník = přímá odpověď na otevřené otázky roadmapy bez scope creepu.
+**Jak ověřeno:** `npm run build` exit 0; HelpPage vitest 25/25; mobil-desktop staticky (dock 200px se vejde, terče coarse ≥44px, `nowrap`+`ellipsis` proti ořezu „Průhledné"). ⚠️ Runtime NEověřeno (browser zakázán): reálné skrytí chrome, chroma barvy v OBS, průhlednost v Browser Source, fullscreen chování.
+**Zhodnocení:** DOBŘE — feasibility průzkum PŘED spec (PIXI init, sloty, printMode precedent) → spec sedla napoprvé, žádné cyklení. Reziduum: čistá read-only URL pro Browser Source odložena do dluhu (chce route+token); grid se neskrývá; živý OBS test čeká na uživatele.
+
+---

@@ -48,6 +48,13 @@
   border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
   transform: translateY(-1px);
 }
+/* 17.10 mobil — dotykový cíl čipu ≥44px (skill mobil-desktop). */
+@media (max-width: 768px) {
+  .chip {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+}
 
 .dot {
   width: 20px;

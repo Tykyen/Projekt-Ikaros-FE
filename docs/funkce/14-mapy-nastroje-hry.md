@@ -283,6 +283,24 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 ### Skrytí / zámek scény
 - `isHidden` (hráč vidí overlay „Scéna není připravena"), `isLocked` (hráč nemůže hýbat). Per-scéna default + **per-hráč override** (`playerStates`, op `scene.playerState`, 10.2n). PJ vidí scénu vždy. BE autoritativní (`effLocked` `:93`).
 
+### Streamer overlay / stream režim (OBS — 17.9)
+- **Co to je:** přepínatelný „stream režim" mapy — skryje veškeré UI chrome (docky nástrojů, badge spojení, počasí/deník sloty, spodní lišta minimalizovaných, PJ panel) a nechá jen čistý PIXI canvas s volitelným pozadím pro chroma key v OBS.
+- **Kde:** dock „🖥️ Zobrazení" → sekce „🎥 Stream (OBS)" (`StreamModeControls`). Aktivní režim = fullscreen mapy.
+- **Kdo:** PJ **i** hráč (skrývá jen vlastní UI chrome, nemění data ani oprávnění; žádný role gate; žádné BE).
+- **Co jde dělat:**
+  - Spustit „🎥 Spustit stream režim" → zapne režim + vstoupí do fullscreenu (`viewportRef.requestFullscreen`).
+  - Volba pozadí: **chroma zelená** (`0x00b140`, default) / **chroma modrá** (`0x0047bb`) / **průhledné** (alpha 0). PIXI canvas i DOM pozadí viewportu se přepínají spolu.
+  - Toggly „Nechat iniciativu" / „Nechat deník hodů" — co zůstane viditelné (default obojí skryté). Volba pozadí + toggly **persistované** v localStorage (`ikaros.map.streamBg`, `ikaros.map.streamKeep`).
+  - Ukončit: **Esc**, rohové tlačítko „✕ Ukončit stream" (klidově opacity 0.15, na hover/fokus plné), nebo opuštění fullscreenu (F11/Esc → `fullscreenchange` vypne režim).
+- **Hranice / co neumí:**
+  - **Průhledné** pozadí funguje jen v OBS **Browser Source** (CEF umí alfa); v běžném **Window/Display Capture** je okno prohlížeče vždy neprůhledné → tam se používá chroma barva + Chroma Key filtr. Default = zelená právě proto.
+  - Žádná **čistá read-only URL** pro Browser Source (mapa bez appky okolo) — skutečná alfa jen v rámci appky. Dluh.
+  - Grid se ve stream režimu **neskrývá** (je v canvasu); zůstává jak je. Žádné presety layoutu.
+  - `active` je runtime (neukládá se) — po reloadu je režim vždy vypnutý.
+- **Zvláštnosti:** pozadí PIXI se řídí **imperativně** přes `app.renderer.background.color/.alpha` (prop `background` se po async initu nepřekresluje, stejně jako u resize). Chrome se skrývá jednotným markerem `data-map-chrome` + `.viewport[data-stream-mode]` CSS (rozptýlené panely obaleny `display:contents` wrapperem, aby marker nepokazil layout).
+- **Stav:** ✅ funkční (build zelený); čeká živý vizuální test v OBS.
+- **Kód:** FE `tactical-map/stream/streamMode.ts`, `components/StreamModeControls.tsx`, `TacticalMapView.tsx` (stream stav + bg effect + exit + `data-map-chrome`), `TacticalMapView.module.css` (`.chromeWrap`, `[data-stream-mode]`, `.streamExit`).
+
 ### Hranice taktické mapy / co NEumí
 - **Žádný skutečný pathfinding** — bariéry/efekty pohyb fyzicky neblokují, `movement` je jen dosah (range). „A*" v kódu = dosahový výpočet, ne hledání cesty kolem překážek.
 - **Sprite atlas** — token obrázky se resolvují jednotlivě (texture cache `useTokenTexture`), není zmíněn jeden bundled atlas; viz princip 10.2 vs. realita.

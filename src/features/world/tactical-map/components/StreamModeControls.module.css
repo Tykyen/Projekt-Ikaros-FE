@@ -1,0 +1,95 @@
+/* 17.9 — ovládání stream režimu uvnitř docku „Zobrazení". */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bgRow {
+  display: flex;
+  gap: 6px;
+}
+.bgBtn {
+  flex: 1;
+  min-width: 0; /* ať flex dovolí zúžení místo přetečení docku */
+  height: 34px;
+  padding: 0 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid rgb(var(--map-ui-accent-rgb) / 0.2);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+  transition: border-color 0.15s, transform 0.1s;
+}
+.bgBtn[data-bg='green'] {
+  background: #00b140;
+}
+.bgBtn[data-bg='blue'] {
+  background: #0047bb;
+}
+.bgBtn[data-bg='transparent'] {
+  /* šachovnice = univerzální symbol průhlednosti */
+  background: repeating-conic-gradient(#bbb 0% 25%, #fff 0% 50%) 50% / 12px 12px;
+  color: #333;
+  text-shadow: none;
+}
+.bgBtnActive {
+  border-color: var(--map-ui-accent-solid, #fff);
+  transform: translateY(-1px);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.startBtn {
+  margin-top: 2px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.4);
+  background: rgb(var(--map-ui-accent-rgb) / 0.15);
+  color: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.startBtn:hover {
+  background: rgb(var(--map-ui-accent-rgb) / 0.25);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.6);
+}
+
+.hint {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.35;
+  opacity: 0.6;
+}
+
+/* 17.4 — dotykové terče na hrubém ukazateli (prst) ≥44px. */
+@media (pointer: coarse) {
+  .bgBtn {
+    height: 44px;
+    font-size: 11px;
+  }
+  .startBtn {
+    min-height: 44px;
+  }
+  .check {
+    min-height: 44px;
+  }
+}

@@ -127,7 +127,14 @@
   }
   .weatherSlot {
     top: 8px;
+    left: 8px;
     right: 8px;
+    /* 17.10 mobil — dvě skupiny (počasí+deník / hovor+mapa) se na úzké
+       obrazovce nevejdou vedle sebe (row nowrap přetékal vpravo) → pod sebe. */
+    flex-direction: column;
+  }
+  .slotRight {
+    justify-content: flex-start;
   }
 }
 
@@ -169,10 +176,60 @@
   .bottomLeftStack {
     left: 12px;
     right: 12px;
-    bottom: 12px;
+    /* 17.10 — i na mobilu ustup liště „Zmenšené" (--map-inset-bottom), jinak
+       log/orchestrace přerostou pod ni. */
+    bottom: calc(12px + var(--map-inset-bottom, 0px));
     width: auto;
     max-width: none;
   }
+}
+
+/* 17.9 — Streamer overlay (OBS režim). `chromeWrap` je „průhledný" obal
+   (display:contents = nemá vlastní box, nemění layout dětí), aby šel rozptýlený
+   UI chrome (docky, spodní lišta) skrýt jedním markerem. */
+.chromeWrap {
+  display: contents;
+}
+/* Ve stream režimu zmizí veškeré UI chrome. Specificita `.viewport[…] [attr]`
+   (0,2,0) přebije jak `.chromeWrap`/`.weatherSlot` (0,1,0), tak flex/contents —
+   bez `!important`. */
+.viewport[data-stream-mode] [data-map-chrome] {
+  display: none;
+}
+/* DOM pozadí pod PIXI canvasem — chroma barva prosvítá skrz průhledný canvas
+   (PIXI alpha řeší TacticalMapView imperativně). */
+.viewport[data-stream-mode][data-stream-bg="green"] {
+  background: #00b140;
+}
+.viewport[data-stream-mode][data-stream-bg="blue"] {
+  background: #0047bb;
+}
+.viewport[data-stream-mode][data-stream-bg="transparent"] {
+  background: transparent;
+}
+
+/* Únikové tlačítko — klidově skoro průhledné (mimo záběr), na hover/fokus plné. */
+.streamExit {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: var(--z-map-modal, 1000);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.15;
+  transition: opacity 0.2s ease;
+}
+.streamExit:hover,
+.streamExit:focus-visible {
+  opacity: 1;
 }
 
 /* 15.4 — oddělovač pod-sekce v docku (Kreslení uvnitř Efektů, Měření uvnitř

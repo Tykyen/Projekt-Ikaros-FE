@@ -43,10 +43,29 @@
 }
 
 .name {
+  flex: 1;
+  min-width: 0;
   font-size: 18px;
   font-weight: 700;
   color: var(--theme-heading, #f1f5f9);
   font-family: var(--font-display, inherit);
+  /* Dlouhé jméno na úzkém okně neroztlačí lištu — ořízne se. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .bar {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .name {
+    font-size: 16px;
+  }
+  .scroll {
+    padding: 12px;
+  }
 }
 
 .scroll {

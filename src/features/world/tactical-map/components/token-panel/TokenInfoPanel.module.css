@@ -214,6 +214,14 @@
   color: var(--map-ui-danger-solid);
 }
 
+/* 17.11 — pop-out do samostatného okna je desktop/druhý-monitor featura; na
+   mobilu (window.open = jen nový tab) mate → tlačítko 🔗 skryj. */
+@media (max-width: 768px) {
+  .popoutBtn {
+    display: none;
+  }
+}
+
 /* ── IDENTITY ROW (avatar + jméno) ─────────────────────────────── */
 .identity {
   display: flex;

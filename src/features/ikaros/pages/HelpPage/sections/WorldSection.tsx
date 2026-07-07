@@ -36,6 +36,7 @@ import {
   Lightbulb,
   Download,
   Hand,
+  Video,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -535,6 +536,25 @@ export function WorldSection() {
               PJ přidá zvuky ze Zvukové databáze do playlistu a tlačítkem „Vysílat" je
               spustí všem na scéně (ve smyčce, na pozadí). Hráč při prvním zvuku klikne
               „Aktivovat zvuk" (pravidlo prohlížeče).
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Video size={15} />} title="Stream režim pro OBS">
+            <p>
+              V panelu <strong>Zobrazení</strong> → sekce <strong>Stream (OBS)</strong>{' '}
+              spustíš stream režim: mapa se roztáhne na celou obrazovku a{' '}
+              <strong>skryje veškeré ovládání</strong> — zůstane jen čistá scéna s
+              figurkami. Ideální pro nahrávání nebo živé vysílání hry.
+            </p>
+            <p>
+              Vybereš <strong>pozadí</strong>: chroma zelenou nebo modrou (na kterou v
+              OBS použiješ „Chroma Key" filtr a mapa se propojí s tvým videem), nebo
+              průhledné (funguje ve zdroji „Browser Source"). Zaškrtávátky si necháš
+              viditelnou <strong>iniciativu</strong> nebo <strong>deník hodů</strong>,
+              pokud je chceš mít v záběru. Volby si stránka zapamatuje.
+            </p>
+            <p>
+              Režim ukončíš klávesou <strong>Esc</strong> nebo tlačítkem „✕ Ukončit
+              stream" v rohu. Funguje pro PJ i hráče.
             </p>
           </MapFeature>
       </HelpAccordion>

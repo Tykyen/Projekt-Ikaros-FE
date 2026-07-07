@@ -64,6 +64,16 @@
 .reopen:hover {
   text-decoration: underline;
 }
+/* 17.10 mobil — dotykové cíle sbalení/rozbalení bojové lišty ≥40px. */
+@media (max-width: 768px) {
+  .collapseBtn {
+    width: 40px;
+    height: 40px;
+  }
+  .reopen {
+    padding: 10px 14px;
+  }
+}
 
 /* Oddělovač „v boji" | „mimo boj" */
 .divider {
