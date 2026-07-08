@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-065.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-066.**
 
 ## Jak je deník členěný
 
@@ -234,3 +234,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](proces.md#-řešení--metriky-růstu-a-nákladů-krok-191-a-192-audit-dat-před-kódem-překopal-scope--2026-07-08) | proces/be+fe | 19.1+19.2 metriky: 3 průzkumní agenti na BE data PŘED kódem odhalili, že zadání předpokládá neexistující data — AI (Fáze 18) neexistuje, pravá W-o-W retence nejde (jen přepisovaný `lastSeenAt`), storage-byty u obrázků nejsou v DB; scope revidován v spec dřív než kód → 0 mrtvého kódu, 0 přepisů | začnu psát „AI limity"/„retenční křivku"/„storage v MB" a v půlce zjistím, že podkladová data neexistují |
 | [✅ ŘEŠENÍ](be.md#-řešení--194-freemium-podporovatel-befe-jeden-zátah--2026-07-08) | be+fe | 19.4 freemium Podporovatel: flag isSupporter+gating(3 světy/prémiové kostky/vězení)+odznak Ikara+admin grant+zeď/stránka; pasti = field-drift toEntity první, error-codes generované (ne ruční), kostky=prefix `bezne-`, JWT neřešit (DB autorita), badge priorita hvězda>odznak; průzkum 8 agenty před spec = 0 přepisů | — |
 | [CH-064](fe.md#ch-064) | fe/css | topbar světa: dlouhý název + full nav překrývaly hledání (Kalendář nedosažitelný); ladil jsem `.worldName max-width` 3× + `flex-wrap` naslepo; kořen = `.nav {min-width:0}` se smrskne místo aby vynutila wrap → dropdowny vytečou přes search; fix `min-width:min-content` | 3× šířka názvu bez ověření vizuálu; uživatel 2× „cyklíš se" |
+| [CH-065](proces.md#ch-065) | proces | nedotáhl 12 motivů náboru z „opatrnosti", ač uživatel jasně chtěl celek + měl jsem vzor (bestiář); obhájil nedodělek procesním pravidlem | prezentuju „základní verzi/kostru/čeká na výběr" u výslovně žádaného celku |
+| [✅ ŘEŠENÍ](proces.md#-řešení--193-nabory-dodělány-do-úplna-12-motivů-na-plnou-úroveň--funkcenapoveda-uzavírá-ch-065--2026-07-08) | proces/fe | 19.3 nábory do úplna (uzavírá CH-065): 12 motivů plná úroveň (textura+ornament, token-driven) + mobil/funkce/napoveda; náhled linkuje reálný CSS; past = uvozovky v JSX `title` shodí build | — |

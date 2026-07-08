@@ -90,6 +90,25 @@ export function PlatformSection() {
             <Link to="/ikaros/systemy">RPG systémech</Link>.
           </p>
         </Tool>
+        <Tool icon={<Users size={16} />} title="Nástěnka náborů (Hledá se)" audience={{ kind: 'vse', label: 'Přihlášení' }}>
+          <p>
+            Vývěska „<strong>hledám hru / hledám hráče</strong>" — najdeš ji
+            tlačítkem <strong>„Hledá se"</strong> pod přehledem světů. Připneš si
+            vlastní lístek: jako hráč <strong>hledám hru</strong> (vybereš si
+            vzhled lístku z 12 motivů), jako vypravěč <strong>hledám hráče</strong>{' '}
+            do svého světa (lístek převezme motiv toho světa). Nástěnku filtruješ
+            podle strany, systému a toho, jestli se hraje online nebo naživo.
+          </p>
+          <p>
+            Každý lístek vypadá <strong>podle motivu svého světa</strong> (tvar,
+            písmo i barva), zatímco pozadí nástěnky se řídí <strong>tvým
+            vzhledem</strong>. Když tě nějaký nábor zaujme, tlačítkem{' '}
+            <strong>„Ozvat se"</strong> pošleš jeho autorovi soukromou zprávu. Svůj
+            lístek můžeš kdykoli zavřít nebo smazat; nevhodné nábory řeší Správce
+            diskuzí a admini. Nábor po čase sám zmizí. Najdeš v{' '}
+            <Link to="/ikaros/nabory">Nástěnce náborů</Link>.
+          </p>
+        </Tool>
       </HelpAccordion>
 
       {/* ── Komunikace ─────────────────────────────────────────────────── */}

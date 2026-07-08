@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&family=Cinzel:wght@600;800&family=EB+Garamond:ital@0;1&family=Pirata+One&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Playfair+Display:wght@700;900&family=Rye&family=Special+Elite&display=swap" rel="stylesheet">
+<!-- Náhled linkuje REÁLNÝ naborSkins.css appky → vždy zrcadlí produkci (0 duplikace). -->
+<link rel="stylesheet" href="../../src/features/ikaros/components/naborSkins.css">
 <style>
 /* Deska = globální skin diváka (přepínatelná). Lístky = motiv světa (fixní). */
 :root{ --bg-1:#0c1230; --bg-2:#1a2350; --glow: rgba(120,150,255,.4); }
@@ -36,7 +38,7 @@ body{ font-family:'Rajdhani',system-ui,sans-serif; }
 @media(max-width:1000px){ .grid{ column-count:2 } }
 @media(max-width:640px){ .grid{ column-count:1 } }
 
-/* ── skeleton lístku (= NaborListek.module.css) ── */
+/* ── skeleton lístku (= NaborListek.module.css, inline kopie pro standalone náhled) ── */
 .card{
   position:relative; break-inside:avoid; margin:0 0 24px; padding:18px;
   display:flex; flex-direction:column; border-radius:10px;
@@ -59,57 +61,6 @@ body{ font-family:'Rajdhani',system-ui,sans-serif; }
 .who{ font-size:12px; color:var(--theme-text-muted); }
 .who b{ color:var(--theme-text); }
 .reply{ font:700 13px 'Rajdhani',sans-serif; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; background:var(--theme-accent); color:var(--text-on-accent,#050508); }
-
-/* ── 12 MOTIVŮ (kopie naborSkins.css) ── */
-[data-nabor-card]{ position:relative; }
-[data-nabor-card]::before,[data-nabor-card]::after{ pointer-events:none; }
-
-[data-nabor-motiv='ikaros'] [data-nabor-card]{ border-radius:14px; border:1px solid var(--theme-accent); box-shadow:inset 0 0 30px -10px var(--theme-glow-gold),0 0 0 1px var(--theme-border-soft),0 18px 40px -14px rgba(0,0,0,.65); overflow:hidden; }
-[data-nabor-motiv='ikaros'] [data-nabor-card]::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:42%; background:radial-gradient(140px 66px at 50% 118%, var(--theme-glow-gold), transparent 70%),repeating-linear-gradient(90deg, transparent 0 24px, var(--theme-border-soft) 24px 25px); -webkit-mask:linear-gradient(180deg,transparent,#000); mask:linear-gradient(180deg,transparent,#000); opacity:.45; }
-[data-nabor-motiv='ikaros'] [data-nabor-title]{ text-shadow:0 0 16px var(--theme-glow-gold); }
-
-[data-nabor-motiv='fantasy'] [data-nabor-card]{ border-radius:30px 8px 30px 8px; border:2px solid var(--theme-accent-cyan,var(--theme-border)); box-shadow:0 16px 40px -14px rgba(0,0,0,.55); }
-[data-nabor-motiv='fantasy'] [data-nabor-card]::before{ content:''; position:absolute; top:-6px; left:-6px; width:46px; height:46px; border-top:2px solid var(--theme-accent-cyan,var(--theme-accent)); border-left:2px solid var(--theme-accent-cyan,var(--theme-accent)); border-radius:30px 0 0 0; }
-[data-nabor-motiv='fantasy'] [data-nabor-card]::after{ content:'❧'; position:absolute; right:10px; bottom:6px; font-size:22px; color:var(--theme-accent-cyan,var(--theme-accent)); opacity:.75; }
-
-[data-nabor-motiv='dark-fantasy'] [data-nabor-card]{ border-radius:0; border:2px solid var(--theme-border); clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 20px 50px -16px rgba(0,0,0,.72); }
-[data-nabor-motiv='dark-fantasy'] [data-nabor-card]::after{ content:''; position:absolute; right:12px; bottom:12px; width:34px; height:34px; border-radius:50%; background:radial-gradient(circle at 38% 34%, var(--theme-accent-bright), var(--theme-accent) 70%); box-shadow:inset 0 2px 4px rgba(0,0,0,.45),0 2px 5px rgba(0,0,0,.4); }
-[data-nabor-motiv='dark-fantasy'] [data-nabor-title]::before{ content:'❖ '; color:var(--theme-accent-bright); }
-
-[data-nabor-motiv='vesmir'] [data-nabor-card]{ border-radius:2px; border:1px solid var(--theme-border); box-shadow:inset 0 0 30px -12px var(--theme-glow-cyan,var(--theme-glow-gold)),0 14px 40px -14px rgba(0,0,0,.6); overflow:hidden; }
-[data-nabor-motiv='vesmir'] [data-nabor-card]::before{ content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg, transparent 0 3px, var(--theme-accent-cyan,rgba(255,255,255,.06)) 3px 4px); opacity:.14; }
-[data-nabor-motiv='vesmir'] [data-nabor-card]::after{ content:''; position:absolute; top:6px; left:6px; width:16px; height:16px; border-top:2px solid var(--theme-accent-cyan,var(--theme-accent)); border-left:2px solid var(--theme-accent-cyan,var(--theme-accent)); }
-[data-nabor-motiv='vesmir'] [data-nabor-title]{ letter-spacing:.06em; text-transform:uppercase; font-size:17px; }
-
-[data-nabor-motiv='cyberpunk'] [data-nabor-card]{ border-radius:0; border:1px solid var(--theme-accent); clip-path:polygon(0 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%); }
-[data-nabor-motiv='cyberpunk'] [data-nabor-card]::after{ content:''; position:absolute; left:0; bottom:0; width:60%; height:6px; background:repeating-linear-gradient(-45deg, var(--theme-accent) 0 9px, rgba(0,0,0,.55) 9px 18px); }
-[data-nabor-motiv='cyberpunk'] [data-nabor-side]{ border-radius:0; clip-path:polygon(0 0,100% 0,90% 100%,0 100%); }
-
-[data-nabor-motiv='steampunk'] [data-nabor-card]{ border-radius:6px; border:2px solid var(--theme-accent); box-shadow:inset 0 0 0 1px var(--theme-border-soft),0 16px 42px -16px rgba(0,0,0,.6); }
-[data-nabor-motiv='steampunk'] [data-nabor-card]::before{ content:''; position:absolute; top:8px; left:8px; width:6px; height:6px; border-radius:50%; background:var(--theme-accent); box-shadow:inset 0 1px 1px rgba(255,255,255,.4), calc(100% - 16px) 0 0 var(--theme-accent), 0 calc(100% - 16px) 0 var(--theme-accent), calc(100% - 16px) calc(100% - 16px) 0 var(--theme-accent); }
-[data-nabor-motiv='steampunk'] [data-nabor-card]::after{ content:'⚙'; position:absolute; right:12px; bottom:6px; font-size:22px; color:var(--theme-accent); opacity:.7; }
-
-[data-nabor-motiv='apokalypsa'] [data-nabor-card]{ border-radius:3px 15px 4px 13px; border:2px dashed var(--theme-border); box-shadow:0 14px 38px -14px rgba(0,0,0,.6); }
-[data-nabor-motiv='apokalypsa'] [data-nabor-card]::before{ content:''; position:absolute; top:0; left:0; right:0; height:5px; background:repeating-linear-gradient(-45deg, var(--theme-accent) 0 10px, transparent 10px 20px); opacity:.8; }
-[data-nabor-motiv='apokalypsa'] [data-nabor-title]{ text-transform:uppercase; letter-spacing:.03em; }
-
-[data-nabor-motiv='horor'] [data-nabor-card]{ border-radius:2px; border:1px solid var(--theme-border-soft); box-shadow:0 16px 44px -16px rgba(0,0,0,.72); }
-[data-nabor-motiv='horor'] [data-nabor-card]::before{ content:''; position:absolute; inset:0; border-radius:inherit; box-shadow:inset 0 0 70px rgba(0,0,0,.6); }
-[data-nabor-motiv='horor'] [data-nabor-card]::after{ content:''; position:absolute; right:0; bottom:0; border-width:0 0 20px 20px; border-style:solid; border-color:transparent transparent var(--theme-surface-strong,var(--theme-surface)) transparent; filter:drop-shadow(-2px -2px 2px rgba(0,0,0,.4)); }
-
-[data-nabor-motiv='mystery'] [data-nabor-card]{ border-radius:3px; border:1px solid var(--theme-border-soft); padding-top:26px; }
-[data-nabor-motiv='mystery'] [data-nabor-card]::before{ content:''; position:absolute; top:9px; left:50%; transform:translateX(-50%); width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 38% 34%, var(--theme-accent-bright), var(--theme-accent) 70%); box-shadow:0 3px 5px rgba(0,0,0,.5); }
-[data-nabor-motiv='mystery'] [data-nabor-card]::after{ content:'CASE'; position:absolute; right:10px; bottom:10px; font:700 11px 'Rajdhani',sans-serif; letter-spacing:.14em; padding:3px 7px; color:var(--theme-accent); border:2px solid var(--theme-accent); border-radius:3px; transform:rotate(-9deg); opacity:.65; }
-
-[data-nabor-motiv='historie'] [data-nabor-card]{ border-radius:4px; border:2px solid var(--theme-accent); outline:1px solid var(--theme-border-soft); outline-offset:4px; box-shadow:0 16px 42px -16px rgba(0,0,0,.58); margin-top:6px; }
-[data-nabor-motiv='historie'] [data-nabor-card]::before{ content:'♛'; position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-size:20px; color:var(--theme-accent); text-shadow:0 2px 4px rgba(0,0,0,.5); }
-
-[data-nabor-motiv='moderni'] [data-nabor-card]{ border-radius:14px; border:1px solid var(--theme-border-soft); box-shadow:0 10px 30px -14px rgba(0,0,0,.5); padding-left:22px; }
-[data-nabor-motiv='moderni'] [data-nabor-card]::before{ content:''; position:absolute; top:14px; bottom:14px; left:8px; width:4px; border-radius:4px; background:var(--theme-accent); }
-
-[data-nabor-motiv='western'] [data-nabor-card]{ border-radius:2px; border:2px solid var(--theme-accent); outline:3px double var(--theme-border); outline-offset:3px; box-shadow:0 14px 38px -14px rgba(0,0,0,.6); }
-[data-nabor-motiv='western'] [data-nabor-card]::after{ content:'★'; position:absolute; right:12px; bottom:8px; font-size:22px; color:var(--theme-accent); opacity:.8; }
-[data-nabor-motiv='western'] [data-nabor-title]{ text-transform:uppercase; letter-spacing:.05em; }
 </style>
 </head>
 <body>
@@ -117,7 +68,7 @@ body{ font-family:'Rajdhani',system-ui,sans-serif; }
   <header class="top">
     <div>
       <h1>Nábory — 12 motivů lístku</h1>
-      <p>Každý lístek nese <b>motiv svého světa</b> (tvar + font + barva). Deska pod nimi = <b>globální skin diváka</b>. Přepni skin vpravo → deska změní barvu, lístky drží svůj motiv.</p>
+      <p>Každý lístek nese <b>motiv svého světa</b> (tvar + font + barva). Deska pod nimi = <b>globální skin diváka</b>. Přepni skin vpravo → deska změní barvu, lístky drží svůj motiv. (Tvary linkované z reálného <code>naborSkins.css</code>.)</p>
     </div>
     <div class="skins">
       <span>Globální skin (deska)</span>
@@ -133,38 +84,37 @@ body{ font-family:'Rajdhani',system-ui,sans-serif; }
 </div>
 
 <script>
-// 12 motivů: reprezentativní paleta (v appce jde z reálného getTheme(motiv).vars).
 const M = [
-  ['ikaros','Ikaros', {s:'rgba(20,12,44,.9)',ss:'rgba(10,6,26,.94)',t:'#ece4ff',h:'#ffffff',a:'#a96cff',ab:'#c9a4ff',b:'rgba(169,108,255,.5)',bs:'rgba(169,108,255,.26)',g:'rgba(169,108,255,.5)',c:'#c9a4ff',oa:'#0c0820',fd:'Orbitron',fb:'Rajdhani'},
+  ['ikaros','Ikaros', {s:'rgba(20,12,44,.9)',ss:'rgba(10,6,26,.94)',t:'#ece4ff',h:'#ffffff',a:'#a96cff',ab:'#c9a4ff',ad:'#3a2470',b:'rgba(169,108,255,.5)',bs:'rgba(169,108,255,.26)',g:'rgba(169,108,255,.5)',c:'#c9a4ff',oa:'#0c0820',fd:'Orbitron',fb:'Rajdhani'},
     {strana:'hledam-hrace',title:'Runner hledá tým',sys:'Shadowrun 6',mode:'Online · Foundry',seats:'2/5',who:'Nyx · před 1 h'}],
-  ['fantasy','Fantasy', {s:'rgba(16,32,22,.92)',ss:'rgba(10,22,14,.95)',t:'#dbe8d6',h:'#eafff0',a:'#3fae6a',ab:'#6ad090',b:'rgba(63,174,106,.5)',bs:'rgba(63,174,106,.28)',g:'rgba(63,174,106,.4)',c:'#6ad090',oa:'#08160e',fd:'Cinzel',fb:'EB Garamond'},
+  ['fantasy','Fantasy', {s:'rgba(16,32,22,.92)',ss:'rgba(10,22,14,.95)',t:'#dbe8d6',h:'#eafff0',a:'#3fae6a',ab:'#6ad090',ad:'#183a24',b:'rgba(63,174,106,.5)',bs:'rgba(63,174,106,.28)',g:'rgba(63,174,106,.4)',c:'#6ad090',oa:'#08160e',fd:'Cinzel',fb:'EB Garamond'},
     {strana:'hledam-hrace',title:'Kronika Aldbaru',sys:'Dračí doupě+',mode:'Online · Discord',seats:'3/6',who:'PJ Sirien · včera'}],
-  ['dark-fantasy','Dark Fantasy', {s:'rgba(22,10,12,.94)',ss:'rgba(14,6,8,.96)',t:'#d8ccce',h:'#ecd6ce',a:'#b03030',ab:'#d64848',b:'rgba(170,130,130,.42)',bs:'rgba(120,80,80,.3)',g:'rgba(176,48,48,.4)',c:'#d64848',oa:'#ffffff',fd:'Pirata One',fb:'Cormorant Garamond'},
+  ['dark-fantasy','Dark Fantasy', {s:'rgba(22,10,12,.94)',ss:'rgba(14,6,8,.96)',t:'#d8ccce',h:'#ecd6ce',a:'#b03030',ab:'#d64848',ad:'#3a1414',b:'rgba(170,130,130,.42)',bs:'rgba(120,80,80,.3)',g:'rgba(176,48,48,.4)',c:'#d64848',oa:'#ffffff',fd:'Pirata One',fb:'Cormorant Garamond'},
     {strana:'hledam-hrace',title:'Stíny nad Pustinou',sys:'DrD 1.6',mode:'Naživo · Praha',seats:'3/5',who:'PJ Krolok · 2 h'}],
-  ['vesmir','Sci-Fi', {s:'rgba(8,18,30,.93)',ss:'rgba(4,10,20,.96)',t:'#cfe6f0',h:'#eaf6ff',a:'#2e9fd8',ab:'#4fd4e4',b:'rgba(79,140,200,.5)',bs:'rgba(79,140,200,.28)',g:'rgba(79,212,228,.4)',c:'#4fd4e4',oa:'#04101c',fd:'Orbitron',fb:'Rajdhani'},
+  ['vesmir','Sci-Fi', {s:'rgba(8,18,30,.93)',ss:'rgba(4,10,20,.96)',t:'#cfe6f0',h:'#eaf6ff',a:'#2e9fd8',ab:'#4fd4e4',ad:'#0a2438',b:'rgba(79,140,200,.5)',bs:'rgba(79,140,200,.28)',g:'rgba(79,212,228,.4)',c:'#4fd4e4',oa:'#04101c',fd:'Orbitron',fb:'Rajdhani'},
     {strana:'hledam-hru',title:'Hledám stůl na stanici',sys:'Cokoli sci-fi',mode:'Online',seats:'',who:'Halgar · 3 dny'}],
-  ['cyberpunk','Cyberpunk', {s:'rgba(16,16,10,.94)',ss:'rgba(8,8,4,.96)',t:'#e8e6d0',h:'#fff6c0',a:'#e8c020',ab:'#ffe040',b:'rgba(232,192,32,.5)',bs:'rgba(232,192,32,.28)',g:'rgba(232,192,32,.4)',c:'#ffe040',oa:'#0a0a04',fd:'Orbitron',fb:'Rajdhani'},
+  ['cyberpunk','Cyberpunk', {s:'rgba(16,16,10,.94)',ss:'rgba(8,8,4,.96)',t:'#e8e6d0',h:'#fff6c0',a:'#e8c020',ab:'#ffe040',ad:'#3a3208',b:'rgba(232,192,32,.5)',bs:'rgba(232,192,32,.28)',g:'rgba(232,192,32,.4)',c:'#ffe040',oa:'#0a0a04',fd:'Orbitron',fb:'Rajdhani'},
     {strana:'hledam-hru',title:'Decker shání partu',sys:'CP Red',mode:'Online',seats:'',who:'V · 4 h'}],
-  ['steampunk','Steampunk', {s:'rgba(30,22,12,.93)',ss:'rgba(20,14,8,.96)',t:'#e8d8b8',h:'#f0d890',a:'#c08828',ab:'#e0a840',b:'rgba(192,136,40,.5)',bs:'rgba(192,136,40,.28)',g:'rgba(192,136,40,.4)',c:'#e0a840',oa:'#1a1208',fd:'Cinzel',fb:'EB Garamond'},
+  ['steampunk','Steampunk', {s:'rgba(30,22,12,.93)',ss:'rgba(20,14,8,.96)',t:'#e8d8b8',h:'#f0d890',a:'#c08828',ab:'#e0a840',ad:'#3a2810',b:'rgba(192,136,40,.5)',bs:'rgba(192,136,40,.28)',g:'rgba(192,136,40,.4)',c:'#e0a840',oa:'#1a1208',fd:'Cinzel',fb:'EB Garamond'},
     {strana:'hledam-hrace',title:'Aeronauti nad Prahou',sys:'Vlastní',mode:'Naživo · Praha',seats:'1/4',who:'PJ Cog · 5 h'}],
-  ['apokalypsa','Post-apokalypsa', {s:'rgba(24,22,14,.93)',ss:'rgba(16,14,8,.96)',t:'#d8d0b0',h:'#e4d494',a:'#8a9a3a',ab:'#aab850',b:'rgba(138,154,58,.5)',bs:'rgba(138,154,58,.28)',g:'rgba(138,154,58,.4)',c:'#aab850',oa:'#12100a',fd:'Special Elite',fb:'Special Elite'},
+  ['apokalypsa','Post-apokalypsa', {s:'rgba(24,22,14,.93)',ss:'rgba(16,14,8,.96)',t:'#d8d0b0',h:'#e4d494',a:'#8a9a3a',ab:'#aab850',ad:'#2a3014',b:'rgba(138,154,58,.5)',bs:'rgba(138,154,58,.28)',g:'rgba(138,154,58,.4)',c:'#aab850',oa:'#12100a',fd:'Special Elite',fb:'Special Elite'},
     {strana:'hledam-hrace',title:'Karavana do Zóny',sys:'Mutant',mode:'Online',seats:'2/5',who:'PJ Rad · 6 h'}],
-  ['horor','Horor', {s:'rgba(16,12,14,.95)',ss:'rgba(8,6,8,.97)',t:'#cac0c4',h:'#dcc8cc',a:'#8a3038',ab:'#b04048',b:'rgba(120,90,95,.4)',bs:'rgba(120,90,95,.24)',g:'rgba(138,48,56,.4)',c:'#b04048',oa:'#ffffff',fd:'Playfair Display',fb:'EB Garamond'},
+  ['horor','Horor', {s:'rgba(16,12,14,.95)',ss:'rgba(8,6,8,.97)',t:'#cac0c4',h:'#dcc8cc',a:'#8a3038',ab:'#b04048',ad:'#2a1014',b:'rgba(120,90,95,.4)',bs:'rgba(120,90,95,.24)',g:'rgba(138,48,56,.4)',c:'#b04048',oa:'#ffffff',fd:'Playfair Display',fb:'EB Garamond'},
     {strana:'hledam-hrace',title:'Dům na kopci',sys:'Zew Cthulhu',mode:'Naživo · Brno',seats:'1/4',who:'PJ Miku · 5 h'}],
-  ['mystery','Mystery', {s:'rgba(16,18,26,.94)',ss:'rgba(10,12,18,.97)',t:'#c8d0dc',h:'#dce4f0',a:'#5a6ab0',ab:'#8090d0',b:'rgba(100,120,180,.42)',bs:'rgba(100,120,180,.26)',g:'rgba(90,106,176,.4)',c:'#8090d0',oa:'#0a0c12',fd:'Special Elite',fb:'EB Garamond'},
+  ['mystery','Mystery', {s:'rgba(16,18,26,.94)',ss:'rgba(10,12,18,.97)',t:'#c8d0dc',h:'#dce4f0',a:'#5a6ab0',ab:'#8090d0',ad:'#161c34',b:'rgba(100,120,180,.42)',bs:'rgba(100,120,180,.26)',g:'rgba(90,106,176,.4)',c:'#8090d0',oa:'#0a0c12',fd:'Special Elite',fb:'EB Garamond'},
     {strana:'hledam-hru',title:'Detektiv hledá případ',sys:'Gumshoe',mode:'Online',seats:'',who:'Nick · 2 dny'}],
-  ['historie','Historický', {s:'rgba(30,24,14,.93)',ss:'rgba(20,16,8,.96)',t:'#e8dab0',h:'#f0c860',a:'#c8a038',ab:'#f0c860',b:'rgba(200,160,56,.5)',bs:'rgba(200,160,56,.28)',g:'rgba(200,160,56,.4)',c:'#f0c860',oa:'#1a1408',fd:'Cinzel',fb:'EB Garamond'},
+  ['historie','Historický', {s:'rgba(30,24,14,.93)',ss:'rgba(20,16,8,.96)',t:'#e8dab0',h:'#f0c860',a:'#c8a038',ab:'#f0c860',ad:'#3a2c10',b:'rgba(200,160,56,.5)',bs:'rgba(200,160,56,.28)',g:'rgba(200,160,56,.4)',c:'#f0c860',oa:'#1a1408',fd:'Cinzel',fb:'EB Garamond'},
     {strana:'hledam-hrace',title:'Dvůr krále Karla',sys:'GURPS',mode:'Naživo · Praha',seats:'2/6',who:'PJ Kron · včera'}],
-  ['moderni','Současnost', {s:'rgba(24,26,30,.93)',ss:'rgba(16,18,22,.97)',t:'#dce0e6',h:'#f0f2f6',a:'#4a90e2',ab:'#6aaef8',b:'rgba(120,130,145,.35)',bs:'rgba(120,130,145,.2)',g:'rgba(74,144,226,.35)',c:'#6aaef8',oa:'#ffffff',fd:'system-ui',fb:'system-ui'},
+  ['moderni','Současnost', {s:'rgba(24,26,30,.93)',ss:'rgba(16,18,22,.97)',t:'#dce0e6',h:'#f0f2f6',a:'#4a90e2',ab:'#6aaef8',ad:'#122438',b:'rgba(120,130,145,.35)',bs:'rgba(120,130,145,.2)',g:'rgba(74,144,226,.35)',c:'#6aaef8',oa:'#ffffff',fd:'system-ui',fb:'system-ui'},
     {strana:'hledam-hru',title:'Hráč shání městskou hru',sys:'Vampire',mode:'Online',seats:'',who:'Alex · 1 h'}],
-  ['western','Western', {s:'rgba(28,20,12,.94)',ss:'rgba(18,12,6,.97)',t:'#e0d0b0',h:'#f0dcb0',a:'#b06828',ab:'#d08840',b:'rgba(176,104,40,.5)',bs:'rgba(176,104,40,.28)',g:'rgba(176,104,40,.4)',c:'#d08840',oa:'#1a1006',fd:'Rye',fb:'Special Elite'},
+  ['western','Western', {s:'rgba(28,20,12,.94)',ss:'rgba(18,12,6,.97)',t:'#e0d0b0',h:'#f0dcb0',a:'#b06828',ab:'#d08840',ad:'#3a2410',b:'rgba(176,104,40,.5)',bs:'rgba(176,104,40,.28)',g:'rgba(176,104,40,.4)',c:'#d08840',oa:'#1a1006',fd:'Rye',fb:'Special Elite'},
     {strana:'hledam-hrace',title:'Hledá se posila do posse',sys:'Deadlands',mode:'Naživo · Ostrava',seats:'3/5',who:'PJ Cassidy · 3 h'}],
 ];
 
 function seatDots(str){ if(!str) return ''; const [t,tot]=str.split('/').map(Number); let d=''; for(let i=0;i<tot;i++) d+=`<i class="${i<t?'full':''}"></i>`; return `<span class="k">Místa: <span class="seats">${d}</span> ${str}</span>`; }
 
 document.getElementById('grid').innerHTML = M.map(([id,name,p,d])=>{
-  const vars=`--theme-surface:${p.s};--theme-surface-strong:${p.ss};--theme-text:${p.t};--theme-text-muted:${p.t}bb;--theme-heading:${p.h};--theme-accent:${p.a};--theme-accent-bright:${p.ab};--theme-border:${p.b};--theme-border-soft:${p.bs};--theme-glow-gold:${p.g};--theme-glow-cyan:${p.g};--theme-accent-cyan:${p.c};--text-on-accent:${p.oa};--font-display:'${p.fd}',serif;--font-body:'${p.fb}',serif;`;
+  const vars=`--theme-surface:${p.s};--theme-surface-strong:${p.ss};--theme-text:${p.t};--theme-text-muted:${p.t}bb;--theme-heading:${p.h};--theme-accent:${p.a};--theme-accent-bright:${p.ab};--theme-accent-dim:${p.ad};--theme-border:${p.b};--theme-border-soft:${p.bs};--theme-glow-gold:${p.g};--theme-glow-cyan:${p.g};--theme-accent-cyan:${p.c};--text-on-accent:${p.oa};--white-rgb:255 255 255;--black-rgb:0 0 0;--font-display:'${p.fd}',serif;--font-body:'${p.fb}',serif;`;
   const stranaLabel = d.strana==='hledam-hrace'?'Hledám hráče':'Hledám hru';
   return `<div data-nabor-motiv="${id}"><div class="motiv-name">${name}</div>
     <article class="card" data-nabor-card data-strana="${d.strana}" style="${vars}">
