@@ -65,7 +65,7 @@
      dlouhý název tlačí nav do hledání (celý název je v title tooltipu). */
   min-width: 0;
   flex-shrink: 1;
-  max-width: min(30vw, 340px);
+  max-width: min(22vw, 240px);
   overflow: hidden;
   text-overflow: ellipsis;
 }
