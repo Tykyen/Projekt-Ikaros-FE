@@ -122,6 +122,9 @@ export interface User {
   lastSeenAt: string;
   createdAt: string;
   updatedAt: string;
+  /** 19.4 — freemium status Podporovatel. */
+  isSupporter?: boolean;
+  supporterSince?: string;
 }
 
 /** 8.3 / D-075 — položka v cross-world přehledu „moje postavy" na profilu. */
@@ -189,6 +192,8 @@ export interface AdminUsersListItem {
   isDeleted?: boolean;
   createdAt: string;
   lastLoginAt?: string;
+  /** 19.4 — status Podporovatel (badge v adresáři admina). */
+  isSupporter?: boolean;
 }
 
 // D-024 — Admin audit log
@@ -202,6 +207,8 @@ export type AdminAuditAction =
   | 'BAN'
   | 'UNBAN'
   | 'ROLE_CHANGE'
+  | 'SUPPORTER_GRANT'
+  | 'SUPPORTER_REVOKE'
   | 'PERMISSIONS_CHANGE'
   | 'ADMIN_PERMISSIONS_CHANGE'
   | 'USER_CREATE'
@@ -1136,6 +1143,9 @@ export interface PublicUserListItem {
   role: UserRole;
   worldsCount: number;
   createdAt: string;
+  /** 19.4 — status Podporovatel + kdy (badge v adresáři + zeď). */
+  isSupporter?: boolean;
+  supporterSince?: string;
   /** Admin-only flag (jen pokud requester je Admin/Superadmin + includeDeleted=1) */
   pendingDeletion?: boolean;
   /** Admin-only flag (jen pokud requester je Admin/Superadmin + includeDeleted=1) */
@@ -1145,6 +1155,16 @@ export interface PublicUserListItem {
 export interface PublicUsersListResponse {
   items: PublicUserListItem[];
   total: number;
+}
+
+/** 19.4 — položka zdi podporovatelů (veřejný GET /users/supporters). */
+export interface SupporterListItem {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+  defaultAvatarType?: DefaultAvatarType;
+  supporterSince: string | null;
 }
 
 export interface PublicUserProfile {
@@ -1161,6 +1181,9 @@ export interface PublicUserProfile {
   role: UserRole;
   worldsCount: number;
   createdAt: string;
+  /** 19.4 — status Podporovatel + kdy (badge na profilu). */
+  isSupporter?: boolean;
+  supporterSince?: string;
   /** 1.5 D-050 — kdy byl naposledy aktivní. `null` pro hiddenPresence/tombstone. */
   lastSeenAt: string | null;
   /** 1.4 §15 — poslední přihlášení; přijde JEN platformovému Adminovi. */

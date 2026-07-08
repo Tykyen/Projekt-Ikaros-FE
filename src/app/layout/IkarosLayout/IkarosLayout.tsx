@@ -14,6 +14,7 @@ import {
   PlusCircle,
   Palette,
   HelpCircle,
+  HandHeart,
   Beer,
   Signpost,
   MessageSquare,
@@ -110,6 +111,7 @@ type NavItemDef = {
 const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'uvodnik',       label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
   { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
+  { navKey: 'podporovatele', label: 'Podporovatelé', to: '/ikaros/podporovatele',             icon: <HandHeart size={18} /> },
   // 15B.4a — veřejný rozcestník landing stránek RPG systémů (anon i člen)
   { navKey: 'systemy',       label: 'RPG systémy',   to: '/ikaros/systemy',                   icon: <Dices size={18} /> },
   // 21.5 — Diskuze/Články/Galerie sloučeny do rozcestníku „Společná tvorba";

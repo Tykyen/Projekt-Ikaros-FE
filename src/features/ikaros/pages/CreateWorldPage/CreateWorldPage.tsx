@@ -169,6 +169,10 @@ export default function CreateWorldPage() {
         toast.error(
           'Dosáhl jsi limitu 30 aktivních světů. Smaž některý nebo požádej admina.',
         );
+      } else if (code === 'WORLD_MEMBERSHIP_QUOTA_REACHED') {
+        toast.error(
+          'Bez podpory můžeš být max ve 3 světech. Staň se podporovatelem (Uživatelé → Podporovatelé), nebo některý svět opusť.',
+        );
       } else {
         toast.error('Vytvoření světa selhalo. Zkus to znovu.');
       }

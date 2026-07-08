@@ -28,6 +28,11 @@ const ROLE_STAR: Partial<Record<UserRole, RoleStarConfig>> = {
   [UserRole.SpravceGalerie]: { className: s.starSpravceGalerie, label: 'Správce galerie' },
 };
 
+/** 19.4 — má daná role hvězdu? (IdentityBadge: hvězda role > odznak podporovatele > nic). */
+export function roleHasStar(role: UserRole): boolean {
+  return ROLE_STAR[role] != null;
+}
+
 export function RoleStar({ role, size = 'md', showLabel = false, className }: Props) {
   const config = ROLE_STAR[role];
   if (!config) return null;

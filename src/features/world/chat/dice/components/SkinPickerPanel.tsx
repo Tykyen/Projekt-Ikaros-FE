@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Skull, Heart } from 'lucide-react';
+import { X, Check, Skull, Heart, Lock } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { isEffectiveSupporter } from '@/shared/lib/supporter';
 import {
   GROUP_ORDER,
   GROUP_LABELS,
@@ -51,6 +55,9 @@ export function SkinPickerPanel({
 }: SkinPickerPanelProps) {
   const { getSkin, setSkin, jailed, toggleJail, isJailed } =
     useDiceSkinMapping(worldId);
+  // 19.4 — prémiové skiny + vězení jen podporovatelům (BE je autorita).
+  const me = useAtomValue(currentUserAtom);
+  const supporter = me ? isEffectiveSupporter(me.role, me.isSupporter) : false;
   const [activeType, setActiveType] = useState<string>('default');
   const [activeGroup, setActiveGroup] = useState<string>(GROUP_ORDER[0]);
   const [showingJail, setShowingJail] = useState(false);
@@ -74,7 +81,7 @@ export function SkinPickerPanel({
   const [prevOpen, setPrevOpen] = useState(open);
   if (open !== prevOpen) {
     setPrevOpen(open);
-    if (open) setShowingJail(initialJail);
+    if (open) setShowingJail(initialJail && supporter);
   }
 
   if (!open) return null;
@@ -120,6 +127,8 @@ export function SkinPickerPanel({
               const free = (grouped[slug] ?? []).filter(
                 (m) => !jailed.includes(m.id),
               ).length;
+              // 19.4 — nepodporovatel: „běžné" odemčené, ostatní zamčené 🔒 (marketing).
+              const locked = !supporter && slug !== 'bezne';
               return (
                 <button
                   key={slug}
@@ -129,29 +138,49 @@ export function SkinPickerPanel({
                       ? styles.catBtnActive
                       : ''
                   }`}
+                  style={
+                    locked ? { opacity: 0.55, cursor: 'not-allowed' } : undefined
+                  }
                   onClick={() => {
+                    if (locked) {
+                      toast(
+                        'Prémiové kostky jsou poděkování pro podporovatele.',
+                      );
+                      return;
+                    }
                     setShowingJail(false);
                     setActiveGroup(slug);
                   }}
                 >
-                  <span>{GROUP_LABELS[slug] ?? slug}</span>
+                  <span>
+                    {GROUP_LABELS[slug] ?? slug}
+                    {locked && (
+                      <Lock
+                        size={11}
+                        aria-hidden="true"
+                        style={{ marginLeft: 5, verticalAlign: '-1px' }}
+                      />
+                    )}
+                  </span>
                   <span className={styles.catCount}>({free})</span>
                 </button>
               );
             })}
-            <button
-              type="button"
-              className={`${styles.catBtn} ${styles.jailBtn} ${
-                showingJail ? styles.catBtnActive : ''
-              }`}
-              onClick={() => setShowingJail(true)}
-              title="Materiály, které jste poslal do vězení za smolné hody"
-            >
-              <span>
-                <Skull size={12} aria-hidden="true" /> Vězení
-              </span>
-              <span className={styles.catCount}>({jailed.length})</span>
-            </button>
+            {supporter && (
+              <button
+                type="button"
+                className={`${styles.catBtn} ${styles.jailBtn} ${
+                  showingJail ? styles.catBtnActive : ''
+                }`}
+                onClick={() => setShowingJail(true)}
+                title="Materiály, které jste poslal do vězení za smolné hody"
+              >
+                <span>
+                  <Skull size={12} aria-hidden="true" /> Vězení
+                </span>
+                <span className={styles.catCount}>({jailed.length})</span>
+              </button>
+            )}
           </aside>
 
           <main className={styles.grid}>
@@ -202,26 +231,28 @@ export function SkinPickerPanel({
                       <Check size={12} />
                     </span>
                   )}
-                  <button
-                    type="button"
-                    className={`${styles.jailToggle} ${jailedMat ? styles.jailToggleFree : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleJail(mat.id);
-                    }}
-                    title={jailedMat ? 'Omilostnit' : 'Uvěznit'}
-                    aria-label={
-                      jailedMat
-                        ? `Omilostnit materiál ${mat.name}`
-                        : `Uvěznit materiál ${mat.name}`
-                    }
-                  >
-                    {jailedMat ? (
-                      <Heart size={12} aria-hidden="true" />
-                    ) : (
-                      <Skull size={12} aria-hidden="true" />
-                    )}
-                  </button>
+                  {supporter && (
+                    <button
+                      type="button"
+                      className={`${styles.jailToggle} ${jailedMat ? styles.jailToggleFree : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleJail(mat.id);
+                      }}
+                      title={jailedMat ? 'Omilostnit' : 'Uvěznit'}
+                      aria-label={
+                        jailedMat
+                          ? `Omilostnit materiál ${mat.name}`
+                          : `Uvěznit materiál ${mat.name}`
+                      }
+                    >
+                      {jailedMat ? (
+                        <Heart size={12} aria-hidden="true" />
+                      ) : (
+                        <Skull size={12} aria-hidden="true" />
+                      )}
+                    </button>
+                  )}
                 </div>
               );
             })}

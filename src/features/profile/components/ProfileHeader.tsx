@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Button, Input, RoleStar, UserAvatar } from '@/shared/ui';
+import { Button, IdentityBadge, Input, UserAvatar } from '@/shared/ui';
 import { AvatarUploader } from './AvatarUploader';
 import { ChangeEmailModal } from './ChangeEmailModal';
 import {
@@ -120,7 +120,11 @@ export function ProfileHeader({ user }: Props) {
         <div className={styles.fields}>
           <div className={styles.titleRow}>
             <h1 className={styles.username}>OSOBNÍ KARTA</h1>
-            <RoleStar role={user.role} size="md" />
+            <IdentityBadge
+              role={user.role}
+              isSupporter={user.isSupporter}
+              size="md"
+            />
             {!editing && (
               <Button
                 type="button"

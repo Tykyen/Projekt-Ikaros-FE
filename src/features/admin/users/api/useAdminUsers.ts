@@ -139,6 +139,36 @@ export function useAdminUpdateRole() {
   });
 }
 
+/** 19.4 — admin uděluje/odebírá status Podporovatel. */
+export function useAdminSetSupporter() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      isSupporter,
+    }: {
+      userId: string;
+      isSupporter: boolean;
+    }) =>
+      api.patch<User>(`/admin/users/${userId}/supporter`, { isSupporter }),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      qc.invalidateQueries({ queryKey: ['public-user-profile'] });
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
+      toast.success(
+        vars.isSupporter
+          ? 'Status Podporovatel udělen'
+          : 'Status Podporovatel odebrán',
+      );
+    },
+    onError: (err) => {
+      toast.error(parseApiError(err));
+    },
+  });
+}
+
 export function useAdminBanUser() {
   const qc = useQueryClient();
   return useMutation({

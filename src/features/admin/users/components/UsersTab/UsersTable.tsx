@@ -6,7 +6,7 @@ import {
   Button,
   ConfirmDialog,
   EmptyState,
-  RoleStar,
+  IdentityBadge,
   Spinner,
   UserAvatar,
 } from '@/shared/ui';
@@ -15,6 +15,7 @@ import { UserRole, type AdminUsersListItem } from '@/shared/types';
 import { ROLE_LABELS, ASSIGNABLE_ROLES } from '@/shared/types/userRoleLabels';
 import {
   useAdminUpdateRole,
+  useAdminSetSupporter,
   useAdminUnbanUser,
   useAdminSetAdminPermissions,
   useAdminCancelDeletion,
@@ -52,6 +53,7 @@ export function UsersTable({
 }: Props) {
   const currentUser = useAtomValue(currentUserAtom);
   const updateRole = useAdminUpdateRole();
+  const setSupporter = useAdminSetSupporter();
   const unban = useAdminUnbanUser();
   const setPerms = useAdminSetAdminPermissions();
   const cancelDeletion = useAdminCancelDeletion();
@@ -179,7 +181,11 @@ export function UsersTable({
                   </td>
                   <td data-label="Role">
                     <span className={s.roleCell}>
-                      <RoleStar role={u.role} size="sm" />
+                      <IdentityBadge
+                        role={u.role}
+                        isSupporter={u.isSupporter}
+                        size="sm"
+                      />
                       {ROLE_LABELS[u.role]}
                       {u.adminPermissions?.canManageAdmins && (
                         <Badge variant="accent" icon={<KeyRound size={12} />}>
@@ -256,6 +262,25 @@ export function UsersTable({
                           </option>
                         ))}
                       </select>
+
+                      <button
+                        type="button"
+                        className={s.actionsButton}
+                        disabled={setSupporter.isPending}
+                        onClick={() =>
+                          setSupporter.mutate({
+                            userId: u.id,
+                            isSupporter: !u.isSupporter,
+                          })
+                        }
+                        title={
+                          u.isSupporter
+                            ? 'Odebrat status Podporovatel'
+                            : 'Udělit status Podporovatel'
+                        }
+                      >
+                        {u.isSupporter ? '★ Podporovatel' : 'Udělit podporu'}
+                      </button>
 
                       {u.bannedAt ? (
                         <button

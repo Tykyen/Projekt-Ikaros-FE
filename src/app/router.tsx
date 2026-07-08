@@ -24,6 +24,7 @@ const CampPage     = lazy(() => import('@/features/chat/pages/CampPage'));
 const VoiceKrcmaPage = lazy(() => import('@/features/voice/pages/VoiceKrcmaPage'));
 const WorldsPage       = lazy(() => import('@/features/ikaros/pages/WorldsPage'));
 const CreateWorldPage  = lazy(() => import('@/features/ikaros/pages/CreateWorldPage'));
+const SupportersPage   = lazy(() => import('@/features/ikaros/pages/SupportersPage'));
 const ProfilePage      = lazy(() => import('@/features/profile/pages/ProfilePage'));
 const ResetPasswordPage      = lazy(() => import('@/features/auth/pages/ResetPasswordPage'));
 const EmailVerifyPage        = lazy(() => import('@/features/auth/pages/EmailVerifyPage'));
@@ -181,6 +182,7 @@ export const router = createBrowserRouter([
       { path: 'ikaros/kouzla',          element: p(ComingSoonPage) },
       { path: 'ikaros/hadanky',         element: p(ComingSoonPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
+      { path: 'ikaros/podporovatele',   element: p(SupportersPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug
       { path: 'ikaros/systemy',         element: p(SystemsHubPage) },
       { path: 'ikaros/systemy/:slug',   element: p(SystemLandingPage) },

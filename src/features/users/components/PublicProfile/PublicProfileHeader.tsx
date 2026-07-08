@@ -1,5 +1,5 @@
 import { Calendar, Globe2, MapPin, Clock } from 'lucide-react';
-import { UserAvatar } from '@/shared/ui';
+import { UserAvatar, SupporterBadge, roleHasStar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { useIsOnline } from '@/shared/presence/usePresence';
 import { relativeTimeCs } from '@/shared/lib/relativeTime';
@@ -45,6 +45,9 @@ export function PublicProfileHeader({ profile }: Props) {
         <div className={s.headerTitleRow}>
           <h2 className={s.headerUsername}>{profile.username}</h2>
           <RoleChip role={profile.role} />
+          {profile.isSupporter && !roleHasStar(profile.role) && (
+            <SupporterBadge size="md" />
+          )}
         </div>
         {profile.displayName && (
           <p className={s.headerDisplayName}>{profile.displayName}</p>

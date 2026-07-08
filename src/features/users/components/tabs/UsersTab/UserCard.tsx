@@ -1,6 +1,6 @@
 import { MapPin, Globe2, MoreVertical } from 'lucide-react';
 import clsx from 'clsx';
-import { UserAvatar } from '@/shared/ui';
+import { UserAvatar, SupporterBadge, roleHasStar } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { RoleChip } from '../../shared/RoleChip';
 import type { PublicUserListItem } from '@/shared/types';
@@ -84,6 +84,9 @@ export function UserCard({ user, onOpen, onKebab }: UserCardProps) {
       )}
 
       <RoleChip role={user.role} size="sm" />
+      {user.isSupporter && !roleHasStar(user.role) && (
+        <SupporterBadge size="sm" />
+      )}
 
       <div className={s.meta}>
         {user.city && (

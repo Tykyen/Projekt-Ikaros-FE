@@ -649,7 +649,9 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE:** ~~kvóty +~~ počítadla (✅); kvóty/vynucení = další krok.
 **Otevřené otázky:** Výše kvót? Co dělat při překročení (blok vs. upozornění)? → řeší navazující krok vynucování.
 
-### - [ ] 19.4 Model podpory (dary / „podporovatel") — [Příloha B]
+### - [~] 19.4 Model podpory (freemium „podporovatel") — [Příloha B]
+<!-- 2026-07-08: IMPLEMENTOVÁNO (spec-19.4, režim A2). Flag isSupporter+supporterSince na User; efektivní podporovatel = flag || tým-role; gating (3 světy / prémiové skiny kostek / vězení); odznak Ikara (IdentityBadge, priorita hvězda>odznak>nic); admin toggle + audit; veřejná stránka /ikaros/podporovatele + zeď (GET /users/supporters). BE typecheck + FE build zelené. Čeká BE restart + mobil-desktop + funkce/napoveda + commit. Kanál na dary = placeholder; provozní ukazatel odložen; právní review před ostrým během. -->
+
 <!-- 2026-07-08: přečíslováno z chybného „19.2" (kolize se 19.2 Náklady) na 19.4 — sedí na H5 v tabulce fází („19.4 dary"). -->
 **Cíl:** Dobrovolné dary/Patreon na provoz; drobná kosmetika jako poděkování (nikdy herní výhoda). + možnosti nástvby
 **Proč:** Komunita ráda přispěje na projekt, který má ráda; štědrý free základ zůstává konkurenční výhodou.
