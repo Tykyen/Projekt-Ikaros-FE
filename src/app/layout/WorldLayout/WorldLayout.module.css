@@ -19,12 +19,15 @@
 
 /* ── Header ── */
 .header {
-  height: var(--header-h);
+  min-height: var(--header-h);
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: 0 var(--sp-4);
+  /* 19.4-followup — při přeplnění (dlouhý název + full nav + akce) se topbar
+     zalomí na 2. řádek místo překryvu nav/hledání; jinak 1 řádek jako dřív. */
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -65,7 +68,7 @@
      dlouhý název tlačí nav do hledání (celý název je v title tooltipu). */
   min-width: 0;
   flex-shrink: 1;
-  max-width: min(22vw, 240px);
+  max-width: min(32vw, 360px);
   overflow: hidden;
   text-overflow: ellipsis;
 }
