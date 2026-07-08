@@ -9,6 +9,7 @@
  * sbalení bez překryvu).
  */
 import { useState } from 'react';
+import { HelpCircle } from 'lucide-react';
 import styles from './MapToolDock.module.css';
 
 interface Props {
@@ -18,6 +19,12 @@ interface Props {
   storageKey: string;
   /** Výchozí sbalený stav, pokud v LS nic není. */
   defaultCollapsed?: boolean;
+  /**
+   * 17.13 — opt-in „?" nápověda v hlavičce. Objeví se jen když je předán;
+   * ostatní docky (Mlha, Zobrazení) zůstávají beze změny. Klik má
+   * `stopPropagation`, takže nepřepne sbalení docku.
+   */
+  onHelp?: () => void;
   children: React.ReactNode;
 }
 
@@ -25,6 +32,7 @@ export function MapToolDock({
   title,
   storageKey,
   defaultCollapsed = false,
+  onHelp,
   children,
 }: Props): React.ReactElement {
   // v2: dřív se výchozí stav zapisoval do LS hned při mountu (eager) → změna
@@ -55,16 +63,41 @@ export function MapToolDock({
       role="toolbar"
       aria-label="Nástroje mapy"
     >
-      <button
-        type="button"
+      {/* 17.13 — header je `div role=button` (ne `<button>`), aby mohl obsahovat
+          vnořené „?" tlačítko (button-in-button je nevalidní). */}
+      <div
         className={styles.header}
         onClick={toggle}
+        role="button"
+        tabIndex={0}
         aria-expanded={!collapsed}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        }}
         title={collapsed ? 'Rozbalit nástroje' : 'Sbalit nástroje'}
       >
         <span className={styles.headerLabel}>{title}</span>
-        <span className={styles.chevron}>{collapsed ? '▸' : '▾'}</span>
-      </button>
+        <div className={styles.headerActions}>
+          {onHelp && (
+            <button
+              type="button"
+              className={styles.help}
+              aria-label="Nápověda k panelu"
+              title="Nápověda k panelu"
+              onClick={(e) => {
+                e.stopPropagation();
+                onHelp();
+              }}
+            >
+              <HelpCircle size={15} aria-hidden="true" />
+            </button>
+          )}
+          <span className={styles.chevron}>{collapsed ? '▸' : '▾'}</span>
+        </div>
+      </div>
 
       {!collapsed && <div className={styles.body}>{children}</div>}
     </div>

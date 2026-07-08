@@ -119,6 +119,7 @@ import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
 import { MapNotebookButton } from "./components/notebook/MapNotebookButton";
 import { MapNotebookOverlay } from "./components/notebook/MapNotebookOverlay";
 import { WorldHelpModal, TacticalMapHelp } from "@/features/world/help";
+import { EfektyKresleniHelp } from "./components/effects/EfektyKresleniHelp";
 import { useGmNotes, useUpdateGmNotes } from "./api/useGmNotes";
 import { useCharacterNotes } from "@/features/world/pages/api/useCharacterSubdocs";
 import { useUpdateCharacterNotes } from "@/features/world/pages/api/useCharacterMutations";
@@ -458,6 +459,10 @@ export function TacticalMapView(): React.ReactElement {
   useEffect(() => {
     const bg = appRef.current?.renderer?.background;
     if (!bg) return;
+    // `renderer.background` je imperativní PIXI objekt (externí knihovna, ne
+    // React hodnota) — mutace barvy/alfy je záměr (viz 17.9, prop `background`
+    // se po initu nepřekresluje). Pravidlo `immutability` je zde false-positive.
+    /* eslint-disable react-hooks/immutability */
     if (streamActive) {
       bg.color = STREAM_CHROMA[streamBg];
       bg.alpha = streamBg === "transparent" ? 0 : 1;
@@ -465,6 +470,7 @@ export function TacticalMapView(): React.ReactElement {
       bg.color = theme.canvasBg;
       bg.alpha = 1;
     }
+    /* eslint-enable react-hooks/immutability */
   }, [streamActive, streamBg, theme.canvasBg]);
 
   const startStreamMode = useCallback(() => {
@@ -651,6 +657,8 @@ export function TacticalMapView(): React.ReactElement {
   // na stránce postavy). Oba hooky volány vždy, gated přes `enabled`/slug.
   const [notebookOpen, setNotebookOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  // 17.13 — nápověda panelu „Efekty & kreslení" (samostatný modal).
+  const [effectsHelpOpen, setEffectsHelpOpen] = useState(false);
   const playerSlug = mySlugs[0] ?? "";
   const gmNotes = useGmNotes(worldId ?? "", isPJ);
   const gmNotesMut = useUpdateGmNotes(worldId ?? "");
@@ -2346,6 +2354,7 @@ export function TacticalMapView(): React.ReactElement {
               title="🎨 Efekty & kreslení"
               storageKey="effects"
               defaultCollapsed
+              onHelp={() => setEffectsHelpOpen(true)}
             >
             {isPJ && (
               <EffectsPalette
@@ -2464,6 +2473,16 @@ export function TacticalMapView(): React.ReactElement {
         size="lg"
       >
         <TacticalMapHelp audience={isPJ ? "pj" : "hrac"} />
+      </WorldHelpModal>
+
+      {/* 17.13 — modal s nápovědou k panelu „Efekty & kreslení". */}
+      <WorldHelpModal
+        open={effectsHelpOpen}
+        onClose={() => setEffectsHelpOpen(false)}
+        title="Efekty & kreslení — nápověda"
+        size="lg"
+      >
+        <EfektyKresleniHelp audience={isPJ ? "pj" : "hrac"} />
       </WorldHelpModal>
 
       {/* Text anotace (kreslicí nástroj „Text") — náhrada nativního window.prompt

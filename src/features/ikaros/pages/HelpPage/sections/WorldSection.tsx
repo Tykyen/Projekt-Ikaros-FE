@@ -463,6 +463,11 @@ export function WorldSection() {
               (soustředné kruhy se zraněním, varianty oheň/plyn/kouř). Guma maže,
               koš smaže vše. Efekty vidí všichni v reálném čase.
             </p>
+            <p>
+              Přímo v panelu „Efekty &amp; kreslení" je <strong>tlačítko „?"</strong> s
+              nápovědou ke všem nástrojům (co dělá bariéra, výbuch, šablona, kreslení) —
+              obsah se přizpůsobí roli (hráč vidí jen kreslení, když mu ho PJ povolí).
+            </p>
           </MapFeature>
           <MapFeature icon={<Triangle size={15} />} title="Šablony oblastí (kouzla)">
             <p>
@@ -522,6 +527,14 @@ export function WorldSection() {
               přepíná se mezi nimi, deaktivuje je, přiřazuje hráče. V sekci „Přístup a
               viditelnost" může mapu hráčům skrýt (👁/🚫) nebo zamknout pohyb (🔓/🔒),
               hromadně i jednotlivě. Knihovna map ukládá scénu jako šablonu (per-PJ).
+            </p>
+            <p>
+              Scénu naplníš přes <strong>aktivní set</strong>: v paletách PC / NPC /
+              Bestiář přes „+ z katalogu" vybereš, kdo je na scéně k dispozici, a pak
+              figurku <strong>klikem nebo přetažením položíš na hex</strong>. NPC a
+              bestie jde klást víc kopií po sobě. Celý postup „od prázdné mapy k boji"
+              najdeš přímo v panelu pod <strong>tlačítkem „?"</strong> (nápověda
+              orchestrace).
             </p>
           </MapFeature>
           <MapFeature icon={<CloudSun size={15} />} title="Počasí na mapě">

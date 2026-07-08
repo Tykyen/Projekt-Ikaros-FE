@@ -253,6 +253,17 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Read gate:** hráč GETne jen scénu s `currentSceneId === scene.id`, jinak 403 `MAP_FORBIDDEN_OTHER_SCENE` (anti-enumerace). PJ vidí vše, orchestrátor read `?isActive=true` je PomocnyPJ+ (R-11 — dřív anonymní dump).
 - **Kód:** BE `operations/world-operations.service.ts`, `operations-authorizer.ts:242`. FE `components/pj-panel/{MapPjPanel,ActiveScenesList,AccessBoard}.tsx`, `hooks/{useActiveScenes,useReassignmentListener}.ts`.
 
+### Nápověda mapových panelů (17.13)
+- **Co to je:** Dedikovaná kontextová nápověda přímo v hlavičce mapových panelů (tlačítko „?"): (a) **Orchestrace** — slovníček (scéna / aktivní scéna / aktivní set / přiřazení / viditelnost), rychlý start (od prázdné mapy k boji), rozpad akcí; (b) **Efekty & kreslení** — efekty (barevná pole / bariéra-DC / výbuch / šablona / guma / koš) + kreslení (čára/šipka/kruh/text, barva, viditelnost, mazání).
+- **Kde:** „?" v hlavičce panelu → `WorldHelpModal` (size `lg`). Orchestrace: `MapPjPanel` → `OrchestraceHelp`. Efekty: `MapToolDock` (dock `tools-effects`, opt-in prop `onHelp`) → `EfektyKresleniHelp`. Reuse in-situ vzoru z 13.6; patička odkazuje na plnou nápovědu.
+- **Kdo:**
+  - Orchestrace — jen PJ (panel PJ-only). Role-aware `canManageScenes` (= `isPjStrict`): PomocnyPJ vidí u tvorby scén „jen plný PJ" (zrcadlí BE `maps.assertCanManage` = `>= WorldRole.PJ`).
+  - Efekty & kreslení — panel vidí PJ **i hráč** (když `canDraw = isPJ || scene.config.allowPlayerDrawing`). Nápověda role-aware `audience` (`pj`|`hrac`): hráč vidí jen sekci **Kreslení** (efekty jsou PJ-only, BE odmítne `effect.*` i `drawing.clear` hráči; hráč smí jen `drawing.add/remove` vlastní). Žádný server gate na nápovědu.
+- **Hranice / co neumí:** Nezrcadlí se do cheat-sheetu iniciativní lišty (`TacticalMapHelp`). Obsah statický (ne generovaný z reálného stavu scény). Ostatní docky (Mlha, Zobrazení) „?" zatím nemají (opt-in vzor připraven).
+- **Zvláštnosti:** „?" klik má `stopPropagation` → nepřepne sbalení panelu/docku. `MapToolDock` header přepsán z `<button>` na `<div role="button">` (+ keyboard toggle), aby šlo vnořit „?" (button-in-button nevalidní). Zrcadleno do `HelpPage → WorldSection`.
+- **Stav:** ✅ funguje (build ✓, testy 5+3 ✓; čeká živý touch/vzhled test).
+- **Kód:** FE `components/pj-panel/{OrchestraceHelp,MapPjPanel}.tsx`, `components/effects/EfektyKresleniHelp.tsx`, `components/MapToolDock.tsx`, `TacticalMapView.tsx`, `features/world/help/*`, `shared/ui/help/*`. Zrcadlo `features/ikaros/pages/HelpPage/sections/WorldSection.tsx`. Spec `docs/arch/phase-17/spec-17.13-napoveda-orchestrace.md`.
+
 ### Knihovna map (per-PJ, cross-world)
 - **Co to je:** Šablony scén — znovupoužitelné mapy. **Per-PJ privátní** (`ownerId` server-enforced), **cross-world** (template nemá worldId, lze aplikovat v jiném světě). Full snapshot **kromě PC tokenů** (server-side `filterOutPcTokens` — jinak by leakl cizí `characterId`).
 - PJ uloží aktuální scénu jako šablonu, načte šablonu na scénu (sekvence ops: image+config+fog+effects+npc...). Admin+ vidí všechny.

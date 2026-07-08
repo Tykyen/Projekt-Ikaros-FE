@@ -34,6 +34,9 @@ import { UvttParseError } from '../../import/parseUvtt';
 import { useResolvedSystemId } from '@/features/world/useResolvedSystemId';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
+import { HelpCircle } from 'lucide-react';
+import { WorldHelpModal } from '@/features/world/help';
+import { OrchestraceHelp } from './OrchestraceHelp';
 import type { SpawnPayload } from '../../utils/spawnPayload';
 import type { MapScene, WorldOperation } from '../../types';
 import styles from './MapPjPanel.module.css';
@@ -94,6 +97,8 @@ export function MapPjPanel({
   );
   const [showLibrary, setShowLibrary] = useState(false);
   const [showLoadPrep, setShowLoadPrep] = useState(false);
+  // 17.13 — dedikovaná nápověda orchestrace (modal).
+  const [helpOpen, setHelpOpen] = useState(false);
   /**
    * 10.2c-edit-1 — sceneId pro pending deactivate confirm dialog. null =
    * dialog zavřený. Po confirm → spustí deactivateMutation → set zpět null.
@@ -255,23 +260,38 @@ export function MapPjPanel({
         }}
       >
         <span className={styles.title}>⚙ Orchestrace</span>
-        {onMinimize && (
+        <div className={styles.titleActions}>
+          {/* 17.13 — dedikovaná nápověda orchestrace. */}
           <button
             type="button"
-            className={styles.minBtn}
-            aria-label="Zmenšit do lišty"
-            title="Zmenšit do lišty"
+            className={styles.helpBtn}
+            aria-label="Nápověda k orchestraci"
+            title="Nápověda k orchestraci"
             onClick={(e) => {
               e.stopPropagation();
-              onMinimize();
+              setHelpOpen(true);
             }}
           >
-            —
+            <HelpCircle size={16} aria-hidden="true" />
           </button>
-        )}
-        <span className={`${styles.chevron} ${expanded ? styles.chevronOpen : ''}`}>
-          ▾
-        </span>
+          {onMinimize && (
+            <button
+              type="button"
+              className={styles.minBtn}
+              aria-label="Zmenšit do lišty"
+              title="Zmenšit do lišty"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMinimize();
+              }}
+            >
+              —
+            </button>
+          )}
+          <span className={`${styles.chevron} ${expanded ? styles.chevronOpen : ''}`}>
+            ▾
+          </span>
+        </div>
       </header>
 
       {expanded && (
@@ -559,6 +579,15 @@ export function MapPjPanel({
           }}
         />
       )}
+      {/* 17.13 — dedikovaná nápověda orchestrace (role-aware dle isPjStrict). */}
+      <WorldHelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        title="Orchestrace — nápověda"
+        size="lg"
+      >
+        <OrchestraceHelp canManageScenes={isPjStrict} />
+      </WorldHelpModal>
     </aside>
   );
 }

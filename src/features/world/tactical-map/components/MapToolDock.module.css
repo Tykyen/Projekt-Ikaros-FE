@@ -86,9 +86,42 @@
   white-space: nowrap;
 }
 
+/* 17.13 — pravá skupina hlavičky („?" nápověda + chevron). */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 17.13 — „?" nápověda panelu (opt-in přes onHelp). */
+.help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  background: none;
+  border: none;
+  color: rgb(var(--map-ui-accent-rgb) / 0.8);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.help:hover {
+  color: var(--map-toolbar-text);
+  background: rgb(var(--map-ui-accent-rgb) / 0.2);
+}
+
 .chevron {
   opacity: 0.7;
   font-size: 11px;
+}
+
+@media (max-width: 480px) {
+  /* Touch terč „?" na dotyku. */
+  .help {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 6px;
+  }
 }
 
 .body {
