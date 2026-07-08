@@ -124,8 +124,10 @@
      `min-width: 0` umožní flex shrinku, ale poslední položka už nemizí
      nepozorovaně — hamburger od 1100 (níže).
      19.4-followup — `min-width: min-content` (ne 0) → nav se NEsmrskne pod
-     obsah; při přeplnění vynutí `flex-wrap` headeru (2. řádek) místo tichého
-     překryvu dropdownů přes hledání. */
+     obsah. Topbar — nav žije na vlastním řádku; `flex-wrap` nechá případné
+     další skupiny („další věci z lišty") zalomit uvnitř nav lišty místo
+     horizontálního scrollu (reálnou výšku dopočítá `--world-header-h`). */
+  flex-wrap: wrap;
   min-width: min-content;
 }
 
@@ -484,7 +486,9 @@
 }
 
 @media (max-width: 768px) {
-  .header { gap: var(--sp-2); }
+  /* Topbar — na mobilu je viditelný jen řádek 1 (navRow skrytý ≤1200), tak
+     stáhni jeho gap; řádek 2 nemá smysl řešit. */
+  .topRow { gap: var(--sp-2); }
   /* Tester-feedback — lupa zpět do headeru vedle pošty (hledání hráč používá
      často). Místo uvolní ⚙ nastavení, které na mobilu ustoupí do draweru. */
   .searchIconBtn { display: flex; }
