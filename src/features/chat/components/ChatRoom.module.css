@@ -8,7 +8,7 @@
 .room {
   --chat-reserve: var(--sp-2);
   position: relative;
-  height: calc(100dvh - var(--header-h) - var(--chat-reserve));
+  height: calc(100dvh - var(--world-header-h, var(--header-h)) - var(--chat-reserve));
   min-height: 360px;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@
 }
 
 .state {
-  height: calc(100dvh - var(--header-h) - var(--chat-reserve, var(--sp-2)));
+  height: calc(100dvh - var(--world-header-h, var(--header-h)) - var(--chat-reserve, var(--sp-2)));
   min-height: 360px;
   display: flex;
   align-items: center;

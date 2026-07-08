@@ -27,7 +27,7 @@
 
 .aside {
   position: sticky;
-  top: calc(var(--header-h, 64px) + 16px);
+  top: calc(var(--world-header-h, var(--header-h, 64px)) + 16px);
 }
 
 @media (max-width: 1024px) {

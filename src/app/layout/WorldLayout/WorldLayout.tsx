@@ -245,6 +245,10 @@ export function WorldLayout() {
   // 17.8 — mobilní drawer světa: focus trap + navrácení fokusu na hamburger
   // (dřív chyběl i Escape). `inert` + dialog role viz JSX drawer níže.
   const worldDrawerRef = useRef<HTMLDivElement>(null);
+  // Dvouřádková hlavička (topbar): měříme reálnou výšku a publikujeme ji jako
+  // `--world-header-h` na shellu (viz efekt níže).
+  const headerRef = useRef<HTMLElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   useFocusTrap({ active: drawerOpen, containerRef: worldDrawerRef });
   useEffect(() => {
     if (!drawerOpen) return;
@@ -489,6 +493,23 @@ export function WorldLayout() {
     };
   }, []);
 
+  // Topbar — reálná výška dvouřádkové hlavičky → `--world-header-h` na shellu.
+  // Chat / taktická mapa / sticky TOC uvnitř světa počítají výšku z ní (fallback
+  // `--header-h` mimo svět), takže druhý řádek (ani zalomení dlouhého názvu) je
+  // nerozhodí. ResizeObserver drží hodnotu i při změně obsahu / resize.
+  useEffect(() => {
+    const header = headerRef.current;
+    const shell = shellRef.current;
+    // jsdom (testy) ResizeObserver nemá → no-op; downstream fallbackne na --header-h.
+    if (!header || !shell || typeof ResizeObserver === 'undefined') return;
+    const sync = () =>
+      shell.style.setProperty('--world-header-h', `${header.offsetHeight}px`);
+    const ro = new ResizeObserver(sync);
+    ro.observe(header);
+    sync();
+    return () => ro.disconnect();
+  }, []);
+
   // 6.8-followup / 5.1 — persona slot headeru. Vedení (PJ/Pomocný PJ) → role +
   // persona avatar (klik → deník PJ); hráč s postavou → postava (klik → profil);
   // jinak username (neklik). Větvení drží `resolvePersona` (čistý, testovatelný).
@@ -508,6 +529,7 @@ export function WorldLayout() {
   return (
     <WorldContext.Provider value={ctxValue}>
       <div
+        ref={shellRef}
         className={s.shell}
         data-theme={themeId}
         data-world-shell
@@ -515,20 +537,21 @@ export function WorldLayout() {
       >
         {/* Spec 5.7a — JS canvas efekt skinu (Matrix rain u `ikaros`) */}
         {theme.effect === 'matrix-rain' && <MatrixRain />}
-        <header className={s.header}>
-          {/* EXIT — funkční i během loadingu / 404 */}
-          <Link to="/" className={s.exitBtn}>EXIT</Link>
+        <header className={s.header} ref={headerRef}>
+          {/* ── Řádek 1 — titulek světa + utility (hledání, akce, persona) ── */}
+          <div className={s.topRow}>
+            {/* EXIT — funkční i během loadingu / 404 */}
+            <Link to="/" className={s.exitBtn}>EXIT</Link>
 
-          {loading ? (
-            /* Spec 5.1 — header skeleton během načítání světa */
-            <>
-              <span className={clsx(s.skeletonBlock, s.skeletonName)} aria-hidden="true" />
-              <span className={clsx(s.skeletonBlock, s.skeletonBadge)} aria-hidden="true" />
-            </>
-          ) : (
-            <>
-              {/* Název světa — accessMode + genre badge přesunuty na úvodní
-                  stránku světa (duplikovaly se v hederu, 2026-05-25). */}
+            {loading ? (
+              /* Spec 5.1 — header skeleton během načítání světa */
+              <>
+                <span className={clsx(s.skeletonBlock, s.skeletonName)} aria-hidden="true" />
+                <span className={clsx(s.skeletonBlock, s.skeletonBadge)} aria-hidden="true" />
+              </>
+            ) : (
+              /* Název světa — accessMode + genre badge přesunuty na úvodní
+                 stránku světa (duplikovaly se v hederu, 2026-05-25). */
               <Link
                 to={`/svet/${worldSlug}`}
                 className={s.worldName}
@@ -536,20 +559,114 @@ export function WorldLayout() {
               >
                 {world?.name ?? 'Svět nenalezen'}
               </Link>
-            </>
-          )}
+            )}
 
-          {/* Elevation toggle — pro platform admina i MIMO full nav, aby se mohl
-              „nahodit" i ve světě, kde není člen (de-elevated vidí jen shell). */}
-          {!loading && isPlatformAdmin && world && (
-            <AdminElevationToggle worldId={world.id} elevated={isElevatedHere} />
-          )}
+            {/* Elevation toggle — pro platform admina i MIMO full nav, aby se mohl
+                „nahodit" i ve světě, kde není člen (de-elevated vidí jen shell). */}
+            {!loading && isPlatformAdmin && world && (
+              <AdminElevationToggle worldId={world.id} elevated={isElevatedHere} />
+            )}
 
-          {/* Spec 2.4 — full nav jen pro membery / globální adminy */}
+            {/* Utility vpravo (hledání, +Nová, pošta, ⚙, persona) — jen membeři /
+                globální admini; `margin-left:auto` je drží u pravé hrany. */}
+            {showFullNav && (
+              <>
+                <div className={s.actions}>
+                  {/* 13.1 — desktop: plné pole; ≤1024px: kompaktní lupa */}
+                  <button
+                    type="button"
+                    className={s.searchBar}
+                    onClick={() => setSearchOpen(true)}
+                  >
+                    <Search size={16} aria-hidden="true" />
+                    <span className={s.searchBarText}>Hledat…</span>
+                    <kbd className={s.searchKbd}>Ctrl K</kbd>
+                  </button>
+                  <button
+                    type="button"
+                    className={clsx(s.actionBtn, s.searchIconBtn)}
+                    onClick={() => setSearchOpen(true)}
+                    title="Hledat"
+                    aria-label="Hledat"
+                  >
+                    <Search size={16} aria-hidden="true" />
+                  </button>
+                  {isPJ && (
+                    <button
+                      type="button"
+                      onClick={() => setWizardOpen(true)}
+                      className={s.newPageBtn}
+                    >
+                      + Nová stránka
+                    </button>
+                  )}
+                  <Link
+                    to="/ikaros/posta"
+                    className={s.actionBtn}
+                    title="Pošta"
+                  >
+                    ✉
+                  </Link>
+
+                  {/* Krok 5.7a — vstup do Nastavení světa (vč. tab Vzhled);
+                      viditelnost tabů uvnitř gatuje role */}
+                  {/* ≤768px: ⚙ ustupuje searchi (s.settingsBtn skryto), nastavení
+                      je dostupné z draweru — viz drawer níže. */}
+                  <Link
+                    to={`/svet/${worldSlug}/nastaveni`}
+                    className={clsx(s.actionBtn, s.settingsBtn)}
+                    title="Nastavení světa"
+                  >
+                    ⚙
+                  </Link>
+
+                  {/* 6.8-followup — persona slot: postava (klik→profil) / vedení
+                      (klik→deník PJ) / username (neklik). */}
+                  {persona.to ? (
+                    <Link
+                      to={persona.to}
+                      className={clsx(s.persona, s.personaLink)}
+                      title={persona.name}
+                    >
+                      <UserAvatar
+                        src={persona.avatarUrl}
+                        defaultType={currentUser?.defaultAvatarType}
+                        size="sm"
+                        alt={persona.name}
+                      />
+                      <span className={s.personaName}>{persona.name}</span>
+                    </Link>
+                  ) : (
+                    <div className={s.persona} title={persona.name}>
+                      <UserAvatar
+                        src={persona.avatarUrl}
+                        defaultType={currentUser?.defaultAvatarType}
+                        size="sm"
+                        alt={persona.name}
+                      />
+                      <span className={s.personaName}>{persona.name}</span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  className={s.hamburger}
+                  onClick={() => setDrawerOpen(true)}
+                  aria-label="Otevřít menu"
+                >
+                  ☰
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* ── Řádek 2 — navigační lišta (Chat + Informace/Svět/Hra/Kalendář).
+              Jen ≥1200px; níž Chat i nav přebírá hamburger (.navRow media query),
+              takže druhý řádek na mobilu odpadá. ── */}
           {showFullNav && (
-            <>
+            <div className={s.navRow}>
               {/* Tester-feedback — chat byl přehlížený (chyběl v nav). Zvýrazněný
-                  vstup jako PRVNÍ položka, accent pill + unread badge. */}
+                  vstup jako PRVNÍ položka nav lišty, accent pill + unread badge. */}
               {realWorldId && (
                 <ChatNavLink
                   variant="bar"
@@ -566,93 +683,7 @@ export function WorldLayout() {
                   />
                 ))}
               </nav>
-
-              <div className={s.actions}>
-                {/* 13.1 — desktop: plné pole; ≤1024px: kompaktní lupa */}
-                <button
-                  type="button"
-                  className={s.searchBar}
-                  onClick={() => setSearchOpen(true)}
-                >
-                  <Search size={16} aria-hidden="true" />
-                  <span className={s.searchBarText}>Hledat…</span>
-                  <kbd className={s.searchKbd}>Ctrl K</kbd>
-                </button>
-                <button
-                  type="button"
-                  className={clsx(s.actionBtn, s.searchIconBtn)}
-                  onClick={() => setSearchOpen(true)}
-                  title="Hledat"
-                  aria-label="Hledat"
-                >
-                  <Search size={16} aria-hidden="true" />
-                </button>
-                {isPJ && (
-                  <button
-                    type="button"
-                    onClick={() => setWizardOpen(true)}
-                    className={s.newPageBtn}
-                  >
-                    + Nová stránka
-                  </button>
-                )}
-                <Link
-                  to="/ikaros/posta"
-                  className={s.actionBtn}
-                  title="Pošta"
-                >
-                  ✉
-                </Link>
-
-                {/* Krok 5.7a — vstup do Nastavení světa (vč. tab Vzhled);
-                    viditelnost tabů uvnitř gatuje role */}
-                {/* ≤768px: ⚙ ustupuje searchi (s.settingsBtn skryto), nastavení
-                    je dostupné z draweru — viz drawer níže. */}
-                <Link
-                  to={`/svet/${worldSlug}/nastaveni`}
-                  className={clsx(s.actionBtn, s.settingsBtn)}
-                  title="Nastavení světa"
-                >
-                  ⚙
-                </Link>
-
-                {/* 6.8-followup — persona slot: postava (klik→profil) / vedení
-                    (klik→deník PJ) / username (neklik). */}
-                {persona.to ? (
-                  <Link
-                    to={persona.to}
-                    className={clsx(s.persona, s.personaLink)}
-                    title={persona.name}
-                  >
-                    <UserAvatar
-                      src={persona.avatarUrl}
-                      defaultType={currentUser?.defaultAvatarType}
-                      size="sm"
-                      alt={persona.name}
-                    />
-                    <span className={s.personaName}>{persona.name}</span>
-                  </Link>
-                ) : (
-                  <div className={s.persona} title={persona.name}>
-                    <UserAvatar
-                      src={persona.avatarUrl}
-                      defaultType={currentUser?.defaultAvatarType}
-                      size="sm"
-                      alt={persona.name}
-                    />
-                    <span className={s.personaName}>{persona.name}</span>
-                  </div>
-                )}
-              </div>
-
-              <button
-                className={s.hamburger}
-                onClick={() => setDrawerOpen(true)}
-                aria-label="Otevřít menu"
-              >
-                ☰
-              </button>
-            </>
+            </div>
           )}
         </header>
 

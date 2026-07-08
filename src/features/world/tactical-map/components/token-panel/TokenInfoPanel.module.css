@@ -34,7 +34,7 @@
   /* 17.10 — deník je PLNÁ výška vpravo (přes celou pravou stranu, i tam kde je
      bojová/„Zmenšené" lišta). Ty se mu naopak vyhnou zprava přes
      --map-inset-right (šířku karty vystavuje TokenInfoPanel na <html>). */
-  top: var(--header-h, 56px);
+  top: var(--world-header-h, var(--header-h, 56px));
   right: 0;
   bottom: 0;
   border-right: none;

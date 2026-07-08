@@ -17,17 +17,15 @@
   z-index: 1;
 }
 
-/* ── Header ── */
+/* ── Header (dvouřádkový topbar) ──
+   Řádek 1 = titulek + utility, Řádek 2 = navigační lišta. Dřív byl vše v jednom
+   flex-wrap řádku, takže při přeplnění padaly dolů AKCE (poslední v DOM) a search
+   se osamocoval doprava — nelogické. Teď je pořadí záměrné: nav je vždy dole.
+   Reálnou výšku měří JS → `--world-header-h` (viz WorldLayout.tsx). */
 .header {
-  min-height: var(--header-h);
   flex-shrink: 0;
   display: flex;
-  align-items: center;
-  /* 19.4-followup — při přeplnění (dlouhý název + full nav + akce) se topbar
-     zalomí na 2. řádek místo překryvu nav/hledání; jinak 1 řádek jako dřív. */
-  flex-wrap: wrap;
-  gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-2) var(--sp-4);
+  flex-direction: column;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -35,6 +33,30 @@
   z-index: var(--z-sticky);
   /* `overflow: hidden` se sem nesmí vrátit — sticky header tvoří containing
      block pro `.dropdown` (position: absolute) a ořízl by ho spodní hranou. */
+}
+
+/* Řádek 1 — titulek světa + utility. `min-height` drží band výšku motivu
+   (--header-h); `flex-wrap` je pojistka pro extrémně dlouhý název + akce. */
+.topRow {
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+}
+
+/* Řádek 2 — navigační lišta zleva, oddělená jemnou linkou. Skrytá ≤1200px,
+   kde nav i chat přebírá hamburger (druhý řádek by byl prázdný). */
+.navRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-1) var(--sp-4);
+  border-top: 1px solid var(--border-subtle);
+}
+@media (max-width: 1200px) {
+  .navRow { display: none; }
 }
 
 /* EXIT button */

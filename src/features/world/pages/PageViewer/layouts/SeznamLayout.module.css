@@ -7,12 +7,12 @@
 
 .menu {
   position: sticky;
-  top: calc(var(--header-h, 64px) + 16px);
+  top: calc(var(--world-header-h, var(--header-h, 64px)) + 16px);
   padding: 1rem;
   border: 1px solid var(--border, rgb(var(--white-rgb) / 0.08));
   border-radius: 8px;
   background: var(--bg-overlay, rgb(var(--white-rgb) / 0.03));
-  max-height: calc(100vh - var(--header-h, 64px) - 32px);
+  max-height: calc(100vh - var(--world-header-h, var(--header-h, 64px)) - 32px);
   overflow-y: auto;
 }
 
@@ -79,7 +79,7 @@
 
 .aside {
   position: sticky;
-  top: calc(var(--header-h, 64px) + 16px);
+  top: calc(var(--world-header-h, var(--header-h, 64px)) + 16px);
 }
 
 @media (max-width: 1024px) {

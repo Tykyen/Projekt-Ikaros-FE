@@ -657,7 +657,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Proč:** Komunita ráda přispěje na projekt, který má ráda; štědrý free základ zůstává konkurenční výhodou.
 **Otevřené otázky:** Vůbec teď, nebo až platforma žije (scénář A)? Jaká kosmetika je „fér" (odznak/barva), aby nerozdělila komunitu?
 
-### - [ ] 19.3 LFG / nábory (objevování her a hráčů) — [analýza sekce 5] 🔁
+### - [x] 19.3 LFG / nábory (objevování her a hráčů) — [analýza sekce 5] 🔁
 **Cíl:** Lehké „hledám hru / hledám hráče" — nábory navázané na přehled světů + adresář.
 **Proč:** Reálná potřeba i v ČR, kterou nikdo česky neřeší; pomáhá proti prázdné platformě (krok 5 trychtýře).
 **Otevřené otázky:** Samostatná featura, nebo rozšíření přehledu světů? Moderace náborů?
