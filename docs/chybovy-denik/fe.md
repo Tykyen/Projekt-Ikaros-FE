@@ -1863,3 +1863,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** DOBŘE — feasibility průzkum PŘED spec (PIXI init, sloty, printMode precedent) → spec sedla napoprvé, žádné cyklení. Reziduum: čistá read-only URL pro Browser Source odložena do dluhu (chce route+token); grid se neskrývá; živý OBS test čeká na uživatele.
 
 ---
+
+### CH-064 — topbar světa: dlouhý název + full nav překrývaly hledání; ladil jsem šířku názvu 3× naslepo, kořen = `.nav {min-width:0}` kolabuje místo wrap · 2026-07-08
+**Co nefungovalo:** Kalendář v topbaru světa nedosažitelný — search „Hledat…" ho překrýval. Postupné opravy `.worldName max-width` 340→240→360 + `.header flex-wrap` — překryv TRVAL. Uživatel 2×: „cyklíš se."
+**Příznak cyklení:** 3 varianty šířky názvu + wrap headeru BEZ vizuálního ověření (browser nemám k dispozici); po každém rebuildu jiný screenshot, hádal jsem naslepo místo diagnózy skutečné příčiny.
+**Kořen:** `.nav { flex:1; min-width:0 }` (bez overflow) → při nedostatku místa se nav SMRSKNE na 0 (`min-width:0` to dovolí) místo aby vynutila `flex-wrap` headeru; NavDropdown items (`white-space:nowrap`) pak VYTEČOU z nav boxu a překryjí `.actions`/search. Zkracování názvu ani wrap headeru nepomůže, DOKUD nav SMÍ zkolabovat.
+**Oprava:** `.nav { min-width: min-content }` (ne 0) → nav se nesmrskne pod obsah → přeteče header → `flex-wrap` zalomí nav na 2. řádek, bez překryvu.
+**Poučení:** (1) u flex „překryvu" hledej, který item má `min-width:0`+overflow visible = tichý kolaps a výtok obsahu; nelaď šířku SOUSEDŮ (název), oprav kolabující item. (2) Bez možnosti ověřit vizuál naživo NEHÁDAT víc než 1×; po 1. neúspěchu požádat o DevTools/computed nebo předat živé ladění uživateli ([[fb_listen_user]]: necyklit na vlastní hypotéze).
+
+---

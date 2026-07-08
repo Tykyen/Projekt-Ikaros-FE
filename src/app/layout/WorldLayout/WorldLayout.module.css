@@ -100,8 +100,11 @@
   /* F0 (spec-9.1) — `overflow: hidden` ořezával poslední položky (typicky
      Kalendář) na rozlišení 768–1100px, kde se hamburger ještě nezapínal.
      `min-width: 0` umožní flex shrinku, ale poslední položka už nemizí
-     nepozorovaně — hamburger od 1100 (níže). */
-  min-width: 0;
+     nepozorovaně — hamburger od 1100 (níže).
+     19.4-followup — `min-width: min-content` (ne 0) → nav se NEsmrskne pod
+     obsah; při přeplnění vynutí `flex-wrap` headeru (2. řádek) místo tichého
+     překryvu dropdownů přes hledání. */
+  min-width: min-content;
 }
 
 .navItem {
