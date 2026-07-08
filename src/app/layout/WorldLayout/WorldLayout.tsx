@@ -529,7 +529,11 @@ export function WorldLayout() {
             <>
               {/* Název světa — accessMode + genre badge přesunuty na úvodní
                   stránku světa (duplikovaly se v hederu, 2026-05-25). */}
-              <Link to={`/svet/${worldSlug}`} className={s.worldName}>
+              <Link
+                to={`/svet/${worldSlug}`}
+                className={s.worldName}
+                title={world?.name ?? 'Svět nenalezen'}
+              >
                 {world?.name ?? 'Svět nenalezen'}
               </Link>
             </>

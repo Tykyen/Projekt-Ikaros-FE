@@ -49,9 +49,9 @@ export function AdminElevationToggle({ worldId, elevated }: Props) {
       }
     >
       {elevated ? <ShieldCheck size={14} /> : <Lock size={14} />}
-      <span className={s.label}>
-        {elevated ? 'Admin režim' : 'Aktivovat admina'}
-      </span>
+      {/* Minimalistický label — admin ví, co to je; stav rozliší ikona + barva,
+          detail zůstává v title tooltipu. */}
+      <span className={s.label}>A</span>
     </button>
   );
 }

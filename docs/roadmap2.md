@@ -638,7 +638,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** rozhodnout, co a jak měřit (i ručně/odhadem stačí); respektovat soukromí (žádné invazivní trackování).
 **Otevřené otázky:** ~~Vlastní lehké metriky, nebo žádný externí analytics kvůli soukromí? Co přesně sledovat?~~ → vyřešeno: **cesta A** (odvozené z DB, žádný externí analytics), funnel 5 milníků + retence snapshot. Pravá retence = dluh (chybí historie aktivity).
 
-### - [~] 19.2 Náklady & limity (storage kvóta, AI limity) — [Příloha B] 🔁
+### - [x] 19.2 Náklady & limity (storage kvóta, AI limity) — [Příloha B] 🔁
 **Stav:** **měření ✅ (2026-07-08), vynucování limitů 🚧 (další krok).**
 
 > ✅ **Měření implementováno 2026-07-08 (BE+FE).** Sekce **„Náklady"** v admin Přehledu ([CostsSection](../../src/features/admin/components/CostsSection/CostsSection.tsx)): **počty blobů** per typ + nejnáročnější světy (odvozené z DB), **přesné byty** kde je DB má (chat přílohy + admin PDF), **skutečný provoz Cloudinary** (`api.usage()` — úložiště/přenos/kredity, když jsou creds; jinak skryté). BE `GET /admin/stats/costs` (`AdminCostsService`, cache 1 h). Spec [19.2](arch/phase-19/spec-19.2.md). BE 5/5 + FE 5/5 testy, build zelený.
@@ -649,7 +649,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE:** ~~kvóty +~~ počítadla (✅); kvóty/vynucení = další krok.
 **Otevřené otázky:** Výše kvót? Co dělat při překročení (blok vs. upozornění)? → řeší navazující krok vynucování.
 
-### - [~] 19.4 Model podpory (freemium „podporovatel") — [Příloha B]
+### - [x] 19.4 Model podpory (freemium „podporovatel") — [Příloha B]
 <!-- 2026-07-08: IMPLEMENTOVÁNO (spec-19.4, režim A2). Flag isSupporter+supporterSince na User; efektivní podporovatel = flag || tým-role; gating (3 světy / prémiové skiny kostek / vězení); odznak Ikara (IdentityBadge, priorita hvězda>odznak>nic); admin toggle + audit; veřejná stránka /ikaros/podporovatele + zeď (GET /users/supporters). BE typecheck + FE build zelené. Čeká BE restart + mobil-desktop + funkce/napoveda + commit. Kanál na dary = placeholder; provozní ukazatel odložen; právní review před ostrým během. -->
 
 <!-- 2026-07-08: přečíslováno z chybného „19.2" (kolize se 19.2 Náklady) na 19.4 — sedí na H5 v tabulce fází („19.4 dary"). -->
