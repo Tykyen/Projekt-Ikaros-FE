@@ -50,6 +50,9 @@ const SystemsHubPage       = lazy(() => import('@/features/ikaros/pages/SystemLa
 const SystemLandingPage    = lazy(() => import('@/features/ikaros/pages/SystemLanding/SystemLandingPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
+// 19.3 — nástěnka náborů (LFG).
+const NaboryPage           = lazy(() => import('@/features/ikaros/pages/NaboryPage'));
+const NaborNovaPage        = lazy(() => import('@/features/ikaros/pages/NaborNovaPage'));
 // 3.7 — `/ikaros/oblibene` stránka oblíbeného obsahu (záložky napříč moduly).
 const FavoritesPage        = lazy(() => import('@/features/ikaros/pages/FavoritesPage'));
 // 21.5 — „Společná tvorba" rozcestník + sdílený stub „Připravujeme".
@@ -213,6 +216,9 @@ export const router = createBrowserRouter([
       { path: 'ikaros/diskuze',         element: p(DiscussionsPage),    loader: requireAuth },
       { path: 'ikaros/diskuze/nova',    element: p(DiscussionsNewPage), loader: requireAuth },
       { path: 'ikaros/diskuze/:id',     element: p(DiscussionDetailPage), loader: requireAuth },
+      // 19.3 — nábory (LFG); logged-in only. Pořadí: /nova před případným /:id.
+      { path: 'ikaros/nabory',          element: p(NaboryPage),       loader: requireAuth },
+      { path: 'ikaros/nabory/nova',     element: p(NaborNovaPage),    loader: requireAuth },
       { path: 'ikaros/posta',           element: p(MailPage),         loader: requireAuth },
       // 3.7 — oblíbený obsah (záložky); jen pro přihlášené.
       { path: 'ikaros/oblibene',        element: p(FavoritesPage),    loader: requireAuth },

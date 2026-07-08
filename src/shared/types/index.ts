@@ -933,6 +933,99 @@ export interface IkarosDiscussionPost {
   createdAtUtc: string;
 }
 
+// ─── Nábory / LFG (19.3) — entity ──────────────────────────────────────────
+
+/** 19.3 — strana náboru: hráč hledá hru, nebo PJ hledá hráče do světa. */
+export type NaborStrana = 'hledam-hru' | 'hledam-hrace';
+
+/**
+ * 19.3 — motiv lístku = TVAR (12, parita s bestiářem). Nezávislá osa od
+ * globálního skinu: motiv řídí jen tvar + signature ornament, barvy/fonty jdou
+ * z `--theme-*` aktivního skinu. Hráč si motiv vybírá, PJ dědí motiv světa.
+ */
+export type NaborMotiv =
+  | 'fantasy'
+  | 'dark-fantasy'
+  | 'vesmir'
+  | 'cyberpunk'
+  | 'steampunk'
+  | 'apokalypsa'
+  | 'horor'
+  | 'mystery'
+  | 'historie'
+  | 'moderni'
+  | 'western'
+  | 'ikaros';
+
+/** Pořadí = pořadí v pickeru; zdroj pravdy pro validaci i UI. */
+export const NABOR_MOTIVY: readonly NaborMotiv[] = [
+  'fantasy',
+  'dark-fantasy',
+  'vesmir',
+  'cyberpunk',
+  'steampunk',
+  'apokalypsa',
+  'horor',
+  'mystery',
+  'historie',
+  'moderni',
+  'western',
+  'ikaros',
+] as const;
+
+/** Lidský název motivu pro picker. */
+export const NABOR_MOTIV_LABELS: Record<NaborMotiv, string> = {
+  fantasy: 'Fantasy',
+  'dark-fantasy': 'Temná fantasy',
+  vesmir: 'Sci-fi / vesmír',
+  cyberpunk: 'Cyberpunk',
+  steampunk: 'Steampunk',
+  apokalypsa: 'Postapokalypsa',
+  horor: 'Horor',
+  mystery: 'Mysteriózní',
+  historie: 'Historie',
+  moderni: 'Moderní',
+  western: 'Western',
+  ikaros: 'Ikaros',
+};
+
+/** 19.3 — režim hraní. */
+export type NaborMode = 'online' | 'zivo';
+
+/** 19.3 — stav náboru (životnost). Skryté z výchozího filtru: `expired`. */
+export type NaborStatus = 'open' | 'closed' | 'expired';
+
+export interface Nabor {
+  id: string;
+  strana: NaborStrana;
+  /** Tvar lístku (viz `NaborMotiv`). */
+  motiv: NaborMotiv;
+  /** Jen u `hledam-hrace` — propagovaný svět. */
+  worldId?: string;
+  worldSlug?: string;
+  worldName?: string;
+  title: string;
+  body: string;
+  /** Volitelný drobný obrázek (Cloudinary; kvóta 19.2). */
+  imageUrl?: string;
+  /** RPG systém; u PJ náboru zdědí z `world.system`. */
+  system?: string;
+  mode: NaborMode;
+  /** Město u `zivo`. */
+  place?: string;
+  /** Jen `hledam-hrace`. */
+  seatsTotal?: number;
+  seatsTaken?: number;
+  status: NaborStatus;
+  authorId: string;
+  authorName: string;
+  /** D-040 — platformový účet autora anonymizován → renderer „Smazaný účet". */
+  authorIsDeleted?: boolean;
+  createdAtUtc: string;
+  /** Auto-expirace (viz spec 19.3 §6). */
+  expiresAtUtc?: string;
+}
+
 export interface UpcomingEventDto {
   id: string;
   worldId: string;

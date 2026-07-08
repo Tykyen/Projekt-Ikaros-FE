@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19.3 · Nástěnka náborů — návrh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Rye&family=IM+Fell+English+SC&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Special+Elite&family=Caveat:wght@600;700&family=Pirata+One&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=EB+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   NÁVRH 19.3 — Nástěnka náborů (LFG)
+   Princip: TYP lístku = tvar + font (tvarový jazyk). MOTIV = barva (tokeny).
+   Deska i lístky čtou --theme-* → ladí se všemi 33 globálními motivy.
+   Přepínač motivů nahoře jen demonstruje tokenizaci (v appce = globální skin).
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── MOTIV: ikaros (default) — reálné hodnoty z themes/ikaros ── */
+:root{
+  --theme-surface: rgba(20,12,44,0.82);
+  --theme-surface-strong: rgba(10,6,26,0.92);
+  --theme-surface-soft: rgba(38,24,72,0.48);
+  --theme-border: rgba(169,108,255,0.5);
+  --theme-border-soft: rgba(169,108,255,0.26);
+  --theme-text: #ece4ff;
+  --theme-text-muted: #b3a6d4;
+  --theme-heading: #ffffff;
+  --theme-accent: #a96cff;
+  --theme-accent-bright: #c9a4ff;
+  --theme-glow: rgba(169,108,255,0.42);
+  --bg-primary: #0c0820;
+  --bg-secondary: #1a0f3a;
+  --text-on-accent: #0c0820;
+  --font-display: 'Orbitron','Rajdhani',sans-serif;
+  --font-body: 'Rajdhani','Segoe UI',sans-serif;
+  --board-tint: rgba(169,108,255,0.10);
+}
+[data-theme="pergamen"]{
+  --theme-surface: rgba(40,26,12,0.88);
+  --theme-surface-strong: rgba(28,18,8,0.95);
+  --theme-surface-soft: rgba(58,38,18,0.55);
+  --theme-border: rgba(212,169,70,0.62);
+  --theme-border-soft: rgba(212,169,70,0.30);
+  --theme-text: #e8d8a0;
+  --theme-text-muted: #b8a070;
+  --theme-heading: #d4a946;
+  --theme-accent: #8a1a10;
+  --theme-accent-bright: #a83020;
+  --theme-glow: rgba(212,169,70,0.45);
+  --bg-primary: #1a0e04;
+  --bg-secondary: #28190a;
+  --text-on-accent: #f0e0b8;
+  --font-display: 'IM Fell English SC','EB Garamond',Georgia,serif;
+  --font-body: 'EB Garamond','Lora',Georgia,serif;
+  --board-tint: rgba(212,169,70,0.10);
+}
+[data-theme="temna-cerven"]{
+  --theme-surface: rgba(28,9,15,0.94);
+  --theme-surface-strong: rgba(14,5,9,0.96);
+  --theme-surface-soft: rgba(35,12,18,0.55);
+  --theme-border: rgba(168,152,144,0.30);
+  --theme-border-soft: rgba(42,12,18,0.55);
+  --theme-text: #e8d6cc;
+  --theme-text-muted: #a08070;
+  --theme-heading: #e8d6cc;
+  --theme-accent: #7e0a1e;
+  --theme-accent-bright: #a8132e;
+  --theme-glow: rgba(168,19,46,0.45);
+  --bg-primary: #0a0307;
+  --bg-secondary: #110509;
+  --text-on-accent: #ffffff;
+  --font-display: 'Pirata One','UnifrakturCook',Georgia,serif;
+  --font-body: 'Cormorant Garamond',Georgia,serif;
+  --board-tint: rgba(168,19,46,0.12);
+}
+
+/* ── nábor-specifické sémantické tokeny (mapované na --theme-*) ── */
+:root, [data-theme]{
+  --nb-paper: var(--theme-surface);
+  --nb-paper-strong: var(--theme-surface-strong);
+  --nb-ink: var(--theme-text);
+  --nb-ink-h: var(--theme-heading);
+  --nb-ink-dim: var(--theme-text-muted);
+  --nb-line: var(--theme-border);
+  --nb-line-soft: var(--theme-border-soft);
+  --nb-accent: var(--theme-accent);
+  --nb-accent-2: var(--theme-accent-bright);
+  --nb-glow: var(--theme-glow);
+  --nb-on-accent: var(--text-on-accent);
+  --nb-lift: 0 3px 6px -2px rgba(0,0,0,.45), 0 14px 30px -12px rgba(0,0,0,.6);
+  --nb-lift-hi: 0 8px 14px -4px rgba(0,0,0,.5), 0 26px 46px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-body);
+  color:var(--nb-ink);
+  background:var(--bg-secondary);
+  min-height:100vh;
+  transition:background-color .4s ease;
+}
+
+/* ── DESKA (pozadí nástěnky) — textura tónovaná tokeny ── */
+.board-wrap{
+  min-height:100vh;
+  padding:clamp(16px,3vw,40px);
+  background-color:var(--bg-secondary);
+  background-image:
+    radial-gradient(1100px 420px at 50% -8%, var(--nb-glow), transparent 62%),
+    radial-gradient(900px 500px at 100% 100%, var(--board-tint), transparent 60%),
+    linear-gradient(180deg, var(--bg-primary), var(--bg-secondary) 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  transition:background-color .4s ease;
+}
+
+/* ── HLAVIČKA ── */
+.top{
+  max-width:1240px;margin:0 auto 8px;
+  display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;
+}
+.title-block h1{
+  font-family:var(--font-display);
+  font-size:clamp(28px,5vw,50px);
+  font-weight:900;letter-spacing:.01em;line-height:1;
+  color:var(--nb-ink-h);
+  text-shadow:0 2px 18px var(--nb-glow);
+}
+.title-block p{color:var(--nb-ink-dim);margin-top:8px;max-width:46ch;font-size:15px}
+
+/* přepínač motivů (demo tokenizace) */
+.theme-switch{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.theme-switch span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--nb-ink-dim)}
+.theme-switch .pills{display:flex;gap:6px}
+.tpill{
+  font-family:var(--font-body);font-size:13px;font-weight:600;
+  padding:7px 14px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--nb-line-soft);
+  background:var(--nb-paper);color:var(--nb-ink);
+  transition:all .18s ease;
+}
+.tpill:hover{border-color:var(--nb-line)}
+.tpill[aria-pressed="true"]{
+  background:var(--nb-accent);color:var(--nb-on-accent);border-color:var(--nb-accent);
+  box-shadow:0 0 0 3px var(--nb-glow);
+}
+
+/* ── FILTR + akce ── */
+.bar{
+  max-width:1240px;margin:22px auto;
+  display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;
+  padding:14px 16px;border-radius:14px;
+  background:var(--nb-paper);border:1px solid var(--nb-line-soft);
+  backdrop-filter:blur(4px);
+}
+.bar .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bar .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--nb-ink-dim);margin-right:2px}
+.chip{
+  font-family:var(--font-body);font-size:13px;font-weight:600;
+  padding:6px 12px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--nb-line-soft);background:transparent;color:var(--nb-ink);
+  transition:all .15s ease;
+}
+.chip:hover{border-color:var(--nb-line)}
+.chip.on{background:var(--nb-accent);color:var(--nb-on-accent);border-color:var(--nb-accent)}
+.bar .spacer{flex:1}
+.btn-add{
+  font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:.02em;
+  padding:11px 20px;border-radius:10px;cursor:pointer;border:none;
+  background:var(--nb-accent);color:var(--nb-on-accent);
+  box-shadow:0 0 0 1px var(--nb-accent), 0 6px 16px -4px var(--nb-glow);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-add:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--nb-accent-2),0 10px 22px -6px var(--nb-glow)}
+
+.hint{
+  max-width:1240px;margin:-8px auto 20px;font-size:13px;color:var(--nb-ink-dim);
+  display:flex;gap:8px;align-items:center;
+}
+.hint b{color:var(--nb-accent-2)}
+
+/* ══ NÁSTĚNKA — rozházené lístky (pinboard) ══ */
+.pin{
+  max-width:1240px;margin:0 auto;
+  column-count:3;column-gap:22px;
+}
+@media(max-width:980px){.pin{column-count:2}}
+@media(max-width:620px){.pin{column-count:1}}
+
+.card{
+  position:relative;
+  break-inside:avoid;margin:0 0 26px;
+  color:var(--nb-ink);
+  box-shadow:var(--nb-lift);
+  transition:transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s ease;
+  animation:rise .55s both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(22px) rotate(var(--rot,0))}to{opacity:1;transform:translateY(0) rotate(var(--rot,0))}}
+.card:nth-child(1){--rot:-1.5deg;animation-delay:.05s}
+.card:nth-child(2){--rot:1.2deg;animation-delay:.13s}
+.card:nth-child(3){--rot:-.8deg;animation-delay:.21s}
+.card:nth-child(4){--rot:1.6deg;animation-delay:.29s}
+.card:nth-child(5){--rot:-1.2deg;animation-delay:.37s}
+.card:nth-child(6){--rot:.9deg;animation-delay:.45s}
+.card:hover{transform:translateY(-8px) rotate(0) scale(1.015);box-shadow:var(--nb-lift-hi);z-index:5}
+
+/* společné vnitřní prvky */
+.side{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;margin-bottom:10px;
+}
+.side.hrac{background:var(--nb-accent);color:var(--nb-on-accent)}
+.side.hra{background:transparent;color:var(--nb-accent-2);border:1px solid var(--nb-line)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--nb-ink-dim);margin:10px 0}
+.meta .k{display:inline-flex;gap:5px;align-items:center}
+.meta .k b{color:var(--nb-ink);font-weight:600}
+.seats{display:inline-flex;gap:3px;align-items:center}
+.seats i{width:9px;height:9px;border-radius:50%;border:1px solid var(--nb-accent);display:inline-block}
+.seats i.full{background:var(--nb-accent)}
+.desc{font-size:14px;line-height:1.5;color:var(--nb-ink);opacity:.92;margin:8px 0 14px}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}
+.who{font-size:12px;color:var(--nb-ink-dim)}
+.who b{color:var(--nb-ink)}
+.reply{
+  font-family:var(--font-body);font-weight:700;font-size:13px;letter-spacing:.02em;
+  padding:8px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;
+  background:var(--nb-accent);color:var(--nb-on-accent);border:none;
+  transition:transform .15s ease,filter .15s ease;
+}
+.reply:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.reply.ghost{background:transparent;color:var(--nb-accent-2);border:1px solid var(--nb-line)}
+
+/* připínáček */
+.tack{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--nb-accent-2), var(--nb-accent) 60%, rgba(0,0,0,.5));
+  box-shadow:0 3px 5px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.4);z-index:3}
+
+/* ── TYP 1 · PLAKÁT „HLEDÁ SE" (western wanted) ── */
+.t-poster{
+  background:var(--nb-paper);
+  border:2px solid var(--nb-accent);
+  outline:1px solid var(--nb-line-soft);outline-offset:4px;
+  padding:22px 20px 18px;border-radius:2px;
+}
+.t-poster .banner{
+  font-family:'Rye',var(--font-display),serif;
+  text-align:center;font-size:30px;line-height:1;color:var(--nb-ink-h);
+  letter-spacing:.04em;margin-bottom:2px;text-shadow:0 2px 0 rgba(0,0,0,.25);
+}
+.t-poster .sub{text-align:center;font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--nb-ink-dim);border-top:1px solid var(--nb-line-soft);border-bottom:1px solid var(--nb-line-soft);padding:5px 0;margin-bottom:14px}
+.t-poster h3{font-family:'Rye',var(--font-display),serif;text-align:center;font-size:21px;color:var(--nb-ink-h);margin-bottom:4px}
+
+/* ── TYP 2 · PERGAMENOVÝ SVITEK ── */
+.t-scroll{
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.16), transparent 8%, transparent 92%, rgba(0,0,0,.16)),
+    var(--nb-paper);
+  border-top:3px double var(--nb-line);
+  border-bottom:3px double var(--nb-line);
+  padding:20px 22px 46px;position:relative;
+  border-radius:3px;
+}
+.t-scroll::before,.t-scroll::after{content:"";position:absolute;left:0;right:0;height:10px;background:
+  radial-gradient(circle at 6px -3px, transparent 6px, var(--nb-paper) 6px) repeat-x;background-size:12px 10px}
+.t-scroll::before{top:-8px}
+.t-scroll::after{bottom:-8px;transform:scaleY(-1)}
+.t-scroll h3{font-family:var(--font-display);font-size:23px;color:var(--nb-ink-h);margin-bottom:2px;letter-spacing:.01em}
+.t-scroll .seal{position:absolute;right:16px;bottom:12px;width:42px;height:42px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, var(--nb-accent-2), var(--nb-accent) 70%);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.4);
+  display:grid;place-items:center;color:var(--nb-on-accent);font-family:var(--font-display);font-size:16px;font-weight:700}
+
+/* ── TYP 3 · NOVINOVÝ VÝSTŘIŽEK ── */
+.t-news{
+  background:var(--nb-paper-strong);
+  padding:18px 18px 16px;border-radius:2px;
+  border:1px solid var(--nb-line-soft);
+  filter:saturate(.85);
+}
+.t-news .rubrika{font-family:'Special Elite',var(--font-body),serif;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--nb-ink-dim);border-bottom:2px solid var(--nb-ink-dim);padding-bottom:5px;margin-bottom:10px;display:flex;justify-content:space-between}
+.t-news h3{font-family:'Playfair Display',var(--font-display),serif;font-weight:900;font-size:25px;line-height:1.02;color:var(--nb-ink-h);margin-bottom:8px}
+.t-news .col{font-family:'Special Elite',var(--font-body),serif;font-size:12.5px;line-height:1.5;color:var(--nb-ink);column-count:2;column-gap:14px;column-rule:1px solid var(--nb-line-soft);margin-bottom:12px}
+.t-news .torn{position:absolute;left:0;right:0;bottom:-6px;height:8px;background:
+  radial-gradient(circle at 5px 8px, var(--nb-paper-strong) 5px, transparent 5px) repeat-x;background-size:10px 8px}
+
+/* ── TYP 4 · POZNÁMKOVÝ BLOČEK (linkovaný, ohnutý roh) ── */
+.t-note{
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, var(--nb-line-soft) 27px 28px),
+    var(--nb-paper);
+  padding:26px 20px 18px;border-radius:3px;
+  border:1px solid var(--nb-line-soft);
+  box-shadow:var(--nb-lift), inset 22px 0 0 -20px var(--nb-accent);
+}
+.t-note h3{font-family:'Caveat',cursive;font-weight:700;font-size:27px;line-height:1;color:var(--nb-ink-h);margin-bottom:4px}
+.t-note .desc,.t-note .meta .k b,.t-note .who b{font-family:'Caveat',cursive;font-size:16px}
+.t-note .dogear{position:absolute;right:0;bottom:0;width:28px;height:28px;
+  background:linear-gradient(135deg, transparent 50%, var(--nb-line-soft) 50%, var(--nb-paper-strong) 52%);
+  border-bottom-right-radius:3px}
+
+/* ── TYP 5 · NEONOVÁ CEDULE (sci-fi/synthwave) ── */
+.t-neon{
+  background:var(--nb-paper-strong);
+  border:1px solid var(--nb-accent);
+  border-radius:10px;padding:20px;
+  box-shadow:inset 0 0 24px -6px var(--nb-glow), 0 0 0 1px var(--nb-line-soft), var(--nb-lift);
+}
+.t-neon .tag{font-family:'Orbitron',var(--font-display),sans-serif;font-size:10px;letter-spacing:.34em;color:var(--nb-accent-2);text-transform:uppercase;margin-bottom:10px}
+.t-neon h3{font-family:'Orbitron',var(--font-display),sans-serif;font-weight:700;font-size:19px;letter-spacing:.02em;color:var(--nb-ink-h);margin-bottom:6px;text-shadow:0 0 14px var(--nb-glow)}
+.t-neon .meta,.t-neon .desc{font-family:var(--font-body)}
+
+/* ── TYP 6 · VISAČKA / ŠTÍTEK (luggage tag na provázku) ── */
+.t-tag{
+  background:var(--nb-paper);
+  border:1px solid var(--nb-line);
+  border-radius:10px 10px 10px 10px;
+  padding:30px 20px 18px;position:relative;
+  clip-path:polygon(0 14%, 46% 14%, 50% 0, 54% 14%, 100% 14%, 100% 100%, 0 100%);
+}
+.t-tag .hole{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:var(--bg-primary);box-shadow:inset 0 1px 3px rgba(0,0,0,.6);z-index:3}
+.t-tag .string{position:absolute;top:-14px;left:50%;width:2px;height:22px;background:var(--nb-accent);transform:translateX(-50%) rotate(8deg);transform-origin:bottom}
+.t-tag h3{font-family:'Special Elite',var(--font-body),serif;font-size:19px;color:var(--nb-ink-h);margin-bottom:4px;text-align:center}
+.t-tag .rubrika{font-family:'Special Elite',var(--font-body),serif;text-align:center;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--nb-ink-dim);margin-bottom:10px}
+
+.footer-note{max-width:1240px;margin:34px auto 0;padding-top:16px;border-top:1px solid var(--nb-line-soft);font-size:12.5px;color:var(--nb-ink-dim);line-height:1.6}
+.footer-note b{color:var(--nb-ink)}
+</style>
+</head>
+<body>
+<div class="board-wrap">
+
+  <!-- HLAVIČKA -->
+  <header class="top">
+    <div class="title-block">
+      <h1>Nástěnka náborů</h1>
+      <p>Hledáš hru, nebo ti chybí hráči? Připni si lístek. Vstup vede z přehledu světů tlačítkem <b>„Hledá&nbsp;se"</b>.</p>
+    </div>
+    <div class="theme-switch">
+      <span>Motiv (= globální skin)</span>
+      <div class="pills">
+        <button class="tpill" data-set="ikaros" aria-pressed="true">Ikaros</button>
+        <button class="tpill" data-set="pergamen" aria-pressed="false">Pergamen</button>
+        <button class="tpill" data-set="temna-cerven" aria-pressed="false">Temná červeň</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- FILTR -->
+  <div class="bar">
+    <div class="grp"><span class="lbl">Strana</span>
+      <button class="chip on">Vše</button>
+      <button class="chip">Hledám hráče</button>
+      <button class="chip">Hledám hru</button>
+    </div>
+    <div class="grp"><span class="lbl">Systém</span>
+      <button class="chip">DrD</button>
+      <button class="chip">JaD</button>
+      <button class="chip">D&D 5e</button>
+      <button class="chip">SR6</button>
+    </div>
+    <div class="grp"><span class="lbl">Režim</span>
+      <button class="chip">Online</button>
+      <button class="chip">Naživo</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn-add">+ Přidat nábor</button>
+  </div>
+  <div class="hint">Šest typů lístku níže je <b>kurátorská sada</b> — autor vybírá tvar, barvy si lístek bere z aktivního motivu. Přepni motiv vpravo nahoře a sleduj, jak deska i lístky změní barvu, ale tvar zůstane.</div>
+
+  <!-- NÁSTĚNKA -->
+  <main class="pin">
+
+    <!-- 1 · PLAKÁT HLEDÁ SE -->
+    <article class="card t-poster">
+      <span class="tack"></span>
+      <div class="banner">HLEDÁ SE</div>
+      <div class="sub">dobrodruh do družiny</div>
+      <span class="side hrac">Hledám hráče</span>
+      <h3>Stíny nad Pustinou</h3>
+      <div class="meta">
+        <span class="k">Systém: <b>DrD 1.6</b></span>
+        <span class="k">Naživo · <b>Praha</b></span>
+        <span class="k">Místa: <span class="seats"><i class="full"></i><i class="full"></i><i class="full"></i><i></i><i></i></span> 3/5</span>
+      </div>
+      <p class="desc">Klasické podzemí, hraje se ob víkend. Vítáni i nováčci, postavy uděláme společně.</p>
+      <div class="foot"><span class="who">PJ <b>Krolok</b> · před 2 h</span><button class="reply">Ozvat se</button></div>
+    </article>
+
+    <!-- 2 · PERGAMENOVÝ SVITEK -->
+    <article class="card t-scroll">
+      <span class="side hrac">Hledám hráče</span>
+      <h3>Kronika Aldbaru</h3>
+      <div class="meta">
+        <span class="k">Systém: <b>Dračí doupě+</b></span>
+        <span class="k">Online · <b>Discord</b></span>
+        <span class="k">Místa: <span class="seats"><i class="full"></i><i class="full"></i><i class="full"></i><i></i><i></i><i></i></span> 3/6</span>
+      </div>
+      <p class="desc">Dlouhá kampaň s důrazem na příběh a intriky. Hledám 3 hráče se zájmem o vyprávění.</p>
+      <div class="foot"><span class="who">PJ <b>Sirien</b> · včera</span><button class="reply">Ozvat se</button></div>
+      <span class="seal">✦</span>
+    </article>
+
+    <!-- 3 · NOVINOVÝ VÝSTŘIŽEK -->
+    <article class="card t-news">
+      <div class="rubrika"><span>Inzerce</span><span>č. 214</span></div>
+      <span class="side hra">Hledám hru</span>
+      <h3>Zkušený hráč hledá stůl</h3>
+      <div class="col">Hraju 8 let, sednu si do rozjeté družiny i nové kampaně. Preferuji online večery ve všední dny. Systém neřeším — přizpůsobím se.</div>
+      <div class="meta"><span class="k">Systém: <b>Cokoli</b></span><span class="k">Online</span></div>
+      <div class="foot"><span class="who"><b>Halgar</b> · před 3 dny</span><button class="reply ghost">Ozvat se</button></div>
+      <span class="torn"></span>
+    </article>
+
+    <!-- 4 · POZNÁMKOVÝ BLOČEK -->
+    <article class="card t-note">
+      <span class="tack"></span>
+      <span class="side hrac">Hledám hráče</span>
+      <h3>Jednorázovka na sobotu</h3>
+      <div class="meta">
+        <span class="k">Systém: <b>JaD</b></span>
+        <span class="k">Naživo · <b>Brno</b></span>
+        <span class="k">Místa: <span class="seats"><i class="full"></i><i></i><i></i><i></i></span> 1/4</span>
+      </div>
+      <p class="desc">Chybí mi poslední hráč na sobotní oneshot. Přijď si zahrát, kostky půjčím!</p>
+      <div class="foot"><span class="who">PJ <b>Miku</b> · před 5 h</span><button class="reply">Ozvat se</button></div>
+      <span class="dogear"></span>
+    </article>
+
+    <!-- 5 · NEONOVÁ CEDULE -->
+    <article class="card t-neon">
+      <div class="tag">// nábor.exe</div>
+      <span class="side hra">Hledám hru</span>
+      <h3>Runner hledá tým</h3>
+      <div class="meta">
+        <span class="k">Systém: <b>Shadowrun 6</b></span>
+        <span class="k">Online · <b>Foundry</b></span>
+      </div>
+      <p class="desc">Decker s vlastním deckem hledá partu na pravidelné shadowruny. Zkušenost s matrixem zaručena.</p>
+      <div class="foot"><span class="who"><b>Nyx</b> · před 1 h</span><button class="reply">Ozvat se</button></div>
+    </article>
+
+    <!-- 6 · VISAČKA / ŠTÍTEK -->
+    <article class="card t-tag">
+      <span class="string"></span><span class="hole"></span>
+      <div class="rubrika">Krátká hra</div>
+      <span class="side hrac">Hledám hráče</span>
+      <h3>Testovací stůl</h3>
+      <div class="meta" style="justify-content:center">
+        <span class="k">Systém: <b>D&D 5e</b></span>
+        <span class="k">Online</span>
+        <span class="k">Místa: <span class="seats"><i class="full"></i><i class="full"></i><i class="full"></i><i></i></span> 3/4</span>
+      </div>
+      <p class="desc" style="text-align:center">Poslední místo do zaběhnuté skupiny. Hrajeme čtvrtky večer.</p>
+      <div class="foot"><span class="who">PJ <b>Ferda</b></span><button class="reply">Ozvat se</button></div>
+    </article>
+
+  </main>
+
+  <p class="footer-note">
+    <b>Co návrh ukazuje:</b> 6 kandidátních tvarů lístku (plakát „Hledá se", pergamenový svitek, novinový výstřižek, poznámkový bloček, neonová cedule, visačka). Každý má vlastní <b>tvar + font</b>; barvu bere z tokenů aktivního motivu → přepínač nahoře to dokládá na 3 motivech (Ikaros / Pergamen / Temná červeň) z reálných hodnot v kódu.<br>
+    <b>K rozhodnutí:</b> které tvary do finální sady (stačí 4), jestli „strana" (hledám hru/hráče) rozlišovat i tvarem nebo jen barvou, a zda papír lístku vždy tónovat motivem (jak teď) — vs. držet světlý papír a z motivu brát jen rám/akcent.
+  </p>
+</div>
+
+<script>
+  const root = document.documentElement;
+  document.querySelectorAll('.tpill').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.tpill').forEach(x=>x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      const t=b.dataset.set;
+      if(t==='ikaros') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+      // znovu-spuštění reveal animace
+      document.querySelectorAll('.card').forEach(c=>{c.style.animation='none';c.offsetHeight;c.style.animation=''});
+    });
+  });
+</script>
+</body>
+</html>

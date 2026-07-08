@@ -281,6 +281,10 @@ export function SidebarContent({
               Prozkoumat světy →
             </Link>
           )}
+          {/* 19.3 — vstup na nástěnku náborů (LFG). */}
+          <Link to="/ikaros/nabory" className={s.showAllLink} onClick={onNav}>
+            Hledá se →
+          </Link>
         </div>
       </div>
 

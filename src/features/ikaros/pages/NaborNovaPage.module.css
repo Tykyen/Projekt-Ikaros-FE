@@ -1,0 +1,149 @@
+/* 19.3 — formulář tvorby náboru. Platformová stránka → globální skin (`:root`). */
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 36px);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.title {
+  font-family: var(--font-display, serif);
+  font-size: clamp(24px, 4vw, 34px);
+  color: var(--theme-heading, var(--theme-text));
+}
+.back {
+  font-size: 14px;
+  color: var(--theme-accent-bright, var(--theme-accent));
+  text-decoration: none;
+}
+.back:hover {
+  text-decoration: underline;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  flex: 1;
+}
+.row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+.hint {
+  font-size: 12px;
+  color: var(--theme-text-muted, var(--theme-text));
+}
+
+.input,
+.select,
+.textarea {
+  font-family: var(--font-body, sans-serif);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--theme-surface-soft, transparent);
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border-soft, rgba(255, 255, 255, 0.12));
+}
+.textarea {
+  resize: vertical;
+}
+
+.toggle {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.seg,
+.segOn {
+  font-family: var(--font-body, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border-soft, rgba(255, 255, 255, 0.12));
+}
+.segOn {
+  background: var(--theme-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--theme-accent);
+}
+
+.motivGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.motiv,
+.motivOn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-body, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid;
+  transition: transform 0.12s ease;
+}
+.motivOn {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.5);
+}
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 26px;
+}
+.ghostBtn,
+.primaryBtn {
+  font-family: var(--font-body, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.ghostBtn {
+  background: transparent;
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border-soft, rgba(255, 255, 255, 0.12));
+}
+.primaryBtn {
+  background: var(--theme-accent);
+  color: var(--text-on-accent, #fff);
+  border: none;
+}
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
