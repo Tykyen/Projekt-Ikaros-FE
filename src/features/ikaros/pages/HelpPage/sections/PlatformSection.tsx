@@ -299,7 +299,12 @@ export function PlatformSection() {
         <Tool icon={<Shield size={16} />} title="Správa platformy (/admin)" audience={{ kind: 'admin', label: 'Jen admini' }} accent="warning">
           <p>
             Admin hub se třemi taby. <strong>Přehled</strong>: dashboard se
-            statistikami a rychlými odkazy. <strong>Uživatelé</strong>: plná správa
+            statistikami a rychlými odkazy — kromě počtů (uživatelé, světy, obsah)
+            i <strong>návštěvnost</strong>, <strong>růst &amp; retence</strong>{' '}
+            (kolik lidí projde cestou registrace → svět → postava → hra a kolik se
+            vrací) a <strong>náklady</strong> (nahraný obsah + využití úložiště
+            Cloudinary). Čísla jsou orientační, počítaná z databáze bez sledování
+            jednotlivců. <strong>Uživatelé</strong>: plná správa
             — hledání, změna role (v hierarchii), ban (i dočasný), naplánování
             smazání (30denní lhůta), u Superadmina jemná oprávnění adminů.{' '}
             <strong>Audit log</strong>: read-only historie admin akcí. Otevřeš

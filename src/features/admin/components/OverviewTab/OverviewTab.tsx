@@ -16,6 +16,8 @@ import { Link } from 'react-router-dom';
 import { useAdminStats } from '../../api/useAdminStats';
 import { StatCard } from './StatCard';
 import { AnalyticsSection } from '../AnalyticsSection/AnalyticsSection';
+import { GrowthSection } from '../GrowthSection/GrowthSection';
+import { CostsSection } from '../CostsSection/CostsSection';
 import s from './OverviewTab.module.css';
 
 /**
@@ -115,6 +117,10 @@ export function OverviewTab() {
       </section>
 
       <AnalyticsSection />
+
+      <GrowthSection />
+
+      <CostsSection />
 
       <section className={s.section}>
         <h2 className={s.sectionTitle}>Fronta</h2>

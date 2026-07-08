@@ -18,4 +18,8 @@ export const adminKeys = {
   stats: ['admin', 'stats'] as const,
   /** 15B.7 — návštěvnost; dotaz `[...analytics, days]`. */
   analytics: ['admin', 'analytics'] as const,
+  /** 19.1 — růst & retence; dotaz `[...growth, days]`. */
+  growth: ['admin', 'growth'] as const,
+  /** 19.2 — počítadla nákladů; dotaz `[...costs]`. */
+  costs: ['admin', 'costs'] as const,
 };

@@ -111,6 +111,48 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
 
 ---
 
+### Růst & retence (19.1, sekce v Přehledu)
+- **Co to je:** onboarding trychtýř + retenční ukazatele registrovaných uživatelů — kde lidé v cestě odpadají a kolik se vrací. Vše **odvozené z DB timestampů, žádný nový tracking** (GDPR-čisté).
+- **Kde:** sekce „Růst & retence" uvnitř tabu Přehled (`components/GrowthSection/GrowthSection.tsx`, za Návštěvností), NE samostatný tab. Data `GET /admin/stats/growth?days=7|30|90`.
+- **Kdo:** FE pod RoleGuardem (Superadmin/Admin). BE `admin.controller.ts` `getStatsGrowth` `@UseGuards(AdminGuard)` (Admin+; `admin.controller.ts:70`).
+- **Co ukazuje:**
+  - **Trychtýř** 5 milníků: Registrovaní → Vstoupil do světa → Má postavu → Zahrál si (world chat) → Hází kostkou (odhad „hraje"). Každý = distinct uživatelé (all-time) + přírůstek z nováčků za období. Konverze % mezi kroky.
+  - **Retence:** Vrátilo se po registraci (aktivace), Lepkavost WAU/MAU, Aktivní 7 d, Aktivní 30 d.
+  - **Kohorty:** tabulka měsíc registrace × registrací / aktivních dodnes / % drží.
+  - **Akvizice:** návštěvníci (z 15B.7) → registrace → poměr.
+  - Přepínač období nováčků 7/30/90 (default 30).
+- **Odkud data (odvozeně, `min(createdAt)` per uživatel):** `users.createdAt` (registrace), `worldmemberships.joinedAt` (svět), `characters` (isNpc=false + userId), world `chatmessages` (worldId≠null, senderId; hody `isDiceRoll`). Akvizice čte `AnalyticsService.getSummary().totals.visitors`.
+- **Hranice / co neumí:**
+  - **⚠️ Pravá week-over-week kohortní retence NEJDE** (dluh **D-19.1-RETENCE**) — v DB je jen přepisovaný `lastSeenAt` bez historie; retence je **snapshot k dnešku**, ne časová řada. UI to čestně označuje.
+  - **Aktivace je aproximace** (`lastSeenAt − createdAt > 24 h`) — guard přepisuje `lastSeenAt` i na registračním requestu.
+  - **Krok „příchod → registrace"** se na konkrétní anonymní návštěvu nenapojuje (bez sledování identity nejde) — jen agregátní poměr.
+  - **„První hra" jako entita neexistuje** → proxy = první hod kostkou / world-chat zpráva.
+  - **Global chat (Hospoda/Camp, worldId=null) se do funnelu nepočítá** — má TTL 1 h, jen world chat je durable.
+- **Zvláštnosti:** cache 15 min per období (agregace přes `chatmessages` je dražší). Každý dílčí dotaz přes `safe()` — chyba → 0/[] + warning, dashboard nespadne. `distinct` počítán aggregation `$group`+`$count` (ne velké pole).
+- **Stav:** ✅ (čeká BE restart + živý touch test)
+- **Kód:** FE `components/GrowthSection/{GrowthSection,FunnelChart}.tsx`, `api/{useGrowthStats,growth.types}.ts`; BE `admin-growth.service.ts`, `admin.controller.ts:70`, `dto/growth-stats.dto.ts`.
+
+---
+
+### Náklady (19.2, sekce v Přehledu)
+- **Co to je:** počítadla provozních nákladů — **jen měření, žádné vynucování**. Kolik obsahu platforma drží a co ji stojí Cloudinary.
+- **Kde:** sekce „Náklady" uvnitř tabu Přehled (`components/CostsSection/CostsSection.tsx`, za Růstem). Data `GET /admin/stats/costs`.
+- **Kdo:** FE RoleGuard (Superadmin/Admin). BE `getStatsCosts` `@UseGuards(AdminGuard)` (Admin+).
+- **Co ukazuje (tři vrstvy):**
+  - **A — počty blobů:** celkem + podle typu (galerie, mapy světů, taktické scény, emotky, obrázky stránek, bestie, obrázky světů) + nejnáročnější světy. Odvozené `countDocuments`.
+  - **B — přesné byty** jen kde je DB má: chat přílohy (`attachments[].size`) + admin PDF (`sizeBytes`).
+  - **C — skutečný provoz Cloudinary** (`api.usage()`): úložiště / přenos / transformace / kredity / plán. Když chybí creds (dev/disk) → sekce skrytá (`available:false`).
+- **Hranice / co neumí:**
+  - **⚠️ Velikost obrázků v bytech se z DB nedopočítá** (dluh **D-19.2-BYTES**) — schémata drží jen `imageUrl`/`publicId`. Vrstva A jsou **počty souborů, ne velikost**; skutečný objem dává jen Cloudinary (C) + chat/PDF (B).
+  - **AI (Fáze 18) neexistuje** → žádná AI počítadla; placeholder „až Fáze 18".
+  - **Vynucování kvót** (blok/upozornění při překročení) NENÍ — je to **navazující krok** roadmapy.
+  - Cloudinary `/usage` je **account-level**, ne per-svět.
+- **Zvláštnosti:** cache 1 h. Cloudinary volání v try/catch → chyba/absence creds neshodí endpoint (`available:false`). Cloudinary config parsuje `CLOUDINARY_URL` v konstruktoru (idempotentní, globální SDK singleton).
+- **Stav:** 🚧 měření ✅ / vynucování limitů = další krok (čeká BE restart)
+- **Kód:** FE `components/CostsSection/CostsSection.tsx`, `api/{useCostStats,costs.types}.ts`; BE `admin-costs.service.ts`, `admin.controller.ts`, `dto/cost-stats.dto.ts`.
+
+---
+
 ### Tab Uživatelé (správa)
 - **Co to je:** filtrovatelná tabulka uživatelů + per-řádek a bulk akce.
 - **Kde:** `components/UsersAdminTab/UsersAdminTab.tsx` → `users/components/UsersTab/UsersTable.tsx`. Data `GET /admin/users`.

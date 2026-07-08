@@ -629,19 +629,28 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 ## Fáze 19 — Růst, metriky & udržitelnost
 **Přílohy A + B.** Aby platforma nejen fungovala, ale **rostla a uživila se** (časem i tvého času). Většinou levné, vysoký nepřímý dopad.
 
-### - [ ] 19.1 Onboarding funnel & metriky retence — [Příloha A]
+### - [x] 19.1 Onboarding funnel & metriky retence — [Příloha A] ✅ *(2026-07-08)*
+
+> ✅ **Implementováno 2026-07-08 (BE+FE).** Nová sekce **„Růst & retence"** v admin Přehledu ([OverviewTab](../../src/features/admin/components/GrowthSection/GrowthSection.tsx)): odvozený **onboarding trychtýř** (registrace → svět → postava → herní akce → hází kostkou) z immutable timestampů (`users.createdAt`, `worldmemberships.joinedAt`, `characters`, world `chatmessages`) + **retenční ukazatele** (aktivace/návrat, lepkavost WAU/MAU, survival kohorty) + **akviziční poměr** (návštěvníci→registrace z 15B.7). Vše **odvozené z DB, žádný nový tracking, GDPR-čisté**. BE `GET /admin/stats/growth` (`AdminGrowthService`, cache 15 min), FE hook `useGrowthStats`. Spec [19.1](arch/phase-19/spec-19.1.md). BE 4/4 + FE 5/5 testy, typecheck+build zelené. **⚠️ Limit (dluh D-19.1-RETENCE):** pravá week-over-week kohortní retence NEJDE — v DB je jen přepisovaný `lastSeenAt` bez historie; retence = snapshot k dnešku. **Čeká BE restart + živý touch test.**
+
 **Cíl:** Sledovat jednoduchý trychtýř (příchod → registrace → první akce → první hra → návrat) a hlavní metriku **„kolik lidí se příští týden vrátí"**.
 **Proč:** Lidé padají na kroku 1 a 3 (nepochopení, prázdná první obrazovka), ne na herních funkcích. Měřit = vědět, kde tlačit.
 **Návrh přípravy:** rozhodnout, co a jak měřit (i ručně/odhadem stačí); respektovat soukromí (žádné invazivní trackování).
-**Otevřené otázky:** Vlastní lehké metriky, nebo žádný externí analytics kvůli soukromí? Co přesně sledovat?
+**Otevřené otázky:** ~~Vlastní lehké metriky, nebo žádný externí analytics kvůli soukromí? Co přesně sledovat?~~ → vyřešeno: **cesta A** (odvozené z DB, žádný externí analytics), funnel 5 milníků + retence snapshot. Pravá retence = dluh (chybí historie aktivity).
 
-### - [ ] 19.2 Náklady & limity (storage kvóta, AI limity) — [Příloha B] 🔁
+### - [~] 19.2 Náklady & limity (storage kvóta, AI limity) — [Příloha B] 🔁
+**Stav:** **měření ✅ (2026-07-08), vynucování limitů 🚧 (další krok).**
+
+> ✅ **Měření implementováno 2026-07-08 (BE+FE).** Sekce **„Náklady"** v admin Přehledu ([CostsSection](../../src/features/admin/components/CostsSection/CostsSection.tsx)): **počty blobů** per typ + nejnáročnější světy (odvozené z DB), **přesné byty** kde je DB má (chat přílohy + admin PDF), **skutečný provoz Cloudinary** (`api.usage()` — úložiště/přenos/kredity, když jsou creds; jinak skryté). BE `GET /admin/stats/costs` (`AdminCostsService`, cache 1 h). Spec [19.2](arch/phase-19/spec-19.2.md). BE 5/5 + FE 5/5 testy, build zelený.
+> **⚠️ Revize scope proti auditu kódu (2026-07-08):** **AI (Fáze 18) neexistuje** → „AI limity" odpadají (placeholder „až Fáze 18"). **Velikost obrázků v bytech se v DB nedrží** → jen počty souborů; skutečné byty jen Cloudinary + chat/PDF (dluh **D-19.2-BYTES**). **Vynucování kvót** (blok/upozornění) = **další krok** (potvrzeno uživatelem). **Čeká BE restart.**
+
 **Cíl:** Předvídatelné náklady — kvóta na úložiště per uživatel/svět + tvrdé limity AI.
 **Proč:** Cloudinary i AI volání jsou platba dle objemu; bez limitů náklady utečou. Známé dluhy **D-NEW-UM10** (chybí kvóta), AI limity z Fáze 18.
-**BE:** kvóty + počítadla; limity/fronty pro AI.
-**Otevřené otázky:** Výše kvót? Co dělat při překročení (blok vs. upozornění)?
+**BE:** ~~kvóty +~~ počítadla (✅); kvóty/vynucení = další krok.
+**Otevřené otázky:** Výše kvót? Co dělat při překročení (blok vs. upozornění)? → řeší navazující krok vynucování.
 
-### - [ ] 19.2 Model podpory (dary / „podporovatel") — [Příloha B]
+### - [ ] 19.4 Model podpory (dary / „podporovatel") — [Příloha B]
+<!-- 2026-07-08: přečíslováno z chybného „19.2" (kolize se 19.2 Náklady) na 19.4 — sedí na H5 v tabulce fází („19.4 dary"). -->
 **Cíl:** Dobrovolné dary/Patreon na provoz; drobná kosmetika jako poděkování (nikdy herní výhoda). + možnosti nástvby
 **Proč:** Komunita ráda přispěje na projekt, který má ráda; štědrý free základ zůstává konkurenční výhodou.
 **Otevřené otázky:** Vůbec teď, nebo až platforma žije (scénář A)? Jaká kosmetika je „fér" (odznak/barva), aby nerozdělila komunitu?

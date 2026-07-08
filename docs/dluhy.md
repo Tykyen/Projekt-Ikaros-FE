@@ -144,6 +144,18 @@ fallback na Map + testy).
 **Zbývá (skutečný chrome drift, ~1622 ve ~160 souborech):** vizuální projití per komponenta napříč 2–3 tématy (proto **ne v automatickém commitu** — riziko rozbití skinů bez živé kontroly). Top cíle: `TemplateEditorModal`, `NotificationCenter`, `PostavaLayout`…
 **Trigger:** sjednocení vzhledu / nový skin odhalí drift. **Měření:** `npm run lint:colors`.
 
+### D-19.1-RETENCE — Pravá week-over-week kohortní retence (chybí historie aktivity)
+**Soubory:** BE `backend/src/modules/admin/admin-growth.service.ts` (`buildRetention`) · zdroj `users` schema.
+**Stav:** 19.1 dodává retenci jen jako **snapshot k dnešku** (aktivace / lepkavost WAU/MAU / survival kohorty podle `createdAt` × aktuální `lastSeenAt`). **Pravá retence T→T+1** (kolik uživatelů registrovaných v týdnu T bylo aktivních v T+1) **NEJDE** — v DB je per-user jen **jeden přepisovaný** `lastSeenAt` (a `lastLoginAt`), žádná historie návratů; analytics je bez `userId` (GDPR), presence in-memory. Zpětný backfill nemožný.
+**Trigger:** až bude potřeba skutečná retenční křivka v čase.
+**Co bude potřeba:** lehký **týdenní append-only snapshot** aktivity (`{ userId, isoWeek }` unique, nebo denní rollup `lastSeenAt`) — zapne pravou retenci **od nasazení dál** (ne zpětně). Malý nový tracking → samostatné produktové rozhodnutí (dnes vědomě cesta A bez trackingu). Spec [19.1 §8](arch/phase-19/spec-19.1.md).
+
+### D-19.2-BYTES — Velikost obrázkových blobů v bytech (dnes jen počty)
+**Soubory:** BE upload cesta (`upload/upload.service.ts` `UploadedImage`) + image schémata (gallery, world-maps, maps, emotes, pages, bestiae, world, avatary).
+**Stav:** 19.2 měří storage jako **počet souborů** per typ/svět — **velikost v bytech se u obrázků do DB neukládá** (schémata drží jen `imageUrl`/`publicId`). Přesné byty známe jen u **chat příloh** (`attachments[].size`) a **admin PDF** (`sizeBytes`); celkový skutečný objem dává jen **Cloudinary `api.usage()`** (account-level, ne per-svět).
+**Trigger:** až bude potřeba přesná velikost per svět/uživatel (nutná podmínka pro **vynucování kvót** — navazující krok 19.2).
+**Co bude potřeba:** ukládat `bytes` (z Cloudinary `result.bytes` / `file.size`) do image schémat při uploadu. Retroaktivně nepokryje staré bloby (jen od nasazení). Spec [19.2 §7](arch/phase-19/spec-19.2.md).
+
 ---
 
 ## Vyřešené

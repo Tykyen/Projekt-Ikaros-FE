@@ -175,3 +175,14 @@ Procesní chyby (workflow, návyky, dodržování pravidel). Index v [README](RE
 **Příznak cyklení:** navrhuju „nahoď se / je to správně" na hlášený chybějící prvek, uživatel opáčí „ale je to majitel / má tam být".
 
 ---
+
+### ✅ ŘEŠENÍ — metriky růstu a nákladů (krok 19.1 a 19.2): audit dat před kódem překopal scope · 2026-07-08
+**Kontext:** Zadání „onboarding funnel + retence (19.1) + počítadla nákladů storage/AI (19.2)". Uživatel odsouhlasil cestu A (odvozené z DB, žádný tracking) a odešel s „dej se do toho".
+**Co zabralo (a proč správně):** PŘED psaním kódu jsem pustil 3 paralelní průzkumné agenty na BE data (retence/presence · funnel/aktivita · storage/AI). Odhalili tři věci, které zadání implicitně předpokládalo, ale **realita kódu je nemá**:
+1. **AI (Fáze 18) vůbec neexistuje** — žádná generativní AI, žádné tokeny → „AI limity" nemají co měřit (vypuštěno, placeholder „až Fáze 18").
+2. **Pravá week-over-week retence NEJDE** — v DB je per-user jen přepisovaný `lastSeenAt` bez historie; analytics je bez `userId`, presence in-memory. Nahrazeno snapshotem k dnešku (aktivace/stickiness/survival kohorty) + dluh D-19.1-RETENCE.
+3. **Storage v bytech u obrázků NEJDE** — schémata drží jen `imageUrl`/`publicId`; byty známe jen u chat příloh + admin PDF. Nahrazeno počty blobů + Cloudinary `api.usage()` + dluh D-19.2-BYTES.
+Scope se revidoval v spec DŘÍV, než vznikl řádek kódu → nevznikl žádný mrtvý kód (AI limitér, pravá retence, byte-scraper obrázků).
+**Poučení:** U featury typu „měř X" NEVĚŘ, že data pro X v DB existují jen proto, že to zadání/roadmapa předpokládá — **audit reálných schémat/timestampů je první krok, ne až implementační detail**. Levný fan-out agentů na „jaká data máme" ušetří psaní kódu, který by se stejně zahodil. Odchylky od zadání, které audit vynutí, prokomunikuj a zrcadli do spec + roadmapy + dluhů (ne tiše).
+**Zhodnocení — dobře:** audit-first = 0 přepisů, 0 cyklení; BE 9/9 + FE 10/10 testů zelených na první ucelený běh; typecheck+build čisté; nesrovnalost dvojího „19.2" v roadmapě zachycena a opravena (dary→19.4). **Špatně/riziko:** rozhodl jsem revizi scope sám (uživatel pryč) — jádro featury stojí, ale AI/retence/storage-odchylky uvidí až zpětně ze spec; mírní to, že nic není commitnuté ani nasazené (čeká BE restart + jeho review).
+**Příznak cyklení (kterému to předešlo):** začít psát „AI limity" / „retenční křivku" / „storage v MB" a až v půlce zjistit, že podkladová data neexistují → zahodit a přepsat.
