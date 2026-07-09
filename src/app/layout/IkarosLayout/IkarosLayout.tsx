@@ -816,9 +816,12 @@ export function IkarosLayout() {
   // 20.5 — admin chat běží ve full-height chat módu (jako `/chat`), ne
   // v 220px admin gridu → shell vyplní celý viewport přes celou plochu.
   const isAdminChat = pathname.startsWith('/admin/chat');
+  // 16.2b-2 — globální bestiář = imerzivní full-width plocha („kniha") bez obou
+  // bočních panelů. Reuse bodyFull (1 sloupec + skrytý levý sidebar).
+  const isBestiar = pathname.startsWith('/ikaros/bestiar');
   // Spec 15.7 — pravý panel se ukáže i anonimovi (obsah = AnonStartPanel
-  // „Začni tady" místo Administrace). Skrytý jen v chat/admin focus módu.
-  const showRightPanel = !isChat && !isAdmin;
+  // „Začni tady" místo Administrace). Skrytý v chat/admin focus módu + bestiar.
+  const showRightPanel = !isChat && !isAdmin && !isBestiar;
 
   function openLeftDrawer() {
     setRightDrawerOpen(false);
@@ -954,7 +957,9 @@ export function IkarosLayout() {
           s.body,
           // Admin chat = full-bleed (jen 1 sloupec); jinak chat/admin = bez
           // pravého panelu. Výlučně, ať se konfliktní grid třídy nepřekrývají.
-          isAdminChat ? s.bodyFull : (isChat || isAdmin) && s.bodyNoRight,
+          isAdminChat || isBestiar
+            ? s.bodyFull
+            : (isChat || isAdmin) && s.bodyNoRight,
         )}
       >
         <aside className={s.sidebar} data-frame-panel="sidebar">

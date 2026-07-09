@@ -224,11 +224,31 @@ export function PlatformSection() {
           <p>
             Jedno tlačítko v hlavním menu, které otevře rozcestník veškeré
             komunitní tvorby. Najdeš tu dlaždice na <strong>Diskuze</strong>,{' '}
-            <strong>Články</strong> a <strong>Galerii</strong> (fungují) a
-            připravované sekce <strong>Bestiář, Herbář, Lektvary, Kouzla</strong>{' '}
-            a <strong>Hádanky</strong> — ty zatím nesou štítek „Připravujeme" a klik
-            tě zavede na stránku, že se sekce chystá. RPG systémy mají v menu
-            vlastní tlačítko.
+            <strong>Články</strong>, <strong>Galerii</strong> a{' '}
+            <strong>Bestiář</strong> (fungují) a připravované sekce{' '}
+            <strong>Herbář, Lektvary, Kouzla</strong> a <strong>Hádanky</strong> —
+            ty zatím nesou štítek „Připravujeme". RPG systémy mají v menu vlastní
+            tlačítko.
+          </p>
+        </Tool>
+        <Tool icon={<BookOpen size={16} />} title="Globální bestiář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
+          <p>
+            Sdílený katalog bytostí napříč světy i herními systémy (ve „Společné
+            tvorbě"). Dvě knihovny: <strong>Schválená</strong> (ověřené bytosti,
+            laděné systém po systému) a <strong>Návrhy</strong> (komunitní, zatím
+            neověřené — vzít lze i tak). Každá bytost je jako kniha: obrázek +
+            popis, nahoře <strong>záložky s pravidly</strong> pro jednotlivé
+            systémy (D&amp;D, Dračí doupě…) a dole <strong>diskuse</strong> —
+            zvlášť k bytosti a zvlášť ke statům každého systému.
+          </p>
+          <p>
+            Číst a diskutovat může každý přihlášený. Můžeš{' '}
+            <strong>vytvořit</strong> novou bytost (uloží se jako návrh a rovnou
+            ji máš i ve svém bestiáři), <strong>navrhnout staty</strong> pro další
+            systém a <strong>vložit</strong> si bytost do svého bestiáře — do
+            osobního, nebo do konkrétního světa, kde jsi Pomocný PJ nebo výš.
+            Popis a obrázek se mění volně, ale <strong>staty se ladí přes
+            diskusi</strong> a schvaluje je správce.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

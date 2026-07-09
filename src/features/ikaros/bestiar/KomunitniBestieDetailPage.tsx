@@ -22,6 +22,7 @@ import { systemLabel } from './components/systems';
 import { useKomunitniBestie } from './hooks/useKomunitniBestiar';
 import { useKomunitniBestiarMutations } from './hooks/useKomunitniBestiarMutations';
 import s from './KomunitniBestieDetail.module.css';
+import './komunitniBestiarSkins.css';
 
 const CURATOR_ROLES = [
   UserRole.Superadmin,

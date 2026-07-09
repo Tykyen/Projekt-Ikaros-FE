@@ -15,6 +15,7 @@ import { useKomunitniBestiar } from './hooks/useKomunitniBestiar';
 import { BestieEditorModal } from './components/BestieEditorModal';
 import type { BestieStatus, GlobalBestie } from './types';
 import s from './KomunitniBestiar.module.css';
+import './komunitniBestiarSkins.css';
 
 const uniq = (arr: string[]) => Array.from(new Set(arr));
 
