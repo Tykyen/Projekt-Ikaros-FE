@@ -8,8 +8,12 @@ import {
   Pencil,
   Theater,
   MoreVertical,
+  Flag,
 } from 'lucide-react';
 import clsx from 'clsx';
+import { useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { ReportModal } from '@/shared/moderation';
 import type { ChatMessage } from '../lib/types';
 import { renderPlainChatContent } from '../lib/renderPlainContent';
 import { resolveTombstone } from '@/shared/lib/tombstone';
@@ -144,6 +148,9 @@ export function MessageItem({
   renderSenderBadge,
 }: MessageItemProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  // 20B — report smí jen přihlášený člen (anonymní host v globálním chatu ne).
+  const viewer = useAtomValue(currentUserAtom);
   const reactionBtnRef = useRef<HTMLButtonElement>(null);
   // Dotyk: jedno ⋮ tlačítko → KebabMenu (inline ikony se na mobilu nevešly do
   // rezervovaného sloupce a ležely na textu).
@@ -276,7 +283,10 @@ export function MessageItem({
   const showReply = allowReply && !isPending && !isFailed;
   const showReact = allowReactions && !isPending && !isFailed;
   const showDelete = (canDelete || (isSelf && !isDice)) && !isPending && !isFailed;
-  const hasActions = showReply || showReact || canEdit || showDelete;
+  // 20B — nahlásit cizí zprávu (ne vlastní, ne odesílanou/selhanou). Snapshot =
+  // text zprávy; autor = reálný účet (i u NPC/PJ persony reportujeme účet).
+  const showReport = !!viewer && !isSelf && !isPending && !isFailed;
+  const hasActions = showReply || showReact || canEdit || showDelete || showReport;
 
   // Dotyk: stejné akce jako inline lišta, jen složené do KebabMenu.
   const menuItems: KebabMenuItem[] = [];
@@ -308,6 +318,13 @@ export function MessageItem({
       icon: <Trash2 size={15} />,
       variant: 'danger',
       onClick: () => onDelete(message.id),
+    });
+  if (showReport)
+    menuItems.push({
+      key: 'report',
+      label: 'Nahlásit zprávu',
+      icon: <Flag size={15} />,
+      onClick: () => setReportOpen(true),
     });
 
   return (
@@ -512,6 +529,17 @@ export function MessageItem({
                   <Trash2 size={13} />
                 </button>
               )}
+              {showReport && (
+                <button
+                  type="button"
+                  className={s.action}
+                  onClick={() => setReportOpen(true)}
+                  title="Nahlásit zprávu"
+                  aria-label="Nahlásit zprávu"
+                >
+                  <Flag size={13} />
+                </button>
+              )}
             </div>
 
             {/* Dotyk — jedno ⋮ tlačítko (vejde se do gutteru, neleží na textu). */}
@@ -549,6 +577,18 @@ export function MessageItem({
             anchorRef={reactionBtnRef}
             onSelect={(emoji) => onToggleReaction(message.id, emoji)}
             onClose={() => setPickerOpen(false)}
+          />
+        )}
+        {/* 20B — report modal (montuje se až při otevření → čistý stav). */}
+        {showReport && reportOpen && (
+          <ReportModal
+            open
+            onClose={() => setReportOpen(false)}
+            targetType="chat_message"
+            targetId={message.id}
+            targetSnapshot={rawText || '[zpráva bez textu]'}
+            targetAuthorName={resolvedSenderName}
+            targetAuthorId={message.senderId}
           />
         )}
       </div>

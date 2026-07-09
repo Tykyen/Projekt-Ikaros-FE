@@ -16,6 +16,8 @@ import {
   NewsDetailModal,
 } from '@/shared/ui';
 import type { KebabMenuItem, NewsCardVM, NewsTone } from '@/shared/ui';
+import { ReportButton } from '@/shared/moderation';
+import { useWorldContext } from '@/features/world/context/WorldContext';
 import { relativeEventDate } from '@/features/world/utils/relativeEventDate';
 import { usePagesDirectory } from '@/features/world/pages/api/usePagesDirectory';
 import { useCalendarConfigs } from '@/features/world/api/useCalendarConfigs';
@@ -63,6 +65,7 @@ export function WorldNewsCard({
   onDelete,
   onArchive,
 }: Props) {
+  const { world } = useWorldContext();
   const [open, setOpen] = useState(false);
   const [kebabAnchor, setKebabAnchor] = useState<HTMLButtonElement | null>(
     null,
@@ -196,7 +199,23 @@ export function WorldNewsCard({
         onOpen={() => setOpen(true)}
         adminSlot={adminSlot}
       />
-      <NewsDetailModal vm={vm} open={open} onClose={() => setOpen(false)} />
+      <NewsDetailModal
+        vm={vm}
+        open={open}
+        onClose={() => setOpen(false)}
+        /* 20B — novinka nemá autora, odpovědný subjekt = svět. Bez targetAuthorId
+           → viditelné všem členům (i PJ, který ji vytvořil). */
+        reportSlot={
+          <ReportButton
+            targetType="world_news"
+            targetId={news.id}
+            targetSnapshot={news.title}
+            targetAuthorName={world?.name ?? 'Svět'}
+            worldId={news.worldId ?? worldId}
+            targetUrl={`/svet/${worldSlug}/novinky`}
+          />
+        }
+      />
 
       {canManage && (
         <KebabMenu

@@ -61,6 +61,13 @@
   margin-top: var(--sp-4);
 }
 
+/* 20B — nahlašovací tlačítko pod hlavičkou článku. */
+.reportRow {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-2);
+}
+
 .header {
   text-align: center;
   padding: var(--sp-6) 0;

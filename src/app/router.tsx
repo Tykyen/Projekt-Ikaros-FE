@@ -49,6 +49,10 @@ const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage
 const SystemsHubPage       = lazy(() => import('@/features/ikaros/pages/SystemLanding/SystemsHubPage'));
 const SystemLandingPage    = lazy(() => import('@/features/ikaros/pages/SystemLanding/SystemLandingPage'));
 const TermsPage            = lazy(() => import('@/features/ikaros/pages/TermsPage'));
+// 20A (Příloha C) — legal statické stránky
+const PrivacyPage          = lazy(() => import('@/features/ikaros/pages/PrivacyPage'));
+const CodeOfConductPage    = lazy(() => import('@/features/ikaros/pages/CodeOfConductPage'));
+const ContactPage          = lazy(() => import('@/features/ikaros/pages/ContactPage'));
 const DiscussionsNewPage   = lazy(() => import('@/features/ikaros/pages/DiscussionsNewPage'));
 // 19.3 — nástěnka náborů (LFG).
 const NaboryPage           = lazy(() => import('@/features/ikaros/pages/NaboryPage'));
@@ -190,6 +194,10 @@ export const router = createBrowserRouter([
       { path: 'ikaros/systemy',         element: p(SystemsHubPage) },
       { path: 'ikaros/systemy/:slug',   element: p(SystemLandingPage) },
       { path: 'podminky',               element: p(TermsPage) },
+      // 20A (Příloha C) — Zásady OÚ (GDPR čl. 13), Pravidla komunity, Kontakt
+      { path: 'soukromi',               element: p(PrivacyPage) },
+      { path: 'kodex',                  element: p(CodeOfConductPage) },
+      { path: 'kontakt',                element: p(ContactPage) },
       // 1.7 — anonymní routes pro mailové linky (reset / verify / email change)
       { path: 'reset-password',         element: p(ResetPasswordPage) },
       { path: 'email-verify',           element: p(EmailVerifyPage) },

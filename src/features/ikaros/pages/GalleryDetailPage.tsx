@@ -7,6 +7,8 @@ import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { Spinner, Breadcrumbs } from '@/shared/ui';
 import { Seo, metaDescription, JsonLd, galleryJsonLd, breadcrumbJsonLd } from '@/shared/seo';
+import { ReportButton } from '@/shared/moderation';
+import { AiBadge } from '@/shared/media';
 import {
   useGalleryImage,
   useApproveGalleryImage,
@@ -79,7 +81,10 @@ export default function GalleryDetailPage() {
       </div>
 
       <div className={s.body}>
-        <h1 className={s.title}>{image.title}</h1>
+        <div className={s.titleRow}>
+          <h1 className={s.title}>{image.title}</h1>
+          {image.aiOrigin && image.aiOrigin !== 'none' && <AiBadge />}
+        </div>
         <div className={s.meta}>
           {/* D-040 — disabled link u smazaného autora galerie. */}
           {image.authorIsDeleted ? (
@@ -108,6 +113,16 @@ export default function GalleryDetailPage() {
         </div>
 
         <GalleryFavorite image={image} />
+
+        <div className={s.reportRow}>
+          <ReportButton
+            targetType="gallery"
+            targetId={image.id}
+            targetSnapshot={image.title}
+            targetAuthorName={image.authorName}
+            targetAuthorId={image.authorId}
+          />
+        </div>
 
         {image.description && <p className={s.desc}>{image.description}</p>}
 

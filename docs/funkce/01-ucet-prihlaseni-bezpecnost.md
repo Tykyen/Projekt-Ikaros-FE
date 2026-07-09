@@ -11,7 +11,7 @@
 - **Kde:** Modal `RegisterModal` (otevřen z LoginModalu „Zaregistruj se" nebo přes `registerModalOpenAtom`). Není to samostatná route.
 - **Kdo:** Anonym. Žádný guard.
 - **Co jde dělat:**
-  - Pole: E-mail, Přezdívka (username), Heslo, Potvrzení hesla, checkbox „Souhlasím s podmínkami" (link na `/podminky`), Cloudflare Turnstile captcha.
+  - Pole: E-mail, Přezdívka (username), Heslo, Potvrzení hesla, checkbox „Souhlasím s podmínkami" (link na `/podminky`), **deklarativní věk** (radio „Je mi 15 nebo více" / „Je mi méně než 15 let", povinné — 20.2/§C2), Cloudflare Turnstile captcha. Pod souhlasem informativní věta „Registrací bereš na vědomí Zásady OÚ" (odkaz na `/soukromi`; Zásady = informace, ne součást souhlasu).
   - Live kontrola dostupnosti přezdívky i e-mailu (ikona) přes `GET /auth/check-username?u=` a `/auth/check-email?e=` (debounce, throttle 60/min).
   - Indikátor síly hesla (`PasswordStrengthIndicator`).
   - Toggle zobrazení hesla.
@@ -24,10 +24,11 @@
 - **Zvláštnosti:**
   - Captcha fail-closed na **obou** stranách. BE: bez `TURNSTILE_SECRET` v prod → 400 `CAPTCHA_FAILED` (dev/test bez secretu projde s warningem). FE: bez `VITE_TURNSTILE_SITE_KEY` v **prod buildu** → widget se nerenderuje, místo něj hláška + submit blokován (už NEpřepadá tiše na test key — 14.2). Test site key `1x00000000000000000000AA` jen jako dev fallback.
   - GDPR: BE vynucuje `acceptedTerms===true` (jinak `TERMS_NOT_ACCEPTED`), ukládá `acceptedTermsAt` + `termsVersion` (`2026-06-05`).
+  - **Věk / nezletilí (20.2/§C2–C3):** volba se odvodí na `isMinor: boolean` (`under15 → true`). **Minimalizace** — neukládá se datum narození, jen flag + `minorSelfDeclaredAt`. Při `isMinor=true` BE nastaví **bezpečné defaulty**: `profileVisibility='friends'` (neveřejný profil), `hiddenInDirectory=true` (skrytý v adresáři) a `parentalConsentStatus='pending'` (u dospělého `'not_required'`). Samotný tok udělení rodičovského souhlasu je zatím stub (jen flag; neblokuje užívání v betě). V profilu se nezletilému ukazuje nenápadná hláška „Účet v režimu ochrany nezletilých" (`AccountSection` → `MinorNotice`).
   - Po registraci BE fire-and-forget pošle verifikační e-mail (selhání mailu registraci nezboří).
   - Throttle `POST /auth/register` = 10/min.
 - **Stav:** ✅ funguje.
-- **Kód:** FE `src/features/auth/components/RegisterModal.tsx:54`, `src/features/auth/api/useAuth.ts:83`, BE `modules/auth/auth.controller.ts:60`, `auth.service.ts:100`, `captcha.service.ts:38`.
+- **Kód:** FE `src/features/auth/components/RegisterModal.tsx:54` (věk `:296`), `registerSchema.ts:28`, `src/features/auth/api/useAuth.ts:83`, BE `modules/auth/auth.controller.ts:60`, `auth.service.ts:100` (minor defaults `:155`), `dto/register.dto.ts:44` (`isMinor`), `users/schemas/user.schema.ts:93` (`isMinor`/`minorSelfDeclaredAt`/`parentalConsentStatus`), `captcha.service.ts:38`.
 
 ---
 
@@ -193,6 +194,7 @@
 - **Kdo:** Přihlášený (vlastní účet). `POST /users/me/deletion-request` (+ `?dryRun=true` preview).
 - **Co jde dělat:**
   - Otevření modalu nejdřív dryRun → preview PJ handover plánu.
+  - Modal nabízí **„Stáhnout moje data (JSON)"** ještě před smazáním (rámec „mazání = nejdřív nabídnout export", 20.2/§C1).
   - Pokud jsi jediný PJ ve světě bez Pomocného PJ → `SOLE_PJ_BLOCK`, modal přepne na seznam blokujících světů (smazat nelze).
   - Jinak: zobrazí plán povýšení Pomocných PJ → PJ, vyžaduje napsání vlastního username + checkbox potvrzení → ostrý request.
   - Po smazání: auto-logout (revoke refresh tokenů přes `user.deletion.requested`).
@@ -213,12 +215,13 @@
 ---
 
 ### GDPR export dat
-- **Co to je:** Export vlastních dat (JSON) podle GDPR.
-- **Kde:** BE `GET /data-export/me` (za `JwtAuthGuard`).
-- **Kdo:** Přihlášený.
-- **Hranice / co neumí:** ⚠️ Na FE NEEXISTUJE žádný konzument (`data-export` se v `Projekt-ikaros-FE/src` nevyskytuje). Endpoint je hotový na BE, ale uživatel ho z UI nespustí.
-- **Stav:** 🚧 částečné (BE bez FE).
-- **Kód:** BE `modules/data-export/data-export.controller.ts:18`. FE: žádný.
+- **Co to je:** Export vlastních dat (JSON) podle GDPR (čl. 15/20).
+- **Kde:** BE `GET /data-export/me` (za `JwtAuthGuard`). FE tlačítko **„Stáhnout moje data (JSON)"** v profilu → sekce „Účet" (`AccountSection`) a v `DeleteAccountModal` (nabídka před smazáním účtu).
+- **Kdo:** Přihlášený (jen vlastní data).
+- **Co jde dělat:** klik → hook `useDataExport` volá `GET /data-export/me` → prohlížeč stáhne Blob jako `ikaros-data-<YYYY-MM-DD>.json`. Dostupné i v pending-delete stavu.
+- **Hranice / co neumí:** account-centric rozsah (profil, world memberships, přátelství/bloky, username request, admin audit kde je uživatel cílem) — ne obsah stránek/postav/zpráv. Admin nemůže exportovat cizí účet.
+- **Stav:** ✅ (20.2/§C1 — FE tlačítko doplněno; dříve BE bez FE).
+- **Kód:** BE `modules/data-export/data-export.controller.ts:16`. FE `src/features/profile/api/useDataExport.ts:30`, `components/AccountSection.tsx:21`.
 
 ---
 
@@ -253,7 +256,7 @@
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 - **Min. délka hesla SJEDNOCENA** (2026-06-27, D-NEW-INV-SEC): registrace i změna/reset = min **8** (`RegisterDto`/`registerSchema` zvednuto na 8). Re-auth `PasswordConfirmDto` (2FA disable) zůstává 6 — validuje **stávající** heslo, legacy 6-znaková se nesmí zamknout.
-- **GDPR data-export bez FE:** `GET /data-export/me` na BE hotový, ale v celém FE žádné volání → uživatel si data z UI nestáhne. (FE bez BE × BE bez FE: zde BE bez FE.)
+- ✅ VYŘEŠENO 20.2/§C1 — **GDPR data-export má FE.** Tlačítko „Stáhnout moje data (JSON)" v profilu → Účet i v `DeleteAccountModal` (`useDataExport` → `GET /data-export/me` → Blob). Dřív BE bez FE.
 - **`logout-all` bez UI:** `POST /auth/logout-all` existuje, ale Bezpečnost sekce profilu ho nenabízí (žádné „odhlásit všechna zařízení" mimo důvěryhodná zařízení a vypnutí 2FA).
 - ✅ OPRAVENO 2026-06-18 — **Cron doc↔chování:** `account-cleanup.cron` JSDoc tvrdí „1× za hodinu", reálně `@Cron('0 3 * * *')` = denně 03:00.
 - **Reminder mail před hard-delete chybí:** přiznaný dluh; `MailerService` injectnutý do cronu „do zásoby" (`void this.mailer`).

@@ -26,6 +26,11 @@
   flex-wrap: wrap;
 }
 
+/* 20B — akční slot (Nahlásit) odsazený vpravo od štítku + data. */
+.reportSlot {
+  margin-left: auto;
+}
+
 .date {
   font-family: var(--font-display);
   font-size: var(--text-sm);

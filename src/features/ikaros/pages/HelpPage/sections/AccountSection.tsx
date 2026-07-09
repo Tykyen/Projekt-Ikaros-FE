@@ -11,6 +11,9 @@ import {
   Globe2,
   Bell,
   Palette,
+  Download,
+  Baby,
+  Flag,
 } from 'lucide-react';
 import { HelpAccordion, StepList, CalloutBox, TermGrid } from '../components';
 
@@ -193,6 +196,49 @@ export function AccountSection() {
           přenese do světa). <strong>Moje akce ve světech</strong> agregují blížící
           se herní akce napříč světy. Komunitní stopa (diskuze, články, galerie) se
           plní postupně.
+        </p>
+      </HelpAccordion>
+
+      <HelpAccordion icon={<Flag size={20} />} title="Moderace (moje hlášení a rozhodnutí)" accent="info">
+        <p>
+          Sekce <strong>Moderace</strong> v profilu shrnuje tvoji stranu
+          nahlašování — na jednom místě vidíš:
+        </p>
+        <TermGrid
+          items={[
+            { term: 'Moje hlášení', desc: 'Co jsi nahlásil/a a v jakém je to stavu (Čeká / V řešení / Vyřízeno).' },
+            { term: 'Rozhodnutí o mém obsahu', desc: 'Když moderátor zasáhl proti tvému obsahu, uvidíš tu odůvodnění a na co se opírá.' },
+          ]}
+        />
+        <p>
+          S rozhodnutím nesouhlasíš? U něj je tlačítko <strong>„Odvolat se"</strong>{' '}
+          — odvolání posoudí <strong>jiný</strong> moderátor než ten, kdo rozhodl.
+          Nahlásit obsah můžeš tlačítkem „Nahlásit" přímo u něj (viz tab Platforma
+          → Nahlásit obsah).
+        </p>
+      </HelpAccordion>
+
+      <HelpAccordion icon={<Download size={20} />} title="Stáhnout moje data" accent="success">
+        <p>
+          V sekci <strong>Účet</strong> je tlačítko{' '}
+          <strong>„Stáhnout moje data (JSON)"</strong>. Vytvoří a stáhne soubor s
+          tvými údaji — profil, členství ve světech, přátelství a další záznamy,
+          které o tobě vedeme (právo na přístup a přenositelnost). Nabídneme ti ho i{' '}
+          <strong>před smazáním účtu</strong>, ať si data odneseš dřív, než zmizí.
+        </p>
+      </HelpAccordion>
+
+      <HelpAccordion icon={<Baby size={20} />} title="Věk a režim ochrany nezletilých" accent="warning">
+        <p>
+          Při registraci se ptáme jen na to, jestli ti je{' '}
+          <strong>15 a víc, nebo méně</strong> — přesné datum narození nechceme.
+        </p>
+        <p>
+          Když je ti <strong>méně než 15</strong>, účet se zapne v{' '}
+          <strong>bezpečném režimu</strong>: profil je neveřejný a skrytý v adresáři
+          uživatelů. U mladších je navíc potřeba <strong>souhlas zákonného
+          zástupce</strong>. Podrobnosti jsou v{' '}
+          <Link to="/soukromi">Zásadách ochrany osobních údajů</Link>.
         </p>
       </HelpAccordion>
 

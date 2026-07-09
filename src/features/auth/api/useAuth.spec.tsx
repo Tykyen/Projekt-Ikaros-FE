@@ -147,6 +147,7 @@ describe('useRegister', () => {
         email: 'newbie@test.io',
         username: 'newbie',
         password: 'pass1234',
+        isMinor: false,
       });
     });
 
@@ -158,6 +159,7 @@ describe('useRegister', () => {
       email: 'newbie@test.io',
       username: 'newbie',
       password: 'pass1234',
+      isMinor: false,
     });
   });
 
@@ -177,6 +179,7 @@ describe('useRegister', () => {
         email: 'x@x.com',
         username: 'x',
         password: 'pass1234',
+        isMinor: false,
       });
     });
 
@@ -195,6 +198,7 @@ describe('useRegister', () => {
           email: 'taken@test.io',
           username: 'newbie',
           password: 'pass1234',
+          isMinor: false,
         })
         .catch(() => {});
     });

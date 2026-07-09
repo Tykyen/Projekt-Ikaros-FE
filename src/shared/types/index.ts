@@ -80,6 +80,10 @@ export interface User {
   hiddenInDirectory?: boolean;
   /** 3.5 D-057 — kdo vidí profil a může psát: `public` (default) | `friends`. */
   profileVisibility?: 'public' | 'friends';
+  /** 20C — deklarativní věk (< 15 let). Zapíná v profilu režim ochrany nezletilých. */
+  isMinor?: boolean;
+  /** 20C — stav souhlasu zákonného zástupce (jen flag; reálný tok = lawyer-pending). */
+  parentalConsentStatus?: 'pending' | 'granted' | 'not_required';
   lastLoginAt?: string;
   usernameChangedAt?: string;
   // 1.3b — ban + admin permissions (D-033 granular)
@@ -292,6 +296,12 @@ export interface RegisterRequest {
   password: string;
   // D-010 — GDPR souhlas (povinný checkbox v RegisterModalu)
   acceptedTerms?: boolean;
+  /**
+   * 20C — deklarativní věk (spec-20C §C2). `true` = uživatel deklaroval < 15 let.
+   * MUSÍ se posílat vždy: BE `RegisterDto` má `isMinor` povinné (+ forbidNonWhitelisted),
+   * takže chybějící pole = 400. FE ho odvozuje z volby ageBracket v RegisterModalu.
+   */
+  isMinor: boolean;
   // D-011 — honeypot (skutečný uživatel nevyplňuje, bot ano → BE odmítne)
   hp?: string;
   /** D-011 — Cloudflare Turnstile token (validuje BE proti siteverify). */
@@ -831,6 +841,12 @@ export interface ArticleReviewListItem {
 
 export type GalleryStatus = 'Draft' | 'Pending' | 'Published' | 'Rejected';
 
+/**
+ * 20D (D1) — self-declared původ obrázku. `none` = běžné dílo, `ai_image` =
+ * autor uvedl, že obrázek vytvořila AI (→ AiBadge). Rozšiřitelný enum.
+ */
+export type GalleryAiOrigin = 'none' | 'ai_image';
+
 export interface GalleryRating {
   userId: string;
   stars: number;
@@ -861,6 +877,8 @@ export interface IkarosGalleryItem {
   rejectReason?: string;
   ratings: GalleryRating[];
   averageRating: number;
+  /** 20D (D1) — self-declared AI původ; `ai_image` zapíná AiBadge. */
+  aiOrigin?: GalleryAiOrigin;
   createdAtUtc: string;
   updatedAtUtc: string;
   publishedAtUtc?: string;
@@ -1307,8 +1325,13 @@ export enum PendingActionType {
   ArticlePendingReview = 'article_pending_review',
   GalleryPendingReview = 'gallery_pending_review',
   DiscussionPendingReview = 'discussion_pending_review',
-  DiscussionReport = 'discussion_report',
+  // B4d — `discussion_report` sjednocen do generického `content_report`
+  // (modul `moderation`); typ odstraněn.
   DiscussionJoinRequest = 'discussion_join_request',
+  /** 20B — generický report napříč plochami (modul `moderation`). */
+  ContentReport = 'content_report',
+  /** 20B B4 — odvolání proti moderačnímu rozhodnutí (přezkum jiným moderátorem). */
+  ModerationAppeal = 'moderation_appeal',
 }
 
 // ─── Diskuze (3.4) — payloady karet ve Zpracovat tabu ──────────────────────
@@ -1325,19 +1348,8 @@ export interface DiscussionReviewListItem {
   submittedAt: string;
 }
 
-/** `discussion_report` — nahlášený příspěvek. */
-export interface DiscussionReportListItem {
-  reportId: string;
-  discussionId: string;
-  discussionTitle: string;
-  postId: string;
-  /** Snapshot obsahu příspěvku v době nahlášení (HTML z RTE). */
-  postContentSnapshot: string;
-  postAuthorName: string;
-  reporterName: string;
-  reason: string;
-  createdAt: string;
-}
+// B4d — `DiscussionReportListItem` odstraněn; nahlášené příspěvky přicházejí
+// jako generický `ContentReportListItem` (targetType='discussion_post').
 
 /** `discussion_join_request` — žádost o přidání do uzamčené diskuze. */
 export interface DiscussionJoinRequestListItem {
@@ -1345,6 +1357,41 @@ export interface DiscussionJoinRequestListItem {
   discussionTitle: string;
   userId: string;
   username: string;
+}
+
+/**
+ * 20B `content_report` — nahlášený obsah (generická moderační fronta modulu
+ * `moderation`). Zrcadlí BE `ContentReportListItem`. `reporterName` je `null`,
+ * pokud byl report anonymní (identita oznamovatele se moderátorovi nezobrazí).
+ */
+export interface ContentReportListItem {
+  reportId: string;
+  /** Hodnota z `ReportTargetType` (viz `@/shared/moderation`). */
+  targetType: string;
+  targetUrl?: string;
+  targetSnapshot: string;
+  targetAuthorName: string;
+  /** Hodnota z `ReportCategory` (viz `@/shared/moderation`). */
+  category: string;
+  reason: string;
+  reporterName: string | null;
+  createdAt: string;
+}
+
+/**
+ * 20B B4 `moderation_appeal` — odvolání proti moderačnímu rozhodnutí čekající
+ * na přezkum jiným moderátorem. Zrcadlí BE queue item. `action`/`targetType`
+ * jsou string hodnoty z `ModerationAction`/`ReportTargetType`
+ * (viz `@/shared/moderation`), stejný vzor jako `ContentReportListItem`.
+ */
+export interface AppealReviewListItem {
+  appealId: string;
+  decisionId: string;
+  appellantName: string;
+  reason: string;
+  action: string;
+  targetType: string;
+  createdAt: string;
 }
 
 export interface PendingActionsCountResponse {

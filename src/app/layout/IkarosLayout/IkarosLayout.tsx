@@ -52,6 +52,7 @@ import { LoginModal } from '@/features/auth/components/LoginModal';
 import { RegisterModal } from '@/features/auth/components/RegisterModal';
 import { ForgotPasswordModal } from '@/features/auth/components/ForgotPasswordModal';
 import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
+import { SiteFooter } from '@/shared/ui/SiteFooter/SiteFooter';
 import { UserAvatar, useFocusTrap } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
@@ -987,6 +988,9 @@ export function IkarosLayout() {
           style={mainStyle}
         >
           <Outlet />
+          {/* 20A — sdílená patička s legal odkazy; skrytá v chat/admin focus
+              módu (stejný gate jako pravý panel). */}
+          {showRightPanel && <SiteFooter />}
         </main>
 
         {showRightPanel && (

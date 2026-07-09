@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { WorldRole } from '@/shared/types';
+import { ReportButton } from '@/shared/moderation';
 import { useFavoritePages } from '../../api/useFavoritePages';
 import { usePrint } from '@/features/world/export/print';
 import type { Page } from '../../api/pages.types';
@@ -113,6 +114,18 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
           >
             <LinkIcon size={18} aria-hidden />
           </button>
+          {/* 20B — nahlásit stránku moderátorům. `page` nenese jméno autora,
+              proto uvádíme svět jako odpovědný subjekt; PC/NPC stránka nese
+              vlastníka (ownerUserId → skryje report vlastníkovi). */}
+          <ReportButton
+            variant="icon"
+            targetType="page"
+            targetId={page.id}
+            targetSnapshot={page.title}
+            targetAuthorName={world?.name ?? 'Neznámý autor'}
+            targetAuthorId={page.ownerUserId}
+            worldId={worldId}
+          />
           {!isCharacterPage && (
             <button
               ref={printRef}

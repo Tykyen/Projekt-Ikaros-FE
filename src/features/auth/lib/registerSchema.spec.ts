@@ -7,6 +7,7 @@ const valid = {
   password: 'pass1234',
   passwordConfirm: 'pass1234',
   acceptedTerms: true,
+  ageBracket: '15plus' as const,
   hp: '',
 };
 
@@ -105,6 +106,29 @@ describe('registerSchema', () => {
       ...valid,
       hp: 'spam-link',
     });
+    expect(result.success).toBe(false);
+  });
+
+  // 20C — deklarativní věk
+  it('akceptuje volbu under15 (nezletilý)', () => {
+    const result = registerSchema.safeParse({ ...valid, ageBracket: 'under15' });
+    expect(result.success).toBe(true);
+  });
+
+  it('odmítne registraci bez zvolené věkové kategorie', () => {
+    const { ageBracket: _drop, ...withoutAge } = valid;
+    const result = registerSchema.safeParse(withoutAge);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find((i) =>
+        i.path.includes('ageBracket'),
+      );
+      expect(issue?.message).toMatch(/věkovou kategorii/i);
+    }
+  });
+
+  it('odmítne neplatnou hodnotu věkové kategorie', () => {
+    const result = registerSchema.safeParse({ ...valid, ageBracket: 'blah' });
     expect(result.success).toBe(false);
   });
 });

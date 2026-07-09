@@ -667,21 +667,28 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 ## Fáze 20 — Governance, právo & moderace
 **Příloha C.** Co platformu chrání před lidskými a právními riziky. „Mít připraveno", ne hasit.
 
-### - [ ] 20.1 Pravidla komunity + nahlašování všude — [Příloha C] 🔁
+> ✅ **20.1–20.3 IMPLEMENTOVÁNO (2026-07-08):** vedeno jako jedna sdílená páteř (report+moderace + legal stránky + upload consent), NE tři featury. Zdroj obsahu = `docs/pravni-ramec/` + `docs/provozni-ramec/`. Specy `docs/arch/phase-20/spec-20A..D`. Vše typecheck-ověřeno (BE+FE), dílčí jest zelené.
+> - **A** ✅ `/soukromi` `/kodex` `/kontakt` + sdílená patička.
+> - **B** ✅ generický report+moderace: ReportButton na 9 plochách (články/galerie/profily/nábory/wiki/diskuze/pošta/chat/novinky), fronta `content_report`, role „správce komunity" (SpravceClanku/Galerie/Diskuzi + Admin), M0–M7, statement of reasons + notifikace, odvolání (reviewer≠moderátor), enforcement (skrýt `moderationHidden`/mazat/ban), M7→etický kanál v /admin/chat, legacy discussion report zmigrován+odstraněn.
+> - **C** ✅ deklarativní věk 15+/<15, minor safe-defaults, data-export FE tlačítko.
+> - **D** ✅ galerie upload consent (prohlášení práv, BE hard-gate) + AiBadge self-declare + consent audit log + license card model (podklad, nenapojený).
+> **⚠️ HANDOFF:** (1) **restart BE** (nová schéma pole napříč moduly); (2) migrace: `cd backend && npm run migrate:discussion-reports`; (3) **vizuální `mobil-desktop`** nových UI; (4) **identita spolku** [DOPLNIT] = dluh **D-063** (blokuje VEŘEJNÉ spuštění). Odložené AI-položky (Fáze 18/21.5) = dluh **D-20D**.
+
+### - [x] 20.1 Pravidla komunity + nahlašování všude — [Příloha C] 🔁 ✅ IMPL 2026-07-08
 **Cíl:** Jasná pravidla komunity + viditelné nahlašování u veškerého uživatelského obsahu.
 **Proč:** Platforma s uživatelským obsahem přitáhne i nevhodný; máme základ (nahlašování, role správců) — sjednotit a zviditelnit.
-**Otevřené otázky:** Kde všude nahlašovat (chat/vlákna/galerie/profily)? Eskalace k moderátorům?
+**Hotovo:** modul `moderation` (BE) + `src/shared/moderation`+`src/features/moderation` (FE); spec-20B. Nahlašování na 9 plochách, M0–M7, statement of reasons, odvolání, eskalace, /kodex. 🔁 zůstává: doplnit enforcement chat/deník content-level (dnes account-level), právní revize.
 
-### - [ ] 20.2 Zásady ochrany údajů (GDPR) + nezletilí — [Příloha C] 🔁
+### - [x] 20.2 Zásady ochrany údajů (GDPR) + nezletilí — [Příloha C] 🔁 ✅ IMPL 2026-07-08
 **Cíl:** Stránka zásad ochrany údajů + ohledy pro nezletilé hráče.
 **Proč:** V ČR/EU platí GDPR; máme self-delete s anonymizací a data-export modul — doplnit transparentnost a souhlas. Dluh **D-010** (GDPR souhlas).
-**Otevřené otázky:** Věková hranice/souhlas rodičů? Co vše zveřejnit v zásadách?
+**Hotovo:** `/soukromi` (čl. 13), deklarativní věk 15+/<15, minor safe-defaults (`isMinor`+`parentalConsentStatus`), data-export FE tlačítko; spec-20C. **Rozhodnuto:** platforma cílí i na <15, rodičovský souhlas = řeší advokát (app-side jen stub). 🔁 zůstává: identita spolku (D-063), reálný rodičovský tok po advokátovi.
 > 🔗 **Podmínky užití:** pracovní **verze 1.0** vydaná 2026-06-18 (FE `TermsPage`, BE `TERMS_VERSION='1.0'`). Zbývá **finální právní revize (advokát)** po beta — to je tady. Před veřejným nasazením blokující.
 
-### - [ ] 20.3 Obsah & autorská práva (upload, AI art) — [Příloha C]
+### - [x] 20.3 Obsah & autorská práva (upload, AI art) — [Příloha C] ✅ IMPL 2026-07-08
 **Cíl:** Pravidla pro nahraný obsah (cizí autorská práva) a označování AI obsahu.
 **Proč:** Riziko u nahraných obrázků i AI artu (Fáze 18); část komunity AI odmítá.
-**Otevřené otázky:** Jak řešit nárokovaný cizí obsah (takedown postup)? Povinné označení AI obsahu?
+**Hotovo:** galerie upload consent (prohlášení práv, BE hard-gate `GALLERY_RIGHTS_NOT_DECLARED`), dobrovolný AiBadge, consent audit log `upload_consents`, license card model `content_licenses` (podklad, nenapojený); spec-20D. Takedown = přes kategorii `copyright` v 20.1. Odloženo (Fáze 18/21.5): strojové značení AI, deepfake filtry, napojení licence — dluh **D-20D**.
 
 ### - [ ] 20.4 Udržitelné tempo / anti-burnout / bus factor — [Příloha C]
 **Cíl:** Chránit hlavní (a možná jediný) zdroj — tebe: udržitelné tempo, dokumentace, automatizace.

@@ -293,7 +293,10 @@
 
 .bubbleFoot {
   margin-top: var(--sp-2);
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
 }
 
 .bubbleDelete {

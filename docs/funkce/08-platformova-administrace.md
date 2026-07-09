@@ -22,6 +22,7 @@ FE enum (`Projekt-ikaros-FE/src/shared/types/index.ts:6`) — po D-053 zúžen n
 - **Platform-admin gate** = `role <= UserRole.Admin`, tj. jen role 1 a 2 (Superadmin, Admin). Vidět `AdminGuard` (`backend/src/common/guards/admin.guard.ts:17`).
 - **Pořadí čísel je významné**: nižší číslo = vyšší moc. Proto `role > UserRole.Admin` = NENÍ admin.
 - **Správci obsahu** (Clánky/Galerie/Diskuze) jsou globální obsahové role, ne admini — vidí jen svou frontu „Zpracovat", nemají přístup do `/admin`.
+  - **Nově (20.1) = „správce komunity":** tři obsahové role dostaly navíc pravomoc moderovat **generickou** frontu nahlášeného obsahu (`content_report`) napříč VŠEMI plochami, nejen svou (`CONTENT_REVIEWER_ROLES` v `backend/src/modules/moderation/moderation.constants.ts:8`). Zásahy na úrovni účtu (M5–M7) a kategorie „ohrožení nezletilých" ale zůstávají jen Adminovi/Superadminovi. Viz sekce „Nahlašování & moderace obsahu" níže.
 - **Ikarus** = běžný přihlášený uživatel. PJ/hráč jsou role uvnitř konkrétního světa (WorldRole), ne globální.
 
 ### ⚠️ Drift FE vs. BE enum
@@ -320,16 +321,50 @@ Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organ
 
 ## Export dat / GDPR (data-export modul)
 
-- **Co to je:** GDPR export VLASTNÍCH dat uživatele do JSON.
-- **Kde:** `GET /data-export/me` (`backend/src/modules/data-export/data-export.controller.ts`).
+- **Co to je:** GDPR export VLASTNÍCH dat uživatele do JSON (čl. 15/20).
+- **Kde:** `GET /data-export/me` (`backend/src/modules/data-export/data-export.controller.ts:16`). FE: tlačítko **„Stáhnout moje data (JSON)"** v profilu → sekce „Účet" (`AccountSection`) a v `DeleteAccountModal` (nabídka exportu před smazáním účtu). Hook `useDataExport` (`src/features/profile/api/useDataExport.ts:30`).
 - **Kdo:** `JwtAuthGuard` — **jakýkoli přihlášený uživatel exportuje JEN svá data** (`user.id` z tokenu). Žádný admin override.
+- **Co jde dělat:** klik → `GET /data-export/me` → prohlížeč stáhne Blob jako soubor `ikaros-data-<YYYY-MM-DD>.json`. Tlačítko je dostupné i v pending-delete stavu (rámec „mazání = nejdřív nabídnout export").
 - **Co exportuje (`data-export.service.ts`):** profil (email, username, displayName, avatar, role, theme/chat preferences, email verified, timestampy), world memberships, friendships (accepted + pending obousměr), friend blocks, pending username request, posledních 100 admin audit záznamů kde je uživatel cílem. Formát JSON `version 1.0`.
 - **Hranice / co neumí:**
   - **NENÍ admin nástroj** — admin nemůže exportovat cizí účet.
-  - **NEMÁ ŽÁDNÝ FE consumer** — v celém FE neexistuje volání `/data-export/me` (žádný hook ani tlačítko). Endpoint je BE-only, z UI nedostupný → de facto dormantní.
-  - Neobsahuje obsah stránek/postav/chatových zpráv, jen metadata vztahů.
-- **Stav:** ⚠️ (BE funkční, FE chybí napojení).
-- **Kód:** BE `modules/data-export/*`.
+  - Neobsahuje obsah stránek/postav/chatových zpráv, jen metadata vztahů (account-centric rozsah, čl. 15).
+- **Stav:** ✅ (20.2/§C1 — FE tlačítko doplněno; dříve BE bez FE).
+- **Kód:** BE `modules/data-export/*`; FE `features/profile/api/useDataExport.ts`, `components/AccountSection.tsx:21`, `components/DeleteAccountModal.tsx:34`.
+
+---
+
+## Nahlašování & moderace obsahu (20.1 / 20.3)
+
+Generický subsystém pro nahlašování jakéhokoli UGC a jeho moderaci (DSA čl. 16 notice, čl. 17 statement of reasons, čl. 18 eskalace, čl. 20 odvolání). Nahradil minimální report na diskuzích jednou frontou napříč plochami. BE modul `backend/src/modules/moderation/`, FE `src/shared/moderation/` (tlačítko + formulář) a `src/features/moderation/` (renderery fronty + odvolání).
+
+### Nahlásit obsah (ReportButton / ReportModal)
+- **Co to je:** malé tlačítko „Nahlásit" (vlajka) u obsahu → modal s formulářem hlášení.
+- **Kde (osazené plochy, ověřeno v kódu):** článek (`ArticleDetailPage.tsx:142`), obrázek v galerii (`GalleryDetailPage.tsx:118`), profil uživatele (`PublicProfileActions.tsx:202`), nábor (`NaborListek.tsx:97`), příspěvek v diskuzi (`DiscussionDetailPage.tsx:346`), stránka světa / wiki (`PageViewer/components/PageHeader.tsx:120`), novinka světa (`WorldNewsCard.tsx:209`), zpráva v poště — jen přijatá (`MailPage/MailDetail.tsx:118`), zpráva v chatu — světový i globální (`chat/components/MessageItem.tsx:583`, přes `ReportModal` z kebabu). Komponenta `src/shared/moderation/ReportButton.tsx:19`.
+- **Kdo:** jen **přihlášený** (`ReportButton` se anonymovi nevykreslí; BE `POST /moderation/reports` je za `JwtAuthGuard`, guest 99 neprojde). Vlastní obsah nelze nahlásit (`targetAuthorId === user.id` → tlačítko skryté).
+- **Co jde dělat (formulář `ReportModal`):** vybrat **kategorii** (Autorská práva / Osobní údaje / Obtěžování / Ohrožení nezletilých / Nezákonný obsah / Spam / Jiné), napsat **důvod** (max 2000), **e-mail** (předvyplněný, povinný — kromě „ohrožení nezletilých", kde je nepovinný), povinné prohlášení **dobré víry**, volba **„informovat mě o výsledku"** a **„nahlásit anonymně"** (skryje jméno oznamovatele moderátorovi). FE nikdy neposílá `reporterId/Name` — bere je BE z tokenu.
+- **Hranice / co neumí:** `ReportTargetType` má v enumu i `bestie` a `character_diary`, ale **na FE zatím nemají osazené tlačítko** (nahlásit bestii ani deník postavy nejde). „Anonymně" je jen maskování identity ve výstupu, ne guest přístup. Kategorie „ohrožení nezletilých" (CSAM) má nízkou bariéru (e-mail nepovinný).
+- **Zvláštnosti:** report se v kolekci `content_reports` **nikdy nemaže** (audit stopa; po vyřízení `status:'resolved'`). Po odeslání se invaliduje fronta „Zpracovat" (badge moderátora) i „moje hlášení".
+- **Stav:** ✅
+- **Kód:** FE `src/shared/moderation/{ReportButton,ReportModal,enums,useModeration}.ts(x)`; BE `moderation.controller.ts:37` (`POST /moderation/reports`), `content-report.schema.ts:16`.
+
+### Moderátorská fronta „Zpracovat" (content_report + moderation_appeal)
+- **Co to je:** nahlášený obsah i odvolání se objeví v osobní frontě „Zpracovat" (`/ikaros/uzivatele?tab=zpracovat`) jako pending akce typu `content_report`, resp. `moderation_appeal`.
+- **Kdo (reviewer set):** frontu i akce **M0–M4** vidí „správci komunity" — `Superadmin, Admin, SpravceClanku, SpravceGalerie, SpravceDiskuzi` (`CONTENT_REVIEWER_ROLES`). **Account-level M5–M7 + kategorie „ohrožení nezletilých"** jen `Superadmin, Admin` (`ACCOUNT_LEVEL_ROLES`). FE u ne-admina M5–M7 z výběru skryje, BE gate vynutí (403). Gating v `moderation.service.ts` (`resolveReport` ř. 213/229) + providery (`content-report.provider.ts:32`).
+- **Co jde dělat (statement of reasons):** u reportu „Vyřídit" → vybrat akci **M0–M7** + napsat **odůvodnění** (uvidí autor i oznamovatel) + **právní/politický základ**. `POST /moderation/reports/:id/resolve` vytvoří rozhodnutí (`moderation_decisions`, log se nemaže).
+  - **M0** Bez zásahu · **M1** Upozornění · **M2** Skrýt část · **M3** Dočasně skrýt · **M4** Odstranit (content-level) · **M5** Omezit účet · **M6** Ukončit účet · **M7** Eskalace mimo platformu (account-level, jen Admin+).
+- **Napojení zásahu (event-driven `moderation.enforce`/`.revert`):** diskuze — flag **`moderationHidden`** (M2/M3 skryje, M4 hard delete); účty — M5 = dočasný ban 30 dní, M6 = trvalý ban, M7 = jen log + notifikace do eskalačního kanálu v `/admin/chat`. **Stub:** enforcement pro `character_diary` a `chat_message` zatím jen loguje (TODO), M4 na ně reálně obsah neskryje.
+- **Stav:** ✅ (content-level a account-level enforcement funkční; skrytí deníku/chat zprávy stub).
+- **Kód:** FE `features/moderation/components/ContentReportRenderer.tsx`, `ResolveReportModal.tsx`, `ZpracovatTab/rendererRegistry.tsx:147`; BE `moderation.controller.ts:81`, `moderation.service.ts`, listenery `ikaros-discussions/moderation-enforcement.listener.ts`, `users/moderation-enforcement.listener.ts`, `platform-chat/moderation-escalation.listener.ts`.
+
+### Vyrozumění, odvolání a eskalace
+- **Autor** postiženého obsahu dostane **odůvodnění zásahu** (statement of reasons, čl. 17) do Pošty a vidí ho v profilu → sekce „Moderace" (`GET /moderation/decisions/mine`). **Oznamovatel** dostane potvrzení příjmu a (pokud zvolil „informovat mě") výsledek; stav svých hlášení vidí v profilu (`GET /moderation/reports/mine`).
+- **Odvolání (čl. 20):** autor se proti rozhodnutí (kromě M0) odvolá tlačítkem „Odvolat se" v profilu → `POST /moderation/decisions/:id/appeal` (jedno odvolání na rozhodnutí). Odvolání spadne do fronty „Zpracovat" jako `moderation_appeal` a **přezkoumá ho JINÝ moderátor** — vlastní rozhodnutí přezkoumat nelze (`APPEAL_SELF_REVIEW_FORBIDDEN`). Výsledek: „Potvrdit rozhodnutí" / „Zrušit rozhodnutí" (`POST /moderation/appeals/:id/review`).
+- **Eskalace M7** → záznam + notifikace do interního kanálu „Moderace — eskalace" v `/admin/chat` (reuse 20.5).
+- **Moderační log:** `GET /moderation/log` (reviewer-gated) — historie rozhodnutí.
+- **Kolekce:** `content_reports`, `moderation_decisions`, `moderation_appeals` (žádná se nemaže → auditní stopa).
+- **Stav:** ✅
+- **Kód:** FE `features/profile/components/ModerationSection.tsx`, `features/moderation/components/{AppealModal,AppealReviewModal,AppealReviewRenderer}.tsx`; BE `moderation.controller.ts:54/96/112`, `moderation-decision.schema.ts`, `moderation-appeal.schema.ts`.
 
 ---
 
@@ -358,6 +393,7 @@ Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organ
   - Galerie: `Superadmin, Admin, SpravceGalerie` (`ikaros-gallery/gallery-review.provider.ts:9`).
   - Diskuze: `Superadmin, Admin, SpravceDiskuzi`.
   - Tito správci se NEdostanou do `/admin`, vidí jen svou frontu „Zpracovat".
+  - **Nahlašování obsahu (20.1, `content_report`)** — kterýkoli z těchto tří správců (+ Admin/Superadmin) moderuje **generickou** frontu reportů napříč všemi plochami (`CONTENT_REVIEWER_ROLES`); M5–M7 + „ohrožení nezletilých" jen Admin+. Podrobně viz sekce „Nahlašování & moderace obsahu" výše.
 
 ---
 
@@ -366,7 +402,7 @@ Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organ
 1. **Reset hesla bez UI** — BE `PUT /users/:id/reset-password` (Superadmin-only) funguje, ale v admin panelu chybí jakékoli tlačítko/hook. Superadmin nemůže resetovat heslo z webu. (`users.controller.ts:537`)
 2. **Create user adminem bez UI** — BE `POST /admin/users` funguje, FE nemá hook ani formulář. (`admin.controller.ts:113`)
 3. **Admin nemůže měnit cizí email** — žádný endpoint ani UI; jen self-service `request-email-change` + ops skript `set-user-email`.
-4. **Data export bez FE consumera** — `GET /data-export/me` nikde ve FE nevoláno → GDPR export z UI nedostupný. (`data-export.controller.ts:21`)
+4. ✅ VYŘEŠENO 20.2/§C1 — **Data export má FE tlačítko.** „Stáhnout moje data (JSON)" v profilu → Účet a v `DeleteAccountModal` (`useDataExport` → `GET /data-export/me` → Blob download). Dřív BE bez FE.
 5. **DungeonBuilderPage = stub** — route `/admin/dungeon-builder` vykreslí jen text `[stub]`. BE `dungeon-maps` modul existuje, ale je per-world PJ tool, není napojený na tuto stránku. (`DungeonBuilderPage.tsx`)
 6. **`canEditPlatformPages` = mrtvý flag** — ukládá se a posílá, ale BE ho nikde nevynucuje; FE checkbox záměrně skryt. (`UsersTable.tsx:338`)
 7. **`canModerateContent` ≠ obsahová moderace** — flag gatuje JEN admin delete/undelete účtu. Schvalování článků/galerie/diskuzí jede přes obsahové role. Název flagu mate.

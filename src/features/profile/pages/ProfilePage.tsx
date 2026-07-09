@@ -14,6 +14,7 @@ import { AppearanceSection } from '../components/AppearanceSection';
 import { PrivacySection } from '../components/PrivacySection';
 import { NotificationPreferencesSection } from '../components/NotificationPreferencesSection';
 import { SecuritySection } from '../components/SecuritySection';
+import { ModerationSection } from '../components/ModerationSection';
 import { AccountSection } from '../components/AccountSection';
 import styles from './ProfilePage.module.css';
 
@@ -85,6 +86,8 @@ export default function ProfilePage() {
         <NotificationPreferencesSection user={user} />
 
         <SecuritySection username={user.username} />
+
+        <ModerationSection />
 
         <AccountSection />
       </div>

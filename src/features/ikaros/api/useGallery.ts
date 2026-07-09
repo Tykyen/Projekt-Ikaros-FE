@@ -3,6 +3,7 @@ import { api, apiClient } from '@/shared/api/client';
 import type {
   IkarosGalleryItem,
   GalleryStats,
+  GalleryAiOrigin,
   ToggleFavoriteResponse,
   TogglePinResponse,
 } from '@/shared/types';
@@ -57,6 +58,10 @@ export interface CreateGalleryDto {
   category?: string;
   /** True → status Pending; jinak Draft. */
   submit?: boolean;
+  /** 20D (D1) — povinné prohlášení práv; bez `true` BE upload odmítne. */
+  rightsDeclared: boolean;
+  /** 20D (D1) — self-declare AI původ; default 'none'. */
+  aiOrigin?: GalleryAiOrigin;
 }
 
 /** 3.3c — inline multipart upload (soubor + metadata v jednom requestu). */
@@ -70,6 +75,9 @@ export function useCreateGalleryImage() {
       if (dto.description) form.append('description', dto.description);
       if (dto.category) form.append('category', dto.category);
       form.append('submit', String(dto.submit ?? false));
+      // 20D (D1) — consent + AI self-declare.
+      form.append('rightsDeclared', String(dto.rightsDeclared));
+      form.append('aiOrigin', dto.aiOrigin ?? 'none');
       const res = await apiClient.post<IkarosGalleryItem>(PREFIX, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });

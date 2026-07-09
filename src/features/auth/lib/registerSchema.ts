@@ -24,6 +24,12 @@ export const registerSchema = z
       .refine((v) => v === true, {
         message: 'Pro vytvoření účtu musíš souhlasit s podmínkami',
       }),
+    // 20C (spec-20C §C2) — deklarativní věk. Povinná volba; z ní se v submit
+    // payloadu odvodí `isMinor` (under15 = true). Minimalizace: NEsbíráme datum
+    // narození. `error` pokryje i undefined (uživatel nic nevybral) → required.
+    ageBracket: z.enum(['15plus', 'under15'], {
+      error: 'Vyber prosím věkovou kategorii',
+    }),
     // D-011 — honeypot. Skutečný uživatel pole nevidí (offscreen). Bot ho vyplní → odmítneme.
     hp: z.string().max(0, 'Bot detection').optional(),
   })

@@ -56,6 +56,14 @@
   gap: var(--sp-3);
 }
 
+/* 20D (D2) — název + volitelný AI štítek na jednom řádku. */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
 .title {
   font-family: var(--prose-font-display);
   font-size: var(--text-2xl);
@@ -94,6 +102,12 @@
 .favoriteBar {
   display: flex;
   margin-top: var(--sp-3);
+}
+
+/* 20B — nahlašovací tlačítko pod meta obrázku. */
+.reportRow {
+  display: flex;
+  margin-top: var(--sp-2);
 }
 
 .desc {

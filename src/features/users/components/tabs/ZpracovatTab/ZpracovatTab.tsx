@@ -17,8 +17,9 @@ const GROUP_TITLES: Record<PendingActionType, string> = {
   [PendingActionType.ArticlePendingReview]: 'Články ke schválení',
   [PendingActionType.GalleryPendingReview]: 'Obrázky ke schválení',
   [PendingActionType.DiscussionPendingReview]: 'Diskuze ke schválení',
-  [PendingActionType.DiscussionReport]: 'Hlášené příspěvky',
   [PendingActionType.DiscussionJoinRequest]: 'Žádosti o vstup do diskuze',
+  [PendingActionType.ContentReport]: 'Nahlášený obsah',
+  [PendingActionType.ModerationAppeal]: 'Odvolání proti rozhodnutí',
 };
 
 /**

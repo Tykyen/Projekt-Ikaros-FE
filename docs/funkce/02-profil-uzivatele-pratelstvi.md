@@ -21,7 +21,8 @@
   - **Soukromí (`PrivacySection`):** 3 přepínače — „Neviditelný mód" (`hiddenPresence`, po změně reconnect socketu), „Skrýt v adresáři uživatelů" (`hiddenInDirectory`), „Jen pro přátele" (`profileVisibility: 'public'|'friends'`).
   - **Notifikace (`NotificationPreferencesSection`, 15.9):** master push vypínač + 7 kategorií ve 4 skupinách + per-device přepínač. Řídí, na co chodí web push. Detail viz kap. 05 „Nastavení notifikací (preference)".
   - **Bezpečnost (`SecuritySection`):** Username (žádost o změnu — schvaluje admin, cooldown 30 dní), Změna hesla (viz kap. 01), 2FA (viz kap. 01), Důvěryhodná zařízení (viz kap. 01).
-  - **Účet (`AccountSection`):** Smazat účet / banner naplánovaného smazání (viz kap. 01).
+  - **Moderace (`ModerationSection`, 20.1):** „Moje hlášení" (co jsem nahlásil + stav Čeká/V řešení/Vyřízeno — pohled oznamovatele) a „Rozhodnutí o mém obsahu" (moderační zásahy vůči mému obsahu = statement of reasons dle DSA čl. 17: akce, odůvodnění, právní/smluvní základ, tlačítko **„Odvolat se"** kromě M0). Data `GET /moderation/reports/mine` a `/decisions/mine`. Renderuje se jen přihlášenému. Detail moderačního workflow viz kap. 08.
+  - **Účet (`AccountSection`):** tlačítko „Stáhnout moje data (JSON)" (20.2), Smazat účet / banner naplánovaného smazání (viz kap. 01). U nezletilého (`isMinor`) navíc informativní hláška „Účet v režimu ochrany nezletilých" (`MinorNotice`).
 - **Editovatelná pole přes `PATCH /users/me` (DTO `UpdateUserDto`):** displayName(32), avatarUrl(url), characterPath(slug), themeSettings(obj), chatPreferences(obj), hiddenPresence(bool), hiddenInDirectory(bool), profileVisibility(public/friends), chatColor(hex), city(100), bio(1000), characterName(64), characterBio(1000), themeId(z THEME_IDS), defaultAvatarType(male/female/being), characterAvatarUrl. **username přes `/me` zakázáno** (Forbidden `USERNAME_CHANGE_VIA_REQUEST`).
 - **Hranice / co neumí:**
   - „Moje diskuze/články/galerie" jsou jen stuby (fáze 3).
@@ -33,7 +34,7 @@
   - **Velikost rozhraní (5.9c)** = CSS `zoom` na `<html>` (aplikuje `ThemeProvider`, `--ui-scale` + `zoom`), zvětší CELÉ rozhraní (text, tlačítka, ikony) napříč platformou, světy i chaty (Putyka/Camp/svět) — jedno hrdlo, žádná změna chat komponent. Ukládá se do `themeSettings.uiScale` (BE volný objekt + shallow-merge → koexistuje s jas/kontrast). **Taktická mapa (PIXI) je z zoomu vyňata** (`.viewport { zoom: calc(1/var(--ui-scale)) }`) → plátno zůstává 1:1; mapové HUD overlaye uvnitř `.viewport` se také nezvětšují.
   - Změna username řešena dedikovaným flow `me/username-request` (vytvořit/získat/zrušit) + admin schválení; po loginu toast o rozhodnuté žádosti (D-028 `last-unseen-decided`).
 - **Stav:** ✅ funguje (komunitní placeholdery 🚧).
-- **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27`, `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `CommunityPlaceholders.tsx:13`, BE `users.controller.ts:60`/`:71`, `dto/update-user.dto.ts:14`.
+- **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27` (`ModerationSection` `:90`), `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `ModerationSection.tsx:71`, `AccountSection.tsx:54`, `CommunityPlaceholders.tsx:13`, BE `users.controller.ts:60`/`:71`, `dto/update-user.dto.ts:14`.
 
 ---
 

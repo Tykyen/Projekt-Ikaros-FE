@@ -10,6 +10,42 @@
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
+### D-066 — Moderace: dvě plochy nedotažené (bestie report + deník/chat enforcement)
+**Soubor:** FE bestie detail (report tlačítko chybí) · BE `characters`/`chat` enforcement listenery (M2/M3/M4 log-only)
+**Problém:** (a) `bestie` má plný BE enforcement (B5-BE: skrýt/smazat/revert) i položku v `ReportTargetType`, ale **NEMÁ FE `ReportButton`** — bestii nelze nahlásit (enforcement je nedosažitelný). (b) `character_diary` a `chat_message`: report jde odeslat, ban autora (M5/M6) funguje, ale **content-level zásah (M2/M3 skrýt, M4 smazat) je jen `logWarn`/TODO** — konkrétní deník/zpráva se reálně neskryje/nesmaže (subdoc / WS gateway, B4b/B5-BE je vědomě odložily).
+**Dopad:** Nízký/střední — „nahlašování všude" je z 9 ploch splněné; chybí bestie (report) a plné vynucení u 2 soukromých ploch. Ban autora funguje všude.
+**Řešení:** (a) přidat `ReportButton targetType="bestie"` do bestie detailu (BE ready). (b) doplnit enforcement: deník = skrýt/smazat subdoc (přes character-subdocs), chat = smazat zprávu přes gateway; nebo vědomě ponechat account-level-only a zdokumentovat.
+**Kdy:** Navazující na 20.1; bestie report brzy (levné), enforcement soukromých ploch dle potřeby.
+
+---
+
+### D-064 — FE `vitest run` suite-wide rozbitý („failed to find current suite")
+**Soubor:** `vitest.config.ts` (auto-merge root `vite.config.ts` s `react()` pluginem) — projevuje se na VŠECH ~466 test souborech.
+**Problém:** `vitest run` selže identicky na všech suitách („Vitest failed to find the current suite", 0 testů) i na souborech, kterých se nikdo nedotkl. Ověřeno na čistém běhu (smazaná cache, bez souběžnosti). NENÍ regrese z 20.1–20.3 — padá i na weather/calendar/tactical-map. Odpovídá známému gotcha (react() plugin se auto-merguje do vitest configu → rozbitý test context; pravděpodobně Node 24 / rozpracovaný working tree).
+**Dopad:** Vysoký pro vývoj — **celý FE unit test runner nejede**; featury 20.1–20.3 ověřeny jen `tsc -b` (build gate) + logika zvlášť, ne vitestem. Produkci neblokuje.
+**Řešení:** Prošetřit `vitest.config.ts` merge s root vite (viz komentář v souboru + memory `vitest_config_gotchas`) — izolovat vitest config od `react()` pluginu / ověřit Node verzi. Dokud nejede, FE se ověřuje `tsc`.
+**Kdy:** Brzy — blokuje FE TDD/regresní síť.
+
+---
+
+### D-065 — Moderace: revert odvolání (unban) nerozlišuje zdroj banu
+**Soubor:** `backend/src/modules/users/moderation-enforcement.listener.ts` (`moderation.revert` větev M5/M6)
+**Problém:** Když se odvolání proti moderačnímu banu vyhoví (`overturned`), listener účet odbanuje bez ohledu na to, jestli byl mezitím nezávisle zabanován adminem z jiného důvodu → mohl by odbanovat účet, který má zůstat zabanovaný. Edge case (zalogováno), moderace = zdroj pravdy.
+**Dopad:** Nízký — vyžaduje souběh moderačního banu + nezávislého admin banu na stejném účtu + overturn odvolání.
+**Řešení:** Ukládat zdroj/důvod banu (`bannedBy` už existuje) a revert unbanovat jen pokud aktuální ban pochází z moderace (`decisionId`/zdroj shoda), jinak jen zalogovat.
+**Kdy:** Až se moderace ostře používá; nízká priorita.
+
+---
+
+### D-063 — Identita správce (spolek) + zpracovatelé nedoplněni na legal stránkách (20A)
+**Soubor:** `src/features/ikaros/pages/PrivacyPage.tsx`, `ContactPage.tsx`, `CodeOfConductPage.tsx`, `TermsPage.tsx` — placeholdery `[DOPLNIT: …]`
+**Problém:** Zásady OÚ (`/soukromi`), Kontakt (`/kontakt`) a Podmínky nemají doplněnou totožnost správce: chybí název spolku, IČO, sídlo, spisová značka + soud spolkového rejstříku a kontaktní/provozní e-mail (pro uživatele i orgány). Navíc seznam zpracovatelů v Zásadách OÚ má u části služeb (hosting, SMTP, AI/LLM, error tracking, platební brána) nepotvrzené konkrétní poskytovatele + jejich EU/třetí-země status a transfer mechanismus (DPF vs. SCC).
+**Dopad:** Vysoký (blokuje **veřejné spuštění**) — GDPR čl. 13 vyžaduje totožnost správce, DSA čl. 11/12 kontaktní místa; bez nich nelze web pustit veřejně. NEblokuje implementaci ani beta.
+**Řešení:** Až uživatel/advokát dodá údaje spolku, nahradit všechny `[DOPLNIT]` (grep `dopisat` / `DOPLNIT`), potvrdit seznam zpracovatelů a u každé US služby uvést DPF/SCC. Poté bumpnout verzi dokumentů.
+**Kdy:** Před veřejným spuštěním (spolek se teprve zakládá). Součást Přílohy C (20.1–20.3).
+
+---
+
 ### D-062 — Token portréty PC/NPC na taktické mapě deformované (roztažení na čtverec)
 **Soubor:** `src/features/world/tactical-map/TacticalMapView.tsx:871` (`resolveTokenImageCrop`) + `components/tokens/TokenSprite.tsx:73-75` (`getSpriteTransform` no-crop větev) + `types.ts:162-171` (`characterData`)
 **Problém:** `resolveTokenImageCrop` vrací `undefined` pro token s `characterData.imageUrl` (tj. každý PC/NPC s portrétem) → padne do no-crop větve `getSpriteTransform`, která vrací `{width:diameter, height:diameter}` → `scale.x ≠ scale.y` pro nečtvercovou texturu = **roztažení na čtverec, zdeformovaný obličej**. Bestie naopak dostávají cover-fit + focal a jsou v pořádku. Typ `characterData` nemá `focalX/focalY/zoom/fit`, takže mapa nemá čeho se chytit. Ověřeno adversariálně (CONFIRMED, 2026-07-06).

@@ -136,6 +136,52 @@
   color: var(--text-primary, var(--text-strong));
 }
 
+/* 20D (D1) — prohlášení autora */
+.consent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-4);
+  border: 1px solid var(--gal-frame-border, var(--frame-border));
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken, var(--surface-1));
+}
+
+.consentLegend {
+  padding: 0 var(--sp-2);
+  font-family: var(--prose-font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary, var(--text-muted));
+  font-weight: var(--weight-semi);
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--text-primary, var(--text-strong));
+  cursor: pointer;
+}
+
+.check input {
+  margin-top: 0.15em;
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+  accent-color: var(--accent, var(--theme-accent));
+  cursor: pointer;
+}
+
+.required {
+  color: var(--accent, var(--theme-accent));
+  font-size: var(--text-xs);
+}
+
 .actions {
   display: flex;
   gap: var(--sp-3);

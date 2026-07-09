@@ -9,20 +9,19 @@ import {
   MessageCircle,
   Check,
   Trash2,
-  Flag,
   Send,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { Spinner, ConfirmDialog, EmptyState } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { ReportButton } from '@/shared/moderation';
 import { UserRole, type IkarosDiscussion, type IkarosDiscussionPost } from '@/shared/types';
 import {
   useDiscussion,
   useDiscussionPosts,
   useAddPost,
   useDeletePost,
-  useReportPost,
   useToggleLikeDiscussion,
   useToggleFavoriteDiscussion,
   useApproveDiscussion,
@@ -212,7 +211,7 @@ function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
               canDelete={
                 post.authorId === user?.id || isManager || isReviewer
               }
-              canReport={post.authorId !== user?.id}
+              canReport={!!user && post.authorId !== user.id}
             />
           ))
         )}
@@ -288,6 +287,16 @@ function AdminApproval({ discussion: d }: { discussion: IkarosDiscussion }) {
 
 // ─── Karta příspěvku ───────────────────────────────────────────────────────
 
+/** Naivní strip HTML — post.content je TipTap HTML, pro snapshot stačí text. */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function PostCard({
   post,
   discussionId,
@@ -300,9 +309,7 @@ function PostCard({
   canReport: boolean;
 }) {
   const del = useDeletePost();
-  const report = useReportPost();
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
 
   return (
     <article className={s.post}>
@@ -336,13 +343,15 @@ function PostCard({
         {(canDelete || canReport) && (
           <div className={s.postActions}>
             {canReport && (
-              <button
-                type="button"
-                className={s.postBtn}
-                onClick={() => setReportOpen(true)}
-              >
-                <Flag size={12} /> Nahlásit
-              </button>
+              <ReportButton
+                variant="text"
+                targetType="discussion_post"
+                targetId={post.id}
+                targetUrl={`/ikaros/diskuze/${discussionId}`}
+                targetSnapshot={stripHtml(post.content).slice(0, 500)}
+                targetAuthorName={post.authorName}
+                targetAuthorId={post.authorId}
+              />
             )}
             {canDelete && (
               <button
@@ -368,26 +377,6 @@ function PostCard({
         message="Tato akce je nevratná."
         confirmLabel="Smazat"
         confirmVariant="danger"
-      />
-      <RejectReasonModal
-        open={reportOpen}
-        onClose={() => setReportOpen(false)}
-        title="Nahlásit příspěvek"
-        isPending={report.isPending}
-        confirmLabel="Nahlásit"
-        helpText="Popiš, co je s příspěvkem v nepořádku. Hlášení uvidí správce diskuzí."
-        onConfirm={(reason) =>
-          report.mutate(
-            { id: discussionId, postId: post.id, reason },
-            {
-              onSuccess: () => {
-                toast.success('Příspěvek nahlášen správci');
-                setReportOpen(false);
-              },
-              onError: () => toast.error('Nepodařilo se nahlásit'),
-            },
-          )
-        }
       />
     </article>
   );

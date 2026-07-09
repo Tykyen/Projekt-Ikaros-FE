@@ -40,6 +40,14 @@
   z-index: 1;
 }
 
+/* 20D (D2) — AI štítek v levém horním rohu thumbnailu (nekoliduje s ♥). */
+.aiOverlay {
+  position: absolute;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: 1;
+}
+
 .card:hover .frame {
   box-shadow: var(--gal-lift-shadow);
 }

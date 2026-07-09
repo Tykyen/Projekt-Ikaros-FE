@@ -30,6 +30,24 @@
   padding: 12px 14px;
 }
 
+/* 20C §C1 — nabídka exportu dat před smazáním */
+.exportRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--frame-border);
+  border-radius: 6px;
+}
+
+.exportNote {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
 .intro {
   margin: 0 0 8px;
   font-size: 0.9rem;

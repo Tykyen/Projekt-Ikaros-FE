@@ -30,6 +30,14 @@
   align-items: flex-start;
 }
 
+/* 20C — akce účtu (export dat + smazání) vedle sebe, na mobilu pod sebou */
+.accountActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
 .text {
   margin: 0;
   font-size: 0.95rem;

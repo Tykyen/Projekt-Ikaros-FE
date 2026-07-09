@@ -36,6 +36,9 @@ export default function GalleryUploadPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('ostatni');
+  // 20D (D1) — povinné prohlášení práv + volitelný self-declare AI (jen upload).
+  const [rightsDeclared, setRightsDeclared] = useState(false);
+  const [isAiImage, setIsAiImage] = useState(false);
 
   // Edit mód — předvyplnit z existujícího obrázku. Render-time pattern
   // (stráž přes prev id) místo useEffect → žádný extra render, hydratace
@@ -71,6 +74,11 @@ export default function GalleryUploadPage() {
       toast.error('Vyber obrázek k nahrání');
       return false;
     }
+    // 20D (D1) — bez prohlášení práv nelze nahrát (jen nový upload).
+    if (!isEdit && !rightsDeclared) {
+      toast.error('Potvrď prohlášení o právech k obsahu');
+      return false;
+    }
     return true;
   }
 
@@ -92,7 +100,15 @@ export default function GalleryUploadPage() {
     }
 
     create.mutate(
-      { file: file as File, title: title.trim(), description, category, submit },
+      {
+        file: file as File,
+        title: title.trim(),
+        description,
+        category,
+        submit,
+        rightsDeclared,
+        aiOrigin: isAiImage ? 'ai_image' : 'none',
+      },
       {
         onSuccess: () => {
           toast.success(
@@ -214,6 +230,32 @@ export default function GalleryUploadPage() {
         />
       </div>
 
+      {/* 20D (D1) — prohlášení práv + AI self-declare (jen nový upload) */}
+      {!isEdit && (
+        <fieldset className={s.consent}>
+          <legend className={s.consentLegend}>Prohlášení autora</legend>
+          <label className={s.check}>
+            <input
+              type="checkbox"
+              checked={rightsDeclared}
+              onChange={(e) => setRightsDeclared(e.target.checked)}
+            />
+            <span>
+              Mám práva k obsahu / neobsahuje cizí chráněný materiál bez licence.
+              <span className={s.required}> (povinné)</span>
+            </span>
+          </label>
+          <label className={s.check}>
+            <input
+              type="checkbox"
+              checked={isAiImage}
+              onChange={(e) => setIsAiImage(e.target.checked)}
+            />
+            <span>Tento obrázek je vytvořený AI.</span>
+          </label>
+        </fieldset>
+      )}
+
       {/* Actions */}
       <div className={s.actions}>
         {isEdit ? (
@@ -230,7 +272,7 @@ export default function GalleryUploadPage() {
             <button
               type="button"
               onClick={() => handleSubmit(false)}
-              disabled={isPending}
+              disabled={isPending || !rightsDeclared}
               className={s.btnSecondary}
             >
               <Save size={16} /> Uložit koncept
@@ -238,7 +280,7 @@ export default function GalleryUploadPage() {
             <button
               type="button"
               onClick={() => handleSubmit(true)}
-              disabled={isPending}
+              disabled={isPending || !rightsDeclared}
               className={s.btnPrimary}
             >
               <Send size={16} /> Odeslat ke schválení

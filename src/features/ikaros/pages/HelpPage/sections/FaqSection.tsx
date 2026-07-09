@@ -108,6 +108,39 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'ucet',
+    q: 'Jak si stáhnu svoje data (a proč)?',
+    a: (
+      <>
+        <p>
+          V <Link to="/ikaros/profil">Profilu</Link> → sekce <strong>Účet</strong>{' '}
+          je tlačítko <strong>„Stáhnout moje data (JSON)"</strong>. Vytvoří soubor s
+          tvými údaji (profil, členství ve světech, přátelství a další záznamy) —
+          máš na to právo (přístup a přenositelnost dat).
+        </p>
+        <p>Nabídneme ti stažení i <strong>před smazáním účtu</strong>.</p>
+      </>
+    ),
+  },
+  {
+    cat: 'ucet',
+    q: 'Kolik mi musí být let a co je režim ochrany nezletilých?',
+    a: (
+      <>
+        <p>
+          Při registraci vybíráš jen, jestli ti je <strong>15 a víc, nebo méně</strong>{' '}
+          — přesné datum nechceme.
+        </p>
+        <p>
+          Když je ti <strong>méně než 15</strong>, účet se zapne v{' '}
+          <strong>bezpečném režimu</strong>: neveřejný profil, skrytý v adresáři, a
+          je potřeba <strong>souhlas zákonného zástupce</strong>. Víc v{' '}
+          <Link to="/soukromi">Zásadách ochrany osobních údajů</Link>.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'ucet',
     q: 'Co je tombstone?',
     a: (
       <p>
@@ -141,6 +174,10 @@ const FAQ: FaqItem[] = [
           <li>žádosti o změnu přezdívky (jen Admin/Superadmin)</li>
           <li>žádosti o vstup do uzavřeného světa (pro PJ světa)</li>
           <li>články / obrázky / diskuze čekající na schválení (pro příslušné správce)</li>
+          <li>
+            nahlášený obsah k moderaci a odvolání proti rozhodnutí (pro správce
+            článků/galerie/diskuzí a adminy)
+          </li>
         </ul>
         <p>Číslo u záložky „Zpracovat" ukazuje počet čekajících položek.</p>
       </>
@@ -172,6 +209,48 @@ const FAQ: FaqItem[] = [
           <li>Druhá strana nedostane žádné upozornění (anti-stalk).</li>
         </ul>
         <p>Zablokované najdeš v tabu <strong>Přátelé</strong> → sekce „Zablokovaní".</p>
+      </>
+    ),
+  },
+  {
+    cat: 'komunita',
+    q: 'Jak nahlásím nevhodný obsah a co se stane potom?',
+    a: (
+      <>
+        <p>
+          U cizího obsahu — článku, obrázku, profilu, náboru, příspěvku v diskuzi,
+          stránky světa, novinky, přijaté zprávy i zprávy v chatu — je tlačítko{' '}
+          <strong>„Nahlásit"</strong> (vlajka). Vybereš <strong>kategorii</strong>{' '}
+          (autorská práva, osobní údaje, obtěžování, ohrožení nezletilých, nezákonný
+          obsah, spam, jiné), popíšeš <strong>důvod</strong> a odešleš. Můžeš{' '}
+          <strong>nahlásit anonymně</strong> (moderátor tvé jméno neuvidí).
+        </p>
+        <p>
+          Hlášení dostane <strong>moderátor</strong> a rozhodne — od „bez zásahu"
+          přes upozornění a skrytí až po odstranění obsahu. Dostaneš{' '}
+          <strong>potvrzení</strong> a případně i výsledek; stav najdeš v{' '}
+          <Link to="/ikaros/profil">Profilu</Link> → <strong>Moderace</strong>. Když
+          někdo nahlásí <em>tvůj</em> obsah a moderátor zasáhne, uvidíš tam
+          odůvodnění a můžeš se <strong>odvolat</strong> (posoudí to jiný moderátor).
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'komunita',
+    q: 'Jak označím, že je obrázek vytvořený AI?',
+    a: (
+      <>
+        <p>
+          Při <strong>nahrávání do galerie</strong> zaškrtni volbu{' '}
+          <strong>„Tento obrázek je vytvořený AI"</strong>. U obrázku (na kartě i v
+          detailu) se pak ukáže malý štítek <strong>„AI"</strong>, aby ostatní
+          věděli, čím vznikl.
+        </p>
+        <p>
+          Nahrát navíc jde jen po <strong>potvrzení</strong>, že máš k obsahu práva
+          a neobsahuje cizí chráněný materiál bez licence.
+        </p>
       </>
     ),
   },
@@ -593,11 +672,28 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'obecne',
+    q: 'Kde najdu pravidla komunity, ochranu údajů a kontakt?',
+    a: (
+      <>
+        <p>V <strong>patičce</strong> každé stránky (a taky odsud):</p>
+        <ul>
+          <li><Link to="/podminky">Podmínky použití</Link> — pravidla používání služby.</li>
+          <li><Link to="/kodex">Pravidla komunity</Link> — co je a není v pořádku (nulová tolerance k obsahu ohrožujícímu nezletilé).</li>
+          <li><Link to="/soukromi">Ochrana osobních údajů</Link> — co o tobě zpracováváme a jaká máš práva.</li>
+          <li><Link to="/kontakt">Kontakt</Link> — kam napsat žádost nebo stížnost.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    cat: 'obecne',
     q: 'Kde nahlásit chybu nebo navrhnout vylepšení?',
     a: (
       <p>
-        E-mailem na adresu uvedenou v <Link to="/podminky">podmínkách použití</Link>.
-        Stručný popis + jak chybu vyvolat + screenshot urychlí opravu.
+        E-mailem na adresu uvedenou v <Link to="/podminky">podmínkách použití</Link>{' '}
+        nebo na <Link to="/kontakt">kontaktní stránce</Link>. Stručný popis + jak
+        chybu vyvolat + screenshot urychlí opravu. <em>(Nevhodný obsah nehlas
+        e-mailem — na to je tlačítko „Nahlásit" přímo u obsahu.)</em>
       </p>
     ),
   },

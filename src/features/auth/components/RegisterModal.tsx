@@ -140,6 +140,8 @@ export function RegisterModal() {
         username: values.username,
         password: values.password,
         acceptedTerms: values.acceptedTerms,
+        // 20C §C2 — odvození deklarativního věku z volby (under15 = nezletilý).
+        isMinor: values.ageBracket === 'under15',
         hp: values.hp,
         captchaToken,
       });
@@ -279,6 +281,41 @@ export function RegisterModal() {
         {errors.acceptedTerms && (
           <p className={s.bannerError} role="alert" aria-live="polite">
             {errors.acceptedTerms.message}
+          </p>
+        )}
+
+        {/* 20A — Zásady OÚ = informace (bereš na vědomí), NE součást souhlasu. */}
+        <p className={s.privacyNote}>
+          Registrací bereš na vědomí{' '}
+          <a href="/soukromi" target="_blank" rel="noopener noreferrer">
+            Zásady ochrany osobních údajů
+          </a>
+          .
+        </p>
+
+        {/* 20C §C2 — deklarativní věk. Minimalizace: jen 15+/<15, ne datum narození. */}
+        <fieldset className={s.age}>
+          <legend className={s.ageLegend}>Kolik ti je let?</legend>
+          <label className={s.ageOption}>
+            <input type="radio" value="15plus" {...rhfRegister('ageBracket')} />
+            <span>Je mi 15 nebo více</span>
+          </label>
+          <label className={s.ageOption}>
+            <input type="radio" value="under15" {...rhfRegister('ageBracket')} />
+            <span>Je mi méně než 15 let</span>
+          </label>
+          <p className={s.ageNote}>
+            U mladších 15 let platí přísnější režim ochrany a je potřeba souhlas
+            zákonného zástupce — víc v{' '}
+            <a href="/soukromi" target="_blank" rel="noopener noreferrer">
+              Zásadách ochrany osobních údajů
+            </a>
+            .
+          </p>
+        </fieldset>
+        {errors.ageBracket && (
+          <p className={s.bannerError} role="alert" aria-live="polite">
+            {errors.ageBracket.message}
           </p>
         )}
 

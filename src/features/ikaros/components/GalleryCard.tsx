@@ -9,6 +9,7 @@ import {
   statusLabel,
 } from '../lib/gallery';
 import { cloudinaryThumb } from '@/shared/lib/cloudinary';
+import { AiBadge } from '@/shared/media';
 import { useToggleFavoriteGallery } from '../api/useGallery';
 import { FavoriteToggle } from './FavoriteToggle';
 import type { GalleryCategory, IkarosGalleryItem } from '@/shared/types';
@@ -51,6 +52,11 @@ export function GalleryCard({ image, categories, isMine, onOpen }: Props) {
           className={s.img}
           loading="lazy"
         />
+        {image.aiOrigin && image.aiOrigin !== 'none' && (
+          <div className={s.aiOverlay}>
+            <AiBadge size="sm" />
+          </div>
+        )}
         {showFav && (
           <div className={s.favoriteOverlay}>
             <FavoriteToggle

@@ -132,24 +132,8 @@ export function useDeletePost() {
   });
 }
 
-export function useReportPost() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      id,
-      postId,
-      reason,
-    }: {
-      id: string;
-      postId: string;
-      reason: string;
-    }) => api.post(`${PREFIX}/${id}/posts/${postId}/report`, { reason }),
-    onSuccess: () => {
-      // C-41 — nahlášení se musí objevit v moderátorské frontě + badge.
-      qc.invalidateQueries({ queryKey: ['pending-actions'] });
-    },
-  });
-}
+// B4d — `useReportPost` odstraněn; nahlašování příspěvků řeší sdílený
+// `<ReportButton targetType="discussion_post" />` (modul `@/shared/moderation`).
 
 // ─── Like / oblíbené ───────────────────────────────────────────────────────
 
@@ -280,16 +264,6 @@ export function useResolveJoinRequest() {
   });
 }
 
-export function useResolveReport() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      reportId,
-      deletePost,
-    }: {
-      reportId: string;
-      deletePost: boolean;
-    }) => api.post(`${PREFIX}/reports/${reportId}/resolve`, { deletePost }),
-    onSuccess: () => invalidate(qc),
-  });
-}
+// B4d — `useResolveReport` (discussion) odstraněn; vyřizování nahlášených
+// příspěvků řeší generický modul `moderation` (`useResolveReport` z
+// `@/shared/moderation`, akce M2–M4 → enforcement listener na BE).

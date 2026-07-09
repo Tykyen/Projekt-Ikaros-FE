@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { toast } from 'sonner';
 import { ChevronLeft, Reply } from 'lucide-react';
 import { Button, Spinner, ConfirmDialog } from '@/shared/ui';
+import { ReportButton } from '@/shared/moderation';
 import {
   useMessageDetail,
   useConversation,
@@ -112,6 +113,18 @@ export function MailDetail({
               </div>
               <div className={s.bubbleBody}>{m.body}</div>
               <div className={s.bubbleFoot}>
+                {/* 20B — nahlásit lze jen přijatou zprávu (ne vlastní odeslanou). */}
+                {!mine && (
+                  <ReportButton
+                    variant="icon"
+                    targetType="mail_message"
+                    targetId={m.id}
+                    targetSnapshot={`${m.subject} — ${m.body}`.slice(0, 500)}
+                    targetAuthorName={m.senderName}
+                    targetAuthorId={m.senderId}
+                    targetUrl="/ikaros/posta"
+                  />
+                )}
                 <button
                   type="button"
                   className={s.bubbleDelete}

@@ -9,6 +9,7 @@ import {
   type DeletionPreview,
   type DeletionBlocking,
 } from '../api/useDeleteAccount';
+import { useDataExport } from '../api/useDataExport';
 import styles from './DeleteAccountModal.module.css';
 
 /**
@@ -29,6 +30,8 @@ interface Props {
 export function DeleteAccountModal({ onClose }: Props) {
   const me = useAtomValue(currentUserAtom);
   const { mutate, isPending } = useRequestSelfDeletion();
+  // 20C §C1 — nabídnout export dat před smazáním (rámec „mazání = nejdřív export").
+  const dataExport = useDataExport();
 
   const [preview, setPreview] = useState<DeletionPreview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(true);
@@ -126,6 +129,22 @@ export function DeleteAccountModal({ onClose }: Props) {
             anonymním autorem.
           </li>
         </ul>
+
+        {/* 20C §C1 — export dat před smazáním. */}
+        <div className={styles.exportRow}>
+          <span className={styles.exportNote}>
+            Před smazáním si můžeš stáhnout svá data.
+          </span>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            loading={dataExport.isPending}
+            onClick={() => dataExport.mutate()}
+          >
+            Stáhnout moje data (JSON)
+          </Button>
+        </div>
 
         {previewLoading && (
           <p className={styles.placeholder}>Načítám PJ handover plán…</p>

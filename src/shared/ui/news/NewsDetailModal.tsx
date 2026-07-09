@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { getImageStyle } from '@/shared/lib/imageStyle';
@@ -9,6 +10,12 @@ interface Props {
   vm: NewsCardVM;
   open: boolean;
   onClose: () => void;
+  /**
+   * 20B (Fáze B5) — volitelný akční slot (typicky „Nahlásit"). Doménový adaptér
+   * (WorldNewsCard) sem vloží `ReportButton` s worldId/autorem; sdílený modal
+   * o moderaci nic neví. Global novinky slot nepředají → nic se nevykreslí.
+   */
+  reportSlot?: ReactNode;
 }
 
 /**
@@ -16,7 +23,7 @@ interface Props {
  * `Modal`: backdrop, ×, Escape, klik do pozadí, focus-trap). Velký hero
  * obrázek nahoře, štítek + plné datum, plný obsah, doménová patička.
  */
-export function NewsDetailModal({ vm, open, onClose }: Props) {
+export function NewsDetailModal({ vm, open, onClose, reportSlot }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={vm.title} size="lg">
       <div className={s.detail}>
@@ -44,6 +51,7 @@ export function NewsDetailModal({ vm, open, onClose }: Props) {
               archivováno
             </span>
           )}
+          {reportSlot && <span className={s.reportSlot}>{reportSlot}</span>}
         </div>
 
         <RichTextEditor

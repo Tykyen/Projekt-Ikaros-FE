@@ -96,6 +96,7 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 - Klávesové zkratky: `Ctrl+K` paleta, `f` toggle oblíbené, `e` editor (jen canEdit), `Shift+?` nápověda, `g s` zpět na seznam.
 - Panel „Odkazuje sem" (backlinks) — JEN PomocnyPJ+ (`canEdit`, řádek 149).
 - **Tisk / PDF** (14.7a) — ikona 🖨 v hlavičce (`PageHeader.tsx`) → `window.print()` jen nad obsahem stránky (viz `## Tisk / PDF` níže).
+- **Nahlásit** (20.1) — tlačítko „Nahlásit" v hlavičce stránky (`PageHeader.tsx:120`, `ReportButton targetType="page"`, `worldId`) → platformová moderační fronta „Zpracovat" (kap. 08); nahlašování protiprávního obsahu je platformní věc, ne PJ governance (R-20).
 
 ### Hranice — co neumí
 - **Tabulky v `content` se renderují i ve vieweru** (15.5-followup, D-NEW-INV-WIKI). `RichTextEditor` zapíná Table extension i v `readOnly` (`enableTable || readOnly`, `RichTextEditor.tsx`) + read CSS `.content .rte-table`. Jeden zásah pokryl všech 8 read layoutů; tabulka napsaná v editoru je teď ve čtení vidět. (Atributová `table` mimo `content` se renderuje samostatně přes `PageSidebar`.)

@@ -58,7 +58,10 @@ const GLOBAL_CARDS: GlobalCard[] = [
     cardCls: s.roleCardSpravceDiskuzi,
     title: 'Správce diskuzí',
     badge: 'Moderátor diskuzí',
-    desc: 'Schvaluje a zamítá pending diskuze, moderuje příspěvky a vlákna.',
+    desc:
+      'Schvaluje a zamítá pending diskuze, moderuje příspěvky a vlákna. ' +
+      'Jako „správce komunity" navíc řeší nahlášený obsah napříč platformou ' +
+      '(kromě zásahů do účtu — ty patří adminům).',
     icon: <RoleStar role={UserRole.SpravceDiskuzi} size="lg" />,
   },
   {
@@ -66,7 +69,10 @@ const GLOBAL_CARDS: GlobalCard[] = [
     cardCls: s.roleCardSpravceClanku,
     title: 'Správce článků',
     badge: 'Moderátor článků',
-    desc: 'Schvaluje a zamítá články, moderuje literární obsah a autory.',
+    desc:
+      'Schvaluje a zamítá články, moderuje literární obsah a autory. ' +
+      'Jako „správce komunity" navíc řeší nahlášený obsah napříč platformou ' +
+      '(kromě zásahů do účtu — ty patří adminům).',
     icon: <RoleStar role={UserRole.SpravceClanku} size="lg" />,
   },
   {
@@ -74,7 +80,10 @@ const GLOBAL_CARDS: GlobalCard[] = [
     cardCls: s.roleCardSpravceGalerie,
     title: 'Správce galerie',
     badge: 'Moderátor galerie',
-    desc: 'Schvaluje obrázky, moderuje galerii a nahrávaný obsah.',
+    desc:
+      'Schvaluje obrázky, moderuje galerii a nahrávaný obsah. ' +
+      'Jako „správce komunity" navíc řeší nahlášený obsah napříč platformou ' +
+      '(kromě zásahů do účtu — ty patří adminům).',
     icon: <RoleStar role={UserRole.SpravceGalerie} size="lg" />,
   },
 ];

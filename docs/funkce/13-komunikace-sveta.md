@@ -175,6 +175,9 @@ DTO `create-world-news.dto.ts`: `title` (≤200), `content` (≤10000), `date` (
 ### Kde se novinky ještě zobrazují
 - Úvodní dashboard světa — sloupec Novinky (`WorldDashboard/columns/NewsColumn.tsx`, `WorldNewsCard`), spec 5.2.
 
+### Nahlásit novinku (20.1)
+- Karta novinky nese tlačítko „Nahlásit" (`WorldNewsCard.tsx:209`, `ReportButton targetType="world_news"`, `worldId`) → platformová moderační fronta „Zpracovat" (kap. 08). Report protiprávního obsahu je platformní záležitost (ne PJ), viz R-20. Jen přihlášený, vlastní obsah ne. *(Zprávy světového chatu report tlačítko zatím nemají — jen globální chat, kap. 05.)*
+
 ### Karta + detail-okno (sjednoceno s globálními novinkami, 2026-06-22)
 - `WorldNewsCard` je teď adaptér nad sdílenou `NewsPreviewCard` + `NewsDetailModal` (`src/shared/ui/news/`) — stejná prezentační vrstva jako globální novinky (kap. 04), liší se jen view-model (svět navíc resolvuje interní odkaz `linkPageSlug` přes `usePagesDirectory` a fantasy datum přes `useCalendarConfigs`).
 - **Plný text oznámení se čte v detail-okně** — dřív nebyl viditelný nikde (karta ukazovala jen 3řádkový úryvek). Interní/externí odkaz se přesunul z karty do okna.

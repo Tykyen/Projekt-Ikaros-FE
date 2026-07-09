@@ -1,4 +1,5 @@
 import { getTheme } from '@/themes/registry';
+import { ReportButton } from '@/shared/moderation';
 import type { Nabor } from '@/shared/types';
 import {
   timeAgo,
@@ -92,17 +93,29 @@ export function NaborListek({ nabor, onOzvatSe }: Props): React.ReactElement {
           {timeAgo(nabor.createdAtUtc)}
           {nabor.worldName ? ` · ${nabor.worldName}` : ''}
         </span>
-        {full ? (
-          <span className={s.closed}>Obsazeno</span>
-        ) : (
-          <button
-            type="button"
-            className={s.reply}
-            onClick={() => onOzvatSe?.(nabor)}
-          >
-            Ozvat se
-          </button>
-        )}
+        <div className={s.footRight}>
+          <ReportButton
+            variant="icon"
+            targetType="nabor"
+            targetId={nabor.id}
+            targetSnapshot={nabor.title}
+            targetAuthorName={nabor.authorName}
+            targetAuthorId={nabor.authorId}
+            worldId={nabor.worldId}
+            targetUrl="/ikaros/nabory"
+          />
+          {full ? (
+            <span className={s.closed}>Obsazeno</span>
+          ) : (
+            <button
+              type="button"
+              className={s.reply}
+              onClick={() => onOzvatSe?.(nabor)}
+            >
+              Ozvat se
+            </button>
+          )}
+        </div>
       </div>
     </article>
   );

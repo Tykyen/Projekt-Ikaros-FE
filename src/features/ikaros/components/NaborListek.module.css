@@ -125,6 +125,11 @@
   margin-top: auto;
   padding-top: 6px;
 }
+.footRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .who {
   font-size: 12px;
   color: var(--theme-text-muted, var(--theme-text));

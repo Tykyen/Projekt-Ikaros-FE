@@ -21,6 +21,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - Psát zprávy (text + barva `chatColor` z profilu), **odpovídat** na zprávu (reply preview), **reagovat** emoji reakcí, **nahrávat přílohy** (max **10 MB**).
   - **Šeptat** (whisper) konkrétnímu uživateli přes WS `ikaros:whisper` (`visibleTo` → vidí jen příjemce a odesílatel) — `ChatRoom.tsx:333`, service `sendWhisper`.
   - Vidět **seznam přítomných** (`UserList`), **indikátor psaní** (`TypingIndicator`), systémové hlášky o příchodu/odchodu.
+  - **Nahlásit** (20.1): přihlášený člen může z akcí u cizí zprávy otevřít report (`ReportModal targetType="chat_message"` → moderační fronta, kap. 08). Platí pro Putyku i Camp (sdílený `MessageItem`); vlastní zprávu nahlásit nelze, guest/host nahlásit nemůže (BE vyžaduje účet). *(Světový chat report na zprávy zatím nemá.)*
   - Admin: **smazat** zprávu (`DELETE /global-chat/messages/:id`).
 - **Hranice / co neumí:**
   - **Zprávy mizí po 1 hodině** — TTL `MESSAGE_TTL_MS = HOUR_MS` (`global-chat.service.ts:42`/`:233`); historie se navíc načítá omezeně (limit ≤ 100) a cron `EVERY_2_HOURS` fyzicky maže expirované (`clean-messages.job.ts`).
@@ -87,6 +88,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Doručené** (`/inbox`, volitelně `?system=true` pro systémová), **Odeslané** (`/sent`), **počet nepřečtených** (`/unread-count` → badge u zvonku).
   - Otevřít zprávu (`GET /:id` ji označí jako přečtenou), zobrazit **celé vlákno** (`/conversation/:conversationId`).
   - **Napsat** novou zprávu (příjemce, předmět, tělo) nebo **odpovědět** ve vláknu (`POST /ikaros-messages`).
+  - **Nahlásit** (20.1): u **přijaté** zprávy tlačítko „Nahlásit" (`ReportButton targetType="mail_message"`) → moderační fronta (kap. 08). Vlastní odeslané zprávy se nenahlašují.
   - **Smazat** zprávu — soft delete jen pro aktuálního uživatele (`DELETE /:id`).
 - **Hranice / co neumí:**
   - **Friend-only filtr (D-057):** pokud má příjemce `profileVisibility = 'friends'`, smí mu novou konverzaci založit jen **přítel** (jinak 403). Systémové zprávy (`senderId='system'`) tento filtr **obcházejí** (`ikaros-messages.service.ts:99`).

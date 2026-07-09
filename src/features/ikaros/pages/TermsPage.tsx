@@ -118,8 +118,10 @@ export default function TermsPage() {
           <strong>Smazání účtu:</strong> kdykoli z profilu — viz čl. 9.
         </li>
         <li>
-          Dotazy k osobním údajům piš na kontakt v čl. 11. Samostatné Zásady
-          ochrany osobních údajů doplníme s finální právní revizí.
+          Podrobnosti najdeš v samostatných{' '}
+          <a href="/soukromi">Zásadách ochrany osobních údajů</a> (co, proč a
+          jak dlouho zpracováváme). Dotazy k osobním údajům piš na{' '}
+          <a href="/kontakt">kontakt</a>.
         </li>
       </ul>
 
@@ -158,9 +160,10 @@ export default function TermsPage() {
 
       <h2>11. Rozhodné právo a kontakt</h2>
       <p>
-        Vztah se řídí právem České republiky. Dotazy, nahlášení obsahu i
-        žádosti k osobním údajům posílej na{' '}
-        <a href="mailto:tykytanjunior@gmail.com">tykytanjunior@gmail.com</a>.
+        Vztah se řídí právem České republiky. Kontaktní místa (pro uživatele
+        i orgány) a nahlašování najdeš na stránce{' '}
+        <a href="/kontakt">Kontakt</a>. Pravidla chování popisují{' '}
+        <a href="/kodex">Pravidla komunity</a>.
       </p>
 
       <p className={styles.footer}>

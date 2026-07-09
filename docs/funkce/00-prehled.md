@@ -2,7 +2,7 @@
 
 > **Účel:** Hloubková, **kódem ověřená** inventura všeho, co platforma dnes umí. Slouží jako podklad pro budoucí uživatelský průvodce (návody) a pro strategii rozšiřování. Každé tvrzení bylo ověřeno přímo ve zdrojovém kódu FE i BE — ne odhadem.
 >
-> **Snímek k:** 2026-07-08 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
+> **Snímek k:** 2026-07-09 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
 >
 > ⚠️ Toto je stav kódu, ne marketingový popis. Kde se název funkce rozchází s realitou, je to označeno v sekci „Nesrovnalosti & dluhy" na konci každé kapitoly.
 
@@ -45,6 +45,8 @@ Každá funkce má jednotnou strukturu:
 | SpravceDiskuzi | 12 | Moderuje diskuze. |
 
 + **Granulární admin práva (D-033):** `canManageAdmins`, `canModerateContent`, `canEditPlatformPages` — viz kap. 08 (pozn.: `canEditPlatformPages` je dnes mrtvý flag).
+
++ **„Správce komunity" (20.1):** obsahové role `SpravceClanku`/`SpravceGalerie`/`SpravceDiskuzi` navíc moderují **generickou** frontu nahlášeného obsahu (`content_report`) napříč všemi plochami — nejen svou. Zásahy na úrovni účtu (M5–M7) a kategorie „ohrožení nezletilých" zůstávají jen Adminovi/Superadminovi. Viz kap. 08 „Nahlašování & moderace obsahu".
 
 > ⚠️ **Drift:** FE enum drží 6 rolí, **BE enum stále nese legacy world role (3–8)** — viz kap. 08.
 

@@ -33,6 +33,7 @@ Společné principy ověřené v kódu:
   - Taby (FE): seznam publikovaných, „Moje" (`/my`), „Zpracovat" (pending fronta — jen recenzent), statistiky (`/stats`).
   - **Hodnocení** 1–5 hvězdiček + volitelný text (`POST /:id/rate`, jen na `Published`, jen přihlášený) — `ikaros-articles.controller.ts:209`.
   - **Oblíbené** (toggle) + **připnutí do sidebaru** max 5 (`/toggle-favorite`, `/toggle-pin`) — `:236`/`:244`.
+  - **Nahlásit** (20.1) — tlačítko „Nahlásit" u cizího článku → generický report do moderační fronty (kap. 08).
   - **Stav přečtení:** `mark-read` (idempotentní), `read-status`, `unread-count` — badge nepřečtených (3.2a) `:75`/`:102`/`:227`.
   - **Historie revizí:** `GET /:id/versions` (autor nebo admin) — `:111`.
 - **Hranice / co neumí:** žádné komentáře pod článkem (jen hvězdičkové hodnocení s textem). Anon nehodnotí, neoznačuje oblíbené ani nečte pending. Verzování je read-only (žádný rollback endpoint). Mazání kategorie smí **jen Superadmin** a jen pokud ji žádný článek nepoužívá (jinak 409).
@@ -67,9 +68,10 @@ Společné principy ověřené v kódu:
   - **BE:** `GET` přes `OptionalJwtAuthGuard` (anon `Published`, recenzent + `Pending`). Nahrávat smí kdokoli přihlášený. Schvaluje recenzent `Superadmin`/`Admin`/`SpravceGalerie` (`ADMIN_ROLES` v `ikaros-gallery.service.ts:22`).
   - **Kategorie** galerie: create/update `Admin`/`Superadmin`, delete jen `Superadmin` (`gallery-categories.controller.ts:43`/`:74`).
 - **Co jde dělat:**
-  - **Nahrát obrázek** (multipart, max **10 MB**, `accept="image/*"`) s titulkem, popisem, kategorií; „Uložit koncept" nebo „Odeslat ke schválení" — `GalleryUploadPage.tsx:16`/`:77`, controller `:108`.
+  - **Nahrát obrázek** (multipart, max **10 MB**, `accept="image/*"`) s titulkem, popisem, kategorií; **povinné prohlášení práv** „Mám práva k obsahu / neobsahuje cizí chráněný materiál bez licence" (bez zaškrtnutí nelze nahrát — 20.3/§D1) + volitelné **„Tento obrázek je vytvořený AI"**; „Uložit koncept" nebo „Odeslat ke schválení" — `GalleryUploadPage.tsx:77`/`:238`/`:249`, controller `:108`.
   - **Editovat** title/description/category (ne samotný soubor) ve stavu `Draft`/`Rejected`.
   - **Hodnotit** 1–5 (+ text) na `Published`, **oblíbené**, **připnout** (max 5) — `:196`/`:216`/`:225`.
+  - **Nahlásit** (20.1) — tlačítko „Nahlásit" u cizího obrázku (kategorie mj. „Autorská práva" = takedown) → moderační fronta (kap. 08).
   - Recenzent: **Schválit**/**Zamítnout s důvodem** (`/approve`, `/reject`) — `:172`/`:182`.
 - **Hranice / co neumí:**
   - **„Alba" jako vlastní entita neexistují** — organizace je jen přes **kategorie** (chips/select). Žádné soukromé/sdílené album, žádné více obrázků v jednom uploadu (1 soubor = 1 položka).
@@ -77,8 +79,10 @@ Společné principy ověřené v kódu:
   - Editace nemění samotný soubor (jen metadata).
   - Bulk approve/reject (jako u článků) tu **chybí** — schvaluje se po jednom.
 - **Zvláštnosti:** EXIF/GPS metadata se při uploadu odstraňují (`strip_profile`, UM-09). Při odeslání ke schválení jde recenzentům systémová pošta s odkazem na obrázek. Smazaný autor → tombstone. **15.9 — web push autorovi** (kategorie `ownContent`) při schválení, zamítnutí i **novém hodnocení** (`pushAuthor` v `ikaros-gallery.service.ts`).
+  - **Obsah/AI (20.3):** obrázek nese pole `aiOrigin` (`none`/`ai_image`, default `none`). Když autor zaškrtl „vytvořeno AI", zobrazí se u obrázku štítek **„AI"** (`AiBadge`) — na detailu i na kartě/thumbnailu. Prohlášení práv se při uploadu zapíše do samostatného **consent audit logu** (BE modul `upload_consents`, doklad „uživatel prohlásil práva"; bez UI). Strojové značení AI (vodoznak/metadata) zatím ne — čeká na Fázi 18.
+  - **License card model (podklad):** BE kolekce `content_licenses` (17 polí dle právního rámce) existuje jako datový podklad pro budoucí komunitní knihovnu (21.5) — **nenapojený** na galerii, žádné UI „klonovat/licence".
 - **Stav:** ✅
-- **Kód:** FE `src/features/ikaros/pages/GalleryUploadPage.tsx`, `GalleryPage.tsx`, `GalleryDetailPage.tsx`, `api/useGallery.ts`. BE `ikaros-gallery.controller.ts`, `ikaros-gallery.service.ts`, `gallery-categories.controller.ts`, `upload.service.ts`.
+- **Kód:** FE `src/features/ikaros/pages/GalleryUploadPage.tsx`, `GalleryPage.tsx`, `GalleryDetailPage.tsx`, `components/GalleryCard.tsx`, `shared/media/AiBadge.tsx`, `api/useGallery.ts`. BE `ikaros-gallery.controller.ts`, `ikaros-gallery.service.ts` (`aiOrigin` schema `:36`, consent record `:274`), `gallery-categories.controller.ts`, `upload.service.ts`, `modules/upload-consents/*`, `modules/content-licenses/*` (podklad).
 
 ---
 
@@ -94,11 +98,11 @@ Společné principy ověřené v kódu:
   - Založit diskuzi (titulek, popis), psát **příspěvky** (rich-text), stránkované načítání (`/posts?skip&limit`).
   - **Lajkovat** diskuzi, dávat do **oblíbených**, **připnout** (max 5).
   - **Správci vlákna:** přidat/odebrat manažera, **pozvat** uživatele, řešit **žádosti o přidání** do uzamčené (`isOpen=false`) diskuze (`/join-request`, `/.../resolve`).
-  - **Moderace:** **nahlásit** cizí příspěvek (`/posts/:postId/report`), smazat vlastní příspěvek (autor) nebo cizí (manažer/admin), recenzent řeší report (`/reports/:reportId/resolve` s volbou `deletePost`).
+  - **Moderace:** **nahlásit** cizí příspěvek — nově přes generický subsystém (`ReportButton targetType="discussion_post"` → `POST /moderation/reports`, kap. 08). Starý discussion report (`/posts/:postId/report` + `/reports/:reportId/resolve`) byl **odstraněn** a data zmigrována do `content_reports`. Smazat vlastní příspěvek (autor) nebo cizí (manažer/admin); moderační zásah M2/M3 příspěvek skryje přes flag `moderationHidden`, M4 smaže.
 - **Hranice / co neumí:**
   - Žádné kategorie/štítky diskuzí (jen otevřená/uzamčená a oblíbené/připnuté).
   - Žádné vnořené odpovědi/threading uvnitř diskuze (ploché příspěvky); reply na konkrétní příspěvek jako u chatu tu není.
-  - Nahlášení příspěvku nemá vlastní administrační přehled na samostatné stránce — řeší se přes `resolveReport` (FE expozici je vhodné ověřit, viz Nesrovnalosti).
+  - Nahlášení příspěvku se od 20.1 řeší v generické frontě „Zpracovat" (typ `content_report`, kap. 08), ne samostatnou stránkou.
 - **Zvláštnosti:** při založení nepschválené diskuze a při schválení/zamítnutí chodí systémová **pošta**. **15.9 — web push autorovi diskuse** (kategorie `ownDiscussion`) při **novém příspěvku** od někoho jiného (`ikaros-discussions.service.ts` `addPost`, s `url` na diskusi). Smazaný autor příspěvku → tombstone avatar + kurzíva (D-040). Uzamčená diskuze (`isOpen=false`) má badge zámku.
 - **Stav:** ✅
 - **Kód:** FE `src/features/ikaros/pages/DiscussionDetailPage.tsx`, `DiscussionsNewPage.tsx`, `api/useDiscussions.ts`. BE `ikaros-discussions.controller.ts`, `ikaros-discussions.service.ts`.
@@ -134,5 +138,5 @@ Společné principy ověřené v kódu:
 4. **`Tyky` hardcoded admin.** Bypass přes username `=== 'Tyky'` je rozeset ve 3 service (články/galerie/diskuze). Křehké (závisí na jménu, ne roli) a duplikované.
 5. **Galerie nemá „alba".** Zadání zmiňuje „alba/kategorie" — reálně existují **jen kategorie**, žádná entita album. Pro průvodce formulovat jako kategorie.
 6. **Galerie postrádá bulk approve/reject**, který články mají — nekonzistence schvalovacího UX mezi dvěma jinak identickými moduly.
-7. **Moderace diskuzí — FE expozice reportů k ověření.** BE `resolveReport` existuje (controller `:264`), ale samostatný admin přehled nahlášených příspěvků v FE jsem nedohledal v rámci této rešerše — ověřit, kde recenzent reporty vyřizuje (možná jen z detailu příspěvku).
+7. ✅ VYŘEŠENO 20.1 — **Moderace diskuzí sjednocena do generické fronty.** Nahlášení příspěvku jede přes `POST /moderation/reports` (`ReportButton targetType="discussion_post"`) a recenzent ho vyřizuje ve frontě „Zpracovat" (`content_report`, `ContentReportRenderer`, kap. 08). Starý discussion report (`POST :id/posts/:postId/report` + `.../reports/:reportId/resolve`) i schema `ikaros_discussion_reports` **odstraněny**, data zmigrována do `content_reports`.
 8. **Mazání kategorií jen Superadmin** (články i galerie) — `Admin` je vytvoří/upraví, ale nesmaže. Záměr, ale pro uživatele matoucí; zmínit v průvodci.

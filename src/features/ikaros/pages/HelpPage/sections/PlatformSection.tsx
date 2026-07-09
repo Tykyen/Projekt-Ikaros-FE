@@ -22,6 +22,10 @@ import {
   Smartphone,
   Dices,
   Palette,
+  Flag,
+  Gavel,
+  Lock,
+  Contact,
 } from 'lucide-react';
 import { HelpAccordion, HelpSubAccordion, TagChip, ScreenshotSlot, type TagKind } from '../components';
 
@@ -243,6 +247,13 @@ export function PlatformSection() {
             koncept nebo odešleš ke schválení; po schválení (Správce galerie) ho lze
             hodnotit a přidat do oblíbených.
           </p>
+          <p>
+            Při nahrávání <strong>musíš potvrdit</strong>, že máš k obsahu práva a
+            neobsahuje cizí chráněný materiál bez licence — bez toho nahrát nejde.
+            Pokud obrázek <strong>vytvořila AI</strong>, zaškrtni to; u obrázku se
+            pak ukáže malý štítek <strong>„AI"</strong>, aby ostatní věděli, čím
+            vznikl.
+          </p>
         </Tool>
         <Tool icon={<Newspaper size={16} />} title="Novinky" audience={{ kind: 'vse', label: 'Všichni' }} accent="corrector">
           <p>
@@ -309,6 +320,54 @@ export function PlatformSection() {
             „Zapomněl/a jsi heslo?" v přihlašovacím dialogu → zadáš e-mail → přijde
             odkaz na reset (platí 1 hodinu, na jedno použití). Pokud měl účet
             naplánované smazání, reset ho zruší a účet obnoví.
+          </p>
+        </Tool>
+      </HelpAccordion>
+
+      {/* ── Pravidla, soukromí & nahlašování ───────────────────────────── */}
+      <HelpAccordion icon={<Gavel size={20} />} title="Pravidla, soukromí & nahlašování" accent="info">
+        <Tool icon={<Flag size={16} />} title="Nahlásit obsah" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
+          <p>
+            U cizího obsahu — <strong>článku, obrázku v galerii, profilu, náboru,
+            příspěvku v diskuzi, stránky světa, novinky, přijaté zprávy v poště i
+            zprávy v chatu</strong> — najdeš tlačítko <strong>„Nahlásit"</strong>{' '}
+            (ikona vlajky). Otevře formulář: vybereš <strong>kategorii</strong>{' '}
+            (autorská práva, osobní údaje, obtěžování, ohrožení nezletilých,
+            nezákonný obsah, spam, jiné), napíšeš <strong>důvod</strong>, necháš
+            (nebo upravíš) svůj e-mail a potvrdíš, že to myslíš vážně. Můžeš zvolit{' '}
+            <strong>„nahlásit anonymně"</strong> (tvé jméno moderátor neuvidí).
+          </p>
+          <p>
+            Co se stane pak: hlášení dostane <strong>moderátor</strong> do fronty a
+            rozhodne — od „bez zásahu" přes upozornění a skrytí až po odstranění
+            obsahu, v krajních případech omezení účtu. Dostaneš{' '}
+            <strong>potvrzení</strong> a (pokud sis to nechal/a poslat) i výsledek.
+            Stav svých hlášení sleduješ v <Link to="/ikaros/profil">Profilu</Link>{' '}
+            → sekce <strong>Moderace</strong>. Vlastní obsah nahlásit nelze.
+          </p>
+        </Tool>
+        <Tool icon={<Gavel size={16} />} title="Pravidla komunity" audience={{ kind: 'vse', label: 'Všichni' }} accent="info">
+          <p>
+            <Link to="/kodex">Pravidla komunity</Link> shrnují, co na platformě
+            platí a co je zakázané (mj. <strong>nulová tolerance</strong> k obsahu
+            ohrožujícímu nezletilé). Odkaz najdeš i v <strong>patičce</strong> na
+            každé stránce.
+          </p>
+        </Tool>
+        <Tool icon={<Lock size={16} />} title="Ochrana osobních údajů" audience={{ kind: 'vse', label: 'Všichni' }} accent="info">
+          <p>
+            <Link to="/soukromi">Zásady ochrany osobních údajů</Link> vysvětlují,
+            jaké údaje o tobě zpracováváme, proč, jak dlouho a jaká máš práva
+            (přístup, oprava, výmaz, přenositelnost). Většinu vyřešíš přímo v appce
+            — <strong>stáhnout data</strong> i <strong>smazat účet</strong> najdeš v{' '}
+            <Link to="/ikaros/profil">Profilu</Link> → Účet.
+          </p>
+        </Tool>
+        <Tool icon={<Contact size={16} />} title="Kontakt" audience={{ kind: 'vse', label: 'Všichni' }} accent="info">
+          <p>
+            <Link to="/kontakt">Kontaktní stránka</Link> říká, kam napsat žádost k
+            osobním údajům, stížnost nebo podnět, který nejde vyřešit tlačítkem
+            „Nahlásit". Odkaz je i v patičce.
           </p>
         </Tool>
       </HelpAccordion>

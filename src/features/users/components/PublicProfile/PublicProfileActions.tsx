@@ -18,6 +18,7 @@ import {
   KebabMenu,
   type KebabMenuItem,
 } from '@/shared/ui';
+import { ReportButton } from '@/shared/moderation';
 import { useFriendshipStatus } from '@/features/friendships/api/useFriendshipStatus';
 import {
   useAcceptFriendRequest,
@@ -196,6 +197,15 @@ export function PublicProfileActions({
           >
             <Mail size={14} aria-hidden="true" /> Napsat zprávu
           </Button>
+        )}
+        {!isSelf && (
+          <ReportButton
+            targetType="profile"
+            targetId={profileId}
+            targetSnapshot={username}
+            targetAuthorName={username}
+            targetAuthorId={profileId}
+          />
         )}
         {showAdminAction && (
           <Button

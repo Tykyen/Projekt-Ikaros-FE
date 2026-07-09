@@ -7,6 +7,7 @@ import { currentUserAtom } from '@/shared/store/authStore';
 import { Spinner, ConfirmDialog, Breadcrumbs } from '@/shared/ui';
 import { Seo, metaDescription, JsonLd, articleJsonLd, breadcrumbJsonLd, firstImageSrc } from '@/shared/seo';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { ReportButton } from '@/shared/moderation';
 import { UserRole } from '@/shared/types';
 import { useArticle, useApproveArticle, useRejectArticle, useDeleteArticle, useSubmitArticle, useRateArticle, useMarkRead, useArticleReadStatus, useArticles, useToggleFavoriteArticle } from '../api/useArticles';
 import { useArticleCategories } from '../api/useArticleCategories';
@@ -137,6 +138,15 @@ export default function ArticleDetailPage() {
           </div>
         </header>
         <ArticleFavorite article={article} />
+        <div className={s.reportRow}>
+          <ReportButton
+            targetType="article"
+            targetId={article.id}
+            targetSnapshot={article.title}
+            targetAuthorName={article.authorName}
+            targetAuthorId={article.authorId}
+          />
+        </div>
       </div>
 
       <div className={s.body}>

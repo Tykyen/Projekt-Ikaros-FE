@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { Button } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
+import { useDataExport } from '../api/useDataExport';
 import { DeleteAccountModal } from './DeleteAccountModal';
 import styles from './ProfileSections.module.css';
 
@@ -11,6 +12,36 @@ function formatDate(iso: string): string {
     month: 'long',
     year: 'numeric',
   });
+}
+
+/**
+ * 20C §C1 — tlačítko „Stáhnout moje data (JSON)" (GDPR čl. 15). Sekundární,
+ * dostupné vždy (i v pending-delete stavu — rámec „mazání = nejdřív nabídnout export").
+ */
+function DataExportButton() {
+  const { mutate, isPending } = useDataExport();
+  return (
+    <Button
+      type="button"
+      variant="secondary"
+      loading={isPending}
+      onClick={() => mutate()}
+    >
+      Stáhnout moje data (JSON)
+    </Button>
+  );
+}
+
+/**
+ * 20C §C3 — nenápadná informativní hláška pro nezletilého (< 15). Zapíná se jen
+ * když `currentUser.isMinor`. Vysvětluje omezený režim (neveřejný profil).
+ */
+function MinorNotice() {
+  return (
+    <p className={styles.placeholderHint} role="note">
+      Účet v režimu ochrany nezletilých — neveřejný profil, skrytý v adresáři.
+    </p>
+  );
 }
 
 /**
@@ -31,6 +62,7 @@ export function AccountSection() {
           <h2 className={styles.sectionTitle}>Účet</h2>
         </header>
         <div className={styles.body}>
+          {me.isMinor && <MinorNotice />}
           <p className={styles.text}>
             <strong>Účet je naplánovaný na smazání.</strong>
             {'\n'}
@@ -45,6 +77,7 @@ export function AccountSection() {
             Pro obnovení se odhlas a přihlas znovu — login během 30denního hold
             spustí reaktivaci.
           </p>
+          <DataExportButton />
         </div>
       </section>
     );
@@ -56,17 +89,24 @@ export function AccountSection() {
         <h2 className={styles.sectionTitle}>Účet</h2>
       </header>
       <div className={styles.body}>
+        {me?.isMinor && <MinorNotice />}
         <p className={styles.text}>
           Smazání účtu spustí 30denní hold; po něm dojde k trvalému anonymizování
           v komunitních příspěvcích (chat, články, galerie, diskuze zůstanou).
         </p>
-        <Button
-          type="button"
-          variant="danger"
-          onClick={() => setModalOpen(true)}
-        >
-          Smazat účet
-        </Button>
+        <p className={styles.placeholderHint}>
+          Před smazáním si můžeš stáhnout svá data.
+        </p>
+        <div className={styles.accountActions}>
+          <DataExportButton />
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => setModalOpen(true)}
+          >
+            Smazat účet
+          </Button>
+        </div>
       </div>
       {modalOpen && <DeleteAccountModal onClose={() => setModalOpen(false)} />}
     </section>

@@ -6,8 +6,9 @@ import {
   type ArticleReviewListItem,
   type GalleryReviewListItem,
   type DiscussionReviewListItem,
-  type DiscussionReportListItem,
   type DiscussionJoinRequestListItem,
+  type ContentReportListItem,
+  type AppealReviewListItem,
 } from '@/shared/types';
 import type { PendingActionRenderer } from './PendingActionCard';
 import {
@@ -41,15 +42,20 @@ import {
   DiscussionReviewMid,
 } from '@/features/ikaros/components/DiscussionReviewRenderer';
 import {
-  DiscussionReportActions,
-  DiscussionReportLeft,
-  DiscussionReportMid,
-} from '@/features/ikaros/components/DiscussionReportRenderer';
-import {
   DiscussionJoinRequestActions,
   DiscussionJoinRequestLeft,
   DiscussionJoinRequestMid,
 } from '@/features/ikaros/components/DiscussionJoinRequestRenderer';
+import {
+  ContentReportActions,
+  ContentReportLeft,
+  ContentReportMid,
+} from '@/features/moderation/components/ContentReportRenderer';
+import {
+  AppealReviewActions,
+  AppealReviewLeft,
+  AppealReviewMid,
+} from '@/features/moderation/components/AppealReviewRenderer';
 
 const usernameRequestRenderer: PendingActionRenderer<AdminUsernameRequestListItem> =
   {
@@ -123,16 +129,8 @@ const discussionReviewRenderer: PendingActionRenderer<DiscussionReviewListItem> 
     ),
   };
 
-// 3.4b — discussion_report (SpravceDiskuzi/Admin/Superadmin řeší nahlášené příspěvky).
-const discussionReportRenderer: PendingActionRenderer<DiscussionReportListItem> =
-  {
-    type: PendingActionType.DiscussionReport,
-    renderLeft: () => <DiscussionReportLeft />,
-    renderMid: (item) => <DiscussionReportMid item={item} />,
-    renderActions: (item, helpers) => (
-      <DiscussionReportActions item={item} helpers={helpers} />
-    ),
-  };
+// B4d — discussion_report sjednocen do generického content_report (níže);
+// vlastní renderer odstraněn.
 
 // 3.4b — discussion_join_request (manažer diskuze řeší žádosti o přidání).
 const discussionJoinRequestRenderer: PendingActionRenderer<DiscussionJoinRequestListItem> =
@@ -144,6 +142,26 @@ const discussionJoinRequestRenderer: PendingActionRenderer<DiscussionJoinRequest
       <DiscussionJoinRequestActions item={item} helpers={helpers} />
     ),
   };
+
+// 20B — content_report (generická moderační fronta napříč plochami).
+const contentReportRenderer: PendingActionRenderer<ContentReportListItem> = {
+  type: PendingActionType.ContentReport,
+  renderLeft: () => <ContentReportLeft />,
+  renderMid: (item) => <ContentReportMid item={item} />,
+  renderActions: (item, helpers) => (
+    <ContentReportActions item={item} helpers={helpers} />
+  ),
+};
+
+// 20B B4 — moderation_appeal (odvolání proti rozhodnutí; přezkum jiným moderátorem).
+const appealReviewRenderer: PendingActionRenderer<AppealReviewListItem> = {
+  type: PendingActionType.ModerationAppeal,
+  renderLeft: () => <AppealReviewLeft />,
+  renderMid: (item) => <AppealReviewMid item={item} />,
+  renderActions: (item, helpers) => (
+    <AppealReviewActions item={item} helpers={helpers} />
+  ),
+};
 
 /**
  * Spec 1.4 — registry rendererů pro Zpracovat tab. Klíč = `PendingActionType`,
@@ -169,8 +187,10 @@ export const PENDING_ACTION_RENDERERS: Partial<
     galleryReviewRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.DiscussionPendingReview]:
     discussionReviewRenderer as PendingActionRenderer<unknown>,
-  [PendingActionType.DiscussionReport]:
-    discussionReportRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.DiscussionJoinRequest]:
     discussionJoinRequestRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.ContentReport]:
+    contentReportRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.ModerationAppeal]:
+    appealReviewRenderer as PendingActionRenderer<unknown>,
 };
