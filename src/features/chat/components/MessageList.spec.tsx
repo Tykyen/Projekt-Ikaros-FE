@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { MessageList } from './MessageList';
 import type { ChatItem, ChatMessage } from '../lib/types';
@@ -80,5 +80,36 @@ describe('MessageList — deep-link skok na zprávu (13.2a)', () => {
     const spy = vi.spyOn(Element.prototype, 'scrollIntoView');
     renderList('neznama-zprava');
     expect(jumpCalled(spy)).toBe(false);
+  });
+});
+
+describe('MessageList — tlačítko „Zobrazit starší" (SC-33)', () => {
+  const renderWith = (props: Partial<Parameters<typeof MessageList>[0]>) =>
+    render(
+      <MemoryRouter>
+        <MessageList {...base} {...props} />
+      </MemoryRouter>,
+    );
+
+  it('bez props se tlačítko nezobrazí (default off — global/admin chat)', () => {
+    renderWith({});
+    expect(screen.queryByText(/starší zprávy/i)).toBeNull();
+  });
+
+  it('hasMoreOlder → zobrazí tlačítko a klik volá onLoadOlder', () => {
+    const onLoadOlder = vi.fn();
+    renderWith({ hasMoreOlder: true, onLoadOlder });
+    const btn = screen.getByRole('button', { name: /starší zprávy/i });
+    fireEvent.click(btn);
+    expect(onLoadOlder).toHaveBeenCalledTimes(1);
+  });
+
+  it('loadingOlder → tlačítko disabled s textem „Načítám…"', () => {
+    const onLoadOlder = vi.fn();
+    renderWith({ hasMoreOlder: true, loadingOlder: true, onLoadOlder });
+    const btn = screen.getByRole('button', { name: /načítám starší/i });
+    expect(btn).toBeDisabled();
+    fireEvent.click(btn);
+    expect(onLoadOlder).not.toHaveBeenCalled();
   });
 });

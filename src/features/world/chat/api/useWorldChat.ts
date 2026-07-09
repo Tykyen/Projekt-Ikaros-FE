@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
@@ -65,6 +66,64 @@ export function useChannelMessages(
       ),
     enabled: !!worldId && !!channelId,
   });
+}
+
+/**
+ * Čistá fce (SC-33) — předsadí starší dávku před stávající zprávy a deduplikuje
+ * dle ID (obrana proti překryvu s optimistic/WS zprávami). `older` jsou starší
+ * než cokoli v `current`, patří tedy na začátek; chronologické řazení zůstává.
+ */
+export function prependOlderMessages(
+  current: ChatMessage[],
+  older: ChatMessage[],
+): ChatMessage[] {
+  if (older.length === 0) return current;
+  const currentIds = new Set(current.map((m) => m.id));
+  const fresh = older.filter((m) => !currentIds.has(m.id));
+  if (fresh.length === 0) return current;
+  return [...fresh, ...current];
+}
+
+/**
+ * Donačtení starší historie konverzace (SC-33). Volá cursor endpoint
+ * `?before=<id nejstarší načtené>` a předsadí dávku do PLOCHÉ messages cache
+ * (stejný klíč jako `useChannelMessages`) — živý WS/optimistic tok se nemění.
+ * `reachedStart` = BE vrátil < HISTORY_LIMIT → žádné starší už nejsou.
+ * Reset stavu při přepnutí konverzace.
+ */
+export function useLoadOlderMessages(
+  worldId: string,
+  channelId: string | null,
+) {
+  const qc = useQueryClient();
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
+  const [reachedStart, setReachedStart] = useState(false);
+  // Reset při přepnutí konverzace řeší remount — `ChannelView` má `key={channelId}`
+  // (WorldChatRoom), takže se hook s novou konverzací nasadí načisto.
+
+  const loadOlder = useCallback(async () => {
+    if (!worldId || !channelId || isLoadingOlder || reachedStart) return;
+    const key = worldChatKeys(worldId).messages(channelId);
+    const oldest = (qc.getQueryData<ChatMessage[]>(key) ?? [])[0];
+    if (!oldest) return;
+    setIsLoadingOlder(true);
+    try {
+      const older = await api.get<ChatMessage[]>(
+        `${base(worldId)}/channels/${channelId}/messages`,
+        { before: oldest.id, limit: HISTORY_LIMIT },
+      );
+      qc.setQueryData<ChatMessage[]>(key, (cur) =>
+        prependOlderMessages(cur ?? [], older),
+      );
+      if (older.length < HISTORY_LIMIT) setReachedStart(true);
+    } catch {
+      // Chyba fetche → tlačítko zůstane aktivní pro retry, nic se nemaže.
+    } finally {
+      setIsLoadingOlder(false);
+    }
+  }, [worldId, channelId, isLoadingOlder, reachedStart, qc]);
+
+  return { loadOlder, isLoadingOlder, reachedStart };
 }
 
 export interface SendWorldMessagePayload {

@@ -726,7 +726,11 @@ export function WorldSection() {
             svět. Chat se sám ladí podle <strong>motivu světa</strong>; pokud ti styl
             nesedí, přepneš si v paletce skin chatu na jiný motiv jen pro sebe. Na
             mobilu klávesa <strong>Enter</strong> dělá nový řádek (odstavec) — zprávu
-            odešleš tlačítkem.
+            odešleš tlačítkem. Konverzace se otevře na posledních zprávách; starší
+            historii donačteš tlačítkem{' '}
+            <strong>„⬆ Zobrazit starší zprávy"</strong> nad výpisem — pohled přitom
+            zůstane tam, kde jsi. Žádné zprávy se neztrácejí, jen se nenačítají
+            všechny naráz.
           </CalloutBox>
           <CalloutBox variant="tip">
             <strong>Číst vše svým písmem 👓.</strong> Když se ti něčí ozdobné

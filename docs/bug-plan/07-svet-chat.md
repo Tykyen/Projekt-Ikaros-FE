@@ -52,7 +52,7 @@ Pokrývá celý real-time komunikační stack světového chatu — strukturu ka
 | SC-30 | Emoji reakce (PUT reactions/:emoji) — toggleje; access check na kanál; WS `chat:message:updated` s aktualizovanou zprávou `[auto]` | M3 | ⬜ |
 | SC-31 | Unread badge — `broadcastUnreadUpdate` odbroadcastne sentinel `-1` (increment) pouze členům s přístupem k danému `accessMode`; Žadatel je vyloučen `[auto]` | M3 | ⬜ |
 | SC-32 | `markAsRead` aktualizuje `lastReadMessageId` na poslední zprávu kanálu, emituje `chat.unread.updated { count: 0 }` → `chat:unread` na FE; FE okamžitě vynuluje badge bez čekání `[auto]` | M5 | ⬜ |
-| SC-33 | Cursor-based paginace zpráv (`before=<id>`, `limit`) — BE vrátí max 100, FE HISTORY_LIMIT=50; zprávy jsou řazeny chronologicky (reversal po `.sort({_id:-1})`) `[auto]` | M3 | ⬜ |
+| SC-33 | Cursor-based paginace zpráv (`before=<id>`, `limit`) — BE vrátí max 100, FE HISTORY_LIMIT=50; zprávy jsou řazeny chronologicky (reversal po `.sort({_id:-1})`) `[auto]` | M3 | ✅ FE tlačítko „Zobrazit starší" (2026-07-09, spec-6.1-followup) — BE už hotové, FE donačítá přes `useLoadOlderMessages` + prepend |
 | SC-34 | MentionAutocomplete na FE — při `@` v composeru se zobrazí nabídka členů světa; klik vloží `@username` do textarey `[human]` | M1 | ⬜ |
 | SC-35 | Hledání (`GET chat/search?q=`) — min. 2 znaky, max. 50 výsledků; PomocnyPJ+ vidí i whispery cizích; hráč jen veřejné + vlastní whispery `[auto]` | M3 | ⬜ |
 | SC-36 | ChatSearchModal na FE — otevření, zadání dotazu, klik na výsledek přepne aktivní konverzaci a modal se zavře `[human]` | M1 | ⬜ |

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { ChatItem, ChatMessage } from '../lib/types';
 import { MessageItem } from './MessageItem';
 import { formatTime } from '../lib/format';
@@ -50,6 +57,12 @@ interface MessageListProps {
   /** 13.2a — deep-link z notifikačního feedu: po načtení doscrolluj + zvýrazni
    *  tuto zprávu. Pokud není v načteném okně, no-op (jako skok z citace). */
   jumpToMessageId?: string | null;
+  /** SC-33 — donačtení starší historie (jen world chat). Když je zadané a
+   *  `hasMoreOlder`, zobrazí se nad výpisem tlačítko „Zobrazit starší zprávy".
+   *  Ostatní chaty (global/admin) props neposílají → default off. */
+  onLoadOlder?: () => void;
+  hasMoreOlder?: boolean;
+  loadingOlder?: boolean;
 }
 
 const isWhisper = (m: ChatMessage) => !!m.visibleTo && m.visibleTo.length > 0;
@@ -98,6 +111,9 @@ export function MessageList({
   resolveOverrideHref,
   renderSenderBadge,
   jumpToMessageId,
+  onLoadOlder,
+  hasMoreOlder = false,
+  loadingOlder = false,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -203,6 +219,26 @@ export function MessageList({
       el.scrollHeight - el.scrollTop - el.clientHeight < STICK_THRESHOLD_PX;
   }, []);
 
+  // SC-33 — kotva scrollu při donačtení starších zpráv. Před fetchem uložíme
+  // vzdálenost ode dna; po vykreslení delší historie (`useLayoutEffect` na
+  // `items`, tj. ještě před paintem) obnovíme `scrollTop`, aby pohled zůstal
+  // zakotvený na téže zprávě a neposkočil dolů. Prepend nemění poslední zprávu,
+  // takže auto-scroll efekt výše se netriggerne — nekolidují.
+  const pendingAnchorRef = useRef<number | null>(null);
+  const handleLoadOlder = useCallback(() => {
+    const el = scrollRef.current;
+    pendingAnchorRef.current = el ? el.scrollHeight - el.scrollTop : null;
+    onLoadOlder?.();
+  }, [onLoadOlder]);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (el && pendingAnchorRef.current != null) {
+      el.scrollTop = el.scrollHeight - pendingAnchorRef.current;
+      pendingAnchorRef.current = null;
+    }
+  }, [items]);
+
   // Drž scroll u dna i když obsah povyroste PO scrollu — typicky dokreslení
   // obrázku přílohy (výšku zná prohlížeč až po stažení; `.single` náhled má
   // `aspect-ratio: auto`, takže do té doby zabírá ~0 px). Bez toho scroll
@@ -224,6 +260,16 @@ export function MessageList({
   return (
     <div className={s.scroll} ref={scrollRef} onScroll={handleScroll}>
       <div className={s.content} ref={contentRef}>
+        {hasMoreOlder && (
+          <button
+            type="button"
+            className={s.loadOlder}
+            onClick={handleLoadOlder}
+            disabled={loadingOlder}
+          >
+            {loadingOlder ? 'Načítám starší…' : '⬆ Zobrazit starší zprávy'}
+          </button>
+        )}
         {items.map((item, i) => {
         if (item.kind === 'system') {
           return (

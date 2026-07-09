@@ -31,6 +31,36 @@
   flex-direction: column;
 }
 
+/* SC-33 — tlačítko „Zobrazit starší zprávy" nad výpisem. Sekundární akce,
+   tematické tokeny → funguje napříč skiny i v global/admin chatu. */
+.loadOlder {
+  align-self: center;
+  margin: var(--sp-2) auto var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  border: 1px solid var(--theme-border-soft, var(--border));
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--theme-text-muted, var(--text-muted));
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+.loadOlder:hover:not(:disabled) {
+  color: var(--theme-heading, var(--accent));
+  border-color: var(--theme-heading, var(--accent));
+}
+.loadOlder:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
 .empty {
   flex: 1;
   display: flex;

@@ -1,6 +1,31 @@
 import { describe, it, expect } from 'vitest';
-import { applyUnreadEvent } from './useWorldChat';
+import { applyUnreadEvent, prependOlderMessages } from './useWorldChat';
 import type { ChannelUnread } from '../lib/types';
+import type { ChatMessage } from '@/features/chat/lib/types';
+
+const msg = (id: string): ChatMessage => ({ id }) as unknown as ChatMessage;
+
+describe('prependOlderMessages', () => {
+  it('předsadí starší dávku před stávající zprávy', () => {
+    const out = prependOlderMessages([msg('c'), msg('d')], [msg('a'), msg('b')]);
+    expect(out.map((m) => m.id)).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('deduplikuje překryv (ponechá jednu kopii, pořadí zachová)', () => {
+    const out = prependOlderMessages([msg('b'), msg('c')], [msg('a'), msg('b')]);
+    expect(out.map((m) => m.id)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('prázdná dávka → vrátí původní referenci (žádný re-render)', () => {
+    const cur = [msg('a')];
+    expect(prependOlderMessages(cur, [])).toBe(cur);
+  });
+
+  it('celá dávka duplicitní → vrátí původní referenci', () => {
+    const cur = [msg('a'), msg('b')];
+    expect(prependOlderMessages(cur, [msg('a')])).toBe(cur);
+  });
+});
 
 describe('applyUnreadEvent', () => {
   const seed: ChannelUnread[] = [

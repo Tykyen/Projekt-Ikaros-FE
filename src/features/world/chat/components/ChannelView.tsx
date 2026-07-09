@@ -25,9 +25,11 @@ import type {
 } from '@/features/chat/lib/types';
 import {
   useChannelMessages,
+  useLoadOlderMessages,
   useDeleteMessage,
   useMarkRead,
   worldChatKeys,
+  HISTORY_LIMIT,
 } from '../api/useWorldChat';
 import { useEditMessage } from '../api/useEditMessage';
 import { useToggleReaction } from '../api/useToggleReaction';
@@ -105,6 +107,10 @@ export function ChannelView({
   const qc = useQueryClient();
   const channelId = channel.id;
   const history = useChannelMessages(worldId, channelId);
+  const { loadOlder, isLoadingOlder, reachedStart } = useLoadOlderMessages(
+    worldId,
+    channelId,
+  );
   const deleteMutation = useDeleteMessage(worldId);
   const markRead = useMarkRead(worldId);
   const editMutation = useEditMessage(worldId);
@@ -605,6 +611,9 @@ export function ChannelView({
             resolveOverrideHref={(slug) =>
               `/svet/${worldSlug}/postava/${slug}`
             }
+            onLoadOlder={loadOlder}
+            hasMoreOlder={!reachedStart && messages.length >= HISTORY_LIMIT}
+            loadingOlder={isLoadingOlder}
             onDelete={(id) => deleteMutation.mutate(id)}
             onReply={setReplyTo}
             onToggleReaction={(messageId, emoji) =>

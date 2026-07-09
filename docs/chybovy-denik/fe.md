@@ -1886,3 +1886,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** Zabralo hladce, 0 cyklení — díky pořadí prototyp→spec→plán→BE-first→FE. Jediná rutina = BE prettier v `lint:check` (3× ruční zalom, ne poučení). Reuse-hodnota: [[19_3_nabory]] vzor „referenční featura → dědí ostatní" platí i tady (bestiář → 21.5a-d).
 
 ---
+
+### ✅ ŘEŠENÍ — „Zobrazit starší zprávy" world chat (SC-33) — plochá cache + prepend, ne useInfiniteQuery · 2026-07-09
+**Co nakonec zabralo:** FE tlačítko donačítá starší historii přes existující BE cursor endpoint (`?before=<id nejstarší načtené>`); starší dávku jen **předsadím** (`prependOlderMessages`, dedup dle ID) do stávající ploché `ChatMessage[]` cache. Nový hook `useLoadOlderMessages` drží `isLoadingOlder`/`reachedStart`. Scroll-kotva: před fetchem uložím „vzdálenost ode dna", v `useLayoutEffect([items])` obnovím `scrollTop` → pohled nepodskočí.
+**Proč to je správně (a ne useInfiniteQuery):** messages cache je plché pole a sahá na něj ~7 míst živého toku (WS příchozí zpráva, optimistic send, edit, delete, reakce). Přechod na stránkovaná data `{pages}` by je všechny nutil přepsat = velké riziko regrese živého chatu. Prepend do plochého pole je nechá beze změny. BE nebylo třeba měnit (SC-33 na BE už hotové — controller/service/repo přijímají `before`).
+**Klíčová past (lint-driven):** reset per-konverzace stavu jsem nejdřív dal do `useEffect` → lint `react-hooks/set-state-in-effect`; pak React kanonický „adjust state during render" přes ref → lint `react-hooks/refs` (cannot access/update ref during render). Správně = **nedělat reset vůbec**: `ChannelView` má `key={channelId}` (WorldChatRoom) → remount stav resetuje sám. Míň kódu, žádný warning, řeší i stale `reachedStart`.
+**Jak ověřeno:** `tsc -b` ✓, eslint ✓ (0 warnings), 18 unit/component testů ✓ (`prependOlderMessages` prepend/dedup/identita reference; tlačítko render/klik/disabled), HelpPage 25/25 ✓. Scroll-kotva jsdom neotestuje (chybí layout engine) — ověřeno rozborem, živý pixel-check na uživateli (testuje na živém webu).
+**Zhodnocení:** Hladce, 0 cyklení. Dvě lint slepé uličky u reset-stavu ukázaly, že „React doporučený vzor" ≠ „co projde tímhle přísným lintem" — když komponenta má `key`, nejlepší reset je žádný reset. Poučení pro příště: u per-prop reset stavu se nejdřív podívat, jestli rodič nekeyuje.
+
+---
