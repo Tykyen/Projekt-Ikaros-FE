@@ -1872,3 +1872,17 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Poučení:** (1) u flex „překryvu" hledej, který item má `min-width:0`+overflow visible = tichý kolaps a výtok obsahu; nelaď šířku SOUSEDŮ (název), oprav kolabující item. (2) Bez možnosti ověřit vizuál naživo NEHÁDAT víc než 1×; po 1. neúspěchu požádat o DevTools/computed nebo předat živé ladění uživateli ([[fb_listen_user]]: necyklit na vlastní hypotéze).
 
 ---
+
+### ✅ ŘEŠENÍ — 16.2b-2 komunitní bestiář (BE 4. scope + statblocks + diskuse + pending) · 2026-07-09
+**Co se řešilo:** Globální (komunitní) bestiář ve „Společné tvorbě" (`/ikaros/bestiar`) = referenční implementace, na které staví herbář/lektvary/kouzla/hádanky (21.5a-d). Postaven BE-first (BE-1 model → BE-2 service → BE-3 diskuse → FE-1 infra+route), prototyp HTML kostry odsouhlasen před specem.
+**Co zabralo (klíčová rozhodnutí + pasti):**
+- **Cross-system bytost vs `systemId` required:** community bytost je cross-system, ale schéma má `systemId` povinné. Řešení = `systemId` = primární systém (marker), reálné pravidlové verze v **`statblocks: Record<systemId, {systemStats,status,authorId,createdAt}>`**. Klon „zplošťuje" jeden statblok → dnešní single-system bestii. Ostatní 3 scope netknuté.
+- **Staty jen přes diskusi (§2a):** `UpdateBestieLoreDto` záměrně BEZ `systemStats` → lore se edituje volně, staty jen přes `proposeStatblock`/`approveStatblock`. Prázdný systém navrhne kdokoli (draft), existující mění jen kurátor.
+- **Route ordering:** statické `community` routy MUSÍ být před `@Get(':id')`, jinak `:id` spolkne „community".
+- **`toEntity` je whitelist** (`be_field_check`): nová pole se nevrátí, dokud je nepřidáš do `toEntity` — přidáno pro `latin/kind/tags/status/authorId/approvedAt/approvedBy/statblocks`.
+- **pending-actions = provider pattern** (ne switch): nový `PendingActionType` + `IPendingActionProvider` (`canHandle`/`count`/`list`) + registrace v `Module.onModuleInit()` (`PendingActionsModule` je `@Global` → bez importu). Kurátor = **sdílený `CURATOR_ROLES`** (Superadmin/Admin/SpravceDiskuzi/SpravceClanku), reuse `isContentReviewer` vzoru.
+- **`authorName` bez users-dependency:** `@CurrentUser()` už nese `username` z JWT (jen rozšířit `RequestUser` interface) — žádný users lookup ani cyklus.
+**Jak ověřeno:** BE `tsc --noEmit` + `lint:check` + jest 12/12 (bestiae); FE `npm run build` ✓ (12.7 s, CSP OK). Živý běh (restart BE) čeká na uživatele.
+**Zhodnocení:** Zabralo hladce, 0 cyklení — díky pořadí prototyp→spec→plán→BE-first→FE. Jediná rutina = BE prettier v `lint:check` (3× ruční zalom, ne poučení). Reuse-hodnota: [[19_3_nabory]] vzor „referenční featura → dědí ostatní" platí i tady (bestiář → 21.5a-d).
+
+---

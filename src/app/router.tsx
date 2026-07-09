@@ -62,6 +62,9 @@ const FavoritesPage        = lazy(() => import('@/features/ikaros/pages/Favorite
 // 21.5 — „Společná tvorba" rozcestník + sdílený stub „Připravujeme".
 const TvorbaHubPage        = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/TvorbaHubPage'));
 const ComingSoonPage       = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/ComingSoonPage'));
+// 16.2b-2 — komunitní (globální) bestiář (nahrazuje stub `ikaros/bestiar`).
+const KomunitniBestiarPage      = lazy(() => import('@/features/ikaros/bestiar/KomunitniBestiarPage'));
+const KomunitniBestieDetailPage = lazy(() => import('@/features/ikaros/bestiar/KomunitniBestieDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -183,7 +186,9 @@ export const router = createBrowserRouter([
       // 21.5 — „Společná tvorba" hub (veřejný) + stuby nepostavených knihoven.
       // Stuby vedou na sdílenou ComingSoonPage (kontext čte z pathname).
       { path: 'ikaros/tvorba',          element: p(TvorbaHubPage) },
-      { path: 'ikaros/bestiar',         element: p(ComingSoonPage) },
+      // 16.2b-2 — komunitní bestiář (list + detail) nahrazuje stub.
+      { path: 'ikaros/bestiar',         element: p(KomunitniBestiarPage) },
+      { path: 'ikaros/bestiar/:id',     element: p(KomunitniBestieDetailPage) },
       { path: 'ikaros/herbar',          element: p(ComingSoonPage) },
       { path: 'ikaros/lektvary',        element: p(ComingSoonPage) },
       { path: 'ikaros/kouzla',          element: p(ComingSoonPage) },

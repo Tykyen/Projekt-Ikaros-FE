@@ -690,11 +690,6 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Proč:** Riziko u nahraných obrázků i AI artu (Fáze 18); část komunity AI odmítá.
 **Hotovo:** galerie upload consent (prohlášení práv, BE hard-gate `GALLERY_RIGHTS_NOT_DECLARED`), dobrovolný AiBadge, consent audit log `upload_consents`, license card model `content_licenses` (podklad, nenapojený); spec-20D. Takedown = přes kategorii `copyright` v 20.1. Odloženo (Fáze 18/21.5): strojové značení AI, deepfake filtry, napojení licence — dluh **D-20D**.
 
-### - [ ] 20.4 Udržitelné tempo / anti-burnout / bus factor — [Příloha C]
-**Cíl:** Chránit hlavní (a možná jediný) zdroj — tebe: udržitelné tempo, dokumentace, automatizace.
-**Proč:** Vyhoření a „bus factor 1" (vše v jedné hlavě) jsou reálná rizika sólo projektu. Kryje se s automatizací (14.4, 14.5) a kvalitou docs (máme).
-**Otevřené otázky:** Jak nastavit udržitelný rytmus vln? Co je minimum dokumentace, aby projekt přežil pauzu?
-
 ### - [x] 20.5 Interní chat správy platformy — [ad-hoc · 2026-07-03] ✅
 **Cíl:** Samostatná stránka `/admin/chat` (jen Superadmin+Admin) — vícekanálový interní chat + sdílené PDF + úkoly týmu. Vstup = nav položka „Chat" v Administraci (naviguje na vlastní route, ne tab).
 **✅ Implementováno (2026-07-03, [spec-20.5](arch/phase-20/spec-20.5.md)):** BE modul `platform-chat` reusuje chat schémata — konverzace = `ChatChannel` (`accessMode:'members'` + `allowedMemberIds`, membership zdarma), zprávy sdílené (bez TTL), WS `platform-chat:*`; seed Hlavní/Vedení (`accessMode:'all'`, zamčené); dokumenty = kolekce `platform_documents` (PDF na Cloudinary raw); úkoly = `admin_tasks` (autorizace owner|superadmin). FE `features/admin/chat` = full-bleed 3 sloupce + hooky + real-time. **Čeká BE restart + mobil-desktop.** Follow-up: přílohy ve zprávě, member-picker + rename/delete UI, role-odznak (senderRole), presence u úkolů.
