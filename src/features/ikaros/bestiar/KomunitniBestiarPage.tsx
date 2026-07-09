@@ -66,6 +66,12 @@ export default function KomunitniBestiarPage() {
       />
       <Breadcrumbs items={crumbs} />
 
+      <div className={s.topNav}>
+        <Link to="/ikaros/tvorba" className={s.backLink}>
+          ← Zpět do Společné tvorby
+        </Link>
+      </div>
+
       <header className={s.head}>
         <h1 className={s.title}>Globální bestiář</h1>
         <p className={s.lead}>

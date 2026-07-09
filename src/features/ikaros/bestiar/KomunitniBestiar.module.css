@@ -8,6 +8,34 @@
   padding: var(--sp-4, 1rem) var(--sp-4, 1rem) var(--sp-8, 3rem);
 }
 
+/* Návrat do Společné tvorby (full-width plocha skryla boční navigaci). */
+.topNav {
+  margin-bottom: var(--sp-3, 0.75rem);
+}
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1, 0.25rem);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  padding: var(--sp-2, 0.5rem) var(--sp-4, 1rem);
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.15);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.05);
+  color: var(--text-secondary, var(--text-primary));
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.backLink:hover {
+  border-color: var(--theme-accent-cyan, var(--accent-bright));
+  color: var(--text-primary);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.09);
+}
+
 .head {
   text-align: center;
   margin: var(--sp-4, 1rem) 0 var(--sp-6, 2rem);
