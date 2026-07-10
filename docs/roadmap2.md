@@ -739,7 +739,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 - **Bestiář** dlaždice → **komunitní scope bestiáře (16.2b-2)**, NE nová paralelní featura. Světový bestiář (`/svet/:slug/bestiar`) zůstává; hub je platformový katalog téhož modelu.
 - **Diskuze/Články/Galerie** → existující routy (`/ikaros/diskuze`, `/clanky`, `/galerie`).
 **Nové knihovny (pod-kroky — model jednou, obsah postupně):**
-- **21.5a Herbář** — katalog rostlin/bylin (lore + účinky/vlastnosti + per-systém staty dle vzoru bestie „systém → statblok").
+- **21.5a Herbář** — katalog rostlin/bylin (lore + účinky/vlastnosti + per-systém staty dle vzoru bestie „systém → statblok"). **Etapa A ✅ (2026-07-10):** BE modul plants + FE list/detail/editor + migrace připravena (56 rostlin). **Etapa B ✅ (2026-07-10):** obrázek u ShopItem (+focal/zoom/fit) + bulk endpoint `POST /campaign/shopitems/bulk` (gate PomocnyPJ+, max 200) + vklad herbář→obchod (single z detailu + bulk z listu). Zbývá: ostrý seed, skiny, per-systém staty. Spec: [arch/phase-21/spec-21.5a-herbar.md](arch/phase-21/spec-21.5a-herbar.md).
 - **21.5b Lektvary** — alchymie / spotřební předměty (ingredience → uvařený, zpravidla jednorázový efekt).
 - **21.5c Kouzla** — magické formule / spelly (efekt, náročnost/mana, dosah, per-systém staty). **= realizace „kouzla" typu už zmíněného v 21.1** (nezakládat druhou knihovnu kouzel).
 - **21.5d Hádanky** — komunitní katalog hádanek/hlavolamů pro PJ (zadání + řešení + nápovědy; reveal řešení jako AKJ-style clearance, 🔁 16.2b-3).

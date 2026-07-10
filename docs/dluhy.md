@@ -2,13 +2,40 @@
 
 > Soubor obsahuje **pouze otevřené a odložené** dluhy.
 > Historie uzavřených dluhů dohledatelná v git logu (`git log --all -- docs/dluhy.md`).
-> Stav k 2026-06-27.
+> Stav k 2026-07-10.
 
 ---
 
 ## Otevřené
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
+
+### D-070 — Herbář: chybí moderation enforcement listener (report/hide rostliny)
+**Soubor:** BE `backend/src/modules/plants/plants.service.ts:137-149` (`moderationSetHidden` bez volajícího) · chybí `ReportTargetType` položka + FE `ReportButton` v herbáři.
+**Problém:** Rostlina má moderační pole (`moderationHidden`/`moderationHiddenReason`) a service metodu `moderationSetHidden` (parity s bestiae B5), ale **nic ji nevolá** — herbář není napojen na generickou moderaci 20B: rostlina nemá položku v `ReportTargetType`, FE detail nemá `ReportButton` a neexistuje enforcement listener, který by na `moderation.hide/delete` skryl/smazal rostlinu. Skrytí jde dnes jen ručním zásahem do DB.
+**Dopad:** Nízký/střední — komunitní rostliny nelze nahlásit ani moderátorsky skrýt přes UI (obsah tvoří přihlášení, katalog seedovaný kurátorem, takže reálné riziko malé), ale „nahlašování všude" na herbář nedosahuje.
+**Řešení:** přidat `plant` do `ReportTargetType`, `ReportButton` do `KomunitniPlantDetailPage`, a enforcement listener (vzor bestiae `moderation-enforcement.listener.ts`) volající `moderationSetHidden`/delete.
+**Kdy:** Navazuje na 20B / Etapu B herbáře; levné (BE metoda ready).
+
+---
+
+### D-071 — Herbář: hard-delete / výměna obrázku rostliny → orphan blob na Cloudinary
+**Soubor:** BE `backend/src/modules/plants/plants.service.ts:120-135` (`remove`) + `repositories/plants.repository.ts` (`update`/`delete`).
+**Problém:** Smazání rostliny (`DELETE community/:id`) ani výměna `imageUrl` v editu **nevydává `media.orphaned` event** (na rozdíl od bestiae, které úklid osiřelých blobů přes EventEmitter má) → obrázek zůstane viset na Cloudinary. Komentář v `remove` to explicitně přiznává. U seedovaných rostlin (folder `community-herbar`) navíc `public_id = slug(name)` s `overwrite:true`, takže re-seed přepíše, ale ruční smazání/výměna z UI blob osiří.
+**Dopad:** Nízký — postupné plýtvání úložištěm; žádná funkční ani bezpečnostní vada.
+**Řešení:** emitovat `media.orphaned` (nebo přímý cleanup) při delete rostliny a při změně `imageUrl` v `update` (starý URL → orphan). Sdílet mechanismus s bestiae/upload cleanupem.
+**Kdy:** S dotažením media cleanupu (souvisí s upload/media audit); nízká priorita.
+
+---
+
+### D-072 — Herbář: vzácnost (`rarity`) nelze v editu vymazat zpět na „neurčeno"
+**Soubor:** FE `src/features/ikaros/herbar/components/PlantEditorModal.tsx:94` (`rarity: rarity || undefined`) · BE `backend/src/modules/plants/schemas/plant.schema.ts:40-41` (`rarity` bez `null`).
+**Problém:** Když uživatel v editoru přepne Vzácnost zpět na „— neurčeno —", FE pošle `rarity: undefined`. Mongoose `$set` hodnotu `undefined` zahodí (a BE `rarity` navíc není nullable), takže dřív nastavená vzácnost v DB **zůstane** — pole nelze vyprázdnit. Ostatní textová pole se v editu vyprázdní správně (posílají se jako `''`), jen `rarity`/`suggestedPrice` (enum/číslo) mají tuto asymetrii.
+**Dopad:** Nízký — kosmetika editace; nastavit lze jinou vzácnost, jen ne „žádnou".
+**Řešení:** FE posílat sentinel pro vymazání (např. `rarity: null`) + BE `update` mapovat `null` na `$unset rarity` (a `rarity` v schématu povolit `null`), nebo přijmout prázdný string a service ho přeložit na `$unset`.
+**Kdy:** Při další práci na herbáři (Etapa B) nebo sjednocení „vymazatelných" polí.
+
+---
 
 ### D-066 — Moderace: dvě plochy nedotažené (bestie report + deník/chat enforcement)
 **Soubor:** FE bestie detail (report tlačítko chybí) · BE `characters`/`chat` enforcement listenery (M2/M3/M4 log-only)

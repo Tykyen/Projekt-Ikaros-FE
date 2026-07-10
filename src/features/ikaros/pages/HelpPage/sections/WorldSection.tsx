@@ -693,7 +693,8 @@ export function WorldSection() {
           <p>
             Obchod světa s kartami zboží. Zakládat položky, typy/skupiny a slevy smí
             PJ i Pomocný PJ; ceny v měnách světa, každý je vidí ve své preferované
-            měně. Hráč nakupuje
+            měně. Položka může mít <strong>obrázek</strong> (na kartě se ukáže
+            miniatura). Hráč nakupuje
             své postavě (peněženka se zůstatkem před/po), PJ komukoli. Nákup přibude do
             výbavy a odečte z účtu; panel „Nákupy" umí vrácení.
           </p>

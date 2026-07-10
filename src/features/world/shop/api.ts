@@ -12,6 +12,7 @@ import type {
   ShopGroup,
   CreateShopItemInput,
   CreateShopGroupInput,
+  BulkCreateShopItemsInput,
   Purchase,
   PurchaseInput,
   PurchaseResult,
@@ -67,6 +68,20 @@ export function useCreateShopItem(worldId: string) {
   return useMutation({
     mutationFn: (input: CreateShopItemInput) =>
       api.post<ShopItem>(`/campaign/shopitems?worldId=${worldId}`, input),
+    onSuccess: () => invalidateShop(qc, worldId),
+  });
+}
+
+/**
+ * 21.5a — hromadné založení položek (např. vklad rostlin z herbáře). BE
+ * `POST /campaign/shopitems/bulk?worldId=` přijme `{ items }` (1–200), gate
+ * PomocnyPJ+. Volající dělí na dávky ≤200.
+ */
+export function useBulkCreateShopItems(worldId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BulkCreateShopItemsInput) =>
+      api.post<ShopItem[]>(`/campaign/shopitems/bulk?worldId=${worldId}`, input),
     onSuccess: () => invalidateShop(qc, worldId),
   });
 }

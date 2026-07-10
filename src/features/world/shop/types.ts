@@ -5,6 +5,7 @@
  * `groupId` ref na `ShopGroup` (prázdné = nezařazeno); `discountPercent` 0–100
  * na položce i skupině — položka přebíjí skupinu (viz `pricing.ts`).
  */
+import type { ImageFit } from '@/shared/lib/imageStyle';
 
 export interface ShopGroup {
   id: string;
@@ -36,6 +37,12 @@ export interface ShopItem {
   /** Slug stránky světa (wiki překlik), ne URL. */
   referenceLink?: string;
   isRecommended: boolean;
+  /** 21.5a — obrázek zboží (parita bestie/rostlina); viz `getImageStyle`. */
+  imageUrl?: string;
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: ImageFit | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,6 +59,16 @@ export interface CreateShopItemInput {
   referenceLink?: string;
   isRecommended?: boolean;
   isShared?: boolean;
+  imageUrl?: string;
+  imageFocalX?: number | null;
+  imageFocalY?: number | null;
+  imageZoom?: number | null;
+  imageFit?: ImageFit | null;
+}
+
+/** 21.5a — hromadné založení položek (BE `POST /campaign/shopitems/bulk`, max 200). */
+export interface BulkCreateShopItemsInput {
+  items: CreateShopItemInput[];
 }
 
 export interface CreateShopGroupInput {

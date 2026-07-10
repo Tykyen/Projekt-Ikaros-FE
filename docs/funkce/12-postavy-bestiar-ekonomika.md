@@ -399,7 +399,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 **Dvouúrovňová diskuse:** `BestieComment` (nová entita) s `targetType` — **`beast`** (o bytosti/lore, napříč systémy, pod knihou) a **`statblock`** (jen ke statům jednoho systému, pod záložkou). Čtou všichni, píší přihlášení. (`bestiae/bestie-comments.service.ts`, `bestie-comment.schema.ts`, FE `hooks/useKomunitniBestiar.ts`)
 
 **Kdo (FE):**
-- Čtení (list/detail/diskuse) — **veřejné** (i anonym).
+- Čtení (list/detail) — **vyžaduje přihlášení** (`BestiaeController` celý pod `JwtAuthGuard`, anonym → 401; žádný `OptionalJwtAuthGuard`). *(Sjednoceno na realitu 2026-07-10: Společná tvorba = login-required; dřívější „veřejné pro anonyma" bylo nepřesné.)*
 - **＋ Nová bytost / ＋ systém / vklad / příspěvek** — jen přihlášený (`currentUserAtom`/`isAuthenticatedAtom`).
 - **✎ Upravit popis** — autor bytosti (`user.id === authorId`) NEBO kurátor.
 - **✎ Upravit staty** (existující statblok, přímá editace — draft i approved) — **jen kurátor** (`isCurator`); tlačítko u aktivní pravidlové záložky, otevře `ProposeStatblockModal` v edit-režimu (předvyplní staty, systém zamčený). (`KomunitniBestieDetailPage.tsx:176-200`)
@@ -434,6 +434,52 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 ---
 
+### Komunitní herbář (21.5a)
+
+**Co to je:** Platformový (cross-svět, cross-systém) katalog rostlin/bylin ve „Společné tvorbě" — **druhá plná komunitní knihovna po bestiáři**, na témže modelu (`scope='community'`, dvě knihovny, kurátorství). Komunita rostliny prohlíží, tvoří (jako návrh) a kurátor schvaluje. Rostlina = **systémově neutrální karta** (Roste / Použití / Vzácnost + popis); staty per systém zatím NEmá — `statblocks` je prázdná mapa připravená na budoucí per-systém účinky (bez migrace).
+
+**Kde:** `/ikaros/herbar` (list) + `/ikaros/herbar/:id` (detail). Nahradilo stub `ComingSoonPage` z 21.5; dlaždice „Herbář" ve Společné tvorbě je `active:true`. FE `features/ikaros/herbar/`. BE modul `plants` — kolekce `plants`, endpointy pod `plants/community/*` (global prefix `/api`). (`router.tsx:196-197`, `SpolecnaTvorba/tiles.ts:72-79`, `KomunitniHerbarPage.tsx`, `KomunitniPlantDetailPage.tsx`)
+
+**Dvě oddělené knihovny:** **Schválená** (`status:'approved'`) a **Návrhy** (`status:'draft'`) — přepínací hřbety s počty; po schválení kurátorem návrh přejde do schválené. Filtry Vzácnost + Štítek (client-side). Seznam-rejstřík (řádek: miniatura · název + lidová jména · vzácnostní odznak). (`KomunitniHerbarPage.tsx:87-176`)
+
+**Karta rostliny (detail):** iluminace (obrázek) + název/aliasy + tabulka **Roste** (`habitat`) / **Použití** (`usage`) / **Vzácnost** (`rarity` + `rarityNote`) / navrhovaná cena / štítky + popis. Akce Upravit (autor/kurátor) a Schválit (kurátor u draftu). **Bez diskuse** (herbář ji zatím nemá — na rozdíl od bestiáře). (`KomunitniPlantDetailPage.tsx`)
+
+**Pole rostliny** (`plant.schema.ts:22-72`): `name`, `aliases` (lidová jména, volný text), `imageUrl` + výřez (`imageFocalX/Y`, `imageZoom`, `imageFit`), `habitat` („Roste"), `usage` („Použití"), `rarity` (enum 5 stupňů `bezna/stredne_bezna/stredne_vzacna/vzacna/velmi_vzacna`, `plant.interface.ts:12-19`), `rarityNote`, `description`, `tags[]`, `suggestedPrice` (číslo bez měny — připraveno na vklad do obchodu = Etapa B), `status`, `authorId`, `approvedAt/By`, `moderationHidden(+Reason)`, `statblocks` (prázdná mapa).
+
+**Kdo (FE):**
+- **＋ Nová rostlina** — jen přihlášený (`isAuthenticatedAtom`); založí návrh. (`KomunitniHerbarPage.tsx:77-83`)
+- **✎ Upravit** — autor (`user.id === authorId`) NEBO kurátor. **✔ Schválit** — kurátor u draftu. (`KomunitniPlantDetailPage.tsx:42-45,82-90`; `CURATOR_ROLES` = Superadmin/Admin/SpravceClanku/SpravceDiskuzi)
+- **＋ Vlož do obchodu / 🛒 Vlož vše do obchodu** — tlačítko vidí každý přihlášený, ale **vklad jde jen do světa, kde je uživatel PomocnyPJ+** (výběr světa se plní z `useMyWorlds` filtrovaného na `membership.role >= PomocnyPJ`; bez takového světa modal ukáže hlášku a vklad je zakázaný). BE gate PomocnyPJ+ na bulk endpointu i single create. (`KomunitniPlantDetailPage.tsx:79-83`, `KomunitniHerbarPage.tsx:79-92`, `InsertToShopModal.tsx:71-83`)
+
+**Kdo (BE):** `plants.service.ts` — **celý `PlantsController` je pod `JwtAuthGuard`** (`plants.controller.ts:34-35`):
+- `list`/`findById` — čtení; moderačně skryté vidí v listu i detailu jen Admin+ (`includeHidden`, `plants.service.ts:33-56`).
+- `create` — přihlášený → `status:'draft'`, `authorId` z JWT (`:59-80`).
+- `update` (PATCH) — autor NEBO kurátor; mění **všechna pole** (herbář nemá lore/statblok split), `statblocks` se přes update nemění; jinak 403 `PLANT_NOT_AUTHOR` (`:86-104`).
+- `approve` (POST `:id/approve`) — kurátor (`requireCurator` → 403 `PLANT_NOT_CURATOR`); draft→approved + `approvedAt/By` (`:107-117`).
+- `remove` (DELETE 204) — autor jen svůj **draft**, kurátor cokoli; jinak 403 `PLANT_NOT_AUTHOR` (`:120-135`). Nenalezeno → 404 `PLANT_NOT_FOUND`.
+- Kurátor = reuse `isBestieCurator` z bestiae (`curator-roles.ts`) — stejná množina rolí, jeden zdroj (`:163-165`).
+- **Pending fronta** „rostliny ke schválení" (`CommunityPlantPendingReview`, `pending-action-type.enum.ts:40`) registrovaná v `PlantsModule.onModuleInit()` — vidí kurátoři, počítá drafty. (`community-plant-review.provider.ts`)
+
+**Co jde dělat (vše):** 2 knihovny + filtry vzácnost/štítek · karta rostliny · tvorba (pole + obrázek přes `HeroUploadCard`) · úprava všech polí (autor/kurátor) · schválení (kurátor) · smazání (autor draftu/kurátor) · pending fronta · **vklad do obchodu světa** (Etapa B): **po jedné** z detailu rostliny (tlačítko „＋ Vlož do obchodu" → 1 `ShopItem`: name = jméno rostliny, description = souhrn Roste/Použití/Lidová jména, obrázek z rostliny, cena předvyplněná `suggestedPrice ?? 0`) i **hromadně** z listu (tlačítko „🛒 Vlož vše do obchodu" → bulk endpoint za všechny zobrazené/filtrované rostliny, jednotná výchozí cena, dávky ≤200; PJ pak dolaďuje ceny v obchodě). (`useKomunitniHerbarMutations.ts`, `components/PlantEditorModal.tsx`, `components/InsertToShopModal.tsx`, `api/herbarApi.ts`)
+
+**Hranice / co neumí:**
+- **Bez per-systém statů** — `statblocks` prázdné, žádné statbloky/editor jako u bestie (model připraven, UI odloženo).
+- **Bez diskuse** k rostlině a **bez klonu** „vlož do svého" (obojí bestiář má; herbář zatím ne).
+- **Skiny per motiv (21 platformových) nejsou** — jen default motiv-aware vzhled (`--theme-*`); data-atributy (`data-plant-card/-portrait`, `data-herbar-list/-row`, `data-lib-tab`, `data-rarity`) připravené pro budoucí skiny.
+- **Moderace:** `moderationHidden` se respektuje při čtení, ale **enforcement listener herbáře chybí** (report/hide rostliny nenapojen na 20B; `moderationSetHidden` volá zatím jen budoucí kód) → **dluh D-070**.
+- **Orphan blob:** hard-delete rostliny / výměna obrázku nepošle `media.orphaned` → osiřelý Cloudinary blob (`plants.service.ts:131-133`) → **dluh D-071**.
+- **Vzácnost nelze v editu vymazat** — FE posílá `rarity: undefined`, mongoose `$set` undefined ignoruje (BE `rarity` není nullable) → jednou nastavená vzácnost zůstává (`PlantEditorModal.tsx:94`) → **dluh D-072**.
+- **Čtení vyžaduje přihlášení** (`PlantsController` celý pod `JwtAuthGuard`, `:34-35`) — **záměr, parity s komunitním bestiářem** (rozhodnuto 2026-07-10: Společná tvorba = login-required, ne veřejné pro anonyma). Nejde o odchylku ani bug.
+
+**Zvláštnosti:** Kurátorská množina rolí sdílená s bestiářem (`isBestieCurator`). `PlantsRepository.toEntity` = explicitní mapování polí. `PlantsModule` silně zjednodušen oproti bestiae (jen community scope, žádný gateway/komentáře/statbloky). ⚠️ Komentářové hlavičky FE souborů omylem uvádějí „21.5b" (jde o 21.5a).
+
+**Migrace (počáteční náplň):** seed skript `backend/scripts/seed-plants/index.ts` (npm `seed:plants`) — načte `plants.json` (**56 rostlin** + obrázky) z `C:/Matrix/ProjektIkaros/migrace-herbar/` (mimo repo, override `HERBAR_DIR`), nahraje obrázky na Cloudinary jako WebP (folder `community-herbar`) a vloží `scope:'community'`, `status:'approved'`, autor Superadmin (Tyky). Idempotence dle `name+scope`; podporuje `--dry-run`/`--limit`/`--export`. **OSTRÝ běh zatím NEPROBĚHL** (čeká na potvrzení DB cíle) — migrace připravena, seed nespuštěn.
+
+**Stav:** 🚧 částečné — **Etapa A + Etapa B hotové** (2026-07-10; BE modul plants + FE list/detail/editor + obrázek v `ShopItem` + bulk endpoint + vklad herbář→obchod single/bulk, build+testy ✓), čeká **ostrý seed** (56 rostlin, po deploji), **skiny (21 motivů)** a **per-systém staty** (odloženo).
+**Kód:** FE `features/ikaros/herbar/` (`KomunitniHerbarPage.tsx`, `KomunitniPlantDetailPage.tsx`, `components/PlantEditorModal.tsx`, `components/InsertToShopModal.tsx`, `hooks/{useKomunitniHerbar,useKomunitniHerbarMutations}.ts`, `api/herbarApi.ts`, `types.ts`, `herbarSkins.css`), `router.tsx:196-197`, `SpolecnaTvorba/tiles.ts:72-79`. Obchodní strana `features/world/shop/` (`types.ts`, `api.ts` `useBulkCreateShopItems`, `components/{ShopItemForm,ShopItemCard}.tsx`). BE `modules/plants/` (`plants.{controller,service,module}.ts`, `repositories/plants.repository.ts`, `schemas/plant.schema.ts`, `interfaces/plant.interface.ts`, `dto/{create,update}-plant.dto.ts`, `community-plant-review.provider.ts`), `pending-actions/pending-action-type.enum.ts:40`; bulk + obrázek `modules/campaign/` (`campaign.controller.ts:612` bulk, `campaign.service.ts:1036` `createShopItemsBulk`, `repositories/campaign-shop-item.repository.ts:41` `createMany`, `dto/bulk-create-shop-items.dto.ts`, `schemas/campaign-shop-item.schema.ts:25-29` image pole). Seed `backend/scripts/seed-plants/index.ts`. Spec `docs/arch/phase-21/spec-21.5a-herbar.md`.
+
+---
+
 ### Obchod (Shop)
 
 **Co to je:** Katalog položek k nákupu se skupinami/typy, slevami, vícem. měnami a napojením na finanční účty postav (nákup odečte peníze a přidá položku do výbavy).
@@ -453,7 +499,8 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - `purchase`: hráč smí kupovat jen své postavě (`NOT_YOUR_CHARACTER`); staff komukoli. Účet musí patřit postavě a být v daném světě. (`campaign-purchase.service.ts:99-126`)
 
 **Co jde dělat (vše):**
-- Položky: název, cena, měna (`currencyCode`), sleva %, skupina/podskupina, doporučeno, reference link, sdílení.
+- Položky: název, cena, měna (`currencyCode`), sleva %, skupina/podskupina, doporučeno, reference link, sdílení, **obrázek** (21.5a — `imageUrl` + výřez `imageFocalX/Y`/`imageZoom`/`imageFit`, parita bestie/rostlina; upload přes `HeroUploadCard` v `ShopItemForm`, miniatura na kartě `ShopItemCard` s fallbackem na iniciálu).
+- **Hromadné vkládání** (21.5a — `POST /campaign/shopitems/bulk?worldId=`, body `{items}` 1–200, gate PomocnyPJ+, dvojí — controller `role()` floor + service `getWorldRole`, repo `insertMany`): založí víc položek jedním requestem. Využívá to vklad z komunitního herbáře (viz „Komunitní herbář") i základ budoucích předpřipravených obchodů.
 - Skupiny/typy: 2 úrovně (parent/child), vlastní sleva % (dědí se na položky).
 - Slevy se NEsčítají — priorita položka > podskupina > skupina (`effectiveDiscount`).
 - **Nákup** (`shopitems/:id/purchase`): množství, sleva, převod do měny účtu (autorita BE), kontrola dostatku (`INSUFFICIENT_FUNDS`). 3 atomické kroky: append do výbavy → odečet z účtu → purchase log. Replica set → `withTransaction`; jinak sekvenční fallback s plnou kompenzací (peníze se neztratí). (`campaign-purchase.service.ts:75-396`)
@@ -467,7 +514,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - Nákup jde jen pro PC (NPC/Lokace nemají výbavu ani účet relevantní pro nákup).
 
 **Stav:** ✅ funguje.
-**Kód:** FE `shop/components/ShopView.tsx`, `shop/api.ts`, `shop/pricing.ts`. BE `campaign/campaign.controller.ts:539-731`, `campaign/services/campaign-purchase.service.ts`.
+**Kód:** FE `shop/components/{ShopView,ShopItemForm,ShopItemCard}.tsx`, `shop/api.ts` (`useBulkCreateShopItems`), `shop/types.ts` (image pole + `BulkCreateShopItemsInput`), `shop/pricing.ts`. BE `campaign/campaign.controller.ts:539-731` (bulk `:612`), `campaign/campaign.service.ts:1036` (`createShopItemsBulk`), `campaign/dto/bulk-create-shop-items.dto.ts`, `campaign/schemas/campaign-shop-item.schema.ts:25-29` (image pole), `campaign/services/campaign-purchase.service.ts`.
 
 ---
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { CurrencyDisplay } from '@/features/world/currencies/shared/CurrencyDisplay';
 import type { WorldCurrencyItem } from '@/features/world/currencies/types';
+import { getImageStyle } from '@/shared/lib/imageStyle';
 import type { ShopItem, ShopGroup } from '../types';
 import { effectiveDiscount, effectivePrice } from '../pricing';
 import s from './shop.module.css';
@@ -41,18 +42,39 @@ export function ShopItemCard({
   return (
     <div className={s.card}>
       <div className={s.cardHead}>
-        <button
-          type="button"
-          className={s.cardTitle}
-          onClick={() => onDetail(item)}
-        >
-          {item.isRecommended && (
-            <span className={s.reco} title="Doporučeno">
-              ⭐
-            </span>
-          )}
-          {item.name}
-        </button>
+        <div className={s.cardHeadMain}>
+          <span className={s.thumb} aria-hidden="true">
+            {item.imageUrl ? (
+              <img
+                src={item.imageUrl}
+                alt=""
+                loading="lazy"
+                style={getImageStyle(
+                  item.imageFocalX,
+                  item.imageFocalY,
+                  item.imageZoom,
+                  item.imageFit,
+                )}
+              />
+            ) : (
+              <span className={s.thumbFallback}>
+                {item.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </span>
+          <button
+            type="button"
+            className={s.cardTitle}
+            onClick={() => onDetail(item)}
+          >
+            {item.isRecommended && (
+              <span className={s.reco} title="Doporučeno">
+                ⭐
+              </span>
+            )}
+            {item.name}
+          </button>
+        </div>
         {canManage && (
           <span className={`${s.cardActions} print-hide`}>
             <button

@@ -1,0 +1,13 @@
+/* 21.5a — Skiny komunitního (globálního) herbáře pro platformové motivy.
+   Globální CSS (NE module) — scoped přes platformový [data-theme] (na .shell)
+   + STABILNÍ data-atributy kostry:
+     [data-plant-scope]   — kořen listu (KomunitniHerbarPage)
+     [data-lib-tab]       — hřbety knihoven (approved / drafts)
+     [data-herbar-list]   — rejstřík (ul)
+     [data-herbar-row]    — řádek rejstříku (li)
+     [data-plant-portrait]— portrét/ikona rostliny (list i detail)
+     [data-plant-card]    — karta detailu rostliny
+   Barvy/fonty z STABILNÍCH tokenů (--accent, --text-primary, --theme-surface,
+   --font-display…) — fungují napříč platformovými motivy; TVAR + ornament per
+   motiv (NE přebarvení). Per-theme pravidla se doplní přes `skin` workflow
+   (analogicky komunitniBestiarSkins.css) — teď jen kontrakt kostry. */

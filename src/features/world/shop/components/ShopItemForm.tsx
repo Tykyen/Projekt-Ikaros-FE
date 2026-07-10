@@ -8,6 +8,8 @@ import { CurrencyAmountInput } from '@/features/world/currencies/shared/Currency
 import type { WorldCurrencyItem } from '@/features/world/currencies/types';
 import { PagePicker } from '@/features/world/pages/PageEditor/components/PagePicker';
 import { usePagesDirectory } from '@/features/world/pages/api/usePagesDirectory';
+import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/HeroUploadCard';
+import type { ImageFit } from '@/shared/lib/imageStyle';
 import { useCreateShopItem, useUpdateShopItem } from '../api';
 import type { ShopItem, ShopGroup, CreateShopItemInput } from '../types';
 import s from './shop.module.css';
@@ -66,6 +68,15 @@ export function ShopItemForm({
   const [linkedItemIds, setLinkedItemIds] = useState<string[]>(
     initial?.linkedItemIds ?? [],
   );
+  const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? '');
+  const [imageFocalX, setImageFocalX] = useState(initial?.imageFocalX ?? 50);
+  const [imageFocalY, setImageFocalY] = useState(initial?.imageFocalY ?? 50);
+  const [imageZoom, setImageZoom] = useState<number | null>(
+    initial?.imageZoom ?? null,
+  );
+  const [imageFit, setImageFit] = useState<ImageFit | null>(
+    initial?.imageFit ?? null,
+  );
 
   const subgroups = useMemo(
     () => groups.filter((g) => g.parentId === groupId),
@@ -95,6 +106,11 @@ export function ShopItemForm({
       isRecommended,
       isShared: canShare ? isShared : undefined,
       linkedItemIds,
+      imageUrl: imageUrl || undefined,
+      imageFocalX: imageUrl ? imageFocalX : null,
+      imageFocalY: imageUrl ? imageFocalY : null,
+      imageZoom: imageUrl ? imageZoom : null,
+      imageFit: imageUrl ? imageFit : null,
     };
 
     const onOk = () => {
@@ -153,6 +169,26 @@ export function ShopItemForm({
             onChange={(e) => setDescription(e.target.value)}
           />
         </label>
+
+        {/* HeroUploadCard = vlastní widget → skupinový popisek span, ne label */}
+        <span className={s.fieldLabel}>
+          Obrázek (volitelný)
+          <HeroUploadCard
+            value={imageUrl}
+            onChange={setImageUrl}
+            compact
+            uploadCta="Nahrát obrázek zboží"
+            focal={{ x: imageFocalX ?? 50, y: imageFocalY ?? 50 }}
+            onFocalChange={(f) => {
+              setImageFocalX(f.x);
+              setImageFocalY(f.y);
+            }}
+            zoom={imageZoom}
+            onZoomChange={setImageZoom}
+            fit={imageFit}
+            onFitChange={setImageFit}
+          />
+        </span>
 
         <div className={s.formRow}>
           <label className={s.fieldLabel}>

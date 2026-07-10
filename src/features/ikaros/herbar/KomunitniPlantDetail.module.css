@@ -1,0 +1,237 @@
+/* 21.5a — detail komunitní rostliny („karta"), default motiv-aware vzhled.
+   Tvarové skiny per motiv později přes `[data-theme] [data-plant-card] …`. */
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--sp-4, 1rem) var(--sp-4, 1rem) var(--sp-8, 3rem);
+}
+
+.card {
+  position: relative;
+  padding: var(--sp-6, 2rem) clamp(1rem, 4vw, 2.5rem);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.1);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.03);
+  backdrop-filter: blur(8px);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sp-2, 0.5rem);
+}
+.back {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  text-decoration: none;
+}
+.stateBadge {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--sp-1, 0.25rem) var(--sp-3, 0.75rem);
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.15);
+  color: var(--text-secondary, var(--text-primary));
+}
+.stateBadge[data-status='draft'] {
+  color: var(--warning, #d9a441);
+  border-color: color-mix(in srgb, var(--warning, #d9a441) 45%, transparent);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2, 0.5rem);
+  justify-content: center;
+  margin-top: var(--sp-3, 0.75rem);
+}
+
+/* Karta: obrázek | informace */
+.spread {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--sp-5, 1.5rem);
+  align-items: start;
+  margin: var(--sp-5, 1.5rem) 0 0;
+}
+.illus {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.12);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+}
+.illus img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.illusFallback {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  opacity: 0.7;
+}
+.info {
+  min-width: 0;
+}
+.plantTitle {
+  margin-bottom: var(--sp-4, 1rem);
+}
+.name {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl, 2.25rem);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+}
+.aliases {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: var(--text-md, 1rem);
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  margin-top: var(--sp-2, 0.5rem);
+}
+
+/* Tabulka atributů */
+.table {
+  margin: 0;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.1);
+  overflow: hidden;
+}
+.tableRow {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.4fr) 1fr;
+  gap: var(--sp-3, 0.75rem);
+  padding: var(--sp-3, 0.75rem) var(--sp-4, 1rem);
+}
+.tableRow + .tableRow {
+  border-top: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.07);
+}
+.tableKey {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  align-self: start;
+  padding-top: 2px;
+}
+.tableVal {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md, 1rem);
+  line-height: 1.6;
+  color: var(--text-primary);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2, 0.5rem);
+}
+.rarityNote {
+  font-style: italic;
+  font-size: var(--text-sm, 0.9rem);
+  color: var(--text-secondary, var(--text-primary));
+}
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1, 0.25rem);
+}
+.tag {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  padding: 2px var(--sp-2, 0.5rem);
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.12);
+  color: var(--text-secondary, var(--text-primary));
+}
+
+/* Odznak vzácnosti (shodný s listem) */
+.rarityChip {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px var(--sp-3, 0.75rem);
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid currentcolor;
+  white-space: nowrap;
+}
+.rarityChip[data-rarity='bezna'] {
+  color: var(--success, #4caf7d);
+  background: color-mix(in srgb, var(--success, #4caf7d) 14%, transparent);
+}
+.rarityChip[data-rarity='stredne_bezna'] {
+  color: var(--theme-accent-cyan, var(--accent-bright, #35d0e0));
+  background: color-mix(
+    in srgb,
+    var(--theme-accent-cyan, var(--accent-bright, #35d0e0)) 14%,
+    transparent
+  );
+}
+.rarityChip[data-rarity='stredne_vzacna'] {
+  color: var(--accent, #b98a3a);
+  background: color-mix(in srgb, var(--accent, #b98a3a) 14%, transparent);
+}
+.rarityChip[data-rarity='vzacna'] {
+  color: var(--warning, #d9a441);
+  background: color-mix(in srgb, var(--warning, #d9a441) 16%, transparent);
+}
+.rarityChip[data-rarity='velmi_vzacna'] {
+  color: var(--danger, #e05260);
+  background: color-mix(in srgb, var(--danger, #e05260) 16%, transparent);
+}
+
+/* Popis */
+.desc {
+  margin-top: var(--sp-6, 2rem);
+}
+.descLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  margin-bottom: var(--sp-2, 0.5rem);
+}
+.descText {
+  font-family: var(--font-body);
+  font-size: var(--text-md, 1rem);
+  line-height: 1.75;
+  color: var(--text-primary);
+  text-align: justify;
+  margin: 0;
+}
+
+.state {
+  text-align: center;
+  padding: var(--sp-7, 2.5rem) var(--sp-4, 1rem);
+  color: var(--text-secondary, var(--text-primary));
+  font-family: var(--font-body);
+}
+
+@media (max-width: 768px) {
+  .spread {
+    grid-template-columns: 1fr;
+  }
+  .illus {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .tableRow {
+    grid-template-columns: 1fr;
+    gap: var(--sp-1, 0.25rem);
+  }
+}

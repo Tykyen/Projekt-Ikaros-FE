@@ -9,6 +9,7 @@ import {
   Bell,
   MessagesSquare,
   BookOpen,
+  Leaf,
   Image,
   Newspaper,
   CalendarDays,
@@ -251,6 +252,31 @@ export function PlatformSection() {
             diskusi</strong> a schvaluje je správce. Schválení není zámek —{' '}
             <strong>správce může staty opravit i později</strong> (errata,
             vyvážení), takže i u ověřené bytosti se čísla časem mohou změnit.
+          </p>
+        </Tool>
+        <Tool icon={<Leaf size={16} />} title="Herbář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
+          <p>
+            Sdílený katalog rostlin a bylin napříč světy (ve „Společné tvorbě").
+            Dvě knihovny: <strong>Schválená</strong> (ověřené rostliny doladěné
+            komunitou) a <strong>Návrhy</strong> (komunitní, zatím neověřené).
+            Každá rostlina je jako <strong>karta bylinkáře</strong>: obrázek +
+            název a lidová jména a tabulka <strong>Roste</strong> (kde ji
+            najdeš), <strong>Použití</strong> (k čemu je) a{' '}
+            <strong>Vzácnost</strong>, plus popis. Filtruješ podle vzácnosti a
+            štítku.
+          </p>
+          <p>
+            Prohlížet a tvořit může každý přihlášený. Novou rostlinu založíš jako{' '}
+            <strong>návrh</strong> (obrázek + pole vyplníš v editoru); údaje jdou
+            volně upravovat a <strong>schvaluje</strong> je správce (přesun do
+            Schválené knihovny).
+          </p>
+          <p>
+            Rostliny lze <strong>vložit do obchodu svého světa</strong> — po jedné
+            z detailu („Vlož do obchodu") nebo hromadně z knihovny („Vlož vše do
+            obchodu"). Vzniknou z nich položky ceníku (obrázek a popis se přenesou,
+            cenu doladíš v obchodě). Vkládat může jen <strong>PJ nebo Pomocný PJ</strong>{' '}
+            daného světa.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

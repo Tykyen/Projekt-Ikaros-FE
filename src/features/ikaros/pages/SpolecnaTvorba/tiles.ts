@@ -75,7 +75,7 @@ export const TVORBA_TILES: TvorbaTile[] = [
     description: 'Rostliny a byliny s jejich účinky.',
     to: '/ikaros/herbar',
     icon: Leaf,
-    active: false,
+    active: true,
   },
   {
     key: 'lektvary',

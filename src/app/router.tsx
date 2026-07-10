@@ -65,6 +65,9 @@ const ComingSoonPage       = lazy(() => import('@/features/ikaros/pages/Spolecna
 // 16.2b-2 — komunitní (globální) bestiář (nahrazuje stub `ikaros/bestiar`).
 const KomunitniBestiarPage      = lazy(() => import('@/features/ikaros/bestiar/KomunitniBestiarPage'));
 const KomunitniBestieDetailPage = lazy(() => import('@/features/ikaros/bestiar/KomunitniBestieDetailPage'));
+// 21.5b — komunitní (globální) herbář (nahrazuje stub `ikaros/herbar`).
+const KomunitniHerbarPage       = lazy(() => import('@/features/ikaros/herbar/KomunitniHerbarPage'));
+const KomunitniPlantDetailPage  = lazy(() => import('@/features/ikaros/herbar/KomunitniPlantDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -189,7 +192,9 @@ export const router = createBrowserRouter([
       // 16.2b-2 — komunitní bestiář (list + detail) nahrazuje stub.
       { path: 'ikaros/bestiar',         element: p(KomunitniBestiarPage) },
       { path: 'ikaros/bestiar/:id',     element: p(KomunitniBestieDetailPage) },
-      { path: 'ikaros/herbar',          element: p(ComingSoonPage) },
+      // 21.5b — komunitní herbář (list + detail) nahrazuje stub.
+      { path: 'ikaros/herbar',          element: p(KomunitniHerbarPage) },
+      { path: 'ikaros/herbar/:id',      element: p(KomunitniPlantDetailPage) },
       { path: 'ikaros/lektvary',        element: p(ComingSoonPage) },
       { path: 'ikaros/kouzla',          element: p(ComingSoonPage) },
       { path: 'ikaros/hadanky',         element: p(ComingSoonPage) },
