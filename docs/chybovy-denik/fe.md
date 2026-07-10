@@ -1910,3 +1910,22 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Proč to je správně:** Otisk = vstupní script hash (Vite mění při každé změně) → nepotřebuje build-time verzi ani nový endpoint. Baseline z DOMu (ne z prvního fetche) chytá i „appka naběhla už zastaralá". Porovnávat JEN vstupní script (lazy chunky přibývají za běhu → jinak falešný poplach). Prompt místo auto-reload = žádná reload smyčka ani ztráta rozepsané zprávy.
 **Jak ověřeno:** `tsc -b` ✓, eslint ✓, 5/5 unit testů `parseEntryScript` ✓. Reálné chování až po DVOU deployích (build s detektorem musí uvidět další build) — ověří uživatel na živém webu.
 **Zhodnocení:** Dobře, čistý self-contained FE fix. Past: řeší detekci+nabídku, NE rychlost stažení; a první přechod na build s detektorem musí ještě proběhnout „ručně" — od dalšího deploye se to samo-léčí. Souvisí s [[CH-066]] (tohle byla ta skutečná příčina, ne šepoty).
+
+---
+
+### ✅ ŘEŠENÍ — a11y warningy: kořen = config bug (severity-blind mapování), 1284 → 345 · 2026-07-10
+**Co nakonec zabralo:** HANDOFF `docs/a11y-cleanup` diagnostikoval kořen 1284 ESLint warningů = blok v `eslint.config.js` (17.8) bral `Object.keys(jsxA11y.flatConfigs.recommended.rules)` a **všechna** pravidla natvrdo mapoval na `'warn'` → ignoroval původní severity. jsx-a11y má 3 pravidla schválně `off`: `control-has-associated-label` (474×), `label-has-for` (468×, deprecated), `anchor-ambiguous-text` (0×) → config je vynutil do warn = ~939 falešných warningů. Fix = `Object.entries` + zachovat off: `const level = Array.isArray(sev) ? sev[0] : sev; return [rule, level === 'off' ? 'off' : 'warn']`.
+**Proč to je správně (a ne další variace):** Nezavírá pravidla plošně (feedback: a11y nesnižovat vypínáním) — jen respektuje severity, kterou autoři jsx-a11y v recommended nastavili. `label-has-for` je navíc doloženě deprecated. Zbylých 345 jsou REÁLNÉ nálezy (label-association, klikací elementy, react-hooks/refs, no-autofocus…), ne šum.
+**Jak ověřeno:** `npx eslint . --format json` + measure skript: 1284 → **345 warningů, 0 errorů** (−73 %). Ověřen i tvar OFF pravidel přímo z pluginu (node -e). Config-only změna, zdroják netknutý → build nedotčen.
+**Zhodnocení:** Dobře, největší dopad za minimum kódu. Napoprvé nezabralo naplno (viz [[CH-068]] — array severity). Zbývá 345 reálných nálezů = samostatné dávky (label-association, klikací elementy, autofocus politika, ne-a11y react-hooks), čekají souhlas na postup.
+
+---
+
+### CH-068 — první verze config fixu minula `control-has-associated-label` (severity = pole, ne string) · 2026-07-10
+**Kontext:** Fix config bugu (viz ✅ ŘEŠENÍ výše) — zachovat `off` severity při downgrade recommended na warn.
+**Co jsem udělal špatně:** První verze porovnávala `sev === 'off'` (holý string). To chytilo `label-has-for` a `anchor-ambiguous-text` (string `"off"`), ale NE `control-has-associated-label`, jehož severity je zapsaná jako **pole** `["off", {ignoreElements, ignoreRoles, includeRoles}]`.
+**Proč to nefungovalo:** `["off",{…}] === 'off'` je false → pravidlo dostalo `'warn'` → shodilo jen 465, zůstalo 819 (474 control-has-associated-label pořád viselo).
+**Poučení:** ESLint severity může být string i pole `['off', {options}]`. Vždy normalizovat: `Array.isArray(sev) ? sev[0] : sev`. Předtím ověřit tvar (`JSON.stringify(rules[key])`), ne předpokládat string.
+**Příznak cyklení:** dvě z tří „off" pravidel zmizela, třetí ne — asymetrie signalizuje rozdílný TVAR dat (pole vs string), ne že fix principiálně nefunguje. Neladit config dokola, podívat se na tvar hodnoty.
+
+---

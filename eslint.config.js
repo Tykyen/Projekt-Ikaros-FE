@@ -42,7 +42,15 @@ export default defineConfig([globalIgnores(['dist']), {
   // pokrytí se čistí postupně. Pravidla bereme z recommended, downgrade na warn.
   files: ['**/*.{ts,tsx}'],
   plugins: { 'jsx-a11y': jsxA11y },
+  // Downgrade recommended na `warn`, ale ZACHOVEJ `off` severity — jsx-a11y má
+  // 3 pravidla schválně vypnutá (control-has-associated-label, label-has-for
+  // deprecated, anchor-ambiguous-text). Mapovat přes klíče by je vynutilo do
+  // warn a přidalo ~942 falešných warningů (šum/deprecated). Viz docs/a11y-cleanup.
   rules: Object.fromEntries(
-    Object.keys(jsxA11y.flatConfigs.recommended.rules).map((rule) => [rule, 'warn']),
+    Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([rule, sev]) => {
+      // Severity je buď string ('off'/'warn'/'error') nebo pole ['off', {opce}].
+      const level = Array.isArray(sev) ? sev[0] : sev
+      return [rule, level === 'off' ? 'off' : 'warn']
+    }),
   ),
 }, ...storybook.configs["flat/recommended"]])
