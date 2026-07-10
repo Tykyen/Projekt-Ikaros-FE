@@ -1,6 +1,10 @@
 /**
- * 16.2b-2 — návrh pravidlové verze statů pro systém, který bytost ještě nemá.
- * Uloží se jako draft (§2a); kurátor ho pak schválí.
+ * 16.2b-2 — návrh / úprava pravidlové verze statů.
+ * - Bez `editSystemId` = návrh nového statbloku pro systém, který bytost nemá
+ *   (uloží se jako draft, §2a; kurátor ho pak schválí).
+ * - S `editSystemId` = kurátorská úprava už existujícího statbloku (draft i
+ *   approved). Systém je zamčený, staty se předvyplní. BE `POST …/statblock` je
+ *   upsert a existující verzi přepíše jen kurátorovi (zachová status/autora).
  */
 import { useState, useMemo } from 'react';
 import { Modal, Button } from '@/shared/ui';
@@ -9,23 +13,37 @@ import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schema
 import { validateForCreate } from '@/features/world/tactical-map/utils/validateSystemStats';
 import { resolveSystemId } from '@/features/world/systemId';
 import { useKomunitniBestiarMutations } from '../hooks/useKomunitniBestiarMutations';
-import { BESTIE_SYSTEMS } from './systems';
+import { BESTIE_SYSTEMS, systemLabel } from './systems';
 import type { GlobalBestie } from '../types';
 import s from './KomunitniBestiarForms.module.css';
 
 interface Props {
   bestie: GlobalBestie;
+  /** Když je uvedeno, jde o kurátorskou úpravu existujícího statbloku. */
+  editSystemId?: string;
   onClose: () => void;
   onSaved?: (b: GlobalBestie) => void;
 }
 
-export function ProposeStatblockModal({ bestie, onClose, onSaved }: Props) {
+export function ProposeStatblockModal({
+  bestie,
+  editSystemId,
+  onClose,
+  onSaved,
+}: Props) {
   const { propose } = useKomunitniBestiarMutations();
+  const isEdit = !!editSystemId;
   const existing = Object.keys(bestie.statblocks ?? {});
   const available = BESTIE_SYSTEMS.filter((sy) => !existing.includes(sy.id));
 
-  const [systemId, setSystemId] = useState(available[0]?.id ?? 'generic');
-  const [systemStats, setSystemStats] = useState<Record<string, unknown>>({});
+  const [systemId, setSystemId] = useState(
+    editSystemId ?? available[0]?.id ?? 'generic',
+  );
+  const [systemStats, setSystemStats] = useState<Record<string, unknown>>(() =>
+    editSystemId
+      ? { ...(bestie.statblocks?.[editSystemId]?.systemStats ?? {}) }
+      : {},
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState('');
 
@@ -58,7 +76,7 @@ export function ProposeStatblockModal({ bestie, onClose, onSaved }: Props) {
         Zrušit
       </Button>
       <Button variant="primary" loading={propose.isPending} onClick={submit}>
-        Navrhnout staty
+        {isEdit ? 'Uložit staty' : 'Navrhnout staty'}
       </Button>
     </>
   );
@@ -67,35 +85,42 @@ export function ProposeStatblockModal({ bestie, onClose, onSaved }: Props) {
     <Modal
       open
       onClose={onClose}
-      title="Navrhnout pravidlovou verzi"
+      title={isEdit ? 'Upravit staty' : 'Navrhnout pravidlovou verzi'}
       size="lg"
       footer={footer}
     >
       <p className={s.hint}>
-        Navrhni staty pro další herní systém. Uloží se jako návrh a komunita ho
-        vyladí v diskusi, než ho kurátor schválí.
+        {isEdit
+          ? 'Kurátorská úprava — změna se uloží rovnou a nahradí staty této pravidlové verze (stav i autor zůstávají).'
+          : 'Navrhni staty pro další herní systém. Uloží se jako návrh a komunita ho vyladí v diskusi, než ho kurátor schválí.'}
       </p>
 
       <div className={s.field}>
         <label className={s.label} htmlFor="ps-system">
           Herní systém
         </label>
-        <select
-          id="ps-system"
-          className={s.select}
-          value={systemId}
-          onChange={(e) => {
-            setSystemId(e.target.value);
-            setSystemStats({});
-            setErrors({});
-          }}
-        >
-          {available.map((sy) => (
-            <option key={sy.id} value={sy.id}>
-              {sy.label}
-            </option>
-          ))}
-        </select>
+        {isEdit ? (
+          <div className={s.input} aria-readonly="true">
+            {systemLabel(systemId)}
+          </div>
+        ) : (
+          <select
+            id="ps-system"
+            className={s.select}
+            value={systemId}
+            onChange={(e) => {
+              setSystemId(e.target.value);
+              setSystemStats({});
+              setErrors({});
+            }}
+          >
+            {available.map((sy) => (
+              <option key={sy.id} value={sy.id}>
+                {sy.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {schema ? (

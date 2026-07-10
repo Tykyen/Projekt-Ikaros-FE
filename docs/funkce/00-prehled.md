@@ -2,7 +2,7 @@
 
 > **Účel:** Hloubková, **kódem ověřená** inventura všeho, co platforma dnes umí. Slouží jako podklad pro budoucí uživatelský průvodce (návody) a pro strategii rozšiřování. Každé tvrzení bylo ověřeno přímo ve zdrojovém kódu FE i BE — ne odhadem.
 >
-> **Snímek k:** 2026-07-09 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
+> **Snímek k:** 2026-07-10 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
 >
 > ⚠️ Toto je stav kódu, ne marketingový popis. Kde se název funkce rozchází s realitou, je to označeno v sekci „Nesrovnalosti & dluhy" na konci každé kapitoly.
 

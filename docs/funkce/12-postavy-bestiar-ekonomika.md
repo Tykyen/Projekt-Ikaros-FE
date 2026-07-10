@@ -402,18 +402,19 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - Čtení (list/detail/diskuse) — **veřejné** (i anonym).
 - **＋ Nová bytost / ＋ systém / vklad / příspěvek** — jen přihlášený (`currentUserAtom`/`isAuthenticatedAtom`).
 - **✎ Upravit popis** — autor bytosti (`user.id === authorId`) NEBO kurátor.
+- **✎ Upravit staty** (existující statblok, přímá editace — draft i approved) — **jen kurátor** (`isCurator`); tlačítko u aktivní pravidlové záložky, otevře `ProposeStatblockModal` v edit-režimu (předvyplní staty, systém zamčený). (`KomunitniBestieDetailPage.tsx:176-200`)
 - **✔ Schválit bytost / staty** — kurátor: `Superadmin | Admin | SpravceClanku | SpravceDiskuzi` (`CURATOR_ROLES` na FE i BE). FE jen skrývá tlačítka; BE je autoritativní.
 
 **Kdo (BE):** `bestiae.service.ts` (community metody):
 - `listCommunity`/`findCommunityById` — veřejné (skryté jen Admin+).
 - `createCommunity` — přihlášený → `status:'draft'`, `authorId` z JWT; **současně klon do autorova `user` bestiáře** (má návrh hned u sebe).
 - `updateCommunityLore` — autor nebo kurátor; **jen lore, NE staty** (DTO bez `systemStats`, pravidlo §2a).
-- `proposeStatblock` — prázdný systém navrhne kdokoli (draft), existující verzi mění jen kurátor.
+- `proposeStatblock` — **upsert**: nový (prázdný) systém navrhne kdokoli (draft); **existující** verzi přepíše **jen kurátor** (`isCurator`), a to i schválenou — zachová `status`/`authorId`/`createdAt`, mění jen `systemStats` (§2a, `bestiae.service.ts:520-561`). Nekurátor u existující verze → 403 `BESTIE_STATBLOCK_EXISTS`.
 - `approveStatblock`/`approveBeast` — `requireCurator` (`curator-roles.ts` `isBestieCurator`).
 - `cloneCommunity` — klon zvolené pravidlové verze → `user`/`world` (snapshot, `clonedFromId`); do světa nutná role PomocnyPJ+ (`assertCanManageWorld`).
 - Komentáře: `list` veřejné, `create` přihlášený (`authorName` = `username` z JWT).
 
-**Co jde dělat (vše):** 2 knihovny + filtry · detail kniha + pravidlové záložky · dvouúrovňová diskuse (číst/psát) · **tvorba** bytosti (lore + obrázek přes `HeroUploadCard` + první statblok přes `EntitySchemaForm`) · **návrh statů** pro další systém · **úprava lore** · **schválení** bytosti i statbloku (kurátor) · **vklad** do Můj/svět (`InsertToBestiaryModal` — nabízí jen světy PomocnyPJ+ se sedícím systémem) · **pending fronta** „bytosti ke schválení" (`CommunityBestiePendingReview` provider, `pending-actions`, vidí kurátoři). (`useKomunitniBestiarMutations.ts`, `components/{BestieEditorModal,ProposeStatblockModal,InsertToBestiaryModal}.tsx`, `community-bestie-review.provider.ts`)
+**Co jde dělat (vše):** 2 knihovny + filtry · detail kniha + pravidlové záložky · dvouúrovňová diskuse (číst/psát) · **tvorba** bytosti (lore + obrázek přes `HeroUploadCard` + první statblok přes `EntitySchemaForm`) · **návrh statů** pro další systém · **úprava statů existující verze** (kurátor, draft i approved) · **úprava lore** · **schválení** bytosti i statbloku (kurátor) · **vklad** do Můj/svět (`InsertToBestiaryModal` — nabízí jen světy PomocnyPJ+ se sedícím systémem) · **pending fronta** „bytosti ke schválení" (`CommunityBestiePendingReview` provider, `pending-actions`, vidí kurátoři). (`useKomunitniBestiarMutations.ts`, `components/{BestieEditorModal,ProposeStatblockModal,InsertToBestiaryModal}.tsx`, `community-bestie-review.provider.ts`)
 
 **Zvláštnosti / pasti:**
 - `community` bytost má `systemId` = **primární systém** (marker, `required`), reálné verze jsou v `statblocks[systemId]`; filtr/list jde přes `statblocks.$exists`, ne `systemId`.
@@ -426,7 +427,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - `mobil-desktop` audit **neproběhl naživo** (CSS má `@media`, ověření čeká na deploy).
 - Diskuse bez WS (po odeslání refetch), flat (bez vláken).
 - Moderace: `moderationHidden` respektováno při čtení, ale FE **nemá hide-akci UI** (jde přes platformovou moderaci 20B).
-- Úprava schváleného statbloku a merge duplicit — odloženo.
+- Úpravu statů smí jen **kurátor** (přímo). Hráčský **návrh revize** už existující/schválené verze (přes diskusi→schválení), **autorská** editace vlastního draftu a **verzovaná historie** statů — odloženo (MVP bez verzí, jen přepis + `updatedAt`). Merge duplicit — odloženo.
 
 **Stav:** 🚧 částečné — funkčně kompletní (BE 12/12 testů, FE build ✓), čeká **živé ověření** (restart BE + deploy FE), `mobil-desktop` a **skiny (21 motivů)**.
 **Kód:** FE `features/ikaros/bestiar/` (`KomunitniBestiar{Page,Detail}.tsx`, `components/*`, `hooks/*`, `api/komunitniBestiarApi.ts`, `types.ts`), `router.tsx`. BE `bestiae/` (`bestiae.{service,controller,module}.ts`, `curator-roles.ts`, `community-bestie-review.provider.ts`, `bestie-comment{s.service,.schema,.repository}`, `dto/{create-community,update-bestie-lore,clone-community,propose-statblock,create-bestie-comment}.dto.ts`), `pending-actions/pending-action-type.enum.ts`. Spec `docs/arch/phase-16/spec-16.2b-2-bestiar-komunitni.md`.

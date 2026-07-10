@@ -45,13 +45,15 @@ GlobalBestie {
 
 ✅ **ROZHODNUTO #1 (varianta a):** globální bytosti jsou **samostatné úložiště** (`community` scope) na stránce ve Společné tvorbě; odsud se **kopíruje do světových bestiářů**. Dnešní `system/user/world` bestie zůstávají single-system; klon „zplošťuje" vybraný statblock. Nerozbíjí existující data.
 
-## 2a. Pravidlo úprav — lore volně, staty jen diskusí ⚠️ TVRDÉ PRAVIDLO
+## 2a. Pravidlo úprav — lore volně, staty diskusí (hráč) / přímo (kurátor)
 
-> Uživatelské zadání: *„Bestii můžeme měnit slovně případně obrázkem, ale staty se musí diskutovat."*
+> Uživatelské zadání: *„Bestii můžeme měnit slovně případně obrázkem, ale staty se musí diskutovat."* + upřesnění 2026-07-10: *„To, že je globální bestie schválená, neznamená, že se staty nebudou/nemohou měnit — správci, admini a superadmin je musí dokázat změnit."*
 
 - **Lore** (`name`, `latin`, `description`, `imageUrl` + výřez, `kind`, `tags`) — **edituje se přímo** (autor bytosti / kurátor). Nízké riziko, textová/obrazová změna.
-- **Staty** (`statblocks[systemId].systemStats`) — **NEmění se přímou editací**. Nový statblok i změna existujícího jde **výhradně přes diskusní/schvalovací tok**: návrh → diskuse ke statům (§4) → schválení kurátorem (§5). Staty jsou herně citlivé (balanc) → ladí se veřejně, ne tiše přepisují.
-- **Důsledek pro UI/BE:** `statblocks[sys].systemStats` je z pohledu běžné editace **read-only**; zápis pouze skrz schválený návrh změny. Zapisuje kurátor při schválení (nebo se odsouhlasený návrh promítne).
+- **Staty** (`statblocks[systemId].systemStats`) — pravidlo záleží na roli:
+  - **Běžný hráč:** staty **NEmění přímou editací**. Nový statblok i změna existujícího jde přes **diskusní/schvalovací tok**: návrh → diskuse ke statům (§4) → schválení kurátorem (§5). Staty jsou herně citlivé (balanc) → ladí se veřejně, ne tiše přepisují.
+  - **Kurátor** (správci diskuzí + správci článků + Admin/Superadmin — titíž jako v §5) smí staty **existujícího** statbloku **editovat přímo**, a to i u **schválené** verze. Schválenost je značka kvality, **ne zámek** — errata/rebalanc/oprava překlepu musí jít bez zakládání nové verze. Přímý zápis zachová `status`, `authorId`, `createdAt`; přepíše jen `systemStats`.
+- **Důsledek pro UI/BE:** pro hráče je `statblocks[sys].systemStats` z pohledu běžné editace **read-only** (zápis jen schváleným návrhem). Pro kurátora je zdrojem přímý upsert `POST /bestiae/community/:id/statblock` (existující verzi přepíše jen kurátorovi — [bestiae.service.ts](../../../../Projekt-ikaros/backend/src/modules/bestiae/bestiae.service.ts) `proposeStatblock`); FE ho vystaví tlačítkem „✎ Upravit staty" u aktivní záložky.
 
 ## 3. Scope — 4. „community"
 
@@ -165,5 +167,5 @@ Rozhodnutí uživatele: **každý platformový motiv = vlastní tvarový jazyk +
 
 - ✅ **Kurátor bytostí** = **správci diskusí + správci článků + platform Admin/Superadmin** (rozhodnutí uživatele 2026-07-09). Reuse existující moderace komunitního obsahu (`pending-actions`, typy `DiscussionPendingReview`/`ArticlePendingReview`); přidá se `CommunityBestiePendingReview` viditelný pro tentýž okruh. Žádná nová role.
 - Pre- vs post-moderace návrhů (roadmapa 16.2b otevřená otázka; 21.4). Návrh: **post** (návrh je hned viditelný v knihovně návrhů, kurátor povyšuje).
-- Verzování statbloku při editaci po schválení (držet historii?) — MVP: bez verzí, jen `updatedAt`.
+- ✅ **Editace statů po schválení** (rozhodnutí 2026-07-10): kurátor edituje **přímo** (viz §2a) — draft i approved. MVP **bez verzované historie** (držet historii statů odloženo), jen přepis + `updatedAt`. Autorská editace vlastního draftu a hráčský návrh revize approved verze zůstávají odložené.
 - Duplicity (dvě komunitní „drak") — merge nástroj? Odloženo.

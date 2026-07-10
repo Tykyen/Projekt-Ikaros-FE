@@ -1938,3 +1938,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** dvě z tří „off" pravidel zmizela, třetí ne — asymetrie signalizuje rozdílný TVAR dat (pole vs string), ne že fix principiálně nefunguje. Neladit config dokola, podívat se na tvar hodnoty.
 
 ---
+
+### ✅ ŘEŠENÍ — kurátor edituje staty komunitní bestie přímo: BE endpoint už byl upsert · 2026-07-10
+**Co nakonec zabralo:** Uživatel chtěl, aby správci/admin/superadmin mohli měnit staty i u **schválené** globální bestie (dnes nešlo). Plán byl BE (nový endpoint `updateStatblock` + DTO + service + testy + restart) **+** FE. Ověření BE kódu ale ukázalo, že `proposeStatblock` (`POST /bestiae/community/:id/statblock`) je už dnes **upsert**: kurátor existující statblok přepíše (zachová `status`/`authorId`/`createdAt`, mění jen `systemStats`), 403 `BESTIE_STATBLOCK_EXISTS` padá jen na nekurátora (`bestiae.service.ts:520-561`). Featura na BE existovala a byla zamýšlená (viz komentář service ř.520-522). Chyběla **jen FE cesta** — `ProposeStatblockModal` filtroval už existující systémy z dropdownu, takže kurátor neměl jak vybrat systém a spustit přepis. Řešení se zúžilo na **FE-only**: edit-režim modalu (`editSystemId` prop, předvyplní staty, zamkne systém) + tlačítko „✎ Upravit staty" pro `isCurator`.
+**Proč to je správně (a ne přidat druhý endpoint):** BE `POST …/statblock` je sémanticky upsert; druhý endpoint dělající totéž = duplicita povrchu + zbytečný restart + BE testy. Reuse existující mutace `propose` → 0 BE logiky, jen narovnání lživých komentářů (`bestie.schema.ts`, `update-bestie-lore.dto.ts`) a spec §2a/§12, které tvrdily „staty jen schvalovacím tokem", ač BE dávno dělá výjimku pro kurátora.
+**Jak ověřeno:** `npm run build` (tsc -b) ✓ 15.56s, 0 TS chyb, CSP hash OK. HelpPage spec 11/11 (flaky „current suite" jen při paralelním běhu 2 souborů). mobil-desktop staticky (reuse `.actions` flex-wrap + `.input` width:100%, 0 nových šířek). Živý test čeká na deploy.
+**Zhodnocení:** Dobře — ověření kódu před stavbou ušetřilo celý BE zásah. Poučení: **před plánováním nového BE endpointu zgrepuj/přečti existující** — `create`/`propose`/`set*` metody bývají upsert; nová „edit" varianta je často jen odemčení FE cesty k tomu, co BE už umí.
+
+---

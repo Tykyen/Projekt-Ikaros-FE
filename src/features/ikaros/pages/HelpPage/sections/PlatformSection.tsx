@@ -248,7 +248,9 @@ export function PlatformSection() {
             systém a <strong>vložit</strong> si bytost do svého bestiáře — do
             osobního, nebo do konkrétního světa, kde jsi Pomocný PJ nebo výš.
             Popis a obrázek se mění volně, ale <strong>staty se ladí přes
-            diskusi</strong> a schvaluje je správce.
+            diskusi</strong> a schvaluje je správce. Schválení není zámek —{' '}
+            <strong>správce může staty opravit i později</strong> (errata,
+            vyvážení), takže i u ověřené bytosti se čísla časem mohou změnit.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

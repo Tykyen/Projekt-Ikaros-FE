@@ -37,9 +37,9 @@ export default function KomunitniBestieDetailPage() {
   const user = useAtomValue(currentUserAtom);
   const { approveSb, approveBst } = useKomunitniBestiarMutations();
   const [activeSystem, setActiveSystem] = useState<string | null>(null);
-  const [modal, setModal] = useState<null | 'editLore' | 'insert' | 'propose'>(
-    null,
-  );
+  const [modal, setModal] = useState<
+    null | 'editLore' | 'insert' | 'propose' | 'editStats'
+  >(null);
 
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !bestie)
@@ -198,6 +198,16 @@ export default function KomunitniBestieDetailPage() {
                     ) : null}
                   </div>
                 ) : null}
+                {isCurator ? (
+                  <div className={s.actions}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setModal('editStats')}
+                    >
+                      ✎ Upravit staty
+                    </Button>
+                  </div>
+                ) : null}
                 <BestieDetail
                   schema={schema}
                   systemStats={activeSb.systemStats}
@@ -257,6 +267,13 @@ export default function KomunitniBestieDetailPage() {
       {modal === 'propose' ? (
         <ProposeStatblockModal
           bestie={bestie}
+          onClose={() => setModal(null)}
+        />
+      ) : null}
+      {modal === 'editStats' && activeSys ? (
+        <ProposeStatblockModal
+          bestie={bestie}
+          editSystemId={activeSys}
           onClose={() => setModal(null)}
         />
       ) : null}
