@@ -1,0 +1,40 @@
+name: Seed bestie (migrace VB -> JaD)
+
+# Jednorázový import migrovaných komunitních bestií (547 ks) do PROD Mongo.
+# Obrázky už jsou na Cloudinary (WebP); tenhle workflow jen vloží dokumenty.
+# Spustí se ručně (Actions -> tento workflow -> Run workflow). Idempotentní —
+# opakované spuštění přeskočí už vložené (dle clonedFromId).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy migration files to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/bestie-all.ndjson ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/bestie.ndjson
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/import.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/import.js
+
+      - name: Import into prod Mongo (via BE container)
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            docker cp /tmp/bestie.ndjson projekt-ikaros-be:/tmp/bestie.ndjson
+            docker cp /tmp/import.js projekt-ikaros-be:/tmp/import.js
+            docker exec projekt-ikaros-be node /tmp/import.js
+          '
