@@ -100,6 +100,10 @@ jobs:
   audit-crossrepo:
     name: FE↔BE contract scanners
     runs-on: ubuntu-latest
+    # Gate: běží JEN když je nastaven repo variable ENABLE_CROSSREPO_AUDIT='true'
+    # + secret BE_REPO_TOKEN (PAT s přístupem k BE repu). Bez toho checkout
+    # privátního BE repa selže ('Not Found') a shodí CI. Zapni, až máš token.
+    if: ${{ vars.ENABLE_CROSSREPO_AUDIT == 'true' }}
     steps:
       - uses: actions/checkout@v4                    # FE do ./
 
@@ -107,6 +111,7 @@ jobs:
         with:
           repository: Tykyen/Projekt-ikaros
           path: be-repo
+          token: ${{ secrets.BE_REPO_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
