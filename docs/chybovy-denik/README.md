@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-067.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-068.**
 
 ## Jak je deník členěný
 
@@ -242,3 +242,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-066](fe.md#ch-066) | fe/proces | hnal jsem „whisper-after-limit" jako příčinu chybějícího tlačítka, ač uživatel 2× řekl „žádné šepoty"; reálná příčina = testerčina PWA běžela starý bundle. Workflow potvrdil MECHANISMUS, ne KAUZALITU | obhajuju hypotézu, kterou uživatel právě faktem vyvrátil („ale kód přece dokazuje…") |
 | [✅ ŘEŠENÍ](fe.md#-řešení--pwa-se-sama-neaktualizuje--detekce-nové-verze--obnovit-151-followup--2026-07-10) | fe | PWA se sama neaktualizuje (SW register-only, resume nenaviguje): `useAppUpdate` porovná otisk vstupního `index-<hash>.js` (DOM vs čerstvý fetch) → banner „Obnovit"; prompt ne auto-reload (žádná smyčka) | — |
 | [✅ ŘEŠENÍ](be.md#-řešení--whisper-filtr-do-mongo-query-limit--viditelné--oprava-pre-existujícího-test-mocku--2026-07-10) | be | whisper filtr `getMessages` do Mongo query (`visibilityUserId` + `$or`, vzor findFeed) → `limit` = viditelné → hráči tlačítko „Zobrazit starší" funguje; + opraven pre-existující test-mock (`mockUsersService.findById` chyběl, 19.4 gate); 125/125, nutný restart BE | — |
+| [CH-067](infra.md#ch-067--seed-bestiae-workflow-ssh-host-bash--c-víceřádkový-se-rozpadl--node-tmpimportjs-nenašel-mongoose--2026-07-09) | infra | seed workflow: `ssh host bash -c '<víceřádkový>'` se rozpadl (uvozovky se ztratí) + `node /tmp/import.js` nenašel `mongoose` (require od místa souboru, ne cwd; deps v `/app/node_modules`); fix = 1 řádek přes `&&` + `docker cp` do `/app` | „skript proběhl, ale spadl na chybějícím modulu / `-c requires argument`" u ssh+docker exec |

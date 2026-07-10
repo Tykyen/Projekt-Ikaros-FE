@@ -31,10 +31,11 @@ jobs:
           scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/import.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/import.js
 
       - name: Import into prod Mongo (via BE container)
+        # POZOR: bez `bash -c '...'` — ssh nezachová uvozovky a víceřádkový string
+        # se rozpadne (CH: `bash: -c: option requires an argument`). Vše na jednom
+        # řádku, příkazy řetězeny přes &&.
+        # import.js kopírujeme do /app (ne /tmp!), aby node našel mongoose v
+        # /app/node_modules — require se resolvuje od místa souboru, ne od cwd.
+        # NDJSON čte import.js z absolutní /tmp/bestie.ndjson (uvnitř kontejneru).
         run: |
-          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
-            set -e
-            docker cp /tmp/bestie.ndjson projekt-ikaros-be:/tmp/bestie.ndjson
-            docker cp /tmp/import.js projekt-ikaros-be:/tmp/import.js
-            docker exec projekt-ikaros-be node /tmp/import.js
-          '
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/bestie.ndjson projekt-ikaros-be:/tmp/bestie.ndjson && docker cp /tmp/import.js projekt-ikaros-be:/app/import.js && docker exec -w /app projekt-ikaros-be node import.js"

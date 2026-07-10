@@ -38,3 +38,23 @@ Produkční build (`deploy.yml`, čistý server bez MITM) arg **nedává** → z
 **Jak ověřeno:** `npm ci --dry-run` (s `.npmrc`) → `up to date in 2s`, exit 0 (ERESOLVE zmizel, lock konzistentní); `@testing-library/dom` v locku 5×. Reálný docker build proběhne až po pushnutí + redeployi.
 
 **Zhodnocení — dobře, ale workaround:** odblokuje deploy s nulovým dopadem na verze/testy. **Poučení:** (1) `legacy-peer-deps` použitý lokálně MUSÍ do repa (`.npmrc`), jinak čistý `npm ci` v CI/dockeru padne; (2) `.npmrc` v Dockerfile explicitně kopírovat — glob `package*.json` ho nezahrne; (3) čistý stav dřív než čerstvý `npm ci`, ne lokální `npm run build` na starých `node_modules`. Dlouhodobě: upgrade jsx-a11y na eslint-10-kompatibilní verzi → zrušit workaround.
+
+---
+
+## CH-067 — seed-bestiae workflow: `ssh host bash -c '<víceřádkový>'` se rozpadl + `node /tmp/import.js` nenašel `mongoose` — 2026-07-09
+
+**Kontext:** migrační workflow `seed-bestiae.yml` (import 547 komunitních bestií do PROD Mongo přes SSH → `docker exec projekt-ikaros-be node import.js`). První reálné spuštění (`workflow_dispatch`) selhalo za 20 s.
+
+**Příznak (dvě chyby najednou v jednom logu):**
+1. `bash: -c: option requires an argument`
+2. `Error: Cannot find module 'mongoose'` … `requireStack: [ '/tmp/import.js' ]` → exit 1.
+
+**Kořen — 2 nezávislé chyby:**
+1. **SSH quoting:** `ssh host bash -c '<multiline>'` nefunguje — ssh **NEzachová uvozovky**, spojí argv mezerami a pošle vzdálenému shellu. Nový řádek = oddělovač příkazů → vzdálený shell dostal `bash -c` bez argumentu (další token byl newline) → error; zbytek řádků paradoxně proběhl přímo v login shellu, takže se to „napůl provedlo".
+2. **Node module resolution:** `require('mongoose')` se resolvuje **od místa souboru** (`/tmp/import.js`), ne od cwd → hledá `/tmp/node_modules` → nic. BE app běží v `/app`, deps jsou v `/app/node_modules` (Dockerfile `WORKDIR /app`).
+
+**Co zabralo:** (a) zrušit `bash -c`, celý remote příkaz **na jednom řádku**, kroky řetězit přes `&&`; (b) `docker cp import.js` do **`/app`** (ne `/tmp`) a spustit `docker exec -w /app … node import.js` → require najde `/app/node_modules/mongoose`. NDJSON zůstává v `/tmp/bestie.ndjson` (import.js ho čte absolutní cestou).
+
+**Jak ověřeno:** zatím jen staticky (rozbor logu + Dockerfile `WORKDIR /app` + `COPY --from=build /app/node_modules ./node_modules`). Reálné ověření = re-run workflow po pushnutí.
+
+**Zhodnocení — dobře:** obě chyby mají jasný kořen a fix je minimální. **Poučení:** (1) přes ssh posílej remote příkaz jako **jeden řetězec** (`&&`), nikdy `bash -c '<víceřádkový>'` — uvozovky se ztratí; (2) `node <soubor>` v cizím adresáři nenajde moduly — buď soubor vedle `node_modules`, nebo `NODE_PATH`; cwd (`-w`) na resolusi `require` **nemá vliv**, jen na relativní cestu k souboru. **Příznak cyklení:** „skript proběhl, ale spadl na chybějícím modulu / `-c requires argument`" u ssh+docker exec.
