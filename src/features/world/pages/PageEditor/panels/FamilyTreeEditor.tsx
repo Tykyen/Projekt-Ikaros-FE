@@ -51,7 +51,7 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
     const p = tree.people.find((x) => x.id === id);
     if (!p) return;
     const nid = uid();
-    let people = [...tree.people];
+    const people = [...tree.people];
     let unions = [...tree.unions];
 
     if (rel === 'partner') {
