@@ -31,13 +31,13 @@ describe("DiceRollButton", () => {
   it("renderuje 🎲 tlačítko s aria-label", () => {
     render(<DiceRollButton {...baseProps} />);
     expect(
-      screen.getByRole("button", { name: "Vlastní hod" }),
+      screen.getByRole("button", { name: "Hod kostkou" }),
     ).toBeInTheDocument();
   });
 
   it("klik otevře dice picker popover", () => {
     render(<DiceRollButton {...baseProps} />);
-    const btn = screen.getByRole("button", { name: "Vlastní hod" });
+    const btn = screen.getByRole("button", { name: "Hod kostkou" });
     // Picker zavřený → header "Hod kostkou" není v DOM.
     expect(screen.queryByText("Hod kostkou")).not.toBeInTheDocument();
     fireEvent.click(btn);
