@@ -19,6 +19,7 @@ import { usePrintMode } from '@/features/world/export/print';
 import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
+import { activateOnKey } from '@/shared/lib/a11y';
 import {
   SR_CORE_ATTRS,
   SR_ATTR_BY_KEY,
@@ -471,7 +472,7 @@ function SkillsPanel({
                 onChange={(e) => updateArr<SrSkill>('skills', i, { spec: e.target.value })}
                 placeholder="specializace"
               />
-              <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('skills', i)}>
+              <span className="sr-del" role="button" tabIndex={0} aria-label="Smazat" onClick={() => removeArr('skills', i)} onKeyDown={activateOnKey(() => removeArr('skills', i))}>
                 ✕
               </span>
             </div>
@@ -571,7 +572,7 @@ function WeaponsPanel({
                 onChange={(e) => updateArr<SrWeapon>('weapons', i, { val: e.target.value })}
                 aria-label="Dovednost"
               />
-              <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('weapons', i)}>
+              <span className="sr-del" role="button" tabIndex={0} aria-label="Smazat" onClick={() => removeArr('weapons', i)} onKeyDown={activateOnKey(() => removeArr('weapons', i))}>
                 ✕
               </span>
             </div>
@@ -688,7 +689,7 @@ export function MagicPanel({ cda, editing }: PanelProps) {
               onChange={(e) => updateArr<SrSpell>('spells', i, { drain: e.target.value })}
               placeholder="odliv"
             />
-            <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('spells', i)}>
+            <span className="sr-del" role="button" tabIndex={0} aria-label="Smazat" onClick={() => removeArr('spells', i)} onKeyDown={activateOnKey(() => removeArr('spells', i))}>
               ✕
             </span>
           </div>
@@ -737,7 +738,7 @@ export function MagicPanel({ cda, editing }: PanelProps) {
               onChange={(e) => updateArr<SrRow3>('powers', i, { a: e.target.value })}
               placeholder="úroveň"
             />
-            <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr('powers', i)}>
+            <span className="sr-del" role="button" tabIndex={0} aria-label="Smazat" onClick={() => removeArr('powers', i)} onKeyDown={activateOnKey(() => removeArr('powers', i))}>
               ✕
             </span>
           </div>
@@ -1043,7 +1044,7 @@ function ArrTable({
               ))}
               {editing && (
                 <td className="td-del">
-                  <span className="sr-del" role="button" aria-label="Smazat" onClick={() => removeArr(arrKey, i)}>
+                  <span className="sr-del" role="button" tabIndex={0} aria-label="Smazat" onClick={() => removeArr(arrKey, i)} onKeyDown={activateOnKey(() => removeArr(arrKey, i))}>
                     ✕
                   </span>
                 </td>

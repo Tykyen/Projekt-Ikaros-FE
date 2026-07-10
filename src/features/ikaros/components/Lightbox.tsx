@@ -103,6 +103,9 @@ export function Lightbox({
   }
 
   return (
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (Esc handler + zavírací křížek), overlay tak nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <div
       className={s.overlay}
       role="dialog"
@@ -146,6 +149,9 @@ export function Lightbox({
         </>
       )}
 
+      {/* Obsahový obal: onClick jen stopPropagation (klik na obrázek nezavře),
+          touch = swipe navigace; není ovládací prvek. Zavření přes Esc/křížek. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         className={s.stage}
         onClick={(e) => e.stopPropagation()}

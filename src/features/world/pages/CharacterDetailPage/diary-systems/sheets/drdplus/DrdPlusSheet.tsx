@@ -9,7 +9,7 @@
  *
  * Data v `customData` s prefixem `drdp_` přes makeCdAccess (delta-merge).
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { usePrintMode } from '@/features/world/export/print';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess } from '../../_shared/cdAccess';
@@ -38,6 +38,7 @@ export function DrdPlusSheet({ diary, mode, onChange, onRoll }: SystemSheetProps
   const cda = makeCdAccess(cd, 'drdp_', onChange);
   const { g, set } = cda;
   const [pickOpen, setPickOpen] = useState(false);
+  const uid = useId();
 
   const prof = (g('profession') || 'bojovnik') as DrdPlusProfessionId;
   const profDef =
@@ -102,20 +103,20 @@ export function DrdPlusSheet({ diary, mode, onChange, onRoll }: SystemSheetProps
           </div>
           <div className="dp-idfields">
             <div className="dp-field dp-wide">
-              <label>Jméno</label>
-              <input value={g('name')} disabled={disabled} aria-label="Jméno" onChange={(e) => set('name', e.target.value)} />
+              <label htmlFor={`${uid}-name`}>Jméno</label>
+              <input id={`${uid}-name`} value={g('name')} disabled={disabled} aria-label="Jméno" onChange={(e) => set('name', e.target.value)} />
             </div>
             <div className="dp-field">
-              <label>Rasa</label>
-              <input value={g('race')} disabled={disabled} aria-label="Rasa" onChange={(e) => set('race', e.target.value)} />
+              <label htmlFor={`${uid}-race`}>Rasa</label>
+              <input id={`${uid}-race`} value={g('race')} disabled={disabled} aria-label="Rasa" onChange={(e) => set('race', e.target.value)} />
             </div>
             <div className="dp-field">
-              <label>Úroveň</label>
-              <input value={g('uroven')} disabled={disabled} aria-label="Úroveň" onChange={(e) => set('uroven', e.target.value)} />
+              <label htmlFor={`${uid}-uroven`}>Úroveň</label>
+              <input id={`${uid}-uroven`} value={g('uroven')} disabled={disabled} aria-label="Úroveň" onChange={(e) => set('uroven', e.target.value)} />
             </div>
             <div className="dp-field">
-              <label>Zkušenosti</label>
-              <input value={g('xp')} disabled={disabled} aria-label="Zkušenosti" onChange={(e) => set('xp', e.target.value)} />
+              <label htmlFor={`${uid}-xp`}>Zkušenosti</label>
+              <input id={`${uid}-xp`} value={g('xp')} disabled={disabled} aria-label="Zkušenosti" onChange={(e) => set('xp', e.target.value)} />
             </div>
           </div>
         </div>

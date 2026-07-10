@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Plus, Star, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui';
@@ -31,6 +31,7 @@ export function CalendarConfigEditor({
   onDelete,
 }: Props) {
   const updateMut = useUpdateCalendarConfig(worldId);
+  const uid = useId();
 
   // Lokální editor state (synchronizovaný s `config` přes effect při změně slug).
   const [name, setName] = useState(config.name);
@@ -84,12 +85,13 @@ export function CalendarConfigEditor({
         <h3 className={s.sectionTitle}>Identita</h3>
         <div className={s.row}>
           <div className={s.rowGrow}>
-            <label className={s.label}>Slug (neměnný)</label>
-            <input className={s.field} value={config.slug} disabled />
+            <label htmlFor={`${uid}-slug`} className={s.label}>Slug (neměnný)</label>
+            <input id={`${uid}-slug`} className={s.field} value={config.slug} disabled />
           </div>
           <div className={s.rowGrow}>
-            <label className={s.label}>Název</label>
+            <label htmlFor={`${uid}-name`} className={s.label}>Název</label>
             <input
+              id={`${uid}-name`}
               className={s.field}
               value={name}
               onChange={(e) => {

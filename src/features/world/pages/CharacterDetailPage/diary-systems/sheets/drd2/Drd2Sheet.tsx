@@ -121,13 +121,14 @@ export function Drd2Sheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
             />
           </div>
           <div className="field field--lvl">
-            <label>Úroveň · využitá / celková</label>
+            <label htmlFor="drd2_total_level">Úroveň · využitá / celková</label>
             <div className="drd2-lvl">
               <span className="used" aria-label="Využitá úroveň">
                 {usedLevel}
               </span>
               <span className="slash">/</span>
               <input
+                id="drd2_total_level"
                 className="hw"
                 value={g('total_level')}
                 disabled={disabled}
@@ -591,8 +592,8 @@ function CompanionList({ cda, disabled }: { cda: CdAccess; disabled: boolean }) 
               ))}
             </div>
             <div className="drd2-bond">
-              <label>Pouto</label>
-              <div className="drd2-pips" role="group" aria-label={`Pomocník ${i + 1} pouto`}>
+              <label htmlFor={`drd2_bond_${i}`}>Pouto</label>
+              <div id={`drd2_bond_${i}`} className="drd2-pips" role="group" aria-label={`Pomocník ${i + 1} pouto`}>
                 {Array.from({ length: 11 }, (_, k) => k + 1).map((k) => (
                   <button
                     type="button"

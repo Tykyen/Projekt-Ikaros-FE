@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import clsx from 'clsx';
+import { activateOnKey } from '@/shared/lib/a11y';
 import type { DefaultAvatarType } from '@/shared/types';
 import styles from './UserAvatar.module.css';
 
@@ -72,6 +73,8 @@ export function UserAvatar({
         style={{ width: px, height: px }}
         aria-label="Smazaný účet"
       >
+        {/* onError jen detekuje rozbitý avatar (fallback), není to uživatelská interakce. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <img
           src={url}
           alt={effectiveAlt}
@@ -86,6 +89,9 @@ export function UserAvatar({
   }
 
   return (
+    // Klikací avatar je záměr; role/tabIndex jsou podmíněné na onClick (ternary →
+    // ESLint nevidí statickou roli button, proto zůstávají element-interactions/tabindex).
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <img
       src={url}
       alt={effectiveAlt}
@@ -94,8 +100,11 @@ export function UserAvatar({
       className={clsx(styles.avatar, styles[size], className)}
       onError={() => setErrored(true)}
       onClick={onClick}
+      onKeyDown={onClick ? activateOnKey(onClick) : undefined}
       role={onClick ? 'button' : undefined}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? alt || 'Avatar' : undefined}
     />
   );
 }

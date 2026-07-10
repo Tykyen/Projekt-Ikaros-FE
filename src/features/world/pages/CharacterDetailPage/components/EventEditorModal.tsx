@@ -77,6 +77,7 @@ export function EventEditorModal({
             <label htmlFor="ev-title" className={s.label}>
               Název
             </label>
+            {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
             <input
               id="ev-title"
               className={s.input}
@@ -85,6 +86,7 @@ export function EventEditorModal({
               placeholder="Název události"
               autoFocus
             />
+            {/* eslint-enable jsx-a11y/no-autofocus */}
           </div>
           <div>
             <label htmlFor="ev-symbol" className={s.label}>
@@ -103,7 +105,8 @@ export function EventEditorModal({
         </div>
 
         <div>
-          <label className={s.label}>Začátek</label>
+          {/* Skupinový popisek pro FantasyDatePicker (víc controlů) → span, ne label */}
+          <span className={s.label}>Začátek</span>
           <FantasyDatePicker
             config={config}
             value={start}
@@ -115,7 +118,8 @@ export function EventEditorModal({
         </div>
 
         <div>
-          <label className={s.label}>Konec (volitelně, pro vícedenní)</label>
+          {/* Skupinový popisek pro FantasyDatePicker (víc controlů) → span, ne label */}
+          <span className={s.label}>Konec (volitelně, pro vícedenní)</span>
           <FantasyDatePicker
             config={config}
             value={end}

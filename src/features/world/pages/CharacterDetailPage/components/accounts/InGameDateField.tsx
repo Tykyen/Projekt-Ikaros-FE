@@ -11,6 +11,7 @@
  *
  * Tlačítko „Dnes" (allowReset) volá `onChange(default)`.
  */
+import { useId } from 'react';
 import { Input } from '@/shared/ui';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import { useCalendarConfigs } from '@/features/world/api/useCalendarConfigs';
@@ -63,6 +64,7 @@ export function InGameDateField({
   const { data: settings } = useWorldSettings(worldId);
   const { data: calendars = [] } = useCalendarConfigs(worldId);
   const defaultDate = useDefaultInGameDate(worldId);
+  const uid = useId();
 
   const activeCalendar = settings?.timelineCalendarSlug
     ? calendars.find((c) => c.slug === settings.timelineCalendarSlug)
@@ -113,9 +115,10 @@ export function InGameDateField({
         )}
       </div>
       <div className={s.grid}>
-        <label className={s.field}>
+        <label className={s.field} htmlFor={`${uid}-day`}>
           <span className={s.fieldLabel}>Den</span>
           <Input
+            id={`${uid}-day`}
             type="number"
             value={clampedDay}
             onChange={(e) =>
@@ -141,9 +144,10 @@ export function InGameDateField({
             ))}
           </select>
         </label>
-        <label className={s.field}>
+        <label className={s.field} htmlFor={`${uid}-year`}>
           <span className={s.fieldLabel}>Rok</span>
           <Input
+            id={`${uid}-year`}
             type="number"
             value={effective.year}
             onChange={(e) =>
@@ -156,9 +160,10 @@ export function InGameDateField({
         </label>
         {allowHour && (
           <>
-            <label className={s.field}>
+            <label className={s.field} htmlFor={`${uid}-hour`}>
               <span className={s.fieldLabel}>Hodina</span>
               <Input
+                id={`${uid}-hour`}
                 type="number"
                 value={effective.hour ?? 12}
                 onChange={(e) =>
@@ -169,9 +174,10 @@ export function InGameDateField({
                 data-testid="igdf-hour"
               />
             </label>
-            <label className={s.field}>
+            <label className={s.field} htmlFor={`${uid}-minute`}>
               <span className={s.fieldLabel}>Minuta</span>
               <Input
+                id={`${uid}-minute`}
                 type="number"
                 value={effective.minute ?? 0}
                 onChange={(e) =>

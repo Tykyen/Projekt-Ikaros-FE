@@ -9,10 +9,20 @@ Snížit / vyčistit **1284 ESLint warningů** ve FE (`Projekt-ikaros-FE`). Vět
 UI + čistá CI. **0 errorů**, takže nic teď nehoří — je to kvalitativní dluh.
 
 ## Stav
-- ✅ **Config fix HOTOV (2026-07-10)** — kořen napraven, `npx eslint .` → **345 warningů, 0 errorů**
-  (z 1284, −73 %). Detail v chybovém deníku [fe.md ✅ ŘEŠENÍ + CH-068]. Zbývá **345 reálných** nálezů (rozpad níž).
-- ~~`npx eslint .` → **1284 warningů, 0 errorů, 246 souborů**~~ (stav před config fixem). CI je na úrovni `warn`
-  (neblokuje), zapnuto v kroku 17.8 (jsx-a11y `warn`, eslint 10 + `legacy-peer-deps`).
+- ✅✅✅ **HOTOVO (2026-07-10)** — `npx eslint .` → **15 warningů, 0 errorů** (z 1284, **−98,8 %**).
+  **Žádný a11y ani react-hooks warning nezbývá.** Zbývajících 15 = jen `react-refresh/only-export-components`
+  = **NENÍ bug** (HMR dev-experience: soubor exportuje komponentu + helper). jsonLd.tsx 11 (case-collision historie
+  CH-019 → split rizikový) + FateLikeSheet/CocBestieCombatActions/GurpsBestieCombatActions/RoleStar po 1. Ponecháno
+  jako acknowledged tech-debt (per config „postupně refaktorujeme").
+- Postup: config fix (1284→345) → dávka 1 label-association (76, →269) → dávka 2 klikací cluster (139, →130)
+  → dávka 3 aria+treeitem (11, →119) + autofocus block-disable (36, →83) → dávka B react-hooks (68, →15).
+  Vše build + dávkové specy ověřeno. Detail: [fe.md ✅ ŘEŠENÍ + CH-068/069].
+- **Dávka B highlight:** `react-hooks/refs` 51 → root fix = destrukturovat `useVoice()` výsledek (member-access
+  `voice.X` na hook-výsledku s refem plošně false-flaguje); `exhaustive-deps` 3 memoizace; zbytek confirmed-safe
+  justified-disable / dead-disable removal.
+- Sdílený helper: [`src/shared/lib/a11y.ts`](../../src/shared/lib/a11y.ts) `activateOnKey` (Enter/mezerník pro role=button spany).
+- Config: `eslint.config.js` — severity fix + `aria-role: {ignoreNonDOM:true}`.
+- ~~1284 warningů~~ (výchozí stav). CI `warn` (neblokuje), krok 17.8.
 - Kompletní rozpis po souborech: **[docs/a11y-cleanup/warnings-by-file.md](./warnings-by-file.md)** (worklist, seřazeno dle počtu).
 - Předchozí a11y v1 (17.8): sdílený `useFocusTrap`, KebabMenu roving-tabindex. Tehdy
   vědomě rozhodnuto **nemigrovat na IconButton** (nebyl to a11y problém) — pozor, ať

@@ -46,9 +46,12 @@ export function DiarySkinSelector({ active, onPick, disabled }: Props) {
         🎨 Vzhled <span className="diary-skin-picker__cur">{activeMeta.emoji} {activeMeta.label}</span>
       </button>
       {open && (
-        <ul className="diary-skin-picker__menu" role="menu">
+        // Menu jako <div> (ne <ul>): role="menu" na <ul> spouští
+        // no-noninteractive-element-to-interactive-role; div + role="menuitemradio"
+        // na tlačítkách je validní menu.
+        <div className="diary-skin-picker__menu" role="menu">
           {DIARY_SKINS.map((s) => (
-            <li key={s.id} role="none">
+            <div key={s.id} role="none">
               <button
                 type="button"
                 role="menuitemradio"
@@ -63,9 +66,9 @@ export function DiarySkinSelector({ active, onPick, disabled }: Props) {
                 {s.label}
                 {s.id === active && <span className="diary-skin-picker__check">✓</span>}
               </button>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

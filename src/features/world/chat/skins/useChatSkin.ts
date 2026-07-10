@@ -38,6 +38,7 @@ function useRootThemeId(): string {
       attributes: true,
       attributeFilter: ['data-theme'],
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- jednorázový sync na aktuální DOM data-theme při mountu (řeší race render↔effect)
     setId(readRootTheme());
     return () => obs.disconnect();
   }, []);

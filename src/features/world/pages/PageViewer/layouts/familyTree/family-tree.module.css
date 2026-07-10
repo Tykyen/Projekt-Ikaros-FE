@@ -331,7 +331,10 @@
   cursor: pointer;
   font-size: 15px;
 }
-.panel label {
+/* `.fieldCaption` = skupinový popisek (span) nad widgetem bez jednoho přímého
+   inputu (foto/odkaz/akce) — stejný vzhled jako `<label>`, ale bez falešného htmlFor. */
+.panel label,
+.panel .fieldCaption {
   display: block;
   margin: 12px 0 5px;
   font: 700 10.5px/1 var(--font-body, sans-serif);

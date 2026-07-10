@@ -180,7 +180,6 @@ export function MapWeatherPanel({
             </div>
           )}
 
-          {/* eslint-disable-next-line jsx-a11y/label-has-for -- label obaluje input (nesting); label-has-for je deprecated, nesting je platný a11y vzor */}
           <label className={styles.fxRow}>
             <input
               type="checkbox"

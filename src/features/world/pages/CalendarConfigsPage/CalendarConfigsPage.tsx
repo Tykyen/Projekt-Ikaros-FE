@@ -299,6 +299,7 @@ function CreateModal({
           <label className={s.label} htmlFor="cc-name">
             Název
           </label>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
           <input
             id="cc-name"
             className={s.field}
@@ -307,6 +308,7 @@ function CreateModal({
             placeholder="Např. Elfí kalendář"
             autoFocus
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </div>
         <div>
           <label className={s.label} htmlFor="cc-slug">

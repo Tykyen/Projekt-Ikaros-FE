@@ -67,6 +67,7 @@ export function LinkPickerPopover({
   // Reset stavu při každém otevření; předvyplň hledání označeným textem.
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset hledání při otevření popoveru (intencionální)
       setQuery(initialQuery ?? '');
       setUrlDraft('');
       inputRef.current?.focus();
@@ -94,7 +95,9 @@ export function LinkPickerPopover({
     };
   }, [open, onClose, anchorRef]);
 
-  const dir = directory ?? [];
+  // Stabilní reference — `directory ?? []` by jinak byl nový `[]` každý render
+  // → memo/odvozené hodnoty níž by se přepočítávaly zbytečně (exhaustive-deps).
+  const dir = useMemo(() => directory ?? [], [directory]);
   const matches = useMemo(
     () => rankPageSuggestions(dir, query),
     [dir, query],
@@ -234,6 +237,7 @@ export function LinkPickerPopover({
 
       {allowUrl && (
         <div className={s.urlRow}>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do URL pole při otevření je záměr: popover se otevře na akci uživatele a trapuje fokus */}
           <input
             type="text"
             value={urlDraft}
@@ -248,6 +252,7 @@ export function LinkPickerPopover({
               }
             }}
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
           <button
             type="button"
             className={s.urlBtn}

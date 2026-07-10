@@ -68,16 +68,27 @@ export function VoiceKrcmaRoom() {
   const [params] = useSearchParams();
   // Pop-out okno (window.open): jen hlasová plocha, bez postranního pokecu.
   const isPopout = params.get('popout') === '1';
-  const voice = useVoice({
+  const {
+    containerRef,
+    joined,
+    connecting,
+    error,
+    local,
+    join,
+    leave,
+    toggleMic,
+    toggleCam,
+    toggleScreen,
+  } = useVoice({
     roomName: jitsiRoomName(ROOM),
     displayName: user?.username,
   });
-  const { roster, sendState } = useVoicePresence(ROOM, voice.joined);
+  const { roster, sendState } = useVoicePresence(ROOM, joined);
 
   // Změnu vlastního mikrofonu/kamery hlásíme do rosteru ostatních.
   useEffect(() => {
-    if (voice.joined) sendState(voice.local.muted, voice.local.cam);
-  }, [voice.joined, voice.local.muted, voice.local.cam, sendState]);
+    if (joined) sendState(local.muted, local.cam);
+  }, [joined, local.muted, local.cam, sendState]);
 
   const openPopout = () => {
     window.open(
@@ -91,7 +102,7 @@ export function VoiceKrcmaRoom() {
 
   return (
     <div className={s.wrap} data-popout={isPopout || undefined}>
-      <section className={s.voice} data-joined={voice.joined || undefined}>
+      <section className={s.voice} data-joined={joined || undefined}>
         <span className={s.frieze} aria-hidden />
         <header className={s.head}>
           <h1 className={s.title}>
@@ -117,7 +128,7 @@ export function VoiceKrcmaRoom() {
         </header>
 
         <div className={s.stage}>
-          {voice.joined && count > 0 && (
+          {joined && count > 0 && (
             <div className={s.rosterBar}>
               {roster.map((p) => (
                 <Participant key={p.userId} p={p} compact />
@@ -129,17 +140,17 @@ export function VoiceKrcmaRoom() {
               Viditelný i během připojování, ať je vidět prompt na mikrofon. */}
           <div
             className={s.jitsi}
-            ref={voice.containerRef}
-            aria-hidden={!voice.joined && !voice.connecting}
+            ref={containerRef}
+            aria-hidden={!joined && !connecting}
           />
 
-          {voice.connecting && (
+          {connecting && (
             <div className={s.connecting} aria-live="polite">
               Připojuji ke krčmě — povol prosím mikrofon v prohlížeči…
             </div>
           )}
 
-          {!voice.joined && !voice.connecting && (
+          {!joined && !connecting && (
             <div className={s.lobby}>
               {count > 0 ? (
                 <ul className={s.tiles}>
@@ -157,41 +168,41 @@ export function VoiceKrcmaRoom() {
               <button
                 type="button"
                 className={s.enter}
-                onClick={voice.join}
-                disabled={voice.connecting}
+                onClick={join}
+                disabled={connecting}
               >
                 <Mic size={18} />
-                {voice.connecting ? 'Připojuji…' : 'Usednout k mikrofonu'}
+                {connecting ? 'Připojuji…' : 'Usednout k mikrofonu'}
               </button>
-              {voice.error && <p className={s.err}>{voice.error}</p>}
+              {error && <p className={s.err}>{error}</p>}
             </div>
           )}
 
-          {voice.joined && (
+          {joined && (
             <div className={s.controls} role="toolbar" aria-label="Ovládání hovoru">
               <button
                 type="button"
                 className={s.ctl}
-                data-off={voice.local.muted || undefined}
-                onClick={voice.toggleMic}
-                aria-label={voice.local.muted ? 'Zapnout mikrofon' : 'Ztlumit mikrofon'}
+                data-off={local.muted || undefined}
+                onClick={toggleMic}
+                aria-label={local.muted ? 'Zapnout mikrofon' : 'Ztlumit mikrofon'}
               >
-                {voice.local.muted ? <MicOff size={20} /> : <Mic size={20} />}
+                {local.muted ? <MicOff size={20} /> : <Mic size={20} />}
               </button>
               <button
                 type="button"
                 className={s.ctl}
-                data-on={voice.local.cam || undefined}
-                onClick={voice.toggleCam}
-                aria-label={voice.local.cam ? 'Vypnout kameru' : 'Zapnout kameru'}
+                data-on={local.cam || undefined}
+                onClick={toggleCam}
+                aria-label={local.cam ? 'Vypnout kameru' : 'Zapnout kameru'}
               >
-                {voice.local.cam ? <Video size={20} /> : <VideoOff size={20} />}
+                {local.cam ? <Video size={20} /> : <VideoOff size={20} />}
               </button>
               <button
                 type="button"
                 className={s.ctl}
-                data-on={voice.local.screen || undefined}
-                onClick={voice.toggleScreen}
+                data-on={local.screen || undefined}
+                onClick={toggleScreen}
                 aria-label="Sdílet obrazovku"
               >
                 <MonitorUp size={20} />
@@ -199,7 +210,7 @@ export function VoiceKrcmaRoom() {
               <button
                 type="button"
                 className={`${s.ctl} ${s.leave}`}
-                onClick={voice.leave}
+                onClick={leave}
                 aria-label="Odejít z hovoru"
               >
                 <PhoneOff size={20} />

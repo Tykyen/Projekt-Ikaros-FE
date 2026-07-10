@@ -48,7 +48,12 @@ export function ClearSceneDialog({
   };
 
   return (
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (zavírací tlačítko „Zrušit"), overlay tak nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className={styles.backdrop} onClick={onClose}>
+      {/* Obsahový obal: onClick jen stopPropagation; zavření přes tlačítko. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <div
         className={styles.dialog}
         onClick={(e) => e.stopPropagation()}

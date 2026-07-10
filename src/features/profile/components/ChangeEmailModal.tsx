@@ -86,7 +86,8 @@ export function ChangeEmailModal({ open, onClose, currentEmail }: Props) {
         </p>
 
         <div>
-          <label
+          {/* jen popisek read-only zobrazení e-mailu (žádný control) → span */}
+          <span
             style={{
               display: 'block',
               fontSize: 'var(--text-xs)',
@@ -95,10 +96,11 @@ export function ChangeEmailModal({ open, onClose, currentEmail }: Props) {
             }}
           >
             Aktuální e-mail
-          </label>
+          </span>
           <div className={s.currentEmail}>{currentEmail}</div>
         </div>
 
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli nového e-mailu */}
         <Input
           label="Nový e-mail"
           type="email"
@@ -111,6 +113,7 @@ export function ChangeEmailModal({ open, onClose, currentEmail }: Props) {
           error={errors.newEmail?.message}
           {...register('newEmail')}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         <div className={s.passwordWrap}>
           <Input

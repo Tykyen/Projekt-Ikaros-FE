@@ -76,8 +76,9 @@ export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
         <div className="hero">
           <div
             className="erb"
-            role={disabled ? undefined : 'button'}
-            tabIndex={disabled ? undefined : 0}
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled || undefined}
             title={disabled ? undefined : 'Klikni pro výběr povolání'}
             onClick={(e) => {
               if (disabled) return;
@@ -138,7 +139,9 @@ export function DrdhSheet({ diary, mode, onChange, onRoll }: SystemSheetProps) {
                 className="erb-pop open"
                 role="listbox"
                 aria-label="Výběr povolání"
+                tabIndex={-1}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
               >
                 {DRDH_PROFESSIONS.map((p) => (
                   <button
@@ -492,7 +495,8 @@ function ResourceBox({
                   key={n}
                   className={`adr-cell${n <= cur ? ' on' : ''}`}
                   role="button"
-                  tabIndex={disabled ? undefined : 0}
+                  tabIndex={disabled ? -1 : 0}
+                  aria-disabled={disabled || undefined}
                   aria-pressed={n <= cur}
                   aria-label={`Adrenalin ${n}`}
                   onClick={() => {

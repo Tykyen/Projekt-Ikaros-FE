@@ -52,7 +52,7 @@ export default function HelpPage() {
         </p>
       </header>
 
-      <nav className={s.tabs} role="tablist" aria-label="Sekce nápovědy">
+      <div className={s.tabs} role="tablist" aria-label="Sekce nápovědy">
         {HELP_TABS.map((t) => (
           <button
             key={t}
@@ -65,7 +65,7 @@ export default function HelpPage() {
             {TAB_LABELS[t]}
           </button>
         ))}
-      </nav>
+      </div>
 
       <section className={s.content} aria-live="polite">
         <Section />

@@ -91,9 +91,10 @@ export function SoundFormModal({
       title={existing ? 'Upravit zvuk' : 'Nový zvuk'}
     >
       <div className={styles.form}>
-        <label className={styles.field}>
+        <label className={styles.field} htmlFor="sound-name">
           <span className={styles.label}>Název *</span>
           <Input
+            id="sound-name"
             value={form.name}
             onChange={(e) => set('name', e.target.value)}
             placeholder="např. Bitva u brány"

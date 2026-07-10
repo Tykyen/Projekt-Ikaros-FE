@@ -37,6 +37,7 @@ export function PinMarker({ pin, dead = false, size = 30 }: Props) {
         } as React.CSSProperties
       }
     >
+      {/* eslint-disable-next-line react-hooks/static-components -- Icon je stabilní lucide komponenta z pinIcon() lookupu, ne inline definice; žádný remount */}
       <Icon size={Math.round(size * 0.52)} strokeWidth={2} aria-hidden />
       <span className={s.flagBadge}>
         <BadgeIcon size={Math.round(size * 0.34)} strokeWidth={2.4} aria-hidden />

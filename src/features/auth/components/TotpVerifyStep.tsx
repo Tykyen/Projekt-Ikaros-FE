@@ -86,6 +86,7 @@ export function TotpVerifyStep({ open, challengeId, onCancel }: Props) {
             : 'Otevři aplikaci authenticator a opiš 6místný kód.'}
         </p>
 
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli ověřovacího kódu */}
         <Input
           label={useBackup ? 'Záložní kód' : 'Ověřovací kód'}
           autoFocus
@@ -97,6 +98,7 @@ export function TotpVerifyStep({ open, challengeId, onCancel }: Props) {
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         <button
           type="button"

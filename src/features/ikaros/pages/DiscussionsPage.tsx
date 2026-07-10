@@ -45,7 +45,7 @@ export default function DiscussionsPage() {
         </Link>
       </header>
 
-      <nav className={s.tabs} role="tablist">
+      <div className={s.tabs} role="tablist">
         <button
           type="button"
           role="tab"
@@ -64,7 +64,7 @@ export default function DiscussionsPage() {
         >
           Moje
         </button>
-      </nav>
+      </div>
 
       <div className={s.toolbar}>
         <label className={s.searchWrap}>

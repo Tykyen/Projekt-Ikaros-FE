@@ -195,6 +195,9 @@ function OzvatModal({ nabor, onClose }: { nabor: Nabor; onClose: () => void }) {
   }
 
   return (
+    // Klik na scrim (mimo modal) zavírá dialog; klávesová cesta existuje
+    // (tlačítko „Zrušit"), overlay nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className={s.scrim}
       role="dialog"
@@ -202,11 +205,14 @@ function OzvatModal({ nabor, onClose }: { nabor: Nabor; onClose: () => void }) {
       aria-label={`Ozvat se na nábor ${nabor.title}`}
       onClick={onClose}
     >
+      {/* onClick jen zastavuje probublání (klik uvnitř modalu nezavírá); není to interaktivní prvek. */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div className={s.modal} onClick={(e) => e.stopPropagation()}>
         <h2 className={s.modalTitle}>Ozvat se — {nabor.title}</h2>
         <p className={s.modalHint}>
           Zpráva půjde přímo autorovi ({nabor.authorName}).
         </p>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli zprávy */}
         <textarea
           className={s.textarea}
           value={msg}
@@ -215,6 +221,7 @@ function OzvatModal({ nabor, onClose }: { nabor: Nabor; onClose: () => void }) {
           rows={4}
           autoFocus
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
         <div className={s.modalFoot}>
           <button type="button" className={s.ghostBtn} onClick={onClose}>
             Zrušit

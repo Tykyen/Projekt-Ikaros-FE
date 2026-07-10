@@ -222,6 +222,7 @@ export function GameEventModal({
       size="md"
     >
       <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
         <Input
           label="Název akce *"
           type="text"
@@ -231,6 +232,7 @@ export function GameEventModal({
           error={errors.title?.message}
           {...register('title')}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         <div className={s.fieldWrap}>
           <label htmlFor="ge-date" className={s.label}>
@@ -249,7 +251,8 @@ export function GameEventModal({
         </div>
 
         <div className={s.fieldWrap}>
-          <label className={s.label}>Obrázek (volitelně, max 10 MB)</label>
+          {/* skupinový popisek uploadu obrázku (víc controlů) → span, ne label */}
+          <span className={s.label}>Obrázek (volitelně, max 10 MB)</span>
           {imageUrl ? (
             <>
               <div className={s.imagePreview}>

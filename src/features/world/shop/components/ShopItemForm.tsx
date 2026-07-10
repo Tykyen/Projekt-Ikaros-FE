@@ -194,7 +194,8 @@ export function ShopItemForm({
         </div>
 
         <div className={s.formRow}>
-          <label className={s.fieldLabel}>
+          {/* složený widget (částka + měna = víc controlů) → span, ne label */}
+          <span className={s.fieldLabel}>
             Cena
             <CurrencyAmountInput
               amount={amount}
@@ -203,7 +204,7 @@ export function ShopItemForm({
               onCurrencyChange={setCurrencyCode}
               items={currencyItems}
             />
-          </label>
+          </span>
 
           <Input
             label="Sleva %"

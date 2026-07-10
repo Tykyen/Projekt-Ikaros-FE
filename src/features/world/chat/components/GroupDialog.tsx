@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
 import { Modal, Button, Input } from '@/shared/ui';
@@ -41,6 +41,7 @@ export function GroupDialog({
   const [iconKey, setIconKey] = useState<string | undefined>(initial?.iconKey);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const uid = useId();
 
   const createGroup = useCreateGroup(worldId);
   const updateGroup = useUpdateGroup(worldId);
@@ -153,15 +154,18 @@ export function GroupDialog({
       }
     >
       <div className={s.form}>
-        <label className={s.field}>
+        <label htmlFor={`${uid}-name`} className={s.field}>
           <span className={s.label}>Název kanálu</span>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli názvu */}
           <Input
+            id={`${uid}-name`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="např. Evropani"
             maxLength={64}
             autoFocus
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </label>
 
         <div className={s.field}>

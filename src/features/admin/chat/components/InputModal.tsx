@@ -28,6 +28,7 @@ export function InputModal({
   const [value, setValue] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- předvyplnění hodnoty při otevření (intencionální)
     if (open) setValue(initialValue ?? '');
   }, [open, initialValue]);
 
@@ -62,6 +63,7 @@ export function InputModal({
     >
       <div className={s.field}>
         {label && <label className={s.label}>{label}</label>}
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli */}
         <input
           className={s.input}
           value={value}
@@ -72,6 +74,7 @@ export function InputModal({
           placeholder={placeholder}
           autoFocus
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
       </div>
     </Modal>
   );

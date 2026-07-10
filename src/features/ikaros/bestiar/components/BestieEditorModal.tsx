@@ -187,7 +187,8 @@ export function BestieEditorModal({ mode, bestie, onClose, onSaved }: Props) {
       </div>
 
       <div className={s.field}>
-        <label className={s.label}>Obrázek</label>
+        {/* skupinový popisek uploadu (HeroUploadCard = vlastní widget) → span */}
+        <span className={s.label}>Obrázek</span>
         <HeroUploadCard
           value={imageUrl}
           onChange={setImageUrl}

@@ -9,7 +9,7 @@ export function ThemeSwitcher() {
   const [open, setOpen] = useState(false);
   const [focusIndex, setFocusIndex] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const popoverRef = useRef<HTMLUListElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   // Krok 5.7 — platformový switcher nabízí jen platformové skiny;
   // světové vzhledy (ikaros, žánrové) sem nepatří.
@@ -50,7 +50,7 @@ export function ThemeSwitcher() {
     setOpen(false);
   };
 
-  const onKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setFocusIndex((i) => Math.min(i + 1, themes.length - 1));
@@ -86,7 +86,10 @@ export function ThemeSwitcher() {
       </button>
 
       {open && (
-        <ul
+        // Listbox jako <div> (ne <ul>): role="listbox" na <ul> spouští
+        // no-noninteractive-element-to-interactive-role; div + role="option"
+        // na tlačítkách je kanonický ARIA listbox.
+        <div
           ref={popoverRef}
           className={s.popover}
           role="listbox"
@@ -100,7 +103,7 @@ export function ThemeSwitcher() {
             const optionStyle: CSSProperties = {};
             if (t.background) optionStyle.backgroundImage = `url(${t.background})`;
             return (
-              <li key={t.id}>
+              <div key={t.id} role="presentation">
                 <button
                   type="button"
                   id={`theme-option-${idx}`}
@@ -120,10 +123,10 @@ export function ThemeSwitcher() {
                   </span>
                   {t.id === themeId && <span className={s.optionCheck} aria-hidden="true">✓</span>}
                 </button>
-              </li>
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
     </div>
   );

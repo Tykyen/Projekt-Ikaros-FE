@@ -94,6 +94,7 @@ export function BestieCard({
               <path d="M6 9l6 6 6-6" />
             </svg>
           </span>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick jen stopPropagation (klik na akce nesmí přepnout kartu); reálné akce = vnořená <Button>, obal nesmí být role=button (nested interactive) */}
           <div
             className={`${styles.actions} print-hide`}
             onClick={(e) => e.stopPropagation()}

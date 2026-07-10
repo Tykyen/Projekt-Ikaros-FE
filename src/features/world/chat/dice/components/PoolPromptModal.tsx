@@ -104,7 +104,12 @@ export const PoolPromptModal: React.FC<PoolPromptModalProps> = ({
   // Portál do body — stejný důvod jako u SkinPickerPanel: `fixed` backdrop se
   // jinak vztahuje k předkovi s `transform` (mapa) a modal skončí mimo střed.
   return createPortal(
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (Esc handler + zavírací křížek), overlay tak nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className={styles.backdrop} onClick={onClose}>
+      {/* Obsahový obal: onClick jen stopPropagation; zavření přes Esc/křížek. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <div
         className={styles.modal}
         role="dialog"

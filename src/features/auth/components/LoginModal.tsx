@@ -159,6 +159,7 @@ export function LoginModal() {
   return (
     <Modal open={open} onClose={close} title="Přihlášení" size="sm">
       <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: Modal trapuje fokus, uživatel čeká kurzor v přihlašovacím poli */}
         <Input
           label="E-mail nebo přezdívka"
           autoFocus
@@ -170,6 +171,7 @@ export function LoginModal() {
           error={errors.identifier?.message}
           {...register('identifier')}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         <div className={s.passwordWrap}>
           <Input

@@ -62,6 +62,9 @@ export function SoundBroadcastButton({
 
       {open && (
         <>
+          {/* Klikací backdrop zavírá popover; klávesová cesta existuje (toggle
+              tlačítko níže), overlay nemusí být fokusovatelný. */}
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
           <div className={s.backdrop} onClick={() => setOpen(false)} />
           <div className={s.popover}>
             <div className={s.urlRow}>

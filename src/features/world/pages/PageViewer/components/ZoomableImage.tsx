@@ -144,16 +144,24 @@ export function ZoomableImage({
   };
 
   return (
+    // Region je záměrně fokusovatelný s klávesovou obsluhou zoom/pan (šipky,
+    // +/−, 0) a myší (drag na canvasu). role="region" je sémanticky správně —
+    // není to tlačítko, jen composite widget s vlastními controls uvnitř.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       ref={containerRef}
       className={clsx(s.container, isFullscreen && s.fullscreen)}
       style={{ height: isFullscreen ? '100dvh' : height }}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       onKeyDown={onKey}
       data-no-lightbox
       role="region"
       aria-label={`Zoomovatelný obrázek: ${alt}`}
     >
+      {/* Drag plocha pro pan; myší gesto. Klávesová alternativa (šipky) je na
+          rodičovském regionu výše. */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div
         className={s.canvas}
         onMouseDown={onMouseDown}

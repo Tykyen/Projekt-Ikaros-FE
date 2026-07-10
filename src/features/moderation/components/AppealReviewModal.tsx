@@ -104,6 +104,7 @@ export function AppealReviewModal({ open, onClose, item, onReviewed }: Props) {
                 <input
                   className={s.radioInput}
                   type="radio"
+                  aria-label={APPEAL_OUTCOME_LABELS[o]}
                   name={`${uid}-outcome`}
                   value={o}
                   checked={outcome === o}

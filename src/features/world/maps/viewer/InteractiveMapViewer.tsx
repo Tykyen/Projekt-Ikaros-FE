@@ -136,7 +136,6 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
     };
     el.addEventListener('wheel', handler, { passive: false });
     return () => el.removeEventListener('wheel', handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fitovaný box obrázku (contain) uvnitř stage.
@@ -161,7 +160,9 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
     return () => document.removeEventListener('keydown', onKey);
   }, [editor, readPin, scenePop, chatPop, onClose]);
 
-  const pins = map?.pins ?? [];
+  // Stabilní reference — `map?.pins ?? []` by jinak byl nový `[]` každý render
+  // → memo hodnoty (deadIds, pinsForRender) by se přepočítávaly (exhaustive-deps).
+  const pins = useMemo(() => map?.pins ?? [], [map?.pins]);
   const accessibleMapIds = useMemo(
     () => new Set(maps.map((m) => m.id)),
     [maps],
@@ -393,6 +394,9 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
 
   if (!map) {
     return createPortal(
+      // Klik na overlay (mimo obsah) zavírá; klávesová cesta existuje (tlačítko
+      // „Zavřít"), overlay nemusí být fokusovatelný.
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         className={s.overlay}
         ref={overlayRef}
@@ -416,6 +420,9 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
   const linked = !!map.linkedSceneId;
 
   return createPortal(
+    // Klik na overlay (mimo obsah) zavírá; klávesová cesta existuje (tlačítko
+    // „Zavřít" v topbaru), overlay nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={s.overlay}
       ref={overlayRef}
@@ -518,6 +525,8 @@ export function InteractiveMapViewer({ worldId, mapId, onClose }: Props) {
               transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
             }}
           >
+            {/* onLoad jen měří poměr stran obrázku, není to uživatelská interakce. */}
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
             <img
               className={s.img}
               src={map.imageUrl}
@@ -709,5 +718,6 @@ function MapTooltip({
 
 function ReadIcon({ icon }: { icon: string }) {
   const Icon = pinIcon(icon) ?? Info;
+  // eslint-disable-next-line react-hooks/static-components -- Icon je stabilní lucide komponenta z pinIcon() lookupu, ne inline definice; žádný remount
   return <Icon size={16} aria-hidden />;
 }

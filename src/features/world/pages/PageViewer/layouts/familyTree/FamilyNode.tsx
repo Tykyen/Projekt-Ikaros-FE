@@ -42,6 +42,7 @@ export function FamilyNode({
       };
   const dates = formatDates(person);
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- uzel je drag cíl v editoru (obsahuje vnořená mini-tlačítka příbuzných → nelze role=button) / navigační dlaždice v náhledu
     <div
       className={className}
       style={style}

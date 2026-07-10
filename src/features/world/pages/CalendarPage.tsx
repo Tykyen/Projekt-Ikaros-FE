@@ -581,6 +581,7 @@ export default function CalendarPage() {
                     </option>
                   ))}
                 </select>
+                {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do pole při otevření skok-popoveru (role=dialog) je záměr */}
                 <input
                   type="number"
                   className={`${s.jumpField} ${s.jumpYear}`}
@@ -595,6 +596,7 @@ export default function CalendarPage() {
                   aria-label="Rok"
                   autoFocus
                 />
+                {/* eslint-enable jsx-a11y/no-autofocus */}
                 <button
                   type="button"
                   className={s.jumpApply}

@@ -695,6 +695,9 @@ export function WorldLayout() {
         {/* Mobile drawer (zprava) — jen pro membery */}
         {showFullNav && (
           <>
+            {/* Klikací backdrop zavírá drawer; klávesová cesta existuje (Esc /
+                focus trap draweru), overlay nemusí být fokusovatelný. */}
+            {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
             <div
               className={clsx(s.drawerBackdrop, drawerOpen && s.drawerBackdropOpen)}
               onClick={() => setDrawerOpen(false)}

@@ -25,7 +25,12 @@ export function KeyboardShortcutsHelp({ open, onClose, canEdit }: Props) {
   if (!open) return null;
 
   return createPortal(
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (zavírací křížek).
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <div className={s.overlay} role="dialog" aria-modal="true" onClick={onClose}>
+      {/* Obsahový obal: onClick jen stopPropagation; zavření přes křížek. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <div
         className={s.panel}
         onClick={(e) => e.stopPropagation()}

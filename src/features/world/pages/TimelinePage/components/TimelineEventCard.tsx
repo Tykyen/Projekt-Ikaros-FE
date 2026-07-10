@@ -168,6 +168,7 @@ export function TimelineEventCard({
           onClick={onLightbox}
           aria-label="Zvětšit obrázek"
         >
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onError = fallback při selhání načtení obrázku, ne uživatelská interakce */}
           <img
             src={event.imageUrl ?? undefined}
             alt={event.title}

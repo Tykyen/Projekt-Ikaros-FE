@@ -183,6 +183,7 @@ export function RegisterModal() {
       {/* eslint-disable-next-line react-hooks/refs -- RHF idiom: onSubmit čte captchaRef až při submitu, ne při renderu (R19 false-positive) */}
       <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className={s.fieldWrap}>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli e-mailu */}
           <Input
             label="E-mail"
             type="email"
@@ -196,6 +197,7 @@ export function RegisterModal() {
             error={errors.email?.message}
             {...rhfRegister('email')}
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
           <span className={s.fieldIcon}>
             <AvailabilityIcon status={emailStatus} />
           </span>

@@ -15,6 +15,7 @@ import { usePrintMode } from '@/features/world/export/print';
 import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
+import { activateOnKey } from '@/shared/lib/a11y';
 import {
   MATRIX_PRESSURE_TYPES,
   MATRIX_SKILL_MAX_PC,
@@ -290,7 +291,7 @@ function LanguagesPanel({ cda, editing }: SubProps) {
                 onChange={(e) => updateArr<MatrixTagValue>('languages', i, { label: e.target.value })}
                 placeholder="Jazyk"
               />
-              <span className="mx-del" onClick={() => removeArr('languages', i)} role="button" aria-label="Smazat jazyk">
+              <span className="mx-del" onClick={() => removeArr('languages', i)} onKeyDown={activateOnKey(() => removeArr('languages', i))} role="button" tabIndex={0} aria-label="Smazat jazyk">
                 ✕
               </span>
             </div>
@@ -563,7 +564,7 @@ function SkillsPanel({
                     {lvl}
                     <small>/{skillMax}</small>
                   </span>
-                  <span className="mx-del" onClick={() => removeArr('abilities', i)} role="button" aria-label="Smazat schopnost">
+                  <span className="mx-del" onClick={() => removeArr('abilities', i)} onKeyDown={activateOnKey(() => removeArr('abilities', i))} role="button" tabIndex={0} aria-label="Smazat schopnost">
                     ✕
                   </span>
                 </>
@@ -649,12 +650,14 @@ function AspectsPanel({ cda, editing }: SubProps) {
                 className={`mx-chip ${charged ? 'charged' : 'depleted'}`}
                 style={{ cursor: 'pointer' }}
                 onClick={() => updateArr<MatrixTagValue>('aspects', i, { value: charged ? 'Vybitý' : 'Nabitý' })}
+                onKeyDown={activateOnKey(() => updateArr<MatrixTagValue>('aspects', i, { value: charged ? 'Vybitý' : 'Nabitý' }))}
                 role="button"
+                tabIndex={0}
                 aria-pressed={charged}
               >
                 {charged ? 'Nabitý' : 'Vybitý'}
               </span>
-              <span className="mx-del" onClick={() => removeArr('aspects', i)} role="button" aria-label="Smazat aspekt">
+              <span className="mx-del" onClick={() => removeArr('aspects', i)} onKeyDown={activateOnKey(() => removeArr('aspects', i))} role="button" tabIndex={0} aria-label="Smazat aspekt">
                 ✕
               </span>
             </div>

@@ -2,6 +2,8 @@
  * 16.2d — sdílené stavební prvky DrD+ deníku (pergamen-kodex).
  * Vše controlled / napojené na cdAccess; ve view mode (disabled) read-only.
  */
+import { useId } from 'react';
+import { activateOnKey } from '@/shared/lib/a11y';
 import type { CdAccess } from '../../_shared/cdAccess';
 import { PRIEST_PRINCIPLES, PRIEST_PRINCIPLE_BUDGET } from './constants';
 
@@ -23,11 +25,18 @@ export function Scale({
 }) {
   const pips = [];
   for (let i = 1; i <= max; i++) {
+    const set = () => onChange(i === value ? 0 : i);
     pips.push(
       <span
         key={i}
         className={'dp-pip' + (i <= value ? ' is-on' : '')}
-        onClick={disabled ? undefined : () => onChange(i === value ? 0 : i)}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-label={`Nastavit ${i}`}
+        aria-pressed={i <= value}
+        aria-disabled={disabled || undefined}
+        onClick={disabled ? undefined : set}
+        onKeyDown={disabled ? undefined : activateOnKey(set)}
       />,
     );
   }
@@ -53,13 +62,22 @@ export function Tri({
 }) {
   return (
     <span className="dp-tri">
-      {[1, 2, 3].map((i) => (
-        <span
-          key={i}
-          className={'dp-pip' + (i <= value ? ' is-on' : '')}
-          onClick={disabled ? undefined : () => onChange(i === value ? 0 : i)}
-        />
-      ))}
+      {[1, 2, 3].map((i) => {
+        const set = () => onChange(i === value ? 0 : i);
+        return (
+          <span
+            key={i}
+            className={'dp-pip' + (i <= value ? ' is-on' : '')}
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-label={`Nastavit ${i}`}
+            aria-pressed={i <= value}
+            aria-disabled={disabled || undefined}
+            onClick={disabled ? undefined : set}
+            onKeyDown={disabled ? undefined : activateOnKey(set)}
+          />
+        );
+      })}
     </span>
   );
 }
@@ -76,6 +94,7 @@ export function WoundGrid({
   label: string;
   disabled?: boolean;
 }) {
+  const uid = useId();
   const mez = Math.max(1, parseInt(cda.g(`${prefix}_mez`, '10'), 10) || 10);
   const smrt = cda.bool(`${prefix}_smrt`);
   const filled = parseInt(cda.g(`${prefix}_val`, '0'), 10) || 0;
@@ -117,19 +136,22 @@ export function WoundGrid({
           <div className="dp-wcells">
             {Array.from({ length: mez }, () => {
               const cellIndex = idx++;
+              const set = () =>
+                cda.set(
+                  `${prefix}_val`,
+                  cellIndex + 1 === filled ? 0 : cellIndex + 1,
+                );
               return (
                 <span
                   key={cellIndex}
                   className={'dp-wcell' + (cellIndex < filled ? ' is-on' : '')}
-                  onClick={
-                    disabled
-                      ? undefined
-                      : () =>
-                          cda.set(
-                            `${prefix}_val`,
-                            cellIndex + 1 === filled ? 0 : cellIndex + 1,
-                          )
-                  }
+                  role="button"
+                  tabIndex={disabled ? -1 : 0}
+                  aria-label={`Zranění ${cellIndex + 1}`}
+                  aria-pressed={cellIndex < filled}
+                  aria-disabled={disabled || undefined}
+                  onClick={disabled ? undefined : set}
+                  onKeyDown={disabled ? undefined : activateOnKey(set)}
                 />
               );
             })}
@@ -138,8 +160,9 @@ export function WoundGrid({
       ))}
       {/* 16.2d-mapa — postih za toto pásmo (číslo, odečítá se od hodů; sdíleno s TM panelem) */}
       <div className="dp-wctl" style={{ marginTop: 8 }}>
-        <label>Postih</label>
+        <label htmlFor={`${uid}-postih`}>Postih</label>
         <input
+          id={`${uid}-postih`}
           type="number"
           value={cda.g(`${prefix}_postih`, '0')}
           disabled={disabled}
@@ -178,21 +201,35 @@ export function SignedScale({
   const neg = [];
   for (let i = negMax; i >= 1; i--) {
     const n = -i;
+    const set = () => setV(v === n ? 0 : n);
     neg.push(
       <span
         key={n}
         className={'dp-naklo-pip dp-neg' + (v < 0 && n >= v ? ' is-on' : '')}
-        onClick={disabled ? undefined : () => setV(v === n ? 0 : n)}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-label={`Nastavit ${n}`}
+        aria-pressed={v < 0 && n >= v}
+        aria-disabled={disabled || undefined}
+        onClick={disabled ? undefined : set}
+        onKeyDown={disabled ? undefined : activateOnKey(set)}
       />,
     );
   }
   const pos = [];
   for (let i = 1; i <= posMax; i++) {
+    const set = () => setV(v === i ? 0 : i);
     pos.push(
       <span
         key={i}
         className={'dp-naklo-pip dp-pos' + (v > 0 && i <= v ? ' is-on' : '')}
-        onClick={disabled ? undefined : () => setV(v === i ? 0 : i)}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-label={`Nastavit ${i}`}
+        aria-pressed={v > 0 && i <= v}
+        aria-disabled={disabled || undefined}
+        onClick={disabled ? undefined : set}
+        onKeyDown={disabled ? undefined : activateOnKey(set)}
       />,
     );
   }
@@ -214,7 +251,12 @@ export function SignedScale({
         {negMax > 0 && <span className="dp-naklo-seg dp-neg-seg">{neg}</span>}
         <span
           className="dp-naklo-zero"
+          role="button"
+          tabIndex={disabled ? -1 : 0}
+          aria-label="Vynulovat"
+          aria-disabled={disabled || undefined}
           onClick={disabled ? undefined : () => setV(0)}
+          onKeyDown={disabled ? undefined : activateOnKey(() => setV(0))}
         >
           0
         </span>

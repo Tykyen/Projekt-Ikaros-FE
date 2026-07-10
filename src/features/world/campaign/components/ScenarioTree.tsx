@@ -193,6 +193,7 @@ export function ScenarioTree({
         )}
         {/* Drop na konec kořene = přesun na root */}
         {!readOnly && dragId && (
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- drop zóna pro drag&drop (jen myš/dotyk); klávesová alternativa přesunu = MoveDialog
           <div
             className={clsx(s.rootDropZone, dropTarget?.id === '__root__' && s.rootDropOn)}
             onDragOver={(e) => {

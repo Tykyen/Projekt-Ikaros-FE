@@ -43,6 +43,7 @@ export function DeletePageModal({
           <span>
             Pro potvrzení napiš slug stránky: <code>{pageSlug}</code>
           </span>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na potvrzovací pole je záměr: modal trapuje fokus */}
           <input
             type="text"
             value={confirmation}
@@ -51,6 +52,7 @@ export function DeletePageModal({
             className={s.input}
             autoFocus
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </label>
       </div>
 

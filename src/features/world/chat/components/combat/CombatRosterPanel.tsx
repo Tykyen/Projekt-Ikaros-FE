@@ -78,6 +78,7 @@ function CombatRow({
   return (
     <li
       className={`${s.row} ${isCurrent ? s.current : ''} ${muted ? s.muted : ''}`}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role -- řádek souboje má plnou klávesovou obsluhu (role=button+tabIndex+onKeyDown); <li> nelze změnit (je v <ul>)
       role="button"
       tabIndex={0}
       title={`Detail ${label}`}
@@ -112,6 +113,7 @@ function CombatRow({
         )}
       </span>
 
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick jen stopPropagation (úprava iniciativy nesmí otevřít detail řádku); interaktivní prvek = vnořený InitiativeInput */}
       <span className={s.init} onClick={(e) => e.stopPropagation()}>
         <InitiativeInput
           value={c.initiative ?? 0}

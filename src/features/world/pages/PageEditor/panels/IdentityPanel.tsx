@@ -122,6 +122,7 @@ export function IdentityPanel({
             <label className={s.checkbox}>
               <input
                 type="checkbox"
+                aria-label="Velký hero nahoře"
                 checked={bigImage}
                 onChange={(e) => onChange({ bigImage: e.target.checked })}
               />
@@ -136,6 +137,7 @@ export function IdentityPanel({
             <label className={s.checkbox}>
               <input
                 type="checkbox"
+                aria-label="Wood-Wide"
                 checked={isWoodWide}
                 onChange={(e) => onChange({ isWoodWide: e.target.checked })}
               />

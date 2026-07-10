@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
 import { Modal, Button, Input } from '@/shared/ui';
@@ -58,6 +58,7 @@ export function ChannelDialog({
   onClose,
 }: ChannelDialogProps) {
   const isEdit = mode === 'edit' && !!initial;
+  const uid = useId();
 
   const [name, setName] = useState(initial?.name ?? '');
   const [groupId, setGroupId] = useState(
@@ -254,15 +255,18 @@ export function ChannelDialog({
       }
     >
       <div className={s.form}>
-        <label className={s.field}>
+        <label htmlFor={`${uid}-name`} className={s.field}>
           <span className={s.label}>Název konverzace</span>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli názvu */}
           <Input
+            id={`${uid}-name`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="např. Evropani Herní"
             maxLength={64}
             autoFocus
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </label>
 
         <label className={s.field}>

@@ -42,6 +42,7 @@ import {
 } from './constants';
 import { Drd16SpellCard } from './Drd16SpellCard';
 import { SheetInitiativeButton } from '../../_shared/SheetInitiativeButton';
+import { activateOnKey } from '@/shared/lib/a11y';
 
 const DRD16_RUNGS = 50;
 
@@ -867,11 +868,18 @@ function DrdLadder({
     const val = perPoint ? i : Math.round(i * step);
     const on = i <= lit;
     const mark = max > 0 && i === maxRung;
+    const setRung = () => setCur(val);
     rungs.push(
       <div
         key={i}
         className={`drd16-rung${on ? ' on' : ''}${mark ? ' maxmark' : ''}`}
-        onClick={disabled ? undefined : () => setCur(val)}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-label={`Nastavit ${val}`}
+        aria-pressed={on}
+        aria-disabled={disabled || undefined}
+        onClick={disabled ? undefined : setRung}
+        onKeyDown={disabled ? undefined : activateOnKey(setRung)}
       >
         <span className="rn">{val}</span>
         <span className="rbar" />

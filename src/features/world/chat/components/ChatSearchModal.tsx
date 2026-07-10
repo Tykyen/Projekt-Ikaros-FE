@@ -52,6 +52,7 @@ export function ChatSearchModal({
       <div className={s.controls}>
         <div className={s.inputWrap}>
           <Search size={16} className={s.icon} aria-hidden="true" />
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do hledání při otevření je záměr: modal trapuje fokus v hledacím poli */}
           <input
             className={s.input}
             value={input}
@@ -59,6 +60,7 @@ export function ChatSearchModal({
             placeholder="Hledej slovo nebo část zprávy…"
             onChange={(e) => setInput(e.target.value)}
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </div>
         <select
           className={s.select}

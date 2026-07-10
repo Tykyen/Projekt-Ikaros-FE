@@ -324,7 +324,6 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
               </div>
 
               <div className={styles.inputs}>
-                {/* eslint-disable-next-line jsx-a11y/label-has-for -- label obaluje input (nesting); label-has-for je deprecated, nesting je platný a11y vzor */}
                 <label className={styles.inputRow}>
                   <span className={styles.inputLabel}>Popis</span>
                   <input
@@ -337,7 +336,6 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
                     className={styles.input}
                   />
                 </label>
-                {/* eslint-disable-next-line jsx-a11y/label-has-for -- label obaluje input (nesting); label-has-for je deprecated, nesting je platný a11y vzor */}
                 <label className={`${styles.inputRow} ${styles.inputRowMod}`}>
                   <span className={styles.inputLabel}>
                     <Sliders size={12} aria-hidden="true" /> Mod

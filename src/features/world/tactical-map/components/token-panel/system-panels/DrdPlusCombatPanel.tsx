@@ -22,7 +22,7 @@
  * Pergamen tělo = self-contained (`.module.css`, `--dd-*` + per-profese
  * `--acc`) — sdílené skin tokeny jsou laděné na tmavý HUD (viz 16.2b).
  */
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
 import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
@@ -48,6 +48,7 @@ import {
   DemonList,
 } from '@/features/world/pages/CharacterDetailPage/diary-systems/sheets/drdplus/DrdPlusCards';
 import { Modal } from '@/shared/ui/Modal/Modal';
+import { activateOnKey } from '@/shared/lib/a11y';
 import type { MapToken } from '../../../types';
 // Okna „k nahlédnutí" reusují deníkové komponenty (.dp-* třídy scoped na .dp-sheet).
 import '@/features/world/pages/CharacterDetailPage/diary-systems/styles/drdplus.css';
@@ -103,6 +104,7 @@ export function DrdPlusCombatPanel({
   const [pending, setPending] = useState<Record<string, unknown>>({});
   const flushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [win, setWin] = useState<string | null>(null);
+  const uid = useId();
 
   useEffect(() => {
     return () => {
@@ -300,8 +302,9 @@ export function DrdPlusCombatPanel({
         return (
           <>
             <div className={styles.manaField}>
-              <label>Aktuální magenergie</label>
+              <label htmlFor={`${uid}-wiz-aktualni`}>Aktuální magenergie</label>
               <input
+                id={`${uid}-wiz-aktualni`}
                 value={g('wiz_aktualni')}
                 disabled={!canEdit}
                 aria-label="Aktuální magenergie"
@@ -441,10 +444,18 @@ export function DrdPlusCombatPanel({
           title: 'Totem',
           node: (
             <div className="dp-field">
-              <label>Zvíře totemu</label>
-              <input value={g('ran_totem')} disabled aria-label="Zvíře totemu" />
-              <label style={{ marginTop: 8 }}>Mechanismy</label>
+              <label htmlFor={`${uid}-ran-totem`}>Zvíře totemu</label>
+              <input
+                id={`${uid}-ran-totem`}
+                value={g('ran_totem')}
+                disabled
+                aria-label="Zvíře totemu"
+              />
+              <label htmlFor={`${uid}-ran-totem-mech`} style={{ marginTop: 8 }}>
+                Mechanismy
+              </label>
               <textarea
+                id={`${uid}-ran-totem-mech`}
                 rows={3}
                 value={g('ran_totem_mech')}
                 disabled
@@ -707,19 +718,19 @@ function WoundTrack({
           <div className={styles.wcells}>
             {Array.from({ length: mez }, () => {
               const ci = idx++;
+              const setCell = () =>
+                cda.set(`${prefix}_val`, ci + 1 === filled ? 0 : ci + 1);
               return (
                 <span
                   key={ci}
                   className={`${styles.wcell}${ci < filled ? ' ' + styles.on : ''}`}
-                  onClick={
-                    canEdit
-                      ? () =>
-                          cda.set(
-                            `${prefix}_val`,
-                            ci + 1 === filled ? 0 : ci + 1,
-                          )
-                      : undefined
-                  }
+                  role="button"
+                  tabIndex={canEdit ? 0 : -1}
+                  aria-label={`Nastavit ${ci + 1}`}
+                  aria-pressed={ci < filled}
+                  aria-disabled={!canEdit || undefined}
+                  onClick={canEdit ? setCell : undefined}
+                  onKeyDown={canEdit ? activateOnKey(setCell) : undefined}
                 />
               );
             })}

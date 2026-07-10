@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Network } from 'lucide-react';
 import { CollapsiblePanel } from '../components/CollapsiblePanel';
 import { HeroUploadCard } from '../components/HeroUploadCard';
@@ -29,6 +29,8 @@ const uid = () => crypto.randomUUID();
 export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
   const tree = familyTree ?? EMPTY;
   const [selId, setSelId] = useState<string | null>(null);
+  // `uid` je modulová funkce (crypto UUID), proto stabilní id polí = `fid`.
+  const fid = useId();
 
   const setPeople = (people: FamilyPerson[]) => onChange({ ...tree, people });
   const updatePerson = (id: string, patch: Partial<FamilyPerson>) =>
@@ -211,7 +213,8 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
                 </button>
               </div>
 
-              <label>Foto</label>
+              {/* Popisek nad widgetem (bez přímého inputu) → span, ne label. */}
+              <span className={s.fieldCaption}>Foto</span>
               <HeroUploadCard
                 compact
                 value={selected.imageUrl ?? ''}
@@ -221,8 +224,9 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
                 }
               />
 
-              <label>Jméno</label>
+              <label htmlFor={`${fid}-name`}>Jméno</label>
               <input
+                id={`${fid}-name`}
                 value={selected.name}
                 onChange={(e) =>
                   updatePerson(selected.id, { name: e.target.value })
@@ -230,8 +234,9 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
                 placeholder="Např. Aldrich"
               />
 
-              <label>Druhý řádek (příjmení / přezdívka)</label>
+              <label htmlFor={`${fid}-sub`}>Druhý řádek (příjmení / přezdívka)</label>
               <input
+                id={`${fid}-sub`}
                 value={selected.sub ?? ''}
                 onChange={(e) =>
                   updatePerson(selected.id, { sub: e.target.value || undefined })
@@ -241,8 +246,9 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
 
               <div className={s.row2}>
                 <div>
-                  <label>Narození</label>
+                  <label htmlFor={`${fid}-born`}>Narození</label>
                   <input
+                    id={`${fid}-born`}
                     value={selected.born ?? ''}
                     onChange={(e) =>
                       updatePerson(selected.id, {
@@ -253,8 +259,9 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
                   />
                 </div>
                 <div>
-                  <label>Úmrtí</label>
+                  <label htmlFor={`${fid}-died`}>Úmrtí</label>
                   <input
+                    id={`${fid}-died`}
                     value={selected.died ?? ''}
                     onChange={(e) =>
                       updatePerson(selected.id, {
@@ -266,7 +273,8 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
                 </div>
               </div>
 
-              <label>Odkaz na stránku (nepovinné)</label>
+              {/* Popisek nad PagePickerem (složený widget) → span, ne label. */}
+              <span className={s.fieldCaption}>Odkaz na stránku (nepovinné)</span>
               <PagePicker
                 worldId={worldId}
                 value={selected.pageSlug ?? null}
@@ -276,7 +284,8 @@ export function FamilyTreeEditor({ worldId, familyTree, onChange }: Props) {
                 placeholder="Vyber stránku postavy…"
               />
 
-              <label>Přidat příbuzného</label>
+              {/* Popisek skupiny akčních tlačítek (žádný input) → span, ne label. */}
+              <span className={s.fieldCaption}>Přidat příbuzného</span>
               <div className={s.relRow}>
                 <button
                   type="button"

@@ -63,6 +63,7 @@ export function PresetSearchBar({
     <div className={s.row}>
       <label className={s.wrap} htmlFor={inputId}>
         <Search className={s.icon} size={18} aria-hidden />
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do hledání při otevření je záměr: search bar wizardu (prop-driven) trapuje fokus v hledacím poli */}
         <input
           id={inputId}
           type="search"
@@ -74,6 +75,7 @@ export function PresetSearchBar({
           aria-label="Hledat preset počasí"
           autoComplete="off"
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
       </label>
     </div>
   );

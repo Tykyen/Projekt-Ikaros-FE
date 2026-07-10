@@ -71,6 +71,7 @@ export function NotificationCenter() {
       onClick={() => setOpen(false)}
       role="presentation"
     >
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- onClick jen stopPropagation (klik uvnitř panelu nesmí zavřít overlay); dialog nemá vlastní klik-akci, Escape řeší window listener */}
       <aside
         ref={panelRef}
         tabIndex={-1}
@@ -92,6 +93,7 @@ export function NotificationCenter() {
           </button>
         </header>
 
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role -- <nav> je sémanticky správný obal navigace záložek; role=tablist odpovídá ARIA tab patternu (vnořené role=tab) */}
         <nav className={s.tabs} role="tablist" aria-label="Typ notifikací">
           {tabs.map((t) => (
             <button

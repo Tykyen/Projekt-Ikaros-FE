@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-069.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-070.**
 
 ## Jak je deník členěný
 
@@ -245,3 +245,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [CH-067](infra.md#ch-067--seed-bestiae-workflow-ssh-host-bash--c-víceřádkový-se-rozpadl--node-tmpimportjs-nenašel-mongoose--2026-07-09) | infra | seed workflow: `ssh host bash -c '<víceřádkový>'` se rozpadl (uvozovky se ztratí) + `node /tmp/import.js` nenašel `mongoose` (require od místa souboru, ne cwd; deps v `/app/node_modules`); fix = 1 řádek přes `&&` + `docker cp` do `/app` | „skript proběhl, ale spadl na chybějícím modulu / `-c requires argument`" u ssh+docker exec |
 | [✅ ŘEŠENÍ](fe.md#-řešení--a11y-warningy-kořen--config-bug-severity-blind-mapování-1284--345--2026-07-10) | fe/config | a11y cleanup kořen: eslint.config (17.8) mapoval recommended přes `Object.keys`→`warn`, ignoroval severity → ~939 falešných; fix `Object.entries`+zachovat `off` (3 pravidla schválně off) → 1284→345 warn, 0 err (−73 %); zbývá 345 reálných nálezů | — |
 | [CH-068](fe.md#ch-068--první-verze-config-fixu-minula-control-has-associated-label-severity--pole-ne-string--2026-07-10) | fe/config | config fix `sev === 'off'` minul `control-has-associated-label` (severity = pole `["off",{opce}]`, ne string) → shodil jen 465 místo 345; normalizovat `Array.isArray(sev)?sev[0]:sev` | dvě z tří off pravidel zmizela, třetí ne = jiný TVAR dat, ne nefunkční fix |
+| [CH-069](proces.md#ch-069--timeoutnuté-npx-ve-foreground-orphanovaly-procesy--každý-další-příkaz-pomalejší-falešné-prostředí-je-pomalé--2026-07-10) | proces | timeoutnuté foreground `npx` (SIGTERM) orphanovaly node procesy (94×) → thrashing → každý další příkaz pomalejší; fix = zabít orphany `_npx\|eslint\|vitest` (ne zvyšovat timeout); dlouhé `npx` na pozadí+Monitor | každý „rychlý" příkaz trvá déle; timeouty se množí; „prostředí pomalé" bez příčiny |

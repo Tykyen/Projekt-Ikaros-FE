@@ -89,7 +89,12 @@ export function SkinPickerPanel({
   const activeMaterialId = getSkin(activeType) || DEFAULT_MATERIAL_ID;
 
   return createPortal(
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (Esc handler + zavírací křížek), overlay tak nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className={styles.backdrop} onClick={onClose}>
+      {/* Obsahový obal: onClick jen stopPropagation; zavření přes Esc/křížek. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <div
         className={styles.modal}
         role="dialog"

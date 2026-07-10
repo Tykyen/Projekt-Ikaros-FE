@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiClient, parseApiError } from '@/shared/api';
+import { activateOnKey } from '@/shared/lib/a11y';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { RoleStar } from '@/shared/ui';
@@ -108,6 +109,7 @@ export default function AdminChatPage() {
 
   useEffect(() => {
     if (!activeConvId && channels && channels.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- auto-výběr prvního kanálu po načtení (default, bez smyčky)
       setActiveConvId(channels[0].id);
     }
   }, [channels, activeConvId]);
@@ -502,6 +504,7 @@ function TasksPanel({
                       >
                         {t.done && <Check size={12} />}
                       </button>
+                      {/* eslint-disable jsx-a11y/no-autofocus -- inline editace úkolu se otevírá až na klik uživatele → autofocus přesune kurzor do právě zobrazeného pole, nekrade fokus při načtení stránky */}
                       {editingId === t.id ? (
                         <input
                           className={s.taskEditInput}
@@ -520,6 +523,7 @@ function TasksPanel({
                       ) : (
                         <span className={s.tasktext}>{t.text}</span>
                       )}
+                      {/* eslint-enable jsx-a11y/no-autofocus */}
                       {canEdit && editingId !== t.id && (
                         <span className={s.taskActions}>
                           <button
@@ -548,6 +552,7 @@ function TasksPanel({
                       )}
                     </div>
                   ))}
+                  {/* eslint-disable jsx-a11y/no-autofocus -- inline přidání úkolu se otevírá až na klik uživatele → autofocus přesune kurzor do nově zobrazeného pole, nekrade fokus při načtení stránky */}
                   {canEdit &&
                     (addingFor === g.ownerId ? (
                       <input
@@ -577,6 +582,7 @@ function TasksPanel({
                         <Plus size={13} aria-hidden /> přidat úkol
                       </button>
                     ))}
+                  {/* eslint-enable jsx-a11y/no-autofocus */}
                 </div>
               )}
             </div>
@@ -705,6 +711,7 @@ function DocumentsView({
               key={d.id}
               className={s.docrow}
               onClick={() => openDoc(d)}
+              onKeyDown={activateOnKey(() => openDoc(d))}
               role="button"
               tabIndex={0}
               title={d.filename}

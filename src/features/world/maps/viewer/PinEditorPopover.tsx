@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { MapPin, FileText, Layers, Info, Search, Trash2 } from 'lucide-react';
 import { PagePicker } from '@/features/world/components/PagePicker/PagePicker';
 import type {
@@ -42,6 +42,7 @@ export function PinEditorPopover({
   onDelete,
   onClose,
 }: Props) {
+  const uid = useId();
   const [label, setLabel] = useState(editing?.label ?? '');
   const [info, setInfo] = useState(editing?.info ?? '');
   const [targetType, setTargetType] = useState<WorldMapPinTargetType>(
@@ -109,8 +110,10 @@ export function PinEditorPopover({
       </h4>
 
       <div className={s.field}>
-        <label className={s.fieldLabel}>Popisek</label>
+        <label className={s.fieldLabel} htmlFor={`${uid}-label`}>Popisek</label>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do prvního pole při otevření popoveru je záměr */}
         <input
+          id={`${uid}-label`}
           className={s.input}
           type="text"
           value={label}
@@ -119,11 +122,13 @@ export function PinEditorPopover({
           onChange={(e) => setLabel(e.target.value)}
           autoFocus
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
       </div>
 
       <div className={s.field}>
-        <label className={s.fieldLabel}>Informace (volitelné)</label>
+        <label className={s.fieldLabel} htmlFor={`${uid}-info`}>Informace (volitelné)</label>
         <textarea
+          id={`${uid}-info`}
           className={s.textarea}
           value={info}
           maxLength={2000}
@@ -133,7 +138,8 @@ export function PinEditorPopover({
       </div>
 
       <div className={s.field}>
-        <label className={s.fieldLabel}>Co pin dělá po kliknutí</label>
+        {/* Skupinový popisek segmentu tlačítek (víc controlů) → span, ne label. */}
+        <span className={s.fieldLabel}>Co pin dělá po kliknutí</span>
         <div className={s.seg}>
           {TYPES.map(({ t, label: l, Icon }) => (
             <button
@@ -151,7 +157,8 @@ export function PinEditorPopover({
 
       {targetType === 'page' && (
         <div className={s.field}>
-          <label className={s.fieldLabel}>Vybrat stránku</label>
+          {/* PagePicker = vlastní widget bez jednoho přímého inputu → span. */}
+          <span className={s.fieldLabel}>Vybrat stránku</span>
           <PagePicker
             worldId={worldId}
             value={targetSlug}
@@ -162,8 +169,9 @@ export function PinEditorPopover({
       )}
       {targetType === 'map' && (
         <div className={s.field}>
-          <label className={s.fieldLabel}>Vybrat mapu</label>
+          <label className={s.fieldLabel} htmlFor={`${uid}-map`}>Vybrat mapu</label>
           <select
+            id={`${uid}-map`}
             className={s.select}
             value={targetMapId ?? ''}
             onChange={(e) => setTargetMapId(e.target.value || null)}
@@ -180,7 +188,8 @@ export function PinEditorPopover({
       )}
 
       <div className={s.field}>
-        <label className={s.fieldLabel}>Vzhled — ikona</label>
+        {/* Skupinový popisek pro filtr + mřížku ikon → span, ne label. */}
+        <span className={s.fieldLabel}>Vzhled — ikona</span>
         <div className={s.field} style={{ marginBottom: 6 }}>
           <div
             className={s.input}
@@ -225,7 +234,8 @@ export function PinEditorPopover({
       </div>
 
       <div className={s.field}>
-        <label className={s.fieldLabel}>Barva</label>
+        {/* Skupinový popisek pro tlačítka barev → span, ne label. */}
+        <span className={s.fieldLabel}>Barva</span>
         <div className={s.colorRow}>
           {PIN_COLORS.map((c) => (
             <button

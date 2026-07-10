@@ -1,4 +1,4 @@
-import { useRef, type ChangeEvent } from 'react';
+import { useId, useRef, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 import { Input, Button, NamedColorPalette } from '@/shared/ui';
 import { useUploadImage, parseApiError } from '@/shared/api';
@@ -45,6 +45,7 @@ export function BlockConfigPanel({
   // Hooks vždy nahoře — pro `image` blok potřebujeme uploader.
   const uploadMut = useUploadImage();
   const fileRef = useRef<HTMLInputElement>(null);
+  const uid = useId();
 
   if (!block) {
     return (
@@ -102,8 +103,9 @@ export function BlockConfigPanel({
       <div className={s.panelHeader}>Konfigurace</div>
       <div className={s.configForm}>
         <div className={s.fieldRow}>
-          <label className={s.fieldLabel}>Label</label>
+          <label className={s.fieldLabel} htmlFor={`${uid}-label`}>Label</label>
           <Input
+            id={`${uid}-label`}
             value={block.label}
             disabled={readOnly}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -113,8 +115,9 @@ export function BlockConfigPanel({
         </div>
 
         <div className={s.fieldRow}>
-          <label className={s.fieldLabel}>Klíč (slug)</label>
+          <label className={s.fieldLabel} htmlFor={`${uid}-key`}>Klíč (slug)</label>
           <Input
+            id={`${uid}-key`}
             value={block.key}
             disabled={readOnly}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -134,8 +137,9 @@ export function BlockConfigPanel({
         </div>
 
         <div className={s.fieldRow}>
-          <label className={s.fieldLabel}>Typ</label>
+          <label className={s.fieldLabel} htmlFor={`${uid}-type`}>Typ</label>
           <select
+            id={`${uid}-type`}
             value={block.type}
             disabled={readOnly}
             onChange={(e) => setField('type', e.target.value as DiaryBlockType)}
@@ -149,8 +153,9 @@ export function BlockConfigPanel({
         </div>
 
         <div className={s.fieldRow}>
-          <label className={s.fieldLabel}>Popis (volitelný)</label>
+          <label className={s.fieldLabel} htmlFor={`${uid}-desc`}>Popis (volitelný)</label>
           <Input
+            id={`${uid}-desc`}
             value={block.config?.description ?? ''}
             disabled={readOnly}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -162,8 +167,9 @@ export function BlockConfigPanel({
         {isNumeric && (
           <div className={s.minMaxGrid}>
             <div className={s.fieldRow}>
-              <label className={s.fieldLabel}>Min</label>
+              <label className={s.fieldLabel} htmlFor={`${uid}-min`}>Min</label>
               <Input
+                id={`${uid}-min`}
                 type="number"
                 value={block.config?.minValue ?? ''}
                 disabled={readOnly}
@@ -176,8 +182,9 @@ export function BlockConfigPanel({
               />
             </div>
             <div className={s.fieldRow}>
-              <label className={s.fieldLabel}>Max</label>
+              <label className={s.fieldLabel} htmlFor={`${uid}-max`}>Max</label>
               <Input
+                id={`${uid}-max`}
                 type="number"
                 value={block.config?.maxValue ?? ''}
                 disabled={readOnly}
@@ -194,8 +201,9 @@ export function BlockConfigPanel({
 
         {isBar && (
           <div className={s.fieldRow}>
-            <label className={s.fieldLabel}>Barva</label>
+            <label className={s.fieldLabel} htmlFor={`${uid}-color`}>Barva</label>
             <Input
+              id={`${uid}-color`}
               type="color"
               value={block.config?.color ?? '#a855f7'}
               disabled={readOnly}
@@ -214,7 +222,8 @@ export function BlockConfigPanel({
 
         {isList && (
           <div className={s.fieldRow}>
-            <label className={s.fieldLabel}>Možnosti (≥ 2)</label>
+            {/* Skupinový popisek (míří na víc inputů) → span, ne label. */}
+            <span className={s.fieldLabel}>Možnosti (≥ 2)</span>
             <div className={s.optionsList}>
               {(block.config?.options ?? []).map((opt, i) => (
                 <div key={i} className={s.optionRow}>
@@ -263,7 +272,8 @@ export function BlockConfigPanel({
 
         {isImage && (
           <div className={s.fieldRow}>
-            <label className={s.fieldLabel}>Výchozí obrázek</label>
+            {/* Skupinový popisek (obrázek + tlačítka, žádný přímý control) → span. */}
+            <span className={s.fieldLabel}>Výchozí obrázek</span>
             {block.config?.imageUrl ? (
               <div
                 style={{
@@ -328,8 +338,9 @@ export function BlockConfigPanel({
 
         {isFormula && (
           <div className={s.fieldRow}>
-            <label className={s.fieldLabel}>Vzorec</label>
+            <label className={s.fieldLabel} htmlFor={`${uid}-formula`}>Vzorec</label>
             <Input
+              id={`${uid}-formula`}
               value={block.config?.expression ?? ''}
               disabled={readOnly}
               placeholder="např. hp / hp_max * 100"
@@ -348,8 +359,9 @@ export function BlockConfigPanel({
         )}
 
         <div className={s.fieldRow}>
-          <label className={s.fieldLabel}>Sekce (volitelná)</label>
+          <label className={s.fieldLabel} htmlFor={`${uid}-section`}>Sekce (volitelná)</label>
           <Input
+            id={`${uid}-section`}
             value={block.config?.layoutArea ?? ''}
             disabled={readOnly}
             placeholder="např. statistiky"

@@ -2,6 +2,7 @@
  * 16.2d — proměnlivá sekce Profese: 6 povolání DrD+.
  * Vybírá se erbem (DrdPlusSheet). Každá sekce čte/zapisuje přes cda.
  */
+import { useId } from 'react';
 import type { CSSProperties } from 'react';
 import type { CdAccess } from '../../_shared/cdAccess';
 import { Scale, Tri, SignedScale, PrincipHex, JsonTable } from './DrdPlusShared';
@@ -223,6 +224,7 @@ function RangerZamereni({ cda, disabled }: SecProps) {
 }
 
 export function RangerSection({ cda, disabled }: SecProps) {
+  const uid = useId();
   return (
     <div className="dp-grid dp-g2">
       <div className="dp-panel dp-span2">
@@ -233,12 +235,12 @@ export function RangerSection({ cda, disabled }: SecProps) {
       <div className="dp-panel">
         <h3>Totem</h3>
         <div className="dp-field">
-          <label>Zvíře totemu</label>
-          <input value={cda.g('ran_totem')} disabled={disabled} onChange={(e) => cda.set('ran_totem', e.target.value)} />
+          <label htmlFor={`${uid}-ran_totem`}>Zvíře totemu</label>
+          <input id={`${uid}-ran_totem`} value={cda.g('ran_totem')} disabled={disabled} onChange={(e) => cda.set('ran_totem', e.target.value)} />
         </div>
         <div className="dp-field">
-          <label>Mechanismy</label>
-          <textarea rows={2} value={cda.g('ran_totem_mech')} disabled={disabled} onChange={(e) => cda.set('ran_totem_mech', e.target.value)} />
+          <label htmlFor={`${uid}-ran_totem_mech`}>Mechanismy</label>
+          <textarea id={`${uid}-ran_totem_mech`} rows={2} value={cda.g('ran_totem_mech')} disabled={disabled} onChange={(e) => cda.set('ran_totem_mech', e.target.value)} />
         </div>
         <h4>Amulety, bylinky, lékárnička</h4>
         <JsonTable

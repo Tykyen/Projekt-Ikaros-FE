@@ -78,6 +78,7 @@ export function ForgotPasswordModal() {
           pošleme ti odkaz pro nastavení nového hesla.
         </p>
 
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli e-mailu */}
         <Input
           label="E-mail"
           type="email"
@@ -90,6 +91,7 @@ export function ForgotPasswordModal() {
           error={errors.email?.message}
           {...register('email')}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         {submitError && (
           <div className={s.banner} role="alert" aria-live="polite">

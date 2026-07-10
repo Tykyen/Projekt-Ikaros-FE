@@ -71,10 +71,16 @@ export function PagePalette({ open, onClose }: Props) {
   if (!open) return null;
 
   return createPortal(
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (Esc handler + výběr z listu), overlay tak nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <div className={s.overlay} role="dialog" aria-modal="true" onClick={onClose}>
+      {/* Obsahový obal: onClick jen stopPropagation; zavření přes Esc. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div className={s.panel} onClick={(e) => e.stopPropagation()}>
         <div className={s.searchRow}>
           <Search size={16} aria-hidden className={s.searchIcon} />
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do hledání při otevření palety je záměr */}
           <input
             type="text"
             value={query}
@@ -84,6 +90,7 @@ export function PagePalette({ open, onClose }: Props) {
             autoFocus
             aria-label="Vyhledat stránku"
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </div>
 
         {ranked.length === 0 ? (

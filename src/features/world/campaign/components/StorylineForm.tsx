@@ -179,6 +179,7 @@ export function StorylineForm({
       }
     >
       <div className={s.form}>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
         <Input
           label="Název"
           value={title}
@@ -190,6 +191,7 @@ export function StorylineForm({
           placeholder="Název linky"
           autoFocus
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
         <div className={s.formRow}>
           <label className={s.field}>
             <span className={s.fieldLabel}>Úroveň</span>

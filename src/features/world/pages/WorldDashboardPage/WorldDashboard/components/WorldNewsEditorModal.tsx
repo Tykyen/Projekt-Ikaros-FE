@@ -287,7 +287,8 @@ export function WorldNewsEditorModal({
             </select>
           </div>
           <div className={s.field}>
-            <label className={s.label}>Datum</label>
+            {/* Skupinový popisek — obal nad toggle tlačítky + datum controly. */}
+            <span className={s.label}>Datum</span>
             <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
               <button
                 type="button"
@@ -363,7 +364,8 @@ export function WorldNewsEditorModal({
 
         {/* 9.5 — image upload + focal */}
         <div className={s.field}>
-          <label className={s.label}>Obrázek (volitelně, max 10 MB)</label>
+          {/* Skupinový popisek — nad upload/preview blokem, ne nad jedním inputem. */}
+          <span className={s.label}>Obrázek (volitelně, max 10 MB)</span>
           {imageUrl ? (
             <>
               <div className={s.imagePreview}>
@@ -436,7 +438,8 @@ export function WorldNewsEditorModal({
 
         {/* 9.5 — page picker + externí URL (mutual exclusive) */}
         <div className={s.field}>
-          <label className={s.label}>Odkaz na stránku (volitelně)</label>
+          {/* Skupinový popisek — nad PagePickerem (custom control, ne <input>). */}
+          <span className={s.label}>Odkaz na stránku (volitelně)</span>
           <Controller
             control={control}
             name="linkPageSlug"

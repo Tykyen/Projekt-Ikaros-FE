@@ -57,6 +57,7 @@ export function RejectReasonModal({
           'Napiš autorovi, co potřebuje upravit nebo doplnit.'}{' '}
         Minimální délka {MIN_REASON} znaků.
       </p>
+      {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli důvodu */}
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value)}
@@ -66,6 +67,7 @@ export function RejectReasonModal({
         className={s.textarea}
         autoFocus
       />
+      {/* eslint-enable jsx-a11y/no-autofocus */}
       <div className={s.counter}>
         <span className={isValid ? s.counterOk : s.counterShort}>
           {reason.length} / {MAX_REASON}

@@ -380,8 +380,8 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
             <div>
               <div className="jad-top-meta">
                 <div className="jad-meta-box">
-                  <label>Iniciativa</label>
-                  <span className="val">{fmtMod(getModFor('dex'))}</span>
+                  <label htmlFor="jad_init">Iniciativa</label>
+                  <span id="jad_init" className="val">{fmtMod(getModFor('dex'))}</span>
                 </div>
                 <div className="jad-meta-box">
                   <label htmlFor="jad_ac">Obranné číslo</label>
@@ -440,13 +440,14 @@ export function JadSheet({ diary, mode, onChange }: SystemSheetProps) {
                     />
                   </div>
                   <div className="hp-box">
-                    <label>Záchrany proti smrti</label>
+                    <label htmlFor="jad_ds_s">Záchrany proti smrti</label>
                     <div
                       style={{ display: 'flex', gap: 8, marginTop: 8, fontSize: 12 }}
                     >
                       <div style={{ flex: 1 }}>
                         Záchr.{' '}
                         <input
+                          id="jad_ds_s"
                           value={g('ds_s')}
                           disabled={disabled}
                           onChange={(e) => set('ds_s', e.target.value)}

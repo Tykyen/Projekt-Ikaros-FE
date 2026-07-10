@@ -48,6 +48,9 @@ export function ShowcaseSection() {
   if (count === 0) return null;
 
   return (
+    // onMouseEnter/Leave jen pozastavují auto-rotaci při hoveru; sekce není
+    // interaktivní ovládací prvek (posun ovládají tečky/šipky uvnitř).
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <section
       className={s.showcase}
       aria-roledescription="carousel"

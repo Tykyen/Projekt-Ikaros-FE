@@ -48,6 +48,7 @@ export function NewsPreviewCard({ vm, onOpen, adminSlot }: Props) {
 
       <div className={s.media}>
         {showImage ? (
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onError = fallback při selhání načtení obrázku, ne uživatelská interakce
           <img
             src={vm.image!.url}
             alt=""

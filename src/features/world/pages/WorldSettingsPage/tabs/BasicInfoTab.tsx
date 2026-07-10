@@ -201,10 +201,11 @@ export default function BasicInfoTab() {
         </div>
 
         <div className={sec.field}>
-          <label className={sec.label}>Adresa</label>
+          <label htmlFor="ws-slug" className={sec.label}>Adresa</label>
           <div className={sec.adressRow}>
             <span className={sec.adressPrefix}>/svet/</span>
             <input
+              id="ws-slug"
               className={`${sec.input} ${sec.adressInput}`}
               value={world.slug}
               disabled

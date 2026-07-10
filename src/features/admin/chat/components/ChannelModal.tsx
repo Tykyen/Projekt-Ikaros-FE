@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { useAdminStaff } from '../api/useAdminTasks';
 import {
@@ -39,9 +39,11 @@ export function ChannelModal({
   const [name, setName] = useState('');
   const [allMembers, setAllMembers] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const uid = useId();
 
   useEffect(() => {
     if (!open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset formuláře při otevření / změně kanálu (intencionální, bez smyčky)
     setName(channel?.name ?? '');
     setAllMembers(channel ? channel.accessMode === 'all' : true);
     setSelected(
@@ -127,8 +129,10 @@ export function ChannelModal({
       }
     >
       <div className={s.field}>
-        <label className={s.label}>Název</label>
+        <label htmlFor={`${uid}-name`} className={s.label}>Název</label>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli názvu */}
         <input
+          id={`${uid}-name`}
           className={s.input}
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -136,12 +140,14 @@ export function ChannelModal({
           maxLength={80}
           autoFocus
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
       </div>
 
       {!seed && (
         <>
           <div className={s.field}>
-            <label className={s.label}>Kdo v ní bude</label>
+            {/* Skupinový popisek — nad radio volbami členství, ne nad jedním controlem. */}
+            <span className={s.label}>Kdo v ní bude</span>
             <label className={s.radio}>
               <input
                 type="radio"

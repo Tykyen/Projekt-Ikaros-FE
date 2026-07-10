@@ -172,6 +172,7 @@ export function NewsFormModal({ open, onClose, mode, initialData }: Props) {
       size="md"
     >
       <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus, uživatel čeká kurzor v poli nadpisu */}
         <Input
           label="Nadpis"
           type="text"
@@ -181,6 +182,7 @@ export function NewsFormModal({ open, onClose, mode, initialData }: Props) {
           error={errors.title?.message}
           {...register('title')}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         <fieldset className={s.typeField}>
           <legend className={s.label}>Typ novinky</legend>

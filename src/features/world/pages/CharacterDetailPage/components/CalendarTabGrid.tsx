@@ -244,6 +244,7 @@ export function CalendarTabGrid({
                 </option>
               ))}
             </select>
+            {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do pole při otevření skok-popoveru (role=dialog) je záměr */}
             <input
               type="number"
               className={`${s.jumpField} ${s.jumpYear}`}
@@ -256,6 +257,7 @@ export function CalendarTabGrid({
               aria-label="Rok"
               autoFocus
             />
+            {/* eslint-enable jsx-a11y/no-autofocus */}
             <button type="button" className={s.jumpApply} onClick={applyJump}>
               Skočit
             </button>
@@ -345,11 +347,13 @@ function DayCell({
     .join(' ');
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- role/tabIndex/onKeyDown podmíněné (klikací jen když onDayClick); dynamickou roli linter nedetekuje
     <div
       className={classes}
       style={cellStyle}
       onClick={onDayClick ? handleCellClick : undefined}
       role={onDayClick ? 'button' : undefined}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- tabIndex jen když je buňka klikací (onDayClick)
       tabIndex={onDayClick ? 0 : undefined}
       onKeyDown={
         onDayClick

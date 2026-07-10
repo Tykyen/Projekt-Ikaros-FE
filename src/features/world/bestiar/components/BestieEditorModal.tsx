@@ -169,6 +169,7 @@ export function BestieEditorModal({
         <div className={styles.row}>
           <label className={styles.label}>
             Jméno *
+            {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
             <input
               type="text"
               className={styles.input}
@@ -177,6 +178,7 @@ export function BestieEditorModal({
               maxLength={100}
               autoFocus
             />
+            {/* eslint-enable jsx-a11y/no-autofocus */}
           </label>
           {errors.name && <p className={styles.error}>{errors.name}</p>}
         </div>

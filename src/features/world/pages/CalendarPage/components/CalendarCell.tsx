@@ -91,6 +91,7 @@ function CalendarCellImpl({
       : undefined;
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- role/tabIndex/onKeyDown jsou podmíněné (klikací jen heat-mode buňky s eventy); dynamickou roli linter nedetekuje
     <div
       className={cellClasses}
       style={cellStyle}

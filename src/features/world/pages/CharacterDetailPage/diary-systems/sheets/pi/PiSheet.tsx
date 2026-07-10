@@ -16,6 +16,7 @@ import { usePrintMode } from '@/features/world/export/print';
 import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import type { SystemSheetProps } from '../../types';
 import { makeCdAccess, type CdAccess } from '../../_shared/cdAccess';
+import { activateOnKey } from '@/shared/lib/a11y';
 import {
   PI_SKILL_MAX_PC,
   PI_SKILL_MAX_NPC,
@@ -415,7 +416,7 @@ function SkillsPanel({ cda, editing, isNpc }: SubProps & { isNpc: boolean }) {
                   />
                   <Pips lvl={lvl} total={total} editable onPick={(n) => updateArr<PiTagValue>('abilities', i, { value: String(n) })} />
                   <span className="pi-skill__lvl">{lvl}</span>
-                  <span className="pi-del" onClick={() => removeArr('abilities', i)} role="button" aria-label="Smazat schopnost">
+                  <span className="pi-del" onClick={() => removeArr('abilities', i)} onKeyDown={activateOnKey(() => removeArr('abilities', i))} role="button" tabIndex={0} aria-label="Smazat schopnost">
                     ✕
                   </span>
                 </>
@@ -469,12 +470,14 @@ function AspectsPanel({ cda, editing }: SubProps) {
                 className={`pi-chip ${charged ? 'charged' : 'depleted'}`}
                 style={{ cursor: 'pointer' }}
                 onClick={() => updateArr<PiTagValue>('aspects', i, { value: charged ? 'Vybitý' : 'Nabitý' })}
+                onKeyDown={activateOnKey(() => updateArr<PiTagValue>('aspects', i, { value: charged ? 'Vybitý' : 'Nabitý' }))}
                 role="button"
+                tabIndex={0}
                 aria-pressed={charged}
               >
                 {charged ? 'Nabitý' : 'Vybitý'}
               </span>
-              <span className="pi-del" onClick={() => removeArr('aspects', i)} role="button" aria-label="Smazat aspekt">
+              <span className="pi-del" onClick={() => removeArr('aspects', i)} onKeyDown={activateOnKey(() => removeArr('aspects', i))} role="button" tabIndex={0} aria-label="Smazat aspekt">
                 ✕
               </span>
             </div>

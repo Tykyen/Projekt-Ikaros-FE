@@ -126,12 +126,18 @@ export function EntityFilterTree({
         )}
       </div>
 
-      <ul className={s.tree} role="tree" aria-label="Filtr entit kalendáře">
+      <div className={s.tree} role="tree" aria-label="Filtr entit kalendáře">
         {ENTITY_GROUP_ORDER.map((group) => {
           const { entries, check, expanded } = groupState(group);
           if (isSearching && entries.length === 0) return null;
           return (
-            <li key={group} className={s.groupNode} role="treeitem" aria-expanded={expanded}>
+            <div
+              key={group}
+              className={s.groupNode}
+              role="treeitem"
+              aria-expanded={expanded}
+              aria-selected={check === 'all'}
+            >
               <div className={s.groupRow}>
                 <button
                   type="button"
@@ -159,9 +165,14 @@ export function EntityFilterTree({
                 </label>
               </div>
               {expanded && (
-                <ul className={s.entityList}>
+                <div className={s.entityList} role="group">
                   {entries.map((e) => (
-                    <li key={e.id} className={s.entityRow} role="treeitem">
+                    <div
+                      key={e.id}
+                      className={s.entityRow}
+                      role="treeitem"
+                      aria-selected={!hiddenEntities.has(e.id)}
+                    >
                       <label className={s.entityLabel}>
                         <input
                           type="checkbox"
@@ -200,14 +211,14 @@ export function EntityFilterTree({
                           {e.eventCount}
                         </span>
                       </label>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
 
       <div className={s.bulkActions}>
         <button type="button" className={s.bulkBtn} onClick={onHideAll}>

@@ -117,6 +117,7 @@ export function IkarosEventCard({ event }: Props) {
     <article className={s.card}>
       <div className={s.media}>
         {showImage ? (
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onError = fallback při selhání načtení obrázku, ne uživatelská interakce
           <img
             src={event.imageUrl!}
             alt=""

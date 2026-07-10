@@ -61,6 +61,9 @@ export function CopyEmoteDialog({
   };
 
   return (
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje
+    // (Esc handler + zavírací křížek), overlay tak nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className={s.scrim}
       onClick={(e) => {

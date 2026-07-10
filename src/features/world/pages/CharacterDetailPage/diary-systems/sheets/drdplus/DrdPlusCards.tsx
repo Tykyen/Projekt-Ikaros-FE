@@ -4,6 +4,7 @@
  * Sbalování formulí/démonů je lokální UI stav (neukládá se).
  */
 import { useState } from 'react';
+import { activateOnKey } from '@/shared/lib/a11y';
 import type { CdAccess } from '../../_shared/cdAccess';
 import { FORMA_AXES, DEMON_KINDS } from './constants';
 
@@ -193,7 +194,15 @@ function FormuleCard({
 
   return (
     <div className={'dp-card' + (collapsed ? ' is-collapsed' : '')}>
-      <div className="dp-card-head" onClick={() => setCollapsed((c) => !c)}>
+      <div
+        className="dp-card-head"
+        role="button"
+        tabIndex={0}
+        aria-expanded={!collapsed}
+        aria-label="Sbalit / rozbalit"
+        onClick={() => setCollapsed((c) => !c)}
+        onKeyDown={activateOnKey(() => setCollapsed((c) => !c))}
+      >
         <button type="button" className="dp-toggle" aria-label="Sbalit / rozbalit">
           {collapsed ? '▸' : '▾'}
         </button>
@@ -509,7 +518,15 @@ function DemonCard({
 
   return (
     <div className={'dp-card' + (collapsed ? ' is-collapsed' : '')}>
-      <div className="dp-card-head" onClick={() => setCollapsed((c) => !c)}>
+      <div
+        className="dp-card-head"
+        role="button"
+        tabIndex={0}
+        aria-expanded={!collapsed}
+        aria-label="Sbalit / rozbalit"
+        onClick={() => setCollapsed((c) => !c)}
+        onKeyDown={activateOnKey(() => setCollapsed((c) => !c))}
+      >
         <button type="button" className="dp-toggle" aria-label="Sbalit / rozbalit">
           {collapsed ? '▸' : '▾'}
         </button>
@@ -522,7 +539,7 @@ function DemonCard({
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => onPatch({ name: e.target.value })}
         />
-        <span className="dp-seg" onClick={(e) => e.stopPropagation()}>
+        <span className="dp-seg" role="presentation" onClick={(e) => e.stopPropagation()}>
           {DEMON_KINDS.map((o) => (
             <button
               type="button"

@@ -100,6 +100,8 @@ export function NpcOverridePanel({
         aria-label="Avatar NPC (URL)"
       />
       {showAvatar && (
+        // onError jen detekuje rozbitý náhled avataru, není to uživatelská interakce.
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <img
           src={state.avatarUrl}
           alt=""

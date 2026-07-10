@@ -107,6 +107,7 @@ function CzechAwareEmojiPicker({
 
   return (
     <div className={s.root}>
+      {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do hledání při otevření je záměr: popover se otevře na akci uživatele a trapuje fokus v hledacím poli */}
       <input
         type="text"
         className={s.search}
@@ -115,6 +116,7 @@ function CzechAwareEmojiPicker({
         onChange={(e) => setQuery(e.target.value)}
         autoFocus
       />
+      {/* eslint-enable jsx-a11y/no-autofocus */}
       {!useEnglishFallback ? (
         <div className={s.viewport}>
           <div

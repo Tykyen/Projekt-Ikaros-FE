@@ -256,6 +256,7 @@ export function TimelineEventModal({
       size="md"
     >
       <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
         <Input
           label="Název *"
           type="text"
@@ -265,9 +266,11 @@ export function TimelineEventModal({
           error={errors.title?.message}
           {...register('title')}
         />
+        {/* eslint-enable jsx-a11y/no-autofocus */}
 
         <div className={s.fieldWrap}>
-          <label className={s.label}>Datum *</label>
+          {/* Skupinový popisek pro FantasyDatePicker (víc controlů) → span, ne label */}
+          <span className={s.label}>Datum *</span>
           {config ? (
             <FantasyDatePicker
               config={config}
@@ -292,7 +295,8 @@ export function TimelineEventModal({
         </div>
 
         <div className={s.fieldWrap}>
-          <label className={s.label}>Obrázek (volitelně, max 10 MB)</label>
+          {/* Skupinový popisek pro obrázkovou sekci (náhled/tlačítka/file picker) → span */}
+          <span className={s.label}>Obrázek (volitelně, max 10 MB)</span>
           {imageUrl ? (
             <>
               <div className={s.imagePreview}>
@@ -360,7 +364,8 @@ export function TimelineEventModal({
         </div>
 
         <div className={s.fieldWrap}>
-          <label className={s.label}>Obsah *</label>
+          {/* Skupinový popisek pro RichTextEditor (víc controlů) → span, ne label */}
+          <span className={s.label}>Obsah *</span>
           <Controller
             control={control}
             name="text"
@@ -389,7 +394,8 @@ export function TimelineEventModal({
         />
 
         <div className={s.fieldWrap}>
-          <label className={s.label}>Související wiki stránka (volitelně)</label>
+          {/* Skupinový popisek pro PagePicker (víc controlů) → span, ne label */}
+          <span className={s.label}>Související wiki stránka (volitelně)</span>
           <Controller
             control={control}
             name="pageSlug"

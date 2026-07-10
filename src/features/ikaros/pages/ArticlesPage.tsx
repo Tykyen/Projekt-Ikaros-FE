@@ -64,7 +64,7 @@ export default function ArticlesPage() {
         )}
       </header>
 
-      <nav className={s.tabs} role="tablist">
+      <div className={s.tabs} role="tablist">
         <button
           type="button"
           role="tab"
@@ -85,7 +85,7 @@ export default function ArticlesPage() {
             Moje
           </button>
         )}
-      </nav>
+      </div>
 
       {tab === 'prehled' && <PrehledTab />}
       {tab === 'moje' && isAuth && <MojeTab />}

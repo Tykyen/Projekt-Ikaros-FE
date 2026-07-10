@@ -56,6 +56,9 @@ export function Modal({
   if (!open) return null;
 
   return createPortal(
+    // Backdrop klik = myší zkratka pro zavření; klávesová cesta existuje (Esc
+    // handler výše + zavírací křížek), proto overlay nemusí být fokusovatelný.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={s.overlay}
       onMouseDown={(e) => {

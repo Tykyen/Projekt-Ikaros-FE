@@ -113,8 +113,11 @@ describe('CalendarConfigsPage', () => {
 
     // Step 2 — klik na „Prázdný" → identity modal.
     await user.click(screen.getByRole('button', { name: /Prázdný kalendář/i }));
-    expect(screen.getByLabelText(/Název/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Slug/i)).toBeInTheDocument();
+    // Editor auto-vybraného configu na pozadí má taky asociované labely
+    // Název/Slug (17.8 a11y) → scope dotaz na dialog „Nový kalendář".
+    const createModal = screen.getByRole('dialog', { name: /Nový kalendář/i });
+    expect(within(createModal).getByLabelText(/Název/i)).toBeInTheDocument();
+    expect(within(createModal).getByLabelText(/Slug/i)).toBeInTheDocument();
   });
 
   it('preset pre-fillne name + auto-suffix slug při konfliktu (9.3-F-I)', async () => {
@@ -136,8 +139,14 @@ describe('CalendarConfigsPage', () => {
       within(dialog).getByRole('button', { name: /^Gregoriánský/i }),
     );
     // Identity step pre-fillne name + auto-suffix slug na `gregorian-2`.
-    const nameInput = screen.getByLabelText(/Název/i) as HTMLInputElement;
-    const slugInput = screen.getByLabelText(/Slug/i) as HTMLInputElement;
+    // Editor na pozadí má taky asociované Název/Slug → scope na dialog.
+    const createModal = screen.getByRole('dialog', { name: /Nový kalendář/i });
+    const nameInput = within(createModal).getByLabelText(
+      /Název/i,
+    ) as HTMLInputElement;
+    const slugInput = within(createModal).getByLabelText(
+      /Slug/i,
+    ) as HTMLInputElement;
     expect(nameInput.value).toBe('Gregoriánský');
     expect(slugInput.value).toBe('gregorian-2');
   });

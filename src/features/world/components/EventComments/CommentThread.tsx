@@ -80,6 +80,7 @@ export function CommentThread({
             ))}
             {isReplying && (
               <div className={s.replyComposer}>
+                {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do reply editoru při otevření odpovědi je záměr */}
                 <CommentComposer
                   eventId={eventId}
                   parentId={root.id}
@@ -88,6 +89,7 @@ export function CommentThread({
                   onSubmit={() => setReplyingTo(null)}
                   onCancel={() => setReplyingTo(null)}
                 />
+                {/* eslint-enable jsx-a11y/no-autofocus */}
               </div>
             )}
           </li>

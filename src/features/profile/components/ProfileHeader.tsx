@@ -213,7 +213,8 @@ export function ProfileHeader({ user }: Props) {
                   <em>{form.formState.errors.city.message}</em>
                 )}
               </label>
-              <label className={styles.editField}>
+              {/* skupina: read-only e-mail + tlačítko změny (víc controlů) → span */}
+              <span className={styles.editField}>
                 <span>E-mail</span>
                 <div className={styles.emailEditRow}>
                   <Input type="email" value={user.email} readOnly disabled />
@@ -226,7 +227,7 @@ export function ProfileHeader({ user }: Props) {
                     Změnit e-mail
                   </Button>
                 </div>
-              </label>
+              </span>
               <div className={styles.editActions}>
                 <Button
                   type="submit"

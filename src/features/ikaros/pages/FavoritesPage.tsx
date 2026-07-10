@@ -72,7 +72,7 @@ export default function FavoritesPage() {
         </p>
       </header>
 
-      <nav className={s.tabs} role="tablist" aria-label="Typ oblíbeného obsahu">
+      <div className={s.tabs} role="tablist" aria-label="Typ oblíbeného obsahu">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -85,7 +85,7 @@ export default function FavoritesPage() {
             {t.label}
           </button>
         ))}
-      </nav>
+      </div>
 
       {typ === 'diskuze' && <DiscussionsTab />}
       {typ === 'clanky' && <ArticlesTab />}

@@ -176,6 +176,7 @@ export function CommentItem({
 
         {isEditing ? (
           <>
+            {/* eslint-disable jsx-a11y/no-autofocus -- autofocus do editoru při otevření inline úpravy je záměr */}
             <textarea
               className={s.editTextarea}
               value={editContent}
@@ -185,6 +186,7 @@ export function CommentItem({
               autoFocus
               aria-invalid={editTooLong ? 'true' : 'false'}
             />
+            {/* eslint-enable jsx-a11y/no-autofocus */}
             <div className={s.editActions}>
               {editContent.length > 1800 && (
                 <span className={editTooLong ? s.counterError : s.counter}>

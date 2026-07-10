@@ -239,9 +239,10 @@ export function ShopView() {
             ))}
           </select>
         </label>
-        <label className={s.filterField}>
+        <label className={s.filterField} htmlFor="shop-filter-currency">
           Měna
           <CurrencySelect
+            id="shop-filter-currency"
             value={resolvedCode}
             onChange={setPreferred}
             items={currencyItems}

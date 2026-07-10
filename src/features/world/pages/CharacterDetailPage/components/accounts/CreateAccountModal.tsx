@@ -81,6 +81,7 @@ export function CreateAccountModal({
           <>
             <label className={s.field}>
               <span>Název účtu</span>
+              {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
               <input
                 type="text"
                 className={s.input}
@@ -89,6 +90,7 @@ export function CreateAccountModal({
                 placeholder="Osobní účet, Tajný fond, …"
                 autoFocus
               />
+              {/* eslint-enable jsx-a11y/no-autofocus */}
             </label>
             <label className={s.field}>
               <span>Měna</span>

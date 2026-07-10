@@ -15,7 +15,7 @@
  *  - Custom calendar months — day max = `monthsList[monthIndex].daysCount`.
  *  - Default values načteny z `worldSettings.currentInGameDate` (current state).
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Calendar } from 'lucide-react';
 import { Modal, Button, Input } from '@/shared/ui';
@@ -64,6 +64,7 @@ export function SetInGameDateModal({ open, onClose, worldId }: Props) {
   const setDate = useSetInGameDate(worldId);
   const { data: settings } = useWorldSettings(worldId);
   const { data: calendars = [] } = useCalendarConfigs(worldId);
+  const uid = useId();
 
   // React Compiler memoizuje vše automaticky — žádný useMemo.
   const activeCalendar = settings?.timelineCalendarSlug
@@ -213,9 +214,10 @@ export function SetInGameDateModal({ open, onClose, worldId }: Props) {
 
         <div className={s.grid}>
           {/* České pořadí datumu: den → měsíc → rok */}
-          <label className={s.field}>
+          <label className={s.field} htmlFor={`${uid}-day`}>
             <span className={s.label}>Den</span>
             <Input
+              id={`${uid}-day`}
               type="number"
               value={clampedDay}
               onChange={(e) => setDay(clamp(Number(e.target.value), 1, dayMax))}
@@ -241,9 +243,10 @@ export function SetInGameDateModal({ open, onClose, worldId }: Props) {
             </select>
           </label>
 
-          <label className={s.field}>
+          <label className={s.field} htmlFor={`${uid}-year`}>
             <span className={s.label}>Rok</span>
             <Input
+              id={`${uid}-year`}
               type="number"
               value={year}
               onChange={(e) =>
@@ -258,9 +261,10 @@ export function SetInGameDateModal({ open, onClose, worldId }: Props) {
 
         {/* Čas: hodina + minuta */}
         <div className={s.timeGrid}>
-          <label className={s.field}>
+          <label className={s.field} htmlFor={`${uid}-hour`}>
             <span className={s.label}>Hodina</span>
             <Input
+              id={`${uid}-hour`}
               type="number"
               value={hour}
               onChange={(e) => setHour(clamp(Number(e.target.value), 0, 23))}
@@ -270,9 +274,10 @@ export function SetInGameDateModal({ open, onClose, worldId }: Props) {
             />
           </label>
 
-          <label className={s.field}>
+          <label className={s.field} htmlFor={`${uid}-minute`}>
             <span className={s.label}>Minuta</span>
             <Input
+              id={`${uid}-minute`}
               type="number"
               value={minute}
               onChange={(e) => setMinute(clamp(Number(e.target.value), 0, 59))}

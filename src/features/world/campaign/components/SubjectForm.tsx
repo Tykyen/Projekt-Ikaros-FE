@@ -154,6 +154,7 @@ export function SubjectForm({
     >
       <div className={s.form}>
         <div className={s.autocomplete}>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
           <Input
             label="Jméno"
             value={name}
@@ -173,6 +174,7 @@ export function SubjectForm({
             autoComplete="off"
             autoFocus
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
           {showSuggest && suggestions.length > 0 && (
             <div className={s.acDropdown} role="listbox">
               {suggestions.map((p) => (

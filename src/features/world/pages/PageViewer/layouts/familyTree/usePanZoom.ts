@@ -31,6 +31,7 @@ export function usePanZoom(
   const drag = useRef<{ x: number; y: number; tx: number; ty: number } | null>(
     null,
   );
+  // eslint-disable-next-line react-hooks/refs -- latest-ref: scaleRef se čte jen v pointer/wheel handlerech (ne v renderu) pro přepočet screen-delta ÷ scale; úmyslný sync v renderu bez lagu
   scaleRef.current = t.s;
 
   const fit = useCallback(() => {
@@ -85,7 +86,6 @@ export function usePanZoom(
     drag.current = { x: e.clientX, y: e.clientY, tx: t.x, ty: t.y };
     setDragging(true);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t.x, t.y]);
 
   useEffect(() => {

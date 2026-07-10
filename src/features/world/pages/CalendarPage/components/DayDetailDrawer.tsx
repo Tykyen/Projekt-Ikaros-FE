@@ -98,6 +98,8 @@ export function DayDetailDrawer({
 
   return (
     <div className={s.backdrop} onClick={onClose} role="presentation">
+      {/* Obsahový obal: onClick jen stopPropagation; zavření přes Esc/křížek. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <aside
         ref={drawerRef}
         className={s.drawer}

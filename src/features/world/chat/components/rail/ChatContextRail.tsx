@@ -81,6 +81,7 @@ export function ChatContextRail({
 
   // Přepnutí konverzace → zahoď combat kontext (combatant.id z jiné neplatí).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset combat kontextu při přepnutí konverzace (intencionální, bez smyčky)
     setOpenCombatantId(null);
     setAddMode(false);
     setSelected(null);

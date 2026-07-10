@@ -85,8 +85,10 @@ export default function DiceBox3D({
   const lastMaterialRef = useRef<string | null>(null);
   // Vždy nejnovější hodnoty (rollNow čte z refs, ne ze zastaralého closure).
   const latestRef = useRef({ notation, active, theme });
+  // eslint-disable-next-line react-hooks/refs -- latest-ref: úmyslný zápis v renderu; ref se čte jen v async `rollNow` (ne v renderu), timing-laděno (6.3-fix5/8), effect-write by vrátil stale closure
   latestRef.current = { notation, active, theme };
   const cbRef = useRef({ onComplete, onError, onRollStart });
+  // eslint-disable-next-line react-hooks/refs -- latest-ref callbacků: čteno jen v async handlerech, ne v renderu
   cbRef.current = { onComplete, onError, onRollStart };
   // Ghost-warmup stav (6.3-fix5 + fix8):
   //   isGhost      = právě běžící roll je neviditelný ghost (onRollComplete ho

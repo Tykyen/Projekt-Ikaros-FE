@@ -46,11 +46,17 @@ export default defineConfig([globalIgnores(['dist']), {
   // 3 pravidla schválně vypnutá (control-has-associated-label, label-has-for
   // deprecated, anchor-ambiguous-text). Mapovat přes klíče by je vynutilo do
   // warn a přidalo ~942 falešných warningů (šum/deprecated). Viz docs/a11y-cleanup.
-  rules: Object.fromEntries(
-    Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([rule, sev]) => {
-      // Severity je buď string ('off'/'warn'/'error') nebo pole ['off', {opce}].
-      const level = Array.isArray(sev) ? sev[0] : sev
-      return [rule, level === 'off' ? 'off' : 'warn']
-    }),
-  ),
+  rules: {
+    ...Object.fromEntries(
+      Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([rule, sev]) => {
+        // Severity je buď string ('off'/'warn'/'error') nebo pole ['off', {opce}].
+        const level = Array.isArray(sev) ? sev[0] : sev
+        return [rule, level === 'off' ? 'off' : 'warn']
+      }),
+    ),
+    // aria-role: ignoruj custom komponenty — jejich `role` prop NENÍ HTML role
+    // (např. <WorldRoleIcon role="pj">, kde „pj" je herní role, ne ARIA role).
+    // DOM elementy s `role="…"` se dál kontrolují.
+    'jsx-a11y/aria-role': ['warn', { ignoreNonDOM: true }],
+  },
 }, ...storybook.configs["flat/recommended"]])

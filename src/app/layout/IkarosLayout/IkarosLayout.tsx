@@ -37,6 +37,7 @@ import { useMyFavoriteArticles } from '@/features/ikaros/api/useArticles';
 import { useMyFavoriteGallery } from '@/features/ikaros/api/useGallery';
 import { useMyFavoriteDiscussions } from '@/features/ikaros/api/useDiscussions';
 import { cloudinaryThumb } from '@/shared/lib/cloudinary';
+import { activateOnKey } from '@/shared/lib/a11y';
 import { useLogout } from '@/features/auth/api/useAuth';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import {
@@ -970,6 +971,7 @@ export function IkarosLayout() {
         <div
           className={clsx(s.drawerBackdrop, (drawerOpen || rightDrawerOpen) && s.drawerBackdropOpen)}
           onClick={closeDrawers}
+          onKeyDown={activateOnKey(closeDrawers)}
           role="button"
           tabIndex={-1}
           aria-label="Zavřít menu"

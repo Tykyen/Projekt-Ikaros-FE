@@ -96,6 +96,9 @@ export function AvatarUploader({
 
   return (
     <div className={styles.wrapper}>
+      {/* Dropzone má nativní alternativu (file input + tlačítko „Vybrat" níže);
+          drag&drop je jen doplněk, který nelze ovládat klávesnicí. */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div
         className={clsx(styles.dropzone, dragOver && styles.dropzoneActive)}
         onDragOver={onDragOver}

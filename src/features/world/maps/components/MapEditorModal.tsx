@@ -124,6 +124,7 @@ export function MapEditorModal({
 
         <label className={s.row}>
           <span className={s.label}>Název *</span>
+          {/* eslint-disable jsx-a11y/no-autofocus -- autofocus na první pole je záměr: modal trapuje fokus */}
           <input
             type="text"
             className={s.input}
@@ -132,6 +133,7 @@ export function MapEditorModal({
             maxLength={200}
             autoFocus
           />
+          {/* eslint-enable jsx-a11y/no-autofocus */}
         </label>
 
         <label className={s.row}>

@@ -40,7 +40,17 @@ export function WorldVoiceHost() {
 
   const active = !!worldId && session?.worldId === worldId;
 
-  const voice = useVoice({
+  const {
+    containerRef,
+    joined,
+    connecting,
+    join,
+    leave,
+    local,
+    toggleMic,
+    toggleCam,
+    toggleScreen,
+  } = useVoice({
     roomName: jitsiRoomName(`world-${worldId}`),
     displayName: character?.name ?? user?.username,
     // Konec hovoru → zavři session i sbalený stav (příští hovor začne rozbalený).
@@ -52,7 +62,7 @@ export function WorldVoiceHost() {
 
   // Aktivace session → připojit (containerRef je v DOM, protože panel se renderuje).
   useEffect(() => {
-    if (active && !voice.joined && !voice.connecting) voice.join();
+    if (active && !joined && !connecting) join();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
@@ -67,10 +77,14 @@ export function WorldVoiceHost() {
     >
       {/* 17.10 — když je hovor sbalený, je celý pruh klikací = spolehlivé
           obnovení (malé „⤢" samo mohl překrývat Jitsi iframe → „nereaguje"). */}
+      {/* role/tabIndex/onKeyDown jsou podmíněné na `minimized` (ternary → ESLint
+          nevidí statickou roli button); klávesová obsluha je za běhu přítomna. */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <header
         className={s.bar}
         onClick={minimized ? () => setMinimized(false) : undefined}
         role={minimized ? 'button' : undefined}
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={minimized ? 0 : undefined}
         aria-label={minimized ? 'Rozbalit hovor' : undefined}
         onKeyDown={
@@ -102,10 +116,10 @@ export function WorldVoiceHost() {
       <div className={s.body} data-min={minimized || undefined}>
         <div
           className={s.jitsi}
-          ref={voice.containerRef}
-          aria-hidden={!voice.joined && !voice.connecting}
+          ref={containerRef}
+          aria-hidden={!joined && !connecting}
         />
-        {voice.connecting && (
+        {connecting && (
           <div className={s.connecting} aria-live="polite">
             Připojuji — povol prosím mikrofon…
           </div>
@@ -116,26 +130,26 @@ export function WorldVoiceHost() {
         <button
           type="button"
           className={s.ctl}
-          data-off={voice.local.muted || undefined}
-          onClick={voice.toggleMic}
-          aria-label={voice.local.muted ? 'Zapnout mikrofon' : 'Ztlumit mikrofon'}
+          data-off={local.muted || undefined}
+          onClick={toggleMic}
+          aria-label={local.muted ? 'Zapnout mikrofon' : 'Ztlumit mikrofon'}
         >
-          {voice.local.muted ? <MicOff size={18} /> : <Mic size={18} />}
+          {local.muted ? <MicOff size={18} /> : <Mic size={18} />}
         </button>
         <button
           type="button"
           className={s.ctl}
-          data-on={voice.local.cam || undefined}
-          onClick={voice.toggleCam}
-          aria-label={voice.local.cam ? 'Vypnout kameru' : 'Zapnout kameru'}
+          data-on={local.cam || undefined}
+          onClick={toggleCam}
+          aria-label={local.cam ? 'Vypnout kameru' : 'Zapnout kameru'}
         >
-          {voice.local.cam ? <Video size={18} /> : <VideoOff size={18} />}
+          {local.cam ? <Video size={18} /> : <VideoOff size={18} />}
         </button>
         <button
           type="button"
           className={s.ctl}
-          data-on={voice.local.screen || undefined}
-          onClick={voice.toggleScreen}
+          data-on={local.screen || undefined}
+          onClick={toggleScreen}
           aria-label="Sdílet obrazovku"
         >
           <MonitorUp size={18} />
@@ -143,7 +157,7 @@ export function WorldVoiceHost() {
         <button
           type="button"
           className={`${s.ctl} ${s.leave}`}
-          onClick={voice.leave}
+          onClick={leave}
           aria-label="Odejít z hovoru"
         >
           <PhoneOff size={18} />
