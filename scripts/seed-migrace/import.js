@@ -1,18 +1,11 @@
 /*
- * Import komunitních bestií do PROD Mongo. Běží UVNITŘ BE kontejneru
- * (má node + mongoose + MONGODB_URI na interní 'mongo:27017').
- *
- * Postup na serveru:
- *   docker cp bestie-all.ndjson projekt-ikaros-be:/tmp/bestie.ndjson
- *   docker cp import.js        projekt-ikaros-be:/tmp/import.js
- *   docker exec projekt-ikaros-be node /tmp/import.js
- *
- * Doplní reálné authorId (Superadmin z DB) místo placeholderu, idempotentně
- * (přeskočí bestie, které už podle clonedFromId existují).
+ * Import v2 komunitních bestií do PROD Mongo. Běží UVNITŘ BE kontejneru.
+ * Nahrazuje předchozí (vadnou) migraci: SMAŽE všechny seed-migrované bestie
+ * (clonedFromId ^seed:jad:) a vloží čerstvých ~584 z opraveného parseru.
+ * Idempotentní přes delete+insert (opakované spuštění dá stejný výsledek).
  */
 const mongoose = require('mongoose');
 const fs = require('fs');
-
 const NDJSON = process.env.NDJSON || '/tmp/bestie.ndjson';
 const AUTHOR_EMAIL = 'tykytanjunior@gmail.com';
 
@@ -27,28 +20,22 @@ const AUTHOR_EMAIL = 'tykytanjunior@gmail.com';
   const aid = String(author._id);
   console.log('Autor:', AUTHOR_EMAIL, '->', aid);
 
+  const del = await db.collection('bestiae').deleteMany({ clonedFromId: { $regex: '^seed:jad:' } });
+  console.log('Smazano starych seed-migrovanych:', del.deletedCount);
+
   const lines = fs.readFileSync(NDJSON, 'utf8').split('\n').filter((l) => l.trim());
   console.log('Radku v souboru:', lines.length);
 
-  let ins = 0;
-  let skip = 0;
-  for (const l of lines) {
+  const docs = lines.map((l) => {
     const d = JSON.parse(l);
-    d.authorId = aid;
-    d.approvedBy = aid;
+    d.authorId = aid; d.approvedBy = aid;
     if (d.statblocks && d.statblocks.jad) d.statblocks.jad.authorId = aid;
-    const exists = await db.collection('bestiae').findOne({ clonedFromId: d.clonedFromId });
-    if (exists) {
-      skip++;
-      continue;
-    }
-    await db.collection('bestiae').insertOne(d);
-    ins++;
-    if (ins % 50 === 0) console.log('  ...vlozeno', ins);
-  }
-  console.log('HOTOVO. Vlozeno:', ins, '| preskoceno (uz existuji):', skip);
+    for (const k of ['approvedAt', 'createdAt', 'updatedAt']) if (d[k]) d[k] = new Date(d[k]);
+    if (d.statblocks && d.statblocks.jad && d.statblocks.jad.createdAt) d.statblocks.jad.createdAt = new Date(d.statblocks.jad.createdAt);
+    return d;
+  });
+
+  const r = await db.collection('bestiae').insertMany(docs, { ordered: false });
+  console.log('HOTOVO. Vlozeno:', r.insertedCount, '/', docs.length);
   await mongoose.disconnect();
-})().catch((e) => {
-  console.error('CHYBA:', e);
-  process.exit(1);
-});
+})().catch((e) => { console.error('CHYBA:', e); process.exit(1); });
