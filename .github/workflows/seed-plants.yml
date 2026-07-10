@@ -1,0 +1,39 @@
+name: Seed herbář (rostliny)
+
+# Jednorázový import komunitního herbáře (56 rostlin) do PROD Mongo.
+# Obrázky už jsou na Cloudinary (WebP); tenhle workflow jen vloží dokumenty.
+# Spustí se ručně (Actions -> tento workflow -> Run workflow). Idempotentní —
+# opakované spuštění smaže předchozí seed (dle seedTag) a vloží znovu; ručně
+# vytvořených rostlin se nedotkne. Nutné až PO deployi BE (kolekce plants).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy migration files to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/plants.ndjson ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/plants.ndjson
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/plants-import.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/plants-import.js
+
+      - name: Import into prod Mongo (via BE container)
+        # Stejný mechanismus jako seed-bestiae: docker cp do kontejneru (import.js
+        # do /app kvůli node_modules resolution, NDJSON do /tmp), pak docker exec.
+        # Vše na jednom řádku (ssh nezachová víceřádkový string) přes &&.
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/plants.ndjson projekt-ikaros-be:/tmp/plants.ndjson && docker cp /tmp/plants-import.js projekt-ikaros-be:/app/plants-import.js && docker exec -w /app -e NDJSON=/tmp/plants.ndjson projekt-ikaros-be node plants-import.js"
