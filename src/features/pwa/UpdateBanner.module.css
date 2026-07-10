@@ -1,0 +1,55 @@
+.banner {
+  position: fixed;
+  left: 50%;
+  top: calc(var(--sp-3) + env(safe-area-inset-top, 0px));
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  width: min(calc(100vw - 2 * var(--sp-3)), 30rem);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  color: var(--text-primary);
+  animation: updateBannerIn 0.3s ease;
+}
+
+@keyframes updateBannerIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+}
+
+.cta {
+  flex-shrink: 0;
+}
+
+/* Mobil: plná šířka (mínus okraje) + větší touch cíl (≥44px). */
+@media (max-width: 768px) {
+  .banner {
+    width: calc(100vw - 2 * var(--sp-3));
+  }
+  .cta {
+    min-height: 44px;
+  }
+}

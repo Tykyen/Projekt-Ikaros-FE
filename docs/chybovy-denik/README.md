@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-066.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-067.**
 
 ## Jak je deník členěný
 
@@ -239,3 +239,6 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](proces.md#-řešení--příloha-c-201203-jako-jedna-sdílená-páteř--sub-krokové-befe-řetězení-s-agenty--2026-07-09) | proces/be+fe | Příloha C 20.1–20.3 = 1 sdílená páteř (generický report+moderace, polymorfní cíl) místo 3 featur; A→B1..B5→C→D; **BE napřed→ověř tsc→FE**, nikdy nemíchat; koordinované=1 fullstack agent; enforcement event-driven; invarianty ověřeny čtením; po restartech ověř disk ne notifikace | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--162b-2-komunitní-bestiář-be-4-scope--statblocks--diskuse--pending--2026-07-09) | be+fe | 16.2b-2 komunitní bestiář (referenční pro 21.5a-d): 4. `community` scope + `statblocks` mapa (systemId marker, cross-system), staty jen přes diskusi (LoreDto bez systemStats), route `community` před `:id`, toEntity whitelist, pending=provider pattern+sdílené CURATOR_ROLES, authorName z JWT username; BE-first prototyp→spec→plán, 0 cyklení | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--zobrazit-starší-zprávy-world-chat-sc-33--plochá-cache--prepend-ne-useinfinitequery--2026-07-09) | fe | „Zobrazit starší zprávy" world chat (SC-33): FE tlačítko donačítá přes BE `?before=` a **prepend** do ploché cache (NE useInfiniteQuery — 7 míst živého toku); scroll-kotva „vzdálenost ode dna" v useLayoutEffect; reset per-konverzace = žádný (ChannelView `key={channelId}` remountuje) — 2 lint slepé uličky (set-state-in-effect, refs-in-render) | — |
+| [CH-066](fe.md#ch-066) | fe/proces | hnal jsem „whisper-after-limit" jako příčinu chybějícího tlačítka, ač uživatel 2× řekl „žádné šepoty"; reálná příčina = testerčina PWA běžela starý bundle. Workflow potvrdil MECHANISMUS, ne KAUZALITU | obhajuju hypotézu, kterou uživatel právě faktem vyvrátil („ale kód přece dokazuje…") |
+| [✅ ŘEŠENÍ](fe.md#-řešení--pwa-se-sama-neaktualizuje--detekce-nové-verze--obnovit-151-followup--2026-07-10) | fe | PWA se sama neaktualizuje (SW register-only, resume nenaviguje): `useAppUpdate` porovná otisk vstupního `index-<hash>.js` (DOM vs čerstvý fetch) → banner „Obnovit"; prompt ne auto-reload (žádná smyčka) | — |
+| [✅ ŘEŠENÍ](be.md#-řešení--whisper-filtr-do-mongo-query-limit--viditelné--oprava-pre-existujícího-test-mocku--2026-07-10) | be | whisper filtr `getMessages` do Mongo query (`visibilityUserId` + `$or`, vzor findFeed) → `limit` = viditelné → hráči tlačítko „Zobrazit starší" funguje; + opraven pre-existující test-mock (`mockUsersService.findById` chyběl, 19.4 gate); 125/125, nutný restart BE | — |

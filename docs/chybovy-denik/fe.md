@@ -1895,3 +1895,18 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** Hladce, 0 cyklení. Dvě lint slepé uličky u reset-stavu ukázaly, že „React doporučený vzor" ≠ „co projde tímhle přísným lintem" — když komponenta má `key`, nejlepší reset je žádný reset. Poučení pro příště: u per-prop reset stavu se nejdřív podívat, jestli rodič nekeyuje.
 
 ---
+
+### CH-066 — hnal jsem „whisper-after-limit" hypotézu, ač uživatel 2× řekl „žádné šepoty" · 2026-07-10
+**Kontext:** Tlačítko „Zobrazit starší" se ukazovalo PJ ale ne testerce (hráčce). Symptom „per-osoba rozdíl".
+**Co jsem udělal špatně:** Našel jsem v BE reálnou vadu (getMessages filtruje šepoty AŽ po limitu → hráč dostane <50) a upnul se na ni jako na příčinu TOHOTO symptomu. Pustil jsem i workflow, který „mechanismus" 3× potvrdil. Uživatel ale opakovaně říkal, že v té konverzaci šepoty NEJSOU.
+**Proč to nefungovalo:** „Mechanismus je reálný" ≠ „je to příčina tohoto konkrétního symptomu". Whisper filtr sníží počet JEN když šepoty existují; bez nich hráč i PJ dostanou stejných 50 → tlačítko by měl vidět oba. Skutečná příčina byla úplně jinde: **testerčina PWA běžela starý bundle** (klientská update-latence), tlačítko na prod bylo celou dobu.
+**Poučení:** Empirický fakt od uživatele („žádné šepoty") má vyšší váhu než „potvrzená" analýza kódu — když si odporují, ověřuj ten fakt, ne hypotézu. U „mně to jde, jim ne" webových bugů nejdřív vyčerpat propagaci klienta (deploy live? bundle na prod? cache/SW?) A AŽ POTOM hloubkovou BE diagnostiku. Adversariální workflow potvrdil MECHANISMUS, ne KAUZALITU — verifikace hypotézy neověřuje, že hypotéza vysvětluje pozorování.
+**Příznak cyklení:** opakovaně obhajuju hypotézu, kterou uživatel právě faktem vyvrátil; „ale kód přece dokazuje…" proti „v praxi to tak není".
+
+---
+
+### ✅ ŘEŠENÍ — PWA se sama neaktualizuje → detekce nové verze + „Obnovit" (15.1-followup) · 2026-07-10
+**Co nakonec zabralo:** Kořen „proč testerka viděla update tak pozdě": SW se v `main.tsx` jen `register()` bez update flow; deploy nemění `sw.js` (identický → žádný SW update), a `index.html` no-cache se projeví jen při navigaci — probuzená PWA nenaviguje → běží starý bundle. Fix: `useAppUpdate` hook porovná otisk běžícího buildu (vstupní `index-<hash>.js` z DOMu) s čerstvým `fetch('/',{cache:'no-store'})` na `visibilitychange`+interval; při rozdílu horní banner „Obnovit" (prompt, ne auto-reload).
+**Proč to je správně:** Otisk = vstupní script hash (Vite mění při každé změně) → nepotřebuje build-time verzi ani nový endpoint. Baseline z DOMu (ne z prvního fetche) chytá i „appka naběhla už zastaralá". Porovnávat JEN vstupní script (lazy chunky přibývají za běhu → jinak falešný poplach). Prompt místo auto-reload = žádná reload smyčka ani ztráta rozepsané zprávy.
+**Jak ověřeno:** `tsc -b` ✓, eslint ✓, 5/5 unit testů `parseEntryScript` ✓. Reálné chování až po DVOU deployích (build s detektorem musí uvidět další build) — ověří uživatel na živém webu.
+**Zhodnocení:** Dobře, čistý self-contained FE fix. Past: řeší detekci+nabídku, NE rychlost stažení; a první přechod na build s detektorem musí ještě proběhnout „ručně" — od dalšího deploye se to samo-léčí. Souvisí s [[CH-066]] (tohle byla ta skutečná příčina, ne šepoty).

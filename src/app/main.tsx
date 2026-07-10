@@ -8,7 +8,7 @@ import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
 import { MaintenanceOverlay } from "@/shared/ui/MaintenanceOverlay";
 import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "@/themes/ThemeProvider";
-import { InstallBanner } from "@/features/pwa";
+import { InstallBanner, UpdateBanner } from "@/features/pwa";
 import { PrerenderReady } from "./PrerenderReady";
 import { bootstrapSchemas } from "@/features/world/tactical-map/schemas/bootstrap";
 import "./index.css";
@@ -42,6 +42,9 @@ createRoot(document.getElementById("root")!).render(
           <Toaster position="bottom-right" theme="dark" richColors />
           {/* 15.1 — PWA install hint (sám se skryje ve standalone / po dismissu) */}
           <InstallBanner />
+          {/* 15.1-followup — detekce nasazené nové verze → „Obnovit" (řeší
+              zaseknutou starou PWA, která se sama neaktualizuje) */}
+          <UpdateBanner />
           {/* Globální údržbový overlay — při výpadku BE (deploy/restart) ukáže
               „Probíhá údržba" místo matoucího „svět nenalezen"; sám se schová. */}
           <MaintenanceOverlay />
