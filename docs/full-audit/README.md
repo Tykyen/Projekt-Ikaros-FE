@@ -1,18 +1,20 @@
-# Plný audit — orchestrátor 16 auditních stylů
+# Plný audit — hloubková brána (16 stylů + rozšířené 17–31)
 
 > Skill: [`.claude/skills/plny-audit/SKILL.md`](../../.claude/skills/plny-audit/SKILL.md) · spustíš
 > `/plny-audit` nebo „spusť plný audit".
 
 Tahle složka je **výstupní prostor** skillu „plný audit". Skill sám 16 auditů nevymýšlí — věrně přehraje
-metodiky z `docs/*-plan/` proti aktuálnímu kódu, paralelizuje detekci přes sub-agenty, hlídá coverage
-drift a 16. auditem (anti-regression) zkontroluje, že je vše v pořádku.
+metodiky z `docs/*-plan/` proti aktuálnímu kódu do plné hloubky, paralelizuje detekci přes sub-agenty,
+hlídá coverage drift a 16. auditem (anti-regression) zkontroluje, že je vše v pořádku. Od 2026-07-11
+navíc vynucuje **SLO bránu** (500 světů · jeskyně až 50 hráčů · voice · LCP ≤ 2,5 s · nula warningů)
+přes rozšířené styly 24–31 a proof-vrstvy `+load`/`+perf` — detaily v SKILL.md.
 
 ## Obsah složky
 
 | Soubor | Co je |
 |---|---|
 | `coverage-baseline.json` | uložený census povrchu kódu (kolekce, listenery, query-keys, …). Diff proti němu = „co kód přerostl od minule". Aktualizuj `npm run audit:census -- --update-baseline`. |
-| `RUN-<datum>/` | výstup jednoho běhu skillu — `report.md` + `scanners/`. Historii registrů `docs/*-audit.md` skill nepřepisuje. |
+| `RUN-<datum>/` | výstup jednoho běhu skillu — `report.md` + `scanners/` + `checkpoints/` (resumability) + `proof/` (db/e2e/teeth/formal/load/perf důkazy). Historii registrů `docs/*-audit.md` skill nepřepisuje. |
 
 ## Census — detekce růstu (samostatně spustitelné)
 

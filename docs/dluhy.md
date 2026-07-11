@@ -152,6 +152,34 @@
 
 ---
 
+### D-SEC-GAP-2026-07-11 — Bezpečnostní/compliance/korektnostní nálezy z gap-huntu (podklad pro styly 32–41)
+> Zdroj: cílený gap-hunt skillu `plny-audit` (7 optik hrozeb + 2 doběhy, 2026-07-11). Nálezy **ověřené čtením kódu**; slouží jako seed pro nové auditní styly 32–41 a jako TODO oprav. Neopravuje se tiše — čeká na rozhodnutí o pořadí. 3 headline nálezy mají připravené návrhy oprav.
+**🔴 KRITICKÉ — ✅ OPRAVENO 2026-07-11 (typecheck+lint+guard testy 25/25; nutný BE restart+deploy):**
+- **SSRF exfiltrace ve world-exportu** — ✅ `world-export.service.ts`: `isMediaUrl` nahrazen origin-allowlistem (`res.cloudinary.com`/`*.cloudinary.com`, jen https) + `fetch` s `AbortSignal.timeout(10s)`, `redirect:'error'` a size cap 25 MB. (Dřív gate propustil jakoukoli http URL s media příponou/„cloudinary" → PJ přečetl interní síť do ZIP.)
+- **Pád instance při výpadku Redisu** — ✅ `socket-io.adapter.ts`: `.on('error', log)` na pub+sub klient → výpadek Redisu už neshodí proces.
+**⭐ VYSOKÉ — ✅ OPRAVENO 2026-07-11:**
+- **JWT role staleness** — ✅ `jwt-auth.guard.ts`: po načtení usera z DB `request.user.role = user.role` (freshness) → demotovaný Admin ztrácí práva okamžitě, ne za 3 dny. + regresní test (12/12). Zbývá follow-up: `tokenVersion` v JWT, aby „odhlásit všude" zabilo i access token (větší, samostatně).
+- **Erasure nechává PII** (GDPR) — `chatmessages.senderName`/`content` se při hard-delete NIKDY neanonymizují (chat modul bez `user.deletion.hardDeleted` handleru); push subscriptions přežijí; `anonymizeForHardDelete` nechá `username`/`characterName`; `/data-export/me` neúplný (čl. 15). Věková brána 15+ (`isMinor`) NEblokuje registraci.
+- **Dvojí odeslání při 2 replikách** — `chat/scheduled-messages.job.ts:24` čte pending a AŽ POTOM `setStatus` (bez atomického claimu); ŽÁDNÝ cron nemá distributed lock → hard-delete/push/anonymizace běží 2× při horizontálním škálování (které SLO 500 světů vyžaduje). **Fix:** `findOneAndUpdate({status:'pending'},{status:'sending'})` claim + Redis lock na crony.
+**~ STŘEDNÍ (výběr):** account enumeration (login timing + `/auth/check-email`), 2FA brute-force bez per-účet lockoutu, ekonomika na float (IEEE-754 drift → overdraft guard selže), offset-paginace bez `_id` tiebreaku, anti-abuse creation-flood (bez capu na počet entit), FE „prázdný stav místo chyby" + nulová FE error-telemetrie, `chatSkin` bez supporter gate, Mongo bez `cs` collation + slug strhává diakritiku (kolize), MeiliSearch bez českého stemmingu, camp cron bez `Europe/Prague`.
+**Dopad:** vysoký — bezpečnostní povrch veřejné 15+ platformy. **Kdy:** SSRF+Redis okamžitě (✅ opraveno c8c1b9e), zbytek jako první běh stylů 32–41. Souvisí: [D-NEW-UM10-storage-quota](#), [D-NEW-chat-presence-scale](#).
+
+### D-LAUNCH-GAP-2026-07-11 — Nálezy 2. gap-huntu (launch-hardening, podklad pro styly 42–46)
+> Zdroj: 2. cílený gap-hunt skillu `plny-audit` (6 optik: vizuál/durabilita/deploy-skew/doručování/hardening/herní integrita + přísný dedup). Nálezy ověřené čtením. Neopravuje se tiše.
+**🔴 KRITICKÉ:**
+- **Refund ztratí peníze při pádu (DUR)** — `campaign-purchase.service.ts:451-486` `refund()` = 3 zápisy BEZ transakce i kompenzace → pád mezi kroky = status `refunded` ale peníze nevrácené, hráč blokován `PURCHASE_ALREADY_REFUNDED` (nevratné); revert-fail jen `logError('ruční oprava nutná')`. + `database.module.ts:9-20` bez `writeConcern:{w:'majority',j:true}` + `purchase`/`transfer` bez idempotency-key (double-click = 2. odečet).
+- **Klient je autorita nad hodem/HP (GI)** — `chat.service.ts:1419` uloží `dicePayload` verbatim (DTO jen `@IsObject()`) → hráč pošle `{sum:20,total:999}` a všem se zobrazí pravý hod; `token-ops.dto.ts:25` + 0 clampů HP v BE → hráč nastaví vlastnímu tokenu `currentHp:99999` i zápor. Server výsledek nikdy nepřepočítává. **HP clamp udělat hned (levné).**
+- **62 slepých FE volání bez BE routy (SKEW)** — `route-audit` hlásí 62 FE volání na neexistující BE routu (`useNabory` POST ozvat-se, `useModeration` GET decisions/mine) a v `ci.yml:106` je scan VYPNUTÝ → ani HEAD-drift se nehlídá. **Zapnout cross-repo route-audit jako CI bránu.**
+- **Stored XSS v `pages.table.title` (PT-36a)** — `sanitizeTable` (`pages.service.ts:54`) sanitizuje headers+values, NE `title`; sink `PageSidebar.tsx:98` `dangerouslySetInnerHTML` → `title:"<img src=x onerror=…>"` střelí u KAŽDÉHO diváka vč. PJ/Admin = krádež cookie / převzetí účtu. **Fix ~jednořádkový (title do `sanitizeTable`).** Nový nález pentest katalogu 2026-07-11.
+- **Undo = peníze/věci z ničeho (PT-43b/c/d)** — `undoLastOnce` (`character-accounts.service.ts:480`) popne poslední tx bez typové vazby: po nákupu/převodu popne DEBET → balance +100, položka/druhý účet zůstává → tvorba peněz cross-account; navíc obchází `allowPlayerSelfAdjust:false`. **Fix:** undo nesmí popnout purchase/transfer-vázanou tx (nebo undo=PJ-only + za stejný gate jako adjust). Nový nález 2026-07-11.
+> Kompletní pentest attack katalog (~55 útoků, 19 stylů, priorita P0-P5, stav pin/it.failing/TODO) = `backend/test/security/attack-catalog.md`. Mezery katalogu (doplnit): REST IDOR na data, hlubší auth flows, CORS reflection, cross-instance, dep CVE.
+**⭐/~ VYSOKÉ+STŘEDNÍ:** vizuální regrese = 0 automatická brána (96 skin CSS, edit tokenu tiše rozbije skin; Chromatic nainstalován ale mrtvý; Playwright jen chromium/desktop → mobil overflow neasertován); SMTP `sendMail` loguje „Sent" i pro neexistujícího příjemce (bounce async, hráč zamčený) + 1 Gmail ~500/den bez fronty → reset-flood vyčerpá cap → legitimní reset tiše selže; push dedup jen na zařízení → WS replay = 2 reset tokeny; last-write-wins na `tokens.$.<key>` (lost update HP v boji).
+**SHARPENINGY (do existujících stylů, ne nové):** styl 5 — Mongo/Redis bez `--auth` + `--bind_ip_all`, backend port `0.0.0.0:3001` obchází TLS; styl 31 — backend bez Docker healthcheck, deploy bez rollbacku (prune+rebuild latest), `ulimits.nofile`/`pids_limit` chybí (socket strop 1024), disk-cap upload-fallbacku (sdílí disk s Mongo); styl 26 — HTTP slow-loris timeouty v `main.ts`; styl 33 — SMTP/webpush bez timeoutu.
+**OPS-RUNBOOK (jednorázově, mimo audit):** SPF/DKIM/DMARC záznamy, TLS cert renewal + do IaC, host firewall/`ulimit`.
+**Dopad:** vysoký — peníze, férovost, launch-stabilita. **Kdy:** HP clamp + route-audit CI gate hned; zbytek první běh stylů 42–46.
+
+---
+
 > _(Shop-purchase atomicita přesunuta jako `FA` cíl do
 > [`seed-scenario-plan/00-cross-cutting.md`](seed-scenario-plan/00-cross-cutting.md) — opraví se tam s důkazem rollbacku.)_
 
