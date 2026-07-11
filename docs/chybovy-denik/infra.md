@@ -58,3 +58,24 @@ Produkční build (`deploy.yml`, čistý server bez MITM) arg **nedává** → z
 **Jak ověřeno:** zatím jen staticky (rozbor logu + Dockerfile `WORKDIR /app` + `COPY --from=build /app/node_modules ./node_modules`). Reálné ověření = re-run workflow po pushnutí.
 
 **Zhodnocení — dobře:** obě chyby mají jasný kořen a fix je minimální. **Poučení:** (1) přes ssh posílej remote příkaz jako **jeden řetězec** (`&&`), nikdy `bash -c '<víceřádkový>'` — uvozovky se ztratí; (2) `node <soubor>` v cizím adresáři nenajde moduly — buď soubor vedle `node_modules`, nebo `NODE_PATH`; cwd (`-w`) na resolusi `require` **nemá vliv**, jen na relativní cestu k souboru. **Příznak cyklení:** „skript proběhl, ale spadl na chybějícím modulu / `-c requires argument`" u ssh+docker exec.
+
+## ✅ ŘEŠENÍ — monitoring 3. noha: health readiness, Discord alerty, Sentry, heartbeat — 2026-07-11
+
+**Kontext.** Vedle plny-audit + pentest (předletové brány) chyběla třetí noha — hlídač BĚŽÍCÍHO provozu. Postaveno na žádost uživatele (single server, docker-compose.prod, Discord komunita), cost-conscious nástroje.
+
+**Co zabralo — postavené vrstvy (BE, na main).**
+- `/health` z konfig-presence → **readiness probe**: aktivně Redis (ping+timeout), Meili (HTTP /health+timeout), Mongo (readyState), + disk (statfs, fail-open), SMTP/RSS info. Sdílené `health-checks.ts` (DRY: /health i cron). PC-08 strip v prod (veřejný endpoint neleakuje).
+- `AlertService` (Discord webhook, rate-limited 10min/klíč, no-op bez `DISCORD_ALERT_WEBHOOK`) + `BruteForceMonitor` (login-fail spike centrálně v exception filtru — bez zásahu do AuthService).
+- Triggery: **5xx** (exception filter) + **health-cron** (á min, dep down/up + disk<15% + RSS práh) + **brute-force** + **denní heartbeat** (dead-man switch ze strany appky).
+- **Error tracking** `@sentry/node`/`@sentry/react` (BE+FE) guardované DSN → GlitchTip; FE navíc globální `unhandledrejection`/`error` handlery (chyby, co dnes mizí). Env vše zadrátováno do deploy.yml+compose.
+- Bonus: **komunitní oznámení** (nový svět/postava → `DISCORD_EVENTS_WEBHOOK`).
+
+**Proč to byl správný směr.** Monitoring = vždy-běžící systém, ne skill co „proběhne". Alerty do Discordu = víš dřív než hráči. Vše no-op bez env (bezpečné nasazení po dávkách). Webhooky živě otestované (HTTP 204).
+
+**Pasti, které jsem cestou vyřešil.**
+- **emitAsync blokace:** `character.created` je `emitAsync` (čeká na listenery) → kdyby můj @OnEvent listener awaitoval Discord (až 5 s), zdržel by 201 tvorby postavy. Fix = SYNCHRONNÍ void handler + `void this.notify*()` (fire-and-forget). **Lekce: @OnEvent na emitAsync eventu nesmí awaitovat pomalou I/O.**
+- **health-ping nesmí sám viset:** každý check má timeout (Redis ping race, Meili AbortSignal), jinak by mrtvá závislost pověsila /health.
+- **spyOn ts-jest:** `jest.spyOn(import * as checks, 'checkDisk')` funguje i na destrukturovaný import (TS kompiluje named import na namespace přístup).
+- **Sentry bezpečně:** `Sentry.init` jen když je DSN (žádné hooky bez DSN); `captureException` bez init = no-op.
+
+**Jak ověřeno.** tsc 0, eslint 0, ~35 nových unit testů + error-contract e2e 12/12 + npm audit prod (high) OK. **Poctivá mezera:** vnitřní monitoring neumí ohlásit vlastní smrt (totální výpadek serveru) → nutný EXTERNÍ UptimeRobot (dead-man switch z druhé strany) — akce uživatele. **Zhodnocení dobře:** dávka po dávce, každá ověřená+pushnutá; no-op bez env = nulové riziko nasazení. **Špatně:** full-app e2e boot timeoutuje (heavy) → health ověřen unit s mock deps místo e2e.

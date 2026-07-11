@@ -48,19 +48,43 @@ fallbacky). Volat z: health-cron (degraded), global exception filter (5xx spike 
 (login-fail spike = brute-force běží), disk-check. **Rate-limit alertů** (max 1/typ/10 min), ať tě
 nezahltí vlastní alert-flood.
 
-### Krok 3 — Sentry (FE nejdřív — tam se dnes chyby ZTRÁCEJÍ)
-FE `GlobalErrorBoundary` dnes jen `console.error` a chybí `unhandledrejection` handler (viz pentest
-gap-hunt) → pády u reálných uživatelů jsou NEVIDITELNÉ. `@sentry/react` init + `Sentry.captureException`
-v boundary + globální `unhandledrejection`/`error` listener. BE `@sentry/nestjs` interceptor na 5xx.
-Oboje za `SENTRY_DSN` (prázdné = vypnuto).
+### Krok 3 — GlitchTip / Sentry error tracking (vybráno: self-hosted GlitchTip)
+GlitchTip je Sentry-protokol-kompatibilní → používá se stejné SDK (`@sentry/*`), jen `SENTRY_DSN` míří
+na vlastní GlitchTip instanci. Setup:
+1. **GlitchTip instance** — přidat službu do `docker-compose.prod.yml` (image `glitchtip/glitchtip` +
+   postgres + redis worker; oficiální compose z glitchtip.com/documentation) NEBO samostatný stack.
+   Vytvořit projekt → dostat **DSN**.
+2. **BE** — `npm i @sentry/nestjs`; `instrument.ts` (`Sentry.init({dsn: process.env.SENTRY_DSN})`)
+   importovat jako **úplně první** řádek `main.ts` (před AppModule); `SentryModule.forRoot()` do
+   AppModule; `SentryGlobalFilter` NEBO ponechat náš `HttpExceptionFilter` a přidat `Sentry.captureException`
+   do 5xx větve. Prázdné `SENTRY_DSN` = init no-op (vypnuto).
+3. **FE** (tam se dnes chyby ZTRÁCEJÍ — `GlobalErrorBoundary` jen `console.error`, chybí
+   `unhandledrejection` handler): `npm i @sentry/react`; `Sentry.init` v `main.tsx`; `Sentry.captureException`
+   v `GlobalErrorBoundary.componentDidCatch` + globální `window.addEventListener('unhandledrejection'|'error')`.
+   FE DSN je veřejný (jde do bundlu) — OK.
+> ⚠️ Nelze ověřit bez běžící GlitchTip instance + DSN → tento krok je **hand-off** (potřebuje tvou infru).
 
-### Krok 4 — Log rotace (compose, proti disk-fill)
-`docker-compose.prod.yml` každé službě: `logging: {driver: json-file, options: {max-size: "10m", max-file: "3"}}`.
-Bez toho app logy zaplní disk sdílený s Mongo → celá platforma dolů (red-team OPS nález).
+### Krok 4 — Log rotace ✅ UŽ EXISTUJE
+`docker-compose.prod.yml` má `x-logging: &default-logging` (json-file, LH-05) aplikovaný na všechny
+služby. Hotovo, není co dělat.
 
-### Krok 5 — UptimeRobot (účet)
-Monitor na `https://<api>/api/health` (keyword `"status":"ok"`) + na FE origin. Alert → Discord/e-mail.
+### Krok 5 — UptimeRobot (účet — tvoje akce)
+Monitor na `https://<api>/api/health` (keyword `"status":"ok"`) + na FE origin. Alert → Discord webhook.
 Odchytí i to, co interní monitoring nevidí (celý server/proxy dole).
+
+### ✅ Co je HOTOVO (kód, na `main`) — stav 2026-07-11
+- **`/health` readiness** — aktivně Mongo+Redis+Meili + disk/SMTP/paměť info (`07d4623`, `5508c27`).
+- **`AlertService`** — Discord webhook, rate-limited, no-op bez env (`b385a59`).
+- **5xx alert** + **error tracking** (`@sentry/node captureException`) z exception filtru (`6463a59`, `7765de1`).
+- **Health-cron** (á min) — dep down/up + **disk <15 %** + **RSS práh** + **denní heartbeat** (`18a65e4`, `5508c27`, `8ea3d69`).
+- **Brute-force alert** — login-fail spike (`96ad06a`).
+- **BE Sentry** — `Sentry.init` guardované `SENTRY_DSN` (`7765de1`).
+- **FE Sentry** — `@sentry/react` + globální `unhandledrejection`/`error` handlery + boundary capture
+  (working tree FE repo — **commituješ ty**; `src/shared/lib/monitoring.ts`).
+- **Komunitní oznámení** — nový svět / postava → `DISCORD_EVENTS_WEBHOOK` (`94197e3`).
+- Env vše zadrátováno do `deploy.yml` + compose (`350eb40`, `7765de1`). Log rotace (LH-05). Webhooky živě OK (204).
+**Zbývá (JEN tvoje infra/akce):** GitHub secrety `DISCORD_*`/`SENTRY_DSN` · GlitchTip instance → DSN ·
+UptimeRobot účet (externí dead-man switch) · commit FE + `VITE_SENTRY_DSN` · deploy.
 
 ## Incident-response runbook (co dělat, když to hoří)
 

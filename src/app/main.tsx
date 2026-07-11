@@ -11,7 +11,12 @@ import { ThemeProvider } from "@/themes/ThemeProvider";
 import { InstallBanner, UpdateBanner } from "@/features/pwa";
 import { PrerenderReady } from "./PrerenderReady";
 import { bootstrapSchemas } from "@/features/world/tactical-map/schemas/bootstrap";
+import { initMonitoring } from "@/shared/lib/monitoring";
 import "./index.css";
+
+// Monitoring (3. noha) — error tracking + globální záchyt async/promise chyb.
+// Co nejdřív, ať pokryje i chyby při startu.
+initMonitoring();
 
 // 10.2d-prep-A C14 — registrace per-system schémat při startup.
 // Idempotent (safe pro HMR a test setup). Po tomto volá konzumenti

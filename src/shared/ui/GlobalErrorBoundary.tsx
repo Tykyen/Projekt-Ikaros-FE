@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { ErrorState, FullPageState } from './StatePlaceholder';
+import { captureError } from '@/shared/lib/monitoring';
 
 interface Props {
   children: ReactNode;
@@ -18,6 +19,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('[GlobalErrorBoundary]', error, info.componentStack);
+    // Monitoring (3. noha) — pošli do GlitchTip/Sentry (dřív chyba jen do konzole).
+    captureError(error, 'react-boundary');
   }
 
   render() {
