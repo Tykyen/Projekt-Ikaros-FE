@@ -1,0 +1,36 @@
+✓ africke
+✓ apokalypsa
+✓ arabsky-svet
+✓ bila
+✓ ctyri-zivly
+✓ cyberpunk
+✓ dark-fantasy
+✓ fantasy
+✓ historie
+✓ horor
+✓ hospoda
+✓ ikaros
+✓ indiane
+✓ kyberpunk
+✓ magie
+✓ mesic
+✓ moderni
+✓ modre-nebe
+✓ mystery
+✓ nemrtvi
+✓ pergamen
+✓ postapo
+✓ priroda
+✓ sci-fi
+✓ severske-runy
+✓ slunce
+✓ steampunk
+✓ temna-cerven
+✓ vesmir
+✓ vesmirna-bitva
+✓ vesmirna-lod
+✓ western
+✓ zlaty-standard
+
+
+All themes pass WCAG AA.

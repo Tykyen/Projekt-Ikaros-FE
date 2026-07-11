@@ -251,3 +251,8 @@ fallback na Map + testy).
 **Kde:** `src/themes/ThemeSwitcher.module.css` + `IkarosLayout.tsx` (`HeaderLoggedOut`).
 **Kořen:** ThemeSwitcher trigger držel plný název motivu (~108 px) a na mobilu se neskrýval (nemá `.headerBtnLabel`), takže anon hlavička přetékala ~42 px; „Registrace" navíc po skrytí labelu zůstávalo prázdné tlačítko.
 **Oprava:** `@media (max-width:768px)` v ThemeSwitcheru skryje název motivu (zůstane jen šipka; výběr běží přes rozbalovací nabídku) → trigger 108→32 px; „Registrace" dostalo ikonu `UserPlus` (na mobilu ikona místo prázdna). Ověřeno měřením: `scrollWidth === clientWidth` na 360/375/768, `hOverflow=false`, žádný `_headerNav`/`_headerBtn` offender.
+
+---
+
+## D-AUDIT-2026-07-11 — otevřené nálezy plného auditu (46 stylů)
+Plný hloubkový audit RUN 2026-07-11 našel ~100+ nálezů. **Kritický deploy-blocker (26× schema `@Prop` union bez `type` → app se nenaboot­uje) + baseline červená JIŽ OPRAVENY.** Nefixnuté (dle priority) v `docs/full-audit/RUN-2026-07-11-1213/report.md` + `checkpoints/`. Hlavní 🔴: herní integrita (dice/HP/turn clamp), anti-abuse kvóty, TOTP lockout + token-invalidace, GDPR erasure handlery, refund tx, cron atomický claim, cascade blob leak (chat attachments), socket-swap FE listener leak, WS bez rate-limitu, bundle SLO, nula DB záloh. Bez souhlasu neopravováno (mimo výše uvedené kritické).

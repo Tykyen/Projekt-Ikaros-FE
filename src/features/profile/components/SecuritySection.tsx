@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isAxiosError } from 'axios';
 import { Clock } from 'lucide-react';
 import { Button, Input } from '@/shared/ui';
+import { parseApiErrorCode } from '@/shared/api';
 import { EditCard } from './EditCard';
 import { TotpCard } from './TotpCard';
 import { TrustedDevicesCard } from './TrustedDevicesCard';
@@ -94,7 +94,10 @@ export function SecuritySection({ username }: { username: string }) {
       passwordForm.reset();
       setEditingPassword(false);
     } catch (err: unknown) {
-      if (isAxiosError(err) && err.response?.status === 401) {
+      // EC-RUN-07-01 fix — BE `changePassword` vrací 400 `INVALID_PASSWORD`
+      // (FIX-50), ne 401 → čteme přes doménový kód (vzor ChangeEmailModal),
+      // jinak field-hláška „heslo špatně" nikdy nenaskočí.
+      if (parseApiErrorCode(err) === 'INVALID_PASSWORD') {
         passwordForm.setError('oldPassword', {
           message: 'Současné heslo je špatně',
         });

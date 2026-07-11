@@ -50,3 +50,19 @@
 **Fix.** Doplněn stejný pattern i do `OptionalJwtAuthGuard` (načíst usera z DB, degradovat banned/deleted na anonyma — optional kontrakt nehází, roli z DB). UsersModule je @Global → DI bezpečné (commit 1fc63d1).
 
 **Poučení / příznak cyklení.** Po opravě GUARDU (nebo jakékoli sdílené auth logiky) **zgrepuj SOUROZENCE** — auth často má víc variant téhož (Jwt/OptionalJwt, per-request/per-socket). Fix v jedné variantě ≠ hotovo. Spojení s CH-011 (gate do service metody volané i interně): vždy hledat VŠECHNA místa téhož vzoru. Příznak: „opravil jsem X, ale díra stejné třídy se pak našla v X'".
+
+## CH-121 — přidání metody do interface rozbilo typované jest.Mocked<> mocky: full jest ZELENÝ, nest build ČERVENÝ — 2026-07-11
+
+**Past.** GDPR erasure: přidal jsem metody do 3 repo interfaces (`anonymizeBySender`/`anonymizeByUser`/`deleteByUserId`). Full jest prošel 2531/2531 → vypadalo hotovo. Ale `tsc --noEmit` (= `nest build` deploy path) FAILNUL: 3 specy mají `jest.Mocked<IRepository>` (typovaný mock), kterému teď chybí nové metody → TS2322. Runtime jest to nevadí (mock je strukturálně OK pro běžící testy), ale tsc/build to zachytí → **deploy build by spadl.**
+
+**Fix.** Doplnit `<metoda>: jest.fn()` do každého typovaného mocku (push/ikaros/global-chat spec).
+
+**Poučení.** Po JAKÉKOLI změně interface/DTO/typu spouštěj `tsc --noEmit` (nebo `nest build`), NE jen jest — jest a typecheck jsou různé brány. Sesterská lekce k deploy-blockeru z téhož RUN (union `@Prop` bez `type`): jest zelený NEgarantuje build/boot zelený. Příznak: „testy projdou, ale build/deploy spadne".
+
+## CH-122 — server clamp gatovaný `typeof===number` je obejitelný číselným STRINGEM (pentest našel v MÉ opravě) — 2026-07-11
+
+**Chyba (má neúplná oprava).** V auditu jsem přidal HP clamp (styl 46) do `map-operations.service` token.update: `if (typeof patch.currentHp === 'number') { clamp }`. Pentest (PT-46d-bypass) to prostřelil: klient pošle `currentHp: "9e9"` jako **STRING** → `typeof !== 'number'` → clamp se PŘESKOČÍ → uloží se doslova → FE parsuje 9e9. Můj vlastní clamp šel obejít typovou záměnou. DTO patch je `@IsObject()` bez hloubkové typové kontroly, takže string projde.
+
+**Fix.** `Number()` coerce + `Number.isFinite` reject: `Number("9e9")`=9e9 (finite) → clampne na maxHp; `Number("abc")`=NaN → 400 `MAP_TOKEN_STATS_INVALID`. `it.failing` pin překlopen na zelený `it`.
+
+**Poučení.** U NE-DŮVĚRYHODNÝCH číselných polí (klient je posílá i jako string) NIKDY negatuj na `typeof===number` — obejde se stringem → clamp/validace se přeskočí. VŽDY `Number()` coerce + `isFinite` reject, nebo typované DTO (`@IsInt`) místo `@IsObject()`. Příznak: „opravil jsem clamp/validaci, ale drží jen pro jeden datový typ (number), string ji obejde". Sesterská lekce k CH-121 (jest ≠ typecheck): oprava ≠ oprava proti VŠEM tvarům vstupu.

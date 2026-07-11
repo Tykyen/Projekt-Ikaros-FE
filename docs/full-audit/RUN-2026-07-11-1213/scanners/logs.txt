@@ -1,0 +1,21 @@
+═══ LOG HYGIENE SCAN (M-SCAN) ═══
+
+─── BE (NestJS) ─── 163 log volání (runtime 143 / test 3 / seed 17)
+  úrovně: log:67  warn:65  error:26  debug:5
+  console.* v runtime cestě: 5   ·   logger.debug/verbose v runtime: 3
+  🚩 runtime taint: SEC:1  PII:0  OBJ:5  JSON:2  CTX:9
+
+─── FE (React) ─── 18 log volání (runtime 16 / test 2 / seed 0)
+  úrovně: error:9  warn:7  log:2
+  console.* v runtime cestě: 16   ·   logger.debug/verbose v runtime: 0
+  🚩 runtime taint: SEC:0  PII:0  OBJ:10  JSON:0  CTX:2
+
+═══ M-DOCKER (sink) + 3RD (wire debug) ═══
+  docker-compose.prod.yml: logging blok=ANO  driver=json-file  rotace(max-size)=ANO
+  docker-compose.yml: logging blok=ANO  driver=json-file  rotace(max-size)=ANO
+  3RD wire-level debug:
+    mongoose.set debug           ✅ OFF
+    nodemailer logger:true       ✅ OFF
+    nodemailer debug:true        ✅ OFF
+    DEBUG env (compose/deploy)   ✅ OFF
+  TOP-level handler (unhandledRejection/uncaughtException): ✅ ANO

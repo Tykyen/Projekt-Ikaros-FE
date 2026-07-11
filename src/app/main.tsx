@@ -18,6 +18,17 @@ import "./index.css";
 // Co nejdřív, ať pokryje i chyby při startu.
 initMonitoring();
 
+// STAB (styl 29) — po deployi má starý tab stale hash lazy chunků → dynamic
+// import route selže (`vite:preloadError`) = bílá stránka. Jednorázový reload
+// načte nový index.html + správné chunky. Guard 10 s: když ani reload nepomůže
+// (2. chyba do 10 s), přestaň loopovat; pozdější chyba (>10 s) reload povolí.
+window.addEventListener('vite:preloadError', () => {
+  const last = Number(sessionStorage.getItem('vite-preload-reload-ts') ?? '0');
+  if (Date.now() - last < 10_000) return;
+  sessionStorage.setItem('vite-preload-reload-ts', String(Date.now()));
+  window.location.reload();
+});
+
 // 10.2d-prep-A C14 — registrace per-system schémat při startup.
 // Idempotent (safe pro HMR a test setup). Po tomto volá konzumenti
 // (BestiarPage, EntitySchemaForm, EntityStatbar) `systemEntitySchemaRegistry.get()`.

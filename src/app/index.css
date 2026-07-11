@@ -21,3 +21,17 @@
 /* D-NEW-notes-inline — handwriting font pro „zápisník" Notes tab. */
 @import '@fontsource/caveat/400.css';
 @import '@fontsource/caveat/600.css';
+
+/* A11Y (plný audit 2026-07-11, styl 17) — globální respekt k prefers-reduced-motion:
+   zkrátí všechny animace/transitions na ~0 (pokryje 19 pulzů/spinnerů/shimmerů
+   bez per-místo guardu). Uživatel s reduced-motion přijímá statické UI. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

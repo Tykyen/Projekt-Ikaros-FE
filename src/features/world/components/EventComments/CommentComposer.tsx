@@ -37,6 +37,9 @@ export function CommentComposer({
   }, [autoFocus]);
 
   async function submit() {
+    // FEL (styl 38) — Enter volá submit() přímo (obchází disabled tlačítko);
+    // bez tohoto guardu 2× Enter během in-flight mutace = 2 komentáře.
+    if (add.isPending) return;
     const trimmed = content.trim();
     if (!trimmed || trimmed.length > MAX) return;
     try {
