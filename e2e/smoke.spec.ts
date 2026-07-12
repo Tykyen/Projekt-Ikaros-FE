@@ -44,5 +44,12 @@ test('login → seznam světů → vstup do světa → taktická mapa', async ({
   await expect(viewport).toBeVisible();
   // PIXI <Application> mountuje <canvas> po načtení scény → nejsilnější důkaz,
   // že se mapa vyrenderovala a PixiJS init nespadl.
-  await expect(viewport.locator('canvas')).toBeVisible({ timeout: 15_000 });
+  //
+  // Viewport ale může obsahovat DVA canvasy: PIXI (mapa) + three.js (3D dice
+  // box, `data-engine="three.js …"`). three.js se mountuje s proměnlivým
+  // timingem → holý `canvas` locator dá 1 nebo 2 elementy → strict-mode
+  // violation (flaky: lokálně 1, CI 2). Cílíme přesně na PIXI (bez data-engine).
+  await expect(
+    viewport.locator('canvas:not([data-engine])'),
+  ).toBeVisible({ timeout: 15_000 });
 });
