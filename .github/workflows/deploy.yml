@@ -72,6 +72,10 @@ jobs:
             set -e
             cd ${{ env.DEPLOY_PATH }}
             docker image prune -f
+            # Build cache: `--no-cache` build ji regeneruje při KAŽDÉM deployi;
+            # bez tohohle rostla do ~50 GB (disk 85 % plný, alert). image prune
+            # ji nemaže (jen dangling images) → nutný samostatný builder prune.
+            docker builder prune -f
             # --no-cache: Docker jinak reusoval starý FE build layer (COPY . . +
             # npm run build) i po rsyncu nového kódu → server servíroval stale
             # bundle (build proběhl za ~46 s = cache hit). Plný rebuild = jistota,
@@ -104,7 +108,7 @@ jobs:
             fi
           '
 
-      - name: Cleanup old Docker images
+      - name: Cleanup old Docker images + build cache
         if: always()
         run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker image prune -f"
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker image prune -f && docker builder prune -f"
