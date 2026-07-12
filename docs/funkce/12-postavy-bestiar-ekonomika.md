@@ -504,7 +504,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - Skupiny/typy: 2 úrovně (parent/child), vlastní sleva % (dědí se na položky).
 - Slevy se NEsčítají — priorita položka > podskupina > skupina (`effectiveDiscount`).
 - **Nákup** (`shopitems/:id/purchase`): množství, sleva, převod do měny účtu (autorita BE), kontrola dostatku (`INSUFFICIENT_FUNDS`). 3 atomické kroky: append do výbavy → odečet z účtu → purchase log. Replica set → `withTransaction`; jinak sekvenční fallback s plnou kompenzací (peníze se neztratí). (`campaign-purchase.service.ts:75-396`)
-- **Storno** (`purchases/:id/refund`): vrátí peníze + odebere položku z výbavy; atomický flip statusu (souběžné storno vrátí max 1×). (`campaign-purchase.service.ts:398-470`)
+- **Storno** (`purchases/:id/refund`): vrátí peníze + odebere položku z výbavy. **Durabilita (2026-07-12):** flip statusu `active→refunded` + kredit účtu běží v `session.withTransaction` — buď obojí commitne, nebo se rollbackne (pád mezi nimi už peníze neztratí; dřív mohl nechat status `refunded` bez vrácených peněz + hráče zablokovat). Fallback bez replica setu = sekvenční s kompenzací. Souběžné storno vrátí max 1× (atomický flip). Odebrání z výbavy je best-effort po tx. (`campaign-purchase.service.ts` `refund`/`runRefundSteps`)
 - **Historie nákupů**: staff vidí vše/per-postava; hráč jen své postavy (`listPurchases`).
 - Řazení dle ceny převedené na preferovanou měnu uživatele; preferovaná měna per-user.
 

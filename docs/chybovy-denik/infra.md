@@ -59,6 +59,36 @@ Produkční build (`deploy.yml`, čistý server bez MITM) arg **nedává** → z
 
 **Zhodnocení — dobře:** obě chyby mají jasný kořen a fix je minimální. **Poučení:** (1) přes ssh posílej remote příkaz jako **jeden řetězec** (`&&`), nikdy `bash -c '<víceřádkový>'` — uvozovky se ztratí; (2) `node <soubor>` v cizím adresáři nenajde moduly — buď soubor vedle `node_modules`, nebo `NODE_PATH`; cwd (`-w`) na resolusi `require` **nemá vliv**, jen na relativní cestu k souboru. **Příznak cyklení:** „skript proběhl, ale spadl na chybějícím modulu / `-c requires argument`" u ssh+docker exec.
 
+---
+
+## CH-070 — zopakoval jsem SSH `bash -c` chybu z CH-067 v novém disk-cleanup workflow (nečetl jsem deník před psaním) — 2026-07-12
+
+**Kontext:** psal jsem nový `server-disk-cleanup.yml` (SSH na server přes GitHub Actions, diagnostika + Docker úklid). Použil jsem `ssh host bash -c '<víceřádkový script>'`.
+
+**Co jsem udělal špatně:** přesně tentýž `bash -c` anti-pattern, který **CH-067 (před 3 dny) už zdokumentoval jako past**. V logu se objevilo `bash: -c: option requires an argument` — identický příznak. Nepřečetl jsem index chybového deníku PŘED psaním SSH workflow, ač CH-067 je přímo v `infra.md` nad tímhle záznamem.
+
+**Proč to nefungovalo (znovu):** ssh nezachová uvozovky, spojí argv mezerami; `bash -c` dostal jako argument newline (prázdno) → error. Zbytek řádků paradoxně proběhl jako samostatné příkazy v login shellu → workflow „napůl fungoval" (diagnostika i úklid se provedly, ale s chybovou hláškou v logu).
+
+**Poučení:** Před psaním JAKÉHOKOLI ssh-remote workflow projdi `infra.md` — CH-067 tenhle přesný vzor řeší. Fix: `ssh host bash -s << 'ENDSSH' … ENDSSH` (script na stdin, heredoc kvotovaný) NEBO jeden řádek s `&&` (jak radí CH-067). Použil jsem heredoc — čistší pro víceřádkové scripty. **Deploy.yml stále `bash -c`** (funguje napůl, kritický workflow → neriskuju sahat) = zdokumentovaný dluh.
+
+**Příznak cyklení:** `bash: -c: option requires an argument` v logu ssh workflow — potřetí to už NEpsat od nuly, zkopírovat heredoc pattern odsud.
+
+---
+
+## ✅ ŘEŠENÍ — disk serveru 85 % plný = Docker build cache 50 GB (deploy maže jen images, ne cache); úklid + trvalá prevence — 2026-07-12
+
+**Kontext.** Monitoring alert „Disk skoro plný, volné 15 %". Uživatel má přístup jen k GitHub Actions + webu (ne SSH terminál). Prod běží jako docker-compose stack (be/fe/prerender/mongo/redis/meili) na VPS `oak.server.leafhost.cz`.
+
+**Co zabralo — diagnóza z dat, ne z hádání.** Nešlo hádat naslepo → napsán jednorázový workflow `server-disk-cleanup.yml` (workflow_dispatch, `diagnose`/`clean`), který přes SSH vypíše `df -h` + `docker system df` PŘED, bezpečně uklidí a vypíše PO. Log ukázal jednoznačného viníka:
+- **Build Cache: 49,9 GB** (331 položek) + Images reclaimable 49,5 GB (98 %). Local Volumes (data) jen 5 GB.
+- Kořen: `deploy.yml` dělá `docker compose build --no-cache` při každém z 317 deployů → nové cache vrstvy pokaždé; cleanup krok dělá jen `docker image prune -f` (**dangling images, NE build cache**) → cache rostla neomezeně.
+
+**Úklid (bezpečný, bez dotčení dat):** `docker builder prune -f` + `docker image prune -af`; schválně BEZ `--volumes` (to by smazalo Mongo/Redis/Meili). Výsledek: disk **85 % → 23 %** (12 GB → 58 GB volných), uvolněno ~46 GB. Web běžel celou dobu (běžící images/kontejnery prune nemaže).
+
+**Trvalá prevence:** do `deploy.yml` přidán `docker builder prune -f` na dvě místa (před buildem + do finálního `if: always()` cleanupu) → cache se teď čistí po každém deployi a problém se nevrátí.
+
+**Zhodnocení — dobře:** diagnostika PŘED zápisem změny (base.md — neměň stav bez důkazu) rozsekla scénář „Docker vs uploads/Mongo" jednoznačně; workflow jako diagnostický kanál funguje i bez SSH přístupu uživatele. **Špatně:** zopakoval jsem CH-067 quoting (viz CH-070) — workflow prošel jen náhodou. **Zbývá:** RSS alert (2,46 GB embedding baseline) je JINÝ problém, čeká na `EMBEDDING_ENABLED=0` + nasazení trend-based monitoru; staré `matrix-*` .NET images (~2 GB) pořád běží Up 4 weeks — pokud je newmatrix mrtvý, lze vypnout.
+
 ## ✅ ŘEŠENÍ — monitoring 3. noha: health readiness, Discord alerty, Sentry, heartbeat — 2026-07-11
 
 **Kontext.** Vedle plny-audit + pentest (předletové brány) chyběla třetí noha — hlídač BĚŽÍCÍHO provozu. Postaveno na žádost uživatele (single server, docker-compose.prod, Discord komunita), cost-conscious nástroje.

@@ -59,6 +59,32 @@
 
 **Poučení.** Po JAKÉKOLI změně interface/DTO/typu spouštěj `tsc --noEmit` (nebo `nest build`), NE jen jest — jest a typecheck jsou různé brány. Sesterská lekce k deploy-blockeru z téhož RUN (union `@Prop` bez `type`): jest zelený NEgarantuje build/boot zelený. Příznak: „testy projdou, ale build/deploy spadne".
 
+## ✅ ŘEŠENÍ — GI: klient autorita nad hodem kostky → server-side očista payloadu (Cesta A, ne autoritativní RNG) — 2026-07-12
+
+**Problém.** Dluh D-LAUNCH-GAP: RNG hodu běží v prohlížeči (`secureRandomInt`), server `dicePayload` ukládal verbatim (DTO jen `@IsObject()`). Hráč pošle `{type:'d20', faces:[15], total:999}` → všem se zobrazí `total:999` (render čte `payload.total`).
+
+**Rozhodnutí (spec→souhlas).** Dvě cesty: **A** = server validuje/přepočítá konzistenci payloadu (RNG zůstane na klientu); **B** = server hází autoritativně (FE pošle jen záměr). Agent-research ukázal, že B = port 455řádkového roll enginu na BE + latence před 3D animací + drift risk (12+ variant, `2d6+` má `sum≠Σfaces`, GURPS/CoC nesčítají mod). Vybrána **A** — zavře dokumentovanou díru (`total:999`) levně, bez rozbití UX. B zapsána jako follow-up dluh D-DICE-SERVER-RNG.
+
+**Co zabralo.** Sdílený `common/dice/dice-payload.validator.ts` `sanitizeDicePayload` volaný ze **2 cest** (chat.service + map-operations `dice.roll`; global chat hody nemá): u součtových typů PŘEPÍŠE `sum`/`total` z `faces` (klientovým číslům nevěří), ověří meze faces + cap délky + clamp modifieru, `400 DICE_PAYLOAD_INVALID`. Systémové typy (`2d6+`/roll-under/percentile/success-pool/mixed/flat) — kde `sum≠Σfaces` nebo nesčítají mod — jen meze + rozsah; success-pool přepočítá `hits` z faces; fate přepočítá i `overpressure`. 26 unit testů.
+
+**Proč to je správně.** Klíčové zjištění: **server NEmůže reprodukovat klientský crypto RNG bez sdíleného seedu** → nelze „ověřit identický hod". Jde jen (a) validovat vnitřní konzistenci (Σfaces=sum, sum+mod=total, faces v mezích) nebo (b) hodit sám (Cesta B). U typů s vlastní total-logikou nejde přepočítat naslepo — validátor musí znát, které jsou součtové a které ne (jinak drift proti historickým hodům).
+
+**Jak ověřeno.** validator spec 26/26; typecheck ✓; lint ✓; existující chat.service + map-operations spec 154/154 (nerozbito). Reálný e2e (`total:999` přes API → přepsáno) čeká na deploy + živý test.
+
+**Zhodnocení — dobře:** spec→souhlas→plán→souhlas→kód dodržen; agent-research chytil past `2d6+`/systémové před psaním validátoru (jinak bych slepě tvrdil sum=Σfaces pro vše a rozbil legit hody). **Zbývá (vědomě):** re-rolling + cílené podvody uvnitř systémových hodů + kosmetická pod-pole (d100 `tens`/`ones`, `crit`) = follow-up Cesta B; pentest e2e dice útok (GI styl 46) není v harnessu — kandidát na regresní pin.
+
+## ✅ ŘEŠENÍ — DUR: refund ztratí peníze při pádu → session.withTransaction (flip+kredit atomicky) — 2026-07-12
+
+**Problém.** Dluh D-LAUNCH-GAP: `refund()` = 3 zápisy bez tx (flip `active→refunded` → kredit účtu → odebrání z výbavy). Pád procesu PŘESNĚ mezi flipem a kreditem → status `refunded` bez vrácených peněz = trvalá ztráta + hráč navždy zablokován `PURCHASE_ALREADY_REFUNDED`. Nákup (`purchase`) transakci MĚL (RC-E5), refund ne.
+
+**Co zabralo.** Klíčové zúžení scope: z 3 kroků jsou **kritické jen flip + kredit** (odebrání z výbavy je už dnes tolerantní `.catch()` — hráč ji mohl smazat ručně). Takže tx obaluje jen ty dva; inventory removal zůstal best-effort PO tx. Zrcadlo `purchase` RC-E5: `session.withTransaction` (replica set) + sekvenční fallback s kompenzací (single-instance). Session protažena přes: repo `markRefundedIfActive`/`markActiveIfRefunded` (+`session?`), nová `accountsService.creditInSession` (appendTransaction se session, **bez** permission gate — autorizace proběhla v refund; `adjust` gate by na `buyerUserId` mohl selhat).
+
+**Proč to je správně.** Ani jedno pořadí BEZ tx nefunguje: flip-first ztratí peníze při pádu (dnešní díra), credit-first umožní double-credit (status pořád active → retry). Atomicita flip+credit je jediná správná cesta. `creditInSession` bez gate je bezpečné, protože refund už ověřil staff/owner výš — gate v `adjust` by naopak selhal (buyer nemusí mít `allowPlayerSelfAdjust`).
+
+**Jak ověřeno.** 5 nových testů: tx cesta (flip+kredit se session, bez kompenzace), fallback (creditInSession bez session), kompenzace (kredit selže → markActiveIfRefunded + throw), double-refund (409), creditInSession unit (session + ACCOUNT_NOT_FOUND). campaign+subdocs 164/164; typecheck ✓; lint ✓. Reálný pád-mezi-kroky test = MongoMemoryReplSet e2e (kandidát, jako race e2e u purchase).
+
+**Zhodnocení — dobře:** zúžení tx na flip+kredit (ne všechny 3 kroky) = menší zásah, invariant peněz drží; unit test transakční cesty přes `mockImplementationOnce` withTransaction (spustí callback) vedle default fallbacku. **Past chycená:** fallback původně volal `adjust` (permission gate) → sjednoceno na `creditInSession` (session optional). **Zbývá:** idempotency-key pro purchase/transfer (double-click) = nový dluh D-PURCHASE-IDEMPOTENCY.
+
 ## CH-122 — server clamp gatovaný `typeof===number` je obejitelný číselným STRINGEM (pentest našel v MÉ opravě) — 2026-07-11
 
 **Chyba (má neúplná oprava).** V auditu jsem přidal HP clamp (styl 46) do `map-operations.service` token.update: `if (typeof patch.currentHp === 'number') { clamp }`. Pentest (PT-46d-bypass) to prostřelil: klient pošle `currentHp: "9e9"` jako **STRING** → `typeof !== 'number'` → clamp se PŘESKOČÍ → uloží se doslova → FE parsuje 9e9. Můj vlastní clamp šel obejít typovou záměnou. DTO patch je `@IsObject()` bez hloubkové typové kontroly, takže string projde.
