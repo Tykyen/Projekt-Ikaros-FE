@@ -10,6 +10,15 @@ afterEach(() => {
   cleanup();
 });
 
+// jsdom nemá ResizeObserver (používá ho MapDock, popovery ad.) — no-op stub,
+// testy měří layout jinak (offsetHeight mock / assert na DOM strukturu).
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+globalThis.ResizeObserver ??= ResizeObserverStub as unknown as typeof ResizeObserver;
+
 // D-NEW-register-captcha-tests — Cloudflare Turnstile (`@marsidev/react-turnstile`)
 // v jsdom nikdy nedokončí challenge → token nevznikne → submit zůstane disabled
 // → RegisterModal testy timeoutují. Mock okamžitě emituje token přes `onSuccess`,

@@ -101,11 +101,18 @@ describe('WorldCard', () => {
     expect(screen.getByText(/Vstoupit do světa/)).toBeInTheDocument();
   });
 
-  it('anon (bez membership): CTA "Detail světa", žádný role chip', () => {
-    renderCard(makeWorld(), null);
-    expect(screen.getByText(/Detail světa/)).toBeInTheDocument();
+  it('anon + private svět: zamčená karta "Soukromý svět", žádný role chip', () => {
+    // Katalog #3 — private svět nečlenovi jen zamčená karta (detail je 404).
+    renderCard(makeWorld({ accessMode: 'private' }), null);
+    expect(screen.getByText(/Soukromý svět/)).toBeInTheDocument();
     expect(screen.queryByText(/Vstoupit do/)).toBeNull();
     expect(screen.queryByText(/Hráč/)).toBeNull();
+  });
+
+  it('anon + public svět: CTA "Detail světa"', () => {
+    renderCard(makeWorld({ accessMode: 'public' }), null);
+    expect(screen.getByText(/Detail světa/)).toBeInTheDocument();
+    expect(screen.queryByText(/Vstoupit do/)).toBeNull();
   });
 
   it('maxPlayers: zobrazuje "X / Y hráčů"', () => {

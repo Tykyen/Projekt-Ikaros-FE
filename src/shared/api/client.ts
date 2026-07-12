@@ -91,6 +91,16 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // PT-35e — tokenVersion mismatch (logout-all / změna hesla): relace je
+    // revokovaná na serveru. Refresh tokeny jsou revokované taky, takže pokus
+    // o refresh by jen oddálil odhlášení o jeden failnutý request — instant
+    // logout s vysvětlující hláškou je správné UX.
+    if (error.response?.status === 401 && code === 'SESSION_REVOKED') {
+      toast.info('Tato relace byla ukončena (odhlášení ze všech zařízení).');
+      logoutAndRedirectToLogin();
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
       const store = getDefaultStore();

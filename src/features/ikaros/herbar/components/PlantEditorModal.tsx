@@ -91,7 +91,9 @@ export function PlantEditorModal({ mode, plant, onClose, onSaved }: Props) {
             imageUrl: imageUrl || '',
             habitat: habitat.trim(),
             usage: usage.trim(),
-            rarity: rarity || undefined,
+            // D-072 — '' (neurčeno) → null sentinel; undefined by JSON vypadl
+            // a dřív nastavená vzácnost by v DB zůstala navždy.
+            rarity: rarity || null,
             rarityNote: rarityNote.trim(),
             description: description.trim(),
             tags: tagList,

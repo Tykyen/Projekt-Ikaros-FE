@@ -68,6 +68,7 @@ Remember-device je v rozsahu vědomě (rozhodnutí PJ 2026-06-18): bez něj se 2
 
 **FE:**
 - Profil → `SecuritySection`: nová karta **„Dvoufaktorové ověření"** (stav, setup wizard s QR + kódem, zobrazení backup kódů, vypnutí) + karta **„Důvěryhodná zařízení"** (výpis + odvolat).
+- *(Addendum 2026-07-12, dluh D-SEC-GAP/PT-35e follow-up):* karta **„Aktivní relace"** — tlačítko „Odhlásit se ze všech zařízení" (`useLogoutAll` → `POST /auth/logout-all`, lokální úklid `clearLocalSession` bez undo okna). Ostatní zařízení dostanou `401 SESSION_REVOKED` (tokenVersion mismatch) → `client.ts` instant-logout s toastem (vzor `BANNED`).
 - `LoginModal`: nový krok `status:'totp_required'` → `TotpVerifyStep` (6místný kód / backup kód + „důvěřovat zařízení").
 - Hooks (`useTotpSetup`, `useEnableTotp`, `useDisableTotp`, `useRegenerateBackupCodes`, `useTrustedDevices`, `useRevokeTrustedDevice`), zod schémata, typy `LoginResponse` union rozšíření.
 - Žádné nové FE npm (QR je obrázek z BE).

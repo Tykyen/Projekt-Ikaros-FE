@@ -12,6 +12,13 @@ vi.mock('../../../api/useAdminStats', () => ({
 vi.mock('../../AnalyticsSection/AnalyticsSection', () => ({
   AnalyticsSection: () => null,
 }));
+// 19.1/19.2 — stejný důvod pro GrowthSection + CostsSection (React Query hooky).
+vi.mock('../../GrowthSection/GrowthSection', () => ({
+  GrowthSection: () => null,
+}));
+vi.mock('../../CostsSection/CostsSection', () => ({
+  CostsSection: () => null,
+}));
 
 const mockHook = vi.mocked(useAdminStats);
 

@@ -102,6 +102,12 @@ export function AccountSection() {
           <strong>Změna hesla</strong> vyžaduje staré heslo. Po úspěšné změně se
           odhlásí všechna ostatní zařízení.
         </p>
+        <p>
+          <strong>Odhlásit se ze všech zařízení</strong> (Bezpečnost → karta
+          „Aktivní relace"): pokud máš podezření, že se k účtu dostal někdo
+          cizí, jedním tlačítkem ukončíš všechna přihlášení — včetně toho
+          aktuálního, pak se přihlásíš znovu.
+        </p>
         <p><strong>Zapomenuté heslo</strong>:</p>
         <StepList
           steps={[

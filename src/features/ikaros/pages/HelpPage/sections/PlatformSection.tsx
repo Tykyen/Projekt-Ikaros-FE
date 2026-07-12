@@ -377,8 +377,9 @@ export function PlatformSection() {
         <Tool icon={<Flag size={16} />} title="Nahlásit obsah" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             U cizího obsahu — <strong>článku, obrázku v galerii, profilu, náboru,
-            příspěvku v diskuzi, stránky světa, novinky, přijaté zprávy v poště i
-            zprávy v chatu</strong> — najdeš tlačítko <strong>„Nahlásit"</strong>{' '}
+            příspěvku v diskuzi, stránky světa, novinky, přijaté zprávy v poště,
+            zprávy v chatu i bestie a rostliny ve Společné tvorbě</strong> —
+            najdeš tlačítko <strong>„Nahlásit"</strong>{' '}
             (ikona vlajky). Otevře formulář: vybereš <strong>kategorii</strong>{' '}
             (autorská práva, osobní údaje, obtěžování, ohrožení nezletilých,
             nezákonný obsah, spam, jiné), napíšeš <strong>důvod</strong>, necháš

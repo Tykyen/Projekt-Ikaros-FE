@@ -10,6 +10,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 import { Breadcrumbs, Button } from '@/shared/ui';
+import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { systemEntitySchemaRegistry } from '@/features/world/tactical-map/schemas/registry';
@@ -109,6 +110,15 @@ export default function KomunitniBestieDetailPage() {
                 ✔ Schválit bytost
               </Button>
             ) : null}
+            {/* D-066a — nahlásit bestii (BE enforcement B5 byl ready, chybělo
+                FE tlačítko). Jméno autora entita nenese → neutrální label. */}
+            <ReportButton
+              targetType="bestie"
+              targetId={bestie.id}
+              targetSnapshot={bestie.name}
+              targetAuthorName="Autor bestie"
+              targetAuthorId={bestie.authorId}
+            />
           </div>
         ) : null}
 

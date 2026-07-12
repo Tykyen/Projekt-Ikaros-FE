@@ -50,7 +50,7 @@ describe('StoryMapPill → viewer', () => {
   it('klik na pilulku otevře interaktivní viewer (portál do body)', () => {
     wrap(<StoryMapPill worldId="w" sceneId="s1" />);
 
-    const btn = screen.getByRole('button', { name: /Příběhová mapa/i });
+    const btn = screen.getByRole('button', { name: /^Mapa$/ });
     expect(btn).toBeTruthy();
     // viewer zatím není otevřený
     expect(screen.queryByText('Poslat do chatu')).toBeNull();
@@ -64,6 +64,6 @@ describe('StoryMapPill → viewer', () => {
 
   it('bez propojené scény se pilulka nevykreslí', () => {
     wrap(<StoryMapPill worldId="w" sceneId="s2" />);
-    expect(screen.queryByText(/Příběhová mapa/i)).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Mapa$/ })).toBeNull();
   });
 });

@@ -179,6 +179,8 @@ export interface FinanceTransaction {
     counterpartyCharacterId: string;
     direction: 'in' | 'out';
   };
+  /** PT-43 — původ tx mimo ruční adjust; `purchase` nejde vrátit přes undo (jen storno nákupu). */
+  origin?: 'purchase';
   /** 8.6 — User ID, který akci provedl (audit pro shared účty). */
   performedByUserId?: string;
 }

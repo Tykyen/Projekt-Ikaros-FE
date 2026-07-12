@@ -62,11 +62,11 @@
 - **Co jde dělat:**
   - Spustí 5s timer (`LOGOUT_UNDO_MS=5000`), vrací cancel funkci pro „Vrátit".
   - Po vypršení: fire-and-forget `POST /auth/logout` (cookie), vymaže tokeny+user, `qc.clear()`.
-- **Hranice / co neumí:** Logout je per-relace (rodina tokenů). Globální „odhlásit všude" je samostatný endpoint `POST /auth/logout-all` (vyžaduje JWT) — na FE jsem nenašel přímé UI volání `logout-all` (Bezpečnost sekce ho neexponuje).
+- **Hranice / co neumí:** Logout je per-relace (rodina tokenů). Globální „odhlásit všude" = `POST /auth/logout-all` (JWT) — od 2026-07-12 má FE UI: profil → Bezpečnost → karta **„Aktivní relace"** s tlačítkem „Odhlásit se ze všech zařízení" (`useLogoutAll` → lokální úklid `clearLocalSession` + navigace domů; bez undo okna — bezpečnostní akce).
 - **Zvláštnosti:** `POST /auth/logout` je idempotentní (204 i pro neplatný token), maže cookie. Změna hesla revokuje všechny refresh tokeny (`user.password.changed`).
-- **Invalidace access tokenu (pentest PT-35e, 2026-07-12):** access token nese claim `tv` = `user.tokenVersion`. `logout-all` i změna hesla bumpnou `tokenVersion` (`$inc`) → `JwtAuthGuard` porovná `tv` s DB a STARÝ access token (jinak žije až 3 dny) odmítne `401 SESSION_REVOKED`. Dřív se revokoval jen refresh, access token přežil. Default `tokenVersion=0` + starý token bez claimu = 0 → deploy nikoho neodhlásí (kill až po reálném bumpu). FE follow-up: tlačítko „odhlásit všude" + `SESSION_REVOKED` → instant-logout v `client.ts` (vzor `BANNED`).
-- **Stav:** ✅ funguje (logout); ✅ access-token invalidace (tokenVersion); ⚠️ logout-all = BE endpoint bez FE UI.
-- **Kód:** FE `useAuth.ts:106`, BE `auth.controller.ts:186` (logout), `:202` (logout-all).
+- **Invalidace access tokenu (pentest PT-35e, 2026-07-12):** access token nese claim `tv` = `user.tokenVersion`. `logout-all` i změna hesla bumpnou `tokenVersion` (`$inc`) → `JwtAuthGuard` porovná `tv` s DB a STARÝ access token (jinak žije až 3 dny) odmítne `401 SESSION_REVOKED`. Dřív se revokoval jen refresh, access token přežil. Default `tokenVersion=0` + starý token bez claimu = 0 → deploy nikoho neodhlásí (kill až po reálném bumpu). FE (2026-07-12): `SESSION_REVOKED` → instant-logout v `client.ts` (vzor `BANNED`) s toastem „Tato relace byla ukončena".
+- **Stav:** ✅ funguje (logout, logout-all vč. FE UI, access-token invalidace).
+- **Kód:** FE `useAuth.ts` (`useLogout`/`useLogoutAll`), `SecuritySection.tsx` (karta Aktivní relace), `client.ts` (SESSION_REVOKED); BE `auth.controller.ts:197` (logout), `:213` (logout-all).
 
 ---
 
@@ -259,7 +259,8 @@
 
 - **Min. délka hesla SJEDNOCENA** (2026-06-27, D-NEW-INV-SEC): registrace i změna/reset = min **8** (`RegisterDto`/`registerSchema` zvednuto na 8). Re-auth `PasswordConfirmDto` (2FA disable) zůstává 6 — validuje **stávající** heslo, legacy 6-znaková se nesmí zamknout.
 - ✅ VYŘEŠENO 20.2/§C1 — **GDPR data-export má FE.** Tlačítko „Stáhnout moje data (JSON)" v profilu → Účet i v `DeleteAccountModal` (`useDataExport` → `GET /data-export/me` → Blob). Dřív BE bez FE.
-- **`logout-all` bez UI:** `POST /auth/logout-all` existuje, ale Bezpečnost sekce profilu ho nenabízí (žádné „odhlásit všechna zařízení" mimo důvěryhodná zařízení a vypnutí 2FA).
+- ✅ VYŘEŠENO 2026-07-12 — **`logout-all` má UI:** profil → Bezpečnost → karta „Aktivní relace" („Odhlásit se ze všech zařízení", `useLogoutAll`). Ostatní zařízení dostanou `401 SESSION_REVOKED` → instant-logout.
+- ✅ VYŘEŠENO 2026-07-12 — **login timing enumeration:** neexistující identifier dřív odpověděl o ~100 ms rychleji (přeskočil bcrypt); teď dummy `bcrypt.compare` proti hash z uuid (login i reaktivace). Pozn.: `/auth/check-email` existenci dál vrací (záměrná UX opora registrace) — viz D-SEC-GAP.
 - ✅ OPRAVENO 2026-06-18 — **Cron doc↔chování:** `account-cleanup.cron` JSDoc tvrdí „1× za hodinu", reálně `@Cron('0 3 * * *')` = denně 03:00.
 - **Reminder mail před hard-delete chybí:** přiznaný dluh; `MailerService` injectnutý do cronu „do zásoby" (`void this.mailer`).
 - **Revert PJ handoveru při reaktivaci = manuální (D-034b):** po obnově účtu zůstanou 2 PJ ve světě, uživatel musí role spravit ručně.

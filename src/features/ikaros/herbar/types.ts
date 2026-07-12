@@ -77,7 +77,10 @@ export interface CreatePlantPayload {
 }
 
 /** Úprava rostliny — mění všechna pole (autor nebo kurátor). */
-export type UpdatePlantPayload = Partial<CreatePlantPayload>;
+export type UpdatePlantPayload = Partial<Omit<CreatePlantPayload, 'rarity'>> & {
+  /** D-072 — `null` = vymazat vzácnost zpět na „neurčeno" (BE → $unset). */
+  rarity?: PlantRarity | null;
+};
 
 export interface HerbarLibraryFilter {
   status?: PlantStatus;

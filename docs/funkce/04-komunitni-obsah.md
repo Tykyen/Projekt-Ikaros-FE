@@ -11,13 +11,13 @@ Společné principy ověřené v kódu:
 ---
 
 ### Společná tvorba — rozcestník komunitního obsahu
-- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii (aktivní) a připravované knihovny Bestiář/Herbář/Lektvary/Kouzla/Hádanky (zatím stuby).
-- **Kde:** route `/ikaros/tvorba` (`TvorbaHubPage`). Hlavní navigace: jedno tlačítko „Společná tvorba" (ikona `Palette`), které **nahradilo** samostatné položky Diskuze/Články/Galerie. „RPG systémy" zůstává v nav samostatně (veřejný SEO landing, ne komunitní tvorba). Stuby: `/ikaros/{bestiar,herbar,lektvary,kouzla,hadanky}` → sdílená `ComingSoonPage`.
+- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii, komunitní **Bestiář** (16.2b-2) a **Herbář** (21.5a); Lektvary/Kouzla/Hádanky zatím stuby.
+- **Kde:** route `/ikaros/tvorba` (`TvorbaHubPage`). Hlavní navigace: jedno tlačítko „Společná tvorba" (ikona `Palette`), které **nahradilo** samostatné položky Diskuze/Články/Galerie. „RPG systémy" zůstává v nav samostatně (veřejný SEO landing, ne komunitní tvorba). Stuby: `/ikaros/{lektvary,kouzla,hadanky}` → sdílená `ComingSoonPage`.
 - **Kdo:** hub i stuby **veřejné** (anon, bez `requireAuth`) — router `src/app/router.tsx`. Jednotlivé cíle si řeší vlastní gating (Diskuze má `requireAuth` → anon klik = login). Data dlaždic `src/features/ikaros/pages/SpolecnaTvorba/tiles.ts`.
 - **Co jde dělat:** proklik na kteroukoli sekci — aktivní dlaždice vede na svou stránku, stub na `ComingSoonPage` („Připravujeme", `noindex`) s odkazem zpět na hub. Aktivní dlaždice nese moderační badge (počet pending pro recenzenta) z `usePendingActionsCount`.
-- **Hranice / co neumí:** Bestiář/Herbář/Lektvary/Kouzla/Hádanky jsou **jen kostry** — žádný obsah, datový model ani editor (viz roadmap2 21.5a–d; Bestiář = komunitní scope 16.2b-2). Hub je čistě navigační vrstva, sám žádný obsah nedrží.
+- **Hranice / co neumí:** Lektvary/Kouzla/Hádanky jsou **jen kostry** — žádný obsah, datový model ani editor (roadmap2 21.5b–d). Hub je čistě navigační vrstva, sám žádný obsah nedrží. Bestiář a Herbář už žijí (viz sekce Herbář níže; komunitní Bestiář čeká na plnou inventuru — viz Nesrovnalosti).
 - **Zvláštnosti:** navigační badge „Společná tvorba" v `IkarosLayout` agreguje **součet** pending typů Diskuze+Články+Galerie (`NavItem` prop `pendingTypes`), aby moderátor o signál sloučením nepřišel; tooltip vyjmenuje neprázdné. Hub v prerenderu klasifikován jako statická cesta (delší TTL); stuby `noindex`.
-- **Stav:** 🚧 (fáze 1 hub + nav + stuby ✅ 2026-07-03; knihovny 21.5a–d nepostaveny)
+- **Stav:** 🚧 (hub + nav ✅ 2026-07-03; Bestiář ✅ 16.2b-2, Herbář ✅ 21.5a; Lektvary/Kouzla/Hádanky = stuby)
 - **Kód:** FE `src/features/ikaros/pages/SpolecnaTvorba/` (`TvorbaHubPage.tsx`, `ComingSoonPage.tsx`, `tiles.ts`), nav `src/app/layout/IkarosLayout/IkarosLayout.tsx` (`PRIMARY_NAV`, `NavItem`), routy `src/app/router.tsx`. BE: žádné (čistě FE navigace).
 
 ---
@@ -130,6 +130,17 @@ Společné principy ověřené v kódu:
 
 ---
 
+### Herbář — komunitní katalog rostlin (21.5a)
+- **Co to je:** Sdílená knihovna rostlin („karta bylinkáře"): dvě knihovny dle `status` (Návrhy / Schválené), detail s iluminací + tabulkou (Roste · Použití · Vzácnost · cena · štítky), editor a vklad rostliny do obchodu světa (single i bulk).
+- **Kde:** `/ikaros/herbar` (knihovna) + `/ikaros/herbar/:id` (detail, `KomunitniPlantDetailPage`). BE modul `plants` (`/api/plants/community…`).
+- **Kdo:** čtení veřejné (skryté rostliny vidí jen Admin+); založit návrh smí přihlášený; upravit autor nebo kurátor; schválit/smazat cokoli kurátor (= správci diskusí/článků + Admin/Superadmin, reuse `isBestieCurator`); autor smí smazat jen svůj návrh.
+- **Co jde dělat:** založit návrh → kurátor schválí (pending fronta „rostliny ke schválení"); upravit všechna pole (od 2026-07-12 jde vzácnost i **vymazat** zpět na „neurčeno" — `rarity: null` → BE `$unset`); vložit do obchodu světa; **nahlásit** (`ReportButton targetType="plant"`, 2026-07-12) — moderace 20B umí rostlinu skrýt (M2/M3, `moderationHidden` + revert) i smazat (M4 = hard delete, **nevratné**), enforcement listener dle vzoru bestiae.
+- **Zvláštnosti:** smazání rostliny i výměna obrázku emitují `media.orphaned` (úklid Cloudinary blobů, 2026-07-12 — dřív orphan). Seed katalogu přes FE workflow (viz memory herbar_21_5a).
+- **Stav:** ✅ (Etapa A+B + report/moderace/orphan cleanup 2026-07-12)
+- **Kód:** FE `src/features/ikaros/herbar/`; BE `backend/src/modules/plants/` (`plants.service.ts`, `moderation-enforcement.listener.ts`).
+
+---
+
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 1. **Web push novinek bez deep-linku.** `IkarosNewsService.create` volá `notifyAll` bez pole `url`, takže service worker (`public/sw.js:30`) otevře default `/` místo `/ikaros/novinky`. Deep-link infrastruktura existuje, ale není naplněna. (Stejný problém má i push globálního chatu — viz kap. 05.)
@@ -140,3 +151,5 @@ Společné principy ověřené v kódu:
 6. **Galerie postrádá bulk approve/reject**, který články mají — nekonzistence schvalovacího UX mezi dvěma jinak identickými moduly.
 7. ✅ VYŘEŠENO 20.1 — **Moderace diskuzí sjednocena do generické fronty.** Nahlášení příspěvku jede přes `POST /moderation/reports` (`ReportButton targetType="discussion_post"`) a recenzent ho vyřizuje ve frontě „Zpracovat" (`content_report`, `ContentReportRenderer`, kap. 08). Starý discussion report (`POST :id/posts/:postId/report` + `.../reports/:reportId/resolve`) i schema `ikaros_discussion_reports` **odstraněny**, data zmigrována do `content_reports`.
 8. **Mazání kategorií jen Superadmin** (články i galerie) — `Admin` je vytvoří/upraví, ale nesmaže. Záměr, ale pro uživatele matoucí; zmínit v průvodci.
+9. **Komunitní Bestiář (16.2b-2) nemá v této kapitole plnou inventuru** — knihovna, detail (statblocks, diskuse, návrhy statů), kurátorské schvalování běží, ale kódem ověřený zápis chybí. Novinka 2026-07-12: detail má `ReportButton targetType="bestie"` (BE enforcement B5 byl ready, tlačítko chybělo — D-066a).
+10. **Report bez jména autora (bestie/rostlina):** entity nesou jen `authorId`, ne username → `targetAuthorName` v reportu je neutrální „Autor bestie/rostliny". Moderátor vidí ID (ban funguje), jméno si musí dohledat.

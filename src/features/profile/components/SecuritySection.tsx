@@ -7,8 +7,10 @@ import { parseApiErrorCode } from '@/shared/api';
 import { EditCard } from './EditCard';
 import { TotpCard } from './TotpCard';
 import { TrustedDevicesCard } from './TrustedDevicesCard';
-import { useMyProfile } from '@/features/auth/api/useAuth';
+import { useMyProfile, useLogoutAll } from '@/features/auth/api/useAuth';
 import { useChangePassword } from '@/features/profile/api/useProfile';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   useMyUsernameRequest,
   useRequestUsernameChange,
@@ -42,6 +44,19 @@ function formatDate(iso: string): string {
 export function SecuritySection({ username }: { username: string }) {
   const [editingPassword, setEditingPassword] = useState(false);
   const [editingUsername, setEditingUsername] = useState(false);
+
+  const navigate = useNavigate();
+  const logoutAll = useLogoutAll();
+
+  async function onLogoutAll() {
+    try {
+      await logoutAll.mutateAsync();
+      toast.success('Odhlásili jsme tě ze všech zařízení.');
+      navigate('/');
+    } catch {
+      toast.error('Odhlášení všech zařízení se nepovedlo. Zkus to znovu.');
+    }
+  }
 
   const change = useChangePassword();
   const { data: profile } = useMyProfile();
@@ -282,6 +297,27 @@ export function SecuritySection({ username }: { username: string }) {
 
       <TotpCard />
       <TrustedDevicesCard />
+
+      {/* PT-35e follow-up — globální revokace všech relací (tokenVersion bump). */}
+      <section className={styles.card}>
+        <header className={styles.headerRow}>
+          <h2 className={styles.sectionTitle}>Aktivní relace</h2>
+        </header>
+        <p className={styles.text}>
+          Pokud máš podezření, že se k tvému účtu dostal někdo cizí, odhlas se
+          naráz ze všech zařízení. Odhlásí to i tuto relaci — poté se přihlásíš
+          znovu.
+        </p>
+        <div>
+          <Button
+            variant="secondary"
+            onClick={onLogoutAll}
+            disabled={logoutAll.isPending}
+          >
+            {logoutAll.isPending ? 'Odhlašuji…' : 'Odhlásit se ze všech zařízení'}
+          </Button>
+        </div>
+      </section>
     </>
   );
 }

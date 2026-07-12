@@ -117,6 +117,27 @@ export function useRegister() {
 }
 
 /**
+ * Lokální úklid session (tokeny + user + RQ cache + per-zařízení drafty).
+ * Sdílí useLogout (timer) a useLogoutAll — jediné místo pravdy pro hygienu.
+ */
+function clearLocalSession(qc: ReturnType<typeof useQueryClient>) {
+  const store = getDefaultStore();
+  store.set(accessTokenAtom, null);
+  store.set(refreshTokenAtom, null);
+  store.set(currentUserAtom, null);
+  store.set(pendingLogoutAtom, null);
+  // C-29 — vyčisti RQ cache (jinak osobní data přežijí pro dalšího uživatele).
+  qc.clear();
+  // FIX-3 — composer draft/NPC maska/RP datum (localStorage) + rozpracované
+  // přílohy (in-memory) jsou per zařízení, ne per uživatel → na sdíleném
+  // PC by je viděl další přihlášený. Stejná hygiena jako qc.clear() (C-29).
+  clearAllComposerSticky();
+  clearAllDraftAttachments();
+  // Hygiena — ať PWA cold open po odhlášení nevede na starou/cizí route.
+  clearLastRoute();
+}
+
+/**
  * Spustí 5s timer pro odhlášení. Vrací cancel funkci pro "Vrátit".
  * Po vypršení timeru:
  *   1) zavolá BE /auth/logout (fire-and-forget — invalidace na serveru)
@@ -134,19 +155,7 @@ export function useLogout() {
       // PC-18: refresh token v httpOnly cookie → logout bez body (cookie se pošle).
       // Fire-and-forget — BE invalidace + clear cookie, FE čistí store i kdyby selhalo.
       api.post('/auth/logout', {}).catch(() => {});
-      store.set(accessTokenAtom, null);
-      store.set(refreshTokenAtom, null);
-      store.set(currentUserAtom, null);
-      store.set(pendingLogoutAtom, null);
-      // C-29 — vyčisti RQ cache (jinak osobní data přežijí pro dalšího uživatele).
-      qc.clear();
-      // FIX-3 — composer draft/NPC maska/RP datum (localStorage) + rozpracované
-      // přílohy (in-memory) jsou per zařízení, ne per uživatel → na sdíleném
-      // PC by je viděl další přihlášený. Stejná hygiena jako qc.clear() (C-29).
-      clearAllComposerSticky();
-      clearAllDraftAttachments();
-      // Hygiena — ať PWA cold open po odhlášení nevede na starou/cizí route.
-      clearLastRoute();
+      clearLocalSession(qc);
     }, LOGOUT_UNDO_MS);
 
     return function cancel() {
@@ -154,6 +163,22 @@ export function useLogout() {
       store.set(pendingLogoutAtom, null);
     };
   };
+}
+
+/**
+ * PT-35e follow-up — „Odhlásit se všude". BE `POST /auth/logout-all` revokuje
+ * všechny refresh tokeny + bumpne tokenVersion (access tokeny všech zařízení
+ * dostanou 401 SESSION_REVOKED). Aktuální relaci čistíme lokálně hned — bez
+ * undo timeru (na rozdíl od useLogout jde o bezpečnostní akci, ne rozmyšlení).
+ */
+export function useLogoutAll() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post<void>('/auth/logout-all', {}),
+    onSuccess: () => {
+      clearLocalSession(qc);
+    },
+  });
 }
 
 /**

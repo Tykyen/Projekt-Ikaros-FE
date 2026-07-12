@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { Breadcrumbs, Button } from '@/shared/ui';
+import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { useKomunitniPlant } from './hooks/useKomunitniHerbar';
@@ -95,6 +96,15 @@ export default function KomunitniPlantDetailPage() {
                 ✔ Schválit
               </Button>
             ) : null}
+            {/* D-070 — nahlašování herbáře (12. plocha 20B). Jméno autora
+                entita nenese → neutrální label; ban řeší targetAuthorId. */}
+            <ReportButton
+              targetType="plant"
+              targetId={plant.id}
+              targetSnapshot={plant.name}
+              targetAuthorName="Autor rostliny"
+              targetAuthorId={plant.authorId}
+            />
           </div>
         ) : null}
 

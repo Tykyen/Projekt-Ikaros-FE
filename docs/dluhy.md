@@ -2,7 +2,7 @@
 
 > Soubor obsahuje **pouze otevřené a odložené** dluhy.
 > Historie uzavřených dluhů dohledatelná v git logu (`git log --all -- docs/dluhy.md`).
-> Stav k 2026-07-10.
+> Stav k 2026-07-12 (kódem ověřená revize všech položek).
 
 ---
 
@@ -10,62 +10,19 @@
 
 > **Dluhy z inventury funkcí (2026-06-18).** Devět seskupených `D-NEW-INV-*` níže vzniklo z kódem ověřené inventury [`docs/funkce/`](funkce/00-prehled.md). Master tracker + mapování na fáze: `docs/roadmap2.md` → **Průřez Ú**. Cíl: na konci Etapy II 0 otevřených. (Rychlé doc/text fixy se řeší zvlášť, ne tady.)
 
-### D-070 — Herbář: chybí moderation enforcement listener (report/hide rostliny)
-**Soubor:** BE `backend/src/modules/plants/plants.service.ts:137-149` (`moderationSetHidden` bez volajícího) · chybí `ReportTargetType` položka + FE `ReportButton` v herbáři.
-**Problém:** Rostlina má moderační pole (`moderationHidden`/`moderationHiddenReason`) a service metodu `moderationSetHidden` (parity s bestiae B5), ale **nic ji nevolá** — herbář není napojen na generickou moderaci 20B: rostlina nemá položku v `ReportTargetType`, FE detail nemá `ReportButton` a neexistuje enforcement listener, který by na `moderation.hide/delete` skryl/smazal rostlinu. Skrytí jde dnes jen ručním zásahem do DB.
-**Dopad:** Nízký/střední — komunitní rostliny nelze nahlásit ani moderátorsky skrýt přes UI (obsah tvoří přihlášení, katalog seedovaný kurátorem, takže reálné riziko malé), ale „nahlašování všude" na herbář nedosahuje.
-**Řešení:** přidat `plant` do `ReportTargetType`, `ReportButton` do `KomunitniPlantDetailPage`, a enforcement listener (vzor bestiae `moderation-enforcement.listener.ts`) volající `moderationSetHidden`/delete.
-**Kdy:** Navazuje na 20B / Etapu B herbáře; levné (BE metoda ready).
-
----
-
-### D-071 — Herbář: hard-delete / výměna obrázku rostliny → orphan blob na Cloudinary
-**Soubor:** BE `backend/src/modules/plants/plants.service.ts:120-135` (`remove`) + `repositories/plants.repository.ts` (`update`/`delete`).
-**Problém:** Smazání rostliny (`DELETE community/:id`) ani výměna `imageUrl` v editu **nevydává `media.orphaned` event** (na rozdíl od bestiae, které úklid osiřelých blobů přes EventEmitter má) → obrázek zůstane viset na Cloudinary. Komentář v `remove` to explicitně přiznává. U seedovaných rostlin (folder `community-herbar`) navíc `public_id = slug(name)` s `overwrite:true`, takže re-seed přepíše, ale ruční smazání/výměna z UI blob osiří.
-**Dopad:** Nízký — postupné plýtvání úložištěm; žádná funkční ani bezpečnostní vada.
-**Řešení:** emitovat `media.orphaned` (nebo přímý cleanup) při delete rostliny a při změně `imageUrl` v `update` (starý URL → orphan). Sdílet mechanismus s bestiae/upload cleanupem.
-**Kdy:** S dotažením media cleanupu (souvisí s upload/media audit); nízká priorita.
-
----
-
-### D-072 — Herbář: vzácnost (`rarity`) nelze v editu vymazat zpět na „neurčeno"
-**Soubor:** FE `src/features/ikaros/herbar/components/PlantEditorModal.tsx:94` (`rarity: rarity || undefined`) · BE `backend/src/modules/plants/schemas/plant.schema.ts:40-41` (`rarity` bez `null`).
-**Problém:** Když uživatel v editoru přepne Vzácnost zpět na „— neurčeno —", FE pošle `rarity: undefined`. Mongoose `$set` hodnotu `undefined` zahodí (a BE `rarity` navíc není nullable), takže dřív nastavená vzácnost v DB **zůstane** — pole nelze vyprázdnit. Ostatní textová pole se v editu vyprázdní správně (posílají se jako `''`), jen `rarity`/`suggestedPrice` (enum/číslo) mají tuto asymetrii.
-**Dopad:** Nízký — kosmetika editace; nastavit lze jinou vzácnost, jen ne „žádnou".
-**Řešení:** FE posílat sentinel pro vymazání (např. `rarity: null`) + BE `update` mapovat `null` na `$unset rarity` (a `rarity` v schématu povolit `null`), nebo přijmout prázdný string a service ho přeložit na `$unset`.
-**Kdy:** Při další práci na herbáři (Etapa B) nebo sjednocení „vymazatelných" polí.
-
----
-
-### D-066 — Moderace: dvě plochy nedotažené (bestie report + deník/chat enforcement)
-**Soubor:** FE bestie detail (report tlačítko chybí) · BE `characters`/`chat` enforcement listenery (M2/M3/M4 log-only)
-**Problém:** (a) `bestie` má plný BE enforcement (B5-BE: skrýt/smazat/revert) i položku v `ReportTargetType`, ale **NEMÁ FE `ReportButton`** — bestii nelze nahlásit (enforcement je nedosažitelný). (b) `character_diary` a `chat_message`: report jde odeslat, ban autora (M5/M6) funguje, ale **content-level zásah (M2/M3 skrýt, M4 smazat) je jen `logWarn`/TODO** — konkrétní deník/zpráva se reálně neskryje/nesmaže (subdoc / WS gateway, B4b/B5-BE je vědomě odložily).
-**Dopad:** Nízký/střední — „nahlašování všude" je z 9 ploch splněné; chybí bestie (report) a plné vynucení u 2 soukromých ploch. Ban autora funguje všude.
-**Řešení:** (a) přidat `ReportButton targetType="bestie"` do bestie detailu (BE ready). (b) doplnit enforcement: deník = skrýt/smazat subdoc (přes character-subdocs), chat = smazat zprávu přes gateway; nebo vědomě ponechat account-level-only a zdokumentovat.
-**Kdy:** Navazující na 20.1; bestie report brzy (levné), enforcement soukromých ploch dle potřeby.
-
----
-
-### D-064 — FE `vitest run` suite-wide rozbitý („failed to find current suite")
-**Soubor:** `vitest.config.ts` (auto-merge root `vite.config.ts` s `react()` pluginem) — projevuje se na VŠECH ~466 test souborech.
-**Problém:** `vitest run` selže identicky na všech suitách („Vitest failed to find the current suite", 0 testů) i na souborech, kterých se nikdo nedotkl. Ověřeno na čistém běhu (smazaná cache, bez souběžnosti). NENÍ regrese z 20.1–20.3 — padá i na weather/calendar/tactical-map. Odpovídá známému gotcha (react() plugin se auto-merguje do vitest configu → rozbitý test context; pravděpodobně Node 24 / rozpracovaný working tree).
-**Dopad:** Vysoký pro vývoj — **celý FE unit test runner nejede**; featury 20.1–20.3 ověřeny jen `tsc -b` (build gate) + logika zvlášť, ne vitestem. Produkci neblokuje.
-**Řešení:** Prošetřit `vitest.config.ts` merge s root vite (viz komentář v souboru + memory `vitest_config_gotchas`) — izolovat vitest config od `react()` pluginu / ověřit Node verzi. Dokud nejede, FE se ověřuje `tsc`.
-**Kdy:** Brzy — blokuje FE TDD/regresní síť.
-
----
-
-### D-065 — Moderace: revert odvolání (unban) nerozlišuje zdroj banu
-**Soubor:** `backend/src/modules/users/moderation-enforcement.listener.ts` (`moderation.revert` větev M5/M6)
-**Problém:** Když se odvolání proti moderačnímu banu vyhoví (`overturned`), listener účet odbanuje bez ohledu na to, jestli byl mezitím nezávisle zabanován adminem z jiného důvodu → mohl by odbanovat účet, který má zůstat zabanovaný. Edge case (zalogováno), moderace = zdroj pravdy.
-**Dopad:** Nízký — vyžaduje souběh moderačního banu + nezávislého admin banu na stejném účtu + overturn odvolání.
-**Řešení:** Ukládat zdroj/důvod banu (`bannedBy` už existuje) a revert unbanovat jen pokud aktuální ban pochází z moderace (`decisionId`/zdroj shoda), jinak jen zalogovat.
-**Kdy:** Až se moderace ostře používá; nízká priorita.
+### D-066 — Moderace: content-level enforcement deníku a chatu (log-only)
+> Část (a) — bestie report — **vyřešena 2026-07-12** (`ReportButton targetType="bestie"` v `KomunitniBestieDetailPage`); spolu s ní přibyl i report rostlin (D-070). Zbývá (b):
+**Soubor:** BE `users/moderation-enforcement.listener.ts:80-92` (fallback logWarn) — `characters`/`chat` nemají vlastní listenery.
+**Problém:** `character_diary` a `chat_message`: report jde odeslat, ban autora (M5/M6) funguje, ale **content-level zásah (M2/M3 skrýt, M4 smazat) je jen `logWarn`/TODO** — konkrétní deník/zpráva se reálně neskryje/nesmaže (subdoc / WS gateway, B4b/B5-BE je vědomě odložily).
+**Dopad:** Nízký/střední — „nahlašování všude" je z 12 ploch splněné; chybí plné vynucení u 2 soukromých ploch. Ban autora funguje všude.
+**Řešení:** doplnit enforcement: deník = skrýt/smazat subdoc (přes character-subdocs), chat = smazat zprávu přes gateway; nebo vědomě ponechat account-level-only a zdokumentovat.
+**Kdy:** Navazující na 20.1; dle potřeby.
 
 ---
 
 ### D-063 — Identita správce (spolek) + zpracovatelé nedoplněni na legal stránkách (20A)
-**Soubor:** `src/features/ikaros/pages/PrivacyPage.tsx`, `ContactPage.tsx`, `CodeOfConductPage.tsx`, `TermsPage.tsx` — placeholdery `[DOPLNIT: …]`
+> `CodeOfConductPage` + `TermsPage` už placeholdery nemají (ověřeno 2026-07-12) — zbývají 2 soubory níže.
+**Soubor:** `src/features/ikaros/pages/PrivacyPage.tsx:35-200`, `ContactPage.tsx:27-52` — placeholdery `[DOPLNIT: …]`
 **Problém:** Zásady OÚ (`/soukromi`), Kontakt (`/kontakt`) a Podmínky nemají doplněnou totožnost správce: chybí název spolku, IČO, sídlo, spisová značka + soud spolkového rejstříku a kontaktní/provozní e-mail (pro uživatele i orgány). Navíc seznam zpracovatelů v Zásadách OÚ má u části služeb (hosting, SMTP, AI/LLM, error tracking, platební brána) nepotvrzené konkrétní poskytovatele + jejich EU/třetí-země status a transfer mechanismus (DPF vs. SCC).
 **Dopad:** Vysoký (blokuje **veřejné spuštění**) — GDPR čl. 13 vyžaduje totožnost správce, DSA čl. 11/12 kontaktní místa; bez nich nelze web pustit veřejně. NEblokuje implementaci ani beta.
 **Řešení:** Až uživatel/advokát dodá údaje spolku, nahradit všechny `[DOPLNIT]` (grep `dopisat` / `DOPLNIT`), potvrdit seznam zpracovatelů a u každé US služby uvést DPF/SCC. Poté bumpnout verzi dokumentů.
@@ -105,19 +62,21 @@
 **Dopad:** Nízký — leak reálného jména PJ mimo chat.
 **Řešení:** aplikovat personu i na serverové cesty (cross-cutting). **Kdy:** Fáze 14. Zdroj: kap. 13.
 
-### D-NEW-INV-PUSH — Inventura: web push spam + chybějící deep-link
-**Soubory:** BE `global-chat.service.ts` (`notifyAll` na každou zprávu), `ikaros-news.service` (`notifyAll` bez `url`), `push.service`; FE `public/sw.js` (deep-link připraven); pošta `ikaros-messages` (bez push).
-**Problém:** globální chat pushuje **každou** zprávu **všem** (spam-vektor, bez throttlingu/opt-out/exclude odesílatele); push payloady nemají `url` → klik otevře jen `/` místo cílové místnosti/novinky; pošta nepushuje vůbec; jediný přepínač zapne/vypne vše (žádné per-typ předvolby).
-**Dopad:** Střední — push prakticky nepoužitelný pro aktivní uživatele.
-**Řešení:** `url` do payloadu; throttle + opt-out + vyloučit odesílatele u chatu; push i pro poštu; per-typ předvolby.
+### D-NEW-INV-PUSH — Inventura: web push mezery (deep-link novinek/Hospody, pošta, odesílatel)
+> Spam-vektor **vyřešen** (push jen z Hospody, opt-in přes kategorii; Camp nepushuje) + články/galerie/diskuze/platform-chat deep-link `url` MAJÍ — ověřeno 2026-07-12.
+**Soubory:** BE `ikaros-news.service.ts:129` (push bez `url`), `global-chat.service.ts:451` (Hospoda push bez `url`, neexkluduje odesílatele), `ikaros-messages.service.ts` (pošta bez push).
+**Problém:** push novinek a Hospody nemá `url` → klik otevře jen `/` místo cíle; odesílatel dostává vlastní push (`notifyAll` bez exclude); pošta nepushuje vůbec (jen WS gateway).
+**Dopad:** Nízký/střední — deep-link a pošta chybí; spam už ne.
+**Řešení:** doplnit `url` do news+Hospoda payloadů; exclude odesílatele; push pro poštu.
 **Kdy:** Fáze 14.8 / 15.1 (PWA). Zdroj: kap. 04/05. Souvisí [[project_web_push_chat_status]].
 
-### D-NEW-INV-ADMIN-UI — Inventura: BE endpointy bez FE (admin/účet)
-**Soubory:** BE `users.controller` reset-password (Superadmin), `admin.controller` `POST /admin/users`, `data-export.controller` `/me`, `auth` `logout-all`; FE chybí.
-**Problém:** funkční BE endpointy nemají FE: admin reset hesla, založení uživatele, GDPR export vlastních dat, „odhlásit všechna zařízení". Změna cizího e-mailu adminem neexistuje vůbec.
-**Dopad:** Střední — GDPR export z UI nedostupný; admin operace jen přes API/skripty.
-**Řešení:** doplnit FE konzumenty + admin formuláře; zvážit endpoint pro adminskou změnu e-mailu.
-**Kdy:** Fáze 14.7 (export) / 20.2 (GDPR). Zdroj: kap. 01/08.
+### D-NEW-INV-ADMIN-UI — Inventura: BE endpointy bez FE (admin)
+> GDPR export vlastních dat (FE `useDataExport`) + „odhlásit všechna zařízení" (karta Aktivní relace v profilu → `useLogoutAll`, 2026-07-12) **hotové**.
+**Soubory:** BE `users.controller` reset-password (Superadmin), `admin.controller` `POST /admin/users`; FE chybí.
+**Problém:** funkční BE endpointy nemají FE: admin reset hesla, založení uživatele. Změna cizího e-mailu adminem neexistuje vůbec.
+**Dopad:** Střední — admin operace jen přes API/skripty.
+**Řešení:** doplnit admin formuláře; zvážit endpoint pro adminskou změnu e-mailu.
+**Kdy:** Fáze 20.2. Zdroj: kap. 01/08.
 
 ### D-NEW-INV-PROFILE — worldsCount + komunitní stuby profilu
 > `displayName` trim (FE+BE) + `void role` (vyjasněn jako záměr 12.1) **vyřešeno 2026-06-27** — viz git log.
@@ -127,25 +86,27 @@
 **Řešení:** doplnit worldsCount do friend shape (BE); napojit sekce na existující moduly. **Kdy:** Fáze 15.6 / 16.4. Zdroj: kap. 02.
 
 ### D-NEW-INV-DATA-SYNC — Inventura: konzistence dat postav/měn
-**Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies` `updateCurrencies` (full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
+> Ověřeno otevřené 2026-07-12: sync TODO trvá (`map-operations.service.ts:698`); currencies dostaly diff jen pro autorizaci (`isMetadataOnlyEdit`), perzistence zůstává full-replace.
+**Soubory:** BE `map-operations.service.ts` (token→Character sync TODO), `world-currencies.service.ts:79` (`updateCurrencies` full-replace), `character-subdocs.service.ts` (finance/inventory create vs. read), `characters.repository.ts` (legacy `/characters/directory`).
 **Problém:** staty/HP tokenu PC/NPC se z mapy nepropíšou do listiny postavy (žijí v `diary.customData`); `updateCurrencies` přepisuje celou sadu (riziko ztráty měn bez delta merge); subdoc finance/výbava se zakládají i pro NPC/Lokaci, ale `getFinance`/`getInventory` je pro ně blokuje 404 → orphan data; legacy adresářový endpoint zůstává vedle Pages directory (dvojí zdroj).
 **Dopad:** Střední — tichá nekonzistence.
 **Řešení:** dotáhnout token↔Character sync; delta merge měn; nezakládat nepoužitelné subdoky (nebo je zpřístupnit); odstranit legacy directory.
 **Kdy:** Fáze 16.2. Zdroj: kap. 12/14.
 
 ### D-NEW-INV-MAPS — Inventura: taktická mapa nedotažené
-**Soubory:** BE `maps`/`map-operations` (undo `inverse=null` u `scene.deactivate`, `member.bulkAssignToScene`; combat order), `world-maps.service.ts:47` (role práh PJ).
-**Problém:** undo neúplné (některé operace nelze vrátit); role-prahy nejednotné (atlas „Mapy" = PJ, ale taktická mapa/zvuky/deník = PomocnyPJ); combat order má dvojí zdroj pravdy (`scene.combat.order` vs. live-sort dle initiative); „A* pohyb" reálně jen dosah, ne pathfinding přes překážky.
+> Role práh atlasu „Mapy" **sjednocen na PomocnyPJ+** (`world-maps.service.ts:56`) — ověřeno 2026-07-12.
+**Soubory:** BE `map-operations.service.ts:352` (undo `inverse=null` u `scene.deactivate`), `world-operations.service.ts:393` (`member.bulkAssignToScene` inverse=null); combat order.
+**Problém:** undo neúplné (některé operace nelze vrátit); combat order má dvojí zdroj pravdy (`scene.combat.order` vs. live-sort dle initiative); „A* pohyb" reálně jen dosah, ne pathfinding přes překážky.
 **Dopad:** Nízký–střední — UX pasti pro PJ.
-**Řešení:** doplnit inverse pro chybějící operace; sjednotit role-prahy; vyjasnit jediný zdroj combat order; pathfinding buď doplnit (17.x), nebo opravit spec (rychlý fix).
+**Řešení:** doplnit inverse pro chybějící operace; vyjasnit jediný zdroj combat order; pathfinding buď doplnit (17.x), nebo opravit spec (rychlý fix).
 **Kdy:** Fáze 17.x. Zdroj: kap. 14.
 
 ### D-NEW-INV-CLEANUP — Inventura: úklid kódu (drift & mrtvé)
-> audit-log labely (FE `AdminAuditAction` srovnáno s BE, +16 akcí) **sjednoceny 2026-06-27** — viz git log.
-**Soubory:** BE `user.interface.ts` (UserRole legacy 3–8), `UsersTable.tsx` (`canEditPlatformPages` mrtvý flag), 3× content service (`Tyky` bypass), `admin.service.ts` (`getUsers` in-memory filtr), `meili-search.service.ts` (tichý fail), favorites toggly (duplicitní).
-**Problém:** BE `UserRole` stále drží legacy world role (3–8), FE už vyhodil (drift po D-053); `canEditPlatformPages` se ukládá, ale nikde nevynucuje; admin bypass přes username `=== 'Tyky'`; `getUsers` filtruje až po vytažení stránky (nekonzistentní paginace); MeiliSearch bez Dockeru vrací prázdno bez chyby; favorites toggle zkopírovaný v 3 modulech.
-**Dopad:** Nízký — maintainability + 1 provozní past (Meili).
-**Řešení:** vyčistit BE enum; odstranit mrtvý flag; bypass přes roli/flag; paginace v DB dotazu; surface Meili health/chybu; centralizovat favorites.
+> audit-log labely (2026-06-27) + `Tyky` bypass (odstraněn, R-RUN-03 + regresní testy) + Meili tichý fail (teď `logWarn` před `return []`) **vyřešeny** — ověřeno 2026-07-12.
+**Soubory:** BE `user.interface.ts:6-11` (UserRole legacy 3–8), `admin.service.ts:154` (`hasPendingDeletion` in-memory filtr — zbytek getUsers už jede v repo query), `user.interface.ts:29` + `admin.service.ts:740` (`canEditPlatformPages` žije v typu/defaultech; FE toggle už skryt), favorites toggly (duplicitní ve 3 modulech).
+**Problém:** BE `UserRole` stále drží legacy world role (3–8), FE už vyhodil (drift po D-053); `hasPendingDeletion` filtruje in-memory po vytažení stránky; mrtvý flag přežívá v typu; favorites toggle zkopírovaný ve 3 modulech.
+**Dopad:** Nízký — maintainability.
+**Řešení:** vyčistit BE enum; `hasPendingDeletion` do DB dotazu; odstranit flag z typu+defaultů; centralizovat favorites.
 **Kdy:** Fáze 14.9. Zdroj: kap. 02/06/08.
 
 ---
@@ -153,25 +114,20 @@
 ---
 
 ### D-SEC-GAP-2026-07-11 — Bezpečnostní/compliance/korektnostní nálezy z gap-huntu (podklad pro styly 32–41)
-> Zdroj: cílený gap-hunt skillu `plny-audit` (7 optik hrozeb + 2 doběhy, 2026-07-11). Nálezy **ověřené čtením kódu**; slouží jako seed pro nové auditní styly 32–41 a jako TODO oprav. Neopravuje se tiše — čeká na rozhodnutí o pořadí. 3 headline nálezy mají připravené návrhy oprav.
-**🔴 KRITICKÉ — ✅ OPRAVENO 2026-07-11 (typecheck+lint+guard testy 25/25; nutný BE restart+deploy):**
-- **SSRF exfiltrace ve world-exportu** — ✅ `world-export.service.ts`: `isMediaUrl` nahrazen origin-allowlistem (`res.cloudinary.com`/`*.cloudinary.com`, jen https) + `fetch` s `AbortSignal.timeout(10s)`, `redirect:'error'` a size cap 25 MB. (Dřív gate propustil jakoukoli http URL s media příponou/„cloudinary" → PJ přečetl interní síť do ZIP.)
-- **Pád instance při výpadku Redisu** — ✅ `socket-io.adapter.ts`: `.on('error', log)` na pub+sub klient → výpadek Redisu už neshodí proces.
-**⭐ VYSOKÉ — ✅ OPRAVENO 2026-07-11:**
-- **JWT role staleness** — ✅ `jwt-auth.guard.ts`: po načtení usera z DB `request.user.role = user.role` (freshness) → demotovaný Admin ztrácí práva okamžitě, ne za 3 dny. + regresní test (12/12). Follow-up `tokenVersion` **✅ ZAVŘENO 2026-07-12 (pentest PT-35e):** access token nese claim `tv`, guard porovná s DB (`401 SESSION_REVOKED`), `logoutAll`+změna hesla bumpnou `$inc tokenVersion`; default-0 = deploy nikoho neodhlásí. FE follow-up: tlačítko „odhlásit všude" + `SESSION_REVOKED` instant-logout v `client.ts` (BE endpoint dnes bez FE UI).
-- **Erasure nechává PII** (GDPR) — `chatmessages.senderName`/`content` se při hard-delete NIKDY neanonymizují (chat modul bez `user.deletion.hardDeleted` handleru); push subscriptions přežijí; `anonymizeForHardDelete` nechá `username`/`characterName`; `/data-export/me` neúplný (čl. 15). Věková brána 15+ (`isMinor`) NEblokuje registraci.
-- **Dvojí odeslání při 2 replikách** — `chat/scheduled-messages.job.ts:24` čte pending a AŽ POTOM `setStatus` (bez atomického claimu); ŽÁDNÝ cron nemá distributed lock → hard-delete/push/anonymizace běží 2× při horizontálním škálování (které SLO 500 světů vyžaduje). **Fix:** `findOneAndUpdate({status:'pending'},{status:'sending'})` claim + Redis lock na crony.
-**~ STŘEDNÍ (výběr):** account enumeration (login timing + `/auth/check-email`), ~~2FA brute-force bez per-účet lockoutu~~ **✅ ZAVŘENO 2026-07-12 (pentest PT-35a): 5 chyb → 15 min lockout (`429 TOTP_LOCKED`), per-účet (nezávislé na IP)**, ekonomika na float (IEEE-754 drift → overdraft guard selže), offset-paginace bez `_id` tiebreaku, anti-abuse creation-flood (bez capu na počet entit), FE „prázdný stav místo chyby" + nulová FE error-telemetrie, `chatSkin` bez supporter gate, Mongo bez `cs` collation + slug strhává diakritiku (kolize), MeiliSearch bez českého stemmingu, camp cron bez `Europe/Prague`.
-**Dopad:** vysoký — bezpečnostní povrch veřejné 15+ platformy. **Kdy:** SSRF+Redis okamžitě (✅ opraveno c8c1b9e), zbytek jako první běh stylů 32–41. Souvisí: [D-NEW-UM10-storage-quota](#), [D-NEW-chat-presence-scale](#).
+> Zdroj: cílený gap-hunt skillu `plny-audit` (2026-07-11). **Opraveno a kódem ověřeno (→ smazáno, viz git log):** SSRF world-export, pád při výpadku Redisu, JWT staleness + `tokenVersion` (PT-35e), TOTP lockout (PT-35a); **2026-07-12 navíc:** scheduled-messages atomický claim (pending→sending + stale recovery), login timing-equalizer (dummy bcrypt), FE „odhlásit všude" + `SESSION_REVOKED` instant-logout. Zbývá:
+**⭐ VYSOKÉ:**
+- **Erasure nechává PII** (GDPR) — stav po revizi 2026-07-12: chat handler `user.deletion.hardDeleted` UŽ anonymizuje `senderName` a push subscriptions se mažou; **vědomě ponecháno** `content` zpráv (zachování konverzace ostatních) a `username` (tombstone) — plná content-erasure = **právní rozhodnutí, které zatím nepadlo**. Věková brána 15+ (`isMinor`) NEblokuje registraci. Zbývá: rozhodnout content/username + registrace <15.
+- **Crony bez distributed locku** — scheduled-messages už mají atomický claim (✅ 2026-07-12), ale ostatní crony (hard-delete/anonymizace/world-cleanup/push) poběží při 2+ replikách na každé instanci → duplicitní běhy. **Fix:** Redis lock (SETNX/redlock) na `@Cron` handlery.
+**~ STŘEDNÍ (výběr):** account enumeration přes `/auth/check-email`/`check-username` (vrací existenci; login timing už srovnán 2026-07-12 — endpoint je ale záměrná UX opora registrace, rozhodnout throttle vs. redesign), ekonomika na float (IEEE-754 drift → overdraft guard selže), offset-paginace bez `_id` tiebreaku, anti-abuse creation-flood (bez capu na počet entit), FE „prázdný stav místo chyby" + nulová FE error-telemetrie, `chatSkin` bez supporter gate (pozn. 2026-07-12: dle `world-membership.schema` vědomě self-service = motiv světa; rozhodnout, zda gate vůbec chceme), Mongo bez `cs` collation + slug strhává diakritiku (kolize), MeiliSearch bez českého stemmingu, camp cron bez `Europe/Prague`.
+**Dopad:** vysoký — bezpečnostní povrch veřejné 15+ platformy. **Kdy:** první běh stylů 32–41. Souvisí: [D-NEW-UM10-storage-quota](#), [D-NEW-chat-presence-scale](#).
 
 ### D-LAUNCH-GAP-2026-07-11 — Nálezy 2. gap-huntu (launch-hardening, podklad pro styly 42–46)
 > Zdroj: 2. cílený gap-hunt skillu `plny-audit` (6 optik: vizuál/durabilita/deploy-skew/doručování/hardening/herní integrita + přísný dedup). Nálezy ověřené čtením. Neopravuje se tiše.
+> **Opraveno a kódem ověřeno (→ smazáno, viz git log):** HP clamp, stored XSS `pages.table.title` (PT-36a), `writeConcern {w:'majority',j:true}`; **2026-07-12 navíc:** undo peníze z ničeho (PT-43b/c/d — `origin:'purchase'`/`transferRef` guard 409 + undo za stejným gate jako adjust). Zbývá:
 **🔴 KRITICKÉ:**
-- **Refund ztratí peníze při pádu (DUR)** — `campaign-purchase.service.ts:451-486` `refund()` = 3 zápisy BEZ transakce i kompenzace → pád mezi kroky = status `refunded` ale peníze nevrácené, hráč blokován `PURCHASE_ALREADY_REFUNDED` (nevratné); revert-fail jen `logError('ruční oprava nutná')`. + `database.module.ts:9-20` bez `writeConcern:{w:'majority',j:true}` + `purchase`/`transfer` bez idempotency-key (double-click = 2. odečet).
-- **Klient je autorita nad hodem/HP (GI)** — `chat.service.ts:1419` uloží `dicePayload` verbatim (DTO jen `@IsObject()`) → hráč pošle `{sum:20,total:999}` a všem se zobrazí pravý hod; `token-ops.dto.ts:25` + 0 clampů HP v BE → hráč nastaví vlastnímu tokenu `currentHp:99999` i zápor. Server výsledek nikdy nepřepočítává. **HP clamp udělat hned (levné).**
-- **62 slepých FE volání bez BE routy (SKEW)** — `route-audit` hlásí 62 FE volání na neexistující BE routu (`useNabory` POST ozvat-se, `useModeration` GET decisions/mine) a v `ci.yml:106` je scan VYPNUTÝ → ani HEAD-drift se nehlídá. **Zapnout cross-repo route-audit jako CI bránu.**
-- **Stored XSS v `pages.table.title` (PT-36a)** — `sanitizeTable` (`pages.service.ts:54`) sanitizuje headers+values, NE `title`; sink `PageSidebar.tsx:98` `dangerouslySetInnerHTML` → `title:"<img src=x onerror=…>"` střelí u KAŽDÉHO diváka vč. PJ/Admin = krádež cookie / převzetí účtu. **Fix ~jednořádkový (title do `sanitizeTable`).** Nový nález pentest katalogu 2026-07-11.
-- **Undo = peníze/věci z ničeho (PT-43b/c/d)** — `undoLastOnce` (`character-accounts.service.ts:480`) popne poslední tx bez typové vazby: po nákupu/převodu popne DEBET → balance +100, položka/druhý účet zůstává → tvorba peněz cross-account; navíc obchází `allowPlayerSelfAdjust:false`. **Fix:** undo nesmí popnout purchase/transfer-vázanou tx (nebo undo=PJ-only + za stejný gate jako adjust). Nový nález 2026-07-11.
+- **Refund ztratí peníze při pádu (DUR)** — `campaign-purchase.service.ts:451` `refund()` má už kompenzační vzor (atomický status-flip `markRefundedIfActive` + revert při selhání kreditu — částečné zlepšení), ale NENÍ transakce: pád procesu PŘESNĚ mezi flipem a kreditem peníze ztratí (v kódu přiznaný dluh; nákup `session.withTransaction` MÁ, refund ne). + `purchase`/`transfer` stále bez idempotency-key (double-click = 2. odečet). **→ vlastní spec (domluveno 2026-07-12).**
+- **Klient je autorita nad hodem (GI)** — `chat.service.ts:1434` uloží `dicePayload` verbatim (DTO jen `@IsObject()`, ověřeno 2026-07-12) → hráč pošle `{sum:20,total:999}` a všem se zobrazí pravý hod. Server výsledek nikdy nepřepočítává. (HP clamp už ✅.) **→ vlastní spec (domluveno 2026-07-12).**
+- **62 slepých FE volání bez BE routy (SKEW)** — cross-repo route-audit v `ci.yml:106` gated za `vars.ENABLE_CROSSREPO_AUDIT` + secret `BE_REPO_TOKEN` → default NEBĚŽÍ, HEAD-drift se nehlídá. **Zapnout jako CI bránu** (akce uživatele: vytvořit PAT + nastavit repo variable).
 > Kompletní pentest attack katalog (~55 útoků, 19 stylů, priorita P0-P5, stav pin/it.failing/TODO) = `backend/test/security/attack-catalog.md`. Mezery katalogu (doplnit): REST IDOR na data, hlubší auth flows, CORS reflection, cross-instance, dep CVE.
 **⭐/~ VYSOKÉ+STŘEDNÍ:** vizuální regrese = 0 automatická brána (96 skin CSS, edit tokenu tiše rozbije skin; Chromatic nainstalován ale mrtvý; Playwright jen chromium/desktop → mobil overflow neasertován); SMTP `sendMail` loguje „Sent" i pro neexistujícího příjemce (bounce async, hráč zamčený) + 1 Gmail ~500/den bez fronty → reset-flood vyčerpá cap → legitimní reset tiše selže; push dedup jen na zařízení → WS replay = 2 reset tokeny; last-write-wins na `tokens.$.<key>` (lost update HP v boji).
 **SHARPENINGY (do existujících stylů, ne nové):** styl 5 — Mongo/Redis bez `--auth` + `--bind_ip_all`, backend port `0.0.0.0:3001` obchází TLS; styl 31 — backend bez Docker healthcheck, deploy bez rollbacku (prune+rebuild latest), `ulimits.nofile`/`pids_limit` chybí (socket strop 1024), disk-cap upload-fallbacku (sdílí disk s Mongo); styl 26 — HTTP slow-loris timeouty v `main.ts`; styl 33 — SMTP/webpush bez timeoutu.
@@ -240,19 +196,5 @@ fallback na Map + testy).
 
 ---
 
-## Vyřešené
-
-### D-16.2F-DRDPLUS-CHAT-BESTIE-SKIN — DrD+ bestie v chatu se neoskinuje · ✅ 2026-07-05
-**Kde:** `src/features/world/chat/components/rail/BestieInstancePanel.tsx` + `BestieRollPanel.tsx` (drdplus větev).
-**Kořen:** drdplus bestie v chatu se renderovala BEZ `DiarySkinScope` → na potomka nevzniklo `data-diary-skin`, takže `--dd-*` skin tokeny (z `diary-skins.css`) se neinjektly a panel `.root` spadl na pergamen fallbacky (`var(--dd-*, <default>)`) = default vzhled bez ohledu na skin. Zavádějící komentář tvrdil „self-contained, `.root` má vlastní --dd-*", ale ty byly v 16.2d odebrány (mapa je zdroj pravdy: `TokenSystemSheet` drdplus obaluje `DiarySkinScope` správně).
-**Oprava:** obaleno `<DiarySkinScope worldId={worldId}>` v obou souborech (vzor drd2/drd16). Komentáře opraveny. Ověřeno: `npm run build` ✓.
-
-### D-NEW-ANON-HEADER-OVERFLOW — Anon hlavička přetékala na úzkém mobilu · ✅ 2026-07-03
-**Kde:** `src/themes/ThemeSwitcher.module.css` + `IkarosLayout.tsx` (`HeaderLoggedOut`).
-**Kořen:** ThemeSwitcher trigger držel plný název motivu (~108 px) a na mobilu se neskrýval (nemá `.headerBtnLabel`), takže anon hlavička přetékala ~42 px; „Registrace" navíc po skrytí labelu zůstávalo prázdné tlačítko.
-**Oprava:** `@media (max-width:768px)` v ThemeSwitcheru skryje název motivu (zůstane jen šipka; výběr běží přes rozbalovací nabídku) → trigger 108→32 px; „Registrace" dostalo ikonu `UserPlus` (na mobilu ikona místo prázdna). Ověřeno měřením: `scrollWidth === clientWidth` na 360/375/768, `hOverflow=false`, žádný `_headerNav`/`_headerBtn` offender.
-
----
-
 ## D-AUDIT-2026-07-11 — otevřené nálezy plného auditu (46 stylů)
-Plný hloubkový audit RUN 2026-07-11 našel ~100+ nálezů. **Kritický deploy-blocker (26× schema `@Prop` union bez `type` → app se nenaboot­uje) + baseline červená JIŽ OPRAVENY.** Nefixnuté (dle priority) v `docs/full-audit/RUN-2026-07-11-1213/report.md` + `checkpoints/`. Hlavní 🔴: herní integrita (HP clamp ✅ / dice+turn otevřené), anti-abuse kvóty ✅, ~~TOTP lockout + token-invalidace~~ **✅ ZAVŘENO 2026-07-12 (pentest PT-35a/e)**, GDPR erasure handlery ✅, refund tx ✅, cron atomický claim, cascade blob leak (chat attachments) ✅, socket-swap FE listener leak, WS bez rate-limitu, bundle SLO, nula DB záloh. Bez souhlasu neopravováno (mimo výše uvedené kritické).
+Plný hloubkový audit RUN 2026-07-11 našel ~100+ nálezů. **Kritický deploy-blocker (26× schema `@Prop` union bez `type` → app se nenaboot­uje) + baseline červená JIŽ OPRAVENY.** Nefixnuté (dle priority) v `docs/full-audit/RUN-2026-07-11-1213/report.md` + `checkpoints/`. Hlavní 🔴: herní integrita (HP clamp ✅ / dice+turn otevřené — dice → vlastní spec), anti-abuse kvóty ✅, ~~TOTP lockout + token-invalidace~~ **✅ ZAVŘENO 2026-07-12 (PT-35a/e; FE „odhlásit všude" + SESSION_REVOKED 2026-07-12)**, GDPR erasure handlery ✅, refund tx ✅ (kompenzace; plná tx → vlastní spec), ~~cron atomický claim~~ **✅ scheduled-messages 2026-07-12** (Redis lock ostatních cronů zbývá — viz D-SEC-GAP), cascade blob leak (chat attachments) ✅, socket-swap FE listener leak, WS bez rate-limitu, bundle SLO, nula DB záloh. Bez souhlasu neopravováno (mimo výše uvedené kritické).

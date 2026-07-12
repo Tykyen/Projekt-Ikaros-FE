@@ -109,6 +109,8 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText('Přezdívka'), 'newbie');
   await user.type(screen.getByLabelText('Heslo'), 'pass1234');
   await user.type(screen.getByLabelText('Potvrzení hesla'), 'pass1234');
+  // 20C §C2 — povinná věková kategorie (bez ní zod blokuje submit)
+  await user.click(screen.getByRole('radio', { name: /Je mi 15 nebo více/i }));
   // D-010 — GDPR checkbox je povinný
   await user.click(screen.getByRole('checkbox'));
 }
@@ -147,6 +149,9 @@ describe('RegisterModal — render + validation', () => {
     await user.type(screen.getByLabelText('Přezdívka'), 'newbie');
     await user.type(screen.getByLabelText('Heslo'), 'pass1234');
     await user.type(screen.getByLabelText('Potvrzení hesla'), 'JINE12345');
+    // ageBracket musí projít — object-level refine (shoda hesel) běží až po
+    // úspěšné base validaci, jinak se chyba shody vůbec nevyhodnotí.
+    await user.click(screen.getByRole('radio', { name: /Je mi 15 nebo více/i }));
     await user.click(screen.getByRole('button', { name: 'Vytvořit účet' }));
     await waitFor(() => {
       expect(screen.getByText(/neshod/i)).toBeInTheDocument();
@@ -178,6 +183,7 @@ describe('RegisterModal — submit + auto-login', () => {
       username: 'newbie',
       password: 'pass1234',
       acceptedTerms: true,
+      isMinor: false,
       captchaToken: 'test-captcha-token',
       hp: '',
     });
