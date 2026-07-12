@@ -66,3 +66,19 @@
 **Fix.** `Number()` coerce + `Number.isFinite` reject: `Number("9e9")`=9e9 (finite) → clampne na maxHp; `Number("abc")`=NaN → 400 `MAP_TOKEN_STATS_INVALID`. `it.failing` pin překlopen na zelený `it`.
 
 **Poučení.** U NE-DŮVĚRYHODNÝCH číselných polí (klient je posílá i jako string) NIKDY negatuj na `typeof===number` — obejde se stringem → clamp/validace se přeskočí. VŽDY `Number()` coerce + `isFinite` reject, nebo typované DTO (`@IsInt`) místo `@IsObject()`. Příznak: „opravil jsem clamp/validaci, ale drží jen pro jeden datový typ (number), string ji obejde". Sesterská lekce k CH-121 (jest ≠ typecheck): oprava ≠ oprava proti VŠEM tvarům vstupu.
+
+## ✅ ŘEŠENÍ — 2 auth P0 díry z pentestu ZAVŘENY: tokenVersion (invalidace access tokenu) + per-účet TOTP lockout — 2026-07-12
+
+**Co zabralo.** Pentest (PT-35a/e) doložil 2 auth díry, které audit vědomě nechal (blast-radius) jako `it.failing` piny. Po schválení specu opraveno:
+- **PT-35e — access token přežil „odhlásit všude" / změnu hesla.** Access token je stateless JWT (TTL 3 dny); `logoutAll` i `handlePasswordChanged` revokovaly jen REFRESH token, access žil dál. Fix = **`tokenVersion`** na useru: access token nese claim `tv`, `JwtAuthGuard` (kde už usera z DB kvůli ban/delete gate načítám) porovná `tv` s DB — nesouhlas → `401 SESSION_REVOKED`. `logoutAll` + `handlePasswordChanged` bumpnou `$inc tokenVersion`.
+- **PT-35a — 2FA kód šel brutit donekonečna.** `loginTotp` ověřuje challenge přes `peek` (nespotřebuje při chybě) a nikde nedržel čítač neúspěchů → útočník s platným heslem hádal 6místný kód bez limitu (per-IP throttle obejde rotací IP). Fix = **per-účet lockout**: `failedTotpAttempts` + `totpLockedUntil`; 5 chyb → zámek 15 min (`429 TOTP_LOCKED`), úspěch resetuje. Atomické repo metody (`$inc` / `findByIdAndUpdate`).
+
+**Proč to je správně (a ne jiná varianta).** (1) **tokenVersion default 0 + starý token bez claimu = 0** → při deployi se NIKDO neodhlásí (kill nastane až po prvním reálném bumpu); to je klíčová vlastnost proti „big-bang logoutu". (2) **Kontrola v guardu, ne nová DB query** — usera tam už načítám kvůli ban/delete/role-freshness, `tv` porovnání je zdarma. (3) **Lockout per-ÚČET, ne per-IP** — pentest schválně rotoval `X-Forwarded-For`; per-IP throttle by nechytl. (4) **Ban/delete řeší per-request gate zvlášť** (zabít token umí i bez logout-all) → tokenVersion pokrývá jen dobrovolné „odhlásit všude" + změnu hesla, nezdvojuje ban cestu.
+
+**Jak ověřeno.** `nest build` ✅ · `tsc --noEmit` ✅ · `eslint` ✅ · session.attack e2e: PT-35a + PT-35e `it.failing`→`it` **GREEN** (9 passed) · celá security e2e 65/65 (regrese guard/token) · unit **2531/2531**. Validita pinů zadarmo: oba byly RED jako `it.failing`, teď procházejí jako `it` → přechod dokazuje, že je zavřela obrana. **BE past (CH-121 znovu):** rozšíření `IUsersRepository` o 3 metody NErozbilo `tsc` (volný mock cast), ale runtime jest ANO (`resetTotpFailures is not a function` v `auth.service.spec`) → doplněn mock. Vždy po interface změně i `jest`, nejen `tsc`.
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Guard už usera načítal → tokenVersion přidán bez výkonového nákladu; default-0 invariant = bezpečný deploy.
+- 👍 Pin `it.failing`→`it` = validita obrany prokázaná automaticky, žádné ruční „vypni obranu, ať zčervená".
+- 👎 `logoutAll` NEMÁ FE UI (funkce 01-ucet:65) → tokenVersion nejvíc těží z cesty **změna hesla**; FE tlačítko „odhlásit všude" + `SESSION_REVOKED` instant-logout v `client.ts` zůstávají FE follow-up.
+- ⚠️ Enumerace účtů (PT-35b/c/d) NEopravena — vědomý trade-off (accepted), zůstává `it.failing`.

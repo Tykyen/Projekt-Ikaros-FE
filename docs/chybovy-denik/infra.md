@@ -79,3 +79,17 @@ Produkční build (`deploy.yml`, čistý server bez MITM) arg **nedává** → z
 - **Sentry bezpečně:** `Sentry.init` jen když je DSN (žádné hooky bez DSN); `captureException` bez init = no-op.
 
 **Jak ověřeno.** tsc 0, eslint 0, ~35 nových unit testů + error-contract e2e 12/12 + npm audit prod (high) OK. **Poctivá mezera:** vnitřní monitoring neumí ohlásit vlastní smrt (totální výpadek serveru) → nutný EXTERNÍ UptimeRobot (dead-man switch z druhé strany) — akce uživatele. **Zhodnocení dobře:** dávka po dávce, každá ověřená+pushnutá; no-op bez env = nulové riziko nasazení. **Špatně:** full-app e2e boot timeoutuje (heavy) → health ověřen unit s mock deps místo e2e.
+
+## ✅ ŘEŠENÍ — RSS alert cinkal každých 30 min: fixní práh POD baseline (ONNX ~2,46 GB), ne leak → trend-based monitor — 2026-07-12
+
+**Symptom.** Discord „⚠️ Vysoká paměť (RSS) 2460–2483 MB > práh 1536 MB — možný memory leak" à ~30 min celou noc. Uživatel: „musíme s tím něco udělat, je to každou hodinu."
+
+**Diagnóza (kořen).** NENÍ leak. Za 4 h RSS 2460→2483 MB (+23 MB) a od 3:19 stagnuje = **vysoká plochá baseline**, ne růst k OOM. Baseline = dva ONNX embedding modely granite (107M+278M) načtené IN-PROCESS (~2–2,5 GB, `embedding-search.service.ts:83`). Práh `RSS_ALERT_MB=1536` je nastavený POD baseline → `rss > 1536` je pravda pořád → cron (á 1 min, cooldown 30 min) alertuje každých 30 min. **Absolutní práh je špatný signál pro leak** — vysoká baseline je legitimní.
+
+**Fix (2 páky).** (1) **Trvalá úspora:** `EMBEDDING_ENABLED=0` v prod `.env` + restart → RSS −2 GB (~500 MB); keyword hledání (MeiliSearch, primární) jede dál, mizí jen sémantická nadstavba. **Akce uživatele** (prod). (2) **Správný monitor (kód):** `health-monitor.service.ts` z „alert když RSS > fixní práh" → **trend-based**: (a) warn „Rostoucí paměť (RSS trend)" jen když RSS trvale nad MINIMEM okna (default +384 MB a ≥20 % za ~30 min) → chytí reálný leak nezávisle na baseline, plochá baseline (i vysoká) mlčí; (b) critical „Kritická paměť (RSS)" při `RSS > RSS_HARD_MB` (default 3500) = blízkost OOM. Nové env volitelné (`RSS_WINDOW`/`RSS_LEAK_GROWTH_MB`/`RSS_HARD_MB`), `RSS_ALERT_MB` deprecated.
+
+**Proč správně.** Baseline (ONNX) je legitimní stav, ne chyba — monitor má hlásit ZMĚNU (růst = leak) nebo REÁLNÉ nebezpečí (blízko OOM), ne absolutní číslo, které závisí na tom, co je zrovna v paměti. Minimum okna (ne nejstarší vzorek) = odolné proti krátkému spiku (export/PDF) na kraji okna. Reset historie při restartu = správně (nový proces nedědí staré vzorky).
+
+**Jak ověřeno.** nest build ✅ · tsc ✅ · eslint ✅ · spec 9/9 (3 nové: plochá 2460 MB → ticho · růst 500→1000 → trend warn · 3600 → critical). Commit 9e854fc.
+
+**Zhodnocení.** Dobře: rozlišení „vysoká baseline vs. rostoucí" je jádro — bez něj monitor buď spamuje (práh nízko) nebo prospí leak (práh vysoko). Špatně/pozor: trend okno 30 vzorků = leak se ohlásí až po ~30 min růstu (přijatelné); velmi pomalý leak pod +384 MB/30 min nechytne (kompromis proti false-pozitivům). Poučení: než „memory leak" → změř TREND, ne absolutní RSS; vysoká baseline ≠ leak.

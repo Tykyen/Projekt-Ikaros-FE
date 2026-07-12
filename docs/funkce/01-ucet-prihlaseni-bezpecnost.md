@@ -64,7 +64,8 @@
   - Po vypršení: fire-and-forget `POST /auth/logout` (cookie), vymaže tokeny+user, `qc.clear()`.
 - **Hranice / co neumí:** Logout je per-relace (rodina tokenů). Globální „odhlásit všude" je samostatný endpoint `POST /auth/logout-all` (vyžaduje JWT) — na FE jsem nenašel přímé UI volání `logout-all` (Bezpečnost sekce ho neexponuje).
 - **Zvláštnosti:** `POST /auth/logout` je idempotentní (204 i pro neplatný token), maže cookie. Změna hesla revokuje všechny refresh tokeny (`user.password.changed`).
-- **Stav:** ✅ funguje (logout); ⚠️ logout-all = BE bez FE UI.
+- **Invalidace access tokenu (pentest PT-35e, 2026-07-12):** access token nese claim `tv` = `user.tokenVersion`. `logout-all` i změna hesla bumpnou `tokenVersion` (`$inc`) → `JwtAuthGuard` porovná `tv` s DB a STARÝ access token (jinak žije až 3 dny) odmítne `401 SESSION_REVOKED`. Dřív se revokoval jen refresh, access token přežil. Default `tokenVersion=0` + starý token bez claimu = 0 → deploy nikoho neodhlásí (kill až po reálném bumpu). FE follow-up: tlačítko „odhlásit všude" + `SESSION_REVOKED` → instant-logout v `client.ts` (vzor `BANNED`).
+- **Stav:** ✅ funguje (logout); ✅ access-token invalidace (tokenVersion); ⚠️ logout-all = BE endpoint bez FE UI.
 - **Kód:** FE `useAuth.ts:106`, BE `auth.controller.ts:186` (logout), `:202` (logout-all).
 
 ---
@@ -151,7 +152,8 @@
   - Jen TOTP (`twoFactorMethod:'totp'`). Žádné SMS / e-mail / WebAuthn/passkeys.
   - 10 záložních kódů, každý 1×. Po vyčerpání nutná regenerace (jinak jen TOTP). Žádné varování „dochází ti kódy".
   - TOTP tolerance ±1 okno (±30 s).
-  - Challenge TTL = 5 min; `peek` neničí challenge při překlepu, brute-force chrání throttler (5/min na `/auth/login/totp`).
+  - Challenge TTL = 5 min; `peek` neničí challenge při překlepu.
+  - **Per-účet lockout (pentest PT-35a, 2026-07-12):** 5 špatných kódů/záložních kódů → účet zamčen 15 min (`429 TOTP_LOCKED`), úspěch čítač resetuje. Nezávislé na IP — `peek` challenge nespotřebuje, takže bez tohoto by útočník s platným heslem hádal kód donekonečna (per-IP throttler `5/min` obejde rotací IP). Čítač `failedTotpAttempts` + `totpLockedUntil` na useru (atomické `$inc`).
 - **Zvláštnosti:**
   - Secret šifrovaný (`TotpCryptoService`, klíč `TOTP_ENC_KEY`). Sanitizace SafeUser odstraní `totpSecretEnc` + `backupCodeHashes`.
   - Challenge se SPOTŘEBUJE až při správném kódu (`consume` po `verifyForLogin`).
