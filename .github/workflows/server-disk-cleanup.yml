@@ -1,0 +1,74 @@
+name: Server Disk Cleanup
+
+# Ruční údržba disku serveru (alert „Disk skoro plný"). Nejdřív VYPÍŠE stav
+# (diagnostika), pak BEZPEČNĚ uklidí Docker build cache + staré obrazy a ukáže,
+# kolik se uvolnilo. NEMAŽE volumes (Mongo/Redis/Meili data) ani běžící stack.
+on:
+  workflow_dispatch:
+    inputs:
+      prune:
+        description: 'Uklidit? "diagnose" = jen vypíše stav, "clean" = i smaže build cache + staré obrazy'
+        required: true
+        default: diagnose
+        type: choice
+        options:
+          - diagnose
+          - clean
+
+jobs:
+  disk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Diagnostika disku (PŘED)
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            echo "===== df -h / ====="
+            df -h /
+            echo ""
+            echo "===== docker system df (souhrn) ====="
+            docker system df
+            echo ""
+            echo "===== docker system df -v | největší images ====="
+            docker system df -v 2>/dev/null | head -40
+            echo ""
+            echo "===== velikost uploads/ (disk fallback) ====="
+            du -sh /opt/*/backend/uploads 2>/dev/null || echo "žádný uploads/ adresář nenalezen"
+          '
+
+      - name: Bezpečný úklid (jen při prune=clean)
+        if: ${{ github.event.inputs.prune == 'clean' }}
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            echo "===== docker builder prune -f (build cache — hlavní žrout po --no-cache buildech) ====="
+            docker builder prune -f
+            echo ""
+            echo "===== docker image prune -af (všechny NEpoužívané obrazy; běžící stack se nedotkne) ====="
+            docker image prune -af
+            # POZN.: schválně BEZ --volumes a BEZ `system prune --volumes` —
+            # to by smazalo Mongo/Redis/Meili data. Volumes necháváme být.
+          '
+
+      - name: Diagnostika disku (PO)
+        if: ${{ github.event.inputs.prune == 'clean' }}
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
+            set -e
+            echo "===== df -h / (po úklidu) ====="
+            df -h /
+            echo ""
+            echo "===== docker system df (po úklidu) ====="
+            docker system df
+          '
