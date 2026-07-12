@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { api } from '@/shared/api/client';
+import { toast } from 'sonner';
+import { api, parseApiErrorCode } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
 import type {
   ConvertCurrencyRequest,
@@ -33,12 +34,33 @@ export function useWorldCurrencies(worldId: string) {
   });
 }
 
+/**
+ * 409 `CURRENCY_CONFLICT` z PUT currencies — souběžná editace (optimistic
+ * lock `expectedUpdatedAt`). Hook hlášku + refetch řeší centrálně; call-site
+ * onError s vlastním toastem má na conflict jen tiše skončit.
+ */
+export function isCurrencyConflict(err: unknown): boolean {
+  return parseApiErrorCode(err) === 'CURRENCY_CONFLICT';
+}
+
 export function useUpdateCurrencies(worldId: string) {
   const qc = useQueryClient();
   const key = worldCurrenciesQueryKey(worldId);
   return useMutation({
-    mutationFn: (payload: UpdateCurrenciesPayload) =>
-      api.put<WorldCurrenciesPayload>(`/worlds/${worldId}/currencies`, payload),
+    mutationFn: (payload: UpdateCurrenciesPayload) => {
+      // Optimistic lock — `expectedUpdatedAt` z posledního GET (cache; onMutate
+      // ho zachovává). Při souběžné změně vrátí BE 409 CURRENCY_CONFLICT
+      // místo tichého přepisu cizí editace. Bez updatedAt (placeholder/legacy)
+      // se token neposílá → BE spadne na prostý upsert.
+      const cachedUpdatedAt = qc.getQueryData<WorldCurrenciesPayload>(key)?.updatedAt;
+      const expectedUpdatedAt =
+        payload.expectedUpdatedAt ??
+        (cachedUpdatedAt ? new Date(cachedUpdatedAt).toISOString() : undefined);
+      return api.put<WorldCurrenciesPayload>(`/worlds/${worldId}/currencies`, {
+        items: payload.items,
+        ...(expectedUpdatedAt ? { expectedUpdatedAt } : {}),
+      });
+    },
     onMutate: async (payload) => {
       await qc.cancelQueries({ queryKey: key });
       const prev = qc.getQueryData<WorldCurrenciesPayload>(key);
@@ -49,8 +71,18 @@ export function useUpdateCurrencies(worldId: string) {
       }));
       return { prev };
     },
-    onError: (_err, _payload, ctx) => {
+    onSuccess: (data) => {
+      // PUT response nese čerstvý `updatedAt` → hned další edit má platný
+      // lock i před dokončením refetche z invalidace.
+      qc.setQueryData(key, data);
+    },
+    onError: (err, _payload, ctx) => {
       if (ctx?.prev) qc.setQueryData(key, ctx.prev);
+      if (isCurrencyConflict(err)) {
+        toast.error(
+          'Měny mezitím upravil někdo jiný — načítám aktuální stav.',
+        );
+      }
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: key });

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { api, apiClient } from '@/shared/api/client';
 import { currentUserAtom } from '@/shared/store/authStore';
+import { socketGenerationAtom } from '@/features/chat/store/socketStore';
 import {
   useSocket,
   useSocketEvent,
@@ -192,13 +193,18 @@ export function useAdminChatRealtime(channelId: string | null): {
     new Map<string, ReturnType<typeof setTimeout>>(),
   );
 
+  // D-AUDIT-2026-07-11 — `socketGenerationAtom` v deps: po swapu instance
+  // (reconnectSocket / re-auth) se effect re-bindne na živý socket; bez toho
+  // by `leave` při unmountu mířil na mrtvou instanci a živý socket by zůstal
+  // v platform-chat roomu (stejný vzor jako useWorldSocket/useMapSocket).
+  const socketGeneration = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     if (!channelId) return;
     socket.emit('platform-chat:join', { channelId });
     return () => {
       socket.emit('platform-chat:leave', { channelId });
     };
-  }, [socket, channelId]);
+  }, [socket, channelId, socketGeneration]);
 
   // Po reconnectu Socket.IO zahodí rooms → re-join.
   // FIX-4 — re-join sám nedoplní zprávy zmeškané BĚHEM výpadku (žádný replay

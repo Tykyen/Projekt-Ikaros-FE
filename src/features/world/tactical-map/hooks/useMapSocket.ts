@@ -12,11 +12,23 @@
  *   - `map:operation` — incoming op od jiných klientů na téže scéně
  *   - `map:reassigned` — private emit pro current usera (PJ ho přesunul)
  *
+ * D-AUDIT-2026-07-11 (socket-swap listener leak) — listenery jedou přes
+ * swap-safe `useSocketEvent`/`useSocketReconnect`; ruční `socket.on` bez
+ * sledování instance zůstal po `reconnectSocket()` viset na mrtvém socketu
+ * (mapa oslepla, re-join se nespustil). Join/leave emit effect sleduje
+ * `socketGenerationAtom`, aby unmount `map:leave` mířil na ŽIVOU instanci.
+ *
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.2.
  */
 import { useCallback, useEffect } from "react";
+import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { getSocket } from "@/features/chat/api/socket";
+import { socketGenerationAtom } from "@/features/chat/store/socketStore";
+import {
+  useSocketEvent,
+  useSocketReconnect,
+} from "@/features/chat/api/useSocket";
 import type { RulerLine } from "../components/MapRulerLayer";
 import type {
   MapOperationBroadcast,
@@ -69,6 +81,11 @@ export function useMapSocket({
   onPing,
   onRuler,
 }: UseMapSocketOptions): UseMapSocketResult {
+  // D-AUDIT-2026-07-11 — `socketGenerationAtom` v deps: po swapu instance se
+  // effect re-runne (leave na starou = neškodný no-op, join na novou), takže
+  // pozdější unmount `map:leave` odejde na ŽIVÝ socket. Bez toho by nová
+  // instance po odchodu z mapy zůstala v scene roomu (BE dedup nemá leave).
+  const socketGeneration = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     if (!sceneId) return;
     const socket = getSocket();
@@ -78,75 +95,43 @@ export function useMapSocket({
     return () => {
       socket.emit("map:leave", sceneId);
     };
-  }, [sceneId]);
+  }, [sceneId, socketGeneration]);
 
   // 10.2i — reconnect: socket.io po (re)connectu má prázdné rooms → musíme
   // re-join scene room (jinak přestaneme dostávat broadcasty) a spustit
   // forced catch-up. `connect` se emituje až PO (re)connectu, takže když je
   // socket při mountu už připojený, initial se nevyvolá (žádný duplicate).
-  useEffect(() => {
-    const socket = getSocket();
-    const handler = (): void => {
-      if (sceneId) socket.emit("map:join", sceneId);
-      onReconnect?.();
-    };
-    socket.on("connect", handler);
-    return () => {
-      socket.off("connect", handler);
-    };
-  }, [sceneId, onReconnect]);
+  // Swap-safe přes `useSocketReconnect` (dřív ruční listener na mrtvé instanci).
+  useSocketReconnect(() => {
+    if (sceneId) getSocket().emit("map:join", sceneId);
+    onReconnect?.();
+  });
 
   // S-02 — BE MapsGateway posílá `error` při selhání operace (forbidden /
   // scéna neexistuje / neautentizováno). Bez listeneru byla akce tichý no-op
   // bez zpětné vazby; toast dá uživateli vědět, že operace neprošla.
-  useEffect(() => {
-    const socket = getSocket();
-    const handler = (payload: { code?: string; message?: string }): void => {
-      toast.error(payload?.message ?? "Operace na mapě se nezdařila.");
-    };
-    socket.on("error", handler);
-    return () => {
-      socket.off("error", handler);
-    };
-  }, []);
+  useSocketEvent<{ code?: string; message?: string }>("error", (payload) => {
+    toast.error(payload?.message ?? "Operace na mapě se nezdařila.");
+  });
 
   // Listener: map:operation (per-scene broadcast)
-  useEffect(() => {
-    if (!onOperation) return;
-    const socket = getSocket();
-    const handler = (payload: MapOperationBroadcast): void =>
-      onOperation(payload);
-    socket.on("map:operation", handler);
-    return () => {
-      socket.off("map:operation", handler);
-    };
-  }, [onOperation]);
+  useSocketEvent<MapOperationBroadcast>("map:operation", (payload) => {
+    onOperation?.(payload);
+  });
 
   // Listener: map:reassigned (private cross-scene přesun)
-  useEffect(() => {
-    if (!onReassigned) return;
-    const socket = getSocket();
-    const handler = (payload: MapReassignedBroadcast): void =>
-      onReassigned(payload);
-    socket.on("map:reassigned", handler);
-    return () => {
-      socket.off("map:reassigned", handler);
-    };
-  }, [onReassigned]);
+  useSocketEvent<MapReassignedBroadcast>("map:reassigned", (payload) => {
+    onReassigned?.(payload);
+  });
 
   // Listener: map:spotlight (PJ ukázal na token — ephemeral)
-  useEffect(() => {
-    if (!onSpotlight) return;
-    const socket = getSocket();
-    const handler = (payload: MapSpotlightBroadcast): void =>
-      onSpotlight(payload);
-    socket.on("map:spotlight", handler);
-    return () => {
-      socket.off("map:spotlight", handler);
-    };
-  }, [onSpotlight]);
+  useSocketEvent<MapSpotlightBroadcast>("map:spotlight", (payload) => {
+    onSpotlight?.(payload);
+  });
 
-  // Listener: map:pinged (kdokoli pingnul — ephemeral). BE posílá poziční args.
+  // Listener: map:pinged (kdokoli pingnul — ephemeral). BE posílá POZIČNÍ args
+  // → nejde přes `useSocketEvent` (předává jen 1. argument); ruční registrace
+  // s re-bindem přes `socketGenerationAtom` (swap-safe) + cleanup stejné reference.
   useEffect(() => {
     if (!onPing) return;
     const socket = getSocket();
@@ -156,23 +141,17 @@ export function useMapSocket({
     return () => {
       socket.off("map:pinged", handler);
     };
-  }, [onPing]);
+  }, [onPing, socketGeneration]);
 
   // Listener: map:rulered (kdokoli měří — ephemeral). BE přidává authenticated
   // userId (klíč per-uživatel, ne z payloadu).
-  useEffect(() => {
-    if (!onRuler) return;
-    const socket = getSocket();
-    const handler = (payload: {
-      userId: string;
-      userName: string;
-      line: RulerLine | null;
-    }): void => onRuler(payload.userId, payload.userName, payload.line);
-    socket.on("map:rulered", handler);
-    return () => {
-      socket.off("map:rulered", handler);
-    };
-  }, [onRuler]);
+  useSocketEvent<{
+    userId: string;
+    userName: string;
+    line: RulerLine | null;
+  }>("map:rulered", (payload) => {
+    onRuler?.(payload.userId, payload.userName, payload.line);
+  });
 
   const emitSpotlight = useCallback(
     (tokenId: string): void => {

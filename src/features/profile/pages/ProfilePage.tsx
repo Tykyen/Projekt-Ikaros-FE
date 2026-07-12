@@ -9,7 +9,7 @@ import { WorldsSection } from '../components/WorldsSection';
 import { MyCharactersSection } from '../components/MyCharactersSection';
 import { ProfileEventsSection } from '../components/ProfileEventsSection';
 import { FriendsSection } from '../components/FriendsSection';
-import { CommunityPlaceholders } from '../components/CommunityPlaceholders';
+import { CommunitySections } from '../components/CommunitySections';
 import { AppearanceSection } from '../components/AppearanceSection';
 import { PrivacySection } from '../components/PrivacySection';
 import { NotificationPreferencesSection } from '../components/NotificationPreferencesSection';
@@ -21,7 +21,7 @@ import styles from './ProfilePage.module.css';
 /**
  * 1.3a — Profil uživatele (`/ikaros/profil`).
  * Self-edit: hlavička (avatar, displayName, město…), bio, postava v Campu,
- * světy, komunita placeholders, vzhled, bezpečnost, účet.
+ * světy, komunitní sekce (diskuze/články/galerie), vzhled, bezpečnost, účet.
  *
  * Username change a smazání účtu jsou disabled (přijdou v 1.3b/c).
  * Změna emailu vyžaduje verifikaci (přijde v 1.7).
@@ -73,7 +73,7 @@ export default function ProfilePage() {
 
         <ProfileEventsSection />
 
-        <CommunityPlaceholders />
+        <CommunitySections userId={user.id} />
 
         <AppearanceSection user={user} />
 

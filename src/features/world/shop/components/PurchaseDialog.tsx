@@ -55,6 +55,10 @@ export function PurchaseDialog({
 
   const [accountId, setAccountId] = useState('');
   const [quantity, setQuantity] = useState(1);
+  // D-PURCHASE-IDEMPOTENCY — nonce per nákupní ZÁMĚR: vzniká při otevření
+  // dialogu (mount), po úspěchu se resetuje. Dvojklik/retry TÉHOŽ záměru
+  // pošle stejný nonce → BE vrátí původní výsledek místo 2. odečtu.
+  const [clientNonce, setClientNonce] = useState(() => crypto.randomUUID());
 
   const account = useMemo(
     () => accounts.find((a) => a.id === accountId) ?? accounts[0],
@@ -101,9 +105,11 @@ export function PurchaseDialog({
         characterId: character.id,
         accountId: account.id,
         quantity,
+        clientNonce,
       },
       {
         onSuccess: (res) => {
+          setClientNonce(crypto.randomUUID()); // další nákup = nový záměr
           toast.success(
             `Koupeno „${item.name}" — přidáno do vybavení. Zůstatek: ${formatCurrency(
               res.newBalance,

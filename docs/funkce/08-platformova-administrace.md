@@ -33,13 +33,12 @@ BE enum (`backend/src/modules/users/interfaces/user.interface.ts:1`) STÁLE obsa
 ## Granulární admin oprávnění (D-033)
 
 ### Model
-Definice `AdminPermissions` (`Projekt-ikaros-FE/src/shared/types/index.ts:21`, BE zrcadlo `backend/src/modules/users/interfaces/user.interface.ts:16`). Tři boolean flagy, default všechny `false`:
+Definice `AdminPermissions` (`Projekt-ikaros-FE/src/shared/types/index.ts:21`, BE zrcadlo `backend/src/modules/users/interfaces/user.interface.ts:16`). Dva boolean flagy, default všechny `false` (třetí, mrtvý `canEditPlatformPages`, byl 2026-07-12 odstraněn z BE i FE — D-NEW-INV-CLEANUP):
 
 | Flag | Co umožňuje | Kde se VYNUCUJE |
 |---|---|---|
 | `canManageAdmins` | Admin smí spravovat oprávnění JINÝCH Adminů | `admin.service.ts:614` (setAdminPermissions) |
 | `canModerateContent` | Admin smí DELETE / UNDELETE cizí účet | `hierarchy.ts:99` (assertCanModerate) |
-| `canEditPlatformPages` | (zamýšleno: editace platform stránek) | **NIKDE — mrtvý flag** |
 
 ### Jak se přidělují
 - Endpoint `PATCH /admin/users/:id/admin-permissions` (`admin.controller.ts:195`), gate `@Roles(Superadmin, Admin)`.
@@ -51,7 +50,6 @@ Definice `AdminPermissions` (`Projekt-ikaros-FE/src/shared/types/index.ts:21`, B
 - Každá změna se auditi (`ADMIN_PERMISSIONS_CHANGE`).
 
 ### Hranice / pasti
-- `canEditPlatformPages` se ukládá i posílá, ale BE ho nikde nevynucuje (žádná editace platform stránek neexistuje) → FE checkbox je záměrně skrytý (`UsersTable.tsx:338`).
 - `canModerateContent` NEgatuje obsahovou moderaci (články/galerie/diskuze) — ta jede přes obsahové ROLE (viz níže), ne přes tento flag. Flag řídí JEN admin delete účtu.
 
 ---
@@ -163,6 +161,10 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
   - **Ban / Odbanovat** — `POST /admin/users/:id/ban` + `/unban`. Ban má důvod + trvání (modal); 0/undefined = trvalý, jinak timed (`bannedUntil`). Ban revokuje všechny refresh tokeny → force logout, invaliduje ban cache, emit `user.identity.changed`.
   - **Smazat účet / Obnovit smazání** — `POST /admin/users/:id/request-deletion` (30denní soft-delete hold, povinný důvod) + `/cancel-deletion`. Vyžaduje `canModerateContent` (pro Admina). Spustí PJ handover (viz níže).
   - **Granulární oprávnění** (jen u cílů s rolí Admin, jen pro Superadmina / Admin-managera) — checkboxy „Správa adminů" (Superadmin-only) a „Moderace obsahu".
+  - **Reset hesla** (D-NEW-INV-ADMIN-UI, jen Superadmin, ne self) — `PUT /users/:id/reset-password` (`{ newPassword }`, 8–128, 204). BE heslo negeneruje/nevrací — dočasné heslo generuje FE (`generateTempPassword`, editovatelné), po nastavení zůstává v modalu ke zkopírování. `ResetPasswordModal.tsx`.
+  - **Změnit e-mail** (D-NEW-INV-ADMIN-UI, jen Superadmin, ne self) — `PATCH /admin/users/:id/email` (`{ email }`). Prefill současné adresy; `SAME_EMAIL` 400 / `EMAIL_TAKEN` 409 field-level, self → 403 `SELF_MODIFICATION`. Nová adresa je `emailVerified: false` (bez confirm mailu). `AdminChangeEmailModal.tsx`.
+- **Co jde dělat (toolbar):**
+  - **Nový uživatel** (D-NEW-INV-ADMIN-UI) — `POST /admin/users` (`{ email, username 3–32, password 8–128, role? }`). Validace zrcadlí BE DTO; `EMAIL_TAKEN`/`USERNAME_TAKEN` field-level; heslo lze vygenerovat + zkopírovat; role select respektuje hierarchii (Admin nenabízí admin role). Audit `USER_CREATE`. `CreateUserModal.tsx` (tlačítko v `UsersAdminTab.tsx`).
 - **Co jde dělat (bulk, `BulkToolbar.tsx`):**
   - Bulk Banovat (trvání permanent/1/7/30/90 dní + důvod), Bulk Odbanovat, Bulk Změnit roli.
   - Best-effort: server vrací `{ successful[], failed[] }`, per-user hierarchy check; selhání jednoho neshodí dávku.
@@ -173,12 +175,9 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
   - Admin NESMÍ měnit roli ani moderovat jiného Admina/Superadmina; nesmí povyšovat na admin role.
   - DELETE/UNDELETE navíc vyžaduje `canModerateContent`.
 - **Hranice / co neumí:**
-  - **Reset hesla NENÍ v admin UI.** BE endpoint `PUT /users/:id/reset-password` (Superadmin-only, `users.controller.ts:537`) existuje, ale FE pro něj nemá žádné tlačítko ani hook → de facto nedostupné z UI.
-  - **Vytvoření uživatele adminem NENÍ v UI.** BE `POST /admin/users` (`admin.controller.ts:113`) funguje, ale FE nemá `useAdminCreateUser` hook ani formulář.
-  - **Změna emailu uživatele adminem neexistuje.** Email mění jen sám uživatel (`POST /users/me/request-email-change`). Admin cizí email změnit přes UI nemůže (existuje jen ops/skript `set-user-email`).
   - Filtry `includeDeleted` / `hasPendingDeletion` BE umí, ale `getUsers` je řeší in-memory po vytažení stránky (nekonzistentní paginace u tombstone řádků — dluh, `admin.service.ts:120`).
 - **Zvláštnosti:** `A+` badge u Admina = má `canManageAdmins`. Self řádek je v akcích zamčený. Veškeré akce auditovány + invalidují stats/audit/public-profile cache.
-- **Stav:** ✅ (s chybějícím reset hesla / create user / set email v UI)
+- **Stav:** ✅
 - **Kód:** FE `users/components/UsersTab/UsersTable.tsx`, `BulkToolbar.tsx`, hooky `users/api/useAdminUsers.ts`; BE `admin.controller.ts:71`, `admin.service.ts`, `helpers/hierarchy.ts`.
 
 ---
@@ -343,7 +342,7 @@ Generický subsystém pro nahlašování jakéhokoli UGC a jeho moderaci (DSA č
 - **Kde (osazené plochy, ověřeno v kódu):** článek (`ArticleDetailPage.tsx:142`), obrázek v galerii (`GalleryDetailPage.tsx:118`), profil uživatele (`PublicProfileActions.tsx:202`), nábor (`NaborListek.tsx:97`), příspěvek v diskuzi (`DiscussionDetailPage.tsx:346`), stránka světa / wiki (`PageViewer/components/PageHeader.tsx:120`), novinka světa (`WorldNewsCard.tsx:209`), zpráva v poště — jen přijatá (`MailPage/MailDetail.tsx:118`), zpráva v chatu — světový i globální (`chat/components/MessageItem.tsx:583`, přes `ReportModal` z kebabu). Komponenta `src/shared/moderation/ReportButton.tsx:19`.
 - **Kdo:** jen **přihlášený** (`ReportButton` se anonymovi nevykreslí; BE `POST /moderation/reports` je za `JwtAuthGuard`, guest 99 neprojde). Vlastní obsah nelze nahlásit (`targetAuthorId === user.id` → tlačítko skryté).
 - **Co jde dělat (formulář `ReportModal`):** vybrat **kategorii** (Autorská práva / Osobní údaje / Obtěžování / Ohrožení nezletilých / Nezákonný obsah / Spam / Jiné), napsat **důvod** (max 2000), **e-mail** (předvyplněný, povinný — kromě „ohrožení nezletilých", kde je nepovinný), povinné prohlášení **dobré víry**, volba **„informovat mě o výsledku"** a **„nahlásit anonymně"** (skryje jméno oznamovatele moderátorovi). FE nikdy neposílá `reporterId/Name` — bere je BE z tokenu.
-- **Hranice / co neumí:** `ReportTargetType` má v enumu i `bestie` a `character_diary`, ale **na FE zatím nemají osazené tlačítko** (nahlásit bestii ani deník postavy nejde). „Anonymně" je jen maskování identity ve výstupu, ne guest přístup. Kategorie „ohrožení nezletilých" (CSAM) má nízkou bariéru (e-mail nepovinný).
+- **Hranice / co neumí:** `ReportTargetType` má v enumu i `character_diary`, ale **na FE zatím nemá osazené tlačítko** (nahlásit deník postavy z UI nejde — BE enforcement už ale připraven je, viz níže). Bestie tlačítko dostala 2026-07-12 (`KomunitniBestieDetailPage.tsx:115`, D-066a), rostlina také (`KomunitniPlantDetailPage.tsx:101`). „Anonymně" je jen maskování identity ve výstupu, ne guest přístup. Kategorie „ohrožení nezletilých" (CSAM) má nízkou bariéru (e-mail nepovinný).
 - **Zvláštnosti:** report se v kolekci `content_reports` **nikdy nemaže** (audit stopa; po vyřízení `status:'resolved'`). Po odeslání se invaliduje fronta „Zpracovat" (badge moderátora) i „moje hlášení".
 - **Stav:** ✅
 - **Kód:** FE `src/shared/moderation/{ReportButton,ReportModal,enums,useModeration}.ts(x)`; BE `moderation.controller.ts:37` (`POST /moderation/reports`), `content-report.schema.ts:16`.
@@ -353,9 +352,12 @@ Generický subsystém pro nahlašování jakéhokoli UGC a jeho moderaci (DSA č
 - **Kdo (reviewer set):** frontu i akce **M0–M4** vidí „správci komunity" — `Superadmin, Admin, SpravceClanku, SpravceGalerie, SpravceDiskuzi` (`CONTENT_REVIEWER_ROLES`). **Account-level M5–M7 + kategorie „ohrožení nezletilých"** jen `Superadmin, Admin` (`ACCOUNT_LEVEL_ROLES`). FE u ne-admina M5–M7 z výběru skryje, BE gate vynutí (403). Gating v `moderation.service.ts` (`resolveReport` ř. 213/229) + providery (`content-report.provider.ts:32`).
 - **Co jde dělat (statement of reasons):** u reportu „Vyřídit" → vybrat akci **M0–M7** + napsat **odůvodnění** (uvidí autor i oznamovatel) + **právní/politický základ**. `POST /moderation/reports/:id/resolve` vytvoří rozhodnutí (`moderation_decisions`, log se nemaže).
   - **M0** Bez zásahu · **M1** Upozornění · **M2** Skrýt část · **M3** Dočasně skrýt · **M4** Odstranit (content-level) · **M5** Omezit účet · **M6** Ukončit účet · **M7** Eskalace mimo platformu (account-level, jen Admin+).
-- **Napojení zásahu (event-driven `moderation.enforce`/`.revert`):** diskuze — flag **`moderationHidden`** (M2/M3 skryje, M4 hard delete); účty — M5 = dočasný ban 30 dní, M6 = trvalý ban, M7 = jen log + notifikace do eskalačního kanálu v `/admin/chat`. **Stub:** enforcement pro `character_diary` a `chat_message` zatím jen loguje (TODO), M4 na ně reálně obsah neskryje.
-- **Stav:** ✅ (content-level a account-level enforcement funkční; skrytí deníku/chat zprávy stub).
-- **Kód:** FE `features/moderation/components/ContentReportRenderer.tsx`, `ResolveReportModal.tsx`, `ZpracovatTab/rendererRegistry.tsx:147`; BE `moderation.controller.ts:81`, `moderation.service.ts`, listenery `ikaros-discussions/moderation-enforcement.listener.ts`, `users/moderation-enforcement.listener.ts`, `platform-chat/moderation-escalation.listener.ts`.
+- **Napojení zásahu (event-driven `moderation.enforce`/`.revert`):** diskuze — flag **`moderationHidden`** (M2/M3 skryje, M4 hard delete); účty — M5 = dočasný ban 30 dní, M6 = trvalý ban, M7 = jen log + notifikace do eskalačního kanálu v `/admin/chat`.
+  - **Deník postavy (`character_diary`, D-066, 2026-07-12):** M2/M3 → `moderationHidden` na subdokumentu deníku; skrytý deník vidí/edituje **jen platform reviewer set** (`isContentReviewer`), **vlastník i PJ dostanou 404** `DIARY_NOT_FOUND` (globální zásah, 404 neprozrazuje existenci — vzor pages). M4 → smazání deníkového subdokumentu (**nevratné** — příští GET lazy-create obnoví PRÁZDNÝ deník, postava zůstává funkční). Revert M2/M3 odkryje; revert M4 nelze. `targetId` = characterId (deník je 1:1 subdokument).
+  - **Chatová zpráva (`chat_message`, D-066, 2026-07-12):** M2/M3 → `moderationHidden` na zprávě; obsah zůstává v DB, ale API/WS výstup se **maskuje pro všechny** — text nahrazen `*Zpráva skryta moderací*`, přílohy/mapRef/dicePayload se zahodí (whitelist v repo `toEntity`), skryté zprávy se nepočítají do unread ani search; klientům jde živý `chat:message:updated`. M4 → soft delete jako PJ mazání (tombstone text, `chat:message:deleted` živě, Cloudinary úklid příloh) — revert **nevratný**. Revert M2/M3 odkryje.
+  - M5–M7 řeší account-level listener v `users` (ban s markerem `bannedBy = moderation:<decisionId>` — revert odbanuje JEN ban z téhož rozhodnutí, nezávislý admin ban přežije, D-065). Vše best-effort (chyba listeneru nikdy neshodí `resolveReport`).
+- **Stav:** ✅ (content-level i account-level enforcement funkční na všech plochách vč. deníku postavy a chatové zprávy — D-066 vyřešen 2026-07-12).
+- **Kód:** FE `features/moderation/components/ContentReportRenderer.tsx`, `ResolveReportModal.tsx`, `ZpracovatTab/rendererRegistry.tsx:147`; BE `moderation.controller.ts:81`, `moderation.service.ts`, listenery `ikaros-discussions/moderation-enforcement.listener.ts`, `users/moderation-enforcement.listener.ts`, `character-subdocs/moderation-enforcement.listener.ts`, `chat/moderation-enforcement.listener.ts` (+ `chat/repositories/chat-message.repository.ts:17` maska, `character-subdocs/character-subdocs.service.ts:343` gate), `platform-chat/moderation-escalation.listener.ts`.
 
 ### Vyrozumění, odvolání a eskalace
 - **Autor** postiženého obsahu dostane **odůvodnění zásahu** (statement of reasons, čl. 17) do Pošty a vidí ho v profilu → sekce „Moderace" (`GET /moderation/decisions/mine`). **Oznamovatel** dostane potvrzení příjmu a (pokud zvolil „informovat mě") výsledek; stav svých hlášení vidí v profilu (`GET /moderation/reports/mine`).
@@ -399,9 +401,9 @@ Generický subsystém pro nahlašování jakéhokoli UGC a jeho moderaci (DSA č
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. **Reset hesla bez UI** — BE `PUT /users/:id/reset-password` (Superadmin-only) funguje, ale v admin panelu chybí jakékoli tlačítko/hook. Superadmin nemůže resetovat heslo z webu. (`users.controller.ts:537`)
-2. **Create user adminem bez UI** — BE `POST /admin/users` funguje, FE nemá hook ani formulář. (`admin.controller.ts:113`)
-3. **Admin nemůže měnit cizí email** — žádný endpoint ani UI; jen self-service `request-email-change` + ops skript `set-user-email`.
+1. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-ADMIN-UI) — **Reset hesla má UI.** Tlačítko „Reset hesla" v tabulce uživatelů (Superadmin-only, ne self) → `ResetPasswordModal` s generovaným heslem + copy. (`useAdminResetPassword`)
+2. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-ADMIN-UI) — **Create user má UI.** Tlačítko „Nový uživatel" nad filtry → `CreateUserModal` (validace dle `CreateUserAdminDto`, field-level TAKEN chyby). (`useAdminCreateUser`)
+3. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-ADMIN-UI) — **Admin změna cizího e-mailu.** Nový BE `PATCH /admin/users/:id/email` (Superadmin-only, `SAME_EMAIL`/`EMAIL_TAKEN`/`SELF_MODIFICATION`, audit `EMAIL_CHANGE`, `emailVerified: false`) + FE tlačítko „Změnit e-mail" → `AdminChangeEmailModal`. (`useAdminUpdateUserEmail`)
 4. ✅ VYŘEŠENO 20.2/§C1 — **Data export má FE tlačítko.** „Stáhnout moje data (JSON)" v profilu → Účet a v `DeleteAccountModal` (`useDataExport` → `GET /data-export/me` → Blob download). Dřív BE bez FE.
 5. **DungeonBuilderPage = stub** — route `/admin/dungeon-builder` vykreslí jen text `[stub]`. BE `dungeon-maps` modul existuje, ale je per-world PJ tool, není napojený na tuto stránku. (`DungeonBuilderPage.tsx`)
 6. **`canEditPlatformPages` = mrtvý flag** — ukládá se a posílá, ale BE ho nikde nevynucuje; FE checkbox záměrně skryt. (`UsersTable.tsx:338`)

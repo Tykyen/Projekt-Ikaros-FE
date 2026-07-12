@@ -14,8 +14,9 @@ interface Props {
 }
 
 /**
- * 15.9 — Notifikace: master vypínač push + 7 přepínačů ve 4 skupinách
- * (Můj svět / Můj obsah / Novinky / Komunita) + per-device brána.
+ * 15.9 — Notifikace: master vypínač push + kategorie v 5 skupinách
+ * (Můj svět / Můj obsah / Novinky / Komunita / Správa platformy)
+ * + per-device brána. Kategorie a defaulty: `NOTIFICATION_GROUPS`.
  *
  * Dvě vrstvy: (1) zařízení musí mít upozornění povolená (`usePush`),
  * (2) preference vybírají, na CO chodí push. Vypnutí kategorie ztlumí jen

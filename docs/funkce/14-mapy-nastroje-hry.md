@@ -116,7 +116,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Pohyb:**
   - PJ kohokoli, hráč jen vlastní token (`useTokenPermissions` / BE `token.characterId === user.id`).
   - Dvě cesty: drag tokenu (`useTokenDrag`) nebo click-to-place (vybrat token → klik na prázdný hex = move). Op `token.move`, optimistic + rollback + toast.
-  - **„A* pohyb":** `movement` stat určuje jen **dosah** pohybu (range), `schemas/types.ts:59`. **Není to pathfinding přes překážky** — bariéry pohyb fyzicky neblokují, jen vizuál. (Viz Nesrovnalosti.)
+  - **Dosah pohybu (dřív „A* pohyb"):** `movement` stat určuje jen **dosah** pohybu (range-check), `schemas/types.ts:59`. **Není to pathfinding přes překážky** — bariéry pohyb fyzicky neblokují, jen vizuál. Pathfinding = případné budoucí rozšíření 17.x (spec opraven, viz Nesrovnalosti 1).
 - **Lock:** per-token `isLocked` (PJ toggle v panelu) → hráč tokenem nepohne, ani needituje HP (BE `operations-authorizer.ts:136`, N-29). Nezávislé na zámku scény.
 - **Smazání:** PJ kohokoli, hráč vlastní; optimistic remove + rollback (C-24). „Odstranit z mapy" — postava v DB zůstává.
 - **Obrázek:** PC/NPC z `characterData.imageUrl`; Bestie nemá characterData → dotahuje se z bestiar cache přes `templateId` (snapshot), fresh resolve každý render (`resolveTokenImage` `:719`).
@@ -313,11 +313,11 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Kód:** FE `tactical-map/stream/streamMode.ts`, `components/StreamModeControls.tsx`, `TacticalMapView.tsx` (stream stav + bg effect + exit + `data-map-chrome`), `TacticalMapView.module.css` (`.chromeWrap`, `[data-stream-mode]`, `.streamExit`).
 
 ### Hranice taktické mapy / co NEumí
-- **Žádný skutečný pathfinding** — bariéry/efekty pohyb fyzicky neblokují, `movement` je jen dosah (range). „A*" v kódu = dosahový výpočet, ne hledání cesty kolem překážek.
+- **Žádný skutečný pathfinding** — bariéry/efekty pohyb fyzicky neblokují, `movement` je jen dosah (range-check). Pathfinding kolem překážek = případné budoucí rozšíření 17.x (spec `takticka-mapa-matrix.md` §23.5 opraven na realitu, 2026-07-12).
 - **Sprite atlas** — token obrázky se resolvují jednotlivě (texture cache `useTokenTexture`), není zmíněn jeden bundled atlas; viz princip 10.2 vs. realita.
-- Undo nepokrývá vše (`scene.deactivate`, bulk assign nemají inverse — MVP).
-- Combat `order` snapshot je v DB, ale lišta ho ignoruje (live sort) — potenciální dvojí zdroj pravdy.
-- Token sync token→Character (HP do DB postavy) je odložen (soft mode, TODO `map-operations.service.ts:630`) — HP změny tokenu se zatím nepropisují do listu postavy automaticky.
+- Undo inverses doplněny (2026-07-12, D-NEW-INV-MAPS): `scene.deactivate` → `scene.activate` (member přiřazení vrací per-member inverses ve world ops logu), bulk assign → `member.bulkRestoreAssignments` (původní per-member přiřazení), `drawing.clear` → `scene.drawings.replace`. Stále PARTIAL: `combat.end` undo obnoví jen order (ne round/effects), `npcTemplate.remove` undo nevrací cascade-smazané tokeny, `dice.roll` je záměrně bez undo. **Undo UI/endpoint stále není zapojen** (`findLastByUser` bez callerů — inverse se jen loguje + vrací v 201).
+- Combat `order` = persistovaný snapshot při startu boje; zobrazované pořadí řídí FE **živě** dle `initiative` (záměr 10.2f). `order` zůstává kvůli legacy fallbacku `combat.turn` bez tokenId, inverse pro `combat.end` a validaci `combat.reorder` — vztah zdokumentován v BE (`map-operations.service.ts`, case `combat.start`).
+- Token→Character HP sync: **HP PC/NPC tokenu se od 2026-07-12 propisuje** z `token.update` (`currentHp`/`maxHp`) do `diary.customData` postavy (per-system klíče, zrcadlo `resolveCharacterHp`; BE `token-hp-diary-map.ts`). Bestie tokeny se záměrně NEsyncují (nezávislá instance). `systemStats`/`injury`/`initiative` v deníku domov nemají → nesyncují se; systémy s odvozeným „HP" (shadowrun/fate/fae/drdplus/drd2) se přeskakují.
 - `seqNumber` může mít gap, když apply uspěje ale alokace selže (akceptováno).
 - **Stav:** ✅ rozsáhle funkční (fáze 10.2a–n), s vědomými MVP limitacemi výše.
 
@@ -360,15 +360,15 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. 🚧 ČÁSTEČNĚ 2026-06-18 (spec/doc opraven; pathfinding zbývá = D-NEW-INV-MAPS) — **„A* pohyb" = jen dosah, ne pathfinding.** Princip 10.2 sliboval A* hledání cesty; v kódu `movement` stat určuje pouze range (`schemas/types.ts:59`) a bariéry pohyb fyzicky neblokují. Buď doplnit skutečné pathfinding, nebo upravit dokumentaci/spec (nelhat o feature).
+1. ✅ VYŘEŠENO 2026-07-12 (doc-fix dle D-NEW-INV-MAPS) — **„A* pohyb" = jen dosah, ne pathfinding.** Princip 10.2 sliboval A* hledání cesty; v kódu `movement` stat určuje pouze range (`schemas/types.ts:59`) a bariéry pohyb fyzicky neblokují. Rozhodnutí: dokumentace/spec opraveny na skutečné chování (dosah/range-check, měření = přímá hex distance) — `takticka-mapa-matrix.md` §21.1 + §23.5 + zdejší kapitola. Skutečný pathfinding zůstává jako případné budoucí rozšíření 17.x.
 
 2. **Dvě role-úrovně správy map.** Atlas „Mapy" (`world-maps`) vyžaduje k editaci **plné PJ** (`>= WorldRole.PJ`, `world-maps.service.ts:47`), ale taktická mapa, zvuky, deník PJ a dungeon (kromě dungeon = PJ) běží na `>= PomocnyPJ`. PomocnyPJ tedy řídí bojiště, ale **nemůže** spravovat obrázkový atlas. Ověřit, zda je to záměr — působí nekonzistentně.
 
 3. **Dungeon-maps čtení = PJ-only, write = PJ-only**, ale taktická mapa write = PomocnyPJ. `DungeonMapsService.assertCanManage` je `>= WorldRole.PJ` (R-12). Nejednotné s ostatními herními nástroji.
 
-4. **Combat order dvojí zdroj pravdy.** `scene.combat.order` se ukládá, ale iniciativní lišta ho ignoruje (live sort dle `initiative`). Snapshot může zastarat (test `useCombat.test.tsx:78` „zastaralý snapshot — ignoruje se"). Riziko zmatení při undo `combat.reorder`.
+4. ✅ VYŘEŠENO 2026-07-12 (prošetřeno + zdokumentováno, D-NEW-INV-MAPS) — **Combat order dvojí zdroj pravdy.** `scene.combat.order` se ukládá, iniciativní lišta ho ignoruje (live sort dle `initiative` = záměrná featura 10.2f; FE posílá `combat.turn` s explicitním tokenId+round). `order` NENÍ mrtvý: drží legacy fallback `combat.turn` bez tokenId (BC), inverse `combat.end`→`combat.start` a validaci permutace `combat.reorder` — proto se neodstraňuje. Vztah zdokumentován komentářem v BE `map-operations.service.ts` (case `combat.start`). Live-sort je autoritativní pro zobrazení; `order` je start-snapshot.
 
-5. **Token HP → Character sync odložen.** `map-operations.service.ts:617-634` má TODO: HP/systemStats změny tokenu se nepropisují do `Character` (soft mode). Hráč musí list postavy obnovit ručně; po smazání tokenu se změny ztratí.
+5. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-DATA-SYNC) — **Token HP → Character sync.** BE `map-operations.service.ts` (`syncTokenHpToDiary` + `token-hp-diary-map.ts`): `token.update` patch `currentHp`/`maxHp` PC/NPC tokenu se best-effort propíše do `diary.customData` postavy (per-system klíče, zrcadlo FE `resolveCharacterHp`). Bestie tokeny záměrně bez syncu (nezávislá instance, memory `bestie_token_inst`). Nesyncuje se: `systemStats`/`injury`/`initiative` (nemají v deníku domov) a systémy s odvozeným „HP" (shadowrun/fate/fae/drdplus/drd2). Postava bez deníku → skip s logem (bez lazy-create).
 
 6. **Undo neúplné.** `scene.deactivate` a `member.bulkAssignToScene` mají `inverse = null` (MVP). PJ musí undo dělat ručně po krocích — uživatelská past.
 

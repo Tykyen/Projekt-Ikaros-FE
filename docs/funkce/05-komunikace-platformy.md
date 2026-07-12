@@ -28,7 +28,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - Žádné trvalé vlákno/archiv, žádné kategorie. Mazání jen Admin+ (uživatel nesmaže ani vlastní).
 - **Zvláštnosti:**
   - **Identita autora zprávy = účet** (`username` + `avatarUrl`). Od **4.2e** se ukládá jako **snapshot** při odeslání (`resolveSenderIdentity` → `senderName`/`senderAvatarUrl`, `global-chat.service.ts`) — zpráva si jméno+avatar pamatuje natrvalo. FE má navíc fallback resolver z presence pro zprávy bez snapshotu (`roomAvatarFor`). Dřív zprávy ukazovaly jen iniciálu (avatar se neplnil).
-  - **15.9 — push jen z Putyky a opt-in:** odeslaná zpráva spustí web push **jen v Putyce** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda')` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Putyku výslovně zapnul v profilu. Camp push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Campu — opraveno). Payload bez `url` → bublina otevře jen `/`. (`global-chat.service.ts` `sendMessage`.)
+  - **15.9 — push jen z Putyky a opt-in:** odeslaná zpráva spustí web push **jen v Putyce** (`room === 'hospoda'`), přes `notifyAll(payload, 'hospoda', { excludeUserId })` (fire-and-forget). Kategorie `hospoda` je v preferencích **default VYP** → defaultně push nedostane nikdo, jen kdo si Putyku výslovně zapnul v profilu. Camp push **negeneruje** (dřív sdílená `notifyAll` spamovala všechny i ze zpráv z Campu — opraveno). **D-NEW-INV-PUSH (2026-07-12):** payload nese `url: '/chat'` (klik na bublinu otevře Putyku) a `excludeUserId` = odesílatel **nedostane push na vlastní zprávu**. (`global-chat.service.ts` `sendMessage`.)
   - Presence je per-socket multi-room; socket je sdílený celou appkou (pošta, online stav, přátelé) — proto se při opuštění chatu neodpojuje, jen odebere z presence. Heartbeat `chat:heartbeat` udržuje „naživu", neaktivita → auto-odhlášení z presence.
 - **Stav:** ✅
 - **Kód:** FE `src/features/chat/pages/ChatPage.tsx`, `components/ChatRoom.tsx`, `components/ChatInput.tsx`, `components/AnonChatGate.tsx` (15.8 brána), `store/anonSession.ts`, `api/useAnonSession.ts`, `api/useGlobalChat.ts`, `api/useSocket.ts`. BE `backend/src/modules/global-chat/global-chat.controller.ts`, `global-chat.service.ts`, `global-chat.gateway.ts`, `anon-ban.service.ts`, `common/guards/guest-or-member.guard.ts`, `auth/auth.service.ts` (`createAnonSession`). Spec 15.8.
@@ -97,7 +97,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 - **Zvláštnosti:**
   - **Real-time:** nová zpráva emituje WS `ikaros:new-message` do `user:{recipientId}` (`ikaros-messages.gateway.ts:37`) → badge a feed se aktualizují bez refreshe.
   - **Systémové zprávy** generuje `system-events.listener` (schválení vstupu do světa `world.access.approved`, přiřazení postavy `world.character.assigned`) a service modulů (schválení/vrácení článku, galerie, diskuze posílají poštu autorovi/adminům).
-  - **NEposílá web push** — nová pošta jen WS + badge; na telefon push nechodí (push má jen novinky a globální chat; svět-chat má vlastní notifyUsers).
+  - **Web push (D-NEW-INV-PUSH, 2026-07-12):** nová zpráva pošty **pushuje příjemci** — kategorie `posta` (default **ZAP**, vypnutelná v profilu → Notifikace), titulek „Nová zpráva v Poště", body `odesílatel: předmět` (ořez 120), deep-link `url: '/ikaros/posta'`, `tag: posta-<conversationId>` (bubliny téhož vlákna se na zařízení slučují). Odesílatel push nedostává (guard `recipientId !== sender.id`). Fire-and-forget. (`ikaros-messages.service.ts:114-133`.) Dřív jen WS + badge — zavřená appka nic nedostala.
   - `conversationId` se generuje předem (`=== _id` kořene vlákna, N-34), aby reply hned trefil správné vlákno.
 - **Stav:** ✅
 - **Kód:** FE `src/features/ikaros/pages/MailPage/` (`MailPage.tsx`, `ComposeModal.tsx`, `MailDetail.tsx`, `MailList.tsx`), `api/useMail.ts`. BE `backend/src/modules/ikaros-messages/ikaros-messages.controller.ts`, `ikaros-messages.service.ts`, `ikaros-messages.gateway.ts`, `system-events.listener.ts`.
@@ -131,28 +131,28 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Vlastní diskuse** → nový příspěvek **autorovi diskuse** `notify(..., 'ownDiscussion')` s `url` na diskusi (kap. 04).
   - **Vlastní článek / galerie** → schválení / zamítnutí / nové hodnocení **autorovi** `notify(..., 'ownContent')` s `url` (kap. 04).
   - **Novinky světa** → členům světa (mimo Zadatele) `notifyUsers(..., 'worldNews')` (kap. 13).
-  - **Novinky Ikarosu** → `notifyAll(..., 'ikarosNews')` (kap. 04).
-  - **Putyka** → `notifyAll(..., 'hospoda')`, **opt-in** (kategorie default VYP).
+  - **Novinky Ikarosu** → `notifyAll(..., 'ikarosNews')` s `url: '/ikaros/novinky'` (deep-link na stránku novinek — detail route neexistuje; D-NEW-INV-PUSH) (kap. 04).
+  - **Putyka** → `notifyAll(..., 'hospoda', { excludeUserId })`, **opt-in** (kategorie default VYP); `url: '/chat'`, odesílatel bez push (D-NEW-INV-PUSH).
+  - **Pošta** → příjemci `notify(..., 'posta')` s `url: '/ikaros/posta'` + `tag: posta-<conversationId>`; default ZAP (D-NEW-INV-PUSH, 2026-07-12 — viz sekce Pošta výše).
+  - **Chat správy platformy** → členům kanálu `notifyUsers(..., 'adminChat')` s `url: '/admin/chat'` + `tag: admin-chat-<channelId>` (20.5; jen tým správy).
   - Filtr příjemců dle preferencí běží v `PushService` (`filterByCategory`/`userWantsCategory` → `wantsPush`); `undefined` pole = default z kódu. Viz funkce „Nastavení notifikací" níže.
 - **Doručovací politika (13.2c-push-delivery, 2026-06-19):** každý push nese **TTL** (default 4 h, konst. `DEFAULT_TTL_SECONDS`) — provider po vypršení notifikaci zahodí, takže offline telefon už nedostane **dny staré** zprávy. Validní **`topic`** (server-side collapse, RFC 8030) navíc nahradí předchozí nedoručenou ve frontě → jen poslední, ne hromada. (`push.service.ts` `sendToSubscriptions`.)
 - **Hranice / co neumí:**
-  - **Pošta nepushuje** (jen WS) — soukromá zpráva na telefon nedorazí jako push.
-  - **`notifyAll` payloady (novinky Ikarosu, Putyka) nemají `url`** → bublina otevře `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie) `url` **mají**.
   - **Granularita jen per-typ, ne per-svět** — nelze ztlumit konkrétní svět (plánováno jako pozdější rozšíření).
   - iOS vyžaduje PWA přidanou na plochu (standardní omezení Safari pro Web Push) — 15.1 install hint to usnadňuje instrukcí „Sdílet → Přidat na plochu" (viz blok „Instalace na plochu (PWA)" níže).
 - **Zvláštnosti:**
   - Neplatné subscription (HTTP 404/410) se automaticky promazávají (`push.service.ts`). VAPID klíče z env (`VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY`); chybí-li, modul při startu spadne na `!` non-null assertu.
   - **Úklid rotovaných odběrů (13.2c-push-delivery):** SW má `pushsubscriptionchange` handler → re-subscribe (auth není v SW dostupný, BE origin dostává query `?api=` z `main.tsx`). Nahlášení nového endpointu řeší FE `usePush` autentizovaně — na mountu porovná endpoint s `localStorage['push:endpoint']`, při změně pošle `POST /push/subscribe` s `oldEndpoint` → BE starý smaže (`subscribe` v `push.service.ts`). Bez toho se mrtvé endpointy hromadily → **duplicitní push na jedno zařízení**.
-- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), **15.9** doplnilo per-typ předvolby + filtr příjemců; dle MEMORY zbývá ověřit doručení na reálném telefonu a deep-linky u broadcast push (novinky Ikarosu, Putyka) nejsou naplněné.
+- **Stav:** 🚧 — infrastruktura funkční (subscribe/unsubscribe/SW/cleanup, TTL/topic dedup, rotace odběru), **15.9** doplnilo per-typ předvolby + filtr příjemců, **D-NEW-INV-PUSH (2026-07-12)** doplnil deep-link `url` do broadcast payloadů (novinky Ikarosu, Putyka), push pošty a exclude odesílatele; zbývá ověřit doručení na reálném telefonu.
 - **Kód:** FE `src/features/notifications/api/usePush.ts`, `components/PushToggle.tsx`, `PushDevicesList.tsx`, `public/sw.js`, `src/app/main.tsx`. BE `backend/src/modules/push/push.controller.ts`, `push.service.ts`, `dto/subscribe.dto.ts`; chat push `backend/src/modules/chat/chat.service.ts`.
 
 ### Nastavení notifikací (preference) — 15.9
-- **Co to je:** Per-uživatelské předvolby, **na co** chodí web push. Master vypínač + 7 kategorií. Filtr běží na BE před každým odesláním push.
+- **Co to je:** Per-uživatelské předvolby, **na co** chodí web push. Master vypínač + 9 kategorií. Filtr běží na BE před každým odesláním push.
 - **Kde:** sekce **„Notifikace"** v profilu (`/ikaros/profil`, `NotificationPreferencesSection`, mezi Soukromím a Bezpečností).
 - **Kdo:** přihlášený, jen vlastní preference (`PATCH /users/me/notification-preferences`, `JwtAuthGuard`). Bez role-gate.
 - **Co jde dělat:**
   - **Master `pushEnabled`** (default ZAP) — vypnutím se ztlumí veškerý push bez ohledu na kategorie.
-  - **7 kategorií** ve 4 skupinách (default ZAP kromě Putyky): *Můj svět* — `worldChat`, `worldEvent`; *Můj obsah* — `ownDiscussion`, `ownContent`; *Novinky* — `worldNews`, `ikarosNews`; *Komunita* — `hospoda` (default **VYP**).
+  - **9 kategorií** v 5 skupinách (default ZAP kromě Putyky): *Můj svět* — `worldChat`, `worldEvent`; *Můj obsah* — `ownDiscussion`, `ownContent`; *Novinky* — `worldNews`, `ikarosNews`; *Komunita* — `posta` (default ZAP; D-NEW-INV-PUSH 2026-07-12), `hospoda` (default **VYP**); *Správa platformy* — `adminChat` (default ZAP; 20.5 — přepínač vidí každý, push ale chodí jen členům admin chatu).
   - **Per-device přepínač** (reuse `usePush`) — povolení push na tomto zařízení (hardware brána, nezávislá na kategoriích).
 - **Hranice / co neumí:**
   - **Řídí jen push bublinu**, ne obsah notifikačního centra (zvoneček ukazuje vše vždy).
@@ -211,8 +211,8 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. **Push bez deep-linku jen u broadcastu.** `notifyAll` payloady (novinky Ikarosu, Putyka) neobsahují `url` → klik otevře jen `/`. Cílené push (chat světa, vlastní diskuse, článek/galerie — 15.9) už `url` **mají**; SW deep-link (`sw.js:35`) funguje. Zbývá doplnit `url` do broadcast payloadů.
-2. **Pošta bez push.** Soukromá/systémová zpráva nikdy nedorazí jako push na telefon (jen WS + badge). Pro uživatele matoucí, když chat pushuje a pošta ne.
+1. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-PUSH) — **Broadcast push má deep-link.** `notifyAll` payloady nesou `url` (novinky Ikarosu `/ikaros/novinky`, Putyka `/chat`) + Putyka `excludeUserId` (odesílatel bez push na vlastní zprávu). (`ikaros-news.service.ts:135`, `global-chat.service.ts:459`)
+2. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-PUSH) — **Pošta pushuje.** Nová zpráva → push příjemci, kategorie `posta` (default ZAP, toggle v profilu → Notifikace, skupina Komunita), `url: '/ikaros/posta'`, `tag` per vlákno, odesílatel excluded. (`ikaros-messages.service.ts:114-133`, `notification-preferences.ts`)
 3. **Dva nezávislé „emote" systémy se snadno zamění.** Globální chat = textové emoji; svět = custom obrázkové. Sdílí UI termín „emoty", ale ne kód ani datový zdroj. V průvodci jasně oddělit, aby amatér nehledal v Putyce obrázkové emoty světa.
 4. **1h TTL globálního chatu** není v UI nikde explicitně komunikováno — uživatel může být překvapen, že se historie „ztrácí". Vhodné zmínit v nápovědě.
 5. **VAPID fail-fast.** Bez env klíčů push modul spadne na non-null assertu při startu (`push.service.ts:31`) — provozní závislost; ověřit, že produkce má klíče (dle MEMORY 3/3 OK).

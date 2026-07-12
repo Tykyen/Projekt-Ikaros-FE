@@ -176,7 +176,9 @@ export function PlatformSection() {
             Soukromé zprávy mezi uživateli. Složky Doručené / Odeslané, zpráva se
             čte jako vlákno a jde rovnou Odpovědět. Novou napíšeš tlačítkem Nová
             zpráva (příjemce našeptávačem) nebo z osobní karty uživatele. Odznak u
-            ikony Pošta ukazuje nepřečtené. V profilu si můžeš zapnout „smí mi psát
+            ikony Pošta ukazuje nepřečtené. Nová zpráva ti přijde i jako{' '}
+            <strong>push upozornění</strong> na telefon (vypneš v Profilu →
+            Notifikace → Pošta). V profilu si můžeš zapnout „smí mi psát
             jen přátelé".
           </p>
         </Tool>
@@ -433,7 +435,9 @@ export function PlatformSection() {
             Cloudinary). Čísla jsou orientační, počítaná z databáze bez sledování
             jednotlivců. <strong>Uživatelé</strong>: plná správa
             — hledání, změna role (v hierarchii), ban (i dočasný), naplánování
-            smazání (30denní lhůta), u Superadmina jemná oprávnění adminů.{' '}
+            smazání (30denní lhůta), u Superadmina jemná oprávnění adminů,
+            založení nového účtu a Superadmin navíc reset hesla či změnu
+            e-mailu uživatele.{' '}
             <strong>Audit log</strong>: read-only historie admin akcí. Otevřeš
             odkazem „Správa platformy" v pravém panelu (Admin+).
           </p>

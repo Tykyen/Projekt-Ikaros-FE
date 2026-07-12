@@ -8,6 +8,8 @@ import type { WorldCurrencyItem } from '../types';
 
 vi.mock('@/shared/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn() },
+  parseApiError: vi.fn(() => 'err'),
+  parseApiErrorCode: vi.fn(() => null),
 }));
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 

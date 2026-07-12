@@ -22,6 +22,8 @@ import {
 } from '../../api/useAdminUsers';
 import { BanModal } from './BanModal';
 import { AdminDeleteUserModal } from './AdminDeleteUserModal';
+import { ResetPasswordModal } from './ResetPasswordModal';
+import { AdminChangeEmailModal } from './AdminChangeEmailModal';
 import { BulkToolbar } from './BulkToolbar';
 import s from './UsersTable.module.css';
 
@@ -63,6 +65,11 @@ export function UsersTable({
   const [unbanTarget, setUnbanTarget] =
     useState<AdminUsersListItem | null>(null);
   const [cancelDeletionTarget, setCancelDeletionTarget] =
+    useState<AdminUsersListItem | null>(null);
+  // D-NEW-INV-ADMIN-UI — reset hesla + změna e-mailu (Superadmin-only akce)
+  const [resetPasswordTarget, setResetPasswordTarget] =
+    useState<AdminUsersListItem | null>(null);
+  const [changeEmailTarget, setChangeEmailTarget] =
     useState<AdminUsersListItem | null>(null);
   // D-025 — bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -326,6 +333,41 @@ export function UsersTable({
                           </button>
                         ))}
 
+                      {/* D-NEW-INV-ADMIN-UI — reset hesla + změna e-mailu.
+                          BE oba endpointy pouští jen Superadmina (403
+                          PASSWORD_RESET/EMAIL_CHANGE_REQUIRES_SUPERADMIN),
+                          e-mail navíc self → 403 SELF_MODIFICATION. */}
+                      {isSuperadmin && (
+                        <>
+                          <button
+                            type="button"
+                            className={s.actionsButton}
+                            onClick={() => setResetPasswordTarget(u)}
+                            disabled={isSelf}
+                            title={
+                              isSelf
+                                ? 'Vlastní heslo změň v profilu (Zabezpečení)'
+                                : 'Nastavit uživateli nové heslo'
+                            }
+                          >
+                            Reset hesla
+                          </button>
+                          <button
+                            type="button"
+                            className={s.actionsButton}
+                            onClick={() => setChangeEmailTarget(u)}
+                            disabled={isSelf}
+                            title={
+                              isSelf
+                                ? 'Vlastní e-mail změň v profilu (s ověřovacím mailem)'
+                                : 'Změnit uživateli e-mail'
+                            }
+                          >
+                            Změnit e-mail
+                          </button>
+                        </>
+                      )}
+
                       {canSeePerms && u.role === UserRole.Admin && !isSelf && (
                         <div className={s.permissionsGroup}>
                           {/* R-05 (A) — mintit admin-managery smí jen Superadmin */}
@@ -365,8 +407,6 @@ export function UsersTable({
                             />
                             Moderace obsahu
                           </label>
-                          {/* R-05 (A) — `canEditPlatformPages` toggle skryt: BE
-                              flag nikde nevynucuje (žádná editace platform stránek). */}
                         </div>
                       )}
                     </div>
@@ -406,6 +446,14 @@ export function UsersTable({
       <AdminDeleteUserModal
         target={deleteTarget}
         onClose={() => setDeleteTarget(null)}
+      />
+      <ResetPasswordModal
+        target={resetPasswordTarget}
+        onClose={() => setResetPasswordTarget(null)}
+      />
+      <AdminChangeEmailModal
+        target={changeEmailTarget}
+        onClose={() => setChangeEmailTarget(null)}
       />
 
       <ConfirmDialog

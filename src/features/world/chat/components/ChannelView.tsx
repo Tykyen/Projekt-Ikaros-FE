@@ -7,6 +7,7 @@ import {
   type CSSProperties,
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 import { Menu, Users, Search, Palette, BookOpen, Glasses } from 'lucide-react';
 import { Spinner } from '@/shared/ui';
@@ -14,6 +15,7 @@ import { WorldHelpButton, WorldHelpModal, ChatHelp } from '@/features/world/help
 import { WorldVoiceButton } from '@/features/voice/components/WorldVoiceButton';
 import type { User } from '@/shared/types';
 import { getSocket } from '@/features/chat/api/socket';
+import { socketGenerationAtom } from '@/features/chat/store/socketStore';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
 import { MessageList } from '@/features/chat/components/MessageList';
 import { TypingIndicator } from '@/features/chat/components/TypingIndicator';
@@ -268,15 +270,16 @@ export function ChannelView({
   );
 
   // ── WS lifecycle ─────────────────────────────────────────────────────
+  // Payload jen `channelId` — identitu (userId/username/avatar/worldRole) bere
+  // BE z ověřeného JWT + DB (anti-spoof W-3); klientská pole ignoruje.
+  // D-AUDIT-2026-07-11 — `socketGenerationAtom` v deps: po swapu instance se
+  // effect re-bindne, takže leave při odchodu odejde na ŽIVÝ socket (dřív na
+  // mrtvý → nový socket zůstal v roomu/presence do disconnectu).
+  const socketGeneration = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     const socket = getSocket();
     socket.emit('room:join', `chat:${channelId}`);
-    socket.emit('chat:channel:join', {
-      channelId,
-      userId: currentUser.id,
-      username: currentUser.username,
-      avatarUrl: currentUser.avatarUrl,
-    });
+    socket.emit('chat:channel:join', { channelId });
     // Po otevření konverzace ji okamžitě označ za přečtenou (Discord/Messenger
     // chování — focus = read). BE odbroadcastne `chat:unread { count: 0 }` →
     // sidebar badge zmizí.
@@ -287,7 +290,7 @@ export function ChannelView({
     };
     // markRead je stable per worldId — schválně mimo deps (jinak loop).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelId, currentUser.id, currentUser.username, currentUser.avatarUrl]);
+  }, [channelId, socketGeneration]);
 
   // W-7 — re-join chat roomu + presence po reconnectu. Bez toho po výpadku sítě
   // přestanou chodit zprávy/typing/presence a hráč zmizí z PJ panelu přítomných.
@@ -296,12 +299,7 @@ export function ChannelView({
   useSocketReconnect(() => {
     const socket = getSocket();
     socket.emit('room:join', `chat:${channelId}`);
-    socket.emit('chat:channel:join', {
-      channelId,
-      userId: currentUser.id,
-      username: currentUser.username,
-      avatarUrl: currentUser.avatarUrl,
-    });
+    socket.emit('chat:channel:join', { channelId });
     void qc.invalidateQueries({ queryKey: messagesKey });
   });
 

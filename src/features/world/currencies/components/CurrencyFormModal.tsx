@@ -5,7 +5,7 @@ import { Modal } from '@/shared/ui/Modal/Modal';
 import { Button } from '@/shared/ui/Button/Button';
 import { Input } from '@/shared/ui/Input/Input';
 import { parseApiError } from '@/shared/api/client';
-import { useUpdateCurrencies } from '../api';
+import { isCurrencyConflict, useUpdateCurrencies } from '../api';
 import type { WorldCurrencyItem } from '../types';
 import {
   createCurrencyItemSchema,
@@ -78,6 +78,9 @@ export function CurrencyFormModal({
           onClose();
         },
         onError: (err) => {
+          // 409 CURRENCY_CONFLICT — hlášku + refetch řeší hook; modal nechat
+          // otevřený (rozepsaná data), uložení po refetchi projde.
+          if (isCurrencyConflict(err)) return;
           toast.error(parseApiError(err));
         },
       },

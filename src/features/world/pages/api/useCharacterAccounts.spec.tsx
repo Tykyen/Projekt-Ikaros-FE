@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
-import { useUpdateAccount } from './useCharacterAccounts';
+import { useAccountTransfer, useUpdateAccount } from './useCharacterAccounts';
 import { api } from '@/shared/api/client';
 
 vi.mock('@/shared/api/client', () => ({
@@ -39,5 +39,31 @@ describe('useCharacterAccounts', () => {
     });
     const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
     expect(keys).toContainEqual(['characters', 'w1']);
+  });
+
+  // D-PURCHASE-IDEMPOTENCY — transfer payload nese clientNonce (UUID per
+  // převodní záměr); BE na retry se stejným nonce vrátí původní převod.
+  it('transfer forwarduje clientNonce v POST payloadu', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      from: { id: 'accA' },
+      to: { id: 'accB' },
+    } as never);
+    const { wrapper } = makeWrapperWithQc();
+    const { result } = renderHook(() => useAccountTransfer('w1', 'accA'), {
+      wrapper,
+    });
+    const nonce = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+    await act(async () => {
+      await result.current.mutateAsync({
+        toAccountId: 'accB',
+        amount: 100,
+        description: 'Výkupné',
+        clientNonce: nonce,
+      });
+    });
+    expect(api.post).toHaveBeenCalledWith(
+      '/worlds/w1/accounts/accA/transfer',
+      expect.objectContaining({ clientNonce: nonce }),
+    );
   });
 });

@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
+import { useAtomValue } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getSocket } from '@/features/chat/api/socket';
+import { socketGenerationAtom } from '@/features/chat/store/socketStore';
 import {
   useSocketEvent,
   useSocketReconnect,
@@ -28,6 +30,11 @@ export function useWorldSocket(worldId: string | null): void {
   const qc = useQueryClient();
   const navigate = useNavigate();
 
+  // D-AUDIT-2026-07-11 — `socketGenerationAtom` v deps: po swapu instance
+  // (reconnectSocket / re-auth) se effect re-bindne na živý socket, takže
+  // odchod ze světa pošle `room:leave` tam, kde socket skutečně v roomu je
+  // (dřív mířil na mrtvou instanci → živý socket zůstal ve `world:{id}` roomu).
+  const socketGeneration = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     if (!worldId) return;
     const socket = getSocket();
@@ -35,7 +42,7 @@ export function useWorldSocket(worldId: string | null): void {
     return () => {
       socket.emit('room:leave', `world:${worldId}`);
     };
-  }, [worldId]);
+  }, [worldId, socketGeneration]);
 
   useSocketReconnect(() => {
     if (worldId) getSocket().emit('room:join', `world:${worldId}`);

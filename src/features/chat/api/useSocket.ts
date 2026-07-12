@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { getSocket, disconnectSocket } from './socket';
 import { accessTokenAtom } from '@/shared/store/authStore';
 import { anonSessionAtom } from '../store/anonSession';
-import { socketStatusAtom } from '../store/socketStore';
+import { socketGenerationAtom, socketStatusAtom } from '../store/socketStore';
 import type { Socket } from 'socket.io-client';
 
 /** Řídí životní cyklus socketu podle auth stavu — volat jednou v root layoutu. */
@@ -64,7 +64,10 @@ export function useSocketReconnect(onReconnect: () => void): void {
   // staré odpojené instanci a re-join callbacky (~14 call-sites: world chat,
   // ChannelView, mapy, friendships, events…) by se po reconnectu nespustily →
   // real-time slepota do F5. Re-registrací na změnu stavu se obnoví.
+  // D-AUDIT-2026-07-11 — navíc `socketGenerationAtom`: kryje swap, při kterém
+  // status skončí na stejné hodnotě (např. reconnect během 'connecting').
   const status = useAtomValue(socketStatusAtom);
+  const generation = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     const socket = getSocket();
     const handler = (): void => ref.current();
@@ -72,7 +75,7 @@ export function useSocketReconnect(onReconnect: () => void): void {
     return () => {
       socket.off('connect', handler);
     };
-  }, [status]);
+  }, [status, generation]);
 }
 
 /** Přihlásí se k socket eventu a odhlásí při unmount. */
@@ -85,7 +88,10 @@ export function useSocketEvent<T = unknown>(
   // zahodí, dokud není auth token, a po jeho načtení vytvoří nový. Sledujeme
   // proto socket stav a po každé změně listener přeregistrujeme na aktuální
   // instanci; jinak by zůstal viset na mrtvém socketu (viz počty místností).
+  // D-AUDIT-2026-07-11 — navíc `socketGenerationAtom` (nová instance = nová
+  // generace): kryje swap, při kterém status skončí na stejné hodnotě.
   const status = useAtomValue(socketStatusAtom);
+  const generation = useAtomValue(socketGenerationAtom);
 
   useEffect(() => {
     handlerRef.current = handler;
@@ -96,5 +102,5 @@ export function useSocketEvent<T = unknown>(
     const cb = (data: T) => handlerRef.current(data);
     socket.on(event, cb);
     return () => { socket.off(event, cb); };
-  }, [event, status]);
+  }, [event, status, generation]);
 }

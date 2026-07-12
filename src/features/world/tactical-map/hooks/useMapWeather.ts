@@ -12,10 +12,12 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2i.md (i-2).
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { getSocket } from "@/features/chat/api/socket";
-import { useSocketReconnect } from "@/features/chat/api/useSocket";
+import {
+  useSocketEvent,
+  useSocketReconnect,
+} from "@/features/chat/api/useSocket";
 import { useWorldContext } from "@/features/world/context/WorldContext";
 import {
   useBroadcastWeather,
@@ -89,29 +91,23 @@ export function useMapWeather(): UseMapWeatherResult {
   });
 
   // listener: patch World query cache (slug i id variant — match dle world.id)
-  useEffect(() => {
-    if (!worldId) return;
-    const socket = getSocket();
-    const handler = (payload: WeatherUpdatedPayload): void => {
-      if (payload.worldId !== worldId) return;
-      const next: ActiveMapWeather | null =
-        payload.weather && payload.generatorId
-          ? {
-              generatorId: payload.generatorId,
-              generatorName: payload.generatorName ?? "",
-              weather: payload.weather,
-              setAt: new Date().toISOString(),
-            }
-          : null;
-      queryClient.setQueriesData<World>({ queryKey: ["worlds"] }, (old) =>
-        old && old.id === worldId ? { ...old, activeMapWeather: next } : old,
-      );
-    };
-    socket.on("weather:updated", handler);
-    return () => {
-      socket.off("weather:updated", handler);
-    };
-  }, [worldId, queryClient]);
+  // D-AUDIT-2026-07-11 — `useSocketEvent` (swap-safe): ruční `socket.on` po
+  // výměně socket instance (reconnectSocket / re-auth) zůstal na mrtvém socketu.
+  useSocketEvent<WeatherUpdatedPayload>("weather:updated", (payload) => {
+    if (!worldId || payload.worldId !== worldId) return;
+    const next: ActiveMapWeather | null =
+      payload.weather && payload.generatorId
+        ? {
+            generatorId: payload.generatorId,
+            generatorName: payload.generatorName ?? "",
+            weather: payload.weather,
+            setAt: new Date().toISOString(),
+          }
+        : null;
+    queryClient.setQueriesData<World>({ queryKey: ["worlds"] }, (old) =>
+      old && old.id === worldId ? { ...old, activeMapWeather: next } : old,
+    );
+  });
 
   const setWeather = useCallback(
     (generatorId: string) => {

@@ -223,6 +223,78 @@ export function useAdminUnbanUser() {
   });
 }
 
+// ── D-NEW-INV-ADMIN-UI — reset hesla / založení uživatele / změna e-mailu ──
+
+/**
+ * Reset hesla uživatele — `PUT /users/:id/reset-password` (Superadmin-only,
+ * BE 403 `PASSWORD_RESET_REQUIRES_SUPERADMIN`). BE heslo NEgeneruje ani
+ * nevrací (204) — nové heslo dodává admin v body (`newPassword`, 8–128).
+ * Úspěch NEtoastuje hook: `ResetPasswordModal` přepíná do stavu „nastaveno",
+ * kde heslo zůstává viditelné ke zkopírování.
+ */
+export function useAdminResetPassword() {
+  return useMutation({
+    mutationFn: ({
+      userId,
+      newPassword,
+    }: {
+      userId: string;
+      newPassword: string;
+    }) => api.put<void>(`/users/${userId}/reset-password`, { newPassword }),
+    onError: (err) => {
+      toast.error(parseApiError(err));
+    },
+  });
+}
+
+/**
+ * Založení uživatele adminem — `POST /admin/users` (AdminGuard; hierarchie:
+ * Admin nesmí zakládat admin role). Vrací SafeUser (201).
+ * `onError` záměrně chybí — `CreateUserModal` mapuje `EMAIL_TAKEN` /
+ * `USERNAME_TAKEN` na field-level chyby (vzor RegisterModal), toast by dubloval.
+ */
+export function useAdminCreateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      email: string;
+      username: string;
+      password: string;
+      role?: UserRole;
+    }) => api.post<User>('/admin/users', body),
+    onSuccess: (user) => {
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-12 — nový účet se objevuje i ve veřejném adresáři.
+      qc.invalidateQueries({ queryKey: ['public-users'] });
+      // C-51/C-52 — dashboard county + audit-log (USER_CREATE je auditovaný).
+      qc.invalidateQueries({ queryKey: adminKeys.stats });
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
+      toast.success(`Uživatel ${user.username} vytvořen`);
+    },
+  });
+}
+
+/**
+ * Změna e-mailu uživatele — `PATCH /admin/users/:id/email` (Superadmin-only).
+ * Chyby: 400 `SAME_EMAIL` · 409 `EMAIL_TAKEN` · 403 `SELF_MODIFICATION` /
+ * `EMAIL_CHANGE_REQUIRES_SUPERADMIN` · 404 `USER_NOT_FOUND`. Nová adresa je
+ * na BE označena `emailVerified: false`.
+ * `onError` záměrně chybí — `AdminChangeEmailModal` mapuje kódy na field chyby.
+ */
+export function useAdminUpdateUserEmail() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, email }: { userId: string; email: string }) =>
+      api.patch<User>(`/admin/users/${userId}/email`, { email }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: adminKeys.users });
+      // C-52 — EMAIL_CHANGE je auditovaná akce.
+      qc.invalidateQueries({ queryKey: adminKeys.auditLog });
+      toast.success('E-mail změněn (nová adresa je neověřená)');
+    },
+  });
+}
+
 // ── 1.3c — Admin moderation: delete request + cancel ───────────────────
 
 export function useAdminRequestDeletion() {
@@ -272,7 +344,6 @@ export function useAdminCancelDeletion() {
 export interface AdminPermissionsPatch {
   canManageAdmins?: boolean;
   canModerateContent?: boolean;
-  canEditPlatformPages?: boolean;
 }
 
 export function useAdminSetAdminPermissions() {

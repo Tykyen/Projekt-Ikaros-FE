@@ -119,6 +119,11 @@ export interface PurchaseInput {
   accountId: string;
   quantity?: number;
   sectionId?: string;
+  /**
+   * D-PURCHASE-IDEMPOTENCY — UUID per nákupní ZÁMĚR. Dvojklik/retry se
+   * stejným nonce = BE vrátí výsledek 1. nákupu místo 2. odečtu.
+   */
+  clientNonce?: string;
 }
 
 export interface PurchaseResult {

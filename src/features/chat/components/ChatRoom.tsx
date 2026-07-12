@@ -284,17 +284,12 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
     if (!channelId || !user) return;
     const socket = getSocket();
     socket.emit('room:join', `chat:${channelId}`);
+    // Identita (userId/username/avatar) jde z ověřeného JWT + DB na BE
+    // (anti-spoof W-10) — klientská pole se ignorují, posílá se jen `room`.
     if (room === 'hospoda') {
-      socket.emit('chat:hospoda:join', {
-        username: user.username,
-        userId: user.id,
-      });
+      socket.emit('chat:hospoda:join');
     } else {
-      socket.emit('chat:room:join', {
-        room,
-        username: user.username,
-        userId: user.id,
-      });
+      socket.emit('chat:room:join', { room });
     }
     void qc.invalidateQueries({ queryKey: keys.messages });
   });
@@ -309,17 +304,12 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
     if (store.get(myRoomsAtom).has(room)) return;
     const socket = getSocket();
     socket.emit('room:join', `chat:${channelId}`);
+    // Identita (userId/username/avatar) jde z ověřeného JWT + DB na BE
+    // (anti-spoof W-10) — klientská pole se ignorují, posílá se jen `room`.
     if (room === 'hospoda') {
-      socket.emit('chat:hospoda:join', {
-        username: user.username,
-        userId: user.id,
-      });
+      socket.emit('chat:hospoda:join');
     } else {
-      socket.emit('chat:room:join', {
-        room,
-        username: user.username,
-        userId: user.id,
-      });
+      socket.emit('chat:room:join', { room });
     }
     setMyRooms((prev) => new Set(prev).add(room));
   }, [channelId, user, room, setMyRooms, store]);
@@ -329,7 +319,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
     if (!channelId) return;
     const socket = getSocket();
     if (room === 'hospoda') {
-      socket.emit('chat:hospoda:leave', {});
+      socket.emit('chat:hospoda:leave');
     } else {
       socket.emit('chat:room:leave', { room });
     }

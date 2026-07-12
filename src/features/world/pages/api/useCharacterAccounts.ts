@@ -221,6 +221,11 @@ export interface TransferInput {
   description: string;
   /** Spec 8.x-prep §4.4 (B4) — herní datum. */
   inGameDate?: FantasyDateLike | null;
+  /**
+   * D-PURCHASE-IDEMPOTENCY — UUID per převodní ZÁMĚR. Dvojklik/retry se
+   * stejným nonce = BE vrátí výsledek 1. převodu místo 2. odečtu.
+   */
+  clientNonce?: string;
 }
 
 export function useAccountTransfer(worldId: string, fromAccountId: string) {

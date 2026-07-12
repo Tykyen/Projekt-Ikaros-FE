@@ -7,7 +7,10 @@
 // refetch), jen rozsvítí `staleFromRemote` (badge „mapa byla mezitím změněna").
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getSocket } from '@/features/chat/api/socket';
+import {
+  useSocketEvent,
+  useSocketReconnect,
+} from '@/features/chat/api/useSocket';
 import { universeQueryKey } from '../api/useUniverse';
 
 interface UniverseUpdatedSignal {
@@ -39,48 +42,35 @@ export function useUniverseSocket(
   // drží výhradně `useWorldSocket` (WorldLayout, jediný vlastník W-7/W-9); tady
   // se dřív dělal vlastní `room:join`/`room:leave`, ale bez ref-countingu →
   // odchod z Universe mapy zavolal `room:leave` i za WorldLayout a vykopl
-  // dashboard z roomu (FIX-1). Zůstává jen `connect` listener, který po
-  // reconnectu refetchne zmeškaný `universe:updated` signál (S-RUN-03).
-  useEffect(() => {
+  // dashboard z roomu (FIX-1).
+  // D-AUDIT-2026-07-11 — dřívější ruční `socket.on('connect')` visel po swapu
+  // instance na mrtvém socketu → `useSocketReconnect` (swap-safe, S-RUN-04).
+  useSocketReconnect(() => {
     if (!worldId) return;
-    const socket = getSocket();
-    const onConnect = (): void => {
-      // S-RUN-03 — re-join sám nestačí: signál `universe:updated` zmeškaný
-      // během výpadku je pryč → po reconnectu refetch (mimo edit mód, kde má
-      // draft přednost a jen rozsvítíme badge „mapa byla mezitím změněna").
-      if (suspendedRef.current) {
-        setStaleFromRemote(true);
-      } else {
-        void queryClient.invalidateQueries({
-          queryKey: universeQueryKey(worldId),
-        });
-      }
-    };
-    socket.on('connect', onConnect);
-    return () => {
-      socket.off('connect', onConnect);
-    };
-  }, [worldId, queryClient]);
-
-  // listener
-  useEffect(() => {
-    if (!worldId) return;
-    const socket = getSocket();
-    const handler = (signal: UniverseUpdatedSignal): void => {
-      if (!signal || signal.worldId !== worldId) return;
-      if (suspendedRef.current) {
-        setStaleFromRemote(true);
-        return;
-      }
+    // S-RUN-03 — re-join sám nestačí: signál `universe:updated` zmeškaný
+    // během výpadku je pryč → po reconnectu refetch (mimo edit mód, kde má
+    // draft přednost a jen rozsvítíme badge „mapa byla mezitím změněna").
+    if (suspendedRef.current) {
+      setStaleFromRemote(true);
+    } else {
       void queryClient.invalidateQueries({
         queryKey: universeQueryKey(worldId),
       });
-    };
-    socket.on('universe:updated', handler);
-    return () => {
-      socket.off('universe:updated', handler);
-    };
-  }, [worldId, queryClient]);
+    }
+  });
+
+  // listener — `useSocketEvent` (swap-safe): ruční varianta po výměně socket
+  // instance (reconnectSocket / re-auth) zůstala bez re-bindu (D-AUDIT-2026-07-11).
+  useSocketEvent<UniverseUpdatedSignal>('universe:updated', (signal) => {
+    if (!worldId || !signal || signal.worldId !== worldId) return;
+    if (suspendedRef.current) {
+      setStaleFromRemote(true);
+      return;
+    }
+    void queryClient.invalidateQueries({
+      queryKey: universeQueryKey(worldId),
+    });
+  });
 
   return { staleFromRemote, clearStale };
 }

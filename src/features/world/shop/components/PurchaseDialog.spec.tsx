@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { PurchaseDialog } from './PurchaseDialog';
 import type { ShopItem } from '../types';
 import type { WorldCurrencyItem } from '@/features/world/currencies/types';
@@ -94,5 +94,21 @@ describe('PurchaseDialog', () => {
     renderDialog(makeItem(), false);
     expect(screen.getByRole('button', { name: 'Koupit' })).toBeDisabled();
     expect(screen.getByText(/požádej PJ/)).toBeInTheDocument();
+  });
+
+  // D-PURCHASE-IDEMPOTENCY — nonce per nákupní záměr (mount dialogu); retry
+  // téhož záměru pošle stejný nonce → BE vrátí původní výsledek (žádný 2. odečet).
+  it('posílá clientNonce (UUID); dvojklik téhož záměru = stejný nonce', () => {
+    renderDialog(makeItem());
+    const buyBtn = screen.getByRole('button', { name: 'Koupit' });
+    fireEvent.click(buyBtn);
+    fireEvent.click(buyBtn);
+    expect(mutate).toHaveBeenCalledTimes(2);
+    const first = mutate.mock.calls[0][0] as { clientNonce?: string };
+    const second = mutate.mock.calls[1][0] as { clientNonce?: string };
+    expect(first.clientNonce).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    );
+    expect(second.clientNonce).toBe(first.clientNonce);
   });
 });

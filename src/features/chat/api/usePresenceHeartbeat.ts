@@ -14,8 +14,14 @@ const HEARTBEAT_MS = 5 * 60_000;
 export function usePresenceHeartbeat(enabled: boolean): void {
   useEffect(() => {
     if (!enabled) return;
-    const socket = getSocket();
-    const id = setInterval(() => socket.emit('chat:heartbeat'), HEARTBEAT_MS);
+    // D-AUDIT-2026-07-11 — `getSocket()` volat ČERSTVĚ v každém ticku, ne
+    // jednou zachycenou proměnnou z mountu: po swapu instance (re-auth,
+    // toggle neviditelnosti) by heartbeat mířil na mrtvý socket a BE by
+    // uživatele po 60 min vyhodil z místností, i když je aktivní.
+    const id = setInterval(
+      () => getSocket().emit('chat:heartbeat'),
+      HEARTBEAT_MS,
+    );
     return () => clearInterval(id);
   }, [enabled]);
 }

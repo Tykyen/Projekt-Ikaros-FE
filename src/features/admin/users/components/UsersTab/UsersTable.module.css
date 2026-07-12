@@ -1,3 +1,18 @@
+/* D-NEW-INV-ADMIN-UI — toolbar nad filtry (tlačítko „Nový uživatel") */
+.tabToolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.tabToolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .filters {
   display: flex;
   gap: 12px;

@@ -7,7 +7,9 @@
  * `sendState` hlásí změnu vlastního mikrofonu/kamery do rosteru ostatních.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { useAtomValue } from 'jotai';
 import { getSocket } from '@/features/chat/api/socket';
+import { socketGenerationAtom } from '@/features/chat/store/socketStore';
 import {
   useSocketEvent,
   useSocketReconnect,
@@ -45,7 +47,10 @@ export function useVoicePresence(
     );
   });
 
-  // Vstup/odchod z hovoru.
+  // Vstup/odchod z hovoru. D-AUDIT-2026-07-11 — `socketGenerationAtom` v deps:
+  // po swapu instance se effect re-bindne, takže `voice:leave` při odchodu
+  // odejde na ŽIVÝ socket (dřív na mrtvý → účastník strašil v rosteru).
+  const socketGeneration = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     if (!inCall) return;
     const socket = getSocket();
@@ -53,7 +58,7 @@ export function useVoicePresence(
     return () => {
       socket.emit('voice:leave', { room });
     };
-  }, [room, inCall]);
+  }, [room, inCall, socketGeneration]);
 
   // Reconnect — server po výpadku sítě roster zapomene → re-join.
   useSocketReconnect(() => {

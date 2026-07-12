@@ -16,16 +16,16 @@
   - **Postava v Campu (`CharacterSection`):** globální chat-postava napříč Ikaros chaty (Putyka + Camp). Pole: Jméno postavy (max 64), Popis (max 1000), Avatar postavy (samostatný slot, 5 MB, resize 256, fallback `being.webp`).
   - **Přátelé (`FriendsSection`):** kompaktní výpis přijatých přátel (avatar + jméno → klik na veřejný profil), odkaz „Spravovat →" do `/ikaros/uzivatele?tab=pratele`.
   - **Světy (`WorldsSection`), Moje postavy (`MyCharactersSection`), Akce (`ProfileEventsSection`):** dynamické sekce (cross-world membership/postavy/události).
-  - **Komunita (`CommunityPlaceholders`):** „Moje diskuze / Moje články / Moje galerie" — STATICKÉ placeholdery „Bude dostupné v dalším updatu (fáze 3)", žádné requesty.
+  - **Komunita (`CommunitySections`, D-NEW-INV-PROFILE 2026-07-12):** „Moje diskuze / Moje články / Moje galerie" — reálné seznamy (název · datum · odkaz na detail, max 5 + „Zobrazit vše (N) →" do příslušné sekce, badge s počtem). Články/galerie přes `useMyArticles`/`useMyGalleryImages`; diskuze klientský filtr `creatorId` nad `useDiscussions()` (BE výpis dle autora neexistuje — stejný vzor jako tab „Moje" na DiscussionsPage, tvůrce vidí i pending/uzamčené). Empty/error stavy přes sdílené `EmptyState`/`ErrorState`. Dřív statické placeholdery „fáze 3".
   - **Vzhled (`AppearanceSection`):** Globální motiv (ThemeSwitcher, ukládá lokálně i na server), Doladění vzhledu (**Velikost rozhraní** slider 100–150 % → `themeSettings.uiScale`, spec 5.9c; jas/kontrast slidery 70–130 %, override barev → `themeSettings.adjust`/`overrides`), Barva chatu (`ChatColorPicker`, hex #RRGGBB, + rozbalovací **nápovědní paleta** 18 pojmenovaných barev — 16.1g `NamedColorPalette`, klik = rychlá volba; sekce defaultně sbalená). Stejná sdílená paleta (`src/shared/ui/NamedColorPalette`) je i u ostatních color pickerů světa (barva zprávy v chatu, barva textu stránky, pruh v deníku, těleso univerza, barva skupiny, tokeny motivu).
   - **Soukromí (`PrivacySection`):** 3 přepínače — „Neviditelný mód" (`hiddenPresence`, po změně reconnect socketu), „Skrýt v adresáři uživatelů" (`hiddenInDirectory`), „Jen pro přátele" (`profileVisibility: 'public'|'friends'`).
-  - **Notifikace (`NotificationPreferencesSection`, 15.9):** master push vypínač + 7 kategorií ve 4 skupinách + per-device přepínač. Řídí, na co chodí web push. Detail viz kap. 05 „Nastavení notifikací (preference)".
+  - **Notifikace (`NotificationPreferencesSection`, 15.9):** master push vypínač + 9 kategorií v 5 skupinách (vč. „Pošta" — D-NEW-INV-PUSH 2026-07-12) + per-device přepínač. Řídí, na co chodí web push. Detail viz kap. 05 „Nastavení notifikací (preference)".
   - **Bezpečnost (`SecuritySection`):** Username (žádost o změnu — schvaluje admin, cooldown 30 dní), Změna hesla (viz kap. 01), 2FA (viz kap. 01), Důvěryhodná zařízení (viz kap. 01).
   - **Moderace (`ModerationSection`, 20.1):** „Moje hlášení" (co jsem nahlásil + stav Čeká/V řešení/Vyřízeno — pohled oznamovatele) a „Rozhodnutí o mém obsahu" (moderační zásahy vůči mému obsahu = statement of reasons dle DSA čl. 17: akce, odůvodnění, právní/smluvní základ, tlačítko **„Odvolat se"** kromě M0). Data `GET /moderation/reports/mine` a `/decisions/mine`. Renderuje se jen přihlášenému. Detail moderačního workflow viz kap. 08.
   - **Účet (`AccountSection`):** tlačítko „Stáhnout moje data (JSON)" (20.2), Smazat účet / banner naplánovaného smazání (viz kap. 01). U nezletilého (`isMinor`) navíc informativní hláška „Účet v režimu ochrany nezletilých" (`MinorNotice`).
 - **Editovatelná pole přes `PATCH /users/me` (DTO `UpdateUserDto`):** displayName(32), avatarUrl(url), characterPath(slug), themeSettings(obj), chatPreferences(obj), hiddenPresence(bool), hiddenInDirectory(bool), profileVisibility(public/friends), chatColor(hex), city(100), bio(1000), characterName(64), characterBio(1000), themeId(z THEME_IDS), defaultAvatarType(male/female/being), characterAvatarUrl. **username přes `/me` zakázáno** (Forbidden `USERNAME_CHANGE_VIA_REQUEST`).
 - **Hranice / co neumí:**
-  - „Moje diskuze/články/galerie" jsou jen stuby (fáze 3).
+  - „Moje diskuze" v profilu = klientský filtr nad celým výpisem diskuzí (BE endpoint „dle autora" chybí) — u tisíců diskuzí by tahal vše.
   - displayName na BE max 32, ale na rozdíl od username NEMÁ min/regex validaci.
   - Avatar upload limit 5 MB (multer), bez UI cropování (server jen resize).
   - Username nelze měnit přímo — jen žádostí se schválením + 30denní cooldown.
@@ -33,8 +33,8 @@
   - Theme se ukládá lokálně i na server (sync napříč zařízeními), doladění vzhledu je per-user a aplikuje se na všech zařízeních.
   - **Velikost rozhraní (5.9c)** = CSS `zoom` na `<html>` (aplikuje `ThemeProvider`, `--ui-scale` + `zoom`), zvětší CELÉ rozhraní (text, tlačítka, ikony) napříč platformou, světy i chaty (Putyka/Camp/svět) — jedno hrdlo, žádná změna chat komponent. Ukládá se do `themeSettings.uiScale` (BE volný objekt + shallow-merge → koexistuje s jas/kontrast). **Taktická mapa (PIXI) je z zoomu vyňata** (`.viewport { zoom: calc(1/var(--ui-scale)) }`) → plátno zůstává 1:1; mapové HUD overlaye uvnitř `.viewport` se také nezvětšují.
   - Změna username řešena dedikovaným flow `me/username-request` (vytvořit/získat/zrušit) + admin schválení; po loginu toast o rozhodnuté žádosti (D-028 `last-unseen-decided`).
-- **Stav:** ✅ funguje (komunitní placeholdery 🚧).
-- **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27` (`ModerationSection` `:90`), `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `ModerationSection.tsx:71`, `AccountSection.tsx:54`, `CommunityPlaceholders.tsx:13`, BE `users.controller.ts:60`/`:71`, `dto/update-user.dto.ts:14`.
+- **Stav:** ✅ funguje.
+- **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27` (`ModerationSection` `:90`), `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `ModerationSection.tsx:71`, `AccountSection.tsx:54`, `CommunitySections.tsx:32`, BE `users.controller.ts:60`/`:71`, `dto/update-user.dto.ts:14`.
 
 ---
 
@@ -74,7 +74,7 @@
 - **Kde:** Route `/ikaros/uzivatele` (`UsersPage`), chráněná `requireAuth`. Default tab „uzivatele".
 - **Kdo:** Každý přihlášený. `visibleTabsForRole` vrací VŠEM stejné 3 taby (role parametr ignorován — `void role`).
 - **Taby:**
-  - **Přátelé (`FriendsTab`):** „Moji přátelé" (grid karet, kebab Otevřít/Odebrat), „Odeslané žádosti" (collapsible), „Zablokovaní" (collapsible, default sbalený). Empty state s CTA do adresáře.
+  - **Přátelé (`FriendsTab`):** „Moji přátelé" (grid karet — karta ukazuje reálný počet světů přítele, `worldsCount` z BE; kebab Otevřít/Odebrat), „Odeslané žádosti" (collapsible), „Zablokovaní" (collapsible, default sbalený). Empty state s CTA do adresáře.
   - **Uživatelé (`UsersTab`):** grid veřejných karet, search (přezdívka/jméno, debounce 300 ms), sort (Nejnovější / Abecedně), stránkování (24/str). `GET /users` (`listPublic`, throttle 60/min).
   - **Zpracovat (`ZpracovatTab`):** osobní fronta pending akcí — agregátor přes `PendingActionType` (žádosti o přátelství, změnu přezdívky, vstup do světa, články/galerie/diskuze ke schválení, hlášené příspěvky, žádosti o vstup do diskuze). Badge s počtem v tabu. Group se skryje při 0 items.
 - **Co kdo vidí per role:**
@@ -139,10 +139,10 @@
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-- **Komunitní placeholdery v profilu = stub:** „Moje diskuze / Moje články / Moje galerie" zobrazují „Bude dostupné v dalším updatu (fáze 3)", žádný request — vydávané jako sekce, ale prázdné. Pro expanzi: napojit na existující moduly (diskuze/články/galerie reálně fungují jinde).
+- ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-PROFILE) — **Komunitní sekce profilu jsou funkční.** „Moje diskuze / Moje články / Moje galerie" zobrazují reálné seznamy s odkazy (`CommunitySections.tsx`, nad existujícími hooky modulů 3.x). Zbytkový dluh: diskuze filtrované klientsky (BE endpoint dle autora chybí).
 - **Role nemá vliv na taby `/ikaros/uzivatele` — ZÁMĚR (12.1):** `visibleTabsForRole`/`defaultTabForRole` všem vracejí stejné 3 komunitní taby (zafixováno testy). `role` param je vestigiální (`void role`) — ponechán kvůli signatuře, ne mrtvý nález k opravě.
 - **Veřejný profil endpoint SJEDNOCEN** (ověřeno 2026-06-27, D-NEW-INV-SEC): nechráněná `GET /users/profile/:id` byla **odstraněna 2026-06-18**; zůstal jen `profile/v14/:id` (JwtAuthGuard + friend-only/tombstone gating + throttle). Leak uzavřen.
 - **`displayName` trim DOPLNĚN** (2026-06-27, D-NEW-INV-PROFILE): FE `headerSchema` + BE `UpdateUserDto` (`@Transform` trim, `transform:true`) → „jen mezery" se normalizují na prázdné (→ fallback na username). Min/regex (jako username) záměrně NE — displayName smí být kratší/volnější.
-- **`FriendsTab` worldsCount = 0 placeholder:** karty přátel zobrazují počet světů jako 0 (BE friend list shape je užší), TODO „per-friend worlds badge (2.x)".
+- ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-PROFILE) — **`FriendsTab` zobrazuje reálný počet světů přítele.** BE friend list shape nese `worldsCount` (1 batch aggregate pro celou stránku, žádný N+1 — `friendships.service.ts:248-277`); FE mapper `toPublicUserListItem` ho propaguje s `?? 0` runtime pojistkou proti staršímu BE (`FriendsTab.tsx:244`).
 - **Friend systém bez kategorií:** žádné skupiny/poznámky/oblíbení přátelé — pro expanzi.
 - **`getCalendarMonth`/`updateCalendarMonth` v users controlleru:** zdánlivě nesouvisející kalendářová pole na user endpointu (themeSettings.calendarMonth) — k ověření, zda nepatří jinam (možná legacy z .NET migrace).

@@ -186,6 +186,7 @@ export function AccountSection() {
             { term: 'Vlastní článek a galerie', desc: 'Schválení, zamítnutí nebo nové hodnocení tvého článku či obrázku.' },
             { term: 'Novinky světa', desc: 'Nová novinka ve světě, jehož jsi členem.' },
             { term: 'Novinky Ikarosu', desc: 'Oznámení a novinky celé platformy.' },
+            { term: 'Pošta', desc: 'Nová soukromá zpráva nebo systémové oznámení v Poště — standardně zapnuto, klepnutí na bublinu otevře Poštu.' },
             { term: 'Putyka', desc: 'Zprávy v Dimenzionální Putyce — standardně vypnuto, ať tě každá hláška neruší.' },
           ]}
         />
@@ -200,8 +201,9 @@ export function AccountSection() {
         <p>
           <strong>Moje světy</strong> = seznam světů, kterých jsi členem (klik tě
           přenese do světa). <strong>Moje akce ve světech</strong> agregují blížící
-          se herní akce napříč světy. Komunitní stopa (diskuze, články, galerie) se
-          plní postupně.
+          se herní akce napříč světy. <strong>Moje diskuze, Moje články a Moje
+          galerie</strong> ukazují, co jsi v komunitě vytvořil/a — klik otevře
+          detail, „Zobrazit vše" přejde do příslušné sekce.
         </p>
       </HelpAccordion>
 

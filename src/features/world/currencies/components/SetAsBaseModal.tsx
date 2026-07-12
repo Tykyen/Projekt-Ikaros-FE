@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { toast } from 'sonner';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import { Button } from '@/shared/ui/Button/Button';
-import { useUpdateCurrencies } from '../api';
+import { isCurrencyConflict, useUpdateCurrencies } from '../api';
 import type { WorldCurrencyItem } from '../types';
 import {
   moveBaseToFront,
@@ -45,7 +45,13 @@ export function SetAsBaseModal({
           toast.success(`Základ změněn na „${target.name}".`);
           onClose();
         },
-        onError: () => {
+        onError: (err) => {
+          // 409 CURRENCY_CONFLICT — hlášku + refetch řeší hook; preview kurzů
+          // je po refetchi stale → zavřít.
+          if (isCurrencyConflict(err)) {
+            onClose();
+            return;
+          }
           toast.error('Změna základu selhala.');
         },
       },

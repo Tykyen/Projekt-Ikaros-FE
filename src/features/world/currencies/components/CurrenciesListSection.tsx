@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { Button } from '@/shared/ui/Button/Button';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog';
 import type { WorldCurrencyItem } from '../types';
-import { useUpdateCurrencies } from '../api';
+import { isCurrencyConflict, useUpdateCurrencies } from '../api';
 import { CurrencyRow } from './CurrencyRow';
 import { CurrencyFormModal } from './CurrencyFormModal';
 import { SetAsBaseModal } from './SetAsBaseModal';
@@ -54,7 +54,13 @@ export function CurrenciesListSection({
           toast.success(`Měna „${deleteTarget.name}" smazána.`);
           setDeleteTarget(null);
         },
-        onError: () => {
+        onError: (err) => {
+          // 409 CURRENCY_CONFLICT — hlášku + refetch řeší hook; jen zavřít
+          // dialog (mazaná měna po refetchi nemusí existovat).
+          if (isCurrencyConflict(err)) {
+            setDeleteTarget(null);
+            return;
+          }
           toast.error('Smazání selhalo. Zkus to znovu.');
         },
       },

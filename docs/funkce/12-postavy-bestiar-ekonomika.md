@@ -542,7 +542,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 
 **Hranice:**
 - `convert` odmítne stejné from==to (`CURRENCY_SAME_FROM_TO`).
-- Update je full-replace celé sady (PUT), ne delta — FE musí poslat kompletní seznam.
+- Update je full-replace celé sady (PUT), ne delta — FE musí poslat kompletní seznam. **Souběžnou editaci hlídá optimistic lock (D-NEW-INV-DATA-SYNC, 2026-07-12):** klient posílá `expectedUpdatedAt` z posledního GET (hook `useUpdateCurrencies` doplní z cache), zápis projde atomicky jen nad nezměněnou verzí — jinak **409 `CURRENCY_CONFLICT`**; FE hook centrálně ukáže toast a refetchne aktuální stav (`currencies/api.ts:38-81`, `world-currencies.service.ts:89-101`).
 - Kurzy jsou statické (žádné historické/živé kurzy).
 
 **Stav:** ✅ funguje.
@@ -583,7 +583,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 4. **Soft-mode validace statů** — bez exportovaného BE schématu (`scripts/export-schemas.mjs`) se `systemStats` bestií i tokenů nevaliduje (`errors._schema` → skip). Záměrné, ale znamená, že nesprávná data projdou pro systémy bez schématu.
 5. **Per-system listina = 13 dedikovaných sheetů** (`registry.ts`), neznámý `world.system` spadne na `generic`. Ověřit, zda všechny systémy v `SYSTEM_PRESETS` (BE) mají odpovídající FE preset a naopak (dvojí zdroj pravdy: FE registry vs. BE SYSTEM_PRESETS).
 6. **Finance/Výbava NPC/Lokace → 404 `*_NOT_APPLICABLE`** je záměr, ne bug — ale FE musí 404 odlišit od skutečné chyby (SubdocErrorState). Budoucí „NPC obchodník / Lokace sklad" = odebrat gate v `getFinance`/`getInventory` (`character-subdocs.service.ts:407,486`). (Embed lišta Výbava/Finance v TM+chatu proto cílí **jen na PC** — rozhodnutí autora 2026-06-30, že NPC Výbavu/Finance mít nebudou.)
-7. **Měny: full-replace PUT** — `updateCurrencies` přepisuje celou sadu; klient musí vždy poslat kompletní seznam, jinak hrozí ztráta měn. Bez delta merge.
+7. **Měny: full-replace PUT** — `updateCurrencies` přepisuje celou sadu (záměr — smazání měny = poslání pole bez ní, delta merge by mazání rozbil). ✅ Riziko ztráty měn při souběhu/zastaralém FE stavu **dořešeno 2026-07-12 (D-NEW-INV-DATA-SYNC)** optimistic lockem `expectedUpdatedAt` → 409 `CURRENCY_CONFLICT` + FE toast a refetch (viz sekce Převodník měn).
 8. **Convert přesnost** — přepočet měn i ceny v obchodě zaokrouhluje na 4 desetinná místa (`round4`); řetězené převody (item currency → account currency) mohou kumulovat zaokrouhlovací chybu. K ověření u drahých položek.
 9. **Bestie update payload nesmí nést immutable pole** — `systemId`/`scope`/`worldId` jsou na BE immutable a nejsou v `UpdateBestieDto`; s `forbidNonWhitelisted` jakékoli pole navíc → **PATCH 400**. FE `BestieEditorModal` proto posílá `systemId` jen do create. (Bylo příčinou 400 při úpravě bestie; opraveno.)
 

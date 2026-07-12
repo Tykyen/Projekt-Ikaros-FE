@@ -33,6 +33,12 @@ export interface WorldCurrenciesPayload {
 /** Body pro `PUT /worlds/:worldId/currencies` — BE přepisuje celý array. */
 export interface UpdateCurrenciesPayload {
   items: WorldCurrencyItem[];
+  /**
+   * Optimistic lock (D-NEW-INV-DATA-SYNC) — `updatedAt` z posledního GET.
+   * Při souběžné změně vrátí BE 409 `CURRENCY_CONFLICT`. Hook
+   * `useUpdateCurrencies` doplňuje automaticky z cache; ručně netřeba.
+   */
+  expectedUpdatedAt?: string;
 }
 
 /** Body pro `POST /worlds/:worldId/currencies/convert`. */

@@ -12,13 +12,18 @@
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.1 (PJ panel), §3.2 (WS sync).
  */
 import { useEffect } from 'react';
+import { useAtomValue } from 'jotai';
 import {
   useQuery,
   useQueryClient,
   type QueryKey,
 } from '@tanstack/react-query';
 import { getSocket } from '@/features/chat/api/socket';
-import { useSocketReconnect } from '@/features/chat/api/useSocket';
+import { socketGenerationAtom } from '@/features/chat/store/socketStore';
+import {
+  useSocketEvent,
+  useSocketReconnect,
+} from '@/features/chat/api/useSocket';
 import { listActiveMapScenes } from '../api/mapApi';
 import type { MapScene, WorldOperationBroadcast } from '../types';
 
@@ -49,27 +54,30 @@ export function useActiveScenes(
     staleTime: 60_000,
   });
 
-  // WS: invalidate na world:operation pokud op.type začíná 'member.'
+  // Join/leave PJ world-ops roomu. D-AUDIT-2026-07-11 — `socketGenerationAtom`
+  // v deps: po swapu instance (reconnectSocket / re-auth) se effect re-bindne,
+  // takže unmount `map:leave-world` odejde na ŽIVÝ socket (dřív mířil na
+  // mrtvou instanci a nový socket zůstal v roomu navždy).
+  const socketGeneration = useAtomValue(socketGenerationAtom);
   useEffect(() => {
     if (!worldId || !enabled) return;
     const socket = getSocket();
-
     socket.emit('map:join-world', worldId);
-
-    const handler = (payload: WorldOperationBroadcast): void => {
-      if (payload.worldId !== worldId) return;
-      if (!payload.op.type.startsWith('member.')) return;
-      void queryClient.invalidateQueries({
-        queryKey: activeScenesQueryKey(worldId),
-      });
-    };
-    socket.on('world:operation', handler);
-
     return () => {
-      socket.off('world:operation', handler);
       socket.emit('map:leave-world', worldId);
     };
-  }, [worldId, enabled, queryClient]);
+  }, [worldId, enabled, socketGeneration]);
+
+  // WS: invalidate na world:operation pokud op.type začíná 'member.'
+  // Swap-safe přes `useSocketEvent` (dřív ruční listener na mrtvé instanci).
+  useSocketEvent<WorldOperationBroadcast>('world:operation', (payload) => {
+    if (!worldId || !enabled) return;
+    if (payload.worldId !== worldId) return;
+    if (!payload.op.type.startsWith('member.')) return;
+    void queryClient.invalidateQueries({
+      queryKey: activeScenesQueryKey(worldId),
+    });
+  });
 
   // W-7 — re-join world scenes roomu po reconnectu. Bez toho PJ orchestrátor po
   // výpadku přestane dostávat member operace a seznam aktivních scén zamrzne.

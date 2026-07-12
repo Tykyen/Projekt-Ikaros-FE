@@ -24,13 +24,11 @@ export type DefaultAvatarType = 'male' | 'female' | 'being';
 export interface AdminPermissions {
   canManageAdmins: boolean;
   canModerateContent: boolean;
-  canEditPlatformPages: boolean;
 }
 
 export const DEFAULT_ADMIN_PERMISSIONS: AdminPermissions = {
   canManageAdmins: false,
   canModerateContent: false,
-  canEditPlatformPages: false,
 };
 
 /**
@@ -48,6 +46,7 @@ export interface NotificationPreferences {
   ikarosNews?: boolean;
   hospoda?: boolean;
   adminChat?: boolean;
+  posta?: boolean;
 }
 
 export interface User {
@@ -1462,6 +1461,8 @@ export interface FriendListItem {
     defaultAvatarType: DefaultAvatarType;
     role: UserRole;
     city: string | null;
+    /** D-NEW-INV-PROFILE — počet světů přítele (BE agregát, bez soft-deleted). */
+    worldsCount: number;
     deleted: boolean;
     pendingDeletion: boolean;
   };

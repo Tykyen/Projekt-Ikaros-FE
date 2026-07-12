@@ -13,7 +13,8 @@ export type NotificationCategory =
   | 'worldNews'
   | 'ikarosNews'
   | 'hospoda'
-  | 'adminChat';
+  | 'adminChat'
+  | 'posta';
 
 export const NOTIFICATION_CATEGORY_DEFAULTS: Record<
   NotificationCategory,
@@ -27,6 +28,7 @@ export const NOTIFICATION_CATEGORY_DEFAULTS: Record<
   ikarosNews: true,
   hospoda: false,
   adminChat: true,
+  posta: true,
 };
 
 export const PUSH_ENABLED_DEFAULT = true;
@@ -102,6 +104,11 @@ export const NOTIFICATION_GROUPS: NotificationGroupMeta[] = [
   {
     title: 'Komunita',
     items: [
+      {
+        key: 'posta',
+        title: 'Pošta',
+        desc: 'Nová zpráva v poště (soukromá zpráva nebo systémové oznámení).',
+      },
       {
         key: 'hospoda',
         title: 'Putyka',

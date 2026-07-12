@@ -2,7 +2,7 @@
 import { getDefaultStore } from 'jotai';
 import { accessTokenAtom } from '@/shared/store/authStore';
 import { anonSessionAtom } from '../store/anonSession';
-import { socketStatusAtom } from '../store/socketStore';
+import { socketGenerationAtom, socketStatusAtom } from '../store/socketStore';
 
 const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
@@ -46,11 +46,20 @@ export function getSocket(): Socket {
   });
 
   store.set(socketStatusAtom, 'connecting');
+  // D-AUDIT-2026-07-11 — signál „vznikla nová instance" pro effecty, které
+  // na instanci drží listenery / room membership (re-bind vzor, viz socketStore).
+  store.set(socketGenerationAtom, store.get(socketGenerationAtom) + 1);
   return socket;
 }
 
 export function disconnectSocket(): void {
   socket?.disconnect();
+  // D-AUDIT-2026-07-11 (socket-swap listener leak) — centrální úklid swapu:
+  // stará instance zahodí VŠECHNY listenery (komponentní i vlastní z getSocket).
+  // Bez toho by na mrtvé instanci visely handlery až do cleanup fáze effectů
+  // (a při jakémkoli pozdním eventu by běžely dvojitě vedle handlerů nové
+  // instance). Component cleanupy pak volají `.off` už jen jako no-op.
+  socket?.removeAllListeners();
   socket = null;
   getDefaultStore().set(socketStatusAtom, 'disconnected');
 }

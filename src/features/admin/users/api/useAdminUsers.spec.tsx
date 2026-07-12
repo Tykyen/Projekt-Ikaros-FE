@@ -8,6 +8,9 @@ import {
   useAdminBulkBan,
   useAdminApproveUsernameRequest,
   useAdminRejectUsernameRequest,
+  useAdminResetPassword,
+  useAdminCreateUser,
+  useAdminUpdateUserEmail,
 } from './useAdminUsers';
 import { adminKeys } from '../../api/adminKeys';
 import { UserRole } from '@/shared/types';
@@ -192,5 +195,68 @@ describe('useAdminRejectUsernameRequest', () => {
     const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
     expect(keys).toContainEqual(['admin', 'audit-log']);
     expect(keys).toContainEqual(['admin', 'users']);
+  });
+});
+
+// ── D-NEW-INV-ADMIN-UI — reset hesla / založení uživatele / změna e-mailu ──
+
+describe('useAdminResetPassword', () => {
+  it('volá PUT /users/:id/reset-password s newPassword v body', async () => {
+    const { wrapper } = makeWrapperWithQc();
+    const { result } = renderHook(() => useAdminResetPassword(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync({
+        userId: 'u1',
+        newPassword: 'TajneHeslo123',
+      });
+    });
+    expect(api.put).toHaveBeenCalledWith('/users/u1/reset-password', {
+      newPassword: 'TajneHeslo123',
+    });
+  });
+});
+
+describe('useAdminCreateUser', () => {
+  it('volá POST /admin/users a invaliduje users + stats + audit-log + public-users', async () => {
+    vi.mocked(api.post).mockResolvedValue({ username: 'novy' } as never);
+    const { wrapper, qc } = makeWrapperWithQc();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    const { result } = renderHook(() => useAdminCreateUser(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync({
+        email: 'novy@x.cz',
+        username: 'novy',
+        password: 'TajneHeslo123',
+        role: UserRole.Ikarus,
+      });
+    });
+    expect(api.post).toHaveBeenCalledWith('/admin/users', {
+      email: 'novy@x.cz',
+      username: 'novy',
+      password: 'TajneHeslo123',
+      role: UserRole.Ikarus,
+    });
+    const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
+    expect(keys).toContainEqual(adminKeys.users);
+    expect(keys).toContainEqual(adminKeys.stats);
+    expect(keys).toContainEqual(adminKeys.auditLog);
+    expect(keys).toContainEqual(['public-users']);
+  });
+});
+
+describe('useAdminUpdateUserEmail', () => {
+  it('volá PATCH /admin/users/:id/email a invaliduje users + audit-log', async () => {
+    const { wrapper, qc } = makeWrapperWithQc();
+    const spy = vi.spyOn(qc, 'invalidateQueries');
+    const { result } = renderHook(() => useAdminUpdateUserEmail(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync({ userId: 'u1', email: 'novy@x.cz' });
+    });
+    expect(api.patch).toHaveBeenCalledWith('/admin/users/u1/email', {
+      email: 'novy@x.cz',
+    });
+    const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
+    expect(keys).toContainEqual(adminKeys.users);
+    expect(keys).toContainEqual(adminKeys.auditLog);
   });
 });

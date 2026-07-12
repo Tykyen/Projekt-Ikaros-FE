@@ -228,9 +228,9 @@ export function FriendsTab() {
  * Spec 1.8 — bridge mezi `FriendListItem.friend` a `PublicUserListItem` shape,
  * který očekává sdílená `UserCard` (z 1.4).
  *
- * `worldsCount` a `createdAt` nejsou součástí friend listu (BE shape je
- * záměrně užší). `UserCard` zobrazuje worldsCount v meta — v Přátelé kontextu
- * jako 0 placeholder, dokud nepřijde 2.x (per-friend worlds badge).
+ * `createdAt` není součástí friend listu (BE shape je záměrně užší) —
+ * mapuje se `acceptedAt`. `worldsCount` posílá BE (D-NEW-INV-PROFILE);
+ * `?? 0` je jen runtime pojistka proti staršímu BE bez pole.
  */
 function toPublicUserListItem(f: FriendListItem): PublicUserListItem {
   return {
@@ -241,7 +241,7 @@ function toPublicUserListItem(f: FriendListItem): PublicUserListItem {
     avatarUrl: f.friend.avatarUrl,
     defaultAvatarType: f.friend.defaultAvatarType,
     role: f.friend.role,
-    worldsCount: 0,
+    worldsCount: f.friend.worldsCount ?? 0,
     createdAt: f.acceptedAt,
     deleted: f.friend.deleted,
     pendingDeletion: f.friend.pendingDeletion,

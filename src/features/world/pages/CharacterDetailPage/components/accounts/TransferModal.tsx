@@ -43,6 +43,10 @@ export function TransferModal({
   const [targetAccountIdState, setTargetAccountIdState] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
   const [description, setDescription] = useState<string>('');
+  // D-PURCHASE-IDEMPOTENCY — nonce per převodní ZÁMĚR: vzniká při otevření
+  // modalu (mount), po úspěchu se resetuje. Dvojklik/retry TÉHOŽ záměru
+  // pošle stejný nonce → BE vrátí původní výsledek místo 2. odečtu.
+  const [clientNonce, setClientNonce] = useState(() => crypto.randomUUID());
   const defaultDate = useDefaultInGameDate(worldId);
   const [inGameDate, setInGameDate] = useState<FantasyDateLike>(defaultDate);
 
@@ -84,9 +88,11 @@ export function TransferModal({
         amount,
         description: description.trim() || 'Převod',
         inGameDate,
+        clientNonce,
       },
       {
         onSuccess: () => {
+          setClientNonce(crypto.randomUUID()); // další převod = nový záměr
           toast.success(`Posláno ${amount} ${fromAccount.currency}`);
           onTransferred();
         },

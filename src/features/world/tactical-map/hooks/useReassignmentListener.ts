@@ -14,10 +14,11 @@
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.5,
  *       docs/arch/maps/scene-assignment-ux/api.md (deactivate cascade).
  */
-import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getSocket } from '@/features/chat/api/socket';
-import { useSocketReconnect } from '@/features/chat/api/useSocket';
+import {
+  useSocketEvent,
+  useSocketReconnect,
+} from '@/features/chat/api/useSocket';
 import { mapSceneQueryKey } from './useMapScene';
 import type { MapReassignedBroadcast } from '../types';
 
@@ -32,23 +33,16 @@ export function useReassignmentListener(worldId: string | null): void {
     void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
   });
 
-  useEffect(() => {
+  // D-AUDIT-2026-07-11 — `useSocketEvent` (swap-safe): ruční `socket.on` po
+  // výměně socket instance (reconnectSocket / re-auth) zůstal na mrtvém socketu.
+  useSocketEvent<MapReassignedBroadcast>('map:reassigned', () => {
     if (!worldId) return;
-    const socket = getSocket();
-
-    const handler = (_payload: MapReassignedBroadcast): void => {
-      // Invalidate cache → useMapScene queryFn refire:
-      //  - newSceneId !== null → GET /maps/active vrátí novou scénu (BE
-      //    update membership.currentSceneId)
-      //  - newSceneId === null → 404 MAP_NO_ACTIVE_SCENE → MapEmptyState
-      void queryClient.invalidateQueries({
-        queryKey: mapSceneQueryKey(worldId),
-      });
-    };
-
-    socket.on('map:reassigned', handler);
-    return () => {
-      socket.off('map:reassigned', handler);
-    };
-  }, [worldId, queryClient]);
+    // Invalidate cache → useMapScene queryFn refire:
+    //  - newSceneId !== null → GET /maps/active vrátí novou scénu (BE
+    //    update membership.currentSceneId)
+    //  - newSceneId === null → 404 MAP_NO_ACTIVE_SCENE → MapEmptyState
+    void queryClient.invalidateQueries({
+      queryKey: mapSceneQueryKey(worldId),
+    });
+  });
 }

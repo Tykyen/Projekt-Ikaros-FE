@@ -16,7 +16,8 @@ Granularita umožňuje Superadminovi udělit adminovi jen vybrané pravomoci mí
 
 - `canManageAdmins` — přidávat/odebírat další adminy
 - `canModerateContent` — schvalovat/vracet obsah
-- `canEditPlatformPages` — upravovat platformové stránky (Nápověda, Pravidla, …)
+
+(Třetí flag `canEditPlatformPages` byl mrtvý — nikde nevynucován — a 2026-07-12 odstraněn z BE i FE.)
 
 Flagy nastavuje **jen Superadmin** — admin si je sám nemůže přidělit.
 
