@@ -10,11 +10,9 @@ import {
   Trash2,
 } from 'lucide-react';
 import type { WorldNewsItem, WorldNewsType } from '@/shared/types';
-import {
-  KebabMenu,
-  NewsPreviewCard,
-  NewsDetailModal,
-} from '@/shared/ui';
+import { KebabMenu } from '@/shared/ui';
+// D-AUDIT bundle: komponenty přímo z './news' (barrel je netáhne — TipTap).
+import { NewsPreviewCard, NewsDetailModal } from '@/shared/ui/news';
 import type { KebabMenuItem, NewsCardVM, NewsTone } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation';
 import { useWorldContext } from '@/features/world/context/WorldContext';

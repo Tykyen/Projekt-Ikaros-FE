@@ -1,0 +1,29 @@
+/**
+ * D-DROBNE-UNDO — „Zpět" pilulka v pravém dolním stacku (pod „Uklidit").
+ * Stejný fialový chrome jazyk (`--map-ui-*`) jako MapTidyButton.
+ */
+.undo {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.6);
+  background: rgb(var(--map-ui-accent-rgb) / 0.18);
+  color: var(--map-toolbar-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+.undo:hover:not(:disabled) {
+  background: rgb(var(--map-ui-accent-rgb) / 0.3);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.9);
+}
+.undo:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

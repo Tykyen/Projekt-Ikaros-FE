@@ -36,6 +36,14 @@ export const registerSchema = z
   .refine((data) => data.password === data.passwordConfirm, {
     path: ['passwordConfirm'],
     message: 'Hesla se neshodují',
+  })
+  // 20C — BE registraci s `isMinor: true` odmítá 400 AGE_REQUIREMENT_NOT_MET.
+  // Volbu under15 NEodstraňujeme (age-gate — bez dotazu by lhali všichni),
+  // ale submit blokujeme už na FE; RegisterModal ukazuje přátelské vysvětlení.
+  .refine((data) => data.ageBracket !== 'under15', {
+    path: ['ageBracket'],
+    message:
+      'Platforma je určena hráčům od 15 let. Registrace zatím není možná — mrkni k nám později!',
   });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;

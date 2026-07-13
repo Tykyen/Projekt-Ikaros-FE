@@ -458,6 +458,56 @@ describe('applyOperationToScene — npcTemplate cascade', () => {
   });
 });
 
+// D-DROBNE-UNDO — ops přicházející typicky jako inverse z undo endpointu
+describe('applyOperationToScene — undo ops (D-DROBNE-UNDO)', () => {
+  it('scene.activate nastaví isActive (inverse scene.deactivate)', () => {
+    const scene = makeScene({ isActive: false });
+    const next = applyOperationToScene(scene, { type: 'scene.activate' });
+    expect(next.isActive).toBe(true);
+    expect(scene.isActive).toBe(false); // immutability
+  });
+
+  it('scene.drawings.replace nahradí kresby (inverse drawing.clear)', () => {
+    const drawings = [
+      {
+        id: 'd1',
+        kind: 'line' as const,
+        points: [0, 0, 10, 10],
+        color: '#ffffff',
+        createdByUserId: 'u1',
+        visibility: 'all' as const,
+      },
+    ];
+    const scene = makeScene({ drawings: [] });
+    const next = applyOperationToScene(scene, {
+      type: 'scene.drawings.replace',
+      drawings,
+    });
+    expect(next.drawings).toEqual(drawings);
+    expect(scene.drawings).toEqual([]); // immutability
+  });
+
+  it('scene.drawings.replace prázdným polem kresby smaže (redo clear)', () => {
+    const scene = makeScene({
+      drawings: [
+        {
+          id: 'd1',
+          kind: 'line' as const,
+          points: [0, 0, 10, 10],
+          color: '#ffffff',
+          createdByUserId: 'u1',
+          visibility: 'all' as const,
+        },
+      ],
+    });
+    const next = applyOperationToScene(scene, {
+      type: 'scene.drawings.replace',
+      drawings: [],
+    });
+    expect(next.drawings).toEqual([]);
+  });
+});
+
 describe('applyOperationToScene — immutability', () => {
   it('nemutuje původní scene (returns nový objekt)', () => {
     const scene = makeScene({ tokens: [makeToken('t1')] });

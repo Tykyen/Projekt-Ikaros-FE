@@ -73,7 +73,7 @@ export default function ProfilePage() {
 
         <ProfileEventsSection />
 
-        <CommunitySections userId={user.id} />
+        <CommunitySections />
 
         <AppearanceSection user={user} />
 

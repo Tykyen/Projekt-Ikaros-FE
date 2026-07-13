@@ -17,6 +17,26 @@ import { UserRole, WorldRole } from '@/shared/types';
 import NotFoundPage from '@/pages/errors/NotFoundPage';
 import ErrorPage from '@/pages/errors/ErrorPage';
 
+// ── Schema-gated lazy ─────────────────────────────────────────────────────
+// D-AUDIT bundle: `bootstrapSchemas()` už neběží sync v main.tsx (schémata
+// by seděla v entry chunku). Stránky, které čtou `systemEntitySchemaRegistry`
+// hned při renderu (taktická mapa, bestiáře, world chat rail, pop-out token),
+// dostanou bootstrap deterministicky: lazy factory počká i na bootstrap chunk.
+// Idempotentní — main.tsx pojistka na pozadí smí doběhnout dřív i později.
+// Export kvůli smoke testu lazy boundary (router-schema-gate.spec.tsx).
+export function withSchemas<T extends { default: ComponentType }>(
+  load: () => Promise<T>,
+): LazyExoticComponent<ComponentType> {
+  return lazy(() =>
+    Promise.all([
+      load(),
+      import('@/features/world/tactical-map/schemas/bootstrap').then((m) =>
+        m.bootstrapSchemas(),
+      ),
+    ]).then(([mod]) => mod),
+  );
+}
+
 // ── Lazy pages — Ikaros ───────────────────────────────────────────────────
 const DashboardPage    = lazy(() => import('@/features/ikaros/pages/DashboardPage'));
 const ChatPage         = lazy(() => import('@/features/chat/pages/ChatPage'));
@@ -63,8 +83,9 @@ const FavoritesPage        = lazy(() => import('@/features/ikaros/pages/Favorite
 const TvorbaHubPage        = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/TvorbaHubPage'));
 const ComingSoonPage       = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/ComingSoonPage'));
 // 16.2b-2 — komunitní (globální) bestiář (nahrazuje stub `ikaros/bestiar`).
-const KomunitniBestiarPage      = lazy(() => import('@/features/ikaros/bestiar/KomunitniBestiarPage'));
-const KomunitniBestieDetailPage = lazy(() => import('@/features/ikaros/bestiar/KomunitniBestieDetailPage'));
+// withSchemas: čtou systemEntitySchemaRegistry (statblocky per systém).
+const KomunitniBestiarPage      = withSchemas(() => import('@/features/ikaros/bestiar/KomunitniBestiarPage'));
+const KomunitniBestieDetailPage = withSchemas(() => import('@/features/ikaros/bestiar/KomunitniBestieDetailPage'));
 // 21.5b — komunitní (globální) herbář (nahrazuje stub `ikaros/herbar`).
 const KomunitniHerbarPage       = lazy(() => import('@/features/ikaros/herbar/KomunitniHerbarPage'));
 const KomunitniPlantDetailPage  = lazy(() => import('@/features/ikaros/herbar/KomunitniPlantDetailPage'));
@@ -77,7 +98,8 @@ const IkarosEmotesAdminPage = lazy(() => import('@/features/ikaros/pages/IkarosE
 
 // ── Lazy pages — World ────────────────────────────────────────────────────
 const WorldDashboardPage = lazy(() => import('@/features/world/pages/WorldDashboardPage'));
-const WorldChatPage      = lazy(() => import('@/features/world/pages/WorldChatPage'));
+// withSchemas: chat rail (bestie panely) čte systemEntitySchemaRegistry.
+const WorldChatPage      = withSchemas(() => import('@/features/world/pages/WorldChatPage'));
 const WorldNewsPage      = lazy(() => import('@/features/world/pages/WorldNewsPage'));
 const WorldMembersPage   = lazy(() => import('@/features/world/pages/WorldMembersPage'));
 const PagesListPage      = lazy(() => import('@/features/world/pages/PagesListPage'));
@@ -91,8 +113,9 @@ const CharacterDetailRoute = lazy(() => import('@/features/world/pages/Character
 const MyCharacterPage    = lazy(() => import('@/features/world/pages/MyCharacterPage'));
 const MapPage            = lazy(() => import('@/features/world/pages/MapPage'));
 const WorldMapsPage      = lazy(() => import('@/features/world/maps'));
-const TacticalMapPage    = lazy(() => import('@/features/world/pages/TacticalMapPage'));
-const BestiarPage        = lazy(() => import('@/features/world/bestiar/BestiarPage'));
+// withSchemas: tokeny/statblocky čtou systemEntitySchemaRegistry při renderu.
+const TacticalMapPage    = withSchemas(() => import('@/features/world/pages/TacticalMapPage'));
+const BestiarPage        = withSchemas(() => import('@/features/world/bestiar/BestiarPage'));
 const CalendarPage       = lazy(() => import('@/features/world/pages/CalendarPage'));
 const TimelinePage       = lazy(() => import('@/features/world/pages/TimelinePage'));
 const WeatherPage        = lazy(() => import('@/features/world/pages/WorldWeatherPage'));
@@ -110,7 +133,8 @@ const CalendarConfigsPage = lazy(() => import('@/features/world/pages/CalendarCo
 const WorldHeadlineAdminPage = lazy(() => import('@/features/world/pages/WorldHeadlineAdminPage'));
 const GroupMembersPage   = lazy(() => import('@/features/world/pages/GroupMembersPage'));
 // 17.11 — pop-out karta tokenu do samostatného okna (mimo WorldLayout = bez menu).
-const TokenCardPopoutPage = lazy(() => import('@/features/world/pages/TokenCardPopoutPage'));
+// withSchemas: token panel čte systemEntitySchemaRegistry.
+const TokenCardPopoutPage = withSchemas(() => import('@/features/world/pages/TokenCardPopoutPage'));
 
 // ── Suspense wrapper ──────────────────────────────────────────────────────
 function p(Comp: LazyExoticComponent<ComponentType>) {

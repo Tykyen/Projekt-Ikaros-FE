@@ -62,6 +62,7 @@ jobs:
           FRONTEND_PORT=${{ vars.FRONTEND_PORT }}
           VITE_API_URL=${{ vars.VITE_API_URL }}
           VITE_TURNSTILE_SITE_KEY=${{ vars.VITE_TURNSTILE_SITE_KEY }}
+          VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}
           BACKEND_HOST=${{ steps.backend.outputs.host }}
           CSP_HEADER_NAME=${{ vars.CSP_HEADER_NAME }}
           EOF"

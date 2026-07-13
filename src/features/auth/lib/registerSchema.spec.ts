@@ -109,10 +109,18 @@ describe('registerSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  // 20C — deklarativní věk
-  it('akceptuje volbu under15 (nezletilý)', () => {
+  // 20C — deklarativní věk. BE registraci under15 odmítá (400
+  // AGE_REQUIREMENT_NOT_MET) → schema blokuje už na FE (refine, chyba pod
+  // ageBracket). Volba ve formuláři zůstává (age-gate), jen nejde odeslat.
+  it('odmítne volbu under15 s vysvětlením pod ageBracket', () => {
     const result = registerSchema.safeParse({ ...valid, ageBracket: 'under15' });
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find((i) =>
+        i.path.includes('ageBracket'),
+      );
+      expect(issue?.message).toMatch(/od 15 let/i);
+    }
   });
 
   it('odmítne registraci bez zvolené věkové kategorie', () => {

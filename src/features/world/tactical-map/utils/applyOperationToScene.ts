@@ -208,6 +208,10 @@ export function applyOperationToScene(
     case 'scene.deactivate':
       return { ...scene, isActive: false };
 
+    // D-DROBNE-UNDO — inverse scene.deactivate (mirror BE CAS isActive=true)
+    case 'scene.activate':
+      return { ...scene, isActive: true };
+
     // 10.2c-edit-2 — load template sekvence
     case 'scene.fog.replace':
       return {
@@ -235,6 +239,10 @@ export function applyOperationToScene(
       const payloadNpc = op.tokens.filter((t) => t.isNpc);
       return { ...scene, tokens: [...pcTokens, ...payloadNpc] };
     }
+
+    // D-DROBNE-UNDO — bulk replace kreseb (inverse drawing.clear); mirror BE $set
+    case 'scene.drawings.replace':
+      return { ...scene, drawings: op.drawings };
 
     case 'scene.sounds.set':
       return { ...scene, activeSoundIds: op.activeSoundIds };

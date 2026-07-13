@@ -8,38 +8,27 @@ import {
 } from '@/shared/ui';
 import { useMyArticles } from '@/features/ikaros/api/useArticles';
 import { useMyGalleryImages } from '@/features/ikaros/api/useGallery';
-import { useDiscussions } from '@/features/ikaros/api/useDiscussions';
+import { useMyDiscussions } from '@/features/ikaros/api/useDiscussions';
 import { formatDateCs } from '@/features/ikaros/lib/articles';
 import styles from './ProfileSections.module.css';
 
 /** Max položek v profilu; zbytek přes „Zobrazit vše →". */
 const LIMIT = 5;
 
-interface Props {
-  /** ID přihlášeného — filtr „založil/a" u diskuzí (BE nemá výpis dle autora). */
-  userId: string;
-}
-
 /**
  * D-NEW-INV-PROFILE — komunitní sekce profilu (dřív placeholder „fáze 3").
  * Moje diskuze / Moje články / Moje galerie: jednoduchý seznam
  * (název · datum · odkaz na detail) nad existujícími hooky modulů 3.x.
  *
- * Diskuze: BE endpoint dle autora neexistuje → klientský filtr `creatorId`
- * nad `useDiscussions()` — stejný vzor jako tab „Moje" na DiscussionsPage
- * (tvůrce svou diskuzi vidí vždy, i pending/uzamčenou).
+ * Diskuze: nativní `GET /ikaros-discussions/my` (`useMyDiscussions`) — BE vrací
+ * vše tvůrce vč. pending/uzamčených, řazené createdAtUtc desc.
  */
-export function CommunitySections({ userId }: Props) {
-  const discussionsQuery = useDiscussions();
+export function CommunitySections() {
+  const discussionsQuery = useMyDiscussions();
   const articlesQuery = useMyArticles();
   const galleryQuery = useMyGalleryImages();
 
-  const myDiscussions = (discussionsQuery.data ?? [])
-    .filter((d) => d.creatorId === userId)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime(),
-    );
+  const myDiscussions = discussionsQuery.data ?? [];
   const myArticles = [...(articlesQuery.data ?? [])].sort(
     (a, b) =>
       new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime(),

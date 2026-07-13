@@ -123,18 +123,19 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'ucet',
-    q: 'Kolik mi musí být let a co je režim ochrany nezletilých?',
+    q: 'Kolik mi musí být let?',
     a: (
       <>
         <p>
-          Při registraci vybíráš jen, jestli ti je <strong>15 a víc, nebo méně</strong>{' '}
-          — přesné datum nechceme.
+          Platforma je určena hráčům <strong>od 15 let</strong>. Při registraci
+          vybíráš jen, jestli ti je <strong>15 a víc, nebo méně</strong> — přesné
+          datum nechceme.
         </p>
         <p>
-          Když je ti <strong>méně než 15</strong>, účet se zapne v{' '}
-          <strong>bezpečném režimu</strong>: neveřejný profil, skrytý v adresáři, a
-          je potřeba <strong>souhlas zákonného zástupce</strong>. Víc v{' '}
-          <Link to="/soukromi">Zásadách ochrany osobních údajů</Link>.
+          Když je ti <strong>méně než 15</strong>, registrace se{' '}
+          <strong>nedokončí</strong> — mrkni k nám později! Dříve založené účty
+          mladších uživatelů zůstávají v režimu ochrany (neveřejný profil, skrytí
+          v adresáři). Víc v <Link to="/soukromi">Zásadách ochrany osobních údajů</Link>.
         </p>
       </>
     ),

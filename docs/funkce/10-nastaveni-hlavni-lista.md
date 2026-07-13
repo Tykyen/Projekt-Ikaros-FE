@@ -207,6 +207,7 @@ Stažení kompletních dat jednoho světa do ZIP (JSON strom). Pilíř B spec-14
 
 ### Zvláštnosti
 - `pj-full` čte celý strom přímo z repozitářů (PJ vidí vše → bez filtrů). Kvůli tomu přidány `exports:` repo tokenů do 6 modulů (campaign/world-maps/universe/timeline/game-events/character-subdocs).
+- **Moderačně skrytý deník se do ZIP nedostane (D-066-ZBYTKY b, 2026-07-13):** export čte diary repo přímo, MIMO moderation gate `assertDiaryNotModerationHidden` — bez filtru by PJ-full ZIP vynesl obsah, který PJ v UI nevidí (skrytý deník vidí jen platform revieweři, vlastník i PJ dostanou 404). `characterSubdocs.diaries[]` se proto filtruje přes `omitModerationHiddenDiaries` (deník s `moderationHidden:true` se **celý vynechá**, žádný placeholder; legacy dokument bez flagu zůstává). Kryto testem `export-moderation.spec.ts`. Kód: BE `world-export/export-moderation.util.ts`.
 - `archiver` 8 = `new ZipArchive()` (ne factory `archiver()`).
 - Média: `collectMediaUrls` rekurzivně projde JSON strom, `fetch` → `media/N.<ext>` + mapa do `media-manifest.json` (pro budoucí import re-upload).
 

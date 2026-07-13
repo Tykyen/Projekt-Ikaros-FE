@@ -31,8 +31,8 @@ export function StartSection() {
               <strong>Zaregistruj se.</strong> V hlavičce klikni na{' '}
               <strong>Registrace</strong>, vyplň e-mail, přezdívku a heslo
               (indikátor síly napoví) a odsouhlas{' '}
-              <Link to="/podminky">podmínky použití</Link>. Po odeslání jsi rovnou
-              přihlášený.
+              <Link to="/podminky">podmínky použití</Link>. Platforma je pro hráče
+              od <strong>15 let</strong>. Po odeslání jsi rovnou přihlášený.
             </>,
             <>
               <strong>Vyplň profil a postavu.</strong> V profilu (po přihlášení)

@@ -29,8 +29,14 @@ export type { TabItem } from './Tabs';
 export { ImageZoomSlider } from './ImageZoomSlider/ImageZoomSlider';
 export { ImageFitToggle } from './ImageFitToggle/ImageFitToggle';
 export { FantasyDatePicker } from './FantasyDatePicker';
-export { NewsPreviewCard, NewsDetailModal, NewsTypeChip, stripHtml } from './news';
-export type { NewsCardVM, NewsCardImage, NewsTone } from './news';
+// D-AUDIT bundle: NewsPreviewCard/NewsDetailModal záměrně NEJSOU v barrelu —
+// NewsDetailModal → RichTextEditor → TipTap (~500 kB) by se přes barrel dostal
+// do entry chunku (initial payload). Importuj je přímo z '@/shared/ui/news'.
+// Lehké části (chip, stripHtml, typy) re-exportujeme z konkrétních souborů,
+// aby barrel nevytvořil hranu na './news/index.ts' (ta modal táhne).
+export { NewsTypeChip } from './news/NewsTypeChip';
+export { stripHtml } from './news/newsVm';
+export type { NewsCardVM, NewsCardImage, NewsTone } from './news/newsVm';
 export {
   StatePlaceholder,
   EmptyState,

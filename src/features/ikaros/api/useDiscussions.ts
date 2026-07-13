@@ -49,6 +49,19 @@ export function useDiscussionsPaginated(offset: number, limit: number) {
   });
 }
 
+/**
+ * Vlastní diskuze přihlášeného — vše, co založil, vč. Pending/uzamčených.
+ * BE řadí createdAtUtc desc (vzor `useMyArticles`).
+ */
+export function useMyDiscussions(options: { enabled?: boolean } = {}) {
+  return useQuery({
+    queryKey: [...DISCUSSIONS_KEY, 'my'],
+    queryFn: () => api.get<IkarosDiscussion[]>(`${PREFIX}/my`),
+    enabled: options.enabled !== false,
+    staleTime: 20_000,
+  });
+}
+
 export function useDiscussion(id: string | undefined) {
   return useQuery({
     queryKey: [...DISCUSSIONS_KEY, 'detail', id],

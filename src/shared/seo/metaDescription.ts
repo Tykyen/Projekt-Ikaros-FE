@@ -1,4 +1,6 @@
-import { stripHtml } from '@/shared/ui/news';
+// D-AUDIT bundle: import z konkrétního souboru, ne z './news' indexu —
+// ten táhne NewsDetailModal → TipTap (~500 kB) do každého importéra.
+import { stripHtml } from '@/shared/ui/news/newsVm';
 
 /**
  * 15B.2 — TipTap/HTML → plain text meta description.

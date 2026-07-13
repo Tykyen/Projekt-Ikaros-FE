@@ -56,6 +56,22 @@ export function postMapOperation(
 }
 
 /**
+ * D-DROBNE-UNDO — vrátí poslední vlastní operaci (BE aplikuje inverse z logu
+ * standardní ops pipeline → 201 + WS broadcast jako běžná op).
+ *
+ * Chyby: 404 `NOTHING_TO_UNDO` (není co vrátit — FE nenápadný toast),
+ * 403 `MAP_OP_FORBIDDEN` (jen PJ / PomocnyPJ).
+ */
+export function postMapUndo(
+  sceneId: string,
+): Promise<ApplyMapOperationResponse> {
+  return api.post<ApplyMapOperationResponse>(
+    `/maps/${sceneId}/operations/undo`,
+    undefined,
+  );
+}
+
+/**
  * Catch-up: vrací operace s `seqNumber > since` (ascending). Pro re-sync
  * po WS reconnect (klient drží `lastSeqNumber`).
  */

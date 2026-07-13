@@ -12,7 +12,7 @@
 - **Kdo:** Anonym. Žádný guard.
 - **Co jde dělat:**
   - Pole: E-mail, Přezdívka (username), Heslo, Potvrzení hesla, checkbox „Souhlasím s podmínkami" (link na `/podminky`), **deklarativní věk** (radio „Je mi 15 nebo více" / „Je mi méně než 15 let", povinné — 20.2/§C2), Cloudflare Turnstile captcha. Pod souhlasem informativní věta „Registrací bereš na vědomí Zásady OÚ" (odkaz na `/soukromi`; Zásady = informace, ne součást souhlasu).
-  - Live kontrola dostupnosti přezdívky i e-mailu (ikona) přes `GET /auth/check-username?u=` a `/auth/check-email?e=` (debounce, throttle 60/min).
+  - Live kontrola dostupnosti přezdívky i e-mailu (ikona) přes `GET /auth/check-username?u=` a `/auth/check-email?e=` (debounce, throttle **10/min** — zpřísněno z 60/min, D-SEC-GAP anti-enumeration, 2026-07-13: na debounced check ve formuláři stačí, hromadný scraping existence účtů brzdí).
   - Indikátor síly hesla (`PasswordStrengthIndicator`).
   - Toggle zobrazení hesla.
   - Skrytý honeypot field `hp` (anti-bot, max 0 znaků). Vynucený na **obou** stranách: FE zod `max(0)` + BE `RegisterDto.hp` `@MaxLength(0)` — prázdné (reálný uživatel) projde, vyplněné (bot) → 400. *(BE `hp` doplněno 2026-06-19 — dřív chybělo, `forbidNonWhitelisted` PC-07 odmítal `hp:''` → registrace rozbitá.)*
@@ -24,11 +24,11 @@
 - **Zvláštnosti:**
   - Captcha fail-closed na **obou** stranách. BE: bez `TURNSTILE_SECRET` v prod → 400 `CAPTCHA_FAILED` (dev/test bez secretu projde s warningem). FE: bez `VITE_TURNSTILE_SITE_KEY` v **prod buildu** → widget se nerenderuje, místo něj hláška + submit blokován (už NEpřepadá tiše na test key — 14.2). Test site key `1x00000000000000000000AA` jen jako dev fallback.
   - GDPR: BE vynucuje `acceptedTerms===true` (jinak `TERMS_NOT_ACCEPTED`), ukládá `acceptedTermsAt` + `termsVersion` (`2026-06-05`).
-  - **Věk / nezletilí (20.2/§C2–C3):** volba se odvodí na `isMinor: boolean` (`under15 → true`). **Minimalizace** — neukládá se datum narození, jen flag + `minorSelfDeclaredAt`. Při `isMinor=true` BE nastaví **bezpečné defaulty**: `profileVisibility='friends'` (neveřejný profil), `hiddenInDirectory=true` (skrytý v adresáři) a `parentalConsentStatus='pending'` (u dospělého `'not_required'`). Samotný tok udělení rodičovského souhlasu je zatím stub (jen flag; neblokuje užívání v betě). V profilu se nezletilému ukazuje nenápadná hláška „Účet v režimu ochrany nezletilých" (`AccountSection` → `MinorNotice`).
-  - Po registraci BE fire-and-forget pošle verifikační e-mail (selhání mailu registraci nezboří).
+  - **Věk 15+ (politika provozního rámce, D-SEC-GAP, 2026-07-13):** volba „Je mi méně než 15 let" registraci **BLOKUJE**. FE: hned při volbě inline vlídné vysvětlení („Platforma je určena hráčům od 15 let. Registrace zatím není možná — mrkni k nám později!", `isUnder15` v `RegisterModal.tsx:330`) + submit blokuje zod `refine` v `registerSchema.ts:43` (radio `under15` se NEodstraňuje — age-gate bez dotazu by lhali všichni). BE pojistka: `isMinor:true` → 400 `AGE_REQUIREMENT_NOT_MET` (`auth.service.ts:147`; kryje starý bundle / obejití formuláře — FE kód mapuje na tutéž hlášku). **Nahrazuje dřívější 20C tok** „registrace projde s `parentalConsentStatus='pending'`" — žádný consent flow není, platforma je od 15 let. **Minimalizace trvá:** neukládá se datum narození, jen `isMinor` (po gate u nových účtů vždy `false`) + `minorSelfDeclaredAt`; `parentalConsentStatus` u nových = vždy `'not_required'`. Bezpečné defaulty nezletilého (neveřejný profil, skrytí v adresáři, `MinorNotice` v profilu) zůstávají ve schématu i kódu pro **legacy účty** registrované před gate.
+  - Po registraci BE fire-and-forget pošle verifikační e-mail (selhání mailu registraci nezboří; od 2026-07-13 jde s SMTP providerem přes outbox frontu — viz „Reset hesla" níže / kap. 00).
   - Throttle `POST /auth/register` = 10/min.
 - **Stav:** ✅ funguje.
-- **Kód:** FE `src/features/auth/components/RegisterModal.tsx:54` (věk `:296`), `registerSchema.ts:28`, `src/features/auth/api/useAuth.ts:83`, BE `modules/auth/auth.controller.ts:60`, `auth.service.ts:100` (minor defaults `:155`), `dto/register.dto.ts:44` (`isMinor`), `users/schemas/user.schema.ts:93` (`isMinor`/`minorSelfDeclaredAt`/`parentalConsentStatus`), `captcha.service.ts:38`.
+- **Kód:** FE `src/features/auth/components/RegisterModal.tsx:54` (věk `:308`, under15 blok `:330`, mapování `AGE_REQUIREMENT_NOT_MET` `:175`), `registerSchema.ts:30` (refine `:43`), `src/features/auth/api/useAuth.ts:83`, BE `modules/auth/auth.controller.ts:50`, `auth.service.ts:100` (age gate `:147`, minor defaulty legacy `:184`), `dto/register.dto.ts:44` (`isMinor`), `users/schemas/user.schema.ts:93` (`isMinor`/`minorSelfDeclaredAt`/`parentalConsentStatus`), `captcha.service.ts:38`.
 
 ---
 
@@ -87,6 +87,7 @@
   - Reset revokuje všechny refresh tokeny + důvěryhodná zařízení (přes `user.password.changed`).
   - Throttle forgot/reset = 5/min.
   - Mailer fail nezboří flow (anti-enumeration, log warning).
+  - **SMTP outbox fronta (D-LAUNCH-GAP „SMTP bez fronty", 2026-07-13):** s SMTP providerem se maily neposílají přímo, ale přes Mongo frontu `mail_outbox` (cron à 30 s). Reset hesla má **vysokou prioritu** — nad denním capem (`SMTP_DAILY_CAP`, default 400) odchází UŽ JEN on, ostatní maily se odloží na další den. Retry/backoff 1→5→30→240 min, po 5 pokusech `failed` + alert (reset hesla = critical). Fail-safe: selže-li zápis do outboxu (Mongo down), mail jde PŘÍMO přes provider — reset hesla nikdy neumře na frontě. Detail kap. 00 „Průřezové koncepty".
 - **Stav:** ✅ funguje.
 - **Kód:** FE `ForgotPasswordModal.tsx:31`, `ResetPasswordPage.tsx:33`, BE `auth.controller.ts:226`/`:242`, `auth.service.ts:477` (forgot)/`:507` (reset).
 
@@ -240,7 +241,7 @@
 
 ### Rate-limiting / throttling (auth)
 - **Co to je:** `@nestjs/throttler` limity na citlivých endpointech (default 100/min/IP + per-endpoint `@Throttle`).
-- **Hodnoty (ověřeno):** register 10/min, login 5/min, login/totp 5/min, reactivate-deletion 5/min, refresh 30/min, forgot/reset 5/min, verify-email 30/min, resend-verification 3/min, confirm-email-change 5/min, check-username/check-email 60/min, 2FA kontroler 15/min, request-email-change 5/min.
+- **Hodnoty (ověřeno):** register 10/min, login 5/min, login/totp 5/min, reactivate-deletion 5/min, refresh 30/min, forgot/reset 5/min, verify-email 30/min, resend-verification 3/min, confirm-email-change 5/min, check-username/check-email **10/min** (zpřísněno z 60/min 2026-07-13, D-SEC-GAP anti-enumeration — endpoint záměrně vrací existenci účtu jako UX oporu registrace, limit brzdí hromadný scraping), 2FA kontroler 15/min, request-email-change 5/min.
 - **Storage (14.6):** přepínatelné. Default in-memory (single-instance — správné, nulový overhead). `THROTTLER_REDIS=1` + dostupný `REDIS_URL` → sdílený counter přes Redis (`@nest-lab/throttler-storage-redis`) pro 2+ replik BE; boot-time probe, při nedostupném Redisu fallback in-memory + warn. Limity beze změny. Vzor `SOCKET_IO_REDIS=1`. (Uzavřelo BE dluh D-028.)
 - **Stav:** ✅ funguje (Redis storage opt-in, zatím nezapnutý — single-instance deploy).
 - **Kód:** BE `auth.controller.ts` (jednotlivé `@Throttle`), `two-factor.controller.ts:29`, `common/throttler/throttler.config.ts`, `app.module.ts` (`ThrottlerModule.forRootAsync`).

@@ -41,12 +41,14 @@ export interface Character {
 
 /**
  * Karta postavy v adresáři. Po sjednocení 9.1 se data plní mapperem
- * `pageEntryToCharacterEntry` z `PageDirectoryEntry` (PageEntry drží
- * `imageUrl` a `ownerUserId` — viz `usePersonaDirectory`). BE legacy
- * `/characters/directory` vrací zúžený tvar bez avatara, ale tento FE
- * type drží pole pro CharacterCard rendering.
+ * z `PageDirectoryEntry` (drží `imageUrl`, `ownerUserId` i `characterId`) —
+ * viz `usePersonaDirectory` (grid postav) a `useCharacterDirectory`
+ * (D-DATA-SYNC-ZBYTKY a — adapter; legacy BE `/characters/directory`
+ * už FE nevolá).
  */
 export interface CharacterDirectoryEntry {
+  /** ⚠️ CHARACTER ID (ne page ID) — finance API (`accessLocationCharacterId`,
+   *  spoluvlastníci) posílají tuhle hodnotu. Past `directory_id`. */
   id: string;
   slug: string;
   name: string;

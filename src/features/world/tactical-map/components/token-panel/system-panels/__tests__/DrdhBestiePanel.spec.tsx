@@ -123,13 +123,12 @@ describe('DrdhBestiePanel', () => {
     );
   });
 
-  it('HP odvozeno z damageable — Životy −1 → patch currentHp', () => {
+  it('HP odvozeno z damageable — Životy −1 → hpDelta (lost-update fix)', () => {
     render(<DrdhBestiePanel {...props} token={makeToken()} onMapRoll={vi.fn()} />);
     expect(screen.getByText('18 / 18')).toBeInTheDocument();
     fireEvent.click(screen.getByLabelText('Životy -1'));
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ patch: { currentHp: 17 } }),
-    );
+    expect(mockMutate).toHaveBeenCalledWith({ tokenId: 't1', hpDelta: -1 });
+    expect(mockMutate.mock.calls[0][0]).not.toHaveProperty('patch');
   });
 
   it('„✏ Upravit bestii" přepne do edit režimu (in-place inputy)', () => {

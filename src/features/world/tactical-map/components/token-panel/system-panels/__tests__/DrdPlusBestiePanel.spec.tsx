@@ -124,12 +124,26 @@ describe('DrdPlusBestiePanel', () => {
     expect(vydrz).toBeDisabled();
   });
 
-  it('wound stepper +1 → patch injury', () => {
+  it('wound stepper +1 → injuryDelta (ne absolutní injury) — lost-update fix', () => {
     render(<DrdPlusBestiePanel {...props} token={makeToken({ injury: 0 })} onMapRoll={vi.fn()} />);
     fireEvent.click(screen.getByLabelText('Zranění +1'));
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ patch: { injury: 1 } }),
+    expect(mockMutate).toHaveBeenCalledWith({ tokenId: 't1', injuryDelta: 1 });
+    expect(mockMutate.mock.calls[0][0]).not.toHaveProperty('patch');
+  });
+
+  it('wound stepper ořízne deltu na strop 3×mez (BE strop nezná)', () => {
+    // mez 7 → strop 21; injury 20 + 5 → efektivní delta 1
+    const first = render(
+      <DrdPlusBestiePanel {...props} token={makeToken({ injury: 20 })} onMapRoll={vi.fn()} />,
     );
+    fireEvent.click(screen.getByLabelText('Zranění +5'));
+    expect(mockMutate).toHaveBeenCalledWith({ tokenId: 't1', injuryDelta: 1 });
+    first.unmount();
+    // na stropu (21) už +5 nic neposílá
+    mockMutate.mockClear();
+    render(<DrdPlusBestiePanel {...props} token={makeToken({ injury: 21 })} onMapRoll={vi.fn()} />);
+    fireEvent.click(screen.getByLabelText('Zranění +5'));
+    expect(mockMutate).not.toHaveBeenCalled();
   });
 
   it('„✏ Upravit bestii" přepne panel do edit režimu (in-place inputy)', () => {

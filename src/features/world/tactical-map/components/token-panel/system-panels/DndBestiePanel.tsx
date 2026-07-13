@@ -110,11 +110,10 @@ export function DndBestiePanel({
 
   const adjustHp = (delta: number): void => {
     if (!canEdit) return;
-    const next =
-      maxHp > 0
-        ? Math.max(0, Math.min(maxHp, currentHp + delta))
-        : Math.max(0, currentHp + delta);
-    update.mutate({ tokenId: token.id, patch: { currentHp: next } });
+    // Lost-update fix: DELTA místo absolutního `patch.currentHp` — server ji
+    // aplikuje atomicky s clampem 0..maxHp a v 201/broadcastu vrací absolutní
+    // hodnotu (zdroj pravdy). Absolutní set ze stale cache ztrácel souběžné zásahy.
+    update.mutate({ tokenId: token.id, hpDelta: delta });
   };
 
   const enterEdit = (): void => {

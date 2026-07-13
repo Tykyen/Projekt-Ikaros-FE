@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { IkarosNews, IkarosNewsType } from '@/shared/types';
-import { NewsPreviewCard, NewsDetailModal } from '@/shared/ui';
+// D-AUDIT bundle: komponenty přímo z './news' (barrel je netáhne — TipTap).
+import { NewsPreviewCard, NewsDetailModal } from '@/shared/ui/news';
 import type { NewsCardVM, NewsTone } from '@/shared/ui';
 import {
   formatRelativePast,

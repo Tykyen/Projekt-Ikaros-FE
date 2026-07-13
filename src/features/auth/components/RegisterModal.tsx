@@ -97,6 +97,10 @@ export function RegisterModal() {
   const emailValue = useWatch({ control, name: 'email' });
   const usernameValue = useWatch({ control, name: 'username' });
   const passwordValue = useWatch({ control, name: 'password' });
+  const ageBracketValue = useWatch({ control, name: 'ageBracket' });
+  // 20C — under15: BE registraci odmítá (400 AGE_REQUIREMENT_NOT_MET) → inline
+  // vysvětlení hned při volbě + blokace submitu (zrcadlí zod refine ve schématu).
+  const isUnder15 = ageBracketValue === 'under15';
 
   const usernameQuery = useCheckUsername(usernameValue);
   const emailQuery = useCheckEmail(emailValue);
@@ -168,6 +172,12 @@ export function RegisterModal() {
         setSubmitError('Ověření captchy selhalo. Zkus to znovu.');
         captchaRef.current?.reset();
         setCaptchaToken(null);
+      } else if (code === 'AGE_REQUIREMENT_NOT_MET') {
+        // Pojistka — FE submit s under15 blokuje, ale kdyby BE přesto odpověděl
+        // (starý bundle, obejití formuláře), ukaž stejné přátelské vysvětlení.
+        setSubmitError(
+          'Platforma je určena hráčům od 15 let. Registrace zatím není možná — mrkni k nám později!',
+        );
       } else {
         setSubmitError(mapErrorToBanner(err));
       }
@@ -315,7 +325,15 @@ export function RegisterModal() {
             .
           </p>
         </fieldset>
-        {errors.ageBracket && (
+        {/* 20C — under15: přátelské vysvětlení hned při volbě (ne až po submitu).
+            Zod refine hlásí totéž → při isUnder15 field error skryjeme (nedublovat). */}
+        {isUnder15 && (
+          <p className={s.ageBlockedNote} role="alert" aria-live="polite">
+            Platforma je určena hráčům od 15 let. Registrace zatím není možná —
+            mrkni k nám později!
+          </p>
+        )}
+        {errors.ageBracket && !isUnder15 && (
           <p className={s.bannerError} role="alert" aria-live="polite">
             {errors.ageBracket.message}
           </p>
@@ -350,7 +368,7 @@ export function RegisterModal() {
           variant="primary"
           size="lg"
           loading={register.isPending}
-          disabled={blockedByAvailability || !captchaToken}
+          disabled={blockedByAvailability || !captchaToken || isUnder15}
           className={s.submit}
         >
           Vytvořit účet

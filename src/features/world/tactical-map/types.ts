@@ -288,7 +288,22 @@ export type MapOperation =
   | { type: 'token.add'; token: MapToken }
   | { type: 'token.move'; tokenId: string; q: number; r: number }
   | { type: 'token.remove'; tokenId: string }
-  | { type: 'token.update'; tokenId: string; patch: Partial<MapToken> }
+  | {
+      type: 'token.update';
+      tokenId: string;
+      patch: Partial<MapToken>;
+      /**
+       * D-LAUNCH-GAP — relativní změna HP/injury (damage/heal tlačítka).
+       * JEN bestie tokeny; nesmí se kombinovat s ne-prázdným `patch` (BE 400).
+       * Server deltu aplikuje ATOMICKY proti aktuální DB hodnotě (clamp
+       * 0..maxHp, injury ≥ 0) → dva souběžné zásahy se neztratí. V 201
+       * response + WS broadcastu je op NORMALIZOVANÁ: `patch.currentHp` /
+       * `patch.injury` nese výslednou ABSOLUTNÍ hodnotu (zdroj pravdy;
+       * `applyOperationToScene` čte jen `patch`).
+       */
+      hpDelta?: number;
+      injuryDelta?: number;
+    }
   // Effect
   | { type: 'effect.add'; effect: MapEffect }
   | { type: 'effect.remove'; effectId: string }
@@ -313,6 +328,8 @@ export type MapOperation =
   | { type: 'scene.name'; name: string }
   | { type: 'scene.folder'; folder: string | null }
   | { type: 'scene.deactivate' }
+  // D-DROBNE-UNDO — inverse scene.deactivate (undo aktivuje zpět); mirror BE
+  | { type: 'scene.activate' }
   // 10.2c-edit-2 — load template sekvence
   | {
       type: 'scene.fog.replace';
@@ -325,6 +342,8 @@ export type MapOperation =
   | { type: 'scene.lights.replace'; lights: MapLight[] }
   | { type: 'scene.npc-templates.replace'; npcTemplates: MapSceneNpc[] }
   | { type: 'scene.tokens.replace-npc'; tokens: MapToken[] }
+  // D-DROBNE-UNDO — inverse drawing.clear (bulk replace kreseb); mirror BE
+  | { type: 'scene.drawings.replace'; drawings: MapDrawing[] }
   | { type: 'scene.sounds.set'; activeSoundIds: string[] }
   // 10.2c-edit-7 — vyčistit + univerzální replace všech tokenů
   | { type: 'scene.tokens.clear' }
@@ -361,7 +380,16 @@ export type MapOperation =
 export type WorldOperation =
   | { type: 'member.assignToScene'; userId: string; sceneId: string }
   | { type: 'member.unassign'; userId: string }
-  | { type: 'member.bulkAssignToScene'; userIds: string[]; sceneId: string };
+  | { type: 'member.bulkAssignToScene'; userIds: string[]; sceneId: string }
+  // D-DROBNE-UNDO — inverse bulkAssignToScene: per-member obnova přiřazení
+  // (`sceneId: null` = member byl bez scény → unassign). Mirror BE
+  // `MemberBulkRestoreAssignmentsOpDto`. FE ji sám neposílá (vzniká jen jako
+  // inverse v BE logu); konzumuje ji `world:operation` listener (invalidate
+  // dle prefixu `member.`).
+  | {
+      type: 'member.bulkRestoreAssignments';
+      assignments: { userId: string; sceneId: string | null }[];
+    };
 
 /** Response z `POST /maps/:id/operations`. */
 export interface ApplyMapOperationResponse {

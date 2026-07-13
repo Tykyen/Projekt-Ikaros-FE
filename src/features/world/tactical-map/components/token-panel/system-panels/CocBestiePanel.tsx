@@ -131,13 +131,25 @@ export function CocBestiePanel({
 
   const adjustHp = (delta: number): void => {
     if (!canEdit) return;
-    const next = maxHp > 0 ? Math.max(0, Math.min(maxHp, currentHp + delta)) : Math.max(0, currentHp + delta);
+    // Lost-update fix: DELTA místo absolutního `patch.currentHp` — server ji
+    // aplikuje atomicky s clampem 0..maxHp a v 201 vrací absolutní hodnotu.
     // Zelený bar na tokenu čte `systemStats['health.current']` (damageable pole
-    // token schématu) — musíme updatovat JEHO, ne jen `currentHp`, jinak bar nereaguje.
-    update.mutate({
-      tokenId: token.id,
-      patch: { currentHp: next, systemStats: sanitize({ ...ss, 'health.current': next }) },
-    });
+    // token schématu) — mirror dopočítáváme z ABSOLUTNÍ hodnoty z response
+    // (ne z lokálního odhadu; ten může být pod souběžnými zásahy mimo).
+    update.mutate(
+      { tokenId: token.id, hpDelta: delta },
+      {
+        onSuccess: (res) => {
+          const abs =
+            res.op.type === 'token.update' ? res.op.patch.currentHp : undefined;
+          if (typeof abs !== 'number') return;
+          update.mutate({
+            tokenId: token.id,
+            patch: { systemStats: sanitize({ ...ss, 'health.current': abs }) },
+          });
+        },
+      },
+    );
   };
 
   // ── inline edit ──

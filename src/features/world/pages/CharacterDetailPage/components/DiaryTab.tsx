@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Spinner, Button, Modal, ConfirmDialog, Badge } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
+import { ReportButton } from '@/shared/moderation';
 import { PrintButton } from '@/features/world/export/print';
 import { parseApiError } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -54,6 +55,19 @@ interface Props {
    * default = undefined → žádné rolly.
    */
   onRoll?: import('../diary-systems/types').SystemSheetProps['onRoll'];
+  /**
+   * D-066-ZBYTKY — cíl pro „Nahlásit" deník (BE kontrakt:
+   * targetType=character_diary, targetId=characterId). Předává PostavaLayout
+   * (stránka postavy = ne-vlastnický pohled PJ/PomocnýPJ); embedy (taktická
+   * mapa) prop nepředávají → bez tlačítka. Vlastníkovi vlastního deníku se
+   * tlačítko skryje samo (`targetAuthorId` v ReportButton).
+   */
+  reportTarget?: {
+    characterId: string;
+    targetSnapshot: string;
+    targetAuthorName: string;
+    targetAuthorId?: string;
+  };
 }
 
 /**
@@ -70,6 +84,7 @@ export function DiaryTab({
   onDirtyChange,
   onProvideSave,
   onRoll,
+  reportTarget,
 }: Props) {
   const { worldId, worldSlug, world } = useWorldContext();
   const { data: diary, isLoading, isError } = useCharacterDiary(worldId, slug);
@@ -136,6 +151,18 @@ export function DiaryTab({
             className="print-hide"
             style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, alignItems: 'center' }}
           >
+            {/* D-066-ZBYTKY — nahlásit deník (jen stránka postavy, viz Props). */}
+            {reportTarget && (
+              <ReportButton
+                variant="icon"
+                targetType="character_diary"
+                targetId={reportTarget.characterId}
+                targetSnapshot={reportTarget.targetSnapshot}
+                targetAuthorName={reportTarget.targetAuthorName}
+                targetAuthorId={reportTarget.targetAuthorId}
+                worldId={worldId}
+              />
+            )}
             {skinSelector}
             <PrintButton title="Vytisknout / uložit deník jako PDF" />
           </div>

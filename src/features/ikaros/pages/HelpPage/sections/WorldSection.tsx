@@ -37,6 +37,7 @@ import {
   Download,
   Hand,
   Video,
+  Undo2,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -535,6 +536,16 @@ export function WorldSection() {
               bestie jde klást víc kopií po sobě. Celý postup „od prázdné mapy k boji"
               najdeš přímo v panelu pod <strong>tlačítkem „?"</strong> (nápověda
               orchestrace).
+            </p>
+          </MapFeature>
+          <MapFeature icon={<Undo2 size={15} />} title={'Tlačítko „Zpět" (vrácení akce)'}>
+            <p>
+              PJ (i pomocný PJ) má v pravém dolním rohu mapy tlačítko{' '}
+              <strong>„Zpět"</strong> — vrátí jeho <strong>poslední akci</strong>{' '}
+              na scéně (přesun či odebrání figurky, efekt, kresba…). Opakovaným
+              klikáním se vrací dál v historii vlastních akcí; hody kostkou se
+              nevracejí. Když už není co vrátit, mapa jen v klidu řekne „Není co
+              vrátit".
             </p>
           </MapFeature>
           <MapFeature icon={<CloudSun size={15} />} title="Počasí na mapě">

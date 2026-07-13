@@ -46,7 +46,7 @@ Member-facing index („Encyklopedie světa") s kartami stránek.
 
 ### Kdo
 - FE: Čtenář+ (memberOnly). Tlačítko „Nová stránka" jen `userRole >= PomocnyPJ` (`PagesListPage.tsx:52`).
-- BE: directory čte každý přihlášený (`pages.controller.ts:55`), gating přes `shieldedBy` enrich per entry.
+- BE: directory má od 2026-07-13 `OptionalJwtAuthGuard` (`pages.controller.ts:62`, D-DATA-SYNC-ZBYTKY a — parita s legacy characters directory): **anonym smí adresář VEŘEJNÉHO světa**, privátní jen členové (brána `assertCanViewWorld` ve `findDirectory`; přihlášený nečlen privátního světa také neprojde, R-AUDIT). Gating obsahu přes `shieldedBy` enrich per entry. ⚠️ CH-120: Optional guard platí JEN pro tuhle routu — sourozenci v controlleru zůstávají na `JwtAuthGuard`. Entry nově nese i `characterId` + `ownerUserId` (adapter `useCharacterDirectory`, kap. 12).
 
 ### Co jde dělat (VŠE)
 - Fulltextové hledání (název + slug, diakritika-insensitive `normalize`).
@@ -429,7 +429,7 @@ BE `users/interfaces/user.interface.ts:125`, `users.controller.ts:174`; FE `page
 | Endpoint | Účel | Gating |
 |---|---|---|
 | `GET /pages` | listing s access filtrem | Čtenář (member), per-page filtr |
-| `GET /pages/directory` | adresář (shieldedBy enrich) | přihlášený |
+| `GET /pages/directory` | adresář (shieldedBy enrich, + `characterId`/`ownerUserId`) | OptionalJwt — veřejný svět i anonym, privátní jen členové (2026-07-13) |
 | `GET /pages/dataSlugs` | všechny slugy (editor pomůcka) | **PomocnyPJ+** (N-37, jinak leak existence AKJ stránek) |
 | `GET /pages/data?number=N` | náhodné stránky (max 50) | přihlášený |
 | `GET /pages/meta/:slug` | metadata + shieldedBy | přihlášený |

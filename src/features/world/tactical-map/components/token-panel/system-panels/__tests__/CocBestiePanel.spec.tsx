@@ -81,15 +81,24 @@ describe('CocBestiePanel', () => {
     );
   });
 
-  it('HP −1 volá update.mutate s currentHp + systemStats health.current', () => {
+  it('HP −1 → hpDelta; mirror systemStats health.current z ABSOLUTNÍ hodnoty v response', () => {
     render(
       <CocBestiePanel token={makeToken()} sceneId="s1" worldId="w1" canEdit onMapRoll={() => {}} />,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Životy -1' }));
+    // 1. volání: delta, žádný absolutní currentHp (lost-update fix)
     expect(mockMutate).toHaveBeenCalledTimes(1);
-    const patch = mockMutate.mock.calls[0][0].patch;
-    expect(patch.currentHp).toBe(12);
-    expect(patch.systemStats['health.current']).toBe(12);
+    const [vars, opts] = mockMutate.mock.calls[0];
+    expect(vars).toEqual({ tokenId: 't1', hpDelta: -1 });
+    // BE 201 vrací op s normalizovaným ABSOLUTNÍM patch.currentHp — jiná
+    // hodnota než lokální odhad (souběžný zásah) → mirror ji musí převzít.
+    opts.onSuccess({
+      op: { type: 'token.update', tokenId: 't1', patch: { currentHp: 5 } },
+    });
+    expect(mockMutate).toHaveBeenCalledTimes(2);
+    const mirror = mockMutate.mock.calls[1][0];
+    expect(mirror.patch.systemStats['health.current']).toBe(5);
+    expect(mirror.patch).not.toHaveProperty('currentHp');
   });
 
   it('bez onMapRoll (read-only) nejsou vlastnosti klikací', () => {

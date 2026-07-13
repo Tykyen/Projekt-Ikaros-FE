@@ -2,14 +2,13 @@
 
 > Soubor obsahuje **pouze otevřené a odložené** dluhy.
 > Historie uzavřených dluhů dohledatelná v git logu (`git log --all -- docs/dluhy.md`).
-> Stav k 2026-07-12 (po hromadné opravě dluhů — vyřešené smazány, viz git log + chybový deník ✅ ŘEŠENÍ).
+> Stav k 2026-07-13 (po hromadné opravě dluhů 12.–13. 7. — vyřešené smazány, viz git log + chybový deník ✅ ŘEŠENÍ).
 
 ---
 
 ## Otevřené
 
 ### D-063 — Identita správce (spolek) + zpracovatelé nedoplněni na legal stránkách (20A)
-> `CodeOfConductPage` + `TermsPage` už placeholdery nemají (ověřeno 2026-07-12) — zbývají 2 soubory níže.
 **Soubor:** `src/features/ikaros/pages/PrivacyPage.tsx:35-200`, `ContactPage.tsx:27-52` — placeholdery `[DOPLNIT: …]`
 **Problém:** Zásady OÚ (`/soukromi`), Kontakt (`/kontakt`) a Podmínky nemají doplněnou totožnost správce: chybí název spolku, IČO, sídlo, spisová značka + soud spolkového rejstříku a kontaktní/provozní e-mail (pro uživatele i orgány). Navíc seznam zpracovatelů v Zásadách OÚ má u části služeb (hosting, SMTP, AI/LLM, error tracking, platební brána) nepotvrzené konkrétní poskytovatele + jejich EU/třetí-země status a transfer mechanismus (DPF vs. SCC).
 **Dopad:** Vysoký (blokuje **veřejné spuštění**) — GDPR čl. 13 vyžaduje totožnost správce, DSA čl. 11/12 kontaktní místa; bez nich nelze web pustit veřejně. NEblokuje implementaci ani beta.
@@ -19,7 +18,7 @@
 ---
 
 ### D-17.8-A11Y-BACKLOG — Přístupnost: odložené vrstvy nad rámec 17.8 v1
-> Většina backlogu vyřešena 2026-07-05 (jsx-a11y lint, sdílený `useFocusTrap`, KebabMenu roving-tabindex, aria-label audit) — viz git log. Zbývá (nízká priorita, vyžaduje živou kontrolu):
+Zbývá (nízká priorita, vyžaduje živou kontrolu):
 - **IconButton adopce** — ~16 ručních `<button>+lucide` (chat: `ChannelItem/Group/View`, `EmoteCard`, rail `*Panel`…) má aria-label, ale neadoptovalo primitiv. Čistě konzistenční refactor; POZOR `IconButton .iconBtn` = ghost/transparent styl → migrace MĚNÍ vzhled → nutný `mobil-desktop` per skin, ne slepě.
 - **Storybook axe** (`.storybook/preview.tsx`) — zůstává `test:'todo'`. Přepnutí na `error` je **no-op**, dokud jsou storybook component testy mimo `vitest run` (D-033, ESM/CJS race) → axe se v CI nespouští. Trigger: browser-mode axe v CI (vyřešení D-033) + ověřená čistota 14 stories.
 - **Focus trap do in-app overlayů**: `WorldChatRoom` mobilní sidebar + scrim, `ChatContextRail` (bez Escape/trap/dialog), `MapNotebookOverlay` + `TokenInfoPanel` (mají Escape+`role=dialog`, chybí trap/restore). Sdílený `useFocusTrap` je připraven — chybí napojení. **Odloženo:** vyžaduje živý mobilní/mapový test (trap ve špatně posouzeném kontextu zhorší UX), proto ne naslepo.
@@ -29,58 +28,47 @@
 ---
 
 ### D-DATA-SYNC-ZBYTKY — zbytky po D-NEW-INV-DATA-SYNC (2026-07-12)
-> Jádro dluhu vyřešeno 2026-07-12 (currencies optimistic lock + FE hydratace, subdocy jen pro PC + úklidový skript, token→deník HP sync 8 systémů) — viz git log. Zbývá:
 **Soubory:** BE `characters/characters.repository.ts` + controller (legacy directory), `maps/operations/token-hp-diary-map.ts` (sync mapa).
-**Problém:** (a) legacy `GET /worlds/:id/characters/directory` žije vedle Pages directory (dvojí zdroj) — **nejde smazat**, FE ho volá z ~9 míst (`useCharacterDirectory`) a BE `chat.service` interně (enrich); (b) token→deník HP sync přeskočen u systémů s nejednoznačným mapováním: shadowrun (odvozenina `sr_attr_bod`+`sr_cond_phys`), fae/fate (stress boxy = pole), drdplus (pásma zranění), drd2 (3 zdroje) + pole `systemStats`/`injury`/`initiative` (nemají v deníku domov).
-**Dopad:** Nízký/střední — dvojí zdroj adresáře (maintainability), HP z mapy se u 5 systémů nepropíše (chování jako dřív).
-**Řešení:** (a) FE migrace `useCharacterDirectory` → Pages directory, pak smazat legacy endpoint; (b) per-system rozhodnutí mapování (produktové — jak má HP z mapy zapisovat do stress boxů / pásem).
-**Kdy:** (a) při příští práci na adresáři postav; (b) při ladění daných systémů.
+**Problém:** (a) legacy `GET /worlds/:id/characters/directory` žil vedle Pages directory (dvojí zdroj); (b) token→deník HP sync přeskočen u systémů s nejednoznačným mapováním: shadowrun (odvozenina `sr_attr_bod`+`sr_cond_phys`), fae/fate (stress boxy = pole), drdplus (pásma zranění), drd2 (3 zdroje) + pole `systemStats`/`injury`/`initiative` (nemají v deníku domov).
+**Dopad:** Nízký/střední — (a) už jen mrtvá HTTP route na BE; HP z mapy se u 5 systémů nepropíše (chování jako dřív).
+**Řešení:** (a) FE migrace `useCharacterDirectory` → Pages directory ✅, pak smazat legacy endpoint; (b) per-system rozhodnutí mapování (produktové — jak má HP z mapy zapisovat do stress boxů / pásem).
+**Stav (a) 2026-07-13 — FE MIGROVÁNO, zbývá smazat legacy route po živém ověření.** BE doplnil: `characterId: string | null` v pages directory entry (z `characterRef`; entry.id zůstává page ID — past `directory_id`) + `OptionalJwtAuthGuard` a `assertCanViewWorld` vždy (anonym: veřejný svět 200, privátní 403 — parita s legacy `assertCanViewDirectory`). FE: `useCharacterDirectory` = adapter nad `GET /pages/directory?type=Postava hráče,NPC,Lokace` se STEJNÝM výstupním tvarem (`id`=**characterId** → finance selecty v `SettingsAccountSection` bezpečné; `userId`=`ownerUserId` → oživena dřív mrtvá sekce „Tvé postavy" v `MapEmptyState` — legacy `userId` nevracel) i queryKey (`charactersQueryKey.directory` → C-15 invalidace z useCreate/Update/DeletePage + useCharacterMutations beze změny); všech 9 call-sites nedotčeno; testy `useCharacterDirectory.spec.tsx`. **Zbývá:** po ověření na živém webu smazat BE `GET /worlds/:id/characters/directory` HTTP route (interní `characters.service.getDirectory` pro `chat.service` enrich ZŮSTÁVÁ).
+**Kdy:** (a) BE smazání route po živém ověření uživatelem; (b) při ladění daných systémů.
 
-### D-066-ZBYTKY — moderace deníku: FE vstup + interní čtecí cesty (2026-07-12)
-> Enforcement deníku a chatu (M2/M3 skrýt, M4 smazat) **implementován 2026-07-12** — viz git log. Zbývají okraje:
-**Problém:** (a) FE nemá report tlačítko pro `character_diary` (typ je jen v enumu) — BE kontrakt definován: `targetId = characterId`; (b) `world-export` a `maps.enrichTokens` čtou diary repo přímo mimo moderation gate → PJ export/HP bar tokenu skrytý deník stále čte (interní/whitelistované cesty, ne veřejné zobrazení obsahu).
-**Dopad:** Nízký — report deníku jde zatím jen nepřímo, interní cesty nejsou leak veřejnosti.
-**Řešení:** (a) ReportButton do UI deníku (posílat characterId); (b) rozhodnout, zda export/enrich má skrytý deník vynechávat.
-**Kdy:** při příští práci na deníku/moderaci.
-
-### D-DROBNE-2026-07-12 — drobné follow-upy z hromadné opravy
-- **Admin změna e-mailu bez notifikace na starou adresu** — `PATCH /admin/users/:id/email` mění tiše; vzor `sendEmailChangeNotice` existuje v auth. Doplnit mail „tvůj e-mail byl změněn správcem".
-- **Nativní `GET /ikaros-discussions/my`** — profil „Moje diskuze" filtruje klientsky (`creatorId`), stejný vzor jako tab „Moje" na DiscussionsPage; nativní endpoint by byl čistší (výkon při stovkách diskuzí).
-- **Undo UI stále nezapojené** — BE inverses doplněny (deactivate/bulkAssign/drawing.clear), ale FE undo tlačítko/endpoint není; při zapojení doplnit FE typy nových ops (`scene.activate`, `scene.drawings.replace`, `member.bulkRestoreAssignments`).
+### D-DROBNE-2026-07-13 — drobné follow-upy z noční dávky
+- **Undo `scene.image` vs. FIX-31 cleanup** — undo výměny podkladu obnoví URL, jejíž blob mohl okamžitý Cloudinary cleanup už smazat → rozbitý obrázek. MVP limitace (komentář v kódu); fix = odložit cleanup podkladů o N dní.
+- **Souběžné HP úpravy PC přes deník** — bestie tokeny mají atomickou deltu (hpDelta), ale PC/NPC HP jde přes `updateWithCustomDataPatch` deníku — dva souběžné zásahy z combat panelů = stejná lost-update třída, menší dopad (jeden hráč = jeden deník).
+- **DrdPlus injury strop 3×mez pod souběhem** — mez žije v systemStats, BE ji nezná → efektivní delta se ořezává lokálně; souběh může strop mírně přetéct (zásahy se neztrácejí).
 **Dopad:** Nízký. **Kdy:** příležitostně při práci na daných plochách.
 
 ---
 
 ### D-SEC-GAP-2026-07-11 — bezpečnostní/compliance nálezy čekající na rozhodnutí nebo infra krok
-> Z původního seznamu **vyřešeno 2026-07-12:** Redis lock cronů (`CronLockService`), offset-paginace `_id` tiebreak (21 míst), anti-abuse creation capy (13 entit, env-konfigurovatelné, `LIMIT_REACHED`), camp cron timeZone (byl už dřív). Zbývá:
 **⭐ ROZHODNUTÍ UŽIVATELE (nelze opravit bez něj):**
-- **Erasure: `content` zpráv + `username` tombstone** — plná content-erasure = právní rozhodnutí, které zatím nepadlo. + **Registrace <15 let** (`isMinor` neblokuje registraci) — produktově-právní rozhodnutí (věková brána 15+).
-- **Account enumeration** přes `/auth/check-email`/`check-username` (vrací existenci; login timing srovnán) — endpoint je záměrná UX opora registrace; rozhodnout throttle vs. redesign.
+- **Erasure: `content` zpráv + `username` tombstone** — plná content-erasure = právní rozhodnutí, které zatím nepadlo. (Registrace <15 už blokována ✅ 2026-07-13 — `AGE_REQUIREMENT_NOT_MET`.)
+- **Account enumeration** přes `/auth/check-email`/`check-username` — mitigace hotová (throttle 10/min/IP, konstantní response ✅ 2026-07-13); zbývá rozhodnout, zda časem redesign (endpoint je záměrná UX opora registrace).
 - **`chatSkin` bez supporter gate** — dle `world-membership.schema` vědomě self-service (motiv světa); rozhodnout, zda gate vůbec chceme.
+**⚙️ AKCE UŽIVATELE (kód hotový, zbývá nastavení):**
+- **Error telemetrie** — BE+FE Sentry/GlitchTip kód kompletní (boundary, unhandled, 5xx, non-HTTP výjimky) a deploy řetěz protažený; zbývá nastavit `SENTRY_DSN` (BE secret) + `VITE_SENTRY_DSN` (FE var) v GitHub.
 **~ TECHNICKÉ (větší zásah / migrace):**
-- **Ekonomika na float** — IEEE-754 drift → overdraft guard může selhat na haléřích; čistý fix = celočíselné minor units (migrace dat + FE formátování).
-- **FE error telemetrie = 0** + vzor „prázdný stav místo chyby" na části ploch — rozhodnout nástroj (Sentry free?) a zavést; souvisí `monitoring` skill.
-- **Mongo bez `cs` collation** + slug strhává diakritiku (kolize „šíp"/„sip") — collation = per-kolekce migrace.
+- **Ekonomika na float** — mitigace hotová (✅ 2026-07-13 `money.util`: round na 4 des., epsilon guard, NaN reject; drift se už nehromadí, historický drift v DB tolerován epsilonem). Plná migrace na celočíselné minor units = volitelný budoucí krok (migrace dat + FE formátování).
+- **Mongo bez `cs` collation** — řazení českých názvů; per-kolekce migrace + indexy. (Slug diakritická kolize page↔character už suffixována ✅ 2026-07-13.)
 - **MeiliSearch bez českého stemmingu** — infra/konfigurační rešerše.
-**Dopad:** střední–vysoký (veřejná 15+ platforma). **Kdy:** rozhodovací položky = až rozhodneš; technické = první běh stylů 32–41.
+- **FE vzor „prázdný stav místo chyby"** na části starších ploch (nové plochy už mají ErrorState+retry).
+**Dopad:** střední (veřejná 15+ platforma). **Kdy:** rozhodovací položky = až rozhodneš; technické = první běh stylů 32–41.
 
 ### D-LAUNCH-GAP-2026-07-11 — launch-hardening zbytky (styly 42–46)
-> **Vyřešeno 2026-07-12:** WS rate-limity (`allowWsEvent` na 4 gateway), webpush timeout, SMTP log wording + per-recipient reset throttle, HTTP `requestTimeout` (keepAlive/headers už byly), Docker healthcheck + `ulimits.nofile` + `pids_limit` (staged v compose, nasadí se příštím deployem). Zbývá:
 **⭐/~ VYSOKÉ+STŘEDNÍ:**
 - **Vizuální regrese = 0 automatická brána** — 96 skin CSS, edit tokenu tiše rozbije skin; Chromatic nainstalován ale mrtvý; Playwright jen chromium/desktop → mobil overflow neasertován. Velká infra položka (render brána `+render` v plny-audit).
-- **SMTP bez fronty** — 1 Gmail účet ~500 mailů/den; reset-flood cap: per-recipient throttle už brání jednomu cíli, ale ne distribuovanému floodu → fronta + denní cap monitor + bounce handling (dnes „předáno SMTP" ≠ doručeno).
-- **Push dedup jen na zařízení** — WS replay může vyrobit 2 reset tokeny (prošetřit reprodukci, pak fix).
-- **Last-write-wins na `tokens.$.<key>`** — souběžný update HP tokenu v boji = lost update (chce per-field ops nebo verzi).
-**SHARPENINGY (do existujících stylů):** styl 5 — Mongo/Redis bez `--auth` + `--bind_ip_all`, backend port `0.0.0.0:3001` obchází TLS (**vyžaduje koordinované ops okno** — vytvořit DB users + env + restart, neriskovat vzdáleně bez tebe); styl 31 — deploy bez rollbacku (prune+rebuild latest), disk-cap upload-fallbacku (sdílí disk s Mongo).
-**OPS-RUNBOOK (jednorázově, mimo audit):** SPF/DKIM/DMARC záznamy, TLS cert renewal + do IaC, host firewall/`ulimit`.
-**Dopad:** vysoký — doručitelnost, férovost, launch-stabilita. **Kdy:** první běh stylů 42–46; ops položky = společně s tebou u serveru.
+- **SMTP bounce** — outbox fronta + denní cap + retry hotové (✅ 2026-07-13); plná async bounce detekce (inbound handling / přechod na transakční službu s webhooky) zůstává — „předáno SMTP" ≠ doručeno.
+**OPS (mimo kód — runbook připraven):** `docs/ops-runbook.md` (BE repo) — Mongo/Redis auth (koordinované okno, keyFile postup), backend port jen pro proxy, SPF/DKIM/DMARC, TLS/Caddyfile do IaC, firewall, deploy rollback (návrh §8 — neimplementován, nejde otestovat bez ostrého deploye).
+**Dopad:** střední — doručitelnost + ops hardening. **Kdy:** vizuál = první běh stylů 42–46; ops = s tebou u serveru dle runbooku.
 
 ### D-AUDIT-2026-07-11 — zbylé nálezy plného auditu (46 stylů)
-> Z hlavních zbývajících **vyřešeno 2026-07-12:** Redis lock cronů, socket-swap FE listener leak (centrální `removeAllListeners` + `socketGenerationAtom` re-bind), WS rate-limity. Zbývá:
-- **Bundle SLO** — bundle přes limit, chce code-split audit (velká položka).
-- **Nula DB záloh** — žádný mongodump/retence. POZOR: zálohy na tentýž disk riskují zaplnění (viz nedávné disk-cleanup incidenty) → rozhodnout cíl (S3/objekt storage?) = ops rozhodnutí s tebou.
+- **Bundle** — initial payload snížen o 37 % (✅ 2026-07-13: 1509→945 kB; kořen = barrel re-export → modulepreload TipTapu). Zbylí kandidáti: definice témat ~155 kB v entry (chce návrh critical-theme, jinak FOUC), auth modaly ~120 kB (vždy-mounted), vnitřní split MapPage (three.js universe, už lazy route). SLO číslo neexistuje — stanovit.
+- **DB zálohy** — ruční workflow `db-backup.yml` hotový (✅ mongodump+retence+disková pojistka); zbývá TVOJE rozhodnutí off-site cíle (B2/R2/scp — runbook §6) a pak zapnout cron.
 - Nefixnuté položky nižší priority v `docs/full-audit/RUN-2026-07-11-1213/report.md` + `checkpoints/`.
-**Kdy:** bundle = samostatný zátah; zálohy = ops rozhodnutí.
+**Kdy:** bundle zbytky = při dalším výkonovém zátahu; zálohy = tvoje volba cíle.
 
 ---
 
@@ -121,11 +109,11 @@
 **Trigger:** až bude potřeba skutečná retenční křivka v čase.
 **Co bude potřeba:** týdenní append-only snapshot aktivity (`{ userId, isoWeek }`) — zapne pravou retenci od nasazení dál. Nový tracking = samostatné produktové rozhodnutí. Spec [19.1 §8](arch/phase-19/spec-19.1.md).
 
-### D-19.2-BYTES — Velikost obrázkových blobů v bytech (dnes jen počty)
-**Soubory:** BE upload cesta + image schémata.
-**Stav:** storage se měří jako počet souborů; velikost v bytech se u obrázků neukládá (jen chat přílohy + admin PDF). Celkový objem jen přes Cloudinary `api.usage()`.
-**Trigger:** až bude potřeba přesná velikost per svět/uživatel (nutná podmínka pro vynucování kvót — UM-10).
-**Co bude potřeba:** ukládat `bytes` do image schémat při uploadu (retroaktivně nepokryje staré bloby). Spec [19.2 §7](arch/phase-19/spec-19.2.md).
+### D-19.2-BYTES — Velikost obrázkových blobů: zbývá FE posílání + agregace
+**Soubory:** FE create/update formuláře entit s obrázkem; BE agregace.
+**Stav:** BE strana hotová (2026-07-13): upload endpointy vracejí `bytes`, všech ~14 image schémat má `imageBytes`/`bytes` pole vč. toEntity; server-side toky (galerie, avatary) ukládají hned. **Zbývá:** (a) FE-driven toky `imageBytes` z upload response do create/update DTO zatím NEposílají (pole zůstává prázdné); (b) agregace per svět/uživatel pro měření (podmínka kvót UM-10); (c) staré bloby bez bytes (retroaktivně nejde).
+**Trigger:** až bude potřeba přesná velikost per svět/uživatel (kvóty UM-10).
+**Co bude potřeba:** protáhnout `bytes` z upload response do entit ve FE formulářích (mapy, bestie, stránky, emoty, světy, rostliny…); pozor na pár imageUrl+imageBytes (výměna obrázku bez bytes = stale hodnota). Spec [19.2 §7](arch/phase-19/spec-19.2.md).
 
 ### D-DICE-SERVER-RNG — Autoritativní hod na serveru (follow-up po Cestě A)
 **Soubory:** BE `common/dice/dice-payload.validator.ts` (dnešní očista) + FE roll engine `chat/dice/lib/rollEngine.ts` (455 ř.) + `diceNotation.ts` (`@` předurčený výsledek pro 3D).

@@ -10,7 +10,6 @@ import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "@/themes/ThemeProvider";
 import { InstallBanner, UpdateBanner } from "@/features/pwa";
 import { PrerenderReady } from "./PrerenderReady";
-import { bootstrapSchemas } from "@/features/world/tactical-map/schemas/bootstrap";
 import { initMonitoring } from "@/shared/lib/monitoring";
 import "./index.css";
 
@@ -29,10 +28,18 @@ window.addEventListener('vite:preloadError', () => {
   window.location.reload();
 });
 
-// 10.2d-prep-A C14 — registrace per-system schémat při startup.
-// Idempotent (safe pro HMR a test setup). Po tomto volá konzumenti
-// (BestiarPage, EntitySchemaForm, EntityStatbar) `systemEntitySchemaRegistry.get()`.
-bootstrapSchemas();
+// 10.2d-prep-A C14 — registrace per-system schémat.
+// D-AUDIT bundle: dřív statický import + sync call → ~60 kB schémat v entry
+// chunku, ačkoli je první render nepotřebuje. Teď: (a) routy, které registry
+// čtou (taktická mapa, bestiáře, world chat, pop-out token), mají deterministický
+// gating v router.tsx (`withSchemas` — bootstrap doběhne PŘED renderem stránky);
+// (b) tady jen pojistka na pozadí pro případné budoucí negated-konzumenty.
+// `bootstrapSchemas()` je idempotentní, dvojí volání je no-op.
+window.setTimeout(() => {
+  void import("@/features/world/tactical-map/schemas/bootstrap").then((m) =>
+    m.bootstrapSchemas(),
+  );
+}, 1000);
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -426,6 +426,23 @@ export function PostavaLayout({ page }: Props) {
               onExitEdit={handleExitEdit}
               onDirtyChange={setActiveTabDirty}
               onProvideSave={provideSave}
+              // D-066-ZBYTKY — „Nahlásit deník" pro ne-vlastníky (PJ/PomocnýPJ/
+              // elevated admin — jediní, kdo cizí deník v UI vidí). Kontrakt:
+              // targetId = characterId. PC: autor = hráč; NPC bez vlastníka →
+              // svět jako odpovědný subjekt (vzor PageHeader). Vlastníkovi se
+              // tlačítko skryje uvnitř ReportButton (targetAuthorId).
+              reportTarget={
+                page.characterRef
+                  ? {
+                      characterId: page.characterRef.characterId,
+                      targetSnapshot: `Deník postavy „${page.title}"`,
+                      targetAuthorName: isPC
+                        ? (playerName ?? 'Neznámý hráč')
+                        : (world?.name ?? 'Neznámý autor'),
+                      targetAuthorId: page.ownerUserId,
+                    }
+                  : undefined
+              }
             />
           )}
           {activeTab === 'finance' && character && canSeePrivate && (

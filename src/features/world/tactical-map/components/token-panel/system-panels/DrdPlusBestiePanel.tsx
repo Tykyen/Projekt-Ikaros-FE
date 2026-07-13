@@ -117,8 +117,14 @@ export function DrdPlusBestiePanel({
 
   const adjustInjury = (delta: number): void => {
     if (!canEdit) return;
-    const next = Math.max(0, Math.min(3 * mez, injury + delta));
-    update.mutate({ tokenId: token.id, patch: { injury: next } });
+    // Lost-update fix: DELTA místo absolutního `patch.injury` — server ji
+    // aplikuje atomicky (clamp ≥ 0) a v 201/broadcastu vrací absolutní
+    // hodnotu. Horní strop 3×mez BE nezná (mez žije v systemStats) → deltu
+    // ořízneme lokálně na efektivní; pod souběhem může strop o pár bodů
+    // přetéct, ale zásahy se neztrácejí.
+    const eff = Math.max(0, Math.min(3 * mez, injury + delta)) - injury;
+    if (eff === 0) return;
+    update.mutate({ tokenId: token.id, injuryDelta: eff });
   };
 
   const setPostih = (v: number): void => {

@@ -245,6 +245,13 @@ export interface PageDirectoryEntry {
   imageFit?: 'cover' | 'contain' | null;
   ownerUserId?: string;
   /**
+   * D-DATA-SYNC-ZBYTKY a — ID Character entity (typy Postava hráče/NPC/Lokace
+   * mají `characterRef`; čistá stránka → null). ⚠️ `entry.id` je PAGE ID —
+   * pro finance/subdoc API vždy použij `characterId` (past `directory_id`).
+   * Optional kvůli starším BE odpovědím v cache.
+   */
+  characterId?: string | null;
+  /**
    * D-062c — pokud má current user nesplněné AKJ/Role requirementy, listing
    * renderuje stub kartu „🔒 AKJ: N — Název" místo normální. Prázdné/undefined =
    * má přístup. Raw accessRequirements se nevrací (privacy).

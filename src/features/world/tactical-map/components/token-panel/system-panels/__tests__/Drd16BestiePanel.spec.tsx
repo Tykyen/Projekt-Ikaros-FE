@@ -98,7 +98,7 @@ describe('Drd16BestiePanel', () => {
     );
   });
 
-  it('HP ± upraví token.currentHp', () => {
+  it('HP ± posílá hpDelta (ne absolutní currentHp) — lost-update fix', () => {
     render(
       <Drd16BestiePanel
         {...props}
@@ -107,9 +107,8 @@ describe('Drd16BestiePanel', () => {
       />,
     );
     fireEvent.click(screen.getByLabelText('Životy -1'));
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ patch: { currentHp: 2 } }),
-    );
+    expect(mockMutate).toHaveBeenCalledWith({ tokenId: 't1', hpDelta: -1 });
+    expect(mockMutate.mock.calls[0][0]).not.toHaveProperty('patch');
   });
 
   it('read-only staty + popis se zobrazí (PJ reference)', () => {

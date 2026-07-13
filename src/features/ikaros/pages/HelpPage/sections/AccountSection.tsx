@@ -236,16 +236,17 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Baby size={20} />} title="Věk a režim ochrany nezletilých" accent="warning">
+      <HelpAccordion icon={<Baby size={20} />} title="Věková hranice 15+" accent="warning">
         <p>
           Při registraci se ptáme jen na to, jestli ti je{' '}
           <strong>15 a víc, nebo méně</strong> — přesné datum narození nechceme.
         </p>
         <p>
-          Když je ti <strong>méně než 15</strong>, účet se zapne v{' '}
-          <strong>bezpečném režimu</strong>: profil je neveřejný a skrytý v adresáři
-          uživatelů. U mladších je navíc potřeba <strong>souhlas zákonného
-          zástupce</strong>. Podrobnosti jsou v{' '}
+          Platforma je určena hráčům <strong>od 15 let</strong>. Když zvolíš
+          „méně než 15", registrace se <strong>nedokončí</strong> — formulář to
+          vysvětlí rovnou a budeme se těšit, až se vrátíš později. Účty mladších
+          uživatelů založené dříve zůstávají v <strong>režimu ochrany</strong>{' '}
+          (neveřejný profil, skrytí v adresáři uživatelů). Podrobnosti jsou v{' '}
           <Link to="/soukromi">Zásadách ochrany osobních údajů</Link>.
         </p>
       </HelpAccordion>

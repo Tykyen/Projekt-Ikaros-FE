@@ -70,6 +70,7 @@ import { WallsLayer } from "./components/WallsLayer";
 import { LightsLayer } from "./components/LightsLayer";
 import { useDrawingTool } from "./hooks/useDrawingTool";
 import { MapToolDock, MapDockStack } from "./components/MapToolDock";
+import { MapUndoButton } from "./components/MapUndoButton";
 import { MapEmptyState } from "./components/MapEmptyState";
 import { MapPlacementBanner } from "./components/MapPlacementBanner";
 import { HexGrid, type MapBounds } from "./components/HexGrid";
@@ -2334,6 +2335,11 @@ export function TacticalMapView(): React.ReactElement {
       <MapDockStack>
         {/* 17.10 A2.3 — Uklidit/Vrátit (nad nástroji; kostky = výjimka). */}
         <MapTidyButton panels={DOCK_META} />
+        {/* D-DROBNE-UNDO — „Zpět" (undo poslední PJ operace). Jen PJ/PomocnyPJ,
+            stejný gating jako ostatní PJ nástroje. */}
+        {isPJ && scene && worldId && (
+          <MapUndoButton sceneId={scene.id} worldId={worldId} />
+        )}
         {scene && currentUser && worldId && (
           <DiceRollButton
             worldId={worldId}

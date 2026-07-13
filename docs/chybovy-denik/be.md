@@ -108,3 +108,18 @@
 - 👍 Pin `it.failing`→`it` = validita obrany prokázaná automaticky, žádné ruční „vypni obranu, ať zčervená".
 - 👎 `logoutAll` NEMÁ FE UI (funkce 01-ucet:65) → tokenVersion nejvíc těží z cesty **změna hesla**; FE tlačítko „odhlásit všude" + `SESSION_REVOKED` instant-logout v `client.ts` zůstávají FE follow-up.
 - ⚠️ Enumerace účtů (PT-35b/c/d) NEopravena — vědomý trade-off (accepted), zůstává `it.failing`.
+
+## ✅ ŘEŠENÍ — D-LAUNCH-GAP lost update na `tokens.$.currentHp` — server-side `hpDelta` přes Mongo pipeline update — 2026-07-12
+
+**Co zabralo.** Diagnóza: BE `token.update` zapisuje per-klíč atomicky (`$set tokens.$.<key>`, žádný celotokenový replace) — race NENÍ v Mongo zápisu, ale v tom, že FE bestie panely (`adjustHp(delta)` v 8 `*BestiePanel.tsx`) počítají `next = clamp(cached + delta)` NA KLIENTOVI a posílají ABSOLUTNÍ `patch.currentHp` → dva souběžné zásahy čtou stejnou stale bázi a druhý `$set` první přepíše. Fix = nová delta semantika: `token.update` op nese volitelné `hpDelta`/`injuryDelta` (`@IsInt` DTO), server je aplikuje **atomicky proti aktuální DB hodnotě** aggregation pipeline updatem (`$map` přes tokens, `$mergeObjects`, clamp `0..maxHp` přes `$min`/`$max`, `$convert onError:0` na legacy ne-čísla, `$literal` na tokenId proti `$`-injection). Po zápisu se op **normalizuje**: do `patch` se doplní výsledná absolutní hodnota z post-update dokumentu (`findOneAndUpdate returnDocument:'after'`) → log/broadcast/201 nesou absolutní stav a stávající FE (`applyOperationToScene` zná jen patch) funguje beze změny. Delta jen pro bestie tokeny (HP PC/NPC žije v deníku postavy — delta proti stored mirror ~0 by byla špatně) a jen s prázdným `patch` (jinak 400).
+
+**Proč to je správně (a ne jiná varianta).** (1) `expectedHp`/verze (optimistic 409) by bez FE změny nic nevyřešila a s FE změnou nutí retry-smyčku; delta je sémanticky přesně to, co damage/heal tlačítko myslí. (2) Absolutní set (uživatel napíše hodnotu) zůstává — „poslední vyhrává" je tam korektní UX. (3) Normalizace na absolutní hodnotu v broadcastu = nulový version-skew vůči starým klientům. (4) Klasické `$inc` + následný clamp = 2 zápisy (přechodný nevalidní stav); pipeline zvládne delta+clamp v JEDNOM atomickém zápisu.
+
+**Past (stála 1 červený e2e běh):** Mongoose `findOneAndUpdate` s polem (pipeline) hodí `MongooseError: Cannot pass an array to query updates unless the 'updatePipeline' option is set` → nutný explicitní opt-in `updatePipeline: true` v options. Unit testy s mockem to NEchytí (repo mock), chytil to až race e2e proti reálnému Mongu.
+
+**Jak ověřeno.** Unit: 7 nových testů (normalizace op/log/broadcast, inverse nese starou hodnotu, 400 kombinace patch+delta, 400 PC/NPC, 404 zmizelý token, žádný diary sync u bestie, 400 string delta) — maps suita 251/251. Race e2e `test/race/maps-token-hp.race.e2e-spec.ts` (replSet): **dva souběžné damage (−3,−2) → HP 5; pět souběžných −1 → HP 5** (s absolutním setem by bylo 7/8 resp. 9), clamp −999→0 / +999→maxHp, kontrakty 400. 6/6 GREEN. `tsc --noEmit` + `eslint` na změněných souborech čisté (mailer/upload/currencies chyby = souběžní agenti).
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Fix je BE-only a zpětně kompatibilní — dnešní FE dál posílá absolutní set (race trvá, dokud FE nepřejde na deltu), nový kontrakt je připravený a otestovaný.
+- 👍 Race e2e odhalil mongoose past, kterou mock-unit testy principiálně nevidí — atomické zápisy VŽDY ověřit proti reálnému Mongu.
+- 👎 FE follow-up nutný: `adjustHp` v 8 bestie panelech přepnout na `hpDelta` (a CoC mirror `systemStats['health.current']` dopočítat z 201 response); do té doby je fix „jen" připravená trubka.

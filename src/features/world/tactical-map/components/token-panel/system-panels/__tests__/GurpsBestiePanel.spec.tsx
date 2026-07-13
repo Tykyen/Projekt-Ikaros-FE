@@ -113,17 +113,22 @@ describe('GurpsBestiePanel', () => {
     );
   });
 
-  it('HP −5 → mutate currentHp + systemStats.health.current (bar čte damageable)', () => {
+  it('HP −5 → hpDelta; mirror systemStats.health.current z ABSOLUTNÍ hodnoty v response', () => {
     render(<GurpsBestiePanel {...props} token={makeToken()} onMapRoll={vi.fn()} />);
     fireEvent.click(screen.getByLabelText('Životy -5'));
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        patch: expect.objectContaining({
-          currentHp: 17,
-          systemStats: expect.objectContaining({ 'health.current': 17 }),
-        }),
-      }),
-    );
+    // 1. volání: delta, žádný absolutní currentHp (lost-update fix)
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+    const [vars, opts] = mockMutate.mock.calls[0];
+    expect(vars).toEqual({ tokenId: 't1', hpDelta: -5 });
+    // BE 201 vrací op s normalizovaným ABSOLUTNÍM patch.currentHp — jiná
+    // hodnota než lokální odhad (souběžný zásah) → mirror ji musí převzít.
+    opts.onSuccess({
+      op: { type: 'token.update', tokenId: 't1', patch: { currentHp: 15 } },
+    });
+    expect(mockMutate).toHaveBeenCalledTimes(2);
+    const mirror = mockMutate.mock.calls[1][0];
+    expect(mirror.patch.systemStats['health.current']).toBe(15);
+    expect(mirror.patch).not.toHaveProperty('currentHp');
   });
 
   it('iniciativa → flat (= Základní rychlost) + zapíše token.initiative', () => {

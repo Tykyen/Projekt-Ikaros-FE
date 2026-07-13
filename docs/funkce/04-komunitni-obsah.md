@@ -103,7 +103,7 @@ Společné principy ověřené v kódu:
   - Žádné kategorie/štítky diskuzí (jen otevřená/uzamčená a oblíbené/připnuté).
   - Žádné vnořené odpovědi/threading uvnitř diskuze (ploché příspěvky); reply na konkrétní příspěvek jako u chatu tu není.
   - Nahlášení příspěvku se od 20.1 řeší v generické frontě „Zpracovat" (typ `content_report`, kap. 08), ne samostatnou stránkou.
-- **Zvláštnosti:** při založení nepschválené diskuze a při schválení/zamítnutí chodí systémová **pošta**. **15.9 — web push autorovi diskuse** (kategorie `ownDiscussion`) při **novém příspěvku** od někoho jiného (`ikaros-discussions.service.ts` `addPost`, s `url` na diskusi). Smazaný autor příspěvku → tombstone avatar + kurzíva (D-040). Uzamčená diskuze (`isOpen=false`) má badge zámku.
+- **Zvláštnosti:** **`GET /ikaros-discussions/my`** (D-DROBNE, 2026-07-13) — vlastní diskuze přihlášeného vč. pending/uzamčených, řazené `createdAtUtc` desc; konzumuje profil „Moje diskuze" (kap. 02, `useMyDiscussions`); statická routa záměrně PŘED `@Get(':id')` (pořadí rout, `ikaros-discussions.controller.ts:70`). Při založení nepschválené diskuze a při schválení/zamítnutí chodí systémová **pošta**. **15.9 — web push autorovi diskuse** (kategorie `ownDiscussion`) při **novém příspěvku** od někoho jiného (`ikaros-discussions.service.ts` `addPost`, s `url` na diskusi). Smazaný autor příspěvku → tombstone avatar + kurzíva (D-040). Uzamčená diskuze (`isOpen=false`) má badge zámku.
 - **Stav:** ✅
 - **Kód:** FE `src/features/ikaros/pages/DiscussionDetailPage.tsx`, `DiscussionsNewPage.tsx`, `api/useDiscussions.ts`. BE `ikaros-discussions.controller.ts`, `ikaros-discussions.service.ts`.
 

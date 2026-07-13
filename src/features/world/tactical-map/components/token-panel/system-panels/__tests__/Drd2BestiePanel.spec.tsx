@@ -91,12 +91,11 @@ describe('Drd2BestiePanel', () => {
     );
   });
 
-  it('Sudba −1 → patch currentHp', () => {
+  it('Sudba −1 → hpDelta (ne absolutní currentHp) — lost-update fix', () => {
     render(<Drd2BestiePanel {...props} token={makeToken()} onMapRoll={vi.fn()} />);
     fireEvent.click(screen.getByLabelText('Sudba -1'));
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ patch: { currentHp: 13 } }),
-    );
+    expect(mockMutate).toHaveBeenCalledWith({ tokenId: 't1', hpDelta: -1 });
+    expect(mockMutate.mock.calls[0][0]).not.toHaveProperty('patch');
   });
 
   it('„✏ Upravit bestii" přepne do edit režimu (in-place inputy)', () => {
