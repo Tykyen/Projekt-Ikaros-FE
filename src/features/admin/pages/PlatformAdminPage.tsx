@@ -83,6 +83,8 @@ export default function PlatformAdminPage() {
       (prev) => {
         const out = new URLSearchParams(prev);
         out.set('tab', next);
+        // Prefill hledání (deep-link z profilu) nepatří jinému tabu.
+        out.delete('search');
         return out;
       },
       { replace: false },

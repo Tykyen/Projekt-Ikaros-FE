@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
 import { Button } from '@/shared/ui';
 import { UserRole } from '@/shared/types';
@@ -18,7 +19,10 @@ const LIMIT = 20;
  * celý tab je za RoleGuardem Admin+, hierarchii rolí hlídá modal + BE).
  */
 export function UsersAdminTab() {
-  const [search, setSearch] = useState('');
+  // Prefill z URL (?search=) — deep-link „Otevřít v administraci" z profilu.
+  // Init-only: další změny hledání zůstávají v lokálním stavu.
+  const [params] = useSearchParams();
+  const [search, setSearch] = useState(() => params.get('search') ?? '');
   const [roleFilter, setRoleFilter] = useState<UserRole | undefined>(undefined);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [page, setPage] = useState(1);

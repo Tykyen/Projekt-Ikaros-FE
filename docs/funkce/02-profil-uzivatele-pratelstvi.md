@@ -56,7 +56,7 @@
 - **Co jde dělat:**
   - Zobrazí: hlavička, karta (role, počet světů, lastSeenAt), bio, postava v Campu (characterName/Bio/avatar).
   - Self-banner pokud `id === me.id`. Tombstone banner (pending/deleted) JEN pro admina.
-  - **Akce (`PublicProfileActions`):** dle friendship statusu — „Přidat do přátel" / „Žádost čeká · Zrušit" / „Přijmout"+„Odmítnout" / „Přátelé · Odebrat" (confirm) / „Odblokovat"; kebab „Blokovat uživatele" (confirm); „Napsat zprávu" (→ `/ikaros/posta?komu=`); admin: „Otevřít v administraci".
+  - **Akce (`PublicProfileActions`):** dle friendship statusu — „Přidat do přátel" / „Žádost čeká · Zrušit" / „Přijmout"+„Odmítnout" / „Přátelé · Odebrat" (confirm) / „Odblokovat"; kebab „Blokovat uživatele" (confirm); „Napsat zprávu" (→ `/ikaros/posta?komu=`); admin: „Otevřít v administraci" (→ `/admin?tab=uzivatele&search=<username>`, předvyplní hledání v admin tabulce; do 2026-07-13 vedlo na zastaralou `/ikaros/uzivatele?view=table`, mrtvou od relokace 12.1).
 - **Kdo vidí (BE `publicProfileV14`):**
   - Tombstone (`isDeleted`) i pending-deletion → ne-admin dostane 404, admin vidí s `deleted`/`pendingDeletion` flagy.
   - `profileVisibility:'friends'` → nepřítel (a ne-admin, ne-self) dostane 403 `PROFILE_FRIENDS_ONLY`.

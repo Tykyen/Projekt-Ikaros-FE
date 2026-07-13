@@ -154,7 +154,7 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
 
 ### Tab Uživatelé (správa)
 - **Co to je:** filtrovatelná tabulka uživatelů + per-řádek a bulk akce.
-- **Kde:** `components/UsersAdminTab/UsersAdminTab.tsx` → `users/components/UsersTab/UsersTable.tsx`. Data `GET /admin/users`.
+- **Kde:** `components/UsersAdminTab/UsersAdminTab.tsx` → `users/components/UsersTab/UsersTable.tsx`. Data `GET /admin/users`. Deep-link `?tab=uzivatele&search=<username>` předvyplní hledání (init-only; přepnutí tabu param zahodí) — používá „Otevřít v administraci" z veřejného profilu.
 - **Kdo:** FE RoleGuard. BE všechny endpointy `AdminGuard`; navíc per-akce hierarchy check.
 - **Co jde dělat (per řádek):**
   - **Změna role** (dropdown, jen 6 globálních rolí `ASSIGNABLE_ROLES`). `PATCH /admin/users/:id/role`.

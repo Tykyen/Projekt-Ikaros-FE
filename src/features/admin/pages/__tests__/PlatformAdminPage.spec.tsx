@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import PlatformAdminPage from '../PlatformAdminPage';
 
 // Těžké taby mockujeme — testujeme jen logiku hubu (default tab, přepínání, URL).
@@ -63,5 +63,20 @@ describe('PlatformAdminPage (12.1 hub)', () => {
     renderAt('/admin');
     fireEvent.click(screen.getByRole('tab', { name: /Uživatelé/ }));
     expect(screen.getByText('UŽIVATELÉ PANEL')).toBeTruthy();
+  });
+
+  it('přepnutí tabu zahodí ?search= (prefill z profilu nepatří jinam)', () => {
+    function LocationProbe() {
+      const loc = useLocation();
+      return <div data-testid="loc">{loc.search}</div>;
+    }
+    render(
+      <MemoryRouter initialEntries={['/admin?tab=uzivatele&search=Foo']}>
+        <PlatformAdminPage />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: /Přehled/ }));
+    expect(screen.getByTestId('loc').textContent).toBe('?tab=prehled');
   });
 });

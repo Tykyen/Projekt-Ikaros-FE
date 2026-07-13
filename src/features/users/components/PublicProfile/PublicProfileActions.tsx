@@ -211,8 +211,10 @@ export function PublicProfileActions({
           <Button
             className={s.actionBtn}
             onClick={() =>
+              // 12.1 — admin správa žije pod /admin; search=username předvyplní
+              // hledání (server-side paginace, focus na řádek by nefungoval).
               navigate(
-                `/ikaros/uzivatele?tab=uzivatele&view=table&focus=${profileId}`,
+                `/admin?tab=uzivatele&search=${encodeURIComponent(username)}`,
               )
             }
           >
