@@ -89,6 +89,9 @@ const KomunitniBestieDetailPage = withSchemas(() => import('@/features/ikaros/be
 // 21.5b — komunitní (globální) herbář (nahrazuje stub `ikaros/herbar`).
 const KomunitniHerbarPage       = lazy(() => import('@/features/ikaros/herbar/KomunitniHerbarPage'));
 const KomunitniPlantDetailPage  = lazy(() => import('@/features/ikaros/herbar/KomunitniPlantDetailPage'));
+// 21.5c — komunitní katalog kouzel (nahrazuje stub `ikaros/kouzla`).
+const KomunitniKouzlaPage       = lazy(() => import('@/features/ikaros/kouzla/KomunitniKouzlaPage'));
+const KomunitniKouzloDetailPage = lazy(() => import('@/features/ikaros/kouzla/KomunitniKouzloDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -220,7 +223,9 @@ export const router = createBrowserRouter([
       { path: 'ikaros/herbar',          element: p(KomunitniHerbarPage) },
       { path: 'ikaros/herbar/:id',      element: p(KomunitniPlantDetailPage) },
       { path: 'ikaros/lektvary',        element: p(ComingSoonPage) },
-      { path: 'ikaros/kouzla',          element: p(ComingSoonPage) },
+      // 21.5c — komunitní katalog kouzel (list + detail) nahrazuje stub.
+      { path: 'ikaros/kouzla',          element: p(KomunitniKouzlaPage) },
+      { path: 'ikaros/kouzla/:id',      element: p(KomunitniKouzloDetailPage) },
       { path: 'ikaros/hadanky',         element: p(ComingSoonPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'ikaros/podporovatele',   element: p(SupportersPage) },

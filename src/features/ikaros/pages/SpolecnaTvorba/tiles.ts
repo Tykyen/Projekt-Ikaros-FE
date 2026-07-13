@@ -91,7 +91,7 @@ export const TVORBA_TILES: TvorbaTile[] = [
     description: 'Magické formule a jejich efekty.',
     to: '/ikaros/kouzla',
     icon: Sparkles,
-    active: false,
+    active: true,
   },
   {
     key: 'hadanky',

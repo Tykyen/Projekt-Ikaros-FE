@@ -10,6 +10,7 @@ import {
   MessagesSquare,
   BookOpen,
   Leaf,
+  Sparkles,
   Image,
   Newspaper,
   CalendarDays,
@@ -227,11 +228,11 @@ export function PlatformSection() {
           <p>
             Jedno tlačítko v hlavním menu, které otevře rozcestník veškeré
             komunitní tvorby. Najdeš tu dlaždice na <strong>Diskuze</strong>,{' '}
-            <strong>Články</strong>, <strong>Galerii</strong> a{' '}
-            <strong>Bestiář</strong> (fungují) a připravované sekce{' '}
-            <strong>Herbář, Lektvary, Kouzla</strong> a <strong>Hádanky</strong> —
-            ty zatím nesou štítek „Připravujeme". RPG systémy mají v menu vlastní
-            tlačítko.
+            <strong>Články</strong>, <strong>Galerii</strong>,{' '}
+            <strong>Bestiář</strong>, <strong>Herbář</strong> a{' '}
+            <strong>Kouzla</strong> (fungují) a připravované sekce{' '}
+            <strong>Lektvary</strong> a <strong>Hádanky</strong> — ty zatím nesou
+            štítek „Připravujeme". RPG systémy mají v menu vlastní tlačítko.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Globální bestiář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
@@ -279,6 +280,27 @@ export function PlatformSection() {
             obchodu"). Vzniknou z nich položky ceníku (obrázek a popis se přenesou,
             cenu doladíš v obchodě). Vkládat může jen <strong>PJ nebo Pomocný PJ</strong>{' '}
             daného světa.
+          </p>
+        </Tool>
+        <Tool icon={<Sparkles size={16} />} title="Komunitní kouzla" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="corrector">
+          <p>
+            Sdílený katalog <strong>vlastních kouzel</strong> hráčů (ve „Společné
+            tvorbě"). Dvě knihovny: <strong>Schválená</strong> (přijatá kouzla,
+            vyvážená systém po systému) a <strong>Návrhy</strong> (komunitní,
+            zatím neschválené). Kouzlo má společný základ — název, popis účinku a
+            obrázek — a k tomu <strong>záložky s pravidly pro jednotlivé herní
+            systémy</strong> (D&amp;D 5e, Dračí doupě, Jeskyně a draci, Dračí
+            hlídka…). Každý systém má vlastní pole podle svých pravidel
+            (magenergie, dosah, složky, odliv…) a vždy <strong>školu magie</strong>.
+            Filtruješ podle systému a školy.
+          </p>
+          <p>
+            Nové kouzlo založíš jako <strong>návrh</strong>; pro další systém jde{' '}
+            <strong>navrhnout pravidlová verze</strong>. Pod kouzlem i pod každou
+            pravidlovou verzí běží <strong>diskuse</strong> — tam se ladí vyvážení,
+            než verzi správce schválí. Popis a obrázek se mění volně; schválenou
+            pravidlovou verzi upravuje jen správce. Katalog je pro vlastní tvorbu —
+            <strong> nepřepisuj sem kouzla z oficiálních příruček</strong>.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

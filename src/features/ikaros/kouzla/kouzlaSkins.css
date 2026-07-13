@@ -1,0 +1,15 @@
+/* 21.5c — Skiny komunitního katalogu kouzel pro platformové motivy.
+   Globální CSS (NE module) — scoped přes platformový [data-theme] (na .shell)
+   + STABILNÍ data-atributy kostry:
+     [data-spell-scope]     — kořen listu (KomunitniKouzlaPage)
+     [data-lib-tab]         — hřbety knihoven (approved / drafts)
+     [data-kouzla-list]     — rejstřík (ul)
+     [data-kouzla-row]      — řádek rejstříku (li)
+     [data-spell-portrait]  — iluminace/ikona kouzla (list i detail)
+     [data-spell-card]      — karta detailu kouzla
+     [data-spell-statblock] — statblok pravidlové verze
+     [data-spell-school]    — badge školy magie
+   Barvy/fonty ze STABILNÍCH tokenů (--accent, --text-primary, --theme-surface,
+   --font-display…) — fungují napříč platformovými motivy; TVAR + ornament per
+   motiv (NE přebarvení). Per-theme pravidla se doplní přes `skin` workflow
+   (analogicky komunitniBestiarSkins.css) — teď jen kontrakt kostry. */
