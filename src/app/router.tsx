@@ -79,9 +79,9 @@ const NaboryPage           = lazy(() => import('@/features/ikaros/pages/NaboryPa
 const NaborNovaPage        = lazy(() => import('@/features/ikaros/pages/NaborNovaPage'));
 // 3.7 — `/ikaros/oblibene` stránka oblíbeného obsahu (záložky napříč moduly).
 const FavoritesPage        = lazy(() => import('@/features/ikaros/pages/FavoritesPage'));
-// 21.5 — „Společná tvorba" rozcestník + sdílený stub „Připravujeme".
+// 21.5 — „Společná tvorba" rozcestník (21.5d dokončil poslední knihovnu —
+// sdílený stub ComingSoonPage už žádná route nepoužívá).
 const TvorbaHubPage        = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/TvorbaHubPage'));
-const ComingSoonPage       = lazy(() => import('@/features/ikaros/pages/SpolecnaTvorba/ComingSoonPage'));
 // 16.2b-2 — komunitní (globální) bestiář (nahrazuje stub `ikaros/bestiar`).
 // withSchemas: čtou systemEntitySchemaRegistry (statblocky per systém).
 const KomunitniBestiarPage      = withSchemas(() => import('@/features/ikaros/bestiar/KomunitniBestiarPage'));
@@ -92,6 +92,15 @@ const KomunitniPlantDetailPage  = lazy(() => import('@/features/ikaros/herbar/Ko
 // 21.5c — komunitní katalog kouzel (nahrazuje stub `ikaros/kouzla`).
 const KomunitniKouzlaPage       = lazy(() => import('@/features/ikaros/kouzla/KomunitniKouzlaPage'));
 const KomunitniKouzloDetailPage = lazy(() => import('@/features/ikaros/kouzla/KomunitniKouzloDetailPage'));
+// 21.5b — komunitní katalog lektvarů (nahrazuje stub `ikaros/lektvary`).
+const KomunitniLektvaryPage      = lazy(() => import('@/features/ikaros/lektvary/KomunitniLektvaryPage'));
+const KomunitniLektvarDetailPage = lazy(() => import('@/features/ikaros/lektvary/KomunitniLektvarDetailPage'));
+// 21.5e — komunitní katalog předmětů (nová knihovna, realizace „items" z 21.1).
+const KomunitniPredmetyPage      = lazy(() => import('@/features/ikaros/predmety/KomunitniPredmetyPage'));
+const KomunitniPredmetDetailPage = lazy(() => import('@/features/ikaros/predmety/KomunitniPredmetDetailPage'));
+// 21.5d — komunitní katalog hádanek (nahrazuje poslední stub `ikaros/hadanky`).
+const KomunitniHadankyPage       = lazy(() => import('@/features/ikaros/hadanky/KomunitniHadankyPage'));
+const KomunitniHadankaDetailPage = lazy(() => import('@/features/ikaros/hadanky/KomunitniHadankaDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -213,8 +222,7 @@ export const router = createBrowserRouter([
       { path: 'ikaros/galerie/nahrat',        element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id/upravit',   element: p(GalleryUploadPage), loader: requireAuth },
       { path: 'ikaros/galerie/:id',           element: p(GalleryDetailPage) },
-      // 21.5 — „Společná tvorba" hub (veřejný) + stuby nepostavených knihoven.
-      // Stuby vedou na sdílenou ComingSoonPage (kontext čte z pathname).
+      // 21.5 — „Společná tvorba" hub (veřejný); všech 6 knihoven už žije.
       { path: 'ikaros/tvorba',          element: p(TvorbaHubPage) },
       // 16.2b-2 — komunitní bestiář (list + detail) nahrazuje stub.
       { path: 'ikaros/bestiar',         element: p(KomunitniBestiarPage) },
@@ -222,11 +230,18 @@ export const router = createBrowserRouter([
       // 21.5b — komunitní herbář (list + detail) nahrazuje stub.
       { path: 'ikaros/herbar',          element: p(KomunitniHerbarPage) },
       { path: 'ikaros/herbar/:id',      element: p(KomunitniPlantDetailPage) },
-      { path: 'ikaros/lektvary',        element: p(ComingSoonPage) },
+      // 21.5b — komunitní katalog lektvarů (list + detail) nahrazuje stub.
+      { path: 'ikaros/lektvary',        element: p(KomunitniLektvaryPage) },
+      { path: 'ikaros/lektvary/:id',    element: p(KomunitniLektvarDetailPage) },
       // 21.5c — komunitní katalog kouzel (list + detail) nahrazuje stub.
       { path: 'ikaros/kouzla',          element: p(KomunitniKouzlaPage) },
       { path: 'ikaros/kouzla/:id',      element: p(KomunitniKouzloDetailPage) },
-      { path: 'ikaros/hadanky',         element: p(ComingSoonPage) },
+      // 21.5e — komunitní katalog předmětů (nová knihovna).
+      { path: 'ikaros/predmety',        element: p(KomunitniPredmetyPage) },
+      { path: 'ikaros/predmety/:id',    element: p(KomunitniPredmetDetailPage) },
+      // 21.5d — komunitní katalog hádanek (list + detail) nahrazuje poslední stub.
+      { path: 'ikaros/hadanky',         element: p(KomunitniHadankyPage) },
+      { path: 'ikaros/hadanky/:id',     element: p(KomunitniHadankaDetailPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'ikaros/podporovatele',   element: p(SupportersPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug

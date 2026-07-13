@@ -1,9 +1,9 @@
 /**
- * 21.5c — detail komunitního kouzla („karta kouzla").
- * Jádro (obrázek + oznámení) + pravidlové záložky (systémy ze `statblocks`) +
- * statblok render dle šablony + dvouúrovňová diskuse + akce (upravit jádro /
- * návrh statbloku / schvalování kurátorem / smazání / nahlásit).
- * Vzor: KomunitniBestieDetailPage.
+ * 21.5e — detail komunitního předmětu („karta předmětu").
+ * Jádro (obrázek + druh + oznámení) + pravidlové záložky (statblocky per
+ * systém; varianta polí dle druhu jádra) + dvouúrovňová diskuse + akce
+ * (vlož do obchodu / upravit / návrh statbloku / schvalování / smazání /
+ * nahlásit). Vzor: KomunitniLektvarDetailPage (21.5b); layout CSS reuse.
  */
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -13,19 +13,17 @@ import { Breadcrumbs, Button } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
-import { SpellDiscussion } from './components/SpellDiscussion';
-import { SpellEditorModal } from './components/SpellEditorModal';
-import { ProposeSpellStatblockModal } from './components/ProposeSpellStatblockModal';
-import { SpellStatblockView } from './components/SpellStatblockView';
-import {
-  getSpellTemplate,
-  spellSchool,
-  spellSystemLabel,
-} from './systems/spellTemplates';
-import { useKouzlo } from './hooks/useKouzla';
-import { useKouzlaMutations } from './hooks/useKouzlaMutations';
-import s from './KomunitniKouzloDetail.module.css';
-import './kouzlaSkins.css';
+import { SpellStatblockView } from '../kouzla/components/SpellStatblockView';
+import { InsertToShopModal } from '../herbar/components/InsertToShopModal';
+import { catalogItemToShopInsert } from './shopInsert';
+import { ItemDiscussion } from './components/ItemDiscussion';
+import { ItemEditorModal } from './components/ItemEditorModal';
+import { ProposeItemStatblockModal } from './components/ProposeItemStatblockModal';
+import { getItemTemplate, itemSystemLabel } from './systems/itemTemplates';
+import { usePredmet } from './hooks/usePredmety';
+import { usePredmetyMutations } from './hooks/usePredmetyMutations';
+import s from '../kouzla/KomunitniKouzloDetail.module.css';
+import './predmetySkins.css';
 
 const CURATOR_ROLES = [
   UserRole.Superadmin,
@@ -34,51 +32,50 @@ const CURATOR_ROLES = [
   UserRole.SpravceDiskuzi,
 ];
 
-export default function KomunitniKouzloDetailPage() {
+export default function KomunitniPredmetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: spell, isLoading, isError } = useKouzlo(id ?? null);
+  const { data: item, isLoading, isError } = usePredmet(id ?? null);
   const user = useAtomValue(currentUserAtom);
-  const { approveSb, approve, remove } = useKouzlaMutations();
+  const { approveSb, approve, remove } = usePredmetyMutations();
   const [activeSystem, setActiveSystem] = useState<string | null>(null);
   const [modal, setModal] = useState<
-    null | 'editLore' | 'propose' | 'editStats'
+    null | 'editLore' | 'propose' | 'editStats' | 'shop'
   >(null);
 
   if (isLoading) return <p className={s.state}>Načítám…</p>;
-  if (isError || !spell)
+  if (isError || !item)
     return (
       <p className={s.state}>
-        Kouzlo nenalezeno. <Link to="/ikaros/kouzla">Zpět na knihovnu</Link>
+        Předmět nenalezen. <Link to="/ikaros/predmety">Zpět na knihovnu</Link>
       </p>
     );
 
-  const systemIds = spell.statblocks ? Object.keys(spell.statblocks) : [];
+  const systemIds = item.statblocks ? Object.keys(item.statblocks) : [];
   const activeSys =
     activeSystem && systemIds.includes(activeSystem)
       ? activeSystem
       : (systemIds[0] ?? null);
-  const activeSb = activeSys ? spell.statblocks?.[activeSys] : undefined;
+  const activeSb = activeSys ? item.statblocks?.[activeSys] : undefined;
 
   const isAuth = Boolean(user);
   const isCurator = !!user && CURATOR_ROLES.includes(user.role);
-  const isAuthor = !!user && user.id === spell.authorId;
+  const isAuthor = !!user && user.id === item.authorId;
   const canEditLore = isAuthor || isCurator;
-  const canDelete = isCurator || (isAuthor && spell.status === 'draft');
+  const canDelete = isCurator || (isAuthor && item.status === 'draft');
 
-  const desc = (spell.description ?? '').trim();
-  const school = activeSb ? spellSchool(activeSb.systemStats) : '';
+  const desc = (item.description ?? '').trim();
   const crumbs = [
     { label: 'Domů', href: '/' },
     { label: 'Společná tvorba', href: '/ikaros/tvorba' },
-    { label: 'Kouzla', href: '/ikaros/kouzla' },
-    { label: spell.name },
+    { label: 'Předměty', href: '/ikaros/predmety' },
+    { label: item.name },
   ];
 
   const onDelete = () => {
-    if (!window.confirm(`Opravdu smazat kouzlo „${spell.name}"?`)) return;
-    remove.mutate(spell.id, {
-      onSuccess: () => navigate('/ikaros/kouzla'),
+    if (!window.confirm(`Opravdu smazat předmět „${item.name}"?`)) return;
+    remove.mutate(item.id, {
+      onSuccess: () => navigate('/ikaros/predmety'),
     });
   };
 
@@ -86,32 +83,35 @@ export default function KomunitniKouzloDetailPage() {
     <article className={s.page}>
       <Breadcrumbs items={crumbs} />
 
-      <div className={s.tome} data-spell-card="">
+      <div className={s.tome} data-item-card="">
         <div className={s.top}>
-          <Link to="/ikaros/kouzla" className={s.back}>
+          <Link to="/ikaros/predmety" className={s.back}>
             ← Zpět na knihovnu
           </Link>
-          <span className={s.stateBadge} data-status={spell.status}>
-            {spell.status === 'approved'
-              ? '✔ Schválené kouzlo'
+          <span className={s.stateBadge} data-status={item.status}>
+            {item.status === 'approved'
+              ? '✔ Schválený předmět'
               : '✎ Návrh — neověřeno'}
           </span>
         </div>
 
         {isAuth ? (
           <div className={s.actions}>
+            <Button variant="primary" onClick={() => setModal('shop')}>
+              ＋ Vlož do obchodu
+            </Button>
             {canEditLore ? (
               <Button variant="ghost" onClick={() => setModal('editLore')}>
-                ✎ Upravit kouzlo
+                ✎ Upravit předmět
               </Button>
             ) : null}
-            {isCurator && spell.status === 'draft' ? (
+            {isCurator && item.status === 'draft' ? (
               <Button
                 variant="ghost"
                 loading={approve.isPending}
-                onClick={() => approve.mutate(spell.id)}
+                onClick={() => approve.mutate(item.id)}
               >
-                ✔ Schválit kouzlo
+                ✔ Schválit předmět
               </Button>
             ) : null}
             {canDelete ? (
@@ -123,34 +123,30 @@ export default function KomunitniKouzloDetailPage() {
                 🗑 Smazat
               </Button>
             ) : null}
-            {/* Jméno autora entita nenese → neutrální label (parita bestiář). */}
+            {/* Jméno autora entita nenese → neutrální label (parity bestiář). */}
             <ReportButton
-              targetType="spell"
-              targetId={spell.id}
-              targetSnapshot={spell.name}
-              targetAuthorName="Autor kouzla"
-              targetAuthorId={spell.authorId}
+              targetType="item"
+              targetId={item.id}
+              targetSnapshot={item.name}
+              targetAuthorName="Autor předmětu"
+              targetAuthorId={item.authorId}
             />
           </div>
         ) : null}
 
         <header className={s.beastTitle}>
-          {spell.aliases ? <div className={s.latin}>{spell.aliases}</div> : null}
-          <h1 className={s.name}>{spell.name}</h1>
-          {school ? (
-            <div className={s.kind} data-spell-school="">
-              {school}
-            </div>
-          ) : null}
+          {item.aliases ? <div className={s.latin}>{item.aliases}</div> : null}
+          <h1 className={s.name}>{item.name}</h1>
+          {item.kind ? <div className={s.kind}>{item.kind}</div> : null}
         </header>
 
         <div className={s.spread}>
-          <div className={s.illus} data-spell-portrait="">
-            {spell.imageUrl ? (
-              <img src={spell.imageUrl} alt={spell.name} />
+          <div className={s.illus} data-item-portrait="">
+            {item.imageUrl ? (
+              <img src={item.imageUrl} alt={item.name} />
             ) : (
               <span className={s.illusFallback} aria-hidden="true">
-                ✦
+                ⚔
               </span>
             )}
           </div>
@@ -161,7 +157,7 @@ export default function KomunitniKouzloDetailPage() {
                 {desc.slice(1)}
               </p>
             ) : (
-              <p className={s.empty}>Kouzlo zatím nemá popis.</p>
+              <p className={s.empty}>Předmět zatím nemá popis.</p>
             )}
           </div>
         </div>
@@ -169,10 +165,12 @@ export default function KomunitniKouzloDetailPage() {
         {systemIds.length > 0 ? (
           <>
             <div className={s.rulesHead}>
-              <div className={s.rulesLabel}>Pravidla podle herního systému</div>
+              <div className={s.rulesLabel}>
+                Mechanika podle herního systému
+              </div>
               <div className={s.tabs} data-ruleset-tabs="" role="tablist">
                 {systemIds.map((sy) => {
-                  const draft = spell.statblocks?.[sy]?.status === 'draft';
+                  const draft = item.statblocks?.[sy]?.status === 'draft';
                   return (
                     <button
                       key={sy}
@@ -182,8 +180,10 @@ export default function KomunitniKouzloDetailPage() {
                       className={clsx(s.tab, draft && s.tabDraft)}
                       onClick={() => setActiveSystem(sy)}
                     >
-                      {spellSystemLabel(sy)}
-                      {draft ? <span className={s.tabFlag}> · návrh</span> : null}
+                      {itemSystemLabel(sy)}
+                      {draft ? (
+                        <span className={s.tabFlag}> · návrh</span>
+                      ) : null}
                     </button>
                   );
                 })}
@@ -213,7 +213,7 @@ export default function KomunitniKouzloDetailPage() {
                         loading={approveSb.isPending}
                         onClick={() =>
                           approveSb.mutate({
-                            id: spell.id,
+                            id: item.id,
                             systemId: activeSys,
                           })
                         }
@@ -225,32 +225,35 @@ export default function KomunitniKouzloDetailPage() {
                 ) : null}
                 {isCurator ? (
                   <div className={s.actions}>
-                    <Button variant="ghost" onClick={() => setModal('editStats')}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setModal('editStats')}
+                    >
                       ✎ Upravit statblok
                     </Button>
                   </div>
                 ) : null}
 
                 <SpellStatblockView
-                  template={getSpellTemplate(activeSys)}
+                  template={getItemTemplate(activeSys, item.kind)}
                   systemStats={activeSb.systemStats}
                 />
 
-                <SpellDiscussion
+                <ItemDiscussion
                   key={activeSys}
-                  spellId={spell.id}
+                  itemId={item.id}
                   targetType="statblock"
                   systemId={activeSys}
                   title="Diskuse ke statbloku"
-                  scopeNote={`jen k verzi ${spellSystemLabel(activeSys)}`}
-                  placeholder={`Napiš k verzi ${spellSystemLabel(activeSys)}…`}
+                  scopeNote={`jen k verzi ${itemSystemLabel(activeSys)}`}
+                  placeholder={`Napiš k verzi ${itemSystemLabel(activeSys)}…`}
                 />
               </div>
             ) : null}
           </>
         ) : (
           <div className={s.empty}>
-            Pro tohle kouzlo zatím není žádná pravidlová verze.
+            Pro tenhle předmět zatím není žádná pravidlová verze.
             {isAuth ? (
               <div className={s.emptyAction}>
                 <Button variant="primary" onClick={() => setModal('propose')}>
@@ -261,32 +264,37 @@ export default function KomunitniKouzloDetailPage() {
           </div>
         )}
 
-        <SpellDiscussion
-          spellId={spell.id}
-          targetType="spell"
-          title="Diskuse o kouzle"
+        <ItemDiscussion
+          itemId={item.id}
+          targetType="item"
+          title="Diskuse o předmětu"
           scopeNote="lore & obecně, napříč systémy"
-          placeholder="Napiš o kouzle (lore, použití, nápady)…"
+          placeholder="Napiš o předmětu (lore, použití, nápady)…"
         />
       </div>
 
       {modal === 'editLore' ? (
-        <SpellEditorModal
+        <ItemEditorModal
           mode="editLore"
-          spell={spell}
+          item={item}
           onClose={() => setModal(null)}
         />
       ) : null}
       {modal === 'propose' ? (
-        <ProposeSpellStatblockModal
-          spell={spell}
+        <ProposeItemStatblockModal item={item} onClose={() => setModal(null)} />
+      ) : null}
+      {modal === 'editStats' && activeSys ? (
+        <ProposeItemStatblockModal
+          item={item}
+          editSystemId={activeSys}
           onClose={() => setModal(null)}
         />
       ) : null}
-      {modal === 'editStats' && activeSys ? (
-        <ProposeSpellStatblockModal
-          spell={spell}
-          editSystemId={activeSys}
+      {modal === 'shop' ? (
+        <InsertToShopModal
+          mode="single"
+          items={[catalogItemToShopInsert(item)]}
+          nounMany="předmětů"
           onClose={() => setModal(null)}
         />
       ) : null}

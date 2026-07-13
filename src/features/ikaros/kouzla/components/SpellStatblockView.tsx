@@ -1,25 +1,24 @@
 /**
- * 21.5c — read-only render statbloku kouzla dle šablony systému. Škola jako
- * badge nahoře, ostatní pole jako řádky popisek : hodnota (vzor karet kouzel
- * z příruček). Neznámé klíče mimo šablonu vypíše taky (forward-kompat, když
- * se šablona časem změní).
+ * 21.5c — read-only render statbloku dle šablony systému. Škola (je-li ve
+ * statech) jako badge nahoře, ostatní pole jako řádky popisek : hodnota (vzor
+ * karet z příruček). Neznámé klíče mimo šablonu vypíše taky (forward-kompat).
+ * Generické nad `SpellSystemTemplate` — reuse i pro lektvary (21.5b).
  */
 import {
   SPELL_EXTRA_KEY,
   formatSpellValue,
-  getSpellTemplate,
   spellExtras,
   spellSchool,
+  type SpellSystemTemplate,
 } from '../systems/spellTemplates';
 import s from './SpellStatblockView.module.css';
 
 interface Props {
-  systemId: string;
+  template: SpellSystemTemplate;
   systemStats: Record<string, unknown>;
 }
 
-export function SpellStatblockView({ systemId, systemStats }: Props) {
-  const template = getSpellTemplate(systemId);
+export function SpellStatblockView({ template, systemStats }: Props) {
   const school = spellSchool(systemStats);
   const known = new Set([
     'school',

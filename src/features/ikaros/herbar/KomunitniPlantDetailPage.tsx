@@ -15,6 +15,7 @@ import { useKomunitniPlant } from './hooks/useKomunitniHerbar';
 import { useKomunitniHerbarMutations } from './hooks/useKomunitniHerbarMutations';
 import { PlantEditorModal } from './components/PlantEditorModal';
 import { InsertToShopModal } from './components/InsertToShopModal';
+import { plantToShopInsert } from './shopInsert';
 import { rarityLabel } from './types';
 import s from './KomunitniPlantDetail.module.css';
 import './herbarSkins.css';
@@ -192,7 +193,8 @@ export default function KomunitniPlantDetailPage() {
       {insertingToShop ? (
         <InsertToShopModal
           mode="single"
-          plants={[plant]}
+          items={[plantToShopInsert(plant)]}
+          nounMany="rostlin"
           onClose={() => setInsertingToShop(false)}
         />
       ) : null}

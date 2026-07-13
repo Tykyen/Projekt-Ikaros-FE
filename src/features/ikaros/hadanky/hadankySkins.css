@@ -1,0 +1,12 @@
+/* 21.5d — Skiny komunitního katalogu hádanek pro platformové motivy.
+   Globální CSS (NE module) — scoped přes platformový [data-theme] (na .shell)
+   + STABILNÍ data-atributy kostry:
+     [data-riddle-scope]   — kořen listu (KomunitniHadankyPage)
+     [data-lib-tab]        — hřbety knihoven (approved / drafts)
+     [data-hadanky-list]   — rejstřík (ul)
+     [data-hadanky-row]    — řádek rejstříku (li)
+     [data-riddle-card]    — karta detailu hádanky
+     [data-riddle-reveal]  — spoiler blok (nápovědy + odpověď)
+     [data-riddle-answer]  — odhalená odpověď
+   Barvy/fonty ze STABILNÍCH tokenů; TVAR + ornament per motiv (NE přebarvení).
+   Per-theme pravidla přes `skin` workflow — teď jen kontrakt kostry. */

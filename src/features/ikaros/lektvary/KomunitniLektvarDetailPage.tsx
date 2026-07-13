@@ -1,9 +1,9 @@
 /**
- * 21.5c — detail komunitního kouzla („karta kouzla").
- * Jádro (obrázek + oznámení) + pravidlové záložky (systémy ze `statblocks`) +
- * statblok render dle šablony + dvouúrovňová diskuse + akce (upravit jádro /
- * návrh statbloku / schvalování kurátorem / smazání / nahlásit).
- * Vzor: KomunitniBestieDetailPage.
+ * 21.5b — detail komunitního lektvaru („karta lektvaru").
+ * Jádro (obrázek + druh + suroviny + oznámení) + pravidlové záložky
+ * (statblocky per systém, reuse view kouzel) + dvouúrovňová diskuse + akce
+ * (vlož do obchodu / upravit / návrh statbloku / schvalování / smazání /
+ * nahlásit). Vzor: KomunitniKouzloDetailPage (21.5c); layout CSS reuse.
  */
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -13,19 +13,21 @@ import { Breadcrumbs, Button } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
-import { SpellDiscussion } from './components/SpellDiscussion';
-import { SpellEditorModal } from './components/SpellEditorModal';
-import { ProposeSpellStatblockModal } from './components/ProposeSpellStatblockModal';
-import { SpellStatblockView } from './components/SpellStatblockView';
+import { SpellStatblockView } from '../kouzla/components/SpellStatblockView';
+import { InsertToShopModal } from '../herbar/components/InsertToShopModal';
+import { potionToShopInsert } from './shopInsert';
+import { PotionDiscussion } from './components/PotionDiscussion';
+import { PotionEditorModal } from './components/PotionEditorModal';
+import { ProposePotionStatblockModal } from './components/ProposePotionStatblockModal';
+import { IngredientsCard } from './components/IngredientsCard';
 import {
-  getSpellTemplate,
-  spellSchool,
-  spellSystemLabel,
-} from './systems/spellTemplates';
-import { useKouzlo } from './hooks/useKouzla';
-import { useKouzlaMutations } from './hooks/useKouzlaMutations';
-import s from './KomunitniKouzloDetail.module.css';
-import './kouzlaSkins.css';
+  getPotionTemplate,
+  potionSystemLabel,
+} from './systems/potionTemplates';
+import { useLektvar } from './hooks/useLektvary';
+import { useLektvaryMutations } from './hooks/useLektvaryMutations';
+import s from '../kouzla/KomunitniKouzloDetail.module.css';
+import './lektvarySkins.css';
 
 const CURATOR_ROLES = [
   UserRole.Superadmin,
@@ -34,51 +36,50 @@ const CURATOR_ROLES = [
   UserRole.SpravceDiskuzi,
 ];
 
-export default function KomunitniKouzloDetailPage() {
+export default function KomunitniLektvarDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: spell, isLoading, isError } = useKouzlo(id ?? null);
+  const { data: potion, isLoading, isError } = useLektvar(id ?? null);
   const user = useAtomValue(currentUserAtom);
-  const { approveSb, approve, remove } = useKouzlaMutations();
+  const { approveSb, approve, remove } = useLektvaryMutations();
   const [activeSystem, setActiveSystem] = useState<string | null>(null);
   const [modal, setModal] = useState<
-    null | 'editLore' | 'propose' | 'editStats'
+    null | 'editLore' | 'propose' | 'editStats' | 'shop'
   >(null);
 
   if (isLoading) return <p className={s.state}>Načítám…</p>;
-  if (isError || !spell)
+  if (isError || !potion)
     return (
       <p className={s.state}>
-        Kouzlo nenalezeno. <Link to="/ikaros/kouzla">Zpět na knihovnu</Link>
+        Lektvar nenalezen. <Link to="/ikaros/lektvary">Zpět na knihovnu</Link>
       </p>
     );
 
-  const systemIds = spell.statblocks ? Object.keys(spell.statblocks) : [];
+  const systemIds = potion.statblocks ? Object.keys(potion.statblocks) : [];
   const activeSys =
     activeSystem && systemIds.includes(activeSystem)
       ? activeSystem
       : (systemIds[0] ?? null);
-  const activeSb = activeSys ? spell.statblocks?.[activeSys] : undefined;
+  const activeSb = activeSys ? potion.statblocks?.[activeSys] : undefined;
 
   const isAuth = Boolean(user);
   const isCurator = !!user && CURATOR_ROLES.includes(user.role);
-  const isAuthor = !!user && user.id === spell.authorId;
+  const isAuthor = !!user && user.id === potion.authorId;
   const canEditLore = isAuthor || isCurator;
-  const canDelete = isCurator || (isAuthor && spell.status === 'draft');
+  const canDelete = isCurator || (isAuthor && potion.status === 'draft');
 
-  const desc = (spell.description ?? '').trim();
-  const school = activeSb ? spellSchool(activeSb.systemStats) : '';
+  const desc = (potion.description ?? '').trim();
   const crumbs = [
     { label: 'Domů', href: '/' },
     { label: 'Společná tvorba', href: '/ikaros/tvorba' },
-    { label: 'Kouzla', href: '/ikaros/kouzla' },
-    { label: spell.name },
+    { label: 'Lektvary', href: '/ikaros/lektvary' },
+    { label: potion.name },
   ];
 
   const onDelete = () => {
-    if (!window.confirm(`Opravdu smazat kouzlo „${spell.name}"?`)) return;
-    remove.mutate(spell.id, {
-      onSuccess: () => navigate('/ikaros/kouzla'),
+    if (!window.confirm(`Opravdu smazat lektvar „${potion.name}"?`)) return;
+    remove.mutate(potion.id, {
+      onSuccess: () => navigate('/ikaros/lektvary'),
     });
   };
 
@@ -86,32 +87,35 @@ export default function KomunitniKouzloDetailPage() {
     <article className={s.page}>
       <Breadcrumbs items={crumbs} />
 
-      <div className={s.tome} data-spell-card="">
+      <div className={s.tome} data-potion-card="">
         <div className={s.top}>
-          <Link to="/ikaros/kouzla" className={s.back}>
+          <Link to="/ikaros/lektvary" className={s.back}>
             ← Zpět na knihovnu
           </Link>
-          <span className={s.stateBadge} data-status={spell.status}>
-            {spell.status === 'approved'
-              ? '✔ Schválené kouzlo'
+          <span className={s.stateBadge} data-status={potion.status}>
+            {potion.status === 'approved'
+              ? '✔ Schválený lektvar'
               : '✎ Návrh — neověřeno'}
           </span>
         </div>
 
         {isAuth ? (
           <div className={s.actions}>
+            <Button variant="primary" onClick={() => setModal('shop')}>
+              ＋ Vlož do obchodu
+            </Button>
             {canEditLore ? (
               <Button variant="ghost" onClick={() => setModal('editLore')}>
-                ✎ Upravit kouzlo
+                ✎ Upravit lektvar
               </Button>
             ) : null}
-            {isCurator && spell.status === 'draft' ? (
+            {isCurator && potion.status === 'draft' ? (
               <Button
                 variant="ghost"
                 loading={approve.isPending}
-                onClick={() => approve.mutate(spell.id)}
+                onClick={() => approve.mutate(potion.id)}
               >
-                ✔ Schválit kouzlo
+                ✔ Schválit lektvar
               </Button>
             ) : null}
             {canDelete ? (
@@ -123,34 +127,32 @@ export default function KomunitniKouzloDetailPage() {
                 🗑 Smazat
               </Button>
             ) : null}
-            {/* Jméno autora entita nenese → neutrální label (parita bestiář). */}
+            {/* Jméno autora entita nenese → neutrální label (parity bestiář). */}
             <ReportButton
-              targetType="spell"
-              targetId={spell.id}
-              targetSnapshot={spell.name}
-              targetAuthorName="Autor kouzla"
-              targetAuthorId={spell.authorId}
+              targetType="potion"
+              targetId={potion.id}
+              targetSnapshot={potion.name}
+              targetAuthorName="Autor lektvaru"
+              targetAuthorId={potion.authorId}
             />
           </div>
         ) : null}
 
         <header className={s.beastTitle}>
-          {spell.aliases ? <div className={s.latin}>{spell.aliases}</div> : null}
-          <h1 className={s.name}>{spell.name}</h1>
-          {school ? (
-            <div className={s.kind} data-spell-school="">
-              {school}
-            </div>
+          {potion.aliases ? (
+            <div className={s.latin}>{potion.aliases}</div>
           ) : null}
+          <h1 className={s.name}>{potion.name}</h1>
+          {potion.kind ? <div className={s.kind}>{potion.kind}</div> : null}
         </header>
 
         <div className={s.spread}>
-          <div className={s.illus} data-spell-portrait="">
-            {spell.imageUrl ? (
-              <img src={spell.imageUrl} alt={spell.name} />
+          <div className={s.illus} data-potion-portrait="">
+            {potion.imageUrl ? (
+              <img src={potion.imageUrl} alt={potion.name} />
             ) : (
               <span className={s.illusFallback} aria-hidden="true">
-                ✦
+                ⚗
               </span>
             )}
           </div>
@@ -161,18 +163,22 @@ export default function KomunitniKouzloDetailPage() {
                 {desc.slice(1)}
               </p>
             ) : (
-              <p className={s.empty}>Kouzlo zatím nemá popis.</p>
+              <p className={s.empty}>Lektvar zatím nemá popis.</p>
             )}
           </div>
         </div>
 
+        <IngredientsCard ingredients={potion.ingredients ?? []} />
+
         {systemIds.length > 0 ? (
           <>
             <div className={s.rulesHead}>
-              <div className={s.rulesLabel}>Pravidla podle herního systému</div>
+              <div className={s.rulesLabel}>
+                Výroba a účinek podle herního systému
+              </div>
               <div className={s.tabs} data-ruleset-tabs="" role="tablist">
                 {systemIds.map((sy) => {
-                  const draft = spell.statblocks?.[sy]?.status === 'draft';
+                  const draft = potion.statblocks?.[sy]?.status === 'draft';
                   return (
                     <button
                       key={sy}
@@ -182,8 +188,10 @@ export default function KomunitniKouzloDetailPage() {
                       className={clsx(s.tab, draft && s.tabDraft)}
                       onClick={() => setActiveSystem(sy)}
                     >
-                      {spellSystemLabel(sy)}
-                      {draft ? <span className={s.tabFlag}> · návrh</span> : null}
+                      {potionSystemLabel(sy)}
+                      {draft ? (
+                        <span className={s.tabFlag}> · návrh</span>
+                      ) : null}
                     </button>
                   );
                 })}
@@ -213,7 +221,7 @@ export default function KomunitniKouzloDetailPage() {
                         loading={approveSb.isPending}
                         onClick={() =>
                           approveSb.mutate({
-                            id: spell.id,
+                            id: potion.id,
                             systemId: activeSys,
                           })
                         }
@@ -225,32 +233,35 @@ export default function KomunitniKouzloDetailPage() {
                 ) : null}
                 {isCurator ? (
                   <div className={s.actions}>
-                    <Button variant="ghost" onClick={() => setModal('editStats')}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setModal('editStats')}
+                    >
                       ✎ Upravit statblok
                     </Button>
                   </div>
                 ) : null}
 
                 <SpellStatblockView
-                  template={getSpellTemplate(activeSys)}
+                  template={getPotionTemplate(activeSys)}
                   systemStats={activeSb.systemStats}
                 />
 
-                <SpellDiscussion
+                <PotionDiscussion
                   key={activeSys}
-                  spellId={spell.id}
+                  potionId={potion.id}
                   targetType="statblock"
                   systemId={activeSys}
                   title="Diskuse ke statbloku"
-                  scopeNote={`jen k verzi ${spellSystemLabel(activeSys)}`}
-                  placeholder={`Napiš k verzi ${spellSystemLabel(activeSys)}…`}
+                  scopeNote={`jen k verzi ${potionSystemLabel(activeSys)}`}
+                  placeholder={`Napiš k verzi ${potionSystemLabel(activeSys)}…`}
                 />
               </div>
             ) : null}
           </>
         ) : (
           <div className={s.empty}>
-            Pro tohle kouzlo zatím není žádná pravidlová verze.
+            Pro tenhle lektvar zatím není žádná pravidlová verze.
             {isAuth ? (
               <div className={s.emptyAction}>
                 <Button variant="primary" onClick={() => setModal('propose')}>
@@ -261,32 +272,40 @@ export default function KomunitniKouzloDetailPage() {
           </div>
         )}
 
-        <SpellDiscussion
-          spellId={spell.id}
-          targetType="spell"
-          title="Diskuse o kouzle"
-          scopeNote="lore & obecně, napříč systémy"
-          placeholder="Napiš o kouzle (lore, použití, nápady)…"
+        <PotionDiscussion
+          potionId={potion.id}
+          targetType="potion"
+          title="Diskuse o lektvaru"
+          scopeNote="recept & obecně, napříč systémy"
+          placeholder="Napiš o lektvaru (recept, použití, nápady)…"
         />
       </div>
 
       {modal === 'editLore' ? (
-        <SpellEditorModal
+        <PotionEditorModal
           mode="editLore"
-          spell={spell}
+          potion={potion}
           onClose={() => setModal(null)}
         />
       ) : null}
       {modal === 'propose' ? (
-        <ProposeSpellStatblockModal
-          spell={spell}
+        <ProposePotionStatblockModal
+          potion={potion}
           onClose={() => setModal(null)}
         />
       ) : null}
       {modal === 'editStats' && activeSys ? (
-        <ProposeSpellStatblockModal
-          spell={spell}
+        <ProposePotionStatblockModal
+          potion={potion}
           editSystemId={activeSys}
+          onClose={() => setModal(null)}
+        />
+      ) : null}
+      {modal === 'shop' ? (
+        <InsertToShopModal
+          mode="single"
+          items={[potionToShopInsert(potion)]}
+          nounMany="lektvarů"
           onClose={() => setModal(null)}
         />
       ) : null}

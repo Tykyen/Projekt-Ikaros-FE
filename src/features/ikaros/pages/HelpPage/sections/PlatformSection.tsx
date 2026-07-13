@@ -11,6 +11,9 @@ import {
   BookOpen,
   Leaf,
   Sparkles,
+  FlaskConical,
+  Swords,
+  Puzzle,
   Image,
   Newspaper,
   CalendarDays,
@@ -227,12 +230,12 @@ export function PlatformSection() {
         <Tool icon={<Palette size={16} />} title="Společná tvorba (rozcestník)" audience={{ kind: 'vse', label: 'Všichni' }} accent="corrector">
           <p>
             Jedno tlačítko v hlavním menu, které otevře rozcestník veškeré
-            komunitní tvorby. Najdeš tu dlaždice na <strong>Diskuze</strong>,{' '}
-            <strong>Články</strong>, <strong>Galerii</strong>,{' '}
-            <strong>Bestiář</strong>, <strong>Herbář</strong> a{' '}
-            <strong>Kouzla</strong> (fungují) a připravované sekce{' '}
-            <strong>Lektvary</strong> a <strong>Hádanky</strong> — ty zatím nesou
-            štítek „Připravujeme". RPG systémy mají v menu vlastní tlačítko.
+            komunitní tvorby: <strong>Diskuze</strong>, <strong>Články</strong>,{' '}
+            <strong>Galerie</strong>, <strong>Bestiář</strong>,{' '}
+            <strong>Herbář</strong>, <strong>Kouzla</strong>,{' '}
+            <strong>Lektvary</strong>, <strong>Předměty</strong> a{' '}
+            <strong>Hádanky</strong> — všech devět sekcí je funkčních. RPG
+            systémy mají v menu vlastní tlačítko.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Globální bestiář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
@@ -301,6 +304,63 @@ export function PlatformSection() {
             než verzi správce schválí. Popis a obrázek se mění volně; schválenou
             pravidlovou verzi upravuje jen správce. Katalog je pro vlastní tvorbu —
             <strong> nepřepisuj sem kouzla z oficiálních příruček</strong>.
+          </p>
+        </Tool>
+        <Tool icon={<FlaskConical size={16} />} title="Komunitní lektvary" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="corrector">
+          <p>
+            Sdílený katalog <strong>vlastních lektvarů</strong> (ve „Společné
+            tvorbě"). Každý lektvar má <strong>druh</strong> (léčivý, jed,
+            posilující…), <strong>recept se surovinami a množstvím</strong>,
+            popis účinku a obrázek — a k tomu <strong>záložky s výrobou a
+            mechanikou pro jednotlivé herní systémy</strong> (magenergie a
+            suroviny v Dračím doupěti, vzácnost v D&amp;D/JaD, forma elixíru v
+            GURPS…). Dvě knihovny: <strong>Schválená</strong> a{' '}
+            <strong>Návrhy</strong>; pod lektvarem i pod každou pravidlovou
+            verzí běží <strong>diskuse</strong> a vyváženou verzi schvaluje
+            správce.
+          </p>
+          <p>
+            Lektvar jde rovnou <strong>vložit do obchodu tvého světa</strong> —
+            po jednom z detailu, nebo hromadně z knihovny (cena se předvyplní z
+            navrhované ceny; vkládat může Pomocný PJ a výš). Katalog je pro
+            vlastní tvorbu — <strong>nepřepisuj sem lektvary z oficiálních
+            příruček</strong>.
+          </p>
+        </Tool>
+        <Tool icon={<Swords size={16} />} title="Komunitní předměty" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="corrector">
+          <p>
+            Sdílený katalog <strong>vlastních předmětů</strong> (ve „Společné
+            tvorbě") — zbraně, zbroje, štíty, nástroje i kouzelné předměty.
+            Podle <strong>druhu předmětu</strong> se nabídnou správná pole:
+            zbraň má útočnost a zranění, zbroj kvalitu či obranné číslo, obyčejný
+            předmět cenu, váhu a použití — vždy podle zvyklostí tvého herního
+            systému (Dračí doupě, D&amp;D/JaD, GURPS, Shadowrun…). Dvě knihovny
+            (<strong>Schválená</strong> / <strong>Návrhy</strong>), diskuse pod
+            předmětem i pod každou pravidlovou verzí, vyvážení schvaluje správce.
+          </p>
+          <p>
+            Předmět jde rovnou <strong>vložit do obchodu tvého světa</strong> —
+            po jednom z detailu, nebo hromadně z knihovny (vkládat může Pomocný
+            PJ a výš). Katalog je pro vlastní tvorbu —{' '}
+            <strong>nepřepisuj sem předměty z oficiálních příruček</strong>.
+          </p>
+        </Tool>
+        <Tool icon={<Puzzle size={16} />} title="Komunitní hádanky" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="corrector">
+          <p>
+            Zásobárna hádanek pro tvou hru (ve „Společné tvorbě") — od lehkých
+            lidových po ultratěžké historické oříšky. Každá hádanka má{' '}
+            <strong>úroveň obtížnosti</strong> (lehká · střední · těžká ·
+            ultratěžká), <strong>odpověď schovanou za klik</strong> a{' '}
+            <strong>postupné nápovědy</strong>, které odkrýváš po jedné — nic si
+            nevyzradíš předčasně. U mnoha najdeš i původ a poznámku pro Pána
+            jeskyně (třeba pověst o Homérovi, kterého hádanka rybářů prý trápila
+            do smrti).
+          </p>
+          <p>
+            Základ tvoří <strong>volné hádanky z lidové slovesnosti a
+            starověku</strong>; vlastní hádanky přidáš jako návrh a po schválení
+            správcem se zařadí do knihovny. Pod hádankou běží diskuse — pozor v
+            ní na spoilery.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

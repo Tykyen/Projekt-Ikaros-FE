@@ -7,6 +7,7 @@ import {
   Leaf,
   FlaskConical,
   Sparkles,
+  Swords,
   Puzzle,
 } from 'lucide-react';
 import { PendingActionType } from '@/shared/types';
@@ -60,14 +61,14 @@ export const TVORBA_TILES: TvorbaTile[] = [
     active: true,
     pendingType: PendingActionType.GalleryPendingReview,
   },
-  // Nové komunitní knihovny — zatím stuby (21.5a–d).
+  // Komunitní knihovny (16.2b-2 + 21.5a–e) — všechny aktivní.
   {
     key: 'bestiar',
     label: 'Bestiář',
     description: 'Sdílený katalog nestvůr a jejich statů.',
     to: '/ikaros/bestiar',
     icon: Skull,
-    active: false,
+    active: true,
   },
   {
     key: 'herbar',
@@ -83,7 +84,7 @@ export const TVORBA_TILES: TvorbaTile[] = [
     description: 'Alchymistické recepty a lektvary.',
     to: '/ikaros/lektvary',
     icon: FlaskConical,
-    active: false,
+    active: true,
   },
   {
     key: 'kouzla',
@@ -93,12 +94,21 @@ export const TVORBA_TILES: TvorbaTile[] = [
     icon: Sparkles,
     active: true,
   },
+  // 21.5e — realizace „items" z roadmap 21.1 (nová knihovna).
+  {
+    key: 'predmety',
+    label: 'Předměty',
+    description: 'Zbraně, zbroje a vybavení pro tvůj systém.',
+    to: '/ikaros/predmety',
+    icon: Swords,
+    active: true,
+  },
   {
     key: 'hadanky',
     label: 'Hádanky',
     description: 'Hlavolamy a hádanky pro hráče.',
     to: '/ikaros/hadanky',
     icon: Puzzle,
-    active: false,
+    active: true,
   },
 ];

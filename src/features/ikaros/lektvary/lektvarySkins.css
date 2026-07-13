@@ -1,0 +1,13 @@
+/* 21.5b — Skiny komunitního katalogu lektvarů pro platformové motivy.
+   Globální CSS (NE module) — scoped přes platformový [data-theme] (na .shell)
+   + STABILNÍ data-atributy kostry:
+     [data-potion-scope]       — kořen listu (KomunitniLektvaryPage)
+     [data-lib-tab]            — hřbety knihoven (approved / drafts)
+     [data-lektvary-list]      — rejstřík (ul)
+     [data-lektvary-row]       — řádek rejstříku (li)
+     [data-potion-portrait]    — iluminace/ikona lektvaru (list i detail)
+     [data-potion-card]        — karta detailu lektvaru
+     [data-potion-ingredients] — karta surovin (recept)
+     [data-spell-statblock]    — statblok pravidlové verze (sdílené s kouzly)
+   Barvy/fonty ze STABILNÍCH tokenů; TVAR + ornament per motiv (NE přebarvení).
+   Per-theme pravidla přes `skin` workflow — teď jen kontrakt kostry. */

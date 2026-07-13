@@ -1,0 +1,51 @@
+/* 21.5b — karta surovin lektvaru (recept: co + kolik). */
+
+.card {
+  border: 1px dashed rgb(var(--white-rgb, 255 255 255) / 0.18);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--sp-3, 0.75rem) var(--sp-4, 1rem);
+  margin: var(--sp-3, 0.75rem) 0;
+  background: rgb(var(--white-rgb, 255 255 255) / 0.02);
+}
+.title {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary, var(--text-primary));
+  margin: 0 0 var(--sp-2, 0.5rem);
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sp-1, 0.25rem) var(--sp-4, 1rem);
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2, 0.5rem);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  color: var(--text-primary);
+  border-bottom: 1px dotted rgb(var(--white-rgb, 255 255 255) / 0.1);
+  padding: 2px 0;
+  min-width: 0;
+}
+.name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.amount {
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+}

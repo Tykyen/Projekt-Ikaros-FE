@@ -36,11 +36,12 @@ const ALL_KEYS = [
   'herbar',
   'lektvary',
   'kouzla',
+  'predmety',
   'hadanky',
 ];
 
 describe('TvorbaHubPage (21.5)', () => {
-  it('vyrenderuje všech 8 dlaždic', () => {
+  it('vyrenderuje všech 9 dlaždic', () => {
     renderHub();
     for (const key of ALL_KEYS) {
       expect(document.querySelector(`[data-tile-key="${key}"]`)).toBeTruthy();
@@ -53,11 +54,13 @@ describe('TvorbaHubPage (21.5)', () => {
     expect(diskuze?.getAttribute('href')).toBe('/ikaros/diskuze');
   });
 
-  it('stub dlaždice je proklikatelná a nese odznak „Připravujeme"', () => {
+  // 21.5d dokončil poslední knihovnu — žádná dlaždice už není stub.
+  it('žádná dlaždice nenese odznak „Připravujeme" (všech 9 aktivních)', () => {
     renderHub();
-    const bestiar = document.querySelector('[data-tile-key="bestiar"]');
-    expect(bestiar?.getAttribute('href')).toBe('/ikaros/bestiar');
-    expect(bestiar?.textContent).toContain('Připravujeme');
+    for (const key of ALL_KEYS) {
+      const tile = document.querySelector(`[data-tile-key="${key}"]`);
+      expect(tile?.textContent, key).not.toContain('Připravujeme');
+    }
   });
 
   it('aktivní dlaždice zobrazí moderační badge z pending byType', () => {

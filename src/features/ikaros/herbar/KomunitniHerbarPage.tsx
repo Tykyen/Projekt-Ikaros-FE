@@ -13,6 +13,7 @@ import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useKomunitniHerbarList } from './hooks/useKomunitniHerbar';
 import { PlantEditorModal } from './components/PlantEditorModal';
 import { InsertToShopModal } from './components/InsertToShopModal';
+import { plantToShopInsert } from './shopInsert';
 import {
   RARITY_OPTIONS,
   rarityLabel,
@@ -195,7 +196,8 @@ export default function KomunitniHerbarPage() {
       {showBulkShop ? (
         <InsertToShopModal
           mode="bulk"
-          plants={filtered}
+          items={filtered.map(plantToShopInsert)}
+          nounMany="rostlin"
           onClose={() => setShowBulkShop(false)}
         />
       ) : null}

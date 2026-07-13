@@ -1,9 +1,11 @@
 /**
- * 21.5a §6 — vklad rostliny/rostlin z komunitního herbáře do OBCHODU světa.
- * `single` = jedna rostlina (existující single create), `bulk` = všechny
- * zobrazené rostliny (bulk endpoint, dávky ≤200). Cílový svět = jen kde je
- * uživatel PomocnyPJ+ (stejný zdroj jako `InsertToBestiaryModal`: `useMyWorlds`
- * + `membership.role`). Herbář je systémově neutrální → bez filtru systému.
+ * 21.5a §6 — vklad položek z komunitního katalogu do OBCHODU světa.
+ * `single` = jedna položka (single create), `bulk` = všechny zobrazené
+ * (bulk endpoint, dávky ≤200). Cílový svět = jen kde je uživatel PomocnyPJ+.
+ *
+ * GENERICKÉ přes `ShopInsertItem` (`../shopInsert.ts`) — používá herbář
+ * (`plantToShopInsert`) i lektvary (`potionToShopInsert`); skloňování přes
+ * `nounMany`. Žádné další kopie modalu (vzor link_picker).
  */
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -20,7 +22,7 @@ import {
   useBulkCreateShopItems,
 } from '@/features/world/shop/api';
 import type { CreateShopItemInput } from '@/features/world/shop/types';
-import type { GlobalPlant } from '../types';
+import type { ShopInsertItem } from '../shopInsert';
 import s from './KomunitniHerbarForms.module.css';
 
 /** BE limit jedné bulk dávky. */
@@ -28,45 +30,43 @@ const BULK_LIMIT = 200;
 
 interface Props {
   mode: 'single' | 'bulk';
-  /** single → 1 rostlina; bulk → aktuálně zobrazené rostliny knihovny. */
-  plants: GlobalPlant[];
+  /** single → 1 položka; bulk → aktuálně zobrazené položky knihovny. */
+  items: ShopInsertItem[];
+  /** Genitiv plurálu do vět („rostlin", „lektvarů"). */
+  nounMany?: string;
   onClose: () => void;
 }
 
-/** Souhrnný popis rostliny → popis položky obchodu. */
-function plantToDescription(p: GlobalPlant): string | undefined {
-  const parts: string[] = [];
-  if (p.habitat?.trim()) parts.push(`Roste: ${p.habitat.trim()}.`);
-  if (p.usage?.trim()) parts.push(`Použití: ${p.usage.trim()}.`);
-  if (p.aliases?.trim()) parts.push(`Lidová jména: ${p.aliases.trim()}.`);
-  return parts.length ? parts.join(' ') : undefined;
-}
-
-function plantToInput(
-  p: GlobalPlant,
+function itemToInput(
+  it: ShopInsertItem,
   price: number,
   currencyCode: string,
   groupId: string,
 ): CreateShopItemInput {
-  const hasImg = !!p.imageUrl;
+  const hasImg = !!it.imageUrl;
   return {
-    name: p.name,
-    description: plantToDescription(p),
+    name: it.name,
+    description: it.description || undefined,
     groupId: groupId || undefined,
     price,
     currencyCode: currencyCode || undefined,
-    imageUrl: p.imageUrl || undefined,
-    imageFocalX: hasImg ? (p.imageFocalX ?? null) : null,
-    imageFocalY: hasImg ? (p.imageFocalY ?? null) : null,
-    imageZoom: hasImg ? (p.imageZoom ?? null) : null,
-    imageFit: hasImg ? (p.imageFit ?? null) : null,
+    imageUrl: it.imageUrl || undefined,
+    imageFocalX: hasImg ? (it.imageFocalX ?? null) : null,
+    imageFocalY: hasImg ? (it.imageFocalY ?? null) : null,
+    imageZoom: hasImg ? (it.imageZoom ?? null) : null,
+    imageFit: hasImg ? (it.imageFit ?? null) : null,
   };
 }
 
-export function InsertToShopModal({ mode, plants, onClose }: Props) {
+export function InsertToShopModal({
+  mode,
+  items,
+  nounMany = 'položek',
+  onClose,
+}: Props) {
   const navigate = useNavigate();
   const single = mode === 'single';
-  const count = plants.length;
+  const count = items.length;
 
   const { data: myWorlds } = useMyWorlds();
   const worldTargets = useMemo(
@@ -96,7 +96,7 @@ export function InsertToShopModal({ mode, plants, onClose }: Props) {
   );
 
   const [amount, setAmount] = useState<number | ''>(
-    single ? (plants[0]?.suggestedPrice ?? 0) : 0,
+    single ? (items[0]?.suggestedPrice ?? 0) : 0,
   );
   const [currencyCode, setCurrencyCode] = useState('');
   // Odvozená měna: user výběr (pokud platný v daném světě) jinak báze světa.
@@ -117,12 +117,12 @@ export function InsertToShopModal({ mode, plants, onClose }: Props) {
     const price = amount === '' ? 0 : amount;
 
     if (single) {
-      const plant = plants[0];
-      if (!plant) return;
-      createM.mutate(plantToInput(plant, price, effectiveCurrency, groupId), {
+      const item = items[0];
+      if (!item) return;
+      createM.mutate(itemToInput(item, price, effectiveCurrency, groupId), {
         onSuccess: () => {
           toast.success(
-            `„${plant.name}" vloženo do obchodu ${targetWorld.name}.`,
+            `„${item.name}" vloženo do obchodu ${targetWorld.name}.`,
             { action: { label: 'Otevřít obchod', onClick: goToShop } },
           );
           onClose();
@@ -133,14 +133,14 @@ export function InsertToShopModal({ mode, plants, onClose }: Props) {
     }
 
     // bulk — po dávkách ≤ BULK_LIMIT
-    const items = plants.map((p) =>
-      plantToInput(p, price, effectiveCurrency, groupId),
+    const inputs = items.map((it) =>
+      itemToInput(it, price, effectiveCurrency, groupId),
     );
     try {
       let done = 0;
-      for (let i = 0; i < items.length; i += BULK_LIMIT) {
+      for (let i = 0; i < inputs.length; i += BULK_LIMIT) {
         const created = await bulkM.mutateAsync({
-          items: items.slice(i, i + BULK_LIMIT),
+          items: inputs.slice(i, i + BULK_LIMIT),
         });
         done += created.length;
       }
@@ -186,12 +186,12 @@ export function InsertToShopModal({ mode, plants, onClose }: Props) {
         <>
           <p className={s.hint}>
             {single
-              ? `Rostlina „${plants[0]?.name}" se vloží jako položka obchodu vybraného světa.`
-              : `Vloží se ${count} zobrazených rostlin jako položky obchodu. Ceny pak dolaď přímo v obchodě.`}
+              ? `„${items[0]?.name}" se vloží jako položka obchodu vybraného světa.`
+              : `Vloží se ${count} zobrazených ${nounMany} jako položky obchodu. Ceny pak dolaď přímo v obchodě.`}
           </p>
           {!single && count > BULK_LIMIT ? (
             <p className={s.hint}>
-              Rostlin je víc než {BULK_LIMIT} — vloží se po dávkách automaticky.
+              Položek je víc než {BULK_LIMIT} — vloží se po dávkách automaticky.
             </p>
           ) : null}
 
