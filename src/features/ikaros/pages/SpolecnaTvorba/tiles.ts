@@ -9,6 +9,7 @@ import {
   Sparkles,
   Swords,
   Puzzle,
+  ReceiptText,
 } from 'lucide-react';
 import { PendingActionType } from '@/shared/types';
 
@@ -109,6 +110,15 @@ export const TVORBA_TILES: TvorbaTile[] = [
     description: 'Hlavolamy a hádanky pro hráče.',
     to: '/ikaros/hadanky',
     icon: Puzzle,
+    active: true,
+  },
+  // 21.5f — komunitní ceníky (kolekce položek s cenou, vklad do obchodu).
+  {
+    key: 'ceniky',
+    label: 'Ceníky',
+    description: 'Hotové ceníky zboží a služeb do obchodu světa.',
+    to: '/ikaros/ceniky',
+    icon: ReceiptText,
     active: true,
   },
 ];

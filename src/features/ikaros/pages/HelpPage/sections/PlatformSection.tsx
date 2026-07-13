@@ -14,6 +14,7 @@ import {
   FlaskConical,
   Swords,
   Puzzle,
+  ReceiptText,
   Image,
   Newspaper,
   CalendarDays,
@@ -233,9 +234,9 @@ export function PlatformSection() {
             komunitní tvorby: <strong>Diskuze</strong>, <strong>Články</strong>,{' '}
             <strong>Galerie</strong>, <strong>Bestiář</strong>,{' '}
             <strong>Herbář</strong>, <strong>Kouzla</strong>,{' '}
-            <strong>Lektvary</strong>, <strong>Předměty</strong> a{' '}
-            <strong>Hádanky</strong> — všech devět sekcí je funkčních. RPG
-            systémy mají v menu vlastní tlačítko.
+            <strong>Lektvary</strong>, <strong>Předměty</strong>,{' '}
+            <strong>Hádanky</strong> a <strong>Ceníky</strong> — všech deset
+            sekcí je funkčních. RPG systémy mají v menu vlastní tlačítko.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Globální bestiář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
@@ -361,6 +362,27 @@ export function PlatformSection() {
             starověku</strong>; vlastní hádanky přidáš jako návrh a po schválení
             správcem se zařadí do knihovny. Pod hádankou běží diskuse — pozor v
             ní na spoilery.
+          </p>
+        </Tool>
+        <Tool icon={<ReceiptText size={16} />} title="Komunitní ceníky" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="corrector">
+          <p>
+            Hotové <strong>ceníky zboží a služeb</strong> (ve „Společné tvorbě")
+            — běžné zboží, jídlo a pití, zbraně a zbroje, zvířata, lodě, služby
+            hostinců… Každá položka má obrázek, popis a cenu ve{' '}
+            <strong>zlatých, stříbrných a měďácích</strong> (1 zlatý = 10
+            stříbrných = 100 měďáků). Delší ceníky jsou rozdělené do sekcí
+            (třeba piva podle krajů) a u zbraní a zbrojí vede odkaz „⚔ Staty" na
+            předmět v katalogu Předmětů, kde si každý herní systém drží vlastní
+            pravidlové hodnoty.
+          </p>
+          <p>
+            Celý ceník (nebo jen vybranou sekci či jednu položku) jde{' '}
+            <strong>vložit do obchodu tvého světa</strong> — každá položka si
+            přinese vlastní cenu, jen zvolíš, která měna světa odpovídá zlatým
+            (vkládat může Pomocný PJ a výš). Vlastní ceník založíš jako návrh v
+            editoru s tabulkou položek; po schválení správcem se zařadí do
+            knihovny. U převzatých obrázků uváděj zdroj a licenci — pole
+            „atribuce" je přímo v editoru.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

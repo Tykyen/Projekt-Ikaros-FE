@@ -1,0 +1,40 @@
+name: Seed ceníky (Morvol)
+
+# Jednorázový import komunitních ceníků (20 ceníků, ~1000 položek) + zbraní a
+# zbrojí do katalogu Předmětů (matrix statblok) do PROD Mongo. Obrázky nahrává
+# import sám na Cloudinary (folder community-ceniky; zdroje = Wikimedia URL
+# v seed JSONu). Spustí se ručně (Actions -> Run workflow). Idempotentní —
+# opakované spuštění smaže předchozí seed (dle seedTag) a vloží znovu; ručně
+# vytvořeného obsahu se nedotkne. Nutné až PO deployi BE (kolekce price_lists).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy migration files to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/ceniky-seed.json ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/ceniky-seed.json
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/ceniky-import.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/ceniky-import.js
+
+      - name: Import into prod Mongo (via BE container)
+        # Stejný mechanismus jako seed-plants: docker cp do kontejneru (import.js
+        # do /app kvůli node_modules resolution, JSON do /tmp), pak docker exec.
+        # Upload ~700 obrázků na Cloudinary trvá — keepalive drží SSH spojení.
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=60 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/ceniky-seed.json projekt-ikaros-be:/tmp/ceniky-seed.json && docker cp /tmp/ceniky-import.js projekt-ikaros-be:/app/ceniky-import.js && docker exec -w /app -e SEED_JSON=/tmp/ceniky-seed.json projekt-ikaros-be node ceniky-import.js"

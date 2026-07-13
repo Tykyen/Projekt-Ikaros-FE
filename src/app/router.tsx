@@ -101,6 +101,9 @@ const KomunitniPredmetDetailPage = lazy(() => import('@/features/ikaros/predmety
 // 21.5d — komunitní katalog hádanek (nahrazuje poslední stub `ikaros/hadanky`).
 const KomunitniHadankyPage       = lazy(() => import('@/features/ikaros/hadanky/KomunitniHadankyPage'));
 const KomunitniHadankaDetailPage = lazy(() => import('@/features/ikaros/hadanky/KomunitniHadankaDetailPage'));
+// 21.5f — komunitní knihovna ceníků (kolekce položek s cenou zl/st/md).
+const KomunitniCenikyPage        = lazy(() => import('@/features/ikaros/ceniky/KomunitniCenikyPage'));
+const KomunitniCenikDetailPage   = lazy(() => import('@/features/ikaros/ceniky/KomunitniCenikDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -242,6 +245,9 @@ export const router = createBrowserRouter([
       // 21.5d — komunitní katalog hádanek (list + detail) nahrazuje poslední stub.
       { path: 'ikaros/hadanky',         element: p(KomunitniHadankyPage) },
       { path: 'ikaros/hadanky/:id',     element: p(KomunitniHadankaDetailPage) },
+      // 21.5f — komunitní knihovna ceníků (list + detail).
+      { path: 'ikaros/ceniky',          element: p(KomunitniCenikyPage) },
+      { path: 'ikaros/ceniky/:id',      element: p(KomunitniCenikDetailPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'ikaros/podporovatele',   element: p(SupportersPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug

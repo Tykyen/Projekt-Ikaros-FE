@@ -1,0 +1,142 @@
+/* 21.5f — styly formulářů/modalů komunitních ceníků (vzor herbář +
+   inline editor položek). */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1, 0.25rem);
+  margin-bottom: var(--sp-3, 0.75rem);
+}
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--text-primary);
+}
+.input,
+.select,
+.textarea {
+  padding: var(--sp-2, 0.5rem) var(--sp-3, 0.75rem);
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.15);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  width: 100%;
+}
+.textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3, 0.75rem);
+}
+.hint {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  font-style: italic;
+  color: var(--text-secondary, var(--text-primary));
+  margin: 0 0 var(--sp-2, 0.5rem);
+}
+.err {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--danger, #e05260);
+  margin: 0 0 var(--sp-2, 0.5rem);
+}
+
+/* ── Inline editor položek ── */
+.itemsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2, 0.5rem);
+  margin: var(--sp-4, 1rem) 0 var(--sp-2, 0.5rem);
+}
+.itemsTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-lg, 1.25rem);
+  color: var(--text-primary);
+}
+.itemsCount {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary, var(--text-primary));
+}
+.itemList {
+  list-style: none;
+  margin: 0 0 var(--sp-3, 0.75rem);
+  padding: 0;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.1);
+  overflow: hidden;
+}
+.itemRow {
+  padding: var(--sp-2, 0.5rem) var(--sp-3, 0.75rem);
+}
+.itemRow + .itemRow {
+  border-top: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.07);
+}
+.itemGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 64px 64px 64px auto;
+  gap: var(--sp-2, 0.5rem);
+  align-items: center;
+}
+.itemBtns {
+  display: inline-flex;
+  gap: 2px;
+}
+.iconBtn {
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  line-height: 1;
+  padding: var(--sp-1, 0.25rem);
+  min-width: 28px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.14);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.03);
+  color: var(--text-secondary, var(--text-primary));
+  cursor: pointer;
+}
+.iconBtn:hover {
+  border-color: var(--theme-accent-cyan, var(--accent-bright));
+  color: var(--text-primary);
+}
+.iconBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.itemDetail {
+  margin-top: var(--sp-2, 0.5rem);
+  padding: var(--sp-3, 0.75rem);
+  border-radius: var(--radius-sm, 8px);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.03);
+}
+.priceLegend {
+  font-family: var(--font-body);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary, var(--text-primary));
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .row2 {
+    grid-template-columns: 1fr;
+  }
+  .itemGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .itemGrid > * {
+    min-width: 0;
+  }
+  /* Dotyková plocha ovládacích tlačítek položky na mobilu. */
+  .iconBtn {
+    min-width: 38px;
+    min-height: 38px;
+  }
+}

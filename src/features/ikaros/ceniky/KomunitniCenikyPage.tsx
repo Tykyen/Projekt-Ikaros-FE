@@ -1,0 +1,176 @@
+/**
+ * 21.5f — Komunitní ceníky ve Společné tvorbě.
+ * Dvě oddělené knihovny (Schválená / Návrhy) + filtr štítku + seznam ceníků
+ * (název, popis, počet položek). Vzhled motiv-aware přes `--theme-*` tokeny.
+ */
+import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { Breadcrumbs, Button } from '@/shared/ui';
+import { Seo } from '@/shared/seo';
+import { isAuthenticatedAtom } from '@/shared/store/authStore';
+import { useKomunitniCenikyList } from './hooks/useKomunitniCeniky';
+import { CenikEditorModal } from './components/CenikEditorModal';
+import type { PriceListStatus, GlobalPriceList } from './types';
+import s from './KomunitniCeniky.module.css';
+
+export default function KomunitniCenikyPage() {
+  const isAuth = useAtomValue(isAuthenticatedAtom);
+  const [library, setLibrary] = useState<PriceListStatus>('approved');
+  const [tagFilter, setTagFilter] = useState('');
+  const [showCreate, setShowCreate] = useState(false);
+
+  const approved = useKomunitniCenikyList({ status: 'approved' });
+  const drafts = useKomunitniCenikyList({ status: 'draft' });
+  const active = library === 'approved' ? approved : drafts;
+  const lists = useMemo(() => active.data ?? [], [active.data]);
+
+  const tag = tagFilter.trim().toLowerCase();
+  const filtered = lists.filter(
+    (l) =>
+      tag === '' || (l.tags ?? []).some((t) => t.toLowerCase().includes(tag)),
+  );
+
+  const crumbs = [
+    { label: 'Domů', href: '/' },
+    { label: 'Společná tvorba', href: '/ikaros/tvorba' },
+    { label: 'Ceníky' },
+  ];
+
+  return (
+    <article className={s.page} data-cenik-scope="community">
+      <Seo
+        title="Komunitní ceníky"
+        description="Sdílené ceníky zboží a služeb — hotové kolekce položek s cenami ve zlatých, stříbrných a měďácích. Jedním klikem do obchodu tvého světa."
+        canonicalPath="/ikaros/ceniky"
+      />
+      <Breadcrumbs items={crumbs} />
+
+      <div className={s.topNav}>
+        <Link to="/ikaros/tvorba" className={s.backLink}>
+          ← Zpět do Společné tvorby
+        </Link>
+      </div>
+
+      <header className={s.head}>
+        <h1 className={s.title}>Komunitní ceníky</h1>
+        <p className={s.lead}>
+          Hotové kolekce zboží a služeb s cenami ve zlatých, stříbrných a
+          měďácích. Prohlížej, tvoř — a celý ceník vlož jedním klikem do
+          obchodu svého světa.
+        </p>
+        {isAuth ? (
+          <div className={s.headActions}>
+            <Button variant="primary" onClick={() => setShowCreate(true)}>
+              ＋ Nový ceník
+            </Button>
+          </div>
+        ) : null}
+      </header>
+
+      {/* Dvě oddělené knihovny */}
+      <div className={s.libTabs} role="tablist" aria-label="Knihovny">
+        <button
+          role="tab"
+          aria-selected={library === 'approved'}
+          className={s.libTab}
+          data-lib-tab="approved"
+          onClick={() => setLibrary('approved')}
+        >
+          <span className={s.libIco} aria-hidden="true">
+            🧾
+          </span>
+          <span className={s.libMain}>
+            <span className={s.libName}>Schválená knihovna</span>
+            <span className={s.libDesc}>ověřené ceníky, doladěné komunitou</span>
+          </span>
+          <span className={s.libCount}>{approved.data?.length ?? '–'}</span>
+        </button>
+
+        <button
+          role="tab"
+          aria-selected={library === 'draft'}
+          className={s.libTab}
+          data-lib-tab="drafts"
+          onClick={() => setLibrary('draft')}
+        >
+          <span className={s.libIco} aria-hidden="true">
+            📝
+          </span>
+          <span className={s.libMain}>
+            <span className={s.libName}>Knihovna návrhů</span>
+            <span className={s.libDesc}>komunitní, zatím neověřené</span>
+          </span>
+          <span className={s.libCount}>{drafts.data?.length ?? '–'}</span>
+        </button>
+      </div>
+
+      {/* Filtry (client-side) */}
+      <div className={s.filters}>
+        <label className={s.filterField}>
+          <span className={s.filterLabel}>Štítek</span>
+          <input
+            className={s.input}
+            value={tagFilter}
+            onChange={(e) => setTagFilter(e.target.value)}
+            placeholder="např. jídlo"
+          />
+        </label>
+      </div>
+
+      {/* Seznam ceníků */}
+      {active.isLoading ? (
+        <p className={s.state}>Načítám…</p>
+      ) : active.isError ? (
+        <p className={s.state}>Knihovnu se nepodařilo načíst.</p>
+      ) : filtered.length === 0 ? (
+        <p className={s.state}>
+          {library === 'approved'
+            ? 'Ve schválené knihovně zatím nic není.'
+            : 'Žádné návrhy.'}
+        </p>
+      ) : (
+        <ul className={s.list} data-cenik-list="">
+          {filtered.map((l) => (
+            <CenikRow key={l.id} list={l} />
+          ))}
+        </ul>
+      )}
+
+      {showCreate ? (
+        <CenikEditorModal
+          mode="create"
+          onClose={() => setShowCreate(false)}
+          onSaved={() => setLibrary('draft')}
+        />
+      ) : null}
+    </article>
+  );
+}
+
+function CenikRow({ list }: { list: GlobalPriceList }) {
+  return (
+    <li className={s.row} data-cenik-row="">
+      <Link to={`/ikaros/ceniky/${list.id}`} className={s.rowLink}>
+        <span className={s.thumb} data-cenik-portrait="">
+          {list.imageUrl ? (
+            <img src={list.imageUrl} alt="" loading="lazy" />
+          ) : (
+            <span className={s.thumbFallback} aria-hidden="true">
+              {list.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+        </span>
+        <span className={s.rowMain}>
+          <span className={s.rowName}>{list.name}</span>
+          {list.description ? (
+            <span className={s.rowDesc}>{list.description}</span>
+          ) : null}
+        </span>
+        <span className={s.countChip} title="Počet položek">
+          {list.items.length} položek
+        </span>
+      </Link>
+    </li>
+  );
+}

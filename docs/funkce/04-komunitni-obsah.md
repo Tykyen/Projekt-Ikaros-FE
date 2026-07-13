@@ -11,13 +11,13 @@ Společné principy ověřené v kódu:
 ---
 
 ### Společná tvorba — rozcestník komunitního obsahu
-- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii a komunitní knihovny: **Bestiář** (16.2b-2), **Herbář** (21.5a), **Kouzla** (21.5c), **Lektvary** (21.5b), **Předměty** (21.5e), **Hádanky** (21.5d) — **všech 9 dlaždic aktivních, žádný stub**.
+- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii a komunitní knihovny: **Bestiář** (16.2b-2), **Herbář** (21.5a), **Kouzla** (21.5c), **Lektvary** (21.5b), **Předměty** (21.5e), **Hádanky** (21.5d), **Ceníky** (21.5f) — **všech 10 dlaždic aktivních, žádný stub**.
 - **Kde:** route `/ikaros/tvorba` (`TvorbaHubPage`). Hlavní navigace: jedno tlačítko „Společná tvorba" (ikona `Palette`), které **nahradilo** samostatné položky Diskuze/Články/Galerie. „RPG systémy" zůstává v nav samostatně (veřejný SEO landing, ne komunitní tvorba). Stuby už nejsou (`ComingSoonPage` bez route — nevyužitá komponenta).
 - **Kdo:** hub i stuby **veřejné** (anon, bez `requireAuth`) — router `src/app/router.tsx`. Jednotlivé cíle si řeší vlastní gating (Diskuze má `requireAuth` → anon klik = login). Data dlaždic `src/features/ikaros/pages/SpolecnaTvorba/tiles.ts`.
 - **Co jde dělat:** proklik na kteroukoli sekci — aktivní dlaždice vede na svou stránku, stub na `ComingSoonPage` („Připravujeme", `noindex`) s odkazem zpět na hub. Aktivní dlaždice nese moderační badge (počet pending pro recenzenta) z `usePendingActionsCount`.
 - **Hranice / co neumí:** Hub je čistě navigační vrstva, sám žádný obsah nedrží. Všechny knihovny žijí (viz sekce níže; komunitní Bestiář čeká na plnou inventuru — viz Nesrovnalosti).
 - **Zvláštnosti:** navigační badge „Společná tvorba" v `IkarosLayout` agreguje **součet** pending typů Diskuze+Články+Galerie (`NavItem` prop `pendingTypes`), aby moderátor o signál sloučením nepřišel; tooltip vyjmenuje neprázdné. Hub v prerenderu klasifikován jako statická cesta (delší TTL); stuby `noindex`.
-- **Stav:** ✅ (hub + nav 2026-07-03; poslední knihovna Hádanky 21.5d dokončena 2026-07-13 — všech 9 dlaždic aktivních vč. opravené dlaždice Bestiář)
+- **Stav:** ✅ (hub + nav 2026-07-03; 10. dlaždice Ceníky 21.5f přidána 2026-07-13)
 - **Kód:** FE `src/features/ikaros/pages/SpolecnaTvorba/` (`TvorbaHubPage.tsx`, `ComingSoonPage.tsx`, `tiles.ts`), nav `src/app/layout/IkarosLayout/IkarosLayout.tsx` (`PRIMARY_NAV`, `NavItem`), routy `src/app/router.tsx`. BE: žádné (čistě FE navigace).
 
 ---
@@ -190,6 +190,20 @@ Společné principy ověřené v kódu:
 - **Zvláštnosti:** dokončením 21.5d jsou **všech 9 dlaždic hubu aktivních** — opravena i letitá nesrovnalost dlaždice Bestiář (`active:false` „Připravujeme", ač bestiář fungoval); hub test přepsán (žádný stub).
 - **Stav:** ✅ (2026-07-13; ověřeno BE typecheck+lint, FE build + cílené vitest; seed čeká na spuštění po deployi)
 - **Kód:** FE `src/features/ikaros/hadanky/` (`RiddleReveal.tsx`, stránky, editor, diskuse); BE `backend/src/modules/riddles/`; seed `backend/scripts/seed-riddles/`; enumy `moderation.enums.ts` (`Riddle='riddle'`), `pending-action-type.enum.ts` (`CommunityRiddlePendingReview`).
+
+---
+
+### Ceníky — komunitní knihovna ceníků (21.5f)
+- **Co to je:** Sdílené **ceníky zboží a služeb** — ceník = JEDEN dokument s vnořenými položkami (max 200), každá položka má název + popis + obrázek s atribucí + **strukturovanou cenu zlaté/stříbrné/měďáky** (pevný poměr 1 zl = 10 st = 100 md) + volitelnou sekci („V hospodě", regiony…) a volitelný **link na předmět katalogu Předmětů** (staty per systém se tady NEduplikují — spec R4). Vklad do obchodu světa s **per-položkovými cenami** (jediná knihovna, která to umí).
+- **Kde:** `/ikaros/ceniky` (knihovna, `KomunitniCenikyPage`) + `/ikaros/ceniky/:id` (detail s tabulkou položek po sekcích); **nová 10. dlaždice** hubu (`ReceiptText`). BE modul `price-lists` (`/api/price-lists/community…`, kolekce `price_lists` + `price_list_comments`).
+- **Kdo:** parity s rodinou — celý controller `JwtAuthGuard` (`price-lists.controller.ts:35`); skryté jen Admin+ (list `includeHidden`, detail 404 — `price-lists.service.ts:57`); návrh/komentář přihlášený; úprava = plná editace jedním PATCH (autor/kurátor, `PRICELIST_NOT_AUTHOR`); schvaluje kurátor (`isBestieCurator`); mazání autor-draft/kurátor; vklad do obchodu PomocnyPJ+ (reuse herbář gate).
+- **Co jde dělat:** založit ceník (jádro + inline editor položek: přidat/upravit/smazat/přesunout ↑↓, sekce, obrázek + povinná atribuce u převzatých, cena 3 pole, link na předmět URL/id) → draft; kurátor schválí; **vklad do obchodu** single (řádek položky) i bulk „Vlož do obchodu (N)" respektující aktivní **filtr sekce** — každá položka si nese vlastní cenu (`priceGsc`, přepočet `zl + st/10 + md/100` ve zvolené „měně pro zlaté", svět bez měn = číslo bez měny); jednoúrovňová diskuse (`price_list_comments`); **nahlásit** (`targetType="price_list"`, 17. plocha 20B), moderace M2/M3 hide + M4 hard delete; pending `community_price_list_pending_review`; detail zobrazuje atribuci obrázku (tooltip na miniatuře) a překlik „⚔ Staty" na linknutý předmět.
+- **Rozšíření `InsertToShopModal` (průřezové):** `ShopInsertItem.priceGsc?` — mají-li ho VŠECHNY položky, modal skryje „Výchozí cena (pro všechny)" a nabídne jen select „Měna pro zlaté"; cena se počítá per položka. Zpětně kompatibilní s herbářem/lektvary/předměty (bez `priceGsc` beze změny). `InsertToShopModal.tsx` (`allGsc`, `gscToDecimal`).
+- **Hranice / co neumí:** bez statblocků přímo v položkách (řeší link na Předměty); editor linku = URL/id input, ne picker; bez skinů (data-atributy `data-cenik-*`); kurz 1:10:100 pevný (needitovatelný); sekce se do obchodu nepřenáší jako skupina (jen text v popisu položky).
+- **Seed (připraven, čeká na dry-run schválení + deploy):** 20 ceníků / ~1011 položek z uživatelova `Ceník.xlsx` (Morvol) + **103 zbraní/zbrojí do Předmětů** (systemId `matrix`, statblok approved s kostkami/kvalitou, provázané `linkedItemId`). Obrázky: Wikimedia Commons (jen PD/CC0/CC BY/CC BY-SA, atribuce v `imageCredit`), upload na Cloudinary `community-ceniky` dělá import uvnitř BE kontejneru. Workflow `.github/workflows/seed-ceniky.yml` + `scripts/seed-migrace/ceniky-import.js` + `ceniky-seed.json` (idempotentní dle `seedTag: ceniky:morvol:v1`).
+- **Zvláštnosti:** položky = vnořené subdokumenty (pořadí = pořadí v poli, `id` uuid doplní service); úklid blobů diffuje **množiny** URL (cover + všechny položky) — `media.orphaned` při update i delete (`price-lists.service.ts` `collectImageUrls`); editor drží celé objekty položek → needitovaná pole (focal/zoom/fit, `imageBytes`) přežijí plnou náhradu `items`.
+- **Stav:** ✅ FE+BE (2026-07-13; BE typecheck+lint ✓, FE build + vitest 107 ✓) · 🚧 seed čeká na dry-run schválení uživatelem + deploy
+- **Kód:** FE `src/features/ikaros/ceniky/` (`types.ts` s `formatGsc`, stránky, `components/CenikEditorModal.tsx`, `CenikDiscussion.tsx`, `shopInsert.ts`), modal `src/features/ikaros/herbar/components/InsertToShopModal.tsx`; BE `backend/src/modules/price-lists/`; enumy `moderation.enums.ts` (`PriceList='price_list'`), `pending-action-type.enum.ts` (`CommunityPriceListPendingReview`); seed `scripts/seed-migrace/ceniky-*.js`.
 
 ---
 

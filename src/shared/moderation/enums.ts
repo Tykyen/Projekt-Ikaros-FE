@@ -5,7 +5,7 @@
  * (oddělená repa), ale ručně zrcadlí. UI labely jsou české.
  */
 
-// ─── Typ nahlašitelného cíle (16 ploch) ──────────────────────────────────
+// ─── Typ nahlašitelného cíle (17 ploch) ──────────────────────────────────
 
 export type ReportTargetType =
   | 'article'
@@ -23,7 +23,8 @@ export type ReportTargetType =
   | 'spell'
   | 'potion'
   | 'item'
-  | 'riddle';
+  | 'riddle'
+  | 'price_list';
 
 export const REPORT_TARGET_TYPE_LABELS: Record<ReportTargetType, string> = {
   article: 'Článek',
@@ -42,6 +43,7 @@ export const REPORT_TARGET_TYPE_LABELS: Record<ReportTargetType, string> = {
   potion: 'Lektvar v katalogu',
   item: 'Předmět v katalogu',
   riddle: 'Hádanka v katalogu',
+  price_list: 'Ceník v katalogu',
 };
 
 // ─── Kategorie hlášení (DSA čl. 16) ───────────────────────────────────────

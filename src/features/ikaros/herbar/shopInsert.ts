@@ -16,6 +16,12 @@ export interface ShopInsertItem {
   imageZoom?: number | null;
   imageFit?: ImageFit | null;
   suggestedPrice?: number | null;
+  /**
+   * 21.5f — strukturovaná cena zlaté/stříbrné/měďáky (poměr 1:10:100).
+   * Mají-li ji VŠECHNY položky, modal místo jedné výchozí ceny přepočte
+   * cenu per položka (`gold + silver/10 + copper/100`) ve zvolené měně.
+   */
+  priceGsc?: { gold: number; silver: number; copper: number };
 }
 
 /** Rostlina herbáře → položka vkladu (souhrn Roste/Použití/Lidová jména). */

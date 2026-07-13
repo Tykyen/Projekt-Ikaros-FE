@@ -15,6 +15,7 @@ import { parseApiError } from '@/shared/api/client';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
 import { WorldRole } from '@/shared/types';
 import { CurrencyAmountInput } from '@/features/world/currencies/shared/CurrencyAmountInput';
+import { CurrencySelect } from '@/features/world/currencies/shared/CurrencySelect';
 import { useWorldCurrencies } from '@/features/world/currencies/api';
 import {
   useShopGroups,
@@ -37,6 +38,11 @@ interface Props {
   onClose: () => void;
 }
 
+/** 21.5f — `{zl,st,md}` → desetinná cena ve „zlatých" (1 zl = 10 st = 100 md). */
+function gscToDecimal(p: NonNullable<ShopInsertItem['priceGsc']>): number {
+  return Math.round((p.gold + p.silver / 10 + p.copper / 100) * 10000) / 10000;
+}
+
 function itemToInput(
   it: ShopInsertItem,
   price: number,
@@ -48,7 +54,9 @@ function itemToInput(
     name: it.name,
     description: it.description || undefined,
     groupId: groupId || undefined,
-    price,
+    // 21.5f — položka se strukturovanou cenou si ji nese sama (per položka);
+    // jinak platí jednotná cena z formuláře.
+    price: it.priceGsc ? gscToDecimal(it.priceGsc) : price,
     currencyCode: currencyCode || undefined,
     imageUrl: it.imageUrl || undefined,
     imageFocalX: hasImg ? (it.imageFocalX ?? null) : null,
@@ -67,6 +75,9 @@ export function InsertToShopModal({
   const navigate = useNavigate();
   const single = mode === 'single';
   const count = items.length;
+  // 21.5f — všechny položky nesou strukturovanou cenu (zl/st/md) → cena se
+  // přepočte per položka, formulář nabízí jen „měnu pro zlaté".
+  const allGsc = count > 0 && items.every((it) => it.priceGsc);
 
   const { data: myWorlds } = useMyWorlds();
   const worldTargets = useMemo(
@@ -238,24 +249,47 @@ export function InsertToShopModal({
             </select>
           </div>
 
-          <div className={s.field}>
-            {/* CurrencyAmountInput = složený widget → skupinový popisek span */}
-            <span className={s.label}>
-              {single ? 'Cena' : 'Výchozí cena (pro všechny)'}
-            </span>
-            <CurrencyAmountInput
-              amount={amount}
-              currencyCode={effectiveCurrency}
-              onAmountChange={setAmount}
-              onCurrencyChange={setCurrencyCode}
-              items={currencyItems}
-            />
-            {currencyItems.length === 0 ? (
+          {allGsc ? (
+            <div className={s.field}>
+              <span className={s.label}>Měna pro zlaté</span>
+              <CurrencySelect
+                value={effectiveCurrency}
+                onChange={setCurrencyCode}
+                items={currencyItems}
+                ariaLabel="Měna pro zlaté"
+              />
               <span className={s.hint}>
-                Svět nemá nastavené měny — cena se uloží bez měny.
+                Každá položka si nese vlastní cenu — přepočte se ze
+                zlatých/stříbrných/měďáků (1 zl = 10 st = 100 md)
+                {single && items[0]?.priceGsc
+                  ? ` — zde ${gscToDecimal(items[0].priceGsc)}`
+                  : ''}{' '}
+                ve zvolené měně.
+                {currencyItems.length === 0
+                  ? ' Svět nemá nastavené měny — cena se uloží bez měny.'
+                  : ''}
               </span>
-            ) : null}
-          </div>
+            </div>
+          ) : (
+            <div className={s.field}>
+              {/* CurrencyAmountInput = složený widget → skupinový popisek span */}
+              <span className={s.label}>
+                {single ? 'Cena' : 'Výchozí cena (pro všechny)'}
+              </span>
+              <CurrencyAmountInput
+                amount={amount}
+                currencyCode={effectiveCurrency}
+                onAmountChange={setAmount}
+                onCurrencyChange={setCurrencyCode}
+                items={currencyItems}
+              />
+              {currencyItems.length === 0 ? (
+                <span className={s.hint}>
+                  Svět nemá nastavené měny — cena se uloží bez měny.
+                </span>
+              ) : null}
+            </div>
+          )}
         </>
       )}
     </Modal>
