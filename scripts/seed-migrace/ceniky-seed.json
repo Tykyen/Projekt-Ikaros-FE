@@ -54,11 +54,11 @@
      "imageCredit": "Andreas Libavius · Wikimedia Commons (Public domain)"
     },
     {
-     "name": "Destilační kolona (základní)",
+     "name": "Destilační kolona (pokročilá)",
      "gold": 1000,
      "silver": 1,
      "copper": 0,
-     "key": "bezne-zbozi/destilacni-kolona-zakladni-2",
+     "key": "bezne-zbozi/destilacni-kolona-pokrocila",
      "imageSrc": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Alembics_from_Andreas_Libavius_Alchymia.png",
      "imageCredit": "Andreas Libavius · Wikimedia Commons (Public domain)"
     },
@@ -1838,7 +1838,7 @@
     {
      "name": "Sójový olej (500 ml)",
      "description": "Typ: E.",
-     "gold": 1000,
+     "gold": 10,
      "silver": 0,
      "copper": 0,
      "key": "byliny-a-koreni/sojovy-olej-500-ml",
@@ -9905,7 +9905,7 @@
     },
     {
      "name": "Kráva",
-     "gold": 400,
+     "gold": 150,
      "silver": 0,
      "copper": 0,
      "key": "zvirata/krava",
