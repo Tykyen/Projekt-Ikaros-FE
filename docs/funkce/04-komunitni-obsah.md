@@ -11,13 +11,13 @@ Společné principy ověřené v kódu:
 ---
 
 ### Společná tvorba — rozcestník komunitního obsahu
-- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii a komunitní knihovny: **Bestiář** (16.2b-2), **Herbář** (21.5a), **Kouzla** (21.5c), **Lektvary** (21.5b), **Předměty** (21.5e), **Hádanky** (21.5d), **Ceníky** (21.5f) — **všech 10 dlaždic aktivních, žádný stub**.
+- **Co to je:** Platformový hub sjednocující veškerou komunitní tvorbu do jedné mřížky dlaždic (tlačítek). Vstupní bod pro Diskuze/Články/Galerii a komunitní knihovny: **Bestiář** (16.2b-2), **Herbář** (21.5a), **Kouzla** (21.5c), **Lektvary** (21.5b), **Předměty** (21.5e), **Hádanky** (21.5d), **Ceníky** (21.5f), **Generátory** (21.2a) — **všech 11 dlaždic aktivních, žádný stub**.
 - **Kde:** route `/ikaros/tvorba` (`TvorbaHubPage`). Hlavní navigace: jedno tlačítko „Společná tvorba" (ikona `Palette`), které **nahradilo** samostatné položky Diskuze/Články/Galerie. „RPG systémy" zůstává v nav samostatně (veřejný SEO landing, ne komunitní tvorba). Stuby už nejsou (`ComingSoonPage` bez route — nevyužitá komponenta).
 - **Kdo:** hub i stuby **veřejné** (anon, bez `requireAuth`) — router `src/app/router.tsx`. Jednotlivé cíle si řeší vlastní gating (Diskuze má `requireAuth` → anon klik = login). Data dlaždic `src/features/ikaros/pages/SpolecnaTvorba/tiles.ts`.
 - **Co jde dělat:** proklik na kteroukoli sekci — aktivní dlaždice vede na svou stránku, stub na `ComingSoonPage` („Připravujeme", `noindex`) s odkazem zpět na hub. Aktivní dlaždice nese moderační badge (počet pending pro recenzenta) z `usePendingActionsCount`.
 - **Hranice / co neumí:** Hub je čistě navigační vrstva, sám žádný obsah nedrží. Všechny knihovny žijí (viz sekce níže; komunitní Bestiář čeká na plnou inventuru — viz Nesrovnalosti).
 - **Zvláštnosti:** navigační badge „Společná tvorba" v `IkarosLayout` agreguje **součet** pending typů Diskuze+Články+Galerie (`NavItem` prop `pendingTypes`), aby moderátor o signál sloučením nepřišel; tooltip vyjmenuje neprázdné. Hub v prerenderu klasifikován jako statická cesta (delší TTL); stuby `noindex`.
-- **Stav:** ✅ (hub + nav 2026-07-03; 10. dlaždice Ceníky 21.5f přidána 2026-07-13)
+- **Stav:** ✅ (hub + nav 2026-07-03; 10. dlaždice Ceníky 21.5f + 11. dlaždice Generátory 21.2a přidány 2026-07-13)
 - **Kód:** FE `src/features/ikaros/pages/SpolecnaTvorba/` (`TvorbaHubPage.tsx`, `ComingSoonPage.tsx`, `tiles.ts`), nav `src/app/layout/IkarosLayout/IkarosLayout.tsx` (`PRIMARY_NAV`, `NavItem`), routy `src/app/router.tsx`. BE: žádné (čistě FE navigace).
 
 ---
@@ -204,6 +204,19 @@ Společné principy ověřené v kódu:
 - **Zvláštnosti:** položky = vnořené subdokumenty (pořadí = pořadí v poli, `id` uuid doplní service); úklid blobů diffuje **množiny** URL (cover + všechny položky) — `media.orphaned` při update i delete (`price-lists.service.ts` `collectImageUrls`); editor drží celé objekty položek → needitovaná pole (focal/zoom/fit, `imageBytes`) přežijí plnou náhradu `items`.
 - **Stav:** ✅ FE+BE (2026-07-13; BE typecheck+lint ✓, FE build + vitest 107 ✓) · 🚧 seed čeká na dry-run schválení uživatelem + deploy
 - **Kód:** FE `src/features/ikaros/ceniky/` (`types.ts` s `formatGsc`, stránky, `components/CenikEditorModal.tsx`, `CenikDiscussion.tsx`, `shopInsert.ts`), modal `src/features/ikaros/herbar/components/InsertToShopModal.tsx`; BE `backend/src/modules/price-lists/`; enumy `moderation.enums.ts` (`PriceList='price_list'`), `pending-action-type.enum.ts` (`CommunityPriceListPendingReview`); seed `scripts/seed-migrace/ceniky-*.js`.
+
+---
+
+### Generátory — jména + potomci (21.2a = první realizace 21.2)
+- **Co to je:** Procedurální generátory bez AI nákladů: **Jména** (náhodná jména ze **jmenných sad** — národ/stát = mužská + ženská jména + příjmení + volitelná přízviska) a **Potomci** (demografický generátor rodin: porodní řada dle předindustriální demografie — počet dětí je výsledek, ne hod kostkou; úmrtí matky při porodu 1 %/porod, dvojčata 1,5 %, pohlaví 51,2 % ♂, presety úmrtnosti Středověk/Tvrdý svět/Prosperita, dožití z úmrtnostní tabulky, příčiny smrti dle věku/pohlaví). **Generování běží čistě na klientu** (`engine/` — mulberry32 seed, Zipf, Markov není na FE). Sady plní komunita.
+- **Kde:** `/ikaros/generatory` (**11. dlaždice** hubu, `Dices`; taby Jména · Potomci · Sady) + `/ikaros/generatory/sady/:id` (detail sady). BE modul `name-sets` (`/api/name-sets/community…`, kolekce `name_sets`).
+- **Kdo:** controller `JwtAuthGuard` (login-required, parita rodiny — `name-sets.controller.ts:33`); skryté sady jen Admin+ (`name-sets.service.ts:57`); sadu založí přihlášený (draft), upraví autor/kurátor, schválí kurátor (`isBestieCurator`), smaže autor-draft/kurátor; moderace 20B (`targetType="name_set"`, M2/M3 hide + M4 hard delete); pending `community_name_set_pending_review`.
+- **Co jde dělat:** **Jména** — výběr sady (skupiny Morvol/Státy/Vlastní), počet 1–50, pohlaví, formát, „běžná jména častěji" (Zipf, jen `frequencySorted` sady), přízviska, **zámky per řádek** (přežijí přegenerování), kopírování, **deterministický seed** (zobrazí se, stejný seed = stejný výsledek). **Potomci** — jmenná sada (jména + volitelný **demografický profil sady**: násobek dožití + okno plodnosti → elfí demografie), preset úmrtnosti, **generace 1–3** (mini-rodokmen, strop ~200 osob, synové dědí příjmení), **rok světa** (výstup v letopočtech), toggle zemřelých dětí, „rovnou pojmenovat", kopie jako text. **Sady** — 2 knihovny, filtr kategorie, hledání, editor (textarey jedno jméno/řádek, BE dedupuje; přechylování `-ová` per sada, demografický profil), detail s ukázkami a kurátorskými akcemi.
+- **Hranice / co neumí:** list sad vrací jen souhrny s počty (plné seznamy až detail — sada má tisíce jmen); bez napojení na tvorbu NPC/rodokmen 17.7 (výstup se kopíruje); sekce Království z autorova Excelu vynechána (rozhodnutí 2026-07-13); bez skinů (data-atributy `data-generator-*`).
+- **Seed (připraven, čeká na dry-run + deploy):** ~76 sad — 22 Morvol národů (z `Generátor jmen Morvol.xlsx`, normalizace + doplnění na ≥500/500/800: reálně-jazykové národy z Wikidata CC0, fantasy národy Markovovou syntézou ve stylu autorových jmen) + 54 států světa (Wikidata, řazeno četností). Workflow `seed-name-sets.yml` + `scripts/seed-migrace/name-sets-import.js` (seedTag `name-sets:v1`).
+- **Zvláštnosti:** enginy mají vlastní vitest suitu (14 testů — determinismus, Zipf, přechylování, invarianty porodní řady, strop rekurze, patrilineární jména); demografický model doložen zdroji (CAMPOP, OWID) ve spec 21.2a.
+- **Stav:** ✅ FE+BE (2026-07-13; BE typecheck+lint ✓, FE build + vitest 18 ✓) · 🚧 seed čeká na dry-run schválení + deploy
+- **Kód:** FE `src/features/ikaros/generatory/` (`engine/` random+names+demography+familyNames, `GeneratoryPage.tsx`, `NameSetDetailPage.tsx`, `components/`); BE `backend/src/modules/name-sets/`; enumy `moderation.enums.ts` (`NameSet='name_set'`), `pending-action-type.enum.ts` (`CommunityNameSetPendingReview`); seed `scripts/seed-migrace/name-sets-*`.
 
 ---
 

@@ -24,7 +24,8 @@ export type ReportTargetType =
   | 'potion'
   | 'item'
   | 'riddle'
-  | 'price_list';
+  | 'price_list'
+  | 'name_set';
 
 export const REPORT_TARGET_TYPE_LABELS: Record<ReportTargetType, string> = {
   article: 'Článek',
@@ -44,6 +45,7 @@ export const REPORT_TARGET_TYPE_LABELS: Record<ReportTargetType, string> = {
   item: 'Předmět v katalogu',
   riddle: 'Hádanka v katalogu',
   price_list: 'Ceník v katalogu',
+  name_set: 'Jmenná sada v generátorech',
 };
 
 // ─── Kategorie hlášení (DSA čl. 16) ───────────────────────────────────────

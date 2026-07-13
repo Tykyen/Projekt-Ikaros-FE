@@ -104,6 +104,9 @@ const KomunitniHadankaDetailPage = lazy(() => import('@/features/ikaros/hadanky/
 // 21.5f — komunitní knihovna ceníků (kolekce položek s cenou zl/st/md).
 const KomunitniCenikyPage        = lazy(() => import('@/features/ikaros/ceniky/KomunitniCenikyPage'));
 const KomunitniCenikDetailPage   = lazy(() => import('@/features/ikaros/ceniky/KomunitniCenikDetailPage'));
+// 21.2a — generátory jmen a potomků (jmenné sady = komunitní knihovna).
+const GeneratoryPage             = lazy(() => import('@/features/ikaros/generatory/GeneratoryPage'));
+const NameSetDetailPage          = lazy(() => import('@/features/ikaros/generatory/NameSetDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -248,6 +251,9 @@ export const router = createBrowserRouter([
       // 21.5f — komunitní knihovna ceníků (list + detail).
       { path: 'ikaros/ceniky',          element: p(KomunitniCenikyPage) },
       { path: 'ikaros/ceniky/:id',      element: p(KomunitniCenikDetailPage) },
+      // 21.2a — generátory (jména + potomci) a detail jmenné sady.
+      { path: 'ikaros/generatory',           element: p(GeneratoryPage) },
+      { path: 'ikaros/generatory/sady/:id',  element: p(NameSetDetailPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'ikaros/podporovatele',   element: p(SupportersPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug

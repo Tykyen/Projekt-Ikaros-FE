@@ -235,8 +235,9 @@ export function PlatformSection() {
             <strong>Galerie</strong>, <strong>Bestiář</strong>,{' '}
             <strong>Herbář</strong>, <strong>Kouzla</strong>,{' '}
             <strong>Lektvary</strong>, <strong>Předměty</strong>,{' '}
-            <strong>Hádanky</strong> a <strong>Ceníky</strong> — všech deset
-            sekcí je funkčních. RPG systémy mají v menu vlastní tlačítko.
+            <strong>Hádanky</strong>, <strong>Ceníky</strong> a{' '}
+            <strong>Generátory</strong> — všech jedenáct sekcí je funkčních.
+            RPG systémy mají v menu vlastní tlačítko.
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Globální bestiář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
@@ -383,6 +384,28 @@ export function PlatformSection() {
             editoru s tabulkou položek; po schválení správcem se zařadí do
             knihovny. U převzatých obrázků uváděj zdroj a licenci — pole
             „atribuce" je přímo v editoru.
+          </p>
+        </Tool>
+        <Tool icon={<Dices size={16} />} title="Generátory jmen a rodin" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="corrector">
+          <p>
+            Dva nástroje pro rychlou tvorbu postav (ve „Společné tvorbě").{' '}
+            <strong>Jména</strong>: vyber jmennou sadu (národy Morvolu nebo
+            desítky států světa včetně české), počet, pohlaví a formát — a
+            generuj. Řádky jdou <strong>zamknout</strong> (přežijí další
+            generování) a kopírovat; česká a slovanská příjmení se ženám
+            správně <strong>přechylují</strong> (-ová). Zobrazený{' '}
+            <strong>seed</strong> můžeš poslat kamarádovi — stejný seed dá
+            stejná jména.
+          </p>
+          <p>
+            <strong>Potomci</strong>: vygeneruje celou rodinu podle skutečné
+            historické demografie — děti přicházejí po ~2,5 letech od sňatku,
+            část se nedožije dospělosti (volíš tvrdost světa), matka může
+            zemřít při porodu, u každého je věk, osud i příčina smrti. Umí i{' '}
+            <strong>více generací</strong> (malý rodokmen), letopočty tvého
+            světa a rovnou všechny <strong>pojmenovat</strong> ze zvolené sady
+            — elfí sady mají vlastní délku života. Vlastní jmennou sadu založíš
+            v záložce Sady (po schválení správcem je pro všechny).
           </p>
         </Tool>
         <Tool icon={<BookOpen size={16} />} title="Články" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">

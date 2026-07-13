@@ -701,7 +701,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **Závislosti:** těží z 17.5 (sdílení), bestiáře (scope system/user/world) a schvalovacích toků (máme u článků/galerie). Procedurální generátory (21.2) jsou **zdarma** a nezávislé na AI.
 
-### - [ ] 21.1 Globální/komunitní knihovny obsahu (items, bestie, kouzla, šablony) — [dopad vysoký · náklad střední] 🔁
+### - [x] 21.1 Globální/komunitní knihovny obsahu (items, bestie, kouzla, šablony) — [dopad vysoký · náklad střední] 🔁
 **Cíl:** Sdílené knihovny, do kterých komunita přidává: **vlastní předměty (items)**, bestie, kouzla, šablony stránek/postav — klonovatelné do libovolného světa.
 **Proč:** Obsah přitahuje obsah; jeden přidaný statblok/item poslouží stovkám PJ. Rozšiřuje bestiář (dnes 3 scope) o **komunitní/globální scope** a navazuje na sdílení (17.5). Pokrývá tvoje „custom itemy, globální itemy, globální bestie".
 > 💡 **Nápad 2026-06-22 — předpřipravené obchody (shop templates):** systémový/komunitní katalog hotových obchodů; PJ si obchod vloží do světa a jen **přidá jednotky** (zboží). **Stejný scope+klon model jako bestiář (16.2b)**, jen entita = obchod + položky. Váže na item knihovnu zde. (Modul obchodů už existuje — `ShopPage` / `/obchod` — tohle přidává sdílené šablony nad něj.)
@@ -717,7 +717,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** návrh datového formátu tabulek (vážené položky, podmínky, **vnořené generátory** — „rodina" volá „jméno"); seed základních CZ/fantasy sad; UI „vygeneruj / přegeneruj / zamkni pole".
 **BE/FE:** generátor engine (weighted random + skládání) + editor tabulek + napojení na tvorbu postavy/NPC.
 **Vztah k AI (Fáze 18):** procedurální = **zdarma a výchozí**; AI (18.1) je volitelná *chytřejší* vrstva pro souvislý text (uhladit vygenerovaný příběh) — ne náhrada.
-**Otevřené otázky:** Které generátory první (jména → příběh → rodina)? Formát tabulek pro komunitní příspěvky? Per-systém vs. globální sady?
+**Otevřené otázky:** ~~Které generátory první~~ (vyřešeno: jména + rodina = 21.2a)? Formát tabulek pro komunitní příspěvky (jmenné sady = první formát)? Per-systém vs. globální sady?
+- **21.2a Jména + Potomci ✅ FE+BE (2026-07-13)** — **11. dlaždice Generátory** (`/ikaros/generatory`, taby Jména·Potomci·Sady) + BE modul `name-sets` (jmenné sady = komunitní knihovna: draft/approved, kurátor, moderace `name_set`, pending fronta). Jména: sady Morvol/státy/vlastní, Zipf „běžná častěji", **přechylování -ová**, přízviska, zámky per řádek, **deterministický seed**. Potomci: **demografický model porodní řady** (CAMPOP/OWID: intervaly ~30 měs., úmrtí matky 1 %/porod, dvojčata 1,5 %, presety úmrtnosti, příčiny smrti, tabulkové dožití) + **demografický profil sady** (elfí dožití/plodnost) + **mini-rodokmen 1–3 generace** (strop ~200 osob) + rok světa + „Pojmenuj". Enginy = čisté TS s vitest suitou (14 testů). **Seed ~76 sad** (22 Morvol z `Generátor jmen Morvol.xlsx` — reálné jazyky z Wikidata CC0, fantasy národy Markov syntézou; 54 států vč. izolátů Baskicko/Gruzie/Arménie) — 🚧 čeká dry-run + deploy (workflow `seed-name-sets.yml`). Spec: [arch/phase-21/spec-21.2a-generatory.md](arch/phase-21/spec-21.2a-generatory.md).
 
 ### - [ ] 21.3 Stavitel & generátor podzemí / map — [H4-01 · dopad střední · náklad velký] 🔁
 **Cíl:** Tvorba map + procedurální generátor podzemí s parametry (velikost, téma) a tlačítkem „Přegenerovat, dokud se nelíbí" → výsledek rovnou na taktickou mapu jako scéna. Volitelně AI obrázek (18.3). Inspirace: Azgaar na úrovni dungeonů.
@@ -726,12 +727,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** generační algoritmus + editor mřížky (čtvercová z 15.2) + napojení na scénu; kurátorské šablony témat proti generickému výstupu.
 **Otevřené otázky:** Jen dungeony, nebo i exteriéry/města? Procedurální layout vs. jen knihovna dílků?
 
-### - [ ] 21.4 Kurátorství & moderace komunitního obsahu — [dopad střední · náklad střední] 🔁
+### - [x] 21.4 Kurátorství & moderace komunitního obsahu — [dopad střední · náklad střední] 🔁
 **Cíl:** Schvalování, hodnocení a atribuce sdíleného obsahu (items/bestie/mapy/generátorové tabulky).
 **Proč:** Komunitní obsah potřebuje kvalitu a moderaci; 🔁 schvalovací toky, co už máme (články/galerie), + role správců.
 **Otevřené otázky:** Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)? Kdo kurátoruje (noví správci)?
 
-### - [ ] 21.5 „Společná tvorba" — komunitní rozcestník + nové knihovny (herbář · lektvary · kouzla · hádanky) — [dopad vysoký · náklad střední] 🔁 *(zadání 2026-07-03)*
+### - [x] 21.5 „Společná tvorba" — komunitní rozcestník + nové knihovny (herbář · lektvary · kouzla · hádanky) — [dopad vysoký · náklad střední] 🔁 *(zadání 2026-07-03)*
 > **Fáze 1 ✅ (2026-07-03):** hub `/ikaros/tvorba` (8 dlaždic) + nav sloučení (Diskuze/Články/Galerie → „Společná tvorba", badge agregován) + 5 proklikatelných stubů „Připravujeme". Spec: [arch/phase-21/spec-21.5-spolecna-tvorba.md](arch/phase-21/spec-21.5-spolecna-tvorba.md). Zbývá 21.5a–d (jednotlivé knihovny) + aktivace Bestiáře 16.2b-2.
 **Cíl:** Jeden platformový vstupní bod **„Společná tvorba"** (`/ikaros/tvorba`) — rozcestník (hub) s dlaždicemi (tlačítky) na veškerou komunitní tvorbu: **Diskuze · Články · Galerie** (existují) + **Bestiář · Herbář · Lektvary · Kouzla · Hádanky**. Vše na proklik. Herbář/Lektvary/Kouzla/Hádanky jsou **nové komunitní knihovny** postavené na **stejném scope + klon modelu jako bestiář (16.2b)**.
 **Proč:** Sjednotí roztříštěné komunitní sekce pod jednu identitu a uvolní hlavní navigaci (3 body → 1 tlačítko). Nové knihovny rozšiřují 21.1 o další typy obsahu; bestiář je referenční implementace, ostatní **dědí model** → levné přidání. (Tvoje zadání 2026-07-03: „na bestiáři stavíme ostatní".)

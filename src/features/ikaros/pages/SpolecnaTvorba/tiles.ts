@@ -10,6 +10,7 @@ import {
   Swords,
   Puzzle,
   ReceiptText,
+  Dices,
 } from 'lucide-react';
 import { PendingActionType } from '@/shared/types';
 
@@ -119,6 +120,15 @@ export const TVORBA_TILES: TvorbaTile[] = [
     description: 'Hotové ceníky zboží a služeb do obchodu světa.',
     to: '/ikaros/ceniky',
     icon: ReceiptText,
+    active: true,
+  },
+  // 21.2a — generátory jmen a potomků (jmenné sady plní komunita).
+  {
+    key: 'generatory',
+    label: 'Generátory',
+    description: 'Jména podle národů a rodiny s reálnou demografií.',
+    to: '/ikaros/generatory',
+    icon: Dices,
     active: true,
   },
 ];

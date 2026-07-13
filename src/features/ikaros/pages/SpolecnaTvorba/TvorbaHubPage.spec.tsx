@@ -39,10 +39,11 @@ const ALL_KEYS = [
   'predmety',
   'hadanky',
   'ceniky',
+  'generatory',
 ];
 
 describe('TvorbaHubPage (21.5)', () => {
-  it('vyrenderuje všech 10 dlaždic', () => {
+  it('vyrenderuje všech 11 dlaždic', () => {
     renderHub();
     for (const key of ALL_KEYS) {
       expect(document.querySelector(`[data-tile-key="${key}"]`)).toBeTruthy();
@@ -56,7 +57,7 @@ describe('TvorbaHubPage (21.5)', () => {
   });
 
   // 21.5d dokončil poslední knihovnu — žádná dlaždice už není stub.
-  it('žádná dlaždice nenese odznak „Připravujeme" (všech 10 aktivních)', () => {
+  it('žádná dlaždice nenese odznak „Připravujeme" (všech 11 aktivních)', () => {
     renderHub();
     for (const key of ALL_KEYS) {
       const tile = document.querySelector(`[data-tile-key="${key}"]`);
