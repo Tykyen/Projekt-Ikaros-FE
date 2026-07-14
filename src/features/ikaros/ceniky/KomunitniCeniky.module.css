@@ -53,6 +53,8 @@
   color: var(--text-secondary, var(--text-primary));
   max-width: 620px;
   margin: 0 auto;
+  /* čitelnost nad obrazovým pozadím */
+  text-shadow: 0 1px 6px rgb(var(--black-rgb, 0 0 0) / 0.55);
 }
 .headActions {
   display: flex;
@@ -79,7 +81,7 @@
   padding: var(--sp-4, 1rem) var(--sp-5, 1.5rem);
   border-radius: var(--radius-md, 12px);
   border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.1);
-  background: rgb(var(--white-rgb, 255 255 255) / 0.03);
+  background: color-mix(in srgb, var(--theme-bg, var(--bg-primary)) 65%, transparent);
   backdrop-filter: blur(8px);
   cursor: pointer;
   text-align: left;
@@ -157,7 +159,8 @@
   padding: var(--sp-2, 0.5rem) var(--sp-3, 0.75rem);
   border-radius: var(--radius-md, 12px);
   border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.15);
-  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+  /* čitelnost nad obrazovým pozadím */
+  background: color-mix(in srgb, var(--theme-bg, var(--bg-primary)) 72%, transparent);
   color: var(--text-primary);
   min-width: 180px;
 }
@@ -174,7 +177,9 @@
   margin: 0;
   border-radius: var(--radius-md, 12px);
   border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.08);
-  background: rgb(var(--white-rgb, 255 255 255) / 0.02);
+  /* čitelnost nad obrazovým pozadím — neprůhledný podklad z barvy motivu */
+  background: color-mix(in srgb, var(--theme-bg, var(--bg-primary)) 80%, transparent);
+  backdrop-filter: blur(8px);
   overflow: hidden;
 }
 /* 21.5k — klikací filtr ér (chips nad štítkovým filtrem) */
@@ -193,7 +198,9 @@
   padding: 6px var(--sp-4, 1rem);
   border-radius: var(--radius-full, 999px);
   border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.25);
-  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+  /* čitelnost nad obrazovým pozadím */
+  background: color-mix(in srgb, var(--theme-bg, var(--bg-primary)) 72%, transparent);
+  backdrop-filter: blur(6px);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.9rem);
@@ -205,7 +212,7 @@
 .eraChip[aria-pressed='true'] {
   border-color: var(--theme-accent-cyan, var(--accent-bright));
   color: var(--theme-accent-cyan, var(--accent-bright));
-  background: rgb(var(--white-rgb, 255 255 255) / 0.08);
+  background: color-mix(in srgb, var(--theme-bg, var(--bg-primary)) 86%, transparent);
 }
 .eraChipCount {
   font-size: var(--text-xs, 0.75rem);
@@ -230,6 +237,8 @@
   font-size: var(--text-xl, 1.35rem);
   color: var(--text-primary);
   margin: var(--sp-6, 1.5rem) 0 var(--sp-3, 0.75rem);
+  /* čitelnost nad obrazovým pozadím */
+  text-shadow: 0 1px 6px rgb(var(--black-rgb, 0 0 0) / 0.55);
 }
 .eraCount {
   font-family: var(--font-body);
