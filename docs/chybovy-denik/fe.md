@@ -2103,3 +2103,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Zhodnocení:** 👍 zabralo napoprvé, 0 cyklení; 👍 průzkum před spec ušetřil BE práci (roadmapa by svedla k `around` endpointu). 👎 známý limit: hluboký skok = stovky zpráv v DOM (list nevirtualizovaný) — řešit až při reálném problému.
 
 ---
+
+### CH-073 — skok na zprávu z hledání nefungoval při přepnutí konverzace (stick-to-bottom vs. čerstvý mount) · 2026-07-14
+**Kontext:** feature „skok na nalezenou zprávu" (spec-chat-search-jump) — v téže konverzaci fungoval, při kliku na výsledek z JINÉ konverzace pohled zůstal dole.
+**Co jsem udělal špatně:** skok jsem otestoval jen v rámci načtené/mountnuté konverzace; neprověřil jsem interakci s „přilepením ke dnu" (`stickRef=true` od mountu + ResizeObserver stahuje pohled na konec při každém nárůstu obsahu). Při přepnutí konverzace se `MessageList` čerstvě mountuje a obrázky/avatary se dokreslují AŽ PO skoku → observer pohled vrátil dolů. V téže konverzaci jsou obrázky už vykreslené → nic nestahovalo → falešný pocit hotovo.
+**Proč to nefungovalo:** dvě scroll autority proti sobě — programový `scrollIntoView` skoku vs. stick-to-bottom observer; skok nevypnul stick.
+**Poučení:** každý programový scroll do historie musí vypnout stick (`stickRef.current = false` v `handleJump`); scroll featury testovat na ČERSTVÉM mountu s nedokreslenými obrázky (přepnutí konverzace), ne jen v už vykreslené. Diagnóza „funguje tady, nefunguje tam" → hledej, co se liší v lifecycle (mount/cache), ne v datech.
+**Příznak cyklení:** ladím scroll/skok a testuju jen v aktuálně otevřené konverzaci.
+
+---

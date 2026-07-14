@@ -137,6 +137,10 @@ export function MessageList({
   const handleJump = useCallback((messageId: string) => {
     const el = itemRefs.current.get(messageId);
     if (!el) return;
+    // Skok = vědomé čtení historie → vypni přilepení ke dnu. Bez toho
+    // ResizeObserver (dokreslení obrázků po čerstvém mountu při přepnutí
+    // konverzace) stáhne pohled zpět na konec a skok se „neprojeví".
+    stickRef.current = false;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setHighlightedId(messageId);
     clearTimeout(highlightTimer.current);

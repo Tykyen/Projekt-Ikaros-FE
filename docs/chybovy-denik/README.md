@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-073.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-074.**
 
 ## Jak je deník členěný
 
@@ -290,3 +290,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--213fg-stavitel-klíč-mapy-témataca-jeskyně-krajina-přes-value-noise--2026-07-14) | fe/be | 21.3f+g: klíč mapy klíčovaný textem popisku (ne id), témata = datové přepínače, CA jeskyně = branch, krajina = value-noise + cesta greedy po elevaci | — |
 | [✅ ŘEŠENÍ](be.md#-řešení--hloubkový-audit-testerce-nechodí-push-notifikace--kód-čistý-opraveny-2-dluhy-diagnostiky--2026-07-14) | be | push audit: diff řetězu od posledního funkčního data → kód čistý (příčina data/zařízení); opraveno: tichý `catch {}` v chat push bloku → log; failCount úklid trvale mrtvých subscriptions (403 VAPID mismatch), práh 8, transientní se nepočítají | „nechodí notifikace" → NEhádat, diff od posledního funkčního data; tichý catch u fire-and-forget = vlajka |
 | [✅ ŘEŠENÍ](fe.md#-řešení--hledání-v-chatu-skok-přímo-na-nalezenou-zprávu-dohledání-v-historii--2026-07-14) | fe | chat search jump: reuse existujícího `jumpToMessageId` + čistá smyčka dohledání v historii (`before` kurzor, pojistka 30 dávek); past = setState v effectu → adjustment-during-render | 2 react-hooks warningy u async smyčky → stav přepínej adjustmentem, effect spouštěj ze stavu |
+| [CH-073](fe.md#ch-073--skok-na-zprávu-z-hledání-nefungoval-při-přepnutí-konverzace-stick-to-bottom-vs-čerstvý-mount--2026-07-14) | fe | skok fungoval jen v téže konverzaci — při přepnutí ho stick-to-bottom ResizeObserver (dokreslení obrázků po mountu) stáhl dolů; fix `stickRef=false` v `handleJump` | scroll featuru testuju jen v už otevřené konverzaci; „funguje tady, ne tam" → hledej lifecycle rozdíl |
