@@ -35,8 +35,29 @@ interface Props {
   items: ShopInsertItem[];
   /** Genitiv plurálu do vět („rostlin", „lektvarů"). */
   nounMany?: string;
+  /**
+   * 21.5g — měna zdrojového ceníku (jen popisky; přepočet je vždy
+   * `gold + silver/10 + copper/100`, u usd = přesně dolary s centy).
+   */
+  priceCurrency?: 'gsc' | 'usd' | 'credits';
   onClose: () => void;
 }
+
+/** 21.5g — popisky přepočtu per měna zdroje. */
+const GSC_LABELS = {
+  gsc: {
+    currencyFor: 'Měna pro zlaté',
+    convertFrom: 'ze zlatých/stříbrných/měďáků (1 zl = 10 st = 100 md)',
+  },
+  usd: {
+    currencyFor: 'Měna pro dolary',
+    convertFrom: 'z dolarů (centy za desetinnou čárkou)',
+  },
+  credits: {
+    currencyFor: 'Měna pro kredity',
+    convertFrom: 'z kreditů',
+  },
+} as const;
 
 /** 21.5f — `{zl,st,md}` → desetinná cena ve „zlatých" (1 zl = 10 st = 100 md). */
 function gscToDecimal(p: NonNullable<ShopInsertItem['priceGsc']>): number {
@@ -70,6 +91,7 @@ export function InsertToShopModal({
   mode,
   items,
   nounMany = 'položek',
+  priceCurrency = 'gsc',
   onClose,
 }: Props) {
   const navigate = useNavigate();
@@ -78,6 +100,7 @@ export function InsertToShopModal({
   // 21.5f — všechny položky nesou strukturovanou cenu (zl/st/md) → cena se
   // přepočte per položka, formulář nabízí jen „měnu pro zlaté".
   const allGsc = count > 0 && items.every((it) => it.priceGsc);
+  const gscLabels = GSC_LABELS[priceCurrency];
 
   const { data: myWorlds } = useMyWorlds();
   const worldTargets = useMemo(
@@ -251,16 +274,16 @@ export function InsertToShopModal({
 
           {allGsc ? (
             <div className={s.field}>
-              <span className={s.label}>Měna pro zlaté</span>
+              <span className={s.label}>{gscLabels.currencyFor}</span>
               <CurrencySelect
                 value={effectiveCurrency}
                 onChange={setCurrencyCode}
                 items={currencyItems}
-                ariaLabel="Měna pro zlaté"
+                ariaLabel={gscLabels.currencyFor}
               />
               <span className={s.hint}>
-                Každá položka si nese vlastní cenu — přepočte se ze
-                zlatých/stříbrných/měďáků (1 zl = 10 st = 100 md)
+                Každá položka si nese vlastní cenu — přepočte se{' '}
+                {gscLabels.convertFrom}
                 {single && items[0]?.priceGsc
                   ? ` — zde ${gscToDecimal(items[0].priceGsc)}`
                   : ''}{' '}

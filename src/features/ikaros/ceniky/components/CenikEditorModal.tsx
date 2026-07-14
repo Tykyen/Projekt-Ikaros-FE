@@ -13,7 +13,11 @@ import { HeroUploadCard } from '@/features/world/pages/PageEditor/components/Her
 import { useKomunitniCenikyMutations } from '../hooks/useKomunitniCenikyMutations';
 import {
   PRICE_LIST_MAX_ITEMS,
+  PRICE_LIST_CURRENCIES,
+  PRICE_LIST_CURRENCY_LABELS,
+  decimalToGsc,
   type GlobalPriceList,
+  type PriceListCurrency,
   type PriceListItemPayload,
   type CreatePriceListPayload,
 } from '../types';
@@ -44,6 +48,11 @@ export function CenikEditorModal({ mode, cenik, onClose, onSaved }: Props) {
   const [description, setDescription] = useState(cenik?.description ?? '');
   const [imageUrl, setImageUrl] = useState(cenik?.imageUrl ?? '');
   const [tags, setTags] = useState((cenik?.tags ?? []).join(', '));
+  // 21.5g — měna zobrazení; hodnoty položek zůstávají gold/silver/copper,
+  // přepnutí měny je proto bezeztrátové.
+  const [currency, setCurrency] = useState<PriceListCurrency>(
+    cenik?.currency ?? 'gsc',
+  );
   const [items, setItems] = useState<PriceListItemPayload[]>(
     () => (cenik?.items ?? []).map((it) => ({ ...it })),
   );
@@ -52,6 +61,8 @@ export function CenikEditorModal({ mode, cenik, onClose, onSaved }: Props) {
 
   const isCreate = mode === 'create';
   const pending = create.isPending || update.isPending;
+  /** usd/credits editují cenu jako jedno desetinné číslo. */
+  const isDecimal = currency !== 'gsc';
 
   const patchItem = (idx: number, patch: Partial<PriceListItemPayload>) =>
     setItems((prev) =>
@@ -100,6 +111,7 @@ export function CenikEditorModal({ mode, cenik, onClose, onSaved }: Props) {
       description: description.trim() || undefined,
       imageUrl: imageUrl || undefined,
       tags: tagList.length ? tagList : undefined,
+      currency,
       items: items.map((it) => ({
         ...it,
         name: it.name.trim(),
@@ -219,6 +231,21 @@ export function CenikEditorModal({ mode, cenik, onClose, onSaved }: Props) {
             onChange={(e) => setTags(e.target.value)}
             placeholder="např. jídlo, služby"
           />
+          <label className={s.label} htmlFor="cl-currency">
+            Měna cen
+          </label>
+          <select
+            id="cl-currency"
+            className={s.select}
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as PriceListCurrency)}
+          >
+            {PRICE_LIST_CURRENCIES.map((c) => (
+              <option key={c} value={c}>
+                {PRICE_LIST_CURRENCY_LABELS[c]}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -229,13 +256,23 @@ export function CenikEditorModal({ mode, cenik, onClose, onSaved }: Props) {
           {items.length} / {PRICE_LIST_MAX_ITEMS}
         </span>
       </div>
-      <p className={s.priceLegend}>ceny: zlaté · stříbrné · měďáky</p>
+      <p className={s.priceLegend}>
+        {currency === 'usd'
+          ? 'ceny: americké dolary ($, s centy za tečkou)'
+          : currency === 'credits'
+            ? 'ceny: kredity'
+            : 'ceny: zlaté · stříbrné · měďáky'}
+      </p>
 
       {items.length > 0 ? (
         <ul className={s.itemList}>
           {items.map((it, idx) => (
             <li key={it.id ?? `new-${idx}`} className={s.itemRow}>
-              <div className={s.itemGrid}>
+              <div
+                className={
+                  isDecimal ? `${s.itemGrid} ${s.itemGridDecimal}` : s.itemGrid
+                }
+              >
                 <input
                   className={s.input}
                   value={it.name}
@@ -252,36 +289,54 @@ export function CenikEditorModal({ mode, cenik, onClose, onSaved }: Props) {
                   maxLength={80}
                   aria-label={`Sekce položky ${idx + 1}`}
                 />
-                <input
-                  className={s.input}
-                  type="number"
-                  min={0}
-                  value={it.gold}
-                  onChange={(e) =>
-                    patchItem(idx, { gold: Number(e.target.value) })
-                  }
-                  aria-label={`Zlaté — položka ${idx + 1}`}
-                />
-                <input
-                  className={s.input}
-                  type="number"
-                  min={0}
-                  value={it.silver}
-                  onChange={(e) =>
-                    patchItem(idx, { silver: Number(e.target.value) })
-                  }
-                  aria-label={`Stříbrné — položka ${idx + 1}`}
-                />
-                <input
-                  className={s.input}
-                  type="number"
-                  min={0}
-                  value={it.copper}
-                  onChange={(e) =>
-                    patchItem(idx, { copper: Number(e.target.value) })
-                  }
-                  aria-label={`Měďáky — položka ${idx + 1}`}
-                />
+                {isDecimal ? (
+                  /* usd/credits — jedna desetinná hodnota; uložení zůstává
+                     gold/silver/copper (přepnutí měny je bezeztrátové). */
+                  <input
+                    className={s.input}
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={it.gold + (it.silver * 10 + it.copper) / 100}
+                    onChange={(e) =>
+                      patchItem(idx, decimalToGsc(Number(e.target.value)))
+                    }
+                    aria-label={`Cena — položka ${idx + 1}`}
+                  />
+                ) : (
+                  <>
+                    <input
+                      className={s.input}
+                      type="number"
+                      min={0}
+                      value={it.gold}
+                      onChange={(e) =>
+                        patchItem(idx, { gold: Number(e.target.value) })
+                      }
+                      aria-label={`Zlaté — položka ${idx + 1}`}
+                    />
+                    <input
+                      className={s.input}
+                      type="number"
+                      min={0}
+                      value={it.silver}
+                      onChange={(e) =>
+                        patchItem(idx, { silver: Number(e.target.value) })
+                      }
+                      aria-label={`Stříbrné — položka ${idx + 1}`}
+                    />
+                    <input
+                      className={s.input}
+                      type="number"
+                      min={0}
+                      value={it.copper}
+                      onChange={(e) =>
+                        patchItem(idx, { copper: Number(e.target.value) })
+                      }
+                      aria-label={`Měďáky — položka ${idx + 1}`}
+                    />
+                  </>
+                )}
                 <span className={s.itemBtns}>
                   <button
                     type="button"

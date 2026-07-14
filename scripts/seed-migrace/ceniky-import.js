@@ -18,7 +18,9 @@ const fs = require('fs');
 
 const SEED_JSON = process.env.SEED_JSON || '/tmp/ceniky-seed.json';
 const AUTHOR_EMAIL = 'tykytanjunior@gmail.com';
-const SEED_TAG = 'ceniky:morvol:v1';
+// 21.5g — parametrizace pro další éry (defaulty = morvol, zpětně kompatibilní)
+const SEED_TAG = process.env.SEED_TAG || 'ceniky:morvol:v1';
+const ITEM_TAGS = (process.env.ITEM_TAGS || 'morvol').split(',');
 const CLOUD_FOLDER = 'community-ceniky';
 /** Přeskoč Cloudinary upload (rychlý test bez obrázků): SKIP_IMAGES=1 */
 const SKIP_IMAGES = process.env.SKIP_IMAGES === '1';
@@ -121,16 +123,19 @@ async function uploadImage(srcUrl, publicId) {
     imageFit: null,
     kind: it.kind,
     description: it.description || '',
-    tags: ['morvol'],
+    tags: ITEM_TAGS,
     suggestedPrice: it.suggestedPrice ?? null,
-    statblocks: {
-      matrix: {
-        systemStats: it.systemStats,
-        status: 'approved', // data od autora systemu (matrix = Morvol)
-        authorId: aid,
-        createdAt: now,
-      },
-    },
+    // 21.5g — bez systemStats = předmět jen s jádrem (žádný statblok)
+    statblocks: it.systemStats
+      ? {
+          matrix: {
+            systemStats: it.systemStats,
+            status: 'approved', // data od autora systemu (matrix = Morvol)
+            authorId: aid,
+            createdAt: now,
+          },
+        }
+      : {},
     seedKey: it.key,
     ...approvedFields,
   }));
@@ -153,6 +158,7 @@ async function uploadImage(srcUrl, publicId) {
     imageZoom: null,
     imageFit: null,
     tags: l.tags,
+    currency: l.currency || 'gsc', // 21.5g — měna zobrazení (usd = éra Přítomnost)
     items: l.items.map((it) => ({
       id: crypto.randomUUID(),
       name: it.name,

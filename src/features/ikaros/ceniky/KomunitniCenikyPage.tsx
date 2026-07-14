@@ -167,6 +167,12 @@ function CenikRow({ list }: { list: GlobalPriceList }) {
             <span className={s.rowDesc}>{list.description}</span>
           ) : null}
         </span>
+        {list.currency && list.currency !== 'gsc' ? (
+          // 21.5g — měnový badge (gsc = default bez badge)
+          <span className={s.countChip} title="Měna ceníku">
+            {list.currency === 'usd' ? '$ USD' : 'kredity'}
+          </span>
+        ) : null}
         <span className={s.countChip} title="Počet položek">
           {list.items.length} položek
         </span>

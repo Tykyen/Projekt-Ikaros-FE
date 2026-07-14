@@ -1,0 +1,40 @@
+name: Seed ceníky (Přítomnost)
+
+# 21.5g — jednorázový import komunitních ceníků éry Přítomnost (22 ceníků,
+# ~995 položek, ceny v USD) + zbraní/ochrany do katalogu Předmětů (bez
+# statbloků) do PROD Mongo. Reuse ceniky-import.js (parametry SEED_TAG +
+# ITEM_TAGS). Obrázky nahrává import sám na Cloudinary (community-ceniky,
+# zdroje = Wikimedia URL v seed JSONu). Spustí se ručně. Idempotentní —
+# opakovaný běh smaže předchozí seed dle seedTag; ručně vytvořeného obsahu
+# se nedotkne. Nutné až PO deployi BE s polem `currency` (price_lists).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy migration files to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/ceniky-pritomnost-seed.json ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/ceniky-pritomnost-seed.json
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/ceniky-import.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/ceniky-import.js
+
+      - name: Import into prod Mongo (via BE container)
+        # Mechanismus jako seed-ceniky: docker cp + docker exec v BE kontejneru.
+        # Upload obrázků na Cloudinary trvá — keepalive drží SSH spojení.
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=60 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/ceniky-pritomnost-seed.json projekt-ikaros-be:/tmp/ceniky-pritomnost-seed.json && docker cp /tmp/ceniky-import.js projekt-ikaros-be:/app/ceniky-import.js && docker exec -w /app -e SEED_JSON=/tmp/ceniky-pritomnost-seed.json -e SEED_TAG=ceniky:pritomnost:v1 -e ITEM_TAGS=přítomnost projekt-ikaros-be node ceniky-import.js"

@@ -11,6 +11,21 @@ export type PriceListStatus = 'draft' | 'approved';
 /** Max položek jednoho ceníku (= limit bulk dávky obchodu). */
 export const PRICE_LIST_MAX_ITEMS = 200;
 
+/**
+ * 21.5g — měna ceníku. Uložení je vždy `{gold,silver,copper}` (1:10:100);
+ * měna určuje jen zobrazení: gsc = zl/st/md, usd = $ (gold=dolary,
+ * copper=centy), credits = kredity (éra Budoucnost — rezervováno).
+ */
+export const PRICE_LIST_CURRENCIES = ['gsc', 'usd', 'credits'] as const;
+export type PriceListCurrency = (typeof PRICE_LIST_CURRENCIES)[number];
+
+/** Popisky měn pro select v editoru a badge v knihovně. */
+export const PRICE_LIST_CURRENCY_LABELS: Record<PriceListCurrency, string> = {
+  gsc: 'Zlaté / stříbrné / měďáky',
+  usd: 'Americké dolary ($)',
+  credits: 'Kredity',
+};
+
 /** Strukturovaná cena zlaté/stříbrné/měďáky. */
 export interface PriceGsc {
   gold: number;
@@ -52,6 +67,8 @@ export interface GlobalPriceList {
   imageZoom?: number | null;
   imageFit?: ImageFit | null;
   tags?: string[];
+  /** 21.5g — měna zobrazení cen (starší dokumenty nemají → gsc). */
+  currency?: PriceListCurrency;
   items: PriceListItem[];
   /** 'draft' = knihovna návrhů, 'approved' = schválená knihovna. */
   status: PriceListStatus;
@@ -87,6 +104,8 @@ export interface CreatePriceListPayload {
   imageZoom?: number | null;
   imageFit?: ImageFit | null;
   tags?: string[];
+  /** 21.5g — měna zobrazení cen (default gsc). */
+  currency?: PriceListCurrency;
   items?: PriceListItemPayload[];
 }
 
@@ -111,6 +130,35 @@ export function formatGsc(p: PriceGsc): string {
   if (p.silver) parts.push(`${p.silver} st`);
   if (p.copper) parts.push(`${p.copper} md`);
   return parts.length ? parts.join(' ') : 'zdarma';
+}
+
+/**
+ * 21.5g — cena dle měny ceníku. gsc = „2 zl 5 st"; usd = „$1,299.50"
+ * (gold=dolary, silver=desetníky, copper=centy; celé dolary bez „.00");
+ * credits = „1 234 kr". Vše nula = „zdarma".
+ */
+export function formatPrice(p: PriceGsc, currency?: PriceListCurrency): string {
+  if (!currency || currency === 'gsc') return formatGsc(p);
+  if (!p.gold && !p.silver && !p.copper) return 'zdarma';
+  if (currency === 'usd') {
+    const dollars = p.gold.toLocaleString('en-US');
+    const cents = p.silver * 10 + p.copper;
+    return cents ? `$${dollars}.${String(cents).padStart(2, '0')}` : `$${dollars}`;
+  }
+  // credits — éra Budoucnost; centové složky se zatím nezobrazují jinak.
+  const whole = p.gold.toLocaleString('cs-CZ');
+  const frac = p.silver * 10 + p.copper;
+  return frac ? `${whole},${String(frac).padStart(2, '0')} kr` : `${whole} kr`;
+}
+
+/** 21.5g — usd editor: desetinná hodnota v dolarech ↔ {gold,silver,copper}. */
+export function decimalToGsc(value: number): PriceGsc {
+  const cents = Math.max(0, Math.round(value * 100));
+  return {
+    gold: Math.floor(cents / 100),
+    silver: Math.floor((cents % 100) / 10),
+    copper: cents % 10,
+  };
 }
 
 /** Cena ve zlatých jako desetinné číslo (1 zl = 10 st = 100 md). */

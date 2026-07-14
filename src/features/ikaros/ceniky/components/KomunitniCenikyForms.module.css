@@ -87,6 +87,10 @@
   gap: var(--sp-2, 0.5rem);
   align-items: center;
 }
+/* 21.5g — usd/credits: jedno desetinné pole ceny místo tří gsc sloupců. */
+.itemGridDecimal {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 110px auto;
+}
 .itemBtns {
   display: inline-flex;
   gap: 2px;

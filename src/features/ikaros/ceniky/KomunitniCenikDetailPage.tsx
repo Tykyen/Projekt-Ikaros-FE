@@ -19,7 +19,12 @@ import { CenikEditorModal } from './components/CenikEditorModal';
 import { CenikDiscussion } from './components/CenikDiscussion';
 import { InsertToShopModal } from '../herbar/components/InsertToShopModal';
 import { cenikItemToShopInsert } from './shopInsert';
-import { formatGsc, sectionsOf, type PriceListItem } from './types';
+import {
+  formatPrice,
+  sectionsOf,
+  type PriceListCurrency,
+  type PriceListItem,
+} from './types';
 import s from './KomunitniCenikDetail.module.css';
 
 const CURATOR_ROLES = [
@@ -178,6 +183,8 @@ export default function KomunitniCenikDetailPage() {
             <p className={s.metaLine}>
               {items.length} položek
               {hasSections ? ` · ${sections.length} sekcí` : ''}
+              {cenik.currency === 'usd' ? ' · ceny v dolarech ($)' : ''}
+              {cenik.currency === 'credits' ? ' · ceny v kreditech' : ''}
             </p>
           </div>
         </div>
@@ -218,6 +225,7 @@ export default function KomunitniCenikDetailPage() {
                   <CenikItemRow
                     key={it.id}
                     item={it}
+                    currency={cenik.currency}
                     canInsert={isAuth}
                     onInsert={() => setShopItems([it])}
                   />
@@ -243,6 +251,7 @@ export default function KomunitniCenikDetailPage() {
           mode={shopItems.length === 1 ? 'single' : 'bulk'}
           items={shopItems.map(cenikItemToShopInsert)}
           nounMany="položek"
+          priceCurrency={cenik.currency ?? 'gsc'}
           onClose={() => setShopItems(null)}
         />
       ) : null}
@@ -252,10 +261,12 @@ export default function KomunitniCenikDetailPage() {
 
 function CenikItemRow({
   item,
+  currency,
   canInsert,
   onInsert,
 }: {
   item: PriceListItem;
+  currency?: PriceListCurrency;
   canInsert: boolean;
   onInsert: () => void;
 }) {
@@ -299,7 +310,10 @@ function CenikItemRow({
         </Link>
       ) : null}
       <span className={s.itemPrice}>
-        {formatGsc({ gold: item.gold, silver: item.silver, copper: item.copper })}
+        {formatPrice(
+          { gold: item.gold, silver: item.silver, copper: item.copper },
+          currency,
+        )}
       </span>
       {canInsert ? (
         <button
