@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { pickZipf, rngFromSeed, triangular } from './random';
-import { feminizeSurnameCs, generateNames } from './names';
+import { feminizeEpithetCs, feminizeSurnameCs, generateNames } from './names';
 import {
   applySetDemography,
   defaultParams,
@@ -101,6 +101,24 @@ describe('names (V1 přechylování + V7 přízviska)', () => {
       expect(n.epithet).toBeDefined();
       expect(n.text).toContain(n.epithet!);
     }
+  });
+
+  it('feminizeEpithetCs (V10) — adjektivum -ý→-á, fráze beze změny', () => {
+    expect(feminizeEpithetCs('Statečný')).toBe('Statečná');
+    expect(feminizeEpithetCs('Železný')).toBe('Železná');
+    expect(feminizeEpithetCs('z Mlžných hor')).toBe('z Mlžných hor');
+    expect(feminizeEpithetCs('od Černé řeky')).toBe('od Černé řeky');
+  });
+
+  it('žena dostane přechýlené přízvisko (V10)', () => {
+    const set = testSet({ epithets: ['Statečný'] });
+    const out = generateNames(rngFromSeed('e'), set, {
+      count: 5,
+      gender: 'f',
+      format: 'full',
+      withEpithet: true,
+    });
+    for (const n of out) expect(n.epithet).toBe('Statečná');
   });
 
   it('determinismus: stejný seed → stejná jména', () => {

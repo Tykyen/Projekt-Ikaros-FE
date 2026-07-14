@@ -1,10 +1,10 @@
-# Chybový deník — index
+﻿# Chybový deník — index
 
 Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení a zhodnocení** (`✅ ŘEŠENÍ` — co nakonec zabralo a jestli to bylo dobře). Vede ho skill [`chybovy-denik`](../../.claude/skills/chybovy-denik/SKILL.md).
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-072.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-073.**
 
 ## Jak je deník členěný
 
@@ -282,3 +282,5 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](fe.md#-řešení--215j-ceníky-blízká-budoucnost-fikční-ceny-přes-sdílenou-tabulku-ekonomických-kotev--2026-07-14) | fe/seed | 21.5j nearfuture: fikční ceny = rešerše reálných kotev + SDÍLENÁ tabulka ve všech briefách (jinak 6 agentů = 6 nekompatibilních hladin); kredity bez změny kódu | 6 nezávislých agentů bez sdílených kotev → nekonzistentní ekonomika |
 | [✅ ŘEŠENÍ](fe.md#-řešení--215k-ceníky-galaktické-dobrodružství-kalibrace-fikční-ekonomiky-z-fan-zdrojů-travellerswelite--2026-07-14) | fe/seed | 21.5k galaxie: fan ekonomiky jako kalibrace (poměry ano, IP jména ne); Traveller mzdy validovaly kotvy ~1:1; éra-pipeline = 5 ér/den | — |
 | [✅ ŘEŠENÍ](fe.md#-řešení--knihovna-ceníků-klikací-chips-filtr-ér-doplněk-r7--2026-07-14) | fe | chips filtr ér v knihovně ceníků (jen existující éry, degradace na „Vše", kombinace se štítkem) | — |
+| [✅ ŘEŠENÍ](fe.md#-řešení--212a-v10-filtr-kategorií-sad--přízviska-s-rodovou-shodou-bez-změny-schématu--2026-07-14) | fe | generátory: filtr kategorií (chips) + přízviska — rodová shoda datovou konvencí (adjektivum -ý / předložková fráze) místo nového pole; regex validace tvarů | víceslovná adjektiva nejdou strojově přechýlit → zakázat konvencí |
+| [CH-072](proces.md#ch-072--přízviska-spuštěna-jako-čistá-kreativa-bez-rešerše-uživatel-se-musel-zeptat-udělal-jsi-průzkum--2026-07-14) | proces | obsahový agent (přízviska) bez rešerše — obsah VŽDY z pramenů, kreativa bez nich jen se souhlasem | obsahový brief bez web search kroku |

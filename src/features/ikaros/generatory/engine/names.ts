@@ -54,6 +54,17 @@ function applySurnameRule(
   return surname;
 }
 
+/**
+ * V10 — přechýlení přízviska pro ženy. Datová konvence (seed i editor):
+ * přízvisko je BUĎ jednoslovné adjektivum na „-ý" (Statečný→Statečná),
+ * NEBO rodově neutrální předložková fráze („z Mlžných hor") — ta se nemění.
+ */
+export function feminizeEpithetCs(epithet: string): string {
+  const e = epithet.trim();
+  if (!e.includes(' ') && e.endsWith('ý')) return e.slice(0, -1) + 'á';
+  return e;
+}
+
 function sample(rng: Rng, list: readonly string[], zipf: boolean): string {
   return zipf ? pickZipf(rng, list) : pick(rng, list);
 }
@@ -82,10 +93,12 @@ export function generateOneName(
         set.femaleSurnameRule,
       )
     : undefined;
-  const epithet =
+  const rawEpithet =
     opts.withEpithet && set.epithets.length > 0
       ? pick(rng, set.epithets)
       : undefined;
+  const epithet =
+    rawEpithet && gender === 'f' ? feminizeEpithetCs(rawEpithet) : rawEpithet;
 
   const text = [given, surname, epithet].filter(Boolean).join(' ');
   return { gender, given, surname, epithet, text };

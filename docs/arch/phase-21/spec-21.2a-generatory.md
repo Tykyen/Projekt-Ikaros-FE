@@ -75,3 +75,11 @@ Route `/ikaros/generatory` — **11. dlaždice** hubu (ikona `Dices`); dvě zál
 ## 6. Mimo scope
 
 Plný engine tabulek 21.2 (vážené položky, podmínky, editor obecných tabulek) · generátory vzhledu/povahy/příběhu · sekce Království (dynastie/tituly — per-svět data později) · přímé napojení na tvorbu postavy/NPC a rodokmen 17.7 (výstup se kopíruje; integrace = další etapa) · skiny.
+
+---
+
+## Addendum V10 (2026-07-14) — filtr kategorií + přízviska (zadání uživatele)
+
+- **Filtr typu sad** (záložka Jména): chips Vše / Fantasy (rasy) / Státy světa / Vlastní nad selectem — zúží nabídku sad; výběr nekompatibilní s filtrem se zruší. Label kategorie `morvol` přejmenován na „Fantasy (rasy)". Zobrazují se jen kategorie, které mají schválené sady.
+- **Přízviska (dokončení V7):** seed doplněn o `epithets` pro všech 76 sad — státy sdílejí obecný pool 50 přízvisek (44 historicky doložených panovnických přídomků: Zbožný, Hrozný, Ryšavý, Kadeřavý… — rešerše List of monarchs by nickname/Byname), každá z 22 fantasy ras má vlastní pool 18 (ladí s kulturou jmen). **Rodová shoda datovou konvencí** (žádná změna schématu): přízvisko je JEN jednoslovné adjektivum na „-ý" (strojově -ý→-á pro ženy — `feminizeEpithetCs`, V10) NEBO rodově neutrální předložková fráze („z Mlžných hor"); tvary validuje inject skript regexem. Měkká adjektiva (-í) a substantiva zakázána (nejdou přechýlit).
+- **Nasazení:** náhled `c:\tmp\prizviska-nahled.html` schválí uživatel → commit seedu → re-run workflow „Seed name-sets" (idempotentní, `epithets` import už přenášel).

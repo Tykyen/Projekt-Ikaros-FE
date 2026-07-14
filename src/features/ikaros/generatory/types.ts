@@ -8,7 +8,7 @@ export type NameSetCategory = 'morvol' | 'svet' | 'vlastni';
 export type FemaleSurnameRule = 'none' | 'cs';
 
 export const NAME_SET_CATEGORY_LABELS: Record<NameSetCategory, string> = {
-  morvol: 'Morvol',
+  morvol: 'Fantasy (rasy)',
   svet: 'Státy světa',
   vlastni: 'Vlastní',
 };

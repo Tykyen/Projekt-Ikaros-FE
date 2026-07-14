@@ -710,7 +710,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **✅ Rozhodnuto (2026-06-15) — kdo smí přidávat do globálu:** defaultně **Admin, Superadmin, vedoucí diskusí (SpravceDiskuzi)**. Navíc **grantovatelná pravomoc běžnému hráči**, který má nápady (per-user flag „smí přispívat do globální knihovny", uděluje admin/správce). 🔁 vzor granular permissions (D-031) + grant model jako AKJ clearance.
 **Otevřené otázky:** Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)? Jak grant hráči udělovat (na žádost, nebo proaktivně)? Jak řešit kvalitu (hodnocení, kurátor → 21.4)?
 
-### - [ ] 21.2 Procedurální generátory postav & detailů (zdarma) — [dopad vysoký · náklad velký] ✅bez-AI
+### - [x] 21.2 Procedurální generátory postav & detailů (zdarma) — [dopad vysoký · náklad velký] ✅bez-AI
 **Cíl:** Generátory, které z **dat a náhodných tabulek** vytvoří cokoli, co postava má: **jména, výšku, věk, vzhled, povahu, životní příběh, rodinu/rodokmen, majetek…** Jednoduché, deterministické, **bez jakýchkoli nákladů**.
 **Proč:** Tvůj preferovaný směr — žádné peníze za AI, plně v naší režii. Klasický a oblíbený nástroj (Dračí Hlídka má podobné). „Jen to bude dost práce" = hlavní náklad jsou **datové tabulky**, ne kód.
 **Klíč:** tabulky plní a rozšiřuje **komunita** (váže na 21.1) — per-systém i per-svět sady (české jméno ≠ elfí ≠ sci-fi). Generátor je tenká vrstva nad daty.

@@ -62,12 +62,40 @@ export function NameSetSelect({
   );
 }
 
+/** Pořadí chips filtru kategorií. */
+const CATEGORY_FILTERS: NameSetCategory[] = ['morvol', 'svet', 'vlastni'];
+
 export function JmenaTab() {
   const { data: sets = [], isLoading } = useNameSetsList({
     status: 'approved',
   });
   const [setId, setSetId] = useState('');
+  /** Filtr typu sad — zúží nabídku selectu (Fantasy rasy / Státy / Vlastní). */
+  const [categoryFilter, setCategoryFilter] = useState<
+    NameSetCategory | 'all'
+  >('all');
   const { data: fullSet } = useNameSet(setId || null);
+
+  const visibleSets = useMemo(
+    () =>
+      categoryFilter === 'all'
+        ? sets
+        : sets.filter((set) => set.category === categoryFilter),
+    [sets, categoryFilter],
+  );
+  const availableCategories = useMemo(
+    () => CATEGORY_FILTERS.filter((c) => sets.some((s2) => s2.category === c)),
+    [sets],
+  );
+
+  const pickCategory = (next: NameSetCategory | 'all') => {
+    setCategoryFilter(next);
+    // vybraná sada mimo nový filtr → zrušit výběr (select by ukazoval prázdno)
+    if (next !== 'all') {
+      const selected = sets.find((s2) => s2.id === setId);
+      if (selected && selected.category !== next) setSetId('');
+    }
+  };
 
   const [count, setCount] = useState(10);
   const [gender, setGender] = useState<'m' | 'f' | 'mix'>('mix');
@@ -118,6 +146,29 @@ export function JmenaTab() {
   return (
     <div data-generator-jmena="">
       <div className={s.panel}>
+        {availableCategories.length > 1 ? (
+          <div className={s.categoryChips} role="group" aria-label="Typ sad">
+            <button
+              type="button"
+              className={s.categoryChip}
+              aria-pressed={categoryFilter === 'all'}
+              onClick={() => pickCategory('all')}
+            >
+              Vše
+            </button>
+            {availableCategories.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className={s.categoryChip}
+                aria-pressed={categoryFilter === c}
+                onClick={() => pickCategory(c)}
+              >
+                {NAME_SET_CATEGORY_LABELS[c]}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <div className={s.paramGrid}>
           <div className={s.field}>
             <label className={s.label} htmlFor="gen-set">
@@ -127,7 +178,7 @@ export function JmenaTab() {
               id="gen-set"
               value={setId}
               onChange={setSetId}
-              sets={sets}
+              sets={visibleSets}
             />
           </div>
           <div className={s.field}>

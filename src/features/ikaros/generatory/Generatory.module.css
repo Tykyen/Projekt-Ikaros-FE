@@ -81,6 +81,39 @@
   padding: var(--sp-4, 1rem) var(--sp-5, 1.5rem);
   margin-bottom: var(--sp-4, 1rem);
 }
+/* filtr typu sad (Fantasy rasy / Státy / Vlastní) — zúží select sady */
+.categoryChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2, 0.5rem);
+  margin-bottom: var(--sp-3, 0.75rem);
+}
+.categoryChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 4px var(--sp-4, 1rem);
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.25);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.9rem);
+  cursor: pointer;
+}
+.categoryChip:hover {
+  border-color: var(--theme-accent-cyan, var(--accent-bright));
+}
+.categoryChip[aria-pressed='true'] {
+  border-color: var(--theme-accent-cyan, var(--accent-bright));
+  color: var(--theme-accent-cyan, var(--accent-bright));
+  background: rgb(var(--white-rgb, 255 255 255) / 0.09);
+}
+@media (max-width: 700px) {
+  .categoryChip {
+    min-height: 44px; /* dotyková plocha na mobilu */
+  }
+}
 .paramGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
