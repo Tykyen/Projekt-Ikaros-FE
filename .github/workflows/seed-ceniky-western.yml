@@ -1,0 +1,36 @@
+name: Seed ceníky (Divoký západ)
+
+# 21.5i — jednorázový import komunitních ceníků éry Divoký západ (13 ceníků,
+# ~390 položek, dobové USD ~1865–1890) + zbraní/nožů do katalogu Předmětů
+# (bez statbloků). Reuse ceniky-import.js (SEED_TAG + ITEM_TAGS). Idempotentní
+# dle seedTag; ručně vytvořeného obsahu se nedotkne. BE s polem `currency`
+# už je nasazen (21.5g).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy migration files to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/ceniky-western-seed.json ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/ceniky-western-seed.json
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/ceniky-import.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/ceniky-import.js
+
+      - name: Import into prod Mongo (via BE container)
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=60 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/ceniky-western-seed.json projekt-ikaros-be:/tmp/ceniky-western-seed.json && docker cp /tmp/ceniky-import.js projekt-ikaros-be:/app/ceniky-import.js && docker exec -w /app -e SEED_JSON=/tmp/ceniky-western-seed.json -e SEED_TAG=ceniky:western:v1 -e 'ITEM_TAGS=divoký západ' projekt-ikaros-be node ceniky-import.js"

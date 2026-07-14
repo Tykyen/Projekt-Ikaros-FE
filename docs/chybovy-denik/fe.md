@@ -2019,3 +2019,8 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Past (stála retry kolo):** Commons dotazy s kvalifikátory „vintage/antique/1910s/1940s" často nemají PD/CC výsledek ≥300px — 96+96 misses. Retry s HOLÝMI názvy objektů („flannel shirt", „icebox", „haversack") dalo 96/96 a 95/95 hitů → **100 % pokrytí obrázky obou ér**. Pro příště: u dobových témat generovat dotazy bez éra-kvalifikátorů rovnou (éru nese samotný předmět), kvalifikátor přidávat jen u profesí/scén.
 **Jak ověřeno:** merge validace (454+434 položek, 0 vadných, ceníky 1:1 s konfigurací); seed JSONy skriptem (počty, currency usd všude, kind rozpad, obrázky 100 %); FE tsc -b + eslint po úpravě nápovědy čisté. Dry-runy čekají na uživatele (gate per éra).
 **Zhodnocení:** dobře, bez cyklení; mid-turn změna zadání (sekvenčnost) zachycena TaskStopem bez ztráty WW1 práce. Celkem 12 rešeršních + 4 dotazové agenty.
+
+
+### ✅ ŘEŠENÍ — 21.5i Ceníky Divoký západ: rutinní reuse pipeline 21.5h, poučení o dotazech potvrzeno · 2026-07-14
+**Co zabralo:** kompletní reuse éra-parametrizované pipeline z 21.5h (merge/fetch/build/retry + `western` v konfiguraci, kindFor rozšířen o nože z Vybavení stopaře) — 13 ceníků / 391 položek + 31 předmětů za jednu vlnu 6 agentů. **Potvrzené poučení z 21.5h:** Commons dotazy BEZ éra-kvalifikátorů („bowie knife", ne „bowie knife 1870s") daly 98 % obrázků napoprvé (8 misses vs. 96 u WW1) → retry 8/8 → 100 %. Doložené kotvy: Colt SAA $17, Winchester 1873 $27–40, Levi's $1.25, longhorn Texas $4 → Kansas $30.
+**Zhodnocení:** dobře, nula cyklení, žádná nová past — vzor „nová éra ceníků" je teď plně opakovatelný (config v merge-valky.js + workflow yml + 6+2 agentů).

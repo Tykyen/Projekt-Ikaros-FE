@@ -380,10 +380,10 @@ export function PlatformSection() {
             Ceníky pokrývají různé <strong>éry</strong>: vedle
             středověku/fantasy i <strong>současnost s cenami v amerických
             dolarech</strong> (badge „$ USD" — mzdy podle profesí, potraviny,
-            elektronika, auta, nájmy, moderní zbraně…) a{' '}
-            <strong>1. a 2. světovou válku</strong> v dobových dolarech (žold,
-            příděly, kontraktní ceny zbraní; éru poznáš podle názvu ceníku a
-            štítku). U dolarového ceníku zapisuješ cenu jako jedno číslo s
+            elektronika, auta, nájmy, moderní zbraně…) a historické éry v
+            dobových dolarech — <strong>divoký západ, 1. a 2. světovou
+            válku</strong> (mzdy a žold, příděly, kontraktní ceny zbraní; éru
+            poznáš podle názvu ceníku a štítku). U dolarového ceníku zapisuješ cenu jako jedno číslo s
             centy (12.34) a při vkladu do obchodu volíš, která měna světa
             odpovídá dolarům.
           </p>
