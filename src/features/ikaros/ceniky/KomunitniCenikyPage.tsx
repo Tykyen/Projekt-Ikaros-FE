@@ -24,6 +24,8 @@ export default function KomunitniCenikyPage() {
   const isAuth = useAtomValue(isAuthenticatedAtom);
   const [library, setLibrary] = useState<PriceListStatus>('approved');
   const [tagFilter, setTagFilter] = useState('');
+  /** 21.5k — klikací filtr ér ('all' = všechny éry). */
+  const [eraFilter, setEraFilter] = useState<string>('all');
   const [showCreate, setShowCreate] = useState(false);
 
   const approved = useKomunitniCenikyList({ status: 'approved' });
@@ -31,15 +33,36 @@ export default function KomunitniCenikyPage() {
   const active = library === 'approved' ? approved : drafts;
   const lists = useMemo(() => active.data ?? [], [active.data]);
 
+  // 21.5k — chips ér z aktuální knihovny (jen existující éry, s počty)
+  const eraChips = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const l of lists) {
+      const era = eraOf(l);
+      counts.set(era, (counts.get(era) ?? 0) + 1);
+    }
+    const order = [
+      ...PRICE_LIST_ERAS.map((e) => e.label),
+      PRICE_LIST_ERA_OTHER,
+    ];
+    return order
+      .filter((era) => counts.has(era))
+      .map((era) => ({ era, count: counts.get(era)! }));
+  }, [lists]);
+  // filtr éry platí, jen pokud éra v aktuální knihovně existuje
+  const activeEra = eraChips.some((c) => c.era === eraFilter)
+    ? eraFilter
+    : 'all';
+
   const tag = tagFilter.trim().toLowerCase();
   const filtered = useMemo(
     () =>
       lists.filter(
         (l) =>
-          tag === '' ||
-          (l.tags ?? []).some((t) => t.toLowerCase().includes(tag)),
+          (activeEra === 'all' || eraOf(l) === activeEra) &&
+          (tag === '' ||
+            (l.tags ?? []).some((t) => t.toLowerCase().includes(tag))),
       ),
-    [lists, tag],
+    [lists, tag, activeEra],
   );
 
   // 21.5j R7 — seskupení podle ér (chronologicky; bez érového štítku = Ostatní)
@@ -133,6 +156,32 @@ export default function KomunitniCenikyPage() {
           <span className={s.libCount}>{drafts.data?.length ?? '–'}</span>
         </button>
       </div>
+
+      {/* 21.5k — klikací filtr ér */}
+      {eraChips.length > 1 ? (
+        <div className={s.eraChips} role="group" aria-label="Filtr ér">
+          <button
+            type="button"
+            className={s.eraChip}
+            aria-pressed={activeEra === 'all'}
+            onClick={() => setEraFilter('all')}
+          >
+            Vše
+          </button>
+          {eraChips.map((c) => (
+            <button
+              key={c.era}
+              type="button"
+              className={s.eraChip}
+              aria-pressed={activeEra === c.era}
+              onClick={() => setEraFilter(c.era)}
+            >
+              {c.era}
+              <span className={s.eraChipCount}>{c.count}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {/* Filtry (client-side) */}
       <div className={s.filters}>
