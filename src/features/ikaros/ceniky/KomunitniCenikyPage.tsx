@@ -11,7 +11,13 @@ import { Seo } from '@/shared/seo';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useKomunitniCenikyList } from './hooks/useKomunitniCeniky';
 import { CenikEditorModal } from './components/CenikEditorModal';
-import type { PriceListStatus, GlobalPriceList } from './types';
+import {
+  PRICE_LIST_ERAS,
+  PRICE_LIST_ERA_OTHER,
+  eraOf,
+  type PriceListStatus,
+  type GlobalPriceList,
+} from './types';
 import s from './KomunitniCeniky.module.css';
 
 export default function KomunitniCenikyPage() {
@@ -26,10 +32,33 @@ export default function KomunitniCenikyPage() {
   const lists = useMemo(() => active.data ?? [], [active.data]);
 
   const tag = tagFilter.trim().toLowerCase();
-  const filtered = lists.filter(
-    (l) =>
-      tag === '' || (l.tags ?? []).some((t) => t.toLowerCase().includes(tag)),
+  const filtered = useMemo(
+    () =>
+      lists.filter(
+        (l) =>
+          tag === '' ||
+          (l.tags ?? []).some((t) => t.toLowerCase().includes(tag)),
+      ),
+    [lists, tag],
   );
+
+  // 21.5j R7 — seskupení podle ér (chronologicky; bez érového štítku = Ostatní)
+  const eraGroups = useMemo(() => {
+    const byEra = new Map<string, GlobalPriceList[]>();
+    for (const l of filtered) {
+      const era = eraOf(l);
+      const arr = byEra.get(era);
+      if (arr) arr.push(l);
+      else byEra.set(era, [l]);
+    }
+    const order = [
+      ...PRICE_LIST_ERAS.map((e) => e.label),
+      PRICE_LIST_ERA_OTHER,
+    ];
+    return order
+      .filter((era) => byEra.has(era))
+      .map((era) => ({ era, lists: byEra.get(era)! }));
+  }, [filtered]);
 
   const crumbs = [
     { label: 'Domů', href: '/' },
@@ -130,11 +159,19 @@ export default function KomunitniCenikyPage() {
             : 'Žádné návrhy.'}
         </p>
       ) : (
-        <ul className={s.list} data-cenik-list="">
-          {filtered.map((l) => (
-            <CenikRow key={l.id} list={l} />
-          ))}
-        </ul>
+        eraGroups.map((g) => (
+          <section key={g.era} data-cenik-era={g.era}>
+            <h2 className={s.eraTitle}>
+              {g.era}
+              <span className={s.eraCount}>{g.lists.length}</span>
+            </h2>
+            <ul className={s.list} data-cenik-list="">
+              {g.lists.map((l) => (
+                <CenikRow key={l.id} list={l} />
+              ))}
+            </ul>
+          </section>
+        ))
       )}
 
       {showCreate ? (

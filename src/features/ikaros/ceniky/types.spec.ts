@@ -4,7 +4,13 @@
  * bezeztrátového round-tripu (přepnutí měny nesmí měnit hodnoty).
  */
 import { describe, it, expect } from 'vitest';
-import { decimalToGsc, formatGsc, formatPrice } from './types';
+import {
+  PRICE_LIST_ERA_OTHER,
+  decimalToGsc,
+  eraOf,
+  formatGsc,
+  formatPrice,
+} from './types';
 
 describe('formatPrice', () => {
   it('gsc (i bez měny) deleguje na formatGsc', () => {
@@ -65,5 +71,20 @@ describe('decimalToGsc', () => {
       const decimal = p.gold + (p.silver * 10 + p.copper) / 100;
       expect(decimalToGsc(decimal)).toEqual(p);
     }
+  });
+});
+
+describe('eraOf', () => {
+  it('rozpozná éru podle štítku (case-insensitive, první shoda)', () => {
+    expect(eraOf({ tags: ['morvol'] })).toBe('Středověk a fantasy');
+    expect(eraOf({ tags: ['Divoký Západ'] })).toBe('Divoký západ');
+    expect(eraOf({ tags: ['1. světová'] })).toBe('1. světová válka');
+    expect(eraOf({ tags: ['přítomnost'] })).toBe('Přítomnost');
+    expect(eraOf({ tags: ['blízká budoucnost'] })).toBe('Blízká budoucnost');
+  });
+
+  it('bez érového štítku → Ostatní (i s jinými štítky / bez tags)', () => {
+    expect(eraOf({ tags: ['jídlo', 'služby'] })).toBe(PRICE_LIST_ERA_OTHER);
+    expect(eraOf({ tags: undefined })).toBe(PRICE_LIST_ERA_OTHER);
   });
 });

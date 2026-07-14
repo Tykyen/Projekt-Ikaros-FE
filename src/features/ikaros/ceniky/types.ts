@@ -26,6 +26,34 @@ export const PRICE_LIST_CURRENCY_LABELS: Record<PriceListCurrency, string> = {
   credits: 'Kredity',
 };
 
+/**
+ * 21.5j R7 — registr ér pro seskupení knihovny (chronologické pořadí).
+ * Éra se pozná podle štítku seedu; ceník bez érového štítku patří do
+ * PRICE_LIST_ERA_OTHER (volná komunitní tvorba).
+ */
+export const PRICE_LIST_ERAS: { label: string; tags: string[] }[] = [
+  { label: 'Středověk a fantasy', tags: ['morvol', 'fantasy', 'středověk'] },
+  { label: 'Divoký západ', tags: ['divoký západ'] },
+  { label: '1. světová válka', tags: ['1. světová'] },
+  { label: '2. světová válka', tags: ['2. světová'] },
+  { label: 'Přítomnost', tags: ['přítomnost'] },
+  { label: 'Blízká budoucnost', tags: ['blízká budoucnost'] },
+  {
+    label: 'Galaktické dobrodružství',
+    tags: ['galaxie', 'galaktické dobrodružství'],
+  },
+];
+export const PRICE_LIST_ERA_OTHER = 'Ostatní a komunitní';
+
+/** Éra ceníku dle štítků (první shoda v registru; jinak Ostatní). */
+export function eraOf(list: Pick<GlobalPriceList, 'tags'>): string {
+  const tags = (list.tags ?? []).map((t) => t.toLowerCase());
+  for (const era of PRICE_LIST_ERAS) {
+    if (era.tags.some((t) => tags.includes(t))) return era.label;
+  }
+  return PRICE_LIST_ERA_OTHER;
+}
+
 /** Strukturovaná cena zlaté/stříbrné/měďáky. */
 export interface PriceGsc {
   gold: number;
