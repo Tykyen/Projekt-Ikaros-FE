@@ -1,0 +1,152 @@
+/* 21.3a — nástrojová lišta editoru podzemí */
+.palette {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  border-right: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  z-index: 3;
+}
+
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.toolBtn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--map-toolbar-text);
+  cursor: pointer;
+}
+
+.toolBtn:hover:not(:disabled) {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
+}
+
+.toolBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.active {
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.6);
+}
+
+.divider {
+  height: 1px;
+  margin: 4px 4px;
+  background: rgb(var(--map-ui-accent-rgb) / 0.25);
+}
+
+.submenu {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 8px;
+  min-width: 168px;
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.35);
+  box-shadow: var(--shadow-lg, 0 8px 28px rgb(var(--black-rgb, 0 0 0) / 0.5));
+  z-index: var(--z-map-tool-panel, 100);
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--map-toolbar-text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.subItem:hover {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
+}
+
+.subActive {
+  background: rgb(var(--map-ui-accent-rgb) / 0.22);
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.6);
+}
+
+.subItem canvas {
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.subHint {
+  margin: 4px 6px 2px;
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+/* ── Mobil: lišta dole vodorovně, podpaleta nahoru ── */
+@media (max-width: 768px) {
+  .palette {
+    flex-direction: row;
+    border-right: none;
+    border-top: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+    order: 2; /* pod plátnem */
+  }
+
+  .tools {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 8px;
+    /* iOS momentum scroll */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toolBtn {
+    width: 44px;
+    height: 44px; /* touch target */
+    flex-shrink: 0;
+  }
+
+  .divider {
+    width: 1px;
+    height: auto;
+    margin: 4px 2px;
+  }
+
+  .submenu {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: calc(100% + 6px);
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: 46vh;
+  }
+
+  .subItem {
+    flex: 1 1 46%;
+    min-height: 44px;
+  }
+
+  .subHint {
+    flex-basis: 100%;
+  }
+}

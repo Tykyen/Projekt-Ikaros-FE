@@ -1,0 +1,186 @@
+/* 21.3a — seznam podzemí světa */
+.page {
+  max-width: var(--content-max, 1100px);
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.teaser {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  border: 1px dashed var(--accent, currentColor);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+}
+
+.teaser h2 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.teaser p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.stateWrap {
+  display: grid;
+  place-items: center;
+  min-height: 30vh;
+}
+
+.empty {
+  max-width: 440px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.12);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
+  transition: border-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--accent, currentColor);
+}
+
+.thumbLink {
+  display: block;
+  line-height: 0;
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.cardText {
+  min-width: 0;
+}
+
+.cardName {
+  margin: 0;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.deleteBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  opacity: 1;
+  border-color: var(--accent, currentColor);
+}
+
+.newForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 0.9rem;
+}
+
+.newForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.newForm select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.2);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.modeFieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.modeFieldset legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.radio {
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 8px !important;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.radio input {
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .deleteBtn {
+    width: 44px;
+    height: 44px; /* touch target */
+  }
+}

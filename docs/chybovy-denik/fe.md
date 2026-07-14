@@ -2057,3 +2057,11 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Proč správně:** alternativa `epithetsFemale[]` = BE schema+DTO+toEntity+editor+seed struktura; konvence tvaru dává správnou češtinu za cenu jedné čisté funkce a obsahového pravidla (zdokumentováno ve spec i validováno strojově).
 **Jak ověřeno:** vitest engine 16/16 (feminizace adjektiv, neutralita frází, žena dostane přechýlené), tsc -b + eslint 0. Náhled přízvisek pro uživatele před re-seedem (gate jako u ceníků).
 **Zhodnocení:** dobře; import name-sets už `epithets` přenášel — stačí re-run workflow po schválení.
+
+---
+
+### ✅ ŘEŠENÍ — 21.3a Tvorba podzemí: editor+generátor postaven nad EXISTUJÍCÍM BE modulem (průzkum před spec ušetřil celý BE) · 2026-07-14
+**Co nakonec zabralo:** Před psaním spec průzkumný agent → nález: BE `dungeon-maps` (CRUD + export scéna/šablona) **už existoval kompletní**, roadmapa přitom tvrdila „postavit od nuly". 21.3a = FE feature `dungeon-builder/` (čistý seedovaný engine rooms-and-mazes s flood-fill zárukou propojenosti, canvas 2D renderer sdílený editor/miniatury/PNG, useReducer editor s undo snapshoty) + malá BE rozšíření (ownerId server-enforced, 4 typy dveří dle uživatelovy donjon legendy, label dekorace, supporter gating v service dle vzoru worlds.service). Trojitý nesoulad přístupů (nav=všichni / FE route=Sa,Admin / BE=PJ) sjednocen na per-world Hrac+ ∧ (Podporovatel ∨ PJ+).
+**Proč správně (a ne variace):** engine bez Reactu = determinismus testovatelný (stejný seed ⇒ identická mapa); canvas 2D místo PIXI = žádné async-init pasti a PNG export zdarma týmž rendererem; spojovací konektory v generátoru NIKDY nezahazovat kvůli kosmetickému filtru (jinak nepropojené podzemí — chyceno při psaní, ne testem). Grandfathering editace po ztrátě Podporovatele = vzor 19.4 limitu světů.
+**Jak ověřeno:** BE typecheck+lint+32 jest (matice rolí vč. legacy bez ownerId); FE `npm run build` čistý, **vitest 483 souborů / 3664 testů** zelených (engine 11), eslint 0, lint:colors 0 nových (render/ v ALLOW jako „papír"), audit:routes bez dungeon driftu. Živý test na webu čeká na uživatele.
+**Zhodnocení:** dobře — jeden zátah BE→FE bez cyklení; TS past: narrowing property do closure nefunguje (dec.type → const). Zbývá 21.3b (export na TM + zdi→MapWall LoS).

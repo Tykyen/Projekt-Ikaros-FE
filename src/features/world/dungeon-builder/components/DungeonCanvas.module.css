@@ -1,0 +1,56 @@
+/* 21.3a — plátno editoru podzemí (chrome v mapových tokenech, papír kreslí canvas) */
+.container {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--map-canvas-bg);
+}
+
+.canvas {
+  display: block;
+  /* Pointer eventy si řešíme sami (pinch, malování) — žádné nativní scroll gesto. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.zoomControls {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.zoomBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  color: var(--map-toolbar-text);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.zoomBtn:hover {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.6);
+}
+
+@media (max-width: 768px) {
+  .zoomControls {
+    right: 8px;
+    bottom: 8px;
+  }
+  .zoomBtn {
+    width: 44px;
+    height: 44px; /* touch target ≥ 44px */
+  }
+}

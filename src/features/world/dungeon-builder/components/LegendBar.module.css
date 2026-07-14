@@ -1,0 +1,34 @@
+/* 21.3a — legenda glyfů */
+.bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 12px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  color: var(--map-toolbar-text);
+  border-top: 1px solid rgb(var(--map-ui-accent-rgb) / 0.25);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.item canvas {
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .bar {
+    /* Na mobilu je dole nástrojová lišta — legenda se schová do řádku nad ní
+       a scrolluje vodorovně. */
+    -webkit-overflow-scrolling: touch;
+  }
+}

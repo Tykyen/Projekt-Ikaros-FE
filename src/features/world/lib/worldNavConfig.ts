@@ -119,7 +119,7 @@ export const HIDEABLE_NAV_ITEMS: readonly HideableNavItem[] = [
     id: 'dungeon-builder',
     label: 'Tvorba podzemí',
     group: 'hra',
-    hint: 'Externí editor (globální /admin/dungeon-builder).',
+    hint: 'Editor a generátor podzemí (21.3, Podporovatelé).',
   },
   // Top-level
   {
@@ -243,12 +243,18 @@ export function buildWorldNav(
           : []),
         { id: 'prevodnik-men', label: 'Převodník měn', to: `${b}/prevodnik-men` },
         { id: 'zvuky', label: 'Zvuková databáze', to: `${b}/zvuky` },
-        {
-          id: 'dungeon-builder',
-          label: 'Tvorba podzemí',
-          to: `/admin/dungeon-builder`,
-          external: true,
-        },
+        // 21.3a — per-world editor podzemí (dřív external /admin/dungeon-builder).
+        // route = memberOnly(Hrac) → skryj Čtenáři (N-05); supporter gate řeší
+        // stránka teaserem (BE je autorita).
+        ...(canAccess(WorldRole.Hrac)
+          ? [
+              {
+                id: 'dungeon-builder',
+                label: 'Tvorba podzemí',
+                to: `${b}/podzemi`,
+              },
+            ]
+          : []),
       ],
     },
     // route `kalendar` = memberOnly(PomocnyPJ) „PJ pohled" → skryj hráčům (N-04).

@@ -137,7 +137,8 @@ const CONFIGS: Cfg[] = [
   // admin/headline (admin/emotes a sablona-deniku jsou nově Settings taby, ne routy)
   { name: 'WMG(PJ) [admin/headline]', make: wmg(WorldRole.PJ),
     exp: ['f', 'p', 'p', 'f', 'f', 'f', 'f', 'f', 'f', 'p'] },
-  // router.tsx:194/203/214 — /admin, dungeon-builder, ikaros/admin/emotes
+  // router.tsx — /admin, admin/chat, ikaros/admin/emotes (21.3a: dungeon-builder
+  // už není admin route — per-world `podzemi` jede přes memberOnly(Hrac))
   { name: 'RoleGuard[Sa,Admin]', make: roleGuard(SA_ADMIN),
     exp: ['f', 'p', 'p', 'f', 'f', 'f', 'f', 'f', 'f', 'f'] },
 ];

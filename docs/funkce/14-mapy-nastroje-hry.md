@@ -1,6 +1,6 @@
 # 14 — Mapy & nástroje hry
 
-Hloubková, kódem ověřená inventura. Pokrývá tři různé „mapy", zvukovou databázi a deník PJ.
+Hloubková, kódem ověřená inventura. Pokrývá tři různé „mapy", zvukovou databázi, deník PJ a tvorbu podzemí (21.3a).
 
 > **Role:** Globální `Superadmin`/`Admin` (číselně 1/2, „≤ Admin" = bypass všeho). Světové (vzestupně) `Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ`. „PJ práva" v této kapitole = `>= PomocnyPJ` (asistent řídí mapu/zvuky stejně jako PJ), pokud není uvedeno jinak. `Admin`/`Sa` mají všude bypass.
 
@@ -11,7 +11,7 @@ Hloubková, kódem ověřená inventura. Pokrývá tři různé „mapy", zvukov
 > | `/svet/:slug/mapy` | `WorldMapsPage` (`features/world/maps`) | **Obrázkový atlas** = galerie statických map ve složkách | `modules/world-maps` |
 > | `/svet/:slug/takticka-mapa` | `TacticalMapPage` → `TacticalMapView` | **Taktická bojová mapa** = PixiJS plátno s tokeny, mlhou, bojem | `modules/maps` |
 >
-> Modul `modules/dungeon-maps` je **Dungeon Builder** (samostatný nástroj, patří do kap. 08) — generuje obrázek + config a umí ho exportovat jako scénu/šablonu do taktické mapy (`exportScene`/`exportTemplate`).
+> Modul `modules/dungeon-maps` je **Tvorba podzemí** (od 21.3a per-world nástroj `/svet/:slug/podzemi`, viz §14.6) — tile-based editor+generátor; umí export jako scénu/šablonu do taktické mapy (`exportScene`/`exportTemplate`, zatím bez FE tlačítka = 21.3b).
 
 Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Nečlen je přesměrován.
 
@@ -360,13 +360,37 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 ---
 
+## 14.6 — Tvorba podzemí (`/podzemi`)
+
+### Editor + generátor podzemí (21.3a)
+- **Co to je:** Samostatný fullscreen nástroj na jednoduchá tile-based podzemí donjon-stylu (bílá podlaha/černý masiv/glyfy dveří): ruční kreslení NEBO procedurální generátor, vybavení nábytkem, PNG export. Freemium výhoda Podporovatelů (19.4).
+- **Kde:** menu Hra → „Tvorba podzemí" → seznam `/svet/:slug/podzemi` (`DungeonListPage`), editor `/podzemi/:dungeonId` (`DungeonEditorPage`). Nahradilo bývalý admin stub `/admin/dungeon-builder` (route smazána).
+- **Kdo:**
+  - Route: `memberOnly(Hrac)` (router.tsx — `podzemi`, `podzemi/:dungeonId`); nav položka jen pro Hrac+ (`worldNavConfig.ts:247-257`), skrývatelná (`dungeon-builder`).
+  - Tvorba (BE autorita): člen **Hrac+ ∧ (Podporovatel ∨ PJ+)** — `assertCanCreate` (`dungeon-maps.service.ts:61-82`, `isEffectiveSupporter` z `users/supporter.util.ts`), jinak 403 `NOT_SUPPORTER`. FE zrcadlí teaserem + skrytím „Nové podzemí" (`DungeonListPage.tsx`, `shared/lib/supporter.ts`).
+  - Čtení seznamu: Hrac+; **hráč vidí jen svoje** (owner filtr), **PJ+ všechna** (`findByWorld`, `dungeon-maps.service.ts:109-125`).
+  - Edit/smazání: **vlastník ∨ PJ+** (`assertCanEdit` → 403 `NOT_DUNGEON_OWNER`); vlastník edituje i po ztrátě Podporovatele (grandfathering, vzor limitu světů). Legacy dungeony bez `ownerId` = PJ-owned.
+  - Export scéna/šablona: **PJ+** (`assertCanManage`) — FE zatím nevolá (21.3b).
+- **Co jde dělat:**
+  - Seznam: karty s canvas miniaturami, založení (název + velikost S/M/L + start „vygenerované"/„prázdné plátno"), smazání s potvrzením.
+  - Generátor (panel v editoru): hustota místností, křivolakost chodeb, % zvláštních dveří, **deterministický seed** (stejný seed = stejná mapa) + „Přegenerovat"; přepis rozmalovaného plátna jen po potvrzení. Algoritmus rooms-and-mazes se zaručenou propojeností (engine `generate.ts`, 11 vitest testů vč. flood-fill spojitosti).
+  - Ruční kreslení: podlaha/guma tažením, 6 typů dveří dle legendy (průchod·dveře·zamčené·s pastí·tajné·padací mříž), schody ↑/↓, voda/láva/jáma, **14 dekorací** (bedna, sud, truhla, postel, stůl, židle, lavice, regál, krb, oltář, sloup, studna, žebřík, suť; opakovaný klik = rotace 90°), textové popisky buněk.
+  - Undo/redo 50 kroků (Ctrl+Z/Y), Ctrl+S uložení, zoom/pan (kolečko, pinch, tlačítka), přejmenování inline, změna rozměrů gridu (ořez/dolití).
+  - **PNG export** s pergamenovým rámem + legendou (tentýž renderer jako editor).
+- **Hranice / co NEumí:** Jen čtvercový grid + „dyson" vzhled (hex/modern = výhled). **Export na taktickou mapu zatím bez FE** (BE endpointy `export-scene`/`export-template` hotové; zdi se do `MapWall`/LoS nepřenáší — 21.3b). Žádná kolaborativní editace (poslední zápis vyhrává, bez WS). Generátor nepokládá nábytek (jen čísla místností). Víc pater/exteriéry/AI obrázek = roadmap 21.3c+.
+- **Zvláštnosti:** Ukládá se explicitně (PUT celé mapy), neuložené změny hlídá `useBlocker` + `beforeunload`. Barvy plátna jsou záměrně fixní „papír" (exportuje se do PNG) — složka `render/` je v ALLOW lint:colors. Limity DTO: grid 10–100, dekorace ≤ 500, název ≤ 120 (`create-dungeon-map.dto.ts`).
+- **Stav:** ✅ 21.3a (editor+generátor+PNG) · 🚧 21.3b export na TM scénu.
+- **Kód:** FE `features/world/dungeon-builder/` (`engine/generate.ts`, `render/{drawDungeon,glyphs}.ts`, `state/editorState.ts`, `components/{DungeonListPage,DungeonEditorPage,DungeonCanvas,ToolPalette,GeneratorPanel}.tsx`), route `app/router.tsx` (`podzemi`). BE `modules/dungeon-maps/{dungeon-maps.service.ts,schemas/dungeon-map.schema.ts,dto/*}` (32 jest testů).
+
+---
+
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 1. ✅ VYŘEŠENO 2026-07-12 (doc-fix dle D-NEW-INV-MAPS) — **„A* pohyb" = jen dosah, ne pathfinding.** Princip 10.2 sliboval A* hledání cesty; v kódu `movement` stat určuje pouze range (`schemas/types.ts:59`) a bariéry pohyb fyzicky neblokují. Rozhodnutí: dokumentace/spec opraveny na skutečné chování (dosah/range-check, měření = přímá hex distance) — `takticka-mapa-matrix.md` §21.1 + §23.5 + zdejší kapitola. Skutečný pathfinding zůstává jako případné budoucí rozšíření 17.x.
 
-2. **Dvě role-úrovně správy map.** Atlas „Mapy" (`world-maps`) vyžaduje k editaci **plné PJ** (`>= WorldRole.PJ`, `world-maps.service.ts:47`), ale taktická mapa, zvuky, deník PJ a dungeon (kromě dungeon = PJ) běží na `>= PomocnyPJ`. PomocnyPJ tedy řídí bojiště, ale **nemůže** spravovat obrázkový atlas. Ověřit, zda je to záměr — působí nekonzistentně.
+2. **Dvě role-úrovně správy map.** Atlas „Mapy" (`world-maps`) vyžaduje k editaci **plné PJ** (`>= WorldRole.PJ`, `world-maps.service.ts:47`), ale taktická mapa, zvuky a deník PJ běží na `>= PomocnyPJ`. PomocnyPJ tedy řídí bojiště, ale **nemůže** spravovat obrázkový atlas. Ověřit, zda je to záměr — působí nekonzistentně.
 
-3. **Dungeon-maps čtení = PJ-only, write = PJ-only**, ale taktická mapa write = PomocnyPJ. `DungeonMapsService.assertCanManage` je `>= WorldRole.PJ` (R-12). Nejednotné s ostatními herními nástroji.
+3. ✅ VYŘEŠENO 2026-07-14 (21.3a) — **Dungeon-maps čtení/write PJ-only.** Gating přepracován: CRUD = Hrac+ s vlastnictvím (tvorba navíc Podporovatel ∨ PJ+), PJ+ spravuje vše, exporty na TM zůstávají PJ+ (`assertCanManage`). Viz §14.6. Pozn.: PomocnyPJ tvoří jen jako Podporovatel (role < PJ) — vědomé rozhodnutí spec 21.3 §3.
 
 4. ✅ VYŘEŠENO 2026-07-12 (prošetřeno + zdokumentováno, D-NEW-INV-MAPS) — **Combat order dvojí zdroj pravdy.** `scene.combat.order` se ukládá, iniciativní lišta ho ignoruje (live sort dle `initiative` = záměrná featura 10.2f; FE posílá `combat.turn` s explicitním tokenId+round). `order` NENÍ mrtvý: drží legacy fallback `combat.turn` bez tokenId (BC), inverse `combat.end`→`combat.start` a validaci permutace `combat.reorder` — proto se neodstraňuje. Vztah zdokumentován komentářem v BE `map-operations.service.ts` (case `combat.start`). Live-sort je autoritativní pro zobrazení; `order` je start-snapshot.
 

@@ -2,7 +2,7 @@
 
 > **Účel:** Hloubková, **kódem ověřená** inventura všeho, co platforma dnes umí. Slouží jako podklad pro budoucí uživatelský průvodce (návody) a pro strategii rozšiřování. Každé tvrzení bylo ověřeno přímo ve zdrojovém kódu FE i BE — ne odhadem.
 >
-> **Snímek k:** 2026-07-13 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
+> **Snímek k:** 2026-07-14 · **Repozitáře:** FE `Projekt-ikaros-FE` (React/TS), BE `Projekt-ikaros/backend` (NestJS).
 >
 > ⚠️ Toto je stav kódu, ne marketingový popis. Kde se název funkce rozchází s realitou, je to označeno v sekci „Nesrovnalosti & dluhy" na konci každé kapitoly.
 
@@ -99,7 +99,7 @@ Každá funkce má jednotnou strukturu:
 | [05](05-komunikace-platformy.md) | Komunikace platformy | `/chat`, `/chat/camp`, `/ikaros/posta`, push |
 | [06](06-akce-oblibene.md) | Akce & oblíbené | `/ikaros/akce`, `/ikaros/oblibene` |
 | [07](07-napoveda-podminky.md) | Nápověda & podmínky | `/ikaros/napoveda`, `/podminky` |
-| [08](08-platformova-administrace.md) | Platformová administrace | `/admin`, `/admin/dungeon-builder`, `/ikaros/admin/emotes` |
+| [08](08-platformova-administrace.md) | Platformová administrace | `/admin`, `/ikaros/admin/emotes` |
 
 ### Svět (`/svet/:worldSlug`)
 
@@ -110,7 +110,7 @@ Každá funkce má jednotnou strukturu:
 | [11](11-stranky-wiki-informace.md) | Stránky, wiki & informace | `/stranky`, `/:slug`, `/edit/:slug`, `/pravidla` |
 | [12](12-postavy-bestiar-ekonomika.md) | Postavy, bestiář & ekonomika | `/postavy`, `/moje-postava`, `/bestiar`, `/obchod`, `/prevodnik-men` |
 | [13](13-komunikace-sveta.md) | Komunikace světa | `/chat`, `/novinky` |
-| [14](14-mapy-nastroje-hry.md) | Mapy & nástroje hry | `/mapa`, `/mapy`, `/takticka-mapa`, `/zvuky`, `/denik-pj` |
+| [14](14-mapy-nastroje-hry.md) | Mapy & nástroje hry | `/mapa`, `/mapy`, `/takticka-mapa`, `/zvuky`, `/denik-pj`, `/podzemi` |
 | [15](15-cas-pribeh.md) | Čas & příběh | `/kalendar`, `/timeline`, `/pocasi`, `/akce`, `/pavucina`, `/scenare` |
 
 ---

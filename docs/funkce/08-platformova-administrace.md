@@ -1,6 +1,6 @@
 # 08 — Platformová administrace
 
-Kódem ověřená inventura platformové administrace Projektu Ikaros. Pokrývá globální role, granulární admin oprávnění (D-033), admin panel (`/admin`) a všechny jeho taby, správu uživatelů, search index, dungeon builder, globální emoty, GDPR export, systémové presety.
+Kódem ověřená inventura platformové administrace Projektu Ikaros. Pokrývá globální role, granulární admin oprávnění (D-033), admin panel (`/admin`) a všechny jeho taby, správu uživatelů, search index, globální emoty, GDPR export, systémové presety. (Dungeon builder se 21.3a přestěhoval do světa — kap. 14 §14.6.)
 
 > Rozsah = jen GLOBÁLNÍ (platformová) administrace. Světové role (PJ / PomocnýPJ / Korektor / Hráč / Čtenář / Žadatel) jsou mimo tuto kapitolu.
 
@@ -290,16 +290,10 @@ Samostatná full-screen stránka (ne tab panelu) pro interní komunikaci a organ
 
 ---
 
-## Dungeon Builder (`/admin/dungeon-builder`)
+## Dungeon Builder (`/admin/dungeon-builder`) — ZRUŠENO
 
-- **Co to je:** zamýšlený platformový nástroj na tile-based dungeony.
-- **Kde:** route `/admin/dungeon-builder`, FE `pages/DungeonBuilderPage.tsx`.
-- **Kdo:** FE `RoleGuard roles={[Superadmin, Admin]}` (router.tsx:206).
-- **Stav:** ⚠️ **STUB.** FE stránka je doslova `<div>[stub] Dungeon builder</div>` (`DungeonBuilderPage.tsx:2`).
-- **Hranice:** FE žádná funkčnost.
-- **Zvláštnosti / BE pozadí:** BE modul `dungeon-maps` EXISTUJE a je funkční, ale je **per-world PJ tool, NE platform-admin nástroj.** Endpointy `/dungeon-maps` (`dungeon-maps.controller.ts`) gatuje `assertCanManage`: `role <= Admin` projde (platform admin bypass), jinak musí být PJ daného světa (`NOT_WORLD_PJ`). Umí CRUD dungeonu + export jako MapTemplate / MapScene. Tento BE modul ale FE stub stránka nepoužívá — jsou rozpojené.
-  - **✅ OPRAVENO 2026-07-05 (SEC-25, RUN-2026-07-05):** create/update DTO (`create-dungeon-map.dto.ts`, `update-dungeon-map.dto.ts`) postrádaly class-validator dekorátory → `ValidationPipe` je nedokázal validovat, endpointy vracely 400 na každý pokus. `exportTemplate`/`export-scene` k tomu padaly 500 (chybějící `ownerId`). Modul byl tedy fakticky nepoužitelný, i když existoval a vypadal hotově — teď reálně funguje.
-- **Kód:** FE `pages/DungeonBuilderPage.tsx` (stub), BE `modules/dungeon-maps/dungeon-maps.controller.ts` (funkční, ale jinde napojený).
+- **✅ VYŘEŠENO 2026-07-14 (21.3a):** admin route `/admin/dungeon-builder` + stub `DungeonBuilderPage.tsx` **smazány**. Tvorba podzemí je teď **per-world nástroj** `/svet/:slug/podzemi` nad BE modulem `dungeon-maps` (gating Hrac+ / Podporovatel / PJ+) — plná inventura v **kap. 14 §14.6**.
+- Historie: stub tu visel od začátku, BE modul byl rozpojený (a do 2026-07-05 kvůli chybějícím DTO dekorátorům fakticky nefunkční, SEC-25).
 
 ---
 
@@ -405,7 +399,7 @@ Generický subsystém pro nahlašování jakéhokoli UGC a jeho moderaci (DSA č
 2. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-ADMIN-UI) — **Create user má UI.** Tlačítko „Nový uživatel" nad filtry → `CreateUserModal` (validace dle `CreateUserAdminDto`, field-level TAKEN chyby). (`useAdminCreateUser`)
 3. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-ADMIN-UI) — **Admin změna cizího e-mailu.** Nový BE `PATCH /admin/users/:id/email` (Superadmin-only, `SAME_EMAIL`/`EMAIL_TAKEN`/`SELF_MODIFICATION`, audit `EMAIL_CHANGE`, `emailVerified: false`) + FE tlačítko „Změnit e-mail" → `AdminChangeEmailModal`. (`useAdminUpdateUserEmail`)
 4. ✅ VYŘEŠENO 20.2/§C1 — **Data export má FE tlačítko.** „Stáhnout moje data (JSON)" v profilu → Účet a v `DeleteAccountModal` (`useDataExport` → `GET /data-export/me` → Blob download). Dřív BE bez FE.
-5. **DungeonBuilderPage = stub** — route `/admin/dungeon-builder` vykreslí jen text `[stub]`. BE `dungeon-maps` modul existuje, ale je per-world PJ tool, není napojený na tuto stránku. (`DungeonBuilderPage.tsx`)
+5. ✅ VYŘEŠENO 2026-07-14 (21.3a) — **DungeonBuilderPage = stub.** Admin route + stub smazány; tvorba podzemí je per-world `/svet/:slug/podzemi` napojená na BE `dungeon-maps` (kap. 14 §14.6).
 6. **`canEditPlatformPages` = mrtvý flag** — ukládá se a posílá, ale BE ho nikde nevynucuje; FE checkbox záměrně skryt. (`UsersTable.tsx:338`)
 7. **`canModerateContent` ≠ obsahová moderace** — flag gatuje JEN admin delete/undelete účtu. Schvalování článků/galerie/diskuzí jede přes obsahové role. Název flagu mate.
 8. **Audit-log label drift** — FE `AuditLogTab` zná `FRIENDSHIP_COOLDOWN_RESET` (v BE typu chybí) a naopak neumí labelovat DELETE/UNDELETE/HARD_DELETE/BULK_*. (`AuditLogTab.tsx:7` vs `admin-audit-log.interface.ts:1`)

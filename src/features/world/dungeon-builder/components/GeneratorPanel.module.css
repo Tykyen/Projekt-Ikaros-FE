@@ -1,0 +1,123 @@
+/* 21.3a — panel generátoru (desktop: pravý sloupec, mobil: fullscreen sheet) */
+.panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 264px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  overflow-y: auto;
+  background: var(--map-toolbar-bg-solid, var(--map-canvas-bg));
+  color: var(--map-toolbar-text);
+  border-left: 1px solid rgb(var(--map-ui-accent-rgb) / 0.3);
+  z-index: var(--z-map-tool-panel, 100);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+}
+
+.closeBtn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.field span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  opacity: 0.9;
+}
+
+.field em {
+  font-style: normal;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.field select,
+.field input[type='number'] {
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 7px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.35);
+  background: rgb(var(--map-ui-panel-rgb, var(--black-rgb, 0 0 0)) / 0.4);
+  color: inherit;
+  font: inherit;
+}
+
+.seedRow {
+  display: flex;
+  gap: 6px;
+}
+
+.seedRow input {
+  flex: 1;
+  min-width: 0;
+}
+
+.diceBtn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  border-radius: 7px;
+  border: 1px solid rgb(var(--map-ui-accent-rgb) / 0.35);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.diceBtn:hover {
+  border-color: rgb(var(--map-ui-accent-rgb) / 0.7);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 11.5px;
+  opacity: 0.65;
+}
+
+@media (max-width: 768px) {
+  .panel {
+    position: fixed;
+    inset: 0;
+    width: auto;
+    border-left: none;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}

@@ -111,7 +111,6 @@ const NameSetDetailPage          = lazy(() => import('@/features/ikaros/generato
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
 const AdminChatPage      = lazy(() => import('@/features/admin/chat/pages/AdminChatPage'));
-const DungeonBuilderPage = lazy(() => import('@/features/admin/pages/DungeonBuilderPage'));
 const IkarosEmotesAdminPage = lazy(() => import('@/features/ikaros/pages/IkarosEmotesAdminPage/IkarosEmotesAdminPage'));
 
 // ── Lazy pages — World ────────────────────────────────────────────────────
@@ -142,6 +141,9 @@ const CampaignPage       = lazy(() => import('@/features/world/pages/CampaignPag
 const StorylinesPage     = lazy(() => import('@/features/world/pages/StorylinesPage'));
 const ShopPage           = lazy(() => import('@/features/world/pages/ShopPage'));
 const SoundsPage         = lazy(() => import('@/features/world/pages/SoundsPage'));
+// 21.3a — tvorba podzemí (per-world; nahradila platformový /admin/dungeon-builder stub).
+const DungeonsPage       = lazy(() => import('@/features/world/pages/DungeonsPage'));
+const DungeonEditorPage  = lazy(() => import('@/features/world/pages/DungeonEditorPage'));
 const CurrencyPage       = lazy(() => import('@/features/world/pages/CurrencyPage'));
 const WorldSettingsPage  = lazy(() => import('@/features/world/pages/WorldSettingsPage'));
 const RulesPage          = lazy(() => import('@/features/world/pages/RulesPage'));
@@ -324,17 +326,8 @@ export const router = createBrowserRouter([
           </RoleGuard>
         ),
       },
-      {
-        path: 'admin/dungeon-builder',
-        loader: requireAuth,
-        element: (
-          // Dungeon Builder je platformový tool (mimo per-world layout), proto
-          // jen Sa/Admin. Per-world varianta by patřila do /svet/:worldId/admin/*.
-          <RoleGuard roles={[UserRole.Superadmin, UserRole.Admin]}>
-            {p(DungeonBuilderPage)}
-          </RoleGuard>
-        ),
-      },
+      // 21.3a — /admin/dungeon-builder (Sa/Admin stub) zrušen; tvorba podzemí
+      // je per-world route `svet/:worldSlug/podzemi` (Hrac+ / Podporovatel).
       {
         path: 'ikaros/admin/emotes',
         loader: requireAuth,
@@ -398,6 +391,10 @@ export const router = createBrowserRouter([
       },
       { path: 'obchod',                 element: memberOnly(p(ShopPage)) },
       { path: 'zvuky',                  element: memberOnly(p(SoundsPage)) },
+      // 21.3a — tvorba podzemí: route Hrac+ (BE navíc gatuje tvorbu na
+      // Podporovatele ∨ PJ+; ne-podporovatel vidí teaser + svoje stavby).
+      { path: 'podzemi',                element: memberOnly(p(DungeonsPage), WorldRole.Hrac) },
+      { path: 'podzemi/:dungeonId',     element: memberOnly(p(DungeonEditorPage), WorldRole.Hrac) },
       { path: 'prevodnik-men',          element: memberOnly(p(CurrencyPage)) },
       { path: 'nastaveni',              element: memberOnly(p(WorldSettingsPage)) },
       { path: 'hraci',                  element: memberOnly(p(WorldMembersPage)) },

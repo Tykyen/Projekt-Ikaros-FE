@@ -48,7 +48,7 @@ export default function HelpPage() {
         <p className={s.lead}>
           Vše, co potřebuješ pro hru — co která stránka umí, kdo má jaká práva a
           jak na účet. Vyber si sekci níže a rozbal, co tě zajímá. Nový tu? Začni
-          tabem <strong>Začni tady</strong>. Aktualizováno k 2026-07-13.
+          tabem <strong>Začni tady</strong>. Aktualizováno k 2026-07-14.
         </p>
       </header>
 

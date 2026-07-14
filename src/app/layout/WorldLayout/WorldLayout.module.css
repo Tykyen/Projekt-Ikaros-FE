@@ -188,7 +188,8 @@
 }
 .dropdownItem:hover { background: var(--bg-card-hover); color: var(--text-primary); }
 
-/* Ikonka „odkaz mimo svět" — Tvorba podzemí je globální admin route */
+/* Ikonka „odkaz mimo svět" — generický mechanismus NavNode.external
+   (21.3a: Tvorba podzemí už je per-world, aktuálně bez konzumenta). */
 .externalIcon {
   margin-left: auto;
   font-size: var(--text-xs);

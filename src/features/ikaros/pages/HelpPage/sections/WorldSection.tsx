@@ -38,6 +38,7 @@ import {
   Hand,
   Video,
   Undo2,
+  Hammer,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -345,6 +346,29 @@ export function WorldSection() {
             pak objeví zelená pilulka „Příběhová mapa") a <strong>poslat do chatu</strong>{' '}
             jako klikací kartu. Viditelnost řídí PJ u každé mapy i vlaječky.
           </p>
+        </Tool>
+        <Tool icon={<Hammer size={16} />} title="Tvorba podzemí" audience={{ kind: 'hrac', label: 'Podporovatelé + PJ' }} accent="info">
+          <p>
+            Nakresli si vlastní jeskyni (menu Hra → Tvorba podzemí): bílé chodby,
+            černá skála, dveře podle klasické legendy (obyčejné, zamčené, tajné,
+            s pastí, padací mříž, průchod), schody, voda, láva i jámy. Nebo nech{' '}
+            <strong>generátor</strong> vysypat celé podzemí — nastavíš velikost,
+            hustotu místností a křivolakost chodeb a klikáš „Přegenerovat", dokud
+            se nelíbí. Vygenerované se dá dál ručně dokreslit.
+          </p>
+          <p>
+            Do místností jde pokládat <strong>vybavení</strong> — bedny, sudy,
+            truhly, postele, stoly, židle, krby, oltáře a další (opakovaný klik
+            položený kus otočí). Buňkám jde dát textový popisek (čísla místností
+            dělá generátor sám). Hotovou mapu stáhneš jako <strong>PNG</strong>{' '}
+            s pergamenovým rámem a legendou.
+          </p>
+          <CalloutBox variant="tip" title="Kdo může stavět">
+            Tvorba podzemí je výhoda <strong>Podporovatelů</strong> (a PJ světa
+            má nástroj vždy). Hráč vidí jen svoje stavby, PJ všechny stavby ve
+            světě. Napojení hotového podzemí rovnou na taktickou mapu 🚧
+            připravujeme.
+          </CalloutBox>
         </Tool>
       </HelpAccordion>
 
