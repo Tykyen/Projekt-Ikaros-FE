@@ -1,7 +1,7 @@
 # Spec 21.5h — Ceníky: éry 1. a 2. světová válka (dobové USD)
 
 > Roadmap: třetí a čtvrtá obsahová dávka knihovny Ceníků — follow-up avizovaný v [spec-21.5g](spec-21.5g-ceniky-pritomnost.md) (éry: středověk 21.5f → přítomnost 21.5g → **WW1 + WW2** → budoucnost/další později; tyto dvě jsou dle uživatele primární).
-> **Stav:** 🚧 V PRÁCI (2026-07-14) — zadáno uživatelem („Uděláme to samé pro první světovou válku a druhou světovou válku… stejným způsobem… dohledat na internetu."). Žádné podklady od uživatele — vše rešerší veřejných dat.
+> **Stav:** 🟢 SEEDY PŘIPRAVENY (2026-07-14) — zadáno uživatelem („stejným způsobem… dohledat na internetu"); žádné podklady, vše rešerší veřejných dat (12 web-search agentů sekvenčně: 6×WW1 → 6×WW2). WW1 = 15 ceníků / 454 položek + 38 předmětů; WW2 = 14 ceníků / 434 položek + 28 předmětů; obrázky Wikimedia 100 % (retry kolo zjednodušených dotazů). Výstupy: `scripts/seed-migrace/ceniky-ww1-seed.json` + `ceniky-ww2-seed.json`, workflows `seed-ceniky-ww1.yml`/`seed-ceniky-ww2.yml`. **Dry-runy `c:\tmp\ceniky-ww1-dry-run.html` a `c:\tmp\ceniky-ww2-dry-run.html` musí schválit uživatel PŘED spuštěním workflow (per éra).**
 
 ---
 
