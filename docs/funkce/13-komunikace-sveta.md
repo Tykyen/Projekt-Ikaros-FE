@@ -126,7 +126,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **Skin chatu (16.1d):** vzhled chatu = **motiv světa** (žánr) — propíše se všem automaticky. Hráč si v 🎨 paletce („Vzhled chatu") přebije skin svého chatu na jiný z 12 motivů, jen pro sebe v tomto světě (`WorldMembership.chatSkin`, whitelist `WORLD_THEME_IDS`; `null` = auto dle světa). Aplikace: `data-chat-skin` na `WorldChatRoom .room` + při overridu scoped přepis `--theme-*` z `getTheme(skin).vars` (`useChatSkin`); paleta+fonty bez refaktoru chat CSS (chrome už čte `--theme-*`), atmosféra per žánr v `chat-skins.css`. Default (bez overridu) dědí `:root` → Ikaros = beze změny. **Stav:** ✅ (BE čeká restart).
 - **Přílohy:** `POST …/upload` (max 10 MB, member-only guard přes `getMembershipAppearance`).
 - **NPC mód:** `overrideName/overrideAvatarUrl/overridePageSlug` jen pro `canManageChat` (PomocnyPJ+) — `chat.service.ts:925-936`.
-- **Hledání:** `GET …/search` (substring v zprávách světa).
+- **Hledání:** `GET …/search` (substring v zprávách světa). **Skok na zprávu (spec-chat-search-jump, 2026-07-14):** klik na výsledek přepne konverzaci **a doscrolluje přímo na zprávu** (zvýraznění reuse `handleJump`). Když zpráva není v načteném okně, `useJumpToMessage` ji **dohledá po dávkách** (`?before=` kurzor, limit 100, pojistka 30 dávek ≈ 3000 zpráv) do ploché messages cache — plovoucí pilulka „Hledám zprávu v historii…", při neúspěchu „Zpráva je příliš hluboko v historii." (zmizí po 6 s). Začátek historie propíše `markReachedStart` → tlačítko „Zobrazit starší" ví, že končí. Čistá smyčka `huntMessageInHistory` s testy. **Kód:** FE `chat/api/useWorldChat.ts`, `ChatSearchModal.tsx` (`onSelectResult(channelId, messageId)`), `WorldChatRoom.tsx` (`jumpTarget` pár), `ChannelView.tsx` (pilulka).
 - **Custom emoty:** per-svět + globální (mergeEmoteSets), správa v tabu Emoty světa.
 - **Souhrn chatů (feed):** `getFeed` agreguje zprávy napříč všemi mými světy, access-safe (`chat.service.ts:810-885`).
 - **Idempotence:** `clientNonce` dedupe při retry po WS dropu.
@@ -138,7 +138,7 @@ Role: world Zadatel < Ctenar < Hrac < Korektor < PomocnyPJ < PJ; platform Supera
 - **Combat (16.1e):** `chat:combat:updated {channelId}` do `chat:{channelId}` roomu → FE refetch rosteru (`GET …/combatants`, server-filtrovaný dle role+R3). Leak-safe signál (jen channelId).
 - **Whisper zprávy** se emitují do `user:{id}` roomů adresátů (ne do channel roomu) — `chat.gateway.ts:241`.
 - **Push notifikace:** chat notifikace chodí na telefon přes web-push (notifyUsers), deep-link `?konverzace={channelId}` vybere konverzaci (adjustment-during-render) a uloží jako poslední aktivní (`WorldChatRoom.tsx:61-162`).
-- **Deep-link na zprávu (13.2a):** `?zprava={messageId}` (z notifikačního feedu „Chaty") → po otevření konverzace `MessageList` na zprávu doscrolluje + zvýrazní (reuse `handleJump` skoku z citace). Předává se jen konverzaci, na kterou link mířil (`active.id === lastDeepLink`); zpráva mimo načtené okno = no-op. Param se po použití uklidí z URL.
+- **Deep-link na zprávu (13.2a):** `?zprava={messageId}` (z notifikačního feedu „Chaty") → po otevření konverzace `MessageList` na zprávu doscrolluje + zvýrazní (reuse `handleJump` skoku z citace). Sdílí `jumpTarget` pár `{channelId, messageId}` se skokem z hledání — zpráva mimo načtené okno se **dohledá v historii** (viz „Hledání" výše; dřív no-op). Param se po použití uklidí z URL.
 
 ---
 

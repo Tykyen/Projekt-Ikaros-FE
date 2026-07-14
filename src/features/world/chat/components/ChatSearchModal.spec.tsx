@@ -1,9 +1,14 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { ChatSearchModal } from './ChatSearchModal';
-import type { GroupWithChannels } from '../lib/types';
+import type { ChatSearchResult, GroupWithChannels } from '../lib/types';
+import { api } from '@/shared/api/client';
+
+vi.mock('@/shared/api/client', () => ({
+  api: { get: vi.fn() },
+}));
 
 const groups: GroupWithChannels[] = [
   {
@@ -45,6 +50,32 @@ describe('ChatSearchModal', () => {
   it('zobrazí nápovědu, dokud je dotaz kratší než 2 znaky', () => {
     wrap(<ChatSearchModal {...props} />);
     expect(screen.getByText(/alespoň 2 znaky/i)).toBeInTheDocument();
+  });
+
+  it('klik na výsledek předá channelId I messageId (skok na zprávu)', async () => {
+    const result: ChatSearchResult = {
+      messageId: 'm42',
+      channelId: 'c1',
+      channelName: 'globální',
+      senderName: 'abi',
+      content: 'hledaná zpráva',
+      createdAt: new Date().toISOString(),
+    };
+    vi.mocked(api.get).mockResolvedValue([result]);
+    const onSelectResult = vi.fn();
+    wrap(<ChatSearchModal {...props} onSelectResult={onSelectResult} />);
+
+    fireEvent.change(screen.getByPlaceholderText(/hledej slovo/i), {
+      target: { value: 'hledaná' },
+    });
+    // Debounce 350 ms → počkej, až se výsledek vykreslí.
+    const item = await screen.findByText(
+      'hledaná zpráva',
+      undefined,
+      { timeout: 2000 },
+    );
+    fireEvent.click(item.closest('button')!);
+    expect(onSelectResult).toHaveBeenCalledWith('c1', 'm42');
   });
 
   it('filtr nabízí konverzace světa + volbu „všechny"', () => {

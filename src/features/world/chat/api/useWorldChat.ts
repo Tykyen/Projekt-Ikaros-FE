@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { useSocketEvent, useSocketReconnect } from '@/features/chat/api/useSocket';
@@ -123,7 +123,121 @@ export function useLoadOlderMessages(
     }
   }, [worldId, channelId, isLoadingOlder, reachedStart, qc]);
 
-  return { loadOlder, isLoadingOlder, reachedStart };
+  // Skok z hledání může na začátek historie narazit mimo `loadOlder` —
+  // setter, ať tlačítko „Zobrazit starší" ví, že už není co načítat.
+  const markReachedStart = useCallback(() => setReachedStart(true), []);
+
+  return { loadOlder, isLoadingOlder, reachedStart, markReachedStart };
+}
+
+/** Dohledání zprávy v historii (skok z hledání) — velikost dávky (BE strop). */
+export const JUMP_BATCH_LIMIT = 100;
+/** Pojistka smyčky dohledání — max dávek (~3000 zpráv do historie). */
+export const JUMP_MAX_BATCHES = 30;
+
+export type HuntResult = 'found' | 'reachedStart' | 'exhausted' | 'cancelled';
+
+/**
+ * Čistá smyčka dohledání zprávy v historii (spec-chat-search-jump): donačítá
+ * starší dávky kurzorem, dokud cíl nenajde / nedojde na začátek historie /
+ * nevyčerpá pojistku. Deps injektované kvůli testovatelnosti (vzor
+ * `prependOlderMessages`).
+ */
+export async function huntMessageInHistory(opts: {
+  targetId: string;
+  /** Fetch starší dávky před daným ID (limit řeší volající). */
+  fetchOlder: (beforeId: string) => Promise<ChatMessage[]>;
+  /** Aktuální zprávy v cache (čte se před každou dávkou — prepend je mění). */
+  getMessages: () => ChatMessage[];
+  /** Předsazení dávky do cache. */
+  prepend: (older: ChatMessage[]) => void;
+  isCancelled: () => boolean;
+  maxBatches?: number;
+  batchLimit?: number;
+}): Promise<HuntResult> {
+  const maxBatches = opts.maxBatches ?? JUMP_MAX_BATCHES;
+  const batchLimit = opts.batchLimit ?? JUMP_BATCH_LIMIT;
+  for (let i = 0; i < maxBatches; i++) {
+    const oldest = opts.getMessages()[0];
+    if (!oldest) return 'exhausted';
+    let older: ChatMessage[];
+    try {
+      older = await opts.fetchOlder(oldest.id);
+    } catch {
+      // Síťová chyba — skonči; případný další klik na výsledek to zkusí znovu.
+      return 'exhausted';
+    }
+    if (opts.isCancelled()) return 'cancelled';
+    opts.prepend(older);
+    if (older.some((m) => m.id === opts.targetId)) return 'found';
+    if (older.length < batchLimit) return 'reachedStart';
+  }
+  return 'exhausted';
+}
+
+export type JumpHuntState = 'idle' | 'hunting' | 'notFound';
+
+/**
+ * Skok na konkrétní zprávu (hledání 6.6 / deep-link 13.2a): když cíl není
+ * v načtené historii, dohledá ho po dávkách (`huntMessageInHistory`) do PLOCHÉ
+ * messages cache — scroll+highlight pak zařídí stávající effect v `MessageList`
+ * (závislý na `items`). Jednorázově per cíl (ref-guard). `notFound` po chvíli
+ * sám zmizí (hláška v `ChannelView`).
+ */
+export function useJumpToMessage(
+  worldId: string,
+  channelId: string | null,
+  targetId: string | null,
+  messages: ChatMessage[],
+  onReachedStart?: () => void,
+): JumpHuntState {
+  const qc = useQueryClient();
+  const [state, setState] = useState<JumpHuntState>('idle');
+  // Adjustment-during-render (vzor deep-linku ve `WorldChatRoom`): nový cíl,
+  // který v načtené historii není, přepne stav na `hunting` bez efektu —
+  // smyčku pak spouští effect níž reakcí na stav.
+  const [huntedTarget, setHuntedTarget] = useState<string | null>(null);
+  if (targetId && targetId !== huntedTarget && messages.length > 0) {
+    setHuntedTarget(targetId);
+    if (!messages.some((m) => m.id === targetId)) setState('hunting');
+  }
+
+  useEffect(() => {
+    if (state !== 'hunting' || !worldId || !channelId || !targetId) return;
+    let cancelled = false;
+    const key = worldChatKeys(worldId).messages(channelId);
+    void huntMessageInHistory({
+      targetId,
+      fetchOlder: (beforeId) =>
+        api.get<ChatMessage[]>(
+          `${base(worldId)}/channels/${channelId}/messages`,
+          { before: beforeId, limit: JUMP_BATCH_LIMIT },
+        ),
+      getMessages: () => qc.getQueryData<ChatMessage[]>(key) ?? [],
+      prepend: (older) =>
+        qc.setQueryData<ChatMessage[]>(key, (cur) =>
+          prependOlderMessages(cur ?? [], older),
+        ),
+      isCancelled: () => cancelled,
+    }).then((result) => {
+      if (cancelled || result === 'cancelled') return;
+      if (result === 'reachedStart') onReachedStart?.();
+      setState(result === 'found' ? 'idle' : 'notFound');
+    });
+    return () => {
+      cancelled = true;
+    };
+    // `onReachedStart` je stabilní callback (`markReachedStart`, useCallback []).
+  }, [state, worldId, channelId, targetId, qc, onReachedStart]);
+
+  // Hláška „nenalezeno" po chvíli sama zmizí.
+  useEffect(() => {
+    if (state !== 'notFound') return;
+    const t = setTimeout(() => setState('idle'), 6000);
+    return () => clearTimeout(t);
+  }, [state]);
+
+  return state;
 }
 
 export interface SendWorldMessagePayload {

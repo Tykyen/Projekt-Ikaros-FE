@@ -80,15 +80,22 @@ export function WorldChatRoom() {
     setLastDeepLink(deepLinkParam);
     setSelectedId(deepLinkParam);
   }
-  // Deep-link na konkrétní zprávu (`?zprava={messageId}`, z notifikačního feedu)
-  // → po otevření konverzace na ni `MessageList` doscrolluje. Drží se ve stavu,
-  // ať skok přežije úklid URL paramu (skok proběhne až po načtení historie).
+  // Skok na konkrétní zprávu — pár {channelId, messageId}. Plní ho deep-link
+  // (`?zprava=`, z notifikačního feedu) i klik na výsledek hledání; `ChannelView`
+  // pak zprávu případně dohledá v historii a `MessageList` doscrolluje. Drží se
+  // ve stavu, ať skok přežije úklid URL paramu (proběhne až po načtení historie).
   const jumpParam = searchParams.get('zprava');
   const [lastJump, setLastJump] = useState<string | null>(null);
-  const [jumpToMessageId, setJumpToMessageId] = useState<string | null>(null);
+  const [jumpTarget, setJumpTarget] = useState<{
+    channelId: string;
+    messageId: string;
+  } | null>(null);
   if (jumpParam && jumpParam !== lastJump) {
     setLastJump(jumpParam);
-    setJumpToMessageId(jumpParam);
+    // Feed posílá vždy konverzaci i zprávu; bez konverzace nemá skok cíl.
+    if (deepLinkParam) {
+      setJumpTarget({ channelId: deepLinkParam, messageId: jumpParam });
+    }
   }
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // Default: zavřeno. PJ si rail otevře přes ikonu (Přítomní), hráč přes
@@ -316,7 +323,9 @@ export function WorldChatRoom() {
             onOpenSearch={() => setSearchOpen(true)}
             worldEmotes={emoteSet}
             jumpToMessageId={
-              active.id === lastDeepLink ? jumpToMessageId : null
+              jumpTarget && active.id === jumpTarget.channelId
+                ? jumpTarget.messageId
+                : null
             }
           />
         ) : (
@@ -361,7 +370,10 @@ export function WorldChatRoom() {
           worldId={worldId}
           groups={groupList}
           onClose={() => setSearchOpen(false)}
-          onSelectResult={selectChannel}
+          onSelectResult={(channelId, messageId) => {
+            selectChannel(channelId);
+            setJumpTarget({ channelId, messageId });
+          }}
         />
       )}
 

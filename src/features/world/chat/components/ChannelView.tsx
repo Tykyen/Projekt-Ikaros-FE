@@ -28,6 +28,7 @@ import type {
 import {
   useChannelMessages,
   useLoadOlderMessages,
+  useJumpToMessage,
   useDeleteMessage,
   useMarkRead,
   worldChatKeys,
@@ -109,10 +110,8 @@ export function ChannelView({
   const qc = useQueryClient();
   const channelId = channel.id;
   const history = useChannelMessages(worldId, channelId);
-  const { loadOlder, isLoadingOlder, reachedStart } = useLoadOlderMessages(
-    worldId,
-    channelId,
-  );
+  const { loadOlder, isLoadingOlder, reachedStart, markReachedStart } =
+    useLoadOlderMessages(worldId, channelId);
   const deleteMutation = useDeleteMessage(worldId);
   const markRead = useMarkRead(worldId);
   const editMutation = useEditMessage(worldId);
@@ -152,6 +151,16 @@ export function ChannelView({
   );
   const messages = useMemo(() => history.data ?? [], [history.data]);
   const items = useMemo<ChatItem[]>(() => toChatItems(messages), [messages]);
+
+  // Skok na zprávu z hledání/deep-linku: když cíl není v načtené historii,
+  // dohledá ho po dávkách do messages cache; scroll pak řeší `MessageList`.
+  const jumpState = useJumpToMessage(
+    worldId,
+    channelId,
+    jumpToMessageId ?? null,
+    messages,
+    markReachedStart,
+  );
 
   // Barva pozadí pro kontrast guard textu zpráv.
   useEffect(() => {
@@ -578,6 +587,13 @@ export function ChannelView({
       </WorldHelpModal>
 
       <div className={s.body}>
+        {jumpState !== 'idle' && (
+          <div className={s.jumpBanner} role="status">
+            {jumpState === 'hunting'
+              ? 'Hledám zprávu v historii…'
+              : 'Zpráva je příliš hluboko v historii.'}
+          </div>
+        )}
         {history.isLoading ? (
           <div className={s.state}>
             <Spinner />

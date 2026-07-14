@@ -9,8 +9,8 @@ interface ChatSearchModalProps {
   worldId: string;
   groups: GroupWithChannels[];
   onClose: () => void;
-  /** Klik na výsledek → přepnout na konverzaci. */
-  onSelectResult: (channelId: string) => void;
+  /** Klik na výsledek → přepnout na konverzaci a skočit na zprávu. */
+  onSelectResult: (channelId: string, messageId: string) => void;
 }
 
 function formatTime(iso: string): string {
@@ -95,7 +95,7 @@ export function ChatSearchModal({
             type="button"
             className={s.result}
             onClick={() => {
-              onSelectResult(r.channelId);
+              onSelectResult(r.channelId, r.messageId);
               onClose();
             }}
           >

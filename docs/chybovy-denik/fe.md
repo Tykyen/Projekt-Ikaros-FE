@@ -2089,3 +2089,17 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Proč správně:** notes vázané na dekoraci-id by umřely s každou úpravou popisku; vazba na text je stabilní a pochopitelná. CA jeskyně NEpatří do rooms-and-mazes pipeline (nemají místnosti/dveře) — čistý branch na vstupu. Krajina znovu potvrdila mapKind vzor: BE změny = 5 stringů v unionu + 1 blocking set.
 **Jak ověřeno:** BE 55 jest (wilderness walls na ASCII, notes v copy/DTO), FE engine 39 vitest (témata propojenost ×6, jeskyně ×3 seedy, krajina determinismus/cesta/limity), tsc+eslint 0, HelpPage 25, build ✓. Glyfy krajiny potřetí přes agenta s kontraktem — potřetí čisté napoprvé.
 **Zhodnocení:** dobře; celý 21.3 (a–g) za den. Pozn.: EditorTool union je třeba rozšiřovat souběžně s CellType (tsc chytil).
+
+## ✅ ŘEŠENÍ — hledání v chatu: skok přímo na nalezenou zprávu (dohledání v historii) · 2026-07-14
+
+**Co nakonec zabralo.** Průzkum před spec ukázal, že mechanismus skoku UŽ existuje (`MessageList.jumpToMessageId` z deep-linku 13.2a — scroll `block:center` + highlight), jen (1) search modal `messageId` zahazoval a (2) skok byl no-op mimo načtené okno 50 zpráv. Fix = FE-only: `onSelectResult(channelId, messageId)` → `WorldChatRoom` drží pár `jumpTarget {channelId, messageId}` (sdílený deep-linkem i hledáním) → nový `useJumpToMessage` v `ChannelView` cíl mimo okno **dohledá po dávkách** kurzorem `?before=` (limit 100, pojistka 30 dávek) do ploché messages cache; scroll pak zařídí stávající effect. Jádro smyčky = čistá async funkce `huntMessageInHistory` s injektovanými deps (fetch/getMessages/prepend/isCancelled) → testovatelná bez renderHook (vzor `prependOlderMessages`). Nezvolen BE `around` endpoint — rozbil by invariant „cache = souvislý blok končící nejnovější zprávou" (WS append, unread).
+
+**Proč to je správně:** reuse celé scroll/highlight/kotva infrastruktury (SC-33 kotva drží pohled při prependu) = ~0 rizika regrese; deep-link z feedu dostal dohledání zdarma (dřív no-op u starších zpráv).
+
+**Past (lint):** první verze hooku = `setState('hunting')` synchronně v effectu + zápis do refu během renderu → 2 react-hooks warningy (`set-state-in-effect`, `refs`). Přepis na **adjustment-during-render** (nový cíl přepne stav při renderu, effect jen spouští smyčku reakcí na stav) + stabilní callback (`markReachedStart`, useCallback []) místo refu. Vzor si pamatovat: side-effect smyčku spouštěj z effectu závislého na STAVU, stav přepínej adjustmentem.
+
+**Jak ověřeno:** hunt smyčka 6 testů (found/kurzor/reachedStart/pojistka/cancel/síť) + klik test modalu + chat suita 350/350, `tsc -b` + eslint čisté, statická responzivita pilulky. Živý test čeká na uživatele.
+
+**Zhodnocení:** 👍 zabralo napoprvé, 0 cyklení; 👍 průzkum před spec ušetřil BE práci (roadmapa by svedla k `around` endpointu). 👎 známý limit: hluboký skok = stovky zpráv v DOM (list nevirtualizovaný) — řešit až při reálném problému.
+
+---

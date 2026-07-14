@@ -123,3 +123,18 @@
 - 👍 Fix je BE-only a zpětně kompatibilní — dnešní FE dál posílá absolutní set (race trvá, dokud FE nepřejde na deltu), nový kontrakt je připravený a otestovaný.
 - 👍 Race e2e odhalil mongoose past, kterou mock-unit testy principiálně nevidí — atomické zápisy VŽDY ověřit proti reálnému Mongu.
 - 👎 FE follow-up nutný: `adjustHp` v 8 bestie panelech přepnout na `hpDelta` (a CoC mirror `systemStats['health.current']` dopočítat z 201 response); do té doby je fix „jen" připravená trubka.
+
+## ✅ ŘEŠENÍ — hloubkový audit „testerce nechodí push notifikace" → kód čistý, opraveny 2 dluhy diagnostiky — 2026-07-14
+
+**Co nakonec zabralo.** Regrese se hledala systematicky **diffem celého push řetězu od posledního prokazatelně funkčního data** (19. 6. — tehdy testerka pushe dostávala, řešily se duplicity): FE (sw.js, usePush, main.tsx registrace) + BE (push.service, chat.service push blok, notification-preferences, users repo) commit po commitu. Výsledek: žádný commit push nerozbil — filtr preferencí 15.9 (22. 6.) je fail-open (undefined prefs → default poslat), `findByIds` fail-open, persona util (13. 7.) defenzivní, dávky 4b/26-schémat se push cesty nedotkly, VAPID se neměnil (server swap 12. 6. byl PŘED funkčním stavem). → Příčina je datová/zařízení (mrtvá subscription v DB nebo vypnutá kategorie v profilu), ne kód. Při auditu ale vypadly 2 reálné dluhy diagnostiky, hned opraveny (commit `085ca47`): (1) chat push blok = fire-and-forget s **tichým `catch {}`** → jakékoliv selhání bez stopy v logu; teď `logger.warn` s message.id; (2) subscription s trvalou chybou mimo 404/410 (400/401/403/413, typicky VAPID mismatch po rotaci) se **nikdy neuklidila** → `failCount` čítač po sobě jdoucích trvalých selhání (atomický `$inc`), po 8 smazání; úspěch i re-subscribe nulují; transientní 429/5xx/timeout se nepočítají (výpadek providera nesmí smazat živé odběry).
+
+**Proč to je správně (a ne další variace).** Bez auditu bych opravoval naslepo („zapni si to znovu") — diff-od-posledního-funkčního-data dává binární odpověď kód/data a vymezuje, KDE hledat dál. U úklidu: mazat hned na 403 by při dočasné server-side VAPID misconfiguraci smazalo VŠECHNY odběry (nevratné) — čítač s prahem 8 + nulování při úspěchu je bezpečný kompromis; 404/410 se dál maže okamžitě (provider potvrdil zánik).
+
+**Jak ověřeno.** Jest push+chat 165/165 (5 nových testů: pod prahem nemaže / na prahu maže / transientní nepočítá / úspěch nuluje jen nenulové / 404-410 beze změny), typecheck + lint:check, push na main (`2d58e5b` resty 21.3 + `085ca47` push). Doručení testerce ověří uživatel živě (checklist: stav toggle u zvonku → kategorie v profilu).
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Audit vyloučil kód za ~30 min čtení diffů; nalezené dluhy jsou přesně ta místa, kvůli kterým se to příště bude zase hádat.
+- 👍 Tichý `catch {}` u fire-and-forget bloků = anti-pattern; při psaní best-effort bloku VŽDY aspoň `logger.warn`.
+- 👎 Kořen u testerky stále NEpotvrzen (nemám přístup k prod DB/logům) — teď aspoň bude v logu vidět; follow-up návrh: tlačítko „Poslat testovací notifikaci" (`POST /push/test`), zatím neschváleno.
+
+---
