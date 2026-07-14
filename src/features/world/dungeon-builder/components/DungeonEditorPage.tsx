@@ -10,16 +10,24 @@ import { Link, useBlocker, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
+  BookOpenText,
   Download,
+  Map as MapIcon,
   Save,
   Settings2,
   Wand2,
 } from 'lucide-react';
 import { Button, ConfirmDialog, Input, Modal, Spinner } from '@/shared/ui';
+import { useUploadImage } from '@/shared/api/useUploadImage';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useDungeonMap, useDungeonMapMutations } from '../hooks/useDungeonMaps';
-import { generateDungeon, type GeneratorParams } from '../engine/generate';
-import { dungeonToPngBlob } from '../render/drawDungeon';
+import { generateDungeon } from '../engine/generate';
+import { generateCity } from '../engine/generateCity';
+import { generateWilderness } from '../engine/generateWilderness';
+import {
+  dungeonToPngBlob,
+  renderDungeonToCanvas,
+} from '../render/drawDungeon';
 import {
   createEditorState,
   editorReducer,
@@ -28,7 +36,8 @@ import {
 import { DUNGEON_LIMITS } from '../types';
 import { DungeonCanvas } from './DungeonCanvas';
 import { ToolPalette } from './ToolPalette';
-import { GeneratorPanel } from './GeneratorPanel';
+import { GeneratorPanel, type GenerateRequest } from './GeneratorPanel';
+import { NotesPanel } from './NotesPanel';
 import { LegendBar } from './LegendBar';
 import styles from './DungeonEditorPage.module.css';
 
@@ -46,10 +55,18 @@ const EMPTY_STATE: EditorState = createEditorState({
 });
 
 export default function DungeonEditorPage(): React.ReactElement {
-  const { dungeonId } = useParams<{ dungeonId: string }>();
-  const { worldId, worldSlug } = useWorldContext();
+  // 21.3c — bez `worldSlug` v URL jedeme v režimu osobní knihovny
+  // (`/ikaros/podzemi/:dungeonId`): jiný zpět-link, bez exportu na TM.
+  const { dungeonId, worldSlug } = useParams<{
+    dungeonId: string;
+    worldSlug?: string;
+  }>();
+  const isLibrary = !worldSlug;
+  const backTo = isLibrary ? '/ikaros/podzemi' : `/svet/${worldSlug}/podzemi`;
+  const { isPJ } = useWorldContext();
   const { data: dungeon, isLoading, isError } = useDungeonMap(dungeonId ?? null);
-  const { replaceDungeon } = useDungeonMapMutations(worldId || null);
+  const { replaceDungeon, exportScene } = useDungeonMapMutations();
+  const uploadImage = useUploadImage();
 
   const [state, dispatch] = useReducer(editorReducer, EMPTY_STATE);
   const loadedIdRef = useRef<string | null>(null);
@@ -61,8 +78,9 @@ export default function DungeonEditorPage(): React.ReactElement {
   }, [dungeon]);
 
   const [showGenerator, setShowGenerator] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [pendingGenerate, setPendingGenerate] =
-    useState<GeneratorParams | null>(null);
+    useState<GenerateRequest | null>(null);
   const [labelCell, setLabelCell] = useState<{ x: number; y: number } | null>(
     null,
   );
@@ -95,6 +113,7 @@ export default function DungeonEditorPage(): React.ReactElement {
           theme: 'dyson',
           cells: state.cells,
           decorations: state.decorations,
+          notes: state.notes,
         },
       },
       {
@@ -128,12 +147,46 @@ export default function DungeonEditorPage(): React.ReactElement {
     return () => window.removeEventListener('keydown', onKey);
   }, [save]);
 
+  // 21.3b — render 1:1 (px obrazu = cellSize × grid) → upload → nová scéna TM.
+  const exportToTacticalMap = async (): Promise<void> => {
+    if (!dungeonId || exportScene.isPending || uploadImage.isPending) return;
+    try {
+      const canvas = renderDungeonToCanvas(
+        {
+          gridWidth: state.gridWidth,
+          gridHeight: state.gridHeight,
+          cells: state.cells,
+          decorations: state.decorations,
+          mapKind: state.mapKind,
+        },
+        { cellPx: state.cellSize, frame: false },
+      );
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, 'image/png'),
+      );
+      if (!blob) throw new Error('render selhal');
+      const file = new File([blob], `${state.name.trim() || 'podzemi'}.png`, {
+        type: 'image/png',
+      });
+      const uploaded = await uploadImage.mutateAsync(file);
+      await exportScene.mutateAsync({ id: dungeonId, imageUrl: uploaded.url });
+      toast.success(
+        'Scéna vytvořena i se zdmi a dveřmi — najdeš ji na taktické mapě v seznamu scén.',
+      );
+    } catch {
+      toast.error('Export na taktickou mapu se nepovedl. Zkus to znovu.');
+    }
+  };
+
   const downloadPng = async (): Promise<void> => {
     const blob = await dungeonToPngBlob({
       gridWidth: state.gridWidth,
       gridHeight: state.gridHeight,
       cells: state.cells,
       decorations: state.decorations,
+      mapKind: state.mapKind,
+      // 21.3f — klíč mapy se tiskne pod legendu.
+      notes: state.notes,
     });
     if (!blob) {
       toast.error('Export PNG selhal.');
@@ -147,8 +200,14 @@ export default function DungeonEditorPage(): React.ReactElement {
     URL.revokeObjectURL(url);
   };
 
-  const applyGenerate = (params: GeneratorParams): void => {
-    const generated = generateDungeon(params);
+  const applyGenerate = (request: GenerateRequest): void => {
+    // 21.3e+g — engine podle druhu mapy (panel posílá odpovídající request).
+    const generated =
+      request.kind === 'city'
+        ? generateCity(request.params)
+        : request.kind === 'wilderness'
+          ? generateWilderness(request.params)
+          : generateDungeon(request.params);
     dispatch({
       type: 'applyGenerated',
       cells: generated.cells,
@@ -158,11 +217,11 @@ export default function DungeonEditorPage(): React.ReactElement {
     });
   };
 
-  const onGenerateRequest = (params: GeneratorParams): void => {
+  const onGenerateRequest = (request: GenerateRequest): void => {
     // Přepis rozmalovaného plátna jen po potvrzení (undo ho sice vrátí,
     // ale nechceme „vygumované" překvapení).
-    if (state.dirty) setPendingGenerate(params);
-    else applyGenerate(params);
+    if (state.dirty) setPendingGenerate(request);
+    else applyGenerate(request);
   };
 
   const onCellClick = (x: number, y: number): void => {
@@ -188,7 +247,7 @@ export default function DungeonEditorPage(): React.ReactElement {
     return (
       <div className={styles.stateWrap}>
         <p>Podzemí se nepodařilo načíst — buď neexistuje, nebo patří jinému staviteli.</p>
-        <Link to={`/svet/${worldSlug}/podzemi`} className={styles.stateLink}>
+        <Link to={backTo} className={styles.stateLink}>
           Zpět na seznam
         </Link>
       </div>
@@ -199,7 +258,7 @@ export default function DungeonEditorPage(): React.ReactElement {
     <div className={styles.editor}>
       <header className={styles.topBar}>
         <Link
-          to={`/svet/${worldSlug}/podzemi`}
+          to={backTo}
           className={styles.backLink}
           aria-label="Zpět na seznam podzemí"
         >
@@ -230,11 +289,26 @@ export default function DungeonEditorPage(): React.ReactElement {
           <button
             type="button"
             className={`${styles.topBtn} ${showGenerator ? styles.topBtnActive : ''}`}
-            title="Generátor podzemí"
-            aria-label="Generátor podzemí"
-            onClick={() => setShowGenerator((v) => !v)}
+            title="Generátor"
+            aria-label="Generátor"
+            onClick={() => {
+              setShowGenerator((v) => !v);
+              setShowNotes(false);
+            }}
           >
             <Wand2 size={17} />
+          </button>
+          <button
+            type="button"
+            className={`${styles.topBtn} ${showNotes ? styles.topBtnActive : ''}`}
+            title="Klíč mapy (popisy k číslům)"
+            aria-label="Klíč mapy"
+            onClick={() => {
+              setShowNotes((v) => !v);
+              setShowGenerator(false);
+            }}
+          >
+            <BookOpenText size={17} />
           </button>
           <button
             type="button"
@@ -245,6 +319,18 @@ export default function DungeonEditorPage(): React.ReactElement {
           >
             <Download size={17} />
           </button>
+          {!isLibrary && isPJ && (
+            <button
+              type="button"
+              className={styles.topBtn}
+              title="Na taktickou mapu (nová scéna se zdmi)"
+              aria-label="Na taktickou mapu"
+              disabled={exportScene.isPending || uploadImage.isPending}
+              onClick={() => void exportToTacticalMap()}
+            >
+              <MapIcon size={17} />
+            </button>
+          )}
           <Button
             type="button"
             size="sm"
@@ -261,9 +347,11 @@ export default function DungeonEditorPage(): React.ReactElement {
 
       <div className={styles.workspace}>
         <ToolPalette
+          mapKind={state.mapKind}
           tool={state.tool}
           doorType={state.doorType}
           decorationType={state.decorationType}
+          surfaceVariant={state.surfaceVariant}
           canUndo={state.undoStack.length > 0}
           canRedo={state.redoStack.length > 0}
           onSelectTool={(tool) => dispatch({ type: 'setTool', tool })}
@@ -272,6 +360,9 @@ export default function DungeonEditorPage(): React.ReactElement {
           }
           onSelectDecorationType={(decorationType) =>
             dispatch({ type: 'setDecorationType', decorationType })
+          }
+          onSelectSurfaceVariant={(surfaceVariant) =>
+            dispatch({ type: 'setSurfaceVariant', surfaceVariant })
           }
           onUndo={() => dispatch({ type: 'undo' })}
           onRedo={() => dispatch({ type: 'redo' })}
@@ -283,6 +374,7 @@ export default function DungeonEditorPage(): React.ReactElement {
               gridHeight: state.gridHeight,
               cells: state.cells,
               decorations: state.decorations,
+              mapKind: state.mapKind,
             }}
             tool={state.tool}
             onStrokeStart={() => dispatch({ type: 'beginStroke' })}
@@ -290,12 +382,24 @@ export default function DungeonEditorPage(): React.ReactElement {
             onStrokeEnd={() => dispatch({ type: 'endStroke' })}
             onCellClick={onCellClick}
           />
-          <LegendBar />
+          <LegendBar mapKind={state.mapKind} />
         </div>
         {showGenerator && (
           <GeneratorPanel
+            mapKind={state.mapKind}
             onGenerate={onGenerateRequest}
             onClose={() => setShowGenerator(false)}
+          />
+        )}
+        {showNotes && (
+          <NotesPanel
+            decorations={state.decorations}
+            notes={state.notes}
+            onSetNote={(label, title, text) =>
+              dispatch({ type: 'setNote', label, title, text })
+            }
+            onRemoveNote={(label) => dispatch({ type: 'removeNote', label })}
+            onClose={() => setShowNotes(false)}
           />
         )}
       </div>

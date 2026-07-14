@@ -17,6 +17,29 @@ import type {
 } from '../types';
 import { isWalkable } from '../types';
 import { createEmptyCells } from './model';
+import { furnishRooms } from './furnish';
+import { generateCaves } from './generateCaves';
+
+/**
+ * 21.3f — téma podzemí: řídí typy místností, zabydlení, povrchy a distribuci
+ * dveří. `jeskyne` přepne na organický CA generátor (generateCaves).
+ */
+export type DungeonTheme =
+  | 'klasika'
+  | 'hrobka'
+  | 'doly'
+  | 'kanaly'
+  | 'pevnost'
+  | 'jeskyne';
+
+export const DUNGEON_THEME_LABELS: Record<DungeonTheme, string> = {
+  klasika: 'Klasika',
+  hrobka: 'Hrobka',
+  doly: 'Doly',
+  kanaly: 'Kanály',
+  pevnost: 'Pevnost',
+  jeskyne: 'Jeskyně',
+};
 
 export interface GeneratorParams {
   /** Rozměry gridu (engine si vynutí lichost; rozsah 11–99). */
@@ -30,6 +53,10 @@ export interface GeneratorParams {
   specialDoorRatio: number;
   /** 0–1: míra ořezu slepých chodeb (1 ≈ žádné slepé konce). Default 0.8. */
   deadEndTrim?: number;
+  /** 21.3d — 0–1: auto-zabydlení místností nábytkem. Default 0 (vypnuto). */
+  furnishing?: number;
+  /** 21.3f — téma (default klasika). */
+  theme?: DungeonTheme;
   seed: number;
 }
 
@@ -81,14 +108,47 @@ const DIRS: readonly Dir[] = [
   [-1, 0],
 ];
 
-/** Distribuce zvláštních dveří (váhy). */
-const SPECIAL_DOORS: readonly { type: DoorCellType; weight: number }[] = [
-  { type: 'door-locked', weight: 30 },
-  { type: 'door-secret', weight: 20 },
-  { type: 'door-trapped', weight: 20 },
-  { type: 'portcullis', weight: 15 },
-  { type: 'archway', weight: 15 },
-];
+/** Distribuce zvláštních dveří (váhy) — 21.3f per téma. */
+const SPECIAL_DOORS_BY_THEME: Record<
+  Exclude<DungeonTheme, 'jeskyne'>,
+  readonly { type: DoorCellType; weight: number }[]
+> = {
+  klasika: [
+    { type: 'door-locked', weight: 30 },
+    { type: 'door-secret', weight: 20 },
+    { type: 'door-trapped', weight: 20 },
+    { type: 'portcullis', weight: 15 },
+    { type: 'archway', weight: 15 },
+  ],
+  // Hrobka: tajné chodby a pasti; mříže sem nepatří.
+  hrobka: [
+    { type: 'door-secret', weight: 40 },
+    { type: 'door-trapped', weight: 30 },
+    { type: 'door-locked', weight: 20 },
+    { type: 'archway', weight: 10 },
+  ],
+  // Doly: většinou otevřené štoly, občas zamčený sklad.
+  doly: [
+    { type: 'archway', weight: 55 },
+    { type: 'door-locked', weight: 25 },
+    { type: 'portcullis', weight: 10 },
+    { type: 'door-trapped', weight: 10 },
+  ],
+  // Kanály: mříže a průlezy.
+  kanaly: [
+    { type: 'portcullis', weight: 45 },
+    { type: 'archway', weight: 30 },
+    { type: 'door-locked', weight: 15 },
+    { type: 'door-secret', weight: 10 },
+  ],
+  // Pevnost: zamčeno a mříže, žádné tajnosti.
+  pevnost: [
+    { type: 'door-locked', weight: 45 },
+    { type: 'portcullis', weight: 35 },
+    { type: 'door-trapped', weight: 10 },
+    { type: 'archway', weight: 10 },
+  ],
+};
 
 const clampOdd = (n: number, min: number, max: number): number => {
   const clamped = Math.max(min, Math.min(max, Math.round(n)));
@@ -96,6 +156,9 @@ const clampOdd = (n: number, min: number, max: number): number => {
 };
 
 export function generateDungeon(params: GeneratorParams): GeneratedDungeon {
+  // 21.3f — organické jeskyně jedou vlastním CA generátorem.
+  if (params.theme === 'jeskyne') return generateCaves(params);
+  const theme: DungeonTheme = params.theme ?? 'klasika';
   const width = clampOdd(params.width, 11, 99);
   const height = clampOdd(params.height, 11, 99);
   const roomDensity = Math.max(0, Math.min(1, params.roomDensity));
@@ -294,11 +357,12 @@ export function generateDungeon(params: GeneratorParams): GeneratedDungeon {
   // zbylé osiřelé záznamy vyhoď.
   const liveDoors = doorCells.filter((d) => isWalkable(cells[d.y][d.x].type));
 
-  // ── 5) Typy dveří ───────────────────────────────────────────────────────
-  const totalWeight = SPECIAL_DOORS.reduce((s, d) => s + d.weight, 0);
+  // ── 5) Typy dveří (váhy dle tématu) ─────────────────────────────────────
+  const specialDoors = SPECIAL_DOORS_BY_THEME[theme];
+  const totalWeight = specialDoors.reduce((s, d) => s + d.weight, 0);
   const pickSpecial = (): DoorCellType => {
     let roll = rng() * totalWeight;
-    for (const d of SPECIAL_DOORS) {
+    for (const d of specialDoors) {
       roll -= d.weight;
       if (roll <= 0) return d.type;
     }
@@ -324,6 +388,46 @@ export function generateDungeon(params: GeneratorParams): GeneratedDungeon {
     rotation: 0,
     label: String(r.number),
   }));
+
+  // ── 7) 21.3d+f — auto-zabydlení (stejný rng ⇒ stejný seed = stejný nábytek).
+  const furnishing = Math.max(0, Math.min(1, params.furnishing ?? 0));
+  if (furnishing > 0) {
+    decorations.push(
+      ...furnishRooms({
+        cells,
+        rooms,
+        doors: liveDoors.map((d) => ({ x: d.x, y: d.y })),
+        furnishing,
+        rng,
+        existingCount: decorations.length,
+        theme,
+      }),
+    );
+  }
+
+  // ── 8) 21.3f — tematické povrchy podlah místností.
+  const themeFloor: Record<Exclude<DungeonTheme, 'jeskyne'>, string | null> = {
+    klasika: null,
+    hrobka: 'dlazba',
+    doly: 'hlina',
+    kanaly: 'dlazba',
+    pevnost: 'dlazba',
+  };
+  const variant = themeFloor[theme];
+  if (variant) {
+    for (const r of rooms)
+      for (let y = r.y; y < r.y + r.height; y++)
+        for (let x = r.x; x < r.x + r.width; x++)
+          if (cells[y][x].type === 'floor')
+            cells[y][x] = { type: 'floor', floorVariant: variant };
+  }
+  if (theme === 'doly') {
+    // Štoly (chodby) taky hliněné.
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++)
+        if (cells[y][x].type === 'floor' && !cells[y][x].floorVariant)
+          cells[y][x] = { type: 'floor', floorVariant: 'hlina' };
+  }
 
   return { cells, decorations, rooms, seed: params.seed };
 }

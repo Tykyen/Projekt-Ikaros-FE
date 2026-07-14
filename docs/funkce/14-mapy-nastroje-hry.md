@@ -11,7 +11,7 @@ Hloubková, kódem ověřená inventura. Pokrývá tři různé „mapy", zvukov
 > | `/svet/:slug/mapy` | `WorldMapsPage` (`features/world/maps`) | **Obrázkový atlas** = galerie statických map ve složkách | `modules/world-maps` |
 > | `/svet/:slug/takticka-mapa` | `TacticalMapPage` → `TacticalMapView` | **Taktická bojová mapa** = PixiJS plátno s tokeny, mlhou, bojem | `modules/maps` |
 >
-> Modul `modules/dungeon-maps` je **Tvorba podzemí** (od 21.3a per-world nástroj `/svet/:slug/podzemi`, viz §14.6) — tile-based editor+generátor; umí export jako scénu/šablonu do taktické mapy (`exportScene`/`exportTemplate`, zatím bez FE tlačítka = 21.3b).
+> Modul `modules/dungeon-maps` je **Tvorba podzemí** (od 21.3a per-world nástroj `/svet/:slug/podzemi` + od 21.3c osobní knihovna `/ikaros/podzemi`, viz §14.6) — tile-based editor+generátor; export jako scéna TM vč. zdí/dveří pro LoS (21.3b).
 
 Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Nečlen je přesměrován.
 
@@ -360,27 +360,31 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 ---
 
-## 14.6 — Tvorba podzemí (`/podzemi`)
+## 14.6 — Stavitel: podzemí, města a krajiny (`/podzemi` + knihovna `/ikaros/podzemi`)
 
-### Editor + generátor podzemí (21.3a)
-- **Co to je:** Samostatný fullscreen nástroj na jednoduchá tile-based podzemí donjon-stylu (bílá podlaha/černý masiv/glyfy dveří): ruční kreslení NEBO procedurální generátor, vybavení nábytkem, PNG export. Freemium výhoda Podporovatelů (19.4).
-- **Kde:** menu Hra → „Tvorba podzemí" → seznam `/svet/:slug/podzemi` (`DungeonListPage`), editor `/podzemi/:dungeonId` (`DungeonEditorPage`). Nahradilo bývalý admin stub `/admin/dungeon-builder` (route smazána).
+### Editor + generátory podzemí, měst a krajin (21.3a–g)
+- **Co to je:** Samostatný fullscreen nástroj na tile-based mapy TŘÍ druhů (`mapKind`, volí se při založení, nekonvertuje se): **podzemí** donjon-stylu (negativ — bílé chodby v černé skále, 6 témat vč. organických jeskyní), **město** (pozitiv — budovy/ulice/hradby) a **krajina** (21.3g — lesy/hory/kopce/pole/mokřady/cesty/vesnička). Ruční kreslení NEBO procedurální generátory s auto-zabydlením, 53 dekorací, povrchy, **Klíč mapy** (21.3f — popisy k číslům, tiskne se pod PNG), **osobní cross-world knihovna** a **export na taktickou mapu vč. zdí (LoS)**. Freemium výhoda Podporovatelů (19.4).
+- **Kde:** menu Hra → „Stavitel" → seznam `/svet/:slug/podzemi` (taby „V tomto světě | Moje knihovna", `DungeonListPage`), editor `/podzemi/:dungeonId`; platformová knihovna **`/ikaros/podzemi`** (`DungeonLibraryPage`, requireAuth) + editor v library režimu `/ikaros/podzemi/:dungeonId` (tatáž `DungeonEditorPage`, režim dle absence `worldSlug` param). Nahradilo bývalý admin stub `/admin/dungeon-builder`.
 - **Kdo:**
-  - Route: `memberOnly(Hrac)` (router.tsx — `podzemi`, `podzemi/:dungeonId`); nav položka jen pro Hrac+ (`worldNavConfig.ts:247-257`), skrývatelná (`dungeon-builder`).
-  - Tvorba (BE autorita): člen **Hrac+ ∧ (Podporovatel ∨ PJ+)** — `assertCanCreate` (`dungeon-maps.service.ts:61-82`, `isEffectiveSupporter` z `users/supporter.util.ts`), jinak 403 `NOT_SUPPORTER`. FE zrcadlí teaserem + skrytím „Nové podzemí" (`DungeonListPage.tsx`, `shared/lib/supporter.ts`).
-  - Čtení seznamu: Hrac+; **hráč vidí jen svoje** (owner filtr), **PJ+ všechna** (`findByWorld`, `dungeon-maps.service.ts:109-125`).
-  - Edit/smazání: **vlastník ∨ PJ+** (`assertCanEdit` → 403 `NOT_DUNGEON_OWNER`); vlastník edituje i po ztrátě Podporovatele (grandfathering, vzor limitu světů). Legacy dungeony bez `ownerId` = PJ-owned.
-  - Export scéna/šablona: **PJ+** (`assertCanManage`) — FE zatím nevolá (21.3b).
+  - Route svět: `memberOnly(Hrac)`; nav položka jen Hrac+ (`worldNavConfig.ts`), skrývatelná (`dungeon-builder`). Platformová knihovna: přihlášený (BE vrací jen vlastní položky).
+  - Tvorba ve světě (BE autorita): člen **Hrac+ ∧ (Podporovatel ∨ PJ+)** — `assertCanCreate` → 403 `NOT_SUPPORTER`. FE teaser + skrytí tlačítek (`isEffectiveSupporter`).
+  - Čtení seznamu světa: Hrac+; hráč jen svoje (owner filtr), PJ+ všechna.
+  - Edit/smazání: vlastník ∨ PJ+ (`NOT_DUNGEON_OWNER`); grandfathering po ztrátě Podporovatele. Legacy bez `ownerId` = PJ-owned.
+  - **Knihovna (21.3c):** položka = dokument s `worldId: null` (vzor MapTemplate). `GET /dungeon-maps/library` owner-only; library položky **owner-only i pro admina**. Kopie `POST /dungeon-maps/:id/copy`: do knihovny = Podporovatel ∨ PJ+ zdrojového světa (403 `NOT_LIBRARY_ELIGIBLE`); do světa = create brána cílového světa. VŽDY kopie (tenant izolace), `ownerId = requester`.
+  - Export scéna/šablona: **PJ+** (`assertCanManage`); z knihovny → 403 `DUNGEON_EXPORT_NEEDS_WORLD`.
 - **Co jde dělat:**
-  - Seznam: karty s canvas miniaturami, založení (název + velikost S/M/L + start „vygenerované"/„prázdné plátno"), smazání s potvrzením.
-  - Generátor (panel v editoru): hustota místností, křivolakost chodeb, % zvláštních dveří, **deterministický seed** (stejný seed = stejná mapa) + „Přegenerovat"; přepis rozmalovaného plátna jen po potvrzení. Algoritmus rooms-and-mazes se zaručenou propojeností (engine `generate.ts`, 11 vitest testů vč. flood-fill spojitosti).
-  - Ruční kreslení: podlaha/guma tažením, 6 typů dveří dle legendy (průchod·dveře·zamčené·s pastí·tajné·padací mříž), schody ↑/↓, voda/láva/jáma, **14 dekorací** (bedna, sud, truhla, postel, stůl, židle, lavice, regál, krb, oltář, sloup, studna, žebřík, suť; opakovaný klik = rotace 90°), textové popisky buněk.
-  - Undo/redo 50 kroků (Ctrl+Z/Y), Ctrl+S uložení, zoom/pan (kolečko, pinch, tlačítka), přejmenování inline, změna rozměrů gridu (ořez/dolití).
-  - **PNG export** s pergamenovým rámem + legendou (tentýž renderer jako editor).
-- **Hranice / co NEumí:** Jen čtvercový grid + „dyson" vzhled (hex/modern = výhled). **Export na taktickou mapu zatím bez FE** (BE endpointy `export-scene`/`export-template` hotové; zdi se do `MapWall`/LoS nepřenáší — 21.3b). Žádná kolaborativní editace (poslední zápis vyhrává, bez WS). Generátor nepokládá nábytek (jen čísla místností). Víc pater/exteriéry/AI obrázek = roadmap 21.3c+.
-- **Zvláštnosti:** Ukládá se explicitně (PUT celé mapy), neuložené změny hlídá `useBlocker` + `beforeunload`. Barvy plátna jsou záměrně fixní „papír" (exportuje se do PNG) — složka `render/` je v ALLOW lint:colors. Limity DTO: grid 10–100, dekorace ≤ 500, název ≤ 120 (`create-dungeon-map.dto.ts`).
-- **Stav:** ✅ 21.3a (editor+generátor+PNG) · 🚧 21.3b export na TM scénu.
-- **Kód:** FE `features/world/dungeon-builder/` (`engine/generate.ts`, `render/{drawDungeon,glyphs}.ts`, `state/editorState.ts`, `components/{DungeonListPage,DungeonEditorPage,DungeonCanvas,ToolPalette,GeneratorPanel}.tsx`), route `app/router.tsx` (`podzemi`). BE `modules/dungeon-maps/{dungeon-maps.service.ts,schemas/dungeon-map.schema.ts,dto/*}` (32 jest testů).
+  - Seznam světa: karty s miniaturami, založení (velikost S/M/L, „vygenerované/prázdné"), akce **Uložit do mé knihovny · Kopírovat do světa…** (`WorldPickerModal` z `useMyWorlds`, filtr PJ+ ∨ supporter&Hrac+) · smazat. Tab knihovna: **Vložit do tohoto světa**, upravit (library editor), smazat.
+  - Generátor podzemí: velikost, hustota místností, křivolakost, % zvláštních dveří, **Zabydlenost 0–100 %** (21.3d — typy místností dle velikosti + šablony nábytku, dveře nikdy neblokuje, `engine/furnish.ts`), deterministický seed + „Přegenerovat". **Témata (21.3f):** klasika·hrobka·doly·kanály·pevnost (tematické pooly místností, povrchy, distribuce dveří — `SPECIAL_DOORS_BY_THEME`) + **jeskyně** = organický CA generátor (`engine/generateCaves.ts`: největší komponenta + tunely, jezírka, hliněné dno; propojenost testem).
+  - **Generátor krajiny (21.3g, `engine/generateWilderness.ts`):** value-noise fBm (elevace+vlhkost, deterministický hash — žádné Math.random) → hory/kopce/les/mokřad/louka, řeka po spádu + jezero, cesta greedy po nejnižším terénu (mosty přes vodu, spojitá přes celou mapu — testem), vesnička s očíslovanými staveními + poli, zeleň/tábor. Parametry: lesnatost, hornatost, voda, osídlení, zabydlenost, seed.
+  - **Klíč mapy (21.3f):** panel (ikona knihy) — k popiskům z mapy (čísla první) titulek+text pro PJ; `notes` na dokumentu (max 200, BE `@ArrayMaxSize(200)`), edituje se s mapou (PUT), kopie ho přenáší, osiřelé položky jde smazat; v PNG se tiskne pod legendu (zalamování, cap 40 položek).
+  - **Generátor města (21.3e, `engine/generateCity.ts`):** volitelná řeka s mosty → hlavní ulice (kříž) + vedlejší uličky rekurzivním dělením bloků → náměstí s kašnou a stánky → parcely budov podél ulic → hradby s bránami a rohovými věžemi (auto/ano/ne) → zeleň → číslování max 12 největších budov → lucerny/vozíky dle Zabydlenosti; **garanční prune** = uliční komponenty odříznuté řekou se vrací na terén (souvislost sítě jištěna testem). Parametry: hustota zástavby, křivolakost ulic, hradby, řeka, zeleň, zabydlenost, seed.
+  - Ruční kreslení per druh: dungeon = podlaha/guma, 6 typů dveří, schody, voda/láva/jáma; město = ulice/budova/hradba/brána/most (canvas náhledy v liště), guma, voda. Sdílené: **povrchy** (dlažba/dřevo/hlína/písek/tráva tažením; město i na terén a ulice), **53 dekorací v 7 kategoriích** (nábytek·kontejnery·dungeon·jeskyně·tábor·**město**·markery pro PJ; rotace opakovaným klikem), popisky.
+  - Undo/redo 50 (Ctrl+Z/Y), Ctrl+S, zoom/pan/pinch, rename, resize gridu.
+  - **PNG export** (rám + legenda per druh) · **„Na taktickou mapu"** (21.3b, jen PJ ve world režimu): render 1:1 (`cellPx = cellSize`) → `POST /upload/content-image` → `export-scene`; BE do scény zapíše `config.gridType:'square'` + **`walls: MapWall[]`** (`dungeon-walls.util.ts`, **kind-aware**: dungeon = hranice podlaha↔skála + dveře; město = obvody budov a hradeb + brány jako dveře; run-merge běhů) → připraveno na dynamické vidění.
+- **Hranice / co NEumí:** Jen čtvercový grid + „dyson" vzhled. Bez kolaborativní editace (poslední zápis vyhrává). Export nepřenáší fog/vision nastavení (PJ si zapne). Výhled (spec §14): patra, popisy místností, komunitní knihovna, exteriéry, hex, AI obrázek.
+- **Zvláštnosti:** Explicitní uložení (PUT celé mapy) + `useBlocker`/`beforeunload`. Plátno = fixní „papír" (`render/` v ALLOW lint:colors). DTO limity: grid 10–100, dekorace ≤ 500, název ≤ 120. Pozor: `GET /dungeon-maps/library` musí být v controlleru PŘED `GET :id`. **Cascade:** world hard-delete maže `dungeonMaps` přes `deleteMany({worldId})` (world-hard-delete.service); hard-delete ÚČTU maže knihovnu vlastníka (`@OnEvent('user.deletion.hardDeleted')` → `deleteLibraryByOwner`) — stavby v živých světech záměrně zůstávají (obsah světa, spravuje PJ).
+- **Stav:** ✅ 21.3a+b+c+d (čeká živé ověření uživatelem na webu).
+- **Kód:** FE `features/world/dungeon-builder/` (`engine/{generate,furnish,model}.ts`, `render/{drawDungeon,glyphs}.ts`, `state/editorState.ts`, `components/{DungeonListPage,DungeonLibraryPage,DungeonEditorPage,DungeonCanvas,DungeonGrid,ToolPalette,GeneratorPanel,WorldPickerModal}.tsx`), router `podzemi` + `ikaros/podzemi`. BE `modules/dungeon-maps/{dungeon-maps.service.ts,dungeon-walls.util.ts,dto/*}` (49 jest testů; FE engine 17 vitest).
 
 ---
 

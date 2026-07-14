@@ -144,6 +144,8 @@ const SoundsPage         = lazy(() => import('@/features/world/pages/SoundsPage'
 // 21.3a — tvorba podzemí (per-world; nahradila platformový /admin/dungeon-builder stub).
 const DungeonsPage       = lazy(() => import('@/features/world/pages/DungeonsPage'));
 const DungeonEditorPage  = lazy(() => import('@/features/world/pages/DungeonEditorPage'));
+// 21.3c — platformová osobní knihovna podzemí (editor sdílí DungeonEditorPage).
+const DungeonLibraryPage = lazy(() => import('@/features/world/dungeon-builder/components/DungeonLibraryPage'));
 const CurrencyPage       = lazy(() => import('@/features/world/pages/CurrencyPage'));
 const WorldSettingsPage  = lazy(() => import('@/features/world/pages/WorldSettingsPage'));
 const RulesPage          = lazy(() => import('@/features/world/pages/RulesPage'));
@@ -256,6 +258,10 @@ export const router = createBrowserRouter([
       // 21.2a — generátory (jména + potomci) a detail jmenné sady.
       { path: 'ikaros/generatory',           element: p(GeneratoryPage) },
       { path: 'ikaros/generatory/sady/:id',  element: p(NameSetDetailPage) },
+      // 21.3c — osobní knihovna podzemí (cross-world) + editor v library režimu.
+      // Osobní obsah (ne Společná tvorba) → requireAuth; BE vrací jen vlastní.
+      { path: 'ikaros/podzemi',              loader: requireAuth, element: p(DungeonLibraryPage) },
+      { path: 'ikaros/podzemi/:dungeonId',   loader: requireAuth, element: p(DungeonEditorPage) },
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'ikaros/podporovatele',   element: p(SupportersPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug

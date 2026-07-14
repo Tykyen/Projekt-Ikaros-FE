@@ -347,9 +347,9 @@ export function WorldSection() {
             jako klikací kartu. Viditelnost řídí PJ u každé mapy i vlaječky.
           </p>
         </Tool>
-        <Tool icon={<Hammer size={16} />} title="Tvorba podzemí" audience={{ kind: 'hrac', label: 'Podporovatelé + PJ' }} accent="info">
+        <Tool icon={<Hammer size={16} />} title="Stavitel — podzemí a města" audience={{ kind: 'hrac', label: 'Podporovatelé + PJ' }} accent="info">
           <p>
-            Nakresli si vlastní jeskyni (menu Hra → Tvorba podzemí): bílé chodby,
+            Nakresli si vlastní jeskyni (menu Hra → Stavitel): bílé chodby,
             černá skála, dveře podle klasické legendy (obyčejné, zamčené, tajné,
             s pastí, padací mříž, průchod), schody, voda, láva i jámy. Nebo nech{' '}
             <strong>generátor</strong> vysypat celé podzemí — nastavíš velikost,
@@ -357,17 +357,42 @@ export function WorldSection() {
             se nelíbí. Vygenerované se dá dál ručně dokreslit.
           </p>
           <p>
-            Do místností jde pokládat <strong>vybavení</strong> — bedny, sudy,
-            truhly, postele, stoly, židle, krby, oltáře a další (opakovaný klik
-            položený kus otočí). Buňkám jde dát textový popisek (čísla místností
-            dělá generátor sám). Hotovou mapu stáhneš jako <strong>PNG</strong>{' '}
-            s pergamenovým rámem a legendou.
+            Další režimy: <strong>město</strong> (ulice, budovy, hradby
+            s branami, mosty — generátor postaví celé městečko s náměstím,
+            kašnou a stánky) a <strong>krajina</strong> (lesy, hory, kopce,
+            pole, mokřady, řeka s mosty, polní cesty a vesnička — plný
+            generátor exteriérů). Generátor podzemí má navíc{' '}
+            <strong>témata</strong>: klasika, hrobka, doly, kanály, pevnost
+            a organické <strong>jeskyně</strong>.
+          </p>
+          <p>
+            K číslům na mapě si v editoru otevřeš <strong>Klíč mapy</strong>{' '}
+            (ikona knihy) a napíšeš, co v místě je — klíč se uloží s mapou
+            a tiskne se pod PNG export jako klasický klíč lokací.
+          </p>
+          <p>
+            Do místností jde pokládat <strong>vybavení z šesti kategorií</strong>{' '}
+            — nábytek (i trůn a křeslo), bedny a sudy, dungeon výbavu (kostry,
+            řetězy, magické kruhy…), jeskynní prvky (stalagmity, krystaly,
+            pavučiny), táborové věci a markery pro PJ (klíč, poklad, vykřičník).
+            Opakovaný klik položený kus otočí. Generátor umí místnosti rovnou{' '}
+            <strong>zabydlet</strong> (posuvník Zabydlenost) a podlahy jdou
+            natřít <strong>povrchem</strong> (dlažba, dřevo, hlína, písek,
+            tráva). Buňkám jde dát textový popisek. Hotovou mapu stáhneš jako{' '}
+            <strong>PNG</strong> s pergamenovým rámem a legendou.
+          </p>
+          <p>
+            Stavby si ukládáš do <strong>osobní knihovny</strong> (záložka
+            „Moje knihovna", nebo přímo stránka Knihovna podzemí po přihlášení)
+            a nosíš je <strong>mezi světy</strong> — vždy jako kopii, kterou si
+            každý svět upraví po svém. PJ navíc pošle hotové podzemí{' '}
+            <strong>na taktickou mapu</strong> jedním tlačítkem: vznikne scéna
+            i se zdmi a dveřmi, takže rovnou funguje mlha války a viditelnost.
           </p>
           <CalloutBox variant="tip" title="Kdo může stavět">
-            Tvorba podzemí je výhoda <strong>Podporovatelů</strong> (a PJ světa
-            má nástroj vždy). Hráč vidí jen svoje stavby, PJ všechny stavby ve
-            světě. Napojení hotového podzemí rovnou na taktickou mapu 🚧
-            připravujeme.
+            Tvorba podzemí a knihovna jsou výhoda <strong>Podporovatelů</strong>{' '}
+            (a PJ světa má nástroj vždy). Hráč vidí jen svoje stavby, PJ všechny
+            stavby ve světě.
           </CalloutBox>
         </Tool>
       </HelpAccordion>

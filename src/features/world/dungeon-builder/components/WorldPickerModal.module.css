@@ -1,0 +1,44 @@
+/* 21.3c — výběr cílového světa */
+.stateWrap {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.option:hover {
+  border-color: var(--accent, currentColor);
+}
+
+.worldName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

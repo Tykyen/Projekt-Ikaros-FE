@@ -8,15 +8,20 @@
 import type {
   DungeonCell,
   DungeonDecoration,
+  DungeonNote,
   DoorCellType,
+  MapKind,
 } from '../types';
-import { isDoorType, isWalkable } from '../types';
+import { blocksSightCity, isDoorType, isWalkable } from '../types';
 import {
   PAPER_COLORS,
   drawDoorGlyph,
   drawStairsGlyph,
   drawTerrainGlyph,
   drawDecorationGlyph,
+  drawCityCellGlyph,
+  drawWildernessCellGlyph,
+  drawFloorVariant,
   type PassageAxis,
 } from './glyphs';
 
@@ -30,11 +35,71 @@ export const LEGEND_ITEMS: readonly { type: DoorCellType; label: string }[] = [
   { type: 'portcullis', label: 'Padací mříž' },
 ];
 
+/** 21.3e — kind-aware legenda (LegendBar i PNG export kreslí přes `draw`). */
+export interface LegendItem {
+  key: string;
+  label: string;
+  draw: (ctx: CanvasRenderingContext2D, s: number) => void;
+}
+
+export function legendItemsFor(kind: MapKind): LegendItem[] {
+  if (kind === 'wilderness') {
+    return (
+      [
+        ['forest', 'Les'],
+        ['mountain', 'Hory'],
+        ['hill', 'Kopce'],
+        ['field', 'Pole'],
+        ['swamp', 'Mokřad'],
+        ['path', 'Cesta'],
+      ] as const
+    )
+      .map(
+        ([type, label]): LegendItem => ({
+          key: type,
+          label,
+          draw: (ctx, s) => drawWildernessCellGlyph(ctx, type, s),
+        }),
+      )
+      .concat([
+        {
+          key: 'building',
+          label: 'Stavení',
+          draw: (ctx, s) => drawCityCellGlyph(ctx, 'building', s),
+        },
+      ]);
+  }
+  if (kind === 'city') {
+    return (
+      [
+        ['building', 'Budova'],
+        ['street', 'Ulice'],
+        ['city-wall', 'Hradby'],
+        ['gate', 'Brána'],
+        ['bridge', 'Most'],
+      ] as const
+    ).map(([type, label]) => ({
+      key: type,
+      label,
+      draw: (ctx, s) => drawCityCellGlyph(ctx, type, s),
+    }));
+  }
+  return LEGEND_ITEMS.map((i) => ({
+    key: i.type,
+    label: i.label,
+    draw: (ctx, s) => drawDoorGlyph(ctx, i.type, s),
+  }));
+}
+
 export interface DrawableDungeon {
   gridWidth: number;
   gridHeight: number;
   cells: DungeonCell[][];
   decorations: DungeonDecoration[];
+  /** 21.3e — druh mapy; bez pole = dungeon. */
+  mapKind?: MapKind;
+  /** 21.3f — klíč mapy; s `frame` se tiskne pod legendu. */
+  notes?: DungeonNote[];
 }
 
 export interface DrawOptions {
@@ -58,15 +123,58 @@ export function frameMetrics(opts: DrawOptions): {
   return { pad, legendH: Math.round(opts.cellPx * LEGEND_H_RATIO) };
 }
 
-/** Celkové rozměry kresby (mapa + případný rám a legenda). */
+/**
+ * 21.3f — zalomené řádky klíče mapy pro PNG (aproximace šířky znaku;
+ * cap 40 položek × 300 znaků, ať se rám nezvrhne v knihu).
+ */
+function noteLines(
+  dungeon: Pick<DrawableDungeon, 'gridWidth' | 'notes'>,
+  opts: DrawOptions,
+): { text: string; bold: boolean }[] {
+  const notes = (dungeon.notes ?? []).filter(
+    (n) => n.title.trim() || n.text.trim(),
+  );
+  if (!opts.frame || notes.length === 0) return [];
+  const fontSize = Math.max(10, Math.round(opts.cellPx * 0.45));
+  const innerW = dungeon.gridWidth * opts.cellPx;
+  const charsPerLine = Math.max(20, Math.floor(innerW / (fontSize * 0.52)));
+  const lines: { text: string; bold: boolean }[] = [];
+  for (const n of notes.slice(0, 40)) {
+    lines.push({
+      text: `${n.label}. ${n.title.trim() || '—'}`,
+      bold: true,
+    });
+    const words = n.text.trim().slice(0, 300).split(/\s+/).filter(Boolean);
+    let line = '';
+    for (const word of words) {
+      if ((line + ' ' + word).trim().length > charsPerLine) {
+        lines.push({ text: line.trim(), bold: false });
+        line = word;
+      } else {
+        line = `${line} ${word}`;
+      }
+    }
+    if (line.trim()) lines.push({ text: line.trim(), bold: false });
+  }
+  return lines;
+}
+
+const noteLineH = (opts: DrawOptions): number =>
+  Math.round(Math.max(10, Math.round(opts.cellPx * 0.45)) * 1.4);
+
+/** Celkové rozměry kresby (mapa + případný rám, legenda a klíč mapy). */
 export function measureDungeon(
-  dungeon: Pick<DrawableDungeon, 'gridWidth' | 'gridHeight'>,
+  dungeon: Pick<DrawableDungeon, 'gridWidth' | 'gridHeight' | 'notes'>,
   opts: DrawOptions,
 ): { width: number; height: number; pad: number } {
   const { pad, legendH } = frameMetrics(opts);
+  const lines = noteLines(dungeon, opts);
+  const keyH = lines.length
+    ? lines.length * noteLineH(opts) + noteLineH(opts)
+    : 0;
   return {
     width: dungeon.gridWidth * opts.cellPx + 2 * pad,
-    height: dungeon.gridHeight * opts.cellPx + 2 * pad + legendH,
+    height: dungeon.gridHeight * opts.cellPx + 2 * pad + legendH + keyH,
     pad,
   };
 }
@@ -87,6 +195,39 @@ function passageAxis(
   if (at(x, y - 1) && at(x, y + 1)) return 'v';
   // Fallback: aspoň jeden vodorovný soused → vodorovná chodba.
   return at(x - 1, y) || at(x + 1, y) ? 'h' : 'v';
+}
+
+/** 21.3e — osa městské buňky (hradba běží podél sousedních hradeb apod.). */
+function cityAxis(
+  cells: DungeonCell[][],
+  x: number,
+  y: number,
+  type: DungeonCell['type'],
+): PassageAxis {
+  const typeAt = (cx: number, cy: number): DungeonCell['type'] | undefined =>
+    cy >= 0 && cy < cells.length && cx >= 0 && cx < (cells[0]?.length ?? 0)
+      ? cells[cy][cx]?.type
+      : undefined;
+  if (type === 'city-wall') {
+    // Zeď se kreslí PODÉL svého běhu.
+    const along = (t: DungeonCell['type'] | undefined): boolean =>
+      t === 'city-wall' || t === 'gate';
+    return along(typeAt(x - 1, y)) || along(typeAt(x + 1, y)) ? 'h' : 'v';
+  }
+  if (type === 'bridge') {
+    // Most podél směru cesty (sousední most/ulice/brána).
+    const road = (t: DungeonCell['type'] | undefined): boolean =>
+      t === 'bridge' || t === 'street' || t === 'gate';
+    return road(typeAt(x - 1, y)) || road(typeAt(x + 1, y)) ? 'h' : 'v';
+  }
+  // Brána: průchod vede tam, kde NEjsou blokující sousedé; mimo grid = volno.
+  const open = (cx: number, cy: number): boolean => {
+    const t = typeAt(cx, cy);
+    return t === undefined ? true : !blocksSightCity(t);
+  };
+  if (open(x - 1, y) && open(x + 1, y)) return 'h';
+  if (open(x, y - 1) && open(x, y + 1)) return 'v';
+  return 'h';
 }
 
 /** Kreslí v rámu buňky (x,y) s normalizací osy — 'v' otočí o 90°. */
@@ -123,17 +264,21 @@ export function drawDungeon(
   const { pad, legendH } = frameMetrics(opts);
   const showGrid = opts.showGrid !== false;
 
-  // ── Rám (pergamen) ──
+  // ── Rám (pergamen) ── výška zahrnuje i klíč mapy (21.3f).
+  const keyLines = noteLines(dungeon, opts);
+  const keyH = keyLines.length
+    ? keyLines.length * noteLineH(opts) + noteLineH(opts)
+    : 0;
   if (opts.frame) {
     ctx.fillStyle = PAPER_COLORS.parchment;
-    ctx.fillRect(0, 0, w * s + 2 * pad, h * s + 2 * pad + legendH);
+    ctx.fillRect(0, 0, w * s + 2 * pad, h * s + 2 * pad + legendH + keyH);
     ctx.strokeStyle = PAPER_COLORS.parchmentEdge;
     ctx.lineWidth = Math.max(2, s * 0.12);
     ctx.strokeRect(
       ctx.lineWidth / 2,
       ctx.lineWidth / 2,
       w * s + 2 * pad - ctx.lineWidth,
-      h * s + 2 * pad + legendH - ctx.lineWidth,
+      h * s + 2 * pad + legendH + keyH - ctx.lineWidth,
     );
   }
 
@@ -159,9 +304,55 @@ export function drawDungeon(
   }
 
   // ── Buňky ──
+  const kind: MapKind =
+    dungeon.mapKind === 'city' || dungeon.mapKind === 'wilderness'
+      ? dungeon.mapKind
+      : 'dungeon';
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      const type = dungeon.cells[y]?.[x]?.type ?? 'empty';
+      const cell = dungeon.cells[y]?.[x];
+      const type = cell?.type ?? 'empty';
+      // 21.3e — město: `empty` = volný terén (papír), případně s povrchem.
+      if (kind === 'city' && (type === 'empty' || type === 'street')) {
+        inCell(ctx, x, y, s, 'h', 0, () => {
+          if (type === 'street') drawCityCellGlyph(ctx, 'street', s);
+          if (cell?.floorVariant)
+            drawFloorVariant(ctx, cell.floorVariant as string, s);
+        });
+        continue;
+      }
+      // 21.3g — krajina: `empty` = louka; `street` = polní cesta; terény
+      // mají vlastní glyfy (variant = parita buňky → střídání vzoru orby).
+      if (kind === 'wilderness') {
+        if (type === 'empty' || type === 'street') {
+          inCell(
+            ctx,
+            x,
+            y,
+            s,
+            type === 'street' ? cityAxis(dungeon.cells, x, y, 'bridge') : 'h',
+            0,
+            () => {
+              if (cell?.floorVariant)
+                drawFloorVariant(ctx, cell.floorVariant as string, s);
+              if (type === 'street') drawWildernessCellGlyph(ctx, 'path', s);
+            },
+          );
+          continue;
+        }
+        if (
+          type === 'forest' ||
+          type === 'mountain' ||
+          type === 'hill' ||
+          type === 'field' ||
+          type === 'swamp'
+        ) {
+          inCell(ctx, x, y, s, 'h', 0, () =>
+            drawWildernessCellGlyph(ctx, type, s, x + y * 31),
+          );
+          continue;
+        }
+      }
       switch (type) {
         case 'empty':
         case 'wall':
@@ -169,6 +360,20 @@ export function drawDungeon(
           ctx.fillRect(x * s, y * s, s, s);
           break;
         case 'floor':
+          // 21.3d — jemné šrafování povrchu (dlažba/dřevo/hlína/…).
+          if (cell?.floorVariant) {
+            inCell(ctx, x, y, s, 'h', 0, () =>
+              drawFloorVariant(ctx, cell.floorVariant as string, s),
+            );
+          }
+          break;
+        case 'building':
+        case 'city-wall':
+        case 'gate':
+        case 'bridge':
+          inCell(ctx, x, y, s, cityAxis(dungeon.cells, x, y, type), 0, () =>
+            drawCityCellGlyph(ctx, type, s),
+          );
           break;
         case 'water':
         case 'lava':
@@ -233,14 +438,31 @@ export function drawDungeon(
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
     let cx = 0;
-    for (const item of LEGEND_ITEMS) {
+    for (const item of legendItemsFor(kind)) {
       ctx.save();
       ctx.translate(cx, 0);
-      drawDoorGlyph(ctx, item.type, glyphS);
+      item.draw(ctx, glyphS);
       ctx.restore();
       ctx.fillStyle = PAPER_COLORS.parchmentInk;
       ctx.fillText(item.label, cx + glyphS * 1.25, glyphS / 2);
       cx += glyphS * 1.6 + ctx.measureText(item.label).width + glyphS * 0.9;
+    }
+    ctx.restore();
+  }
+
+  // ── Klíč mapy (21.3f) — pod legendou ──
+  if (opts.frame && keyLines.length > 0) {
+    const fontSize = Math.max(10, Math.round(s * 0.45));
+    const lineH = noteLineH(opts);
+    let ly = h * s + 2 * pad + legendH + lineH * 0.8;
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = PAPER_COLORS.parchmentInk;
+    for (const line of keyLines) {
+      ctx.font = `${line.bold ? 'bold ' : ''}${fontSize}px system-ui, sans-serif`;
+      ctx.fillText(line.text, pad, ly);
+      ly += lineH;
     }
     ctx.restore();
   }

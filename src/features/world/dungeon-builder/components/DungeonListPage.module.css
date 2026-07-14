@@ -1,4 +1,5 @@
-/* 21.3a — seznam podzemí světa */
+/* 21.3a+c — seznam podzemí světa + platformová knihovna (sdílené page styly;
+   karty gridu žijí v DungeonGrid.module.css) */
 .page {
   max-width: var(--content-max, 1100px);
   margin: 0 auto;
@@ -44,70 +45,19 @@
   opacity: 0.85;
 }
 
+.libraryHint {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
 .stateWrap {
   display: grid;
   place-items: center;
   min-height: 30vh;
 }
 
-.empty {
-  max-width: 440px;
-  text-align: center;
-  opacity: 0.8;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.12);
-  background: rgb(var(--white-rgb, 255 255 255) / 0.04);
-  transition: border-color 0.15s ease;
-}
-
-.card:hover {
-  border-color: var(--accent, currentColor);
-}
-
-.thumbLink {
-  display: block;
-  line-height: 0;
-}
-
-.cardBody {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-}
-
-.cardText {
-  min-width: 0;
-}
-
-.cardName {
-  margin: 0;
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cardMeta {
-  margin: 2px 0 0;
-  font-size: 0.78rem;
-  opacity: 0.65;
-}
-
-.deleteBtn {
+.actionBtn {
   display: grid;
   place-items: center;
   width: 32px;
@@ -121,7 +71,7 @@
   cursor: pointer;
 }
 
-.deleteBtn:hover {
+.actionBtn:hover {
   opacity: 1;
   border-color: var(--accent, currentColor);
 }
@@ -170,17 +120,44 @@
   cursor: pointer;
 }
 
+/* 21.3e — přepínač druhu mapy (podzemí/město) */
+.kindRow {
+  display: flex;
+  gap: 8px;
+}
+
+.kindOption {
+  flex: 1;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px !important;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid rgb(var(--white-rgb, 255 255 255) / 0.2);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.kindOption input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.kindActive {
+  border-color: var(--accent, currentColor);
+  background: rgb(var(--white-rgb, 255 255 255) / 0.06);
+}
+
 .radio input {
   margin-top: 2px;
 }
 
 @media (max-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  }
-
-  .deleteBtn {
-    width: 44px;
-    height: 44px; /* touch target */
+  .actionBtn {
+    width: 40px;
+    height: 40px; /* touch target (3 vedle sebe na kartě 160px) */
   }
 }

@@ -9,9 +9,12 @@ import type {
   DungeonDecoration,
   DungeonDecorationType,
   DungeonMap,
+  DungeonNote,
   DoorCellType,
+  FloorVariant,
+  MapKind,
 } from '../types';
-import { DUNGEON_LIMITS } from '../types';
+import { DUNGEON_LIMITS, normalizeMapKind } from '../types';
 import { cloneCells, resizeCells } from '../engine/model';
 
 export type EditorTool =
@@ -24,8 +27,21 @@ export type EditorTool =
   | 'water'
   | 'lava'
   | 'pit'
+  | 'surface'
   | 'decoration'
-  | 'label';
+  | 'label'
+  // 21.3e — město
+  | 'street'
+  | 'building'
+  | 'city-wall'
+  | 'gate'
+  | 'bridge'
+  // 21.3g — krajina
+  | 'forest'
+  | 'mountain'
+  | 'hill'
+  | 'field'
+  | 'swamp';
 
 /** Nástroje, které malují tažením (ostatní = klik). */
 export const DRAG_TOOLS: ReadonlySet<EditorTool> = new Set([
@@ -33,6 +49,16 @@ export const DRAG_TOOLS: ReadonlySet<EditorTool> = new Set([
   'erase',
   'water',
   'lava',
+  'surface',
+  'street',
+  'building',
+  'city-wall',
+  'bridge',
+  'forest',
+  'mountain',
+  'hill',
+  'field',
+  'swamp',
 ]);
 
 interface Snapshot {
@@ -42,14 +68,20 @@ interface Snapshot {
 
 export interface EditorState {
   name: string;
+  /** 21.3e — druh mapy řídí sadu nástrojů i renderer. */
+  mapKind: MapKind;
   gridWidth: number;
   gridHeight: number;
   cellSize: number;
   cells: DungeonCell[][];
   decorations: DungeonDecoration[];
+  /** 21.3f — klíč mapy (mimo undo stack; edituje se textově v panelu). */
+  notes: DungeonNote[];
   tool: EditorTool;
   doorType: DoorCellType;
   decorationType: Exclude<DungeonDecorationType, 'label'>;
+  /** 21.3d — malovaný povrch; null = gumování povrchu. */
+  surfaceVariant: FloorVariant | null;
   undoStack: Snapshot[];
   redoStack: Snapshot[];
   dirty: boolean;
@@ -64,6 +96,7 @@ export type EditorAction =
       type: 'setDecorationType';
       decorationType: Exclude<DungeonDecorationType, 'label'>;
     }
+  | { type: 'setSurfaceVariant'; surfaceVariant: FloorVariant | null }
   | { type: 'beginStroke' }
   | { type: 'paintCell'; x: number; y: number }
   | { type: 'endStroke' }
@@ -78,6 +111,9 @@ export type EditorAction =
       gridHeight: number;
     }
   | { type: 'rename'; name: string }
+  // 21.3f — klíč mapy: upsert / smazání položky dle labelu.
+  | { type: 'setNote'; label: string; title: string; text: string }
+  | { type: 'removeNote'; label: string }
   | { type: 'resize'; gridWidth: number; gridHeight: number; cellSize: number }
   | { type: 'markSaved' };
 
@@ -130,7 +166,32 @@ function applyTool(s: EditorState, x: number, y: number): EditorState {
     case 'water':
     case 'lava':
     case 'pit':
+    case 'street': // 21.3e+g — město/krajina (stejný vzor: nastav typ buňky)
+    case 'building':
+    case 'city-wall':
+    case 'gate':
+    case 'bridge':
+    case 'forest':
+    case 'mountain':
+    case 'hill':
+    case 'field':
+    case 'swamp':
       return current.type === s.tool ? s : setCell({ type: s.tool });
+    case 'surface': {
+      // 21.3d+g — povrch: dungeon jen na podlahu; město/krajina na terén a cestu.
+      const paintable =
+        s.mapKind === 'dungeon'
+          ? current.type === 'floor'
+          : current.type === 'empty' || current.type === 'street';
+      if (!paintable) return s;
+      const next = s.surfaceVariant ?? undefined;
+      if (current.floorVariant === next) return s;
+      return setCell(
+        next
+          ? { type: current.type, floorVariant: next }
+          : { type: current.type },
+      );
+    }
     default:
       return s;
   }
@@ -200,8 +261,10 @@ function placeDecoration(
 }
 
 export function createEditorState(dungeon: DungeonMap): EditorState {
+  const mapKind = normalizeMapKind(dungeon.mapKind);
   return {
     name: dungeon.name,
+    mapKind,
     gridWidth: dungeon.gridWidth,
     gridHeight: dungeon.gridHeight,
     cellSize: dungeon.cellSize,
@@ -210,9 +273,11 @@ export function createEditorState(dungeon: DungeonMap): EditorState {
         ? cloneCells(dungeon.cells)
         : resizeCells(dungeon.cells, dungeon.gridWidth, dungeon.gridHeight),
     decorations: dungeon.decorations.map((d) => ({ ...d })),
-    tool: 'floor',
+    notes: (dungeon.notes ?? []).map((n) => ({ ...n })),
+    tool: mapKind === 'dungeon' ? 'floor' : 'street',
     doorType: 'door',
-    decorationType: 'bedna',
+    decorationType: mapKind === 'dungeon' ? 'bedna' : 'strom',
+    surfaceVariant: mapKind === 'dungeon' ? 'dlazba' : 'trava',
     undoStack: [],
     redoStack: [],
     dirty: false,
@@ -233,6 +298,8 @@ export function editorReducer(
       return { ...s, doorType: a.doorType, tool: 'door' };
     case 'setDecorationType':
       return { ...s, decorationType: a.decorationType, tool: 'decoration' };
+    case 'setSurfaceVariant':
+      return { ...s, surfaceVariant: a.surfaceVariant, tool: 'surface' };
     case 'beginStroke':
       return s.strokeOpen ? s : { ...pushUndo(s), strokeOpen: true };
     case 'paintCell':
@@ -286,6 +353,33 @@ export function editorReducer(
       return {
         ...s,
         name: a.name.slice(0, DUNGEON_LIMITS.maxNameLength),
+        dirty: true,
+      };
+    case 'setNote': {
+      const label = a.label.trim();
+      if (!label) return s;
+      const others = s.notes.filter((n) => n.label !== label);
+      if (others.length >= 200) return s;
+      // Prázdná položka = smazání (nedržet vatu v dokumentu).
+      if (!a.title.trim() && !a.text.trim())
+        return { ...s, notes: others, dirty: true };
+      return {
+        ...s,
+        notes: [
+          ...others,
+          {
+            label,
+            title: a.title.slice(0, 120),
+            text: a.text.slice(0, 2000),
+          },
+        ],
+        dirty: true,
+      };
+    }
+    case 'removeNote':
+      return {
+        ...s,
+        notes: s.notes.filter((n) => n.label !== a.label),
         dirty: true,
       };
     case 'resize': {

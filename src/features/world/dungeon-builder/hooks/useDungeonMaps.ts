@@ -1,6 +1,8 @@
 /**
- * 21.3a — TanStack Query hooks pro podzemí světa.
- * Klíč `['dungeon-maps', worldId]`; detail `['dungeon-maps', 'detail', id]`.
+ * 21.3a+c — TanStack Query hooks pro podzemí světa a osobní knihovnu.
+ * Klíče: `['dungeon-maps', worldId]` · `['dungeon-maps', 'library']` ·
+ * detail `['dungeon-maps', 'detail', id]`. Mutace invalidují prefixem
+ * `['dungeon-maps']` — kopie se dotýkají světa i knihovny najednou.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dungeonMapsApi } from '../api/dungeonMapsApi';
@@ -14,6 +16,15 @@ export function useDungeonMaps(worldId: string | null) {
   });
 }
 
+/** 21.3c — moje osobní knihovna (cross-world). */
+export function useDungeonLibrary(enabled = true) {
+  return useQuery({
+    queryKey: ['dungeon-maps', 'library'],
+    queryFn: () => dungeonMapsApi.listLibrary(),
+    enabled,
+  });
+}
+
 export function useDungeonMap(id: string | null) {
   return useQuery({
     queryKey: ['dungeon-maps', 'detail', id],
@@ -22,10 +33,10 @@ export function useDungeonMap(id: string | null) {
   });
 }
 
-export function useDungeonMapMutations(worldId: string | null) {
+export function useDungeonMapMutations() {
   const qc = useQueryClient();
   const invalidate = () => {
-    void qc.invalidateQueries({ queryKey: ['dungeon-maps', worldId] });
+    void qc.invalidateQueries({ queryKey: ['dungeon-maps'] });
   };
 
   const createDungeon = useMutation({
@@ -47,5 +58,24 @@ export function useDungeonMapMutations(worldId: string | null) {
     onSuccess: invalidate,
   });
 
-  return { createDungeon, replaceDungeon, removeDungeon };
+  // 21.3c — kopie do knihovny / do světa.
+  const copyDungeon = useMutation({
+    mutationFn: (vars: { id: string; targetWorldId?: string }) =>
+      dungeonMapsApi.copy(vars.id, vars.targetWorldId),
+    onSuccess: invalidate,
+  });
+
+  // 21.3b — export na taktickou mapu (scéna vzniká na BE).
+  const exportScene = useMutation({
+    mutationFn: (vars: { id: string; imageUrl: string }) =>
+      dungeonMapsApi.exportScene(vars.id, vars.imageUrl),
+  });
+
+  return {
+    createDungeon,
+    replaceDungeon,
+    removeDungeon,
+    copyDungeon,
+    exportScene,
+  };
 }

@@ -1,19 +1,33 @@
 /**
- * 21.3a — seznam podzemí světa (`/svet/:worldSlug/podzemi`).
+ * 21.3a+c — podzemí světa (`/svet/:worldSlug/podzemi`).
  *
- * Gating (FE zrcadlí BE): tvořit smí PJ+ vždy a člen Hrac+ s Podporovatelem;
- * hráč vidí jen svoje stavby, PJ všechny. Ne-podporovatel vidí teaser.
+ * Taby: „V tomto světě" (stavby světa) | „Moje knihovna" (osobní cross-world
+ * úložiště). Kopie: svět → knihovna, knihovna → tento svět, svět → jiný svět.
+ * Gating zrcadlí BE: tvořit smí PJ+ vždy a člen Hrac+ s Podporovatelem.
  */
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
-import { Hammer, Lock, Plus, Trash2 } from 'lucide-react';
-import { Button, ConfirmDialog, Input, Modal, Spinner } from '@/shared/ui';
+import {
+  ArrowDownToLine,
+  BookMarked,
+  Globe2,
+  Hammer,
+  Lock,
+  Pencil,
+  Plus,
+  Trash2,
+} from 'lucide-react';
+import { Button, ConfirmDialog, Input, Modal, Spinner, Tabs } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { isEffectiveSupporter } from '@/shared/lib/supporter';
 import { useWorldContext } from '@/features/world/context/WorldContext';
-import { useDungeonMaps, useDungeonMapMutations } from '../hooks/useDungeonMaps';
+import {
+  useDungeonLibrary,
+  useDungeonMaps,
+  useDungeonMapMutations,
+} from '../hooks/useDungeonMaps';
 import { createEmptyCells } from '../engine/model';
 import {
   SIZE_PRESETS,
@@ -21,10 +35,18 @@ import {
   randomSeed,
   type SizePresetKey,
 } from '../engine/generate';
-import type { DungeonMap, DungeonMapInput } from '../types';
-import { DUNGEON_LIMITS } from '../types';
-import { DungeonThumb } from './DungeonThumb';
+import { generateCity } from '../engine/generateCity';
+import { generateWilderness } from '../engine/generateWilderness';
+import type { DungeonMap, DungeonMapInput, MapKind } from '../types';
+import { DUNGEON_LIMITS, MAP_KIND_LABELS } from '../types';
+import { DungeonGrid } from './DungeonGrid';
+import { WorldPickerModal } from './WorldPickerModal';
 import styles from './DungeonListPage.module.css';
+
+const sortByModified = (items: DungeonMap[] | undefined): DungeonMap[] =>
+  [...(items ?? [])].sort((a, b) =>
+    (b.lastModified ?? '').localeCompare(a.lastModified ?? ''),
+  );
 
 export default function DungeonListPage(): React.ReactElement {
   const { worldId, worldSlug, isPJ } = useWorldContext();
@@ -33,30 +55,32 @@ export default function DungeonListPage(): React.ReactElement {
   const canCreate = isPJ || supporter;
 
   const navigate = useNavigate();
+  const [tab, setTab] = useState<'world' | 'library'>('world');
   const { data: dungeons, isLoading } = useDungeonMaps(worldId || null);
-  const { createDungeon, removeDungeon } = useDungeonMapMutations(
-    worldId || null,
-  );
+  const { data: library, isLoading: libraryLoading } = useDungeonLibrary();
+  const { createDungeon, removeDungeon, copyDungeon } =
+    useDungeonMapMutations();
 
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState('');
+  const [newKind, setNewKind] = useState<MapKind>('dungeon');
   const [newSize, setNewSize] = useState<SizePresetKey>('M');
   const [newMode, setNewMode] = useState<'empty' | 'generated'>('generated');
   const [deleteTarget, setDeleteTarget] = useState<DungeonMap | null>(null);
-
-  const sorted = useMemo(
-    () =>
-      [...(dungeons ?? [])].sort((a, b) =>
-        (b.lastModified ?? '').localeCompare(a.lastModified ?? ''),
-      ),
-    [dungeons],
-  );
+  const [pickerSource, setPickerSource] = useState<DungeonMap | null>(null);
 
   const create = (): void => {
     const preset = SIZE_PRESETS[newSize];
     const base: DungeonMapInput = {
       worldId,
-      name: newName.trim() || 'Nové podzemí',
+      name:
+        newName.trim() ||
+        (newKind === 'city'
+          ? 'Nové město'
+          : newKind === 'wilderness'
+            ? 'Nová krajina'
+            : 'Nové podzemí'),
+      mapKind: newKind,
       gridType: 'square',
       gridWidth: preset.width,
       gridHeight: preset.height,
@@ -66,14 +90,40 @@ export default function DungeonListPage(): React.ReactElement {
       decorations: [],
     };
     if (newMode === 'generated') {
-      const g = generateDungeon({
-        width: preset.width,
-        height: preset.height,
-        roomDensity: 0.5,
-        windiness: 0.4,
-        specialDoorRatio: 0.3,
-        seed: randomSeed(),
-      });
+      // 21.3e — engine dle druhu mapy.
+      const g =
+        newKind === 'city'
+          ? generateCity({
+              width: preset.width,
+              height: preset.height,
+              buildingDensity: 0.6,
+              windiness: 0.4,
+              walls: 'auto',
+              river: 'auto',
+              greenery: 0.5,
+              furnishing: 0.4,
+              seed: randomSeed(),
+            })
+          : newKind === 'wilderness'
+            ? generateWilderness({
+                width: preset.width,
+                height: preset.height,
+                forestness: 0.6,
+                mountainness: 0.4,
+                water: 'auto',
+                settlement: 'auto',
+                furnishing: 0.5,
+                seed: randomSeed(),
+              })
+            : generateDungeon({
+                width: preset.width,
+                height: preset.height,
+                roomDensity: 0.5,
+                windiness: 0.4,
+                specialDoorRatio: 0.3,
+                furnishing: 0.4,
+                seed: randomSeed(),
+              });
       base.cells = g.cells;
       base.decorations = g.decorations;
       base.gridWidth = g.cells[0].length;
@@ -90,15 +140,132 @@ export default function DungeonListPage(): React.ReactElement {
     });
   };
 
+  const saveToLibrary = (d: DungeonMap): void => {
+    copyDungeon.mutate(
+      { id: d.id },
+      {
+        onSuccess: () =>
+          toast.success(`„${d.name || 'Bez názvu'}" uloženo do tvé knihovny.`),
+        onError: () =>
+          toast.error(
+            'Do knihovny se to nepovedlo uložit — knihovna je výhoda Podporovatelů (a PJ).',
+          ),
+      },
+    );
+  };
+
+  const insertHere = (d: DungeonMap): void => {
+    copyDungeon.mutate(
+      { id: d.id, targetWorldId: worldId },
+      {
+        onSuccess: (created) => {
+          toast.success('Vloženo do tohoto světa.');
+          setTab('world');
+          void navigate(`/svet/${worldSlug}/podzemi/${created.id}`);
+        },
+        onError: () => toast.error('Vložení do světa se nepovedlo.'),
+      },
+    );
+  };
+
+  const actionBtn = (
+    title: string,
+    icon: React.ReactNode,
+    onClick: () => void,
+  ): React.ReactElement => (
+    <button
+      type="button"
+      className={styles.actionBtn}
+      title={title}
+      aria-label={title}
+      onClick={onClick}
+    >
+      {icon}
+    </button>
+  );
+
+  const worldTab = isLoading ? (
+    <div className={styles.stateWrap}>
+      <Spinner />
+    </div>
+  ) : (
+    <DungeonGrid
+      dungeons={sortByModified(dungeons)}
+      emptyText={
+        canCreate
+          ? 'Zatím tu žádné podzemí není. Založ první — generátor ti během vteřiny nabídne celou kobku.'
+          : isPJ
+            ? 'Zatím tu žádné podzemí není.'
+            : 'Žádné vlastní stavby. Až budeš Podporovatel, tady porostou.'
+      }
+      onOpen={(d) => void navigate(`/svet/${worldSlug}/podzemi/${d.id}`)}
+      meta={(d) => (isPJ && d.ownerId && me && d.ownerId !== me.id ? 'hráčská stavba' : null)}
+      actions={(d) => {
+        const mine = !!me && d.ownerId === me.id;
+        const canManage = isPJ || mine;
+        return (
+          <>
+            {canManage &&
+              actionBtn('Uložit do mé knihovny', <BookMarked size={16} />, () =>
+                saveToLibrary(d),
+              )}
+            {canManage &&
+              actionBtn('Kopírovat do světa…', <Globe2 size={16} />, () =>
+                setPickerSource(d),
+              )}
+            {canManage &&
+              actionBtn('Smazat podzemí', <Trash2 size={16} />, () =>
+                setDeleteTarget(d),
+              )}
+          </>
+        );
+      }}
+    />
+  );
+
+  const libraryTab = libraryLoading ? (
+    <div className={styles.stateWrap}>
+      <Spinner />
+    </div>
+  ) : (
+    <>
+      <p className={styles.libraryHint}>
+        Knihovna je tvoje osobní a jde s tebou napříč světy. Úpravy v ní
+        neovlivní kopie ve světech (a naopak).
+      </p>
+      <DungeonGrid
+        dungeons={sortByModified(library)}
+        emptyText="Knihovna je prázdná. U stavby ve světě klikni na záložku „Uložit do mé knihovny“."
+        onOpen={(d) => void navigate(`/ikaros/podzemi/${d.id}`)}
+        actions={(d) => (
+          <>
+            {canCreate &&
+              actionBtn(
+                'Vložit do tohoto světa',
+                <ArrowDownToLine size={16} />,
+                () => insertHere(d),
+              )}
+            {actionBtn('Upravit v knihovně', <Pencil size={16} />, () =>
+              void navigate(`/ikaros/podzemi/${d.id}`),
+            )}
+            {actionBtn('Smazat z knihovny', <Trash2 size={16} />, () =>
+              setDeleteTarget(d),
+            )}
+          </>
+        )}
+      />
+    </>
+  );
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>
-          <Hammer size={22} aria-hidden /> Tvorba podzemí
+          <Hammer size={22} aria-hidden /> Stavitel
         </h1>
         {canCreate && (
           <Button type="button" onClick={() => setShowNew(true)}>
-            <Plus size={16} /> Nové podzemí
+            <Plus size={16} /> Nová mapa
           </Button>
         )}
       </header>
@@ -107,76 +274,32 @@ export default function DungeonListPage(): React.ReactElement {
         <section className={styles.teaser}>
           <Lock size={28} aria-hidden />
           <div>
-            <h2>Stavěj vlastní jeskyně</h2>
+            <h2>Stavěj vlastní jeskyně i města</h2>
             <p>
-              Tvorba podzemí je výhoda <strong>Podporovatelů</strong> — nakresli
-              nebo si nech vygenerovat vlastní kobky, vybav je nábytkem
-              a vytiskni je jako mapu. Podpoř projekt a stav.
+              Stavitel je výhoda <strong>Podporovatelů</strong> — nakresli nebo
+              si nech vygenerovat kobky i celá městečka, vybav je, ulož si je
+              do osobní knihovny a nos je mezi světy. Podpoř projekt a stav.
             </p>
           </div>
         </section>
       )}
 
-      {isLoading ? (
-        <div className={styles.stateWrap}>
-          <Spinner />
-        </div>
-      ) : sorted.length === 0 ? (
-        <div className={styles.stateWrap}>
-          <p className={styles.empty}>
-            {canCreate
-              ? 'Zatím tu žádné podzemí není. Založ první — generátor ti během vteřiny nabídne celou kobku.'
-              : isPJ
-                ? 'Zatím tu žádné podzemí není.'
-                : 'Žádné vlastní stavby. Až budeš Podporovatel, tady porostou.'}
-          </p>
-        </div>
-      ) : (
-        <div className={styles.grid}>
-          {sorted.map((d) => {
-            const mine = !!me && d.ownerId === me.id;
-            const canDelete = isPJ || mine;
-            return (
-              <article key={d.id} className={styles.card}>
-                <Link
-                  to={`/svet/${worldSlug}/podzemi/${d.id}`}
-                  className={styles.thumbLink}
-                  aria-label={`Otevřít podzemí ${d.name || 'bez názvu'}`}
-                >
-                  <DungeonThumb dungeon={d} />
-                </Link>
-                <div className={styles.cardBody}>
-                  <div className={styles.cardText}>
-                    <h3 className={styles.cardName}>
-                      {d.name || 'Bez názvu'}
-                    </h3>
-                    <p className={styles.cardMeta}>
-                      {d.gridWidth}×{d.gridHeight}
-                      {isPJ && d.ownerId && !mine && ' · hráčská stavba'}
-                    </p>
-                  </div>
-                  {canDelete && (
-                    <button
-                      type="button"
-                      className={styles.deleteBtn}
-                      title="Smazat podzemí"
-                      aria-label={`Smazat podzemí ${d.name || 'bez názvu'}`}
-                      onClick={() => setDeleteTarget(d)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
+      <Tabs
+        orientation="horizontal"
+        items={[
+          { id: 'world', label: 'V tomto světě' },
+          { id: 'library', label: 'Moje knihovna' },
+        ]}
+        activeId={tab}
+        onChange={(id) => setTab(id as 'world' | 'library')}
+      >
+        {tab === 'world' ? worldTab : libraryTab}
+      </Tabs>
 
       <Modal
         open={showNew}
         onClose={() => setShowNew(false)}
-        title="Nové podzemí"
+        title="Nová mapa"
         size="sm"
         footer={
           <>
@@ -198,13 +321,39 @@ export default function DungeonListPage(): React.ReactElement {
         }
       >
         <div className={styles.newForm}>
+          <fieldset className={styles.modeFieldset}>
+            <legend>Druh mapy</legend>
+            <div className={styles.kindRow}>
+              {(['dungeon', 'city', 'wilderness'] as const).map((k) => (
+                <label
+                  key={k}
+                  className={`${styles.kindOption} ${newKind === k ? styles.kindActive : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="dungeon-kind"
+                    checked={newKind === k}
+                    onChange={() => setNewKind(k)}
+                  />
+                  {k === 'dungeon' ? '🕳️' : k === 'city' ? '🏘️' : '🌲'}{' '}
+                  {MAP_KIND_LABELS[k]}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <label htmlFor="dungeon-name-input">
             Název
             <Input
               id="dungeon-name-input"
               value={newName}
               maxLength={DUNGEON_LIMITS.maxNameLength}
-              placeholder="Např. Krysí kanály"
+              placeholder={
+                newKind === 'city'
+                  ? 'Např. Vraní Lhota'
+                  : newKind === 'wilderness'
+                    ? 'Např. Mlžné vrchy'
+                    : 'Např. Krysí kanály'
+              }
               onChange={(e) => setNewName(e.target.value)}
             />
           </label>
@@ -231,7 +380,11 @@ export default function DungeonListPage(): React.ReactElement {
                 checked={newMode === 'generated'}
                 onChange={() => setNewMode('generated')}
               />
-              Vygenerovaným podzemím (dá se přegenerovat i dokreslit)
+              {newKind === 'city'
+                ? 'Vygenerovaným městem (dá se přegenerovat i dokreslit)'
+                : newKind === 'wilderness'
+                  ? 'Vygenerovanou krajinou (dá se přegenerovat i dokreslit)'
+                  : 'Vygenerovaným podzemím (dá se přegenerovat i dokreslit)'}
             </label>
             <label className={styles.radio}>
               <input
@@ -245,6 +398,29 @@ export default function DungeonListPage(): React.ReactElement {
           </fieldset>
         </div>
       </Modal>
+
+      <WorldPickerModal
+        open={pickerSource !== null}
+        title={`Kopírovat „${pickerSource?.name || 'Bez názvu'}“ do světa`}
+        confirmLabel="Kopírovat"
+        supporter={supporter}
+        excludeWorldId={worldId}
+        isPending={copyDungeon.isPending}
+        onClose={() => setPickerSource(null)}
+        onConfirm={(targetWorldId) => {
+          if (!pickerSource) return;
+          copyDungeon.mutate(
+            { id: pickerSource.id, targetWorldId },
+            {
+              onSuccess: () => {
+                toast.success('Kopie vytvořena v cílovém světě.');
+                setPickerSource(null);
+              },
+              onError: () => toast.error('Kopie se nepovedla.'),
+            },
+          );
+        }}
+      />
 
       <ConfirmDialog
         open={deleteTarget !== null}

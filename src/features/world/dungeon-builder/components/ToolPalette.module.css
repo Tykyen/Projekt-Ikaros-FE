@@ -101,6 +101,32 @@
   opacity: 0.65;
 }
 
+/* 21.3d — široká podpaleta dekorací s kategoriemi (2sloupcové sekce) */
+.submenuWide {
+  min-width: 320px;
+}
+
+.subCategory {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.subCategoryTitle {
+  margin: 6px 6px 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.subCategoryItems {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
 /* ── Mobil: lišta dole vodorovně, podpaleta nahoru ── */
 @media (max-width: 768px) {
   .palette {
@@ -148,5 +174,17 @@
 
   .subHint {
     flex-basis: 100%;
+  }
+
+  .submenuWide {
+    min-width: 0;
+  }
+
+  .subCategory {
+    flex-basis: 100%;
+  }
+
+  .subCategoryItems {
+    grid-template-columns: 1fr 1fr;
   }
 }

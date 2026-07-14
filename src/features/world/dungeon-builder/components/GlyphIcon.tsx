@@ -50,6 +50,24 @@ export function DoorGlyphIcon({
   );
 }
 
+/** 21.3e — generická canvas ikonka pro libovolnou draw funkci (legenda). */
+export function GlyphIcon({
+  draw,
+  size = 24,
+}: {
+  draw: (ctx: CanvasRenderingContext2D, s: number) => void;
+  size?: number;
+}): React.ReactElement {
+  const ref = useGlyphCanvas(draw, size);
+  return (
+    <canvas
+      ref={ref}
+      style={{ width: size, height: size, display: 'block' }}
+      aria-hidden
+    />
+  );
+}
+
 export function DecorationGlyphIcon({
   type,
   size = 24,
