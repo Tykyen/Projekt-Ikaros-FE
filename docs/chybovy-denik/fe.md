@@ -2038,3 +2038,9 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Proč správně:** lekce z Morvol cenové revize — mzdy↔ceny↔doprava musí tvořit uzavřenou ekonomiku; bez sdílených kotev by 6 nezávislých agentů vyprodukovalo 6 nekompatibilních cenových hladin.
 **Jak ověřeno:** merge validace 380/380 (0 vadných), seed skriptem (credits všude, kind rozpad 11 zbroj/8 střelná/8 zbraň), obrázky 379/380 přes reálné NASA analogy (dotazy bez „futuristic" kvalifikátorů — stejná lekce jako éra-kvalifikátory).
 **Zhodnocení:** dobře, bez cyklení. Vzor pro 21.5k galaktické dobrodružství: tam reálné kotvy nebudou → kalibrovat na fan ekonomiky (pokyn uživatele: hodnoty ano, IP názvy ne) + interní konzistence tabulkou kotev zůstává klíčová.
+
+
+### ✅ ŘEŠENÍ — 21.5k Ceníky Galaktické dobrodružství: kalibrace fikční ekonomiky z fan zdrojů (Traveller/SW/Elite) · 2026-07-14
+**Co zabralo:** kombinace vzoru 21.5j (sdílená tabulka kotev ve všech briefách) s pokynem uživatele „inspiruj se fan tvorbou": agenti web-searchem načetli POMĚRY z fan ekonomik (Traveller SRD mzdy posádky — seděly na mé kotvy téměř 1:1, což kotvy zpětně validovalo; Wookieepedia ceny blasterů/droidů/frachtýřů vč. poměru ojetý:nový 1:4; Elite doky; Starfinder+Cyberpunk RED gradient kybernetiky) a přenesli je na setting-neutrální druhové názvy — žádná IP jména v obsahu. Vnitřní konzistence vyšla i napříč agenty (vrak 60k + FTL jádro 180k ≈ ojetý frachtýř 250k, aniž to měli zadané).
+**Jak ověřeno:** merge 380/380 (0 vadných), seed validace (credits všude, kind 21 střelná / 17 zbroj), obrázky 380/380 přes reálné analogy (retry 15/15 — nejčastější díra = příliš specifické složeniny, holý název zabírá).
+**Zhodnocení:** dobře, bez cyklení; 5 nových ér za jediný den díky plně opakovatelné pipeline (config + workflow + 6+2 agentů + retry kolo). Celá řada ér tím je kompletní: středověk → western → WW1 → WW2 → přítomnost → blízká budoucnost → galaxie.
