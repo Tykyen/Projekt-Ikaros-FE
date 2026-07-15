@@ -271,6 +271,19 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - PJ uloží aktuální scénu jako šablonu, načte šablonu na scénu (sekvence ops: image+config+fog+effects+npc...). Admin+ vidí všechny.
 - **Kód:** FE `components/pj-panel/MapLibraryModal.tsx`. BE `maps/map-templates.controller.ts`, `repositories/map-templates.repository.ts`.
 
+### Sdílení scén — veřejný katalog (22.5)
+- **Co to je:** PJ **publikuje** šablonu ze své knihovny map do **veřejného katalogu** Společné tvorby (`/ikaros/sceny`); jiný PJ ji **naklonuje** jako novou scénu do svého světa. „Publikuj → katalog → naklonuj." Rozsah 22.5 = jen scény (bestie se sdílí přes Společnou tvorbu, celé světy blokuje odložený import 14.7).
+- **Kde:** Publikace = tlačítko „Publikovat" na kartě šablony v `MapLibraryModal` (taktická mapa) → `PublishTemplateModal` (licence). Katalog = dlaždice „Scény" v hubu `/ikaros/tvorba` → route `/ikaros/sceny` (list) + `/ikaros/sceny/:id` (detail), **login-required**. Klon = „Naklonovat do světa" na detailu → `CloneToWorldModal` (výběr světa, kde jsem PJ).
+- **Kdo:**
+  - Publikovat/stáhnout: **vlastník** šablony (Admin+ bypass). BE `map-templates.controller` `POST :id/publish|unpublish` (owner check `elevation-exempt`).
+  - Klonovat: **PJ+** cílového světa (BE `POST /maps` `assertCanManage` = `>= WorldRole.PJ`); FE modal filtruje světy `>= PJ`.
+  - Schvalovat/zamítat: **kurátor** (`isBestieCurator` = Superadmin/Admin/SpravceClanku/SpravceDiskuzi) přes **Zpracovat tab** (fronta „Sdílené scény ke schválení", `PendingActionType.CommunitySceneTemplatePendingReview`). Katalog listuje jen `published ∧ approved ∧ ¬moderationHidden`.
+- **Co jde dělat:** publikovat (licence: `clone`/`read`, uvedení autora, AI původ), stáhnout z katalogu (klony zůstávají), naklonovat do světa, nahlásit (`ReportButton targetType=scene_template`), kurátor schválit/zamítnout.
+- **Hranice / leak-safe:** klon **nenese PC tokeny** (šablona je nemá) ani **svět-scoped zvuky** (`activeSoundIds` strippnuté při publikaci). Licence `cloneAllowed=false` (`read`) → klon 403 `TEMPLATE_CLONE_FORBIDDEN`. Cizí **nepublikovanou** šablonu nelze naklonovat (403 `TEMPLATE_NOT_SHARED`). Katalog vrací whitelist bez owner-privátních polí. **Poprvé napojena licenční karta 20D** (`content_licenses`): publish vytvoří kartu, unpublish → `withdrawn`.
+- **Otevřené (drobnosti):** `CatalogEntry.cloneAllowed` se z BE nevrací → FE zašednutí „read-only" scén chybí, odchytí se až 403 při klonu. `targetAuthorId` v katalogu není → ReportButton se autorovi nepředskryje (BE self-report blokuje).
+- **Stav:** ✅ (BE nasazeno, e2e 7/7; FE build ✓, čeká commit+deploy+živé ověření).
+- **Kód:** FE `features/ikaros/sceny/*` (KomunitniSceny/ScenaDetail Page + api + hooks + CloneToWorldModal + SceneTemplateReviewRenderer), `tactical-map/components/pj-panel/{PublishTemplateModal,MapLibraryModal}.tsx`, tile `SpolecnaTvorba/tiles.ts`, `shared/moderation/enums.ts`, `ZpracovatTab/rendererRegistry.tsx`. BE `maps/{scene-template-sharing.service,scene-template-moderation.listener,scene-template-review.provider}.ts`, `map-templates.controller.ts`, `maps.service.ts` (klon brána), `content-licenses` (napojení). Spec [arch/phase-22/spec-22.5](../arch/phase-22/spec-22.5-sdileni-klonovani-scen.md).
+
 ### Počasí na mapě
 - **Co to je:** Vizuální atmosféra počasí (déšť/sníh...) jako DOM overlay nad plátnem + panel v rohu. PJ nastaví/vypne, hráč jen vidí + toggle FX lokálně.
 - **Zvláštnost:** mapa dostává world-level event `weather:updated` přes **neutrální room** (`world:{id}` z `weather.updated` `OnEvent`, `maps.gateway.ts:238`), ne PJ-only room (memory `map_world_room_join`) — leak-safe.

@@ -1,0 +1,71 @@
+/* 22.5 — renderer fronty šablon scén ke schválení. */
+.left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.thumbFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--accent-soft, rgb(var(--white-rgb) / 0.08));
+  color: var(--text-secondary);
+}
+
+.mid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.author {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.author:hover {
+  color: var(--text-primary);
+}
+
+.btnApprove,
+.btnReject {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+}
+.btnApprove:hover {
+  background: rgb(80 200 120 / 0.15);
+}
+.btnReject:hover {
+  background: rgb(220 90 90 / 0.15);
+}
+.btnApprove:disabled,
+.btnReject:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

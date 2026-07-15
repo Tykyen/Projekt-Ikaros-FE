@@ -13,12 +13,19 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
+import { toast } from 'sonner';
 import { Modal, Button, ConfirmDialog } from '@/shared/ui';
 import { api, apiClient } from '@/shared/api/client';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
 import { postWorldOperation } from '../../api/worldOpsApi';
+import {
+  publishSceneTemplate,
+  unpublishSceneTemplate,
+  type PublishSceneTemplateInput,
+} from '@/features/ikaros/sceny/api/sceneCatalogApi';
+import { PublishTemplateModal } from './PublishTemplateModal';
 import type { MapScene } from '../../types';
 import styles from './MapLibraryModal.module.css';
 
@@ -42,6 +49,10 @@ interface MapTemplate {
   activeSoundIds?: string[];
   createdAt?: string;
   updatedAt?: string;
+  // 22.5 — stav publikace do veřejného katalogu.
+  published?: boolean;
+  reviewStatus?: 'pending' | 'approved' | 'rejected' | null;
+  moderationHidden?: boolean;
 }
 
 interface Props {
@@ -167,6 +178,41 @@ export function MapLibraryModal({
       setError(e instanceof Error ? e.message : 'Smazání selhalo'),
   });
 
+  // 22.5 — publikace šablony do veřejného katalogu (+ stažení).
+  const [publishTarget, setPublishTarget] = useState<MapTemplate | null>(null);
+  const publishMutation = useMutation({
+    mutationFn: (vars: { id: string; input: PublishSceneTemplateInput }) =>
+      publishSceneTemplate(vars.id, vars.input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['map-templates'] });
+      setPublishTarget(null);
+      toast.success('Šablona odeslána do katalogu — čeká na schválení.');
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : 'Publikace selhala.'),
+  });
+  const unpublishMutation = useMutation({
+    mutationFn: (id: string) => unpublishSceneTemplate(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['map-templates'] });
+      toast.success('Šablona stažena z katalogu.');
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : 'Stažení selhalo.'),
+  });
+
+  /** Popisek stavu publikace pro badge na kartě. */
+  function publishBadge(t: MapTemplate): { label: string; cls: string } | null {
+    if (!t.published) return null;
+    if (t.moderationHidden)
+      return { label: 'Skryto moderací', cls: styles.badgeHidden };
+    if (t.reviewStatus === 'approved')
+      return { label: 'V katalogu', cls: styles.badgeApproved };
+    if (t.reviewStatus === 'rejected')
+      return { label: 'Zamítnuto', cls: styles.badgeRejected };
+    return { label: 'Čeká na schválení', cls: styles.badgePending };
+  }
+
   const handleDelete = (t: MapTemplate): void => {
     if (!confirm(`Trvale smazat šablonu "${t.name}"?`)) return;
     deleteMutation.mutate(t.id);
@@ -245,6 +291,14 @@ export function MapLibraryModal({
                 </div>
                 <div className={styles.cardBody}>
                   <h5 className={styles.cardName}>{t.name}</h5>
+                  {(() => {
+                    const b = publishBadge(t);
+                    return b ? (
+                      <span className={`${styles.badge} ${b.cls}`}>
+                        {b.label}
+                      </span>
+                    ) : null;
+                  })()}
                   <div className={styles.cardActions}>
                     <Button
                       variant="primary"
@@ -254,6 +308,25 @@ export function MapLibraryModal({
                     >
                       Načíst
                     </Button>
+                    {/* 22.5 — publikace/stažení z veřejného katalogu (jen vlastník). */}
+                    {t.published ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => unpublishMutation.mutate(t.id)}
+                        disabled={unpublishMutation.isPending}
+                      >
+                        Stáhnout
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setPublishTarget(t)}
+                      >
+                        Publikovat
+                      </Button>
+                    )}
                     <Button
                       variant="danger"
                       size="sm"
@@ -300,6 +373,17 @@ export function MapLibraryModal({
           if (pendingLoadTemplate) loadMutation.mutate(pendingLoadTemplate);
         }}
       />
+      {/* 22.5 — formulář licence při publikaci do katalogu. */}
+      {publishTarget && (
+        <PublishTemplateModal
+          templateName={publishTarget.name}
+          isPending={publishMutation.isPending}
+          onClose={() => setPublishTarget(null)}
+          onConfirm={(input) =>
+            publishMutation.mutate({ id: publishTarget.id, input })
+          }
+        />
+      )}
     </Modal>
   );
 }

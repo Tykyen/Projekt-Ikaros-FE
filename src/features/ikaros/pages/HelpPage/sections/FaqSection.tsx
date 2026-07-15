@@ -315,6 +315,26 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Můžu sdílet svou bojovou scénu ostatním PJ (a použít cizí)?',
+    a: (
+      <>
+        <p>
+          Ano. Na taktické mapě otevři <strong>Knihovnu map</strong> a u své
+          uložené šablony klikni <strong>Publikovat</strong> — scéna se po
+          schválení kurátorem objeví v katalogu <strong>Společná tvorba → Scény</strong>.
+          Vybereš, jestli si ji ostatní smí jen prohlížet, nebo i naklonovat.
+        </p>
+        <p>
+          Z katalogu si naopak cizí scénu <strong>naklonuješ do svého světa</strong>{' '}
+          (kde jsi Pán jeskyně) — vznikne nová scéna na taktické mapě i s pozadím,
+          NPC a mlhou. Kvůli soukromí se <strong>nepřenášejí hráčské postavy ani
+          zvuky</strong>.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak připravím scénu, aby ji hráči zatím neviděli nebo nehýbali tokeny?',
     a: (
       <>

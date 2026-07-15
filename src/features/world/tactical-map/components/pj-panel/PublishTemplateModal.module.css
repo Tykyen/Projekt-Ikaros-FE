@@ -1,0 +1,48 @@
+/* 22.5 — formulář publikace šablony scény. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.select {
+  padding: 8px 10px;
+  background: var(--bg-input, var(--bg-card));
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

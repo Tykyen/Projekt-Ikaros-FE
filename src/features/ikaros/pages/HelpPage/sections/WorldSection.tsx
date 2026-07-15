@@ -4,6 +4,7 @@ import {
   FileText,
   Users,
   Map as MapIcon,
+  MapPinned,
   Swords,
   ScrollText,
   CalendarDays,
@@ -408,6 +409,23 @@ export function WorldSection() {
             (a PJ světa má nástroj vždy). Hráč vidí jen svoje stavby, PJ všechny
             stavby ve světě.
           </CalloutBox>
+        </Tool>
+        <Tool icon={<MapPinned size={16} />} title="Sdílet scénu do katalogu" audience={{ kind: 'pj', label: 'PJ' }} accent="info">
+          <p>
+            Hotovou bojovou scénu můžeš <strong>publikovat do veřejného katalogu</strong>{' '}
+            pro ostatní PJ. Na taktické mapě otevři <strong>Knihovnu map</strong>,
+            u své uložené šablony klikni <strong>Publikovat</strong> a vyber, co s ní
+            ostatní smí (naklonovat, nebo jen prohlížet) a jestli se má uvádět tvoje
+            jméno. Scéna se objeví v katalogu <strong>Společná tvorba → Scény</strong>,
+            jakmile ji schválí kurátor. Kdykoli ji můžeš <strong>Stáhnout</strong> —
+            už naklonované scény tím nezmizí.
+          </p>
+          <p>
+            Naopak z <strong>katalogu scén</strong> si cizí scénu{' '}
+            <strong>naklonuješ do svého světa</strong> (tam, kde jsi PJ) jedním
+            tlačítkem — vznikne nová scéna na taktické mapě i s pozadím, NPC a mlhou.
+            Hráčské postavy ani zvuky se z bezpečnostních důvodů nepřenášejí.
+          </p>
         </Tool>
       </HelpAccordion>
 

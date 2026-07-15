@@ -803,7 +803,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** veřejná prezentační stránka světa (bez přihlášení).
 **Otevřené otázky:** Co všechno jde zveřejnit (stránky/mapa/timeline/postavy)? Per-stránka, nebo per-svět přepínač? SEO/náhledové karty pro sdílení?
 
-### - [ ] 22.5 Sdílení & klonování světů/šablon (bývalý 17.5) — [E4 · dopad střední · náklad střední] 🔁
+### - [x] 22.5 Sdílení & klonování světů/šablon (bývalý 17.5) — [E4 · dopad střední · náklad střední] 🔁
+> ✅ IMPLEMENTOVÁNO 2026-07-15 (BE+FE, e2e 7/7): rozsah = SCÉNY (šablony TM). Publikuj scénu z knihovny → katalog `/ikaros/sceny` (login) → naklonuj do světa. Poprvé napojena licenční karta 20D; kurátorská fronta v Zpracovat tabu; moderace `scene_template`. Bestie se sdílí přes Společnou tvorbu, celé světy blokuje odložený import (mimo rozsah). Spec: [arch/phase-22/spec-22.5-sdileni-klonovani-scen.md](arch/phase-22/spec-22.5-sdileni-klonovani-scen.md). BE nasazeno; FE čeká commit+deploy+živé ověření.
 > Přesunuto z 17.5 (2026-07-05): veřejný katalog + síťový efekt = růstová/marketing páka závěru Etapy II.
 **Cíl:** „Publikovat jako šablonu" pro svět/scénu/bestii → katalog k naklonování.
 **Proč:** Obsah přitahuje obsah; buduje síťový efekt klíčový u niky. Máme privátní knihovnu map — chybí veřejné sdílení.

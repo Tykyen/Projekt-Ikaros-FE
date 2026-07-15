@@ -11,6 +11,7 @@ import {
   Puzzle,
   ReceiptText,
   Dices,
+  MapPinned,
 } from 'lucide-react';
 import { PendingActionType } from '@/shared/types';
 
@@ -130,5 +131,15 @@ export const TVORBA_TILES: TvorbaTile[] = [
     to: '/ikaros/generatory',
     icon: Dices,
     active: true,
+  },
+  // 22.5 — sdílené scény taktických map (publikuj šablonu → naklonuj do světa).
+  {
+    key: 'sceny',
+    label: 'Scény',
+    description: 'Hotové bojové scény k naklonování na taktickou mapu.',
+    to: '/ikaros/sceny',
+    icon: MapPinned,
+    active: true,
+    pendingType: PendingActionType.CommunitySceneTemplatePendingReview,
   },
 ];

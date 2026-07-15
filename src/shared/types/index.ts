@@ -1337,6 +1337,8 @@ export enum PendingActionType {
   ContentReport = 'content_report',
   /** 20B B4 — odvolání proti moderačnímu rozhodnutí (přezkum jiným moderátorem). */
   ModerationAppeal = 'moderation_appeal',
+  /** 22.5 — publikované šablony scén čekající na schválení kurátorem. */
+  CommunitySceneTemplatePendingReview = 'community_scene_template_pending_review',
 }
 
 // ─── Diskuze (3.4) — payloady karet ve Zpracovat tabu ──────────────────────
@@ -1397,6 +1399,20 @@ export interface AppealReviewListItem {
   action: string;
   targetType: string;
   createdAt: string;
+}
+
+/**
+ * 22.5 `community_scene_template_pending_review` — publikovaná šablona scény
+ * čekající na schválení kurátorem (Zpracovat tab). Zrcadlí BE
+ * `SceneTemplateReviewListItem`.
+ */
+export interface SceneTemplateReviewListItem {
+  templateId: string;
+  name: string;
+  imageUrl: string;
+  publicAuthorName: string;
+  authorId: string;
+  submittedAt: string;
 }
 
 export interface PendingActionsCountResponse {

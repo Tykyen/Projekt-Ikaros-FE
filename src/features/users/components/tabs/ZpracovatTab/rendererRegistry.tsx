@@ -9,6 +9,7 @@ import {
   type DiscussionJoinRequestListItem,
   type ContentReportListItem,
   type AppealReviewListItem,
+  type SceneTemplateReviewListItem,
 } from '@/shared/types';
 import type { PendingActionRenderer } from './PendingActionCard';
 import {
@@ -56,6 +57,11 @@ import {
   AppealReviewLeft,
   AppealReviewMid,
 } from '@/features/moderation/components/AppealReviewRenderer';
+import {
+  SceneTemplateReviewActions,
+  SceneTemplateReviewLeft,
+  SceneTemplateReviewMid,
+} from '@/features/ikaros/sceny/components/SceneTemplateReviewRenderer';
 
 const usernameRequestRenderer: PendingActionRenderer<AdminUsernameRequestListItem> =
   {
@@ -163,6 +169,17 @@ const appealReviewRenderer: PendingActionRenderer<AppealReviewListItem> = {
   ),
 };
 
+// 22.5 — community_scene_template_pending_review (šablony scén ke schválení).
+const sceneTemplateReviewRenderer: PendingActionRenderer<SceneTemplateReviewListItem> =
+  {
+    type: PendingActionType.CommunitySceneTemplatePendingReview,
+    renderLeft: (item) => <SceneTemplateReviewLeft item={item} />,
+    renderMid: (item) => <SceneTemplateReviewMid item={item} />,
+    renderActions: (item, helpers) => (
+      <SceneTemplateReviewActions item={item} helpers={helpers} />
+    ),
+  };
+
 /**
  * Spec 1.4 — registry rendererů pro Zpracovat tab. Klíč = `PendingActionType`,
  * hodnota = konkrétní renderer.
@@ -193,4 +210,6 @@ export const PENDING_ACTION_RENDERERS: Partial<
     contentReportRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.ModerationAppeal]:
     appealReviewRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.CommunitySceneTemplatePendingReview]:
+    sceneTemplateReviewRenderer as PendingActionRenderer<unknown>,
 };

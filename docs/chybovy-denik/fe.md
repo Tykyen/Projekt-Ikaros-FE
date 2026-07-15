@@ -2151,3 +2151,24 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 - 👍 Nález interceptoru PŘED nasazením — vyplynul z plánového rizika „anon member-only fetche"; kontrola „co udělá klient anonymovi na 401" se vyplatila jako první krok B5, ne poslední.
 - 👍 Samostatná ShowcaseBar místo ohýbání member nav = malý, izolovaný diff bez rizika leaku member UI.
 - 👎 ConfirmDialog panel jsem nejdřív vnořil do cizího `SettingsPanel` (JSX špatně zavřený) — chyba oka, chytil jsem hned; při přidávání druhého panelu do tab souboru zkontroluj, že jde o sourozence.
+
+---
+
+### ✅ ŘEŠENÍ — 22.5 sdílení scén dávka B (FE): publikace z knihovny map + katalog /ikaros/sceny + klon modal + kurátorská fronta · 2026-07-15
+
+**Co zabralo.** FE vrstva sdílení scén postavená přesně na vzorech z FE průzkumu (4 agenti): publish UI do `MapLibraryModal` (tlačítko Publikovat/Stáhnout + badge stavu na kartě šablony) + `PublishTemplateModal` (licence: klon/čtení, uvedení autora, AI původ); nová feature `features/ikaros/sceny/` = katalog `KomunitniScenyPage` (mřížka náhledů) + `KomunitniScenaDetailPage` (detail + Naklonovat + ReportButton) + api modul + hooky (vzor bestiář/herbář); `CloneToWorldModal` (výběr světa `>= PJ` → `POST /maps {templateId}`, vzor `WorldPickerModal`); dlaždice „Scény" v hubu Společné tvorby; moderace = enum `scene_template` do `shared/moderation/enums.ts` + ReportButton na detailu; **kurátorská fronta v Zpracovat tabu** (renderer `SceneTemplateReviewRenderer` vzor `ArticleReviewRenderer` + registry + `GROUP_TITLES` + `PendingActionType` do FE enumu).
+
+**4 implementační rozhodnutí (zvolena při impl., ne strategická):**
+1. **Route `/ikaros/sceny`** (ne `/tvorba/sceny` ze spec) — konzistence se všemi 8 komunitními knihovnami (`/ikaros/<lib>`).
+2. **Klon filtr světů `>= WorldRole.PJ`** — BE `POST /maps` `assertCanManage` = PJ (ne PomocnyPJ); modal s PomocnyPJ by nabídl svět končící 403.
+3. **Kurátorská fronta = Zpracovat tab (Cesta A), ne inline** — katalog listuje jen `approved`, takže bez fronty by kurátor pending scény vůbec neviděl (bestiář si inline mohl dovolit, má draft záložku; scénový katalog ji z designu nemá). FE průzkum tohle správně vypíchl jako funkčně nutné.
+4. **`cloneAllowed` FE odchytí 403** (`TEMPLATE_CLONE_FORBIDDEN`) — BE katalog mapper `cloneAllowed` nevrací; zašednutí read-only scén předem = drobný BE follow-up.
+
+**Past (chycená FE průzkumem, ne až buildem):** `GROUP_TITLES` v `ZpracovatTab` je `Record<PendingActionType, string>` **exhaustivní** — přidání hodnoty do FE `PendingActionType` enumu VYNUTÍ i záznam tam, jinak tsc padne. (`PENDING_ACTION_RENDERERS` je naopak `Partial<Record>` — nevynucuje.) Ošetřeno rovnou.
+
+**Jak ověřeno.** `npm run build` (tsc -b + vite + CSP hash) ✓ 2×, eslint --fix čistý, vitest ZpracovatTab+moderation+SpolecnaTvorba+HelpPage zelené (4+25+…). Statická mobil-desktop review: katalog `grid auto-fill minmax(220→150px)` + media 600px, detail `max-width`+`aspect-ratio`+`flex-wrap`, modaly vlastní responsivita — bez fixních šířek, bez horiz. scrollu. Živé ověření (publish→schválení→klon, screenshoty) = uživatel po deployi.
+
+**Zhodnocení — dobře/špatně.**
+- 👍 FE průzkum (4 agenti) dal přesné `soubor:řádek` cíle → implementace bez tápání; a předem chytil 2 pasti (exhaustivní GROUP_TITLES, klon vyžaduje PJ ne PomocnyPJ).
+- 👍 Reuse hotových vzorů (WorldPickerModal, ArticleReviewRenderer, KomunitniHerbarPage) → konzistentní UX, malý originální kód.
+- 👎 Zůstaly 2 drobné BE gapy (cloneAllowed v katalogu, authorId pro self-hide reportu) — vědomě odloženo jako follow-up, ne dluh blokující MVP.

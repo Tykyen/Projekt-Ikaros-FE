@@ -156,3 +156,21 @@
 - 👍 „Anon = nejnižší člen po existující cestě" místo nové filtrační vrstvy = malý diff, invariant drží konstrukcí, ne testem.
 - 👍 Čtení konzumentů před psaním (be_field_check návyk) chytilo obě strip pasti předem — žádný červený běh kvůli nim.
 - 👎 Error-contract tvar `{error:{code}}` jsem si v e2e nejdřív tipnul špatně (1 červený běh) — při assertech na error body VŽDY nejdřív mrknout do `http-exception.filter.ts`.
+
+## ✅ ŘEŠENÍ — 22.5 sdílení scén dávka A (BE): publikace mapTemplates + katalog + klon-brána + poprvé napojená licenční karta 20D — 2026-07-15
+
+**Co zabralo.** 22.5 = veřejné sdílení SCÉN (ne bestií — ty se sdílí přes Společnou tvorbu; ne celých světů — blokuje odložený import). Klíčové zjištění průzkumu: šablona scény (`mapTemplates`) je už dnes cross-world snapshot s PC tokeny strippnutými při save (`filterOutPcTokens`) a instancování do světa (`maps.service.create({templateId})`) už existuje → **klon z katalogu je laciný**, přidává se jen publikace + katalog + brána. Rozšířil jsem `mapTemplates` o publikační pole (published/reviewStatus/authorId/publicAuthorName/moderationHidden/licenseId), přidal `SceneTemplateSharingService` (publish/unpublish/katalog/approve/reject/moderace), veřejný katalog (login, whitelist mapper `toCatalogEntry` bez raw ownerId), moderaci (`ReportTargetType.scene_template` + enforcement listener, vzor bestiae), kurátorský tok (`PendingActionType.CommunitySceneTemplatePendingReview` + review provider, registrace v `MapsModule.onModuleInit`) a klon-bránu v `maps.service.create`.
+
+**Poprvé napojená licenční karta 20D.** Modul `content_licenses` byl od 20D „PODKLAD (nenapojený): 21.5/klonování sem sáhne". 22.5 je jeho první konzument: publish vytvoří kartu (`licenseMode` default `clone`, `attributionRequired`, `publicAuthorName` snapshot — řeší dluh „jen authorId"), klon čte `cloneAllowed` (403 když false), unpublish → `withdrawn`.
+
+**3 leak-safe invarianty (kontrakt):** (1) PC tokeny — šablona je nemá (filterOutPcTokens), klon je nemá → e2e pin. (2) Zvuky (OO1) — `activeSoundIds` odkazují na svět-scoped `sounds` (worldId), v cizím světě mrtvé + leak → **strip na `[]` při publikaci i při klonu cizí šablony**; vlastní šablona si zvuky ponechá. (3) Katalog = whitelist mapper bez ownerId; jen published∧approved∧¬hidden.
+
+**Klon-brána past (kryto e2e):** `maps.service.create({templateId})` dnes owner NEkontroluje → po přidání veřejného katalogu MUSÍ mít bránu: vlastní šablona vždy, CIZÍ jen `published∧approved∧¬hidden ∧ cloneAllowed`. Bez ní by přes známé ID šlo instancovat cizí nepublikovanou šablonu.
+
+**Jak ověřeno.** typecheck + lint:check (vč. elevation-bypass — owner-check šablon označen `// elevation-exempt: cross-world per-owner bez worldId`) čisté; unit 241/241 (maps+content-licenses+pending+moderation; opraveny 3 DI mocky — controller spec +sharing/+repo metody, maps.service spec +ContentLicensesService, +2 nové unit testy klon-brány); nový `test/scene-template-share.e2e-spec.ts` 7/7 (PC strip, publish→pending+strip zvuků+licenční karta, katalog pending-neviditelný→approve, klon bez PC/zvuků, read-only 403, cizí-nepublikovaná 403, unpublish); smoke-full-app 1/1 (start appky s novými providery OK). Kurátor v e2e = DB `role:1` (JwtAuthGuard refreshuje z DB per-request).
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Průzkum (6 agentů) předem odhalil, že půlka 22.5 už existuje (bestie sdílené, scéna serializovaná, PC-strip hotový) → MVP se zúžil na scény = malý diff, velký dopad.
+- 👍 „Klon = existující instancování + brána" místo nové kopírovací logiky; PC leak-safe konstrukcí, ne kontrolou.
+- 👍 20D karta byla připravená přesně na tohle — napojení bylo pár řádků.
+- 👎 POST endpointy vracely 201 (Nest default), test čekal 200 → 1 červený běh; state-transition POST (publish/approve) dostaly `@HttpCode(200)`. Při POST vracejícím entitu (ne created resource) rovnou HttpCode(200).

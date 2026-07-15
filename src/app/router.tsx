@@ -107,6 +107,9 @@ const KomunitniCenikDetailPage   = lazy(() => import('@/features/ikaros/ceniky/K
 // 21.2a — generátory jmen a potomků (jmenné sady = komunitní knihovna).
 const GeneratoryPage             = lazy(() => import('@/features/ikaros/generatory/GeneratoryPage'));
 const NameSetDetailPage          = lazy(() => import('@/features/ikaros/generatory/NameSetDetailPage'));
+// 22.5 — komunitní katalog sdílených scén (login-required).
+const KomunitniScenyPage         = lazy(() => import('@/features/ikaros/sceny/KomunitniScenyPage'));
+const KomunitniScenaDetailPage   = lazy(() => import('@/features/ikaros/sceny/KomunitniScenaDetailPage'));
 
 // ── Lazy pages — Admin ────────────────────────────────────────────────────
 const PlatformAdminPage  = lazy(() => import('@/features/admin/pages/PlatformAdminPage'));
@@ -280,6 +283,9 @@ export const router = createBrowserRouter([
       // 21.2a — generátory (jména + potomci) a detail jmenné sady.
       { path: 'ikaros/generatory',           element: p(GeneratoryPage) },
       { path: 'ikaros/generatory/sady/:id',  element: p(NameSetDetailPage) },
+      // 22.5 — sdílené scény (katalog + detail). BE katalog je login-required.
+      { path: 'ikaros/sceny',           element: p(KomunitniScenyPage), loader: requireAuth },
+      { path: 'ikaros/sceny/:id',       element: p(KomunitniScenaDetailPage), loader: requireAuth },
       // 21.3c — osobní knihovna podzemí (cross-world) + editor v library režimu.
       // Osobní obsah (ne Společná tvorba) → requireAuth; BE vrací jen vlastní.
       { path: 'ikaros/podzemi',              loader: requireAuth, element: p(DungeonLibraryPage) },
