@@ -22,4 +22,6 @@ export const adminKeys = {
   growth: ['admin', 'growth'] as const,
   /** 19.2 — počítadla nákladů; dotaz `[...costs]`. */
   costs: ['admin', 'costs'] as const,
+  /** 20.6 — využití motivů a skinů; dotaz `[...themeUsage]`. */
+  themeUsage: ['admin', 'theme-usage'] as const,
 };

@@ -694,6 +694,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Cíl:** Samostatná stránka `/admin/chat` (jen Superadmin+Admin) — vícekanálový interní chat + sdílené PDF + úkoly týmu. Vstup = nav položka „Chat" v Administraci (naviguje na vlastní route, ne tab).
 **✅ Implementováno (2026-07-03, [spec-20.5](arch/phase-20/spec-20.5.md)):** BE modul `platform-chat` reusuje chat schémata — konverzace = `ChatChannel` (`accessMode:'members'` + `allowedMemberIds`, membership zdarma), zprávy sdílené (bez TTL), WS `platform-chat:*`; seed Hlavní/Vedení (`accessMode:'all'`, zamčené); dokumenty = kolekce `platform_documents` (PDF na Cloudinary raw); úkoly = `admin_tasks` (autorizace owner|superadmin). FE `features/admin/chat` = full-bleed 3 sloupce + hooky + real-time. **Čeká BE restart + mobil-desktop.** Follow-up: přílohy ve zprávě, member-picker + rename/delete UI, role-odznak (senderRole), presence u úkolů.
 
+### - [x] 20.6 Přehled využití motivů a skinů (admin statistika) — [přání testerů · 2026-07-15 · dopad střední · náklad malý] ✅
+**Cíl:** Read-only admin přehled, **kolik lidí/světů/členství používá který motiv a skin** — podklad pro osekání málo využívaných (udržovat každý na profesionální úrovni stojí čas).
+**Proč:** Platforma nabízí 33 motivů + 8 skinů deníku + 12 skinů chatu. Bez čísel nevíme, které nikdo vědomě nepoužívá a dají se vyřadit. Přání testerů z live provozu.
+**✅ Implementováno (2026-07-15, [spec-20.6](arch/phase-20/spec-20.6-vyuziti-motivu-skinu.md)):** BE `GET /admin/stats/theme-usage` (`admin-theme-usage.service.ts`, Admin+) = 5 dimenzí čistou agregací DB (users `themeId` · worlds `themeId` · memberships `themeId`/`diarySkin`/`chatSkin` jedním `$facet`), cache 15 min, `safe()` per dimenze. FE sekce „Motivy a skiny" v admin Přehledu (`ThemeUsageSection` + čistá `themeUsage.lib.ts`, vzor Growth/Costs). **Klíč:** `counts` (vědomé volby) odděleno od `noChoice` (dědí default) — „bez volby" ≠ „nevyužité"; kandidát na osekání = 0 vědomých voleb všude, kde se nabízí. Ověřeno: BE jest 6/6 + typecheck + lint; FE vitest 12/12 + tsc -b + eslint + statický mobil-desktop. **Čeká BE restart/deploy + živý screenshot.**
+**Hranice / krok 2:** jen měří, **neoseká** — vyřazení motivu z nabídky (registr FE + `THEME_IDS`/whitelisty BE) = navazující krok podle čísel. Skiny kostek (`diceSkinMapping`) mimo V1. Objevena nesrovnalost `World.themeId` schema default `'modre-nebe'` ≠ FE `'ikaros'` → dluh **D-064**.
+
 ---
 
 ## Fáze 21 — Komunitní tvorba & sdílený obsah

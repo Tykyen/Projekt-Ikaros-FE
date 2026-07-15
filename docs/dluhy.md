@@ -8,6 +8,15 @@
 
 ## Otevřené
 
+### D-064 — World.themeId schema default ('modre-nebe') ≠ FE DEFAULT_WORLD_THEME ('ikaros')
+**Soubor:** BE `backend/src/modules/worlds/schemas/world.schema.ts:52` (`@Prop({ default: 'modre-nebe' })`) vs. FE `src/themes/registry.ts:40` (`DEFAULT_WORLD_THEME = 'ikaros'`)
+**Problém:** Svět vytvořený bez explicitního `themeId` dostane od Mongoose default `'modre-nebe'` — což je **platformový** motiv (scope `platform`), ne světový. FE ale očekává jako výchozí vzhled světa `'ikaros'`. Dva zdroje pravdy pro „výchozí motiv světa" se rozcházejí. (Pokud `CreateWorld` vždy nastaví `themeId` dle žánru, schema default se v praxi neuplatní — je pak jen mrtvá/matoucí hodnota; nutno ověřit tok vytvoření světa.)
+**Dopad:** Nízký — objeveno při 20.6 (přehled využití motivů). Důsledek pro přehled: světy nikdy nemají `themeId == null` (schema vždy zapíše), takže „bez volby" u světů ≈ 0 a `'modre-nebe'` se u světové dimenze zobrazí jako reálná hodnota „mimo nabídku". Nekazí data, jen zhoršuje čitelnost dimenze „Motiv světa".
+**Řešení:** Sjednotit zdroj pravdy — buď BE schema default změnit na `'ikaros'` (a ověřit, že to nerozbije existující světy), nebo default z schématu odstranit a nechat volbu čistě na `CreateWorld` service (pak `null` = skutečně „nevybráno" a přehled 20.6 je přesnější). Nejdřív ověřit `CreateWorldPage` + world-create service, jestli `themeId` posílají.
+**Kdy:** Při příští práci na vytváření/nastavení světa, nebo až přehled 20.6 ukáže, že `'modre-nebe'` u světů reálně mate.
+
+---
+
 ### D-063 — Identita správce (spolek) + zpracovatelé nedoplněni na legal stránkách (20A)
 **Soubor:** `src/features/ikaros/pages/PrivacyPage.tsx:35-200`, `ContactPage.tsx:27-52` — placeholdery `[DOPLNIT: …]`
 **Problém:** Zásady OÚ (`/soukromi`), Kontakt (`/kontakt`) a Podmínky nemají doplněnou totožnost správce: chybí název spolku, IČO, sídlo, spisová značka + soud spolkového rejstříku a kontaktní/provozní e-mail (pro uživatele i orgány). Navíc seznam zpracovatelů v Zásadách OÚ má u části služeb (hosting, SMTP, AI/LLM, error tracking, platební brána) nepotvrzené konkrétní poskytovatele + jejich EU/třetí-země status a transfer mechanismus (DPF vs. SCC).

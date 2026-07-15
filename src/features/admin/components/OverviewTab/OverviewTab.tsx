@@ -18,6 +18,7 @@ import { StatCard } from './StatCard';
 import { AnalyticsSection } from '../AnalyticsSection/AnalyticsSection';
 import { GrowthSection } from '../GrowthSection/GrowthSection';
 import { CostsSection } from '../CostsSection/CostsSection';
+import { ThemeUsageSection } from '../ThemeUsageSection/ThemeUsageSection';
 import s from './OverviewTab.module.css';
 
 /**
@@ -121,6 +122,8 @@ export function OverviewTab() {
       <GrowthSection />
 
       <CostsSection />
+
+      <ThemeUsageSection />
 
       <section className={s.section}>
         <h2 className={s.sectionTitle}>Fronta</h2>

@@ -152,6 +152,29 @@ Centrální platformový admin hub se 6 taby (z toho 1 dev-only).
 
 ---
 
+### Motivy a skiny (20.6, sekce v Přehledu)
+- **Co to je:** read-only přehled využití všech vizuálních voleb platformy — **jen měření, podklad pro osekání** málo využívaných motivů/skinů. Žádný nový tracking, čistá agregace stavu DB.
+- **Kde:** sekce „Motivy a skiny" uvnitř tabu Přehled (`components/ThemeUsageSection/ThemeUsageSection.tsx`, za Náklady). Data `GET /admin/stats/theme-usage`.
+- **Kdo:** FE RoleGuard (Superadmin/Admin). BE `getStatsThemeUsage` `@UseGuards(AdminGuard)` (Admin+; `admin.controller.ts`).
+- **Co ukazuje (5 dimenzí, každá = bar list seřazený dle využití):**
+  - **Motiv platformy** (`User.themeId`) — kolik uživatelů; default `modre-nebe` absorbuje děděné (bez volby).
+  - **Motiv světa** (`World.themeId`) — kolik světů.
+  - **Osobní motiv světa** per člen (`WorldMembership.themeId`, 5.9b override) — kolik členství.
+  - **Skin deníku** (`WorldMembership.diarySkin`, 16.2c) — kolik členství.
+  - **Skin chatu** (`WorldMembership.chatSkin`, 16.1d) — kolik členství.
+- **Klíčové rozlišení (spec 20.6 §4):** BE vrací `counts` (vědomé volby) zvlášť od `noChoice` (dědí default). „Bez volby" **NENÍ** „nevyužité". **Kandidát na osekání** = motiv/skin s 0 vědomými volbami napříč VŠEMI dimenzemi, kde se nabízí, a není default dimenze. Souhrn nahoře vypíše kandidáty jako chip seznam.
+- **Hranice / co neumí:**
+  - **Jen měří, neoseká** — samotné vyřazení motivu z nabídky (registr FE + `THEME_IDS`/whitelisty BE) = navazující krok 2 podle čísel.
+  - `noChoice` u diary/chat skinů se **nerozpouští** na konkrétní systémový default (závisí na světě → drahý lookup); zobrazí se jako agregát „bez volby".
+  - Skiny kostek (`diceSkinMapping`) nejsou zahrnuté (jiná struktura — `Record` per typ).
+  - **⚠️ `World.themeId` má schema default `'modre-nebe'`** (≠ FE `DEFAULT_WORLD_THEME='ikaros'`, dluh **D-064**) → světy nemají `null`, „bez volby" u světů ≈ 0 a `'modre-nebe'` se u světové dimenze zobrazí jako „mimo nabídku".
+  - Žádné časové řady — snapshot k `generatedAt`.
+- **Zvláštnosti:** cache 15 min (single-slot). 3 membership dimenze jedním `$facet` scanem; users/worlds po jednom `$group`. Každá dimenze přes `safe()` — chyba → prázdná dimenze + warning, přehled nespadne. FE klasifikuje syrová BE ID přes theme registry (názvy, scope, legacy detekce) — BE je „hloupé".
+- **Stav:** ✅ přehled funguje (čeká BE restart/deploy) / osekávání = krok 2
+- **Kód:** FE `components/ThemeUsageSection/{ThemeUsageSection.tsx,themeUsage.lib.ts}`, `api/{useThemeUsageStats,themeUsage.types}.ts`; BE `admin-theme-usage.service.ts`, `admin.controller.ts`, `dto/theme-usage.dto.ts`. Spec `docs/arch/phase-20/spec-20.6-vyuziti-motivu-skinu.md`.
+
+---
+
 ### Tab Uživatelé (správa)
 - **Co to je:** filtrovatelná tabulka uživatelů + per-řádek a bulk akce.
 - **Kde:** `components/UsersAdminTab/UsersAdminTab.tsx` → `users/components/UsersTab/UsersTable.tsx`. Data `GET /admin/users`. Deep-link `?tab=uzivatele&search=<username>` předvyplní hledání (init-only; přepnutí tabu param zahodí) — používá „Otevřít v administraci" z veřejného profilu.
