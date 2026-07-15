@@ -94,20 +94,42 @@ describe('CreateWorldPage', () => {
     );
   });
 
-  it('po manuálním editu adresy už auto-derive z názvu nezpřepisuje slug', () => {
+  it('adresa (slug) není v UI a odvozuje se automaticky z názvu', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      id: 'w1',
+      name: 'Šedý hrad',
+      slug: 'sedy-hrad',
+      system: 'matrix',
+      ownerId: 'u1',
+      isActive: true,
+      accessMode: 'private',
+      playerCount: 0,
+      createdAt: '',
+      updatedAt: '',
+    });
+
     renderPage();
 
-    const nameInput = screen.getByLabelText(/Název světa/);
-    const slugInput = screen.getByLabelText(/^Adresa$/);
+    // Pole Adresa se před uživatelem vůbec nerenderuje.
+    expect(screen.queryByLabelText(/^Adresa$/)).toBeNull();
 
-    fireEvent.change(nameInput, { target: { value: 'První' } });
-    expect((slugInput as HTMLInputElement).value).toBe('prvni');
+    fireEvent.change(screen.getByLabelText(/Název světa/), {
+      target: { value: 'Šedý hrad' },
+    });
+    fireEvent.change(screen.getByLabelText(/^Žánr$/), {
+      target: { value: 'Fantasy' },
+    });
 
-    fireEvent.change(slugInput, { target: { value: 'muj-vlastni' } });
-    expect((slugInput as HTMLInputElement).value).toBe('muj-vlastni');
+    const submit = screen.getByRole('button', { name: /Vytvořit svět/ });
+    await waitFor(() => expect(submit).not.toBeDisabled(), { timeout: 2000 });
+    fireEvent.click(submit);
 
-    fireEvent.change(nameInput, { target: { value: 'Druhý název' } });
-    expect((slugInput as HTMLInputElement).value).toBe('muj-vlastni');
+    // Slug odvozený z názvu (cs translit) putuje do payloadu i bez UI pole.
+    await waitFor(() => expect(api.post).toHaveBeenCalled());
+    expect(api.post).toHaveBeenCalledWith(
+      '/worlds',
+      expect.objectContaining({ slug: 'sedy-hrad' }),
+    );
   });
 
   it('WORLD_QUOTA_REACHED z BE → specifický toast', async () => {

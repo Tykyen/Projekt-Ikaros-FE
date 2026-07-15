@@ -135,12 +135,11 @@ src/features/ikaros/pages/CreateWorldPage/
 **Formulář — 5 sekcí v pořadí:**
 
 1. **Základní informace**
-   - **Název světa *** (`<input type="text">`, 2–60 znaků, required)
-   - **Slug** (`<input type="text">`, 2–40 znaků, regex `^[a-z0-9-]+$`)
-     - Auto-derive z názvu (cs translit: š→s, č→c, ř→r, ž→z, ý→y, á→a, í→i, é→e, ú→u, ů→u, ě→e, ť→t, ď→d, ň→n; mezery → `-`; lowercase; strip non-`a-z0-9-`; max 40).
-     - Pokud uživatel slug ručně upraví, auto-derive se zastaví (dirty flag).
-     - Helper text pod inputem: „Adresa světa: `/svet/<slug>`".
-   - **Identita světa** (`<textarea>`, 0–1000 znaků) — popis světa pro hráče. Placeholder: „Tento svět je o…".
+   - **Název světa *** (`<input type="text">`, 2–60 znaků, required). **Počítadlo znaků** `X / 60` pod polem (od 90 % zvýrazněné akcentem). *(2026-07-15, připomínky testerů)*
+   - **Slug** — **od 2026-07-15 před uživatelem úplně schovaný** (připomínky testerů: URL stejně nevyužijí a lze do ní napsat nesmysl). Odvozuje se automaticky z názvu (cs translit: š→s, č→c, ř→r, ž→z, ý→y, á→a, í→i, é→e, ú→u, ů→u, ě→e, ť→t, ď→d, ň→n; mezery → `-`; lowercase; strip non-`a-z0-9-`; max 40) a do UI se nerenderuje žádný input.
+     - Zpětná vazba o kolizi/nevalidnosti se váže na pole **Název**: `taken` → „Svět s tímto názvem už existuje, zvol jiný.", `invalid` → „Z názvu nejde vytvořit adresa — použij aspoň 2 písmena nebo číslice."
+     - *Historie:* původně (2026-05-14) editovatelný `<input>` 2–40 znaků, regex `^[a-z0-9-]+$`, s dirty-flag zastavením auto-derive. Dirty flag v [`useWorldSlug`](../../src/features/ikaros/pages/CreateWorldPage/hooks/useWorldSlug.ts) zůstává v hooku, ale `onSlugChange` se už nepředává → slug je vždy auto.
+   - **Identita světa** (`<textarea>`, 0–1000 znaků) — popis světa pro hráče. Placeholder: „Tento svět je o…". **Počítadlo znaků** `X / 1000` pod polem. *(2026-07-15, připomínky testerů)*
 
 2. **Žánr a styl**
    - **Žánr *** (`<select>`, required) — `Fantasy`, `Sci-Fi`, `Cyberpunk`, `Post-apokalypsa`, `Horror`, `Mystery`, `Historický`, `Moderní / Současný`, `Western`, `Vlastní`. Při výběru „Vlastní" se zobrazí inline `<input>` pro free-text.

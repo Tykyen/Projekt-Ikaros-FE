@@ -89,6 +89,27 @@
   border-color: var(--accent);
 }
 
+/* Řádek pod inputem: vlevo chybová/pomocná hláška, vpravo počítadlo znaků. */
+.fieldFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.counter {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.counterWarn {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .adressRow {
   display: flex;
   align-items: center;

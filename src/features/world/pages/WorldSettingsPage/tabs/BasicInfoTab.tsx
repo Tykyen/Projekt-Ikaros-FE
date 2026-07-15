@@ -121,6 +121,8 @@ export default function BasicInfoTab() {
   const genre = watch("genre");
   const system = watch("system");
   const imageUrl = watch("imageUrl");
+  const nameLen = watch("name")?.length ?? 0;
+  const descLen = watch("description")?.length ?? 0;
 
   async function handleFile(file: File) {
     try {
@@ -197,7 +199,14 @@ export default function BasicInfoTab() {
             maxLength={60}
             {...register("name")}
           />
-          {errors.name && <p className={sec.error}>{errors.name.message}</p>}
+          <div className={sec.fieldFooter}>
+            {errors.name && <p className={sec.error}>{errors.name.message}</p>}
+            <span
+              className={`${sec.counter} ${nameLen >= 60 * 0.9 ? sec.counterWarn : ""}`}
+            >
+              {nameLen} / 60
+            </span>
+          </div>
         </div>
 
         <div className={sec.field}>
@@ -228,6 +237,13 @@ export default function BasicInfoTab() {
             maxLength={1000}
             {...register("description")}
           />
+          <div className={sec.fieldFooter}>
+            <span
+              className={`${sec.counter} ${descLen >= 1000 * 0.9 ? sec.counterWarn : ""}`}
+            >
+              {descLen} / 1000
+            </span>
+          </div>
         </div>
 
         <div className={sec.field}>

@@ -33,7 +33,9 @@ export default function CreateWorldPage() {
 
   // Form state
   const [name, setName] = useState('');
-  const { slug, onSlugChange } = useWorldSlug(name);
+  // Adresa (slug) se odvozuje z názvu a je před uživatelem schovaná — proto
+  // nepředáváme `onSlugChange` (dirty flag se nikdy neaktivuje = vždy auto).
+  const { slug } = useWorldSlug(name);
   const [description, setDescription] = useState('');
 
   const [genre, setGenre] = useState('');
@@ -113,8 +115,8 @@ export default function CreateWorldPage() {
     nameOk && slugOk && genreOk && systemOk && slugStatus !== 'checking';
 
   const missing: string[] = [];
-  if (!nameOk) missing.push('Název');
-  if (!slugOk) missing.push('Adresa');
+  // Adresa je skrytá a odvozená z názvu → kolize/nevalidnost hlásíme jako „Název".
+  if (!nameOk || !slugOk) missing.push('Název');
   if (!genreOk) missing.push('Žánr');
   if (!systemOk) missing.push('Systém');
   const submitTitle = canSubmit
@@ -196,11 +198,9 @@ export default function CreateWorldPage() {
       <div className={s.grid}>
         <BasicInfoSection
           name={name}
-          slug={slug}
           description={description}
           slugStatus={slugStatus}
           onNameChange={setName}
-          onSlugChange={onSlugChange}
           onDescriptionChange={setDescription}
         />
         <GenreSection
