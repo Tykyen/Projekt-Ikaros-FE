@@ -187,6 +187,28 @@ function memberOnly(
   );
 }
 
+/**
+ * 22.4 — vitrínové sekce (spec 22.4 §2): člen jede postaru (Čtenář+),
+ * nečlen/anonym projde read-only, JEN když má svět zapnuté veřejné nahlížení
+ * (`world.publicShowcase`). Tvrdou hranici drží BE (OptionalJwt + brána
+ * SHOWCASE_DISABLED); tohle jen pouští render místo redirectu.
+ */
+function showcaseOrMember(
+  element: ReactNode,
+  minWorldRole: WorldRole = WorldRole.Ctenar,
+): ReactNode {
+  return (
+    <WorldMembershipGuard
+      minWorldRole={minWorldRole}
+      fallbackGlobalRoles={[UserRole.Superadmin, UserRole.Admin]}
+      redirectTo="/svet/:worldSlug"
+      allowShowcase
+    >
+      {element}
+    </WorldMembershipGuard>
+  );
+}
+
 // ── Per-route auth loader ─────────────────────────────────────────────────
 // Pokud chybí token, uloží zamýšlenou cestu do sessionStorage (LoginModal
 // po úspěšném přihlášení tam naviguje), redirectne na úvodník s
@@ -360,17 +382,19 @@ export const router = createBrowserRouter([
       { index: true,                    element: p(WorldDashboardPage) },
       // Spec 2.4 — všechny content sub-routes vyžadují Čtenář+ (non-member redirect).
       { path: 'chat',                   element: memberOnly(p(WorldChatPage)) },
-      { path: 'novinky',                element: memberOnly(p(WorldNewsPage)) },
-      { path: 'stranky',                element: memberOnly(p(PagesListPage)) },
+      // 22.4 — vitrínové sekce (showcaseOrMember): anonym/nečlen read-only,
+      // když má svět zapnuté veřejné nahlížení. Chat/TM/voice/nástroje NE.
+      { path: 'novinky',                element: showcaseOrMember(p(WorldNewsPage)) },
+      { path: 'stranky',                element: showcaseOrMember(p(PagesListPage)) },
       { path: 'nova-stranka',           element: memberOnly(p(PageEditorPage)) },
       { path: 'edit/:slug',             element: memberOnly(p(PageEditorPage)) },
-      { path: 'postavy',                element: memberOnly(p(CharactersPage)) },
+      { path: 'postavy',                element: showcaseOrMember(p(CharactersPage)) },
       { path: 'postava/:slug',          element: memberOnly(p(CharacterDetailRoute)) },
       { path: 'moje-postava',           element: memberOnly(p(MyCharacterPage)) },
-      { path: 'mapa',                   element: memberOnly(p(MapPage)) },
-      { path: 'mapy',                   element: memberOnly(p(WorldMapsPage)) },
+      { path: 'mapa',                   element: showcaseOrMember(p(MapPage)) },
+      { path: 'mapy',                   element: showcaseOrMember(p(WorldMapsPage)) },
       { path: 'takticka-mapa',          element: memberOnly(p(TacticalMapPage)) },
-      { path: 'bestiar',                element: memberOnly(p(BestiarPage)) },
+      { path: 'bestiar',                element: showcaseOrMember(p(BestiarPage)) },
       // R-18 — kalendář = „PJ pohled" (BE aggregate PomocnyPJ+); gate dřív na route.
       { path: 'kalendar',               element: memberOnly(p(CalendarPage), WorldRole.PomocnyPJ) },
       // R-06 — timeline read = Hrac+ (BE `timeline.assertMember`); gate Ctenar
@@ -404,7 +428,7 @@ export const router = createBrowserRouter([
       { path: 'prevodnik-men',          element: memberOnly(p(CurrencyPage)) },
       { path: 'nastaveni',              element: memberOnly(p(WorldSettingsPage)) },
       { path: 'hraci',                  element: memberOnly(p(WorldMembersPage)) },
-      { path: 'pravidla',               element: memberOnly(p(RulesPage)) },
+      { path: 'pravidla',               element: showcaseOrMember(p(RulesPage)) },
       // 12.3 — autogenerovaná stránka skupiny (záložka „Informace").
       { path: 'skupina/:groupKey',      element: memberOnly(p(GroupMembersPage)) },
       {
@@ -461,8 +485,8 @@ export const router = createBrowserRouter([
           </WorldMembershipGuard>
         ),
       },
-      // Wiki stránky — catch-all (musí být poslední)
-      { path: ':slug', element: memberOnly(p(PageViewerPage)) },
+      // Wiki stránky — catch-all (musí být poslední). 22.4: vitrínová sekce.
+      { path: ':slug', element: showcaseOrMember(p(PageViewerPage)) },
     ],
   },
 

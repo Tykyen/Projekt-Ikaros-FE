@@ -25,6 +25,13 @@ map $uri $prerender_path {
     "~^/ikaros/(clanky|galerie)(/[^/]+)?/?$"               1;
     "~^/ikaros/systemy(/[^/]+)?/?$"                        1;
     "~^/svet/[^/]+/?$"                                     1;
+    # 22.4 vitrína — veřejné sekce světa + wiki stránky (jedna úroveň pod
+    # slugem). Sekce vyjmenované explicitně (NE wildcard — chat/takticka-mapa/
+    # nastaveni apod. se prerenderovat NESMÍ); wiki catch-all kryje druhý
+    # vzor s vyloučením member-only segmentů. Svět bez vitríny je leak-safe
+    # i tak: sidecar renderuje jako anonym → BE mu obsah nevydá.
+    "~^/svet/[^/]+/(novinky|stranky|postavy|mapa|mapy|bestiar|pravidla)/?$" 1;
+    "~^/svet/[^/]+/(?!chat|nova-stranka|edit|postava|moje-postava|takticka-mapa|kalendar|timeline|pocasi|akce|pavucina|scenare|obchod|zvuky|podzemi|prevodnik-men|nastaveni|hraci|skupina|denik-pj|admin|karta-tokenu)[^/]+/?$" 1;
 }
 
 # 3) prerender JEN když crawler AND veřejná routa (AND dvou map přes konkatenaci)

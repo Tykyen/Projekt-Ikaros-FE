@@ -433,7 +433,7 @@ BE `users/interfaces/user.interface.ts:125`, `users.controller.ts:174`; FE `page
 | `GET /pages/dataSlugs` | všechny slugy (editor pomůcka) | **PomocnyPJ+** (N-37, jinak leak existence AKJ stránek) |
 | `GET /pages/data?number=N` | náhodné stránky (max 50) | přihlášený |
 | `GET /pages/meta/:slug` | metadata + shieldedBy | přihlášený |
-| `GET /pages/:slug` | plný obsah | 3-branový gating |
+| `GET /pages/:slug` | plný obsah | 3-branový gating; od 22.4 `OptionalJwt` — anonym JEN přes zapnutou vitrínu světa (`assertShowcaseViewable`, 403 `SHOWCASE_DISABLED`; AKJ/vyhrazené dál 403), viz kap. 09 |
 | `GET /pages/:slug/backlinks` | „Odkazuje sem" (7.1l) | access na cíl, filtr přístupných |
 | `POST/PATCH/DELETE` | CRUD | PomocnyPJ+ |
 

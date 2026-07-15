@@ -1,0 +1,86 @@
+/* 22.4 — lišta vitrínových sekcí pro anonyma/nečlena. */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.tag {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+/* Sekce se na úzkých displejích posouvají vodorovně — lišta se nikdy nezlomí
+   do nečitelného vícepatra a stránka nescrolluje do stran. */
+.links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  min-width: 0;
+  flex: 1;
+}
+
+.link {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.link:hover {
+  color: var(--text-primary);
+  background: var(--accent-soft, rgb(var(--white-rgb) / 0.08));
+}
+
+.linkActive,
+.linkActive:hover {
+  color: var(--text-primary);
+  background: var(--accent-soft, rgb(var(--white-rgb) / 0.12));
+}
+
+.cta {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--accent-contrast, var(--text-primary));
+  background: var(--accent, var(--bg-input));
+  border: 1px solid var(--border-strong, var(--border));
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .bar {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  /* Na mobilu má přednost navigace — popisek lišty ustoupí. */
+  .tag {
+    display: none;
+  }
+
+  /* Dotykové cíle — vyšší pilulky (≥40px) pro prst. */
+  .link,
+  .cta {
+    padding: 10px 12px;
+  }
+}

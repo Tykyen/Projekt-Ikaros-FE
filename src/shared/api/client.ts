@@ -101,6 +101,18 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 22.4 vitrína — request BEZ Authorization = skutečný anonym (accessToken
+    // je persistovaný v localStorage, guest token v atomu; oba by v hlavičce
+    // byly). Anonym nemá co refreshovat — 401 z member-only fetche jen tiše
+    // rejectni, ať vitrínového návštěvníka nevykopne toast+redirect na login.
+    if (
+      error.response?.status === 401 &&
+      original &&
+      !original.headers?.Authorization
+    ) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
       const store = getDefaultStore();

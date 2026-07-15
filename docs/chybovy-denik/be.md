@@ -138,3 +138,21 @@
 - 👎 Kořen u testerky stále NEpotvrzen (nemám přístup k prod DB/logům) — teď aspoň bude v logu vidět; follow-up návrh: tlačítko „Poslat testovací notifikaci" (`POST /push/test`), zatím neschváleno.
 
 ---
+
+## ✅ ŘEŠENÍ — 22.4 vitrína dávka A: anonymní čtení světa přes OptionalJwt + `publicShowcase` — 2026-07-15
+
+**Co zabralo.** Nový per-svět flag `publicShowcase` (default false; přepíná jen PJ přes `canAdminWorld`; na private světě 400 `SHOWCASE_PRIVATE_WORLD`; přechod na private ho auto-shodí) + jedna sdílená brána `assertShowcaseViewable(world)` v `common/utils/showcase.ts` (403 `SHOWCASE_DISABLED` i pro neexistující svět = anti-enumeration). Otevřené endpointy: pages `GET :slug`, world-maps `GET`+`GET folders`, bestiae `GET`+`GET :id` — všechny per-routa `OptionalJwtAuthGuard`, anon větev = brána + **cesta nejnižšího člena** (pages: člen bez clearance; mapy: hráčská cesta `userId=null` + `stripForPlayer`; bestie: jen world+system scope). Žádný nový „anon mapper" — anon jede existující Čtenářovou cestou → kontrakt anon ⊆ Čtenář drží konstrukcí. Sitemap: vitrínové sekce + wiki stránky (bez `accessRequirements`/`moderationHidden`, strop 200/svět, dedupe `pravidla`).
+
+**Dvě mongoose-strip pasti chycené PŘED napsáním kódu (čtením konzumentů).** Mongoose **tiše vyhazuje `undefined` z query podmínek**:
+1. `membershipRepo.findByUserAndWorld(undefined, worldId)` → query `{worldId}` → matchne **CIZÍ membership** → anon by zdědil roli náhodného člena (pages `assertAccess`/`filterAkjTabsForViewer`). Fix: `userId ? await lookup : null`.
+2. bestiae `repo.findVisible({userId: undefined})` → `$or` větev `{scope:'user', ownerUserId: undefined}` → `{scope:'user'}` → **VŠECHNY osobní bestie všech uživatelů**. Fix: sentinel `userId: ''` (mongoose '' nestripne, nematchne nic) + `user: []` v response; pin v e2e.
+**Poučení: u OptionalJwt anon větví NIKDY nepouštět `undefined` do mongoose query — guarded lookup nebo sentinel.**
+
+**Sundání class-level guardu (world-maps 13 rout, bestiae 17 rout).** Každá routa MUSÍ dostat explicitní guard; ověřeno grepem `@(Get|Post|Patch|Delete)\(|@UseGuards` — počty dekorátorů musí sedět 1:1. Jedna zapomenutá mutace = tichý anon zápis; kryto i e2e (anon mutace → 401).
+
+**Jak ověřeno.** typecheck + lint:check (vč. elevation-bypass guardu) čisté; unit 326/326 (seo mock chain doplněn o `.limit()`, bestiae spec o `IWorldsRepository` mock); nový `test/showcase.e2e-spec.ts` 14/14 (governance přepínače, anon 200 + invariant anon⊆Čtenář na klíčích response, AKJ nikdy, svět bez vitríny 403, mutace 401, A→B→A persistence flagu); regrese rest-idor + seed-isolation + worlds-join 51/51.
+
+**Zhodnocení — dobře/špatně.**
+- 👍 „Anon = nejnižší člen po existující cestě" místo nové filtrační vrstvy = malý diff, invariant drží konstrukcí, ne testem.
+- 👍 Čtení konzumentů před psaním (be_field_check návyk) chytilo obě strip pasti předem — žádný červený běh kvůli nim.
+- 👎 Error-contract tvar `{error:{code}}` jsem si v e2e nejdřív tipnul špatně (1 červený běh) — při assertech na error body VŽDY nejdřív mrknout do `http-exception.filter.ts`.

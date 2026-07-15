@@ -28,6 +28,7 @@ import {
   useKeyboardSequence,
 } from './hooks/useKeyboardShortcut';
 import { useFavoritePages } from '../api/useFavoritePages';
+import { Seo, metaDescription } from '@/shared/seo';
 import type { Page, PageType } from '../api/pages.types';
 import s from './PageViewer.module.css';
 
@@ -132,8 +133,24 @@ export function PageViewer({ page }: Props) {
     page.type === 'Postava hráče' ||
     page.type === 'NPC';
 
+  // 22.4 — indexovat jen vitrínové světy (publicShowcase + public/open);
+  // member-only obsah nese noindex (bot se k němu přes prerender stejně
+  // nedostane — renderuje jako anonym).
+  const showcaseIndexable =
+    world?.publicShowcase === true &&
+    (world.accessMode === 'public' || world.accessMode === 'open');
+
   return (
     <>
+      <Seo
+        title={world ? `${page.title} · ${world.name}` : page.title}
+        description={
+          metaDescription(page.content) ??
+          `${page.title} — stránka světa ${world?.name ?? 'na platformě Ikaros'}.`
+        }
+        image={page.imageUrl}
+        noindex={!showcaseIndexable}
+      />
       <article ref={containerRef} className={s.article} data-print-scope>
         <PageHeader page={page} readTimeMinutes={readTimeMinutes} />
         <AkjDecryptedBanner

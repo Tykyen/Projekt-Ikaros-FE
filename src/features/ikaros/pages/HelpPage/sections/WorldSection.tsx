@@ -39,6 +39,7 @@ import {
   Video,
   Undo2,
   Hammer,
+  Eye,
 } from 'lucide-react';
 import {
   HelpAccordion,
@@ -114,6 +115,19 @@ export function WorldSection() {
             menu s <strong>Kopírovat odkaz</strong>, <strong>Facebook</strong> a{' '}
             <strong>X</strong>. Sdílí se jen adresa světa; u veřejného světa se host
             rovnou podívá, u soukromého požádá o vstup.
+          </p>
+        </Tool>
+        <Tool icon={<Eye size={16} />} title="Veřejné nahlížení (výkladní skříň)" audience={{ kind: 'pj', label: 'Zapíná PJ' }}>
+          <p>
+            PJ může v <strong>Nastavení světa → Přístup</strong> zapnout{' '}
+            <strong>Veřejné nahlížení</strong> — svět se pak stane výkladní skříní:
+            i nepřihlášený návštěvník si prohlédne novinky, stránky, adresář postav,
+            mapy, bestiář a pravidla. Vidí přesně to, co člen v roli{' '}
+            <strong>Čtenář</strong>, a nemůže nic měnit. Chat, taktická mapa, voice
+            a herní nástroje zůstávají jen pro členy; utajené a vyhrazené stránky
+            zůstávají skryté. Obsah zaindexují vyhledávače — svět tak láká nové
+            hráče. Funguje jen u veřejných světů (ne soukromých) a jde kdykoli
+            vypnout.
           </p>
         </Tool>
         <Tool icon={<Crown size={16} />} title="Role ve světě" audience={{ kind: 'vse', label: 'Členové' }}>

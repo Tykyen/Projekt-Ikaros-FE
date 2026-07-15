@@ -400,7 +400,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 **Dvouúrovňová diskuse:** `BestieComment` (nová entita) s `targetType` — **`beast`** (o bytosti/lore, napříč systémy, pod knihou) a **`statblock`** (jen ke statům jednoho systému, pod záložkou). Čtou všichni, píší přihlášení. (`bestiae/bestie-comments.service.ts`, `bestie-comment.schema.ts`, FE `hooks/useKomunitniBestiar.ts`)
 
 **Kdo (FE):**
-- Čtení (list/detail) — **vyžaduje přihlášení** (`BestiaeController` celý pod `JwtAuthGuard`, anonym → 401; žádný `OptionalJwtAuthGuard`). *(Sjednoceno na realitu 2026-07-10: Společná tvorba = login-required; dřívější „veřejné pro anonyma" bylo nepřesné.)*
+- Čtení (list/detail) — **komunitní routy (`community/*`) vyžadují přihlášení** (`JwtAuthGuard` per-routa; Společná tvorba = login-required, rozhodnuto 2026-07-10). Pozn. 22.4 (2026-07-15): class-level guard z `BestiaeController` sundán — obecné `GET /bestiae` a `GET /bestiae/:id` jsou `OptionalJwtAuthGuard` kvůli vitríně světa (anonym JEN world+system scope vitrínového světa přes `assertShowcaseViewable`; osobní bestie nikdy — viz kap. 09 „Veřejné nahlížení"). Komunitní knihovny se to netýká.
 - **＋ Nová bytost / ＋ systém / vklad / příspěvek** — jen přihlášený (`currentUserAtom`/`isAuthenticatedAtom`).
 - **✎ Upravit popis** — autor bytosti (`user.id === authorId`) NEBO kurátor.
 - **✎ Upravit staty** (existující statblok, přímá editace — draft i approved) — **jen kurátor** (`isCurator`); tlačítko u aktivní pravidlové záložky, otevře `ProposeStatblockModal` v edit-režimu (předvyplní staty, systém zamčený). (`KomunitniBestieDetailPage.tsx:176-200`)

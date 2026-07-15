@@ -7,6 +7,7 @@ import { useUpdateWorld } from '@/features/world/api/useUpdateWorld';
 import { PillChips } from '@/features/ikaros/pages/CreateWorldPage/components/PillChips';
 import sec from '@/features/ikaros/pages/CreateWorldPage/components/sections.module.css';
 import { SettingsPanel } from '../components/SettingsPanel';
+import s from './AccessModeTab.module.css';
 
 const OPTIONS: {
   id: World['accessMode'];
@@ -58,6 +59,8 @@ export default function AccessModeTab() {
     setMode(world.accessMode);
   }
   const [confirmClosed, setConfirmClosed] = useState(false);
+  // 22.4 — vitrína: zapnutí (= zveřejnění obsahu internetu) jde přes confirm.
+  const [confirmShowcase, setConfirmShowcase] = useState(false);
 
   if (!world) return null;
 
@@ -81,7 +84,22 @@ export default function AccessModeTab() {
     void save(mode);
   }
 
+  const showcaseOn = world.publicShowcase === true;
+  const showcaseDisabled = world.accessMode === 'private';
+
+  async function saveShowcase(next: boolean) {
+    try {
+      await mutation.mutateAsync({ publicShowcase: next });
+      toast.success(
+        next ? 'Veřejné nahlížení zapnuto.' : 'Veřejné nahlížení vypnuto.',
+      );
+    } catch {
+      toast.error('Uložení selhalo. Zkus to znovu.');
+    }
+  }
+
   return (
+    <>
     <SettingsPanel
       title="Přístupový režim"
       description="Kdo svět vidí a jak se do něj dostane."
@@ -126,5 +144,51 @@ export default function AccessModeTab() {
         }}
       />
     </SettingsPanel>
+
+      {/* 22.4 — veřejná výkladní skříň (anonym = pohled Čtenáře, read-only). */}
+      <SettingsPanel
+        title="Veřejné nahlížení (výkladní skříň)"
+        description="Ukaž svět i nepřihlášeným návštěvníkům — ochutnávka pro nové hráče."
+      >
+        <label className={s.check}>
+          <input
+            type="checkbox"
+            checked={showcaseOn}
+            disabled={showcaseDisabled || mutation.isPending}
+            onChange={(e) => {
+              if (e.target.checked) setConfirmShowcase(true);
+              else void saveShowcase(false);
+            }}
+          />
+          Povolit veřejné nahlížení
+        </label>
+        <p className={s.note}>
+          Návštěvník z internetu uvidí <strong>totéž co člen v roli Čtenář</strong> —
+          novinky, stránky, postavy, mapy, bestiář a pravidla (včetně map
+          označených „veřejná — všichni členové"). Nemůže nic měnit. Chat,
+          taktická mapa, voice a herní nástroje zůstávají jen pro členy; AKJ a
+          vyhrazené stránky zůstávají skryté. Vyhledávače (Google) obsah
+          zaindexují.
+        </p>
+        {showcaseDisabled && (
+          <p className={s.warn}>
+            Soukromý svět veřejné nahlížení mít nemůže — nejdřív přepni
+            přístupový režim.
+          </p>
+        )}
+        <ConfirmDialog
+          open={confirmShowcase}
+          onClose={() => setConfirmShowcase(false)}
+          title="Zveřejnit svět k nahlížení?"
+          message="Vše, co vidí člen v roli Čtenář, uvidí kdokoli na internetu bez přihlášení a obsah se objeví ve vyhledávačích. Vypnout to jde kdykoli."
+          confirmLabel="Zveřejnit"
+          isPending={mutation.isPending}
+          onConfirm={async () => {
+            await saveShowcase(true);
+            setConfirmShowcase(false);
+          }}
+        />
+      </SettingsPanel>
+    </>
   );
 }

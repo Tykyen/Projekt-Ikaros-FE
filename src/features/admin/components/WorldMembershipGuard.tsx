@@ -20,6 +20,12 @@ interface Props {
    * Speciální token `:worldSlug` v cíli se nahradí aktuálním slugem z URL.
    */
   redirectTo?: string;
+  /**
+   * 22.4 — vitrína: nečlen/anonym projde read-only, když má svět zapnuté
+   * veřejné nahlížení (`world.publicShowcase`). Jen pro vitrínové sekce
+   * (spec 22.4 §2); BE drží tvrdou hranici (OptionalJwt + brána).
+   */
+  allowShowcase?: boolean;
   children: ReactNode;
 }
 
@@ -39,6 +45,7 @@ export function WorldMembershipGuard({
   minWorldRole,
   fallbackGlobalRoles,
   redirectTo,
+  allowShowcase,
   children,
 }: Props) {
   const user = useAtomValue(currentUserAtom);
@@ -65,6 +72,12 @@ export function WorldMembershipGuard({
   }
 
   if (worldRole != null && worldRole >= minWorldRole) {
+    return <>{children}</>;
+  }
+
+  // 22.4 vitrína — nečlen/anonym smí read-only, když je veřejné nahlížení
+  // zapnuté. Až PO membership checkách (člen jede postaru, vyšší role drží).
+  if (allowShowcase && world?.publicShowcase === true) {
     return <>{children}</>;
   }
 

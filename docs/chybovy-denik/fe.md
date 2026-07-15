@@ -2121,3 +2121,33 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** ladím výpočet pozice skoku, zatímco kořen je obsah rostoucí PO skoku.
 
 ---
+
+---
+
+### ✅ ŘEŠENÍ — MyThemeTab.spec falešné timeouty: dynamický import UVNITŘ testu platí transformaci grafu témat · 2026-07-15
+
+**Symptom:** 2 testy padaly — test 1 timeout 5 s, test 2 `Found multiple elements: radio "Fantasy"`. Vypadalo to jako duplicitní label motivu (slepá ulička ~30 min: registry motivů, RTL waitFor, act, cleanup — všechno čisté).
+
+**Skutečný kořen (doložen file-logem, konzole je ve vitestu tlumená):** `renderTab()` dělal `await import('../tabs/MyThemeTab')` UVNITŘ testu → vite transformace + evaluace celého grafu témat (33 skinů, měřeno `import 6.21s`) běžela uvnitř 5s timeoutu testu → test 1 umřel DŘÍV, než se vůbec vyrenderovalo. Kaskáda: nedokončený import z testu 1 dořešil render během testu 2 → druhý grid v DOM → „multiple Fantasy" (sekundární symptom, který mátl diagnózu). Spec se „rozbil sám" růstem počtu skinů — nikdo se ho nedotkl (git log čistý).
+
+**Fix:** statický `import MyThemeTab from '../tabs/MyThemeTab'` — `vi.mock` je hoistovaný a platí i pro statické importy, dynamika byla zbytečná; import fáze (6,6 s) běží mimo timeout testu, testy samotné 0,7 s. 3/3 zelené.
+
+**Poučení:**
+- **Dynamický `await import()` v testu = časovaná bomba** — cena transformace importního grafu se počítá do timeoutu testu a roste s codebase. Používat JEN s `vi.doMock` (kdy je nutný), jinak statický import.
+- Timeout přesně na hranici testTimeout (5015–5027 ms) + „multiple elements" v NÁSLEDUJÍCÍM testu = podpis téhle třídy problému (nedokončená async práce přetéká do dalšího testu).
+- `console.log` ve vitestu tady nebyl vidět — diagnostika přes `appendFileSync` do scratchpadu funguje vždy.
+
+---
+
+### ✅ ŘEŠENÍ — 22.4 vitrína dávka B (FE): anon navigace + guard + past „401 vykopne anonyma na login" · 2026-07-15
+
+**Co zabralo.** FE vrstva vitríny: `showcaseOrMember()` helper v routeru (8 rout) + prop `allowShowcase` ve `WorldMembershipGuard` (větev AŽ PO member checkách — člen jede postaru) · `ShowcaseBar` (samostatná lišta pilulek s `overflow-x:auto`, NE ohýbání member nav — plná nav gatuje i akce/drawer/persence, anon variantu by prolezly member prvky) · toggle v `AccessModeTab` s ConfirmDialogem (zapnutí = zveřejnění internetu, chce vědomý souhlas) · `<Seo>` v `PageVieweru` (`noindex` mimo vitrínu) · prerender whitelist: sekce vyjmenované explicitně + wiki catch-all přes **negative lookahead** s výčtem member-only segmentů (wildcard by prerenderoval chat/TM/nastavení).
+
+**Klíčový nález (mohl potopit celou featuru):** interceptor v `client.ts` na KAŽDÉ 401 zkoušel refresh → pro anonyma refresh vždy selže → `toast + logoutAndRedirectToLogin` → **anonym vykopnut na `/?openLogin=1` prvním member-only fetchem** (na vitrínové stránce jich pár je — settings, favorites…). Fix: 401 requestu **bez Authorization hlavičky** = skutečný anonym (access token je persistovaný v localStorage, guest token v atomu — oba by v hlavičce byly) → tichý reject bez refresh pokusu. Přihlášených se nedotkne (jejich requesty hlavičku mají vždy). Vedlejší přínos: zklidní i dnešní anon 401 spam (typ N-30).
+
+**Jak ověřeno.** `npm run build` (tsc -b + CSP hash) ✓, eslint --fix čistý, vitest dotčené oblasti 19 souborů / 93 testů ✓ (WorldSettingsPage, admin guard, PageViewer, WorldLayout, HelpPage 25/25). Statická CSS review (mobil-desktop): ShowcaseBar overflow-x + touch targets ≥40px na mobilu; živé ověření (anon okno, 375/768/1440, Googlebot curl) = uživatel po deployi.
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Nález interceptoru PŘED nasazením — vyplynul z plánového rizika „anon member-only fetche"; kontrola „co udělá klient anonymovi na 401" se vyplatila jako první krok B5, ne poslední.
+- 👍 Samostatná ShowcaseBar místo ohýbání member nav = malý, izolovaný diff bez rizika leaku member UI.
+- 👎 ConfirmDialog panel jsem nejdřív vnořil do cizího `SettingsPanel` (JSX špatně zavřený) — chyba oka, chytil jsem hned; při přidávání druhého panelu do tab souboru zkontroluj, že jde o sourozence.

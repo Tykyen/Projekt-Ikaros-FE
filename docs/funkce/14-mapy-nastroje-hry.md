@@ -23,7 +23,7 @@ Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Ne
 - **Co to je:** Galerie obrázkových map světa ve vnořeném stromu složek (13.4/13.4b). Od **16.5 interaktivní**: nad mapou jdou klikací **vlaječky (piny)** na stránky / jiné mapy / info, mapa se dá **propojit s taktickou scénou** a **poslat do chatu** (viz „Interaktivní vlaječky" níže).
 - **Kde:** FE `src/features/world/maps/WorldMapsPage.tsx`. BE `modules/world-maps`.
 - **Kdo:**
-  - Čtení: každý člen, ale s **leak-safe visibility filtrem** (viz níže).
+  - Čtení: každý člen, ale s **leak-safe visibility filtrem** (viz níže). Od 22.4 (2026-07-15) navíc **anonym u vitrínového světa** (`GET /world-maps` + `folders` = `OptionalJwtAuthGuard`; anon → `assertShowcaseView` → hráčská cesta `userId=null`, tj. jen `isPublic` mapy + `stripForPlayer`; ostatní routy explicitně `JwtAuthGuard`) — viz kap. 09 „Veřejné nahlížení".
   - Správa (přidat/upravit/smazat mapu i složku, řadit, **vlaječky, propojení scény**): **PomocnyPJ+** světa (`canManage` = `>= WorldRole.PomocnyPJ`, D-NEW-INV-MAPS) nebo global Admin+. FE gate `isPJ` zobrazí edit UI. BE `WorldMapsService.assertCanManage`.
 - **Co jde dělat (vše):**
   - PJ: vytvořit mapu (titulek, popis, `imageUrl`, viditelnost), upravit, smazat, přeřadit (`reorder`).

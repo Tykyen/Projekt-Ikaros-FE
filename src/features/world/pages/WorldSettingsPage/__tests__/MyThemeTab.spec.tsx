@@ -38,8 +38,13 @@ vi.mock('@/features/world/context/WorldContext', () => ({
   useWorldContext: () => ({ world }),
 }));
 
-async function renderTab() {
-  const { default: MyThemeTab } = await import('../tabs/MyThemeTab');
+// POZOR: import MUSÍ být statický (vi.mock je hoistovaný, mocky platí i tak).
+// Dynamický `await import()` uvnitř testu spouštěl transformaci celého grafu
+// témat (33 skinů, ~6 s) UVNITŘ 5s timeoutu testu → falešné timeouty, které
+// rostly s počtem skinů (vyřešeno 2026-07-15, viz chybový deník).
+import MyThemeTab from '../tabs/MyThemeTab';
+
+function renderTab() {
   return render(<MyThemeTab />);
 }
 

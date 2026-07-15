@@ -16,6 +16,8 @@ export interface UpdateWorldInput {
   maxPlayers?: number | null;
   playersWanted?: string;
   accessMode?: World['accessMode'];
+  /** 22.4 — veřejné nahlížení (výkladní skříň); BE guard: jen PJ, ne-private. */
+  publicShowcase?: boolean;
   themeId?: string;
   themeOverrides?: Record<string, string>;
   /** D-NEW-theme-bg-empty (2026-05-21) — `null` = clear ($unset na BE). */

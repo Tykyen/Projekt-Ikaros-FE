@@ -34,6 +34,7 @@ import type { NavNode, NavLinkItem } from '@/features/world/lib/headlineNav';
 import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 import { AdminElevationToggle } from '@/features/world/components/AdminElevationToggle';
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
+import { ShowcaseBar } from '@/features/world/components/ShowcaseBar/ShowcaseBar';
 import { resolvePersona } from './resolvePersona';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { WorldVoiceHost } from '@/features/voice/components/WorldVoiceHost';
@@ -382,6 +383,10 @@ export function WorldLayout() {
   // renderovat ani globálnímu adminovi; tělo ukáže `WorldNotFound`.
   const showFullNav =
     !!world && !loading && (status === 'member' || isGlobalAdmin);
+  // 22.4 vitrína — anonym/nečlen na světě s veřejným nahlížením dostane
+  // redukovanou lištu vitrínových sekcí (místo plné member navigace).
+  const showShowcaseBar =
+    !!world && !loading && !showFullNav && world.publicShowcase === true;
 
   // 8.3 — slot „moje postava" ve světě. Najde entry v directory dle
   // membership.characterPath; pokud chybí (žádná postava / smazaná postava),
@@ -691,6 +696,9 @@ export function WorldLayout() {
         {showFullNav && (
           <LastInfoBar worldId={realWorldId} lastInfo={settings?.lastInfo} />
         )}
+
+        {/* 22.4 — vitrínová lišta pro anonyma/nečlena (veřejné nahlížení). */}
+        {showShowcaseBar && <ShowcaseBar worldSlug={worldSlug} />}
 
         {/* Mobile drawer (zprava) — jen pro membery */}
         {showFullNav && (

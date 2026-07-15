@@ -449,6 +449,12 @@ export interface World {
   deletedAt?: string | null;
   deletedBy?: string | null;
   accessMode: 'public' | 'private' | 'open' | 'closed';
+  /**
+   * 22.4 — veřejná výkladní skříň: anonym smí read-only nahlížet do vybraných
+   * sekcí (anon = Čtenář). Jen ne-private světy; BE flag auto-shodí při
+   * přechodu na private.
+   */
+  publicShowcase?: boolean;
   playerCount: number;
   /** 2.2 — volitelná max kapacita pro sort "volná místa" + 2.3 wizard. */
   maxPlayers?: number | null;

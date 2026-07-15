@@ -793,7 +793,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** průvodce (wizard) + kontextové tipy + vstup do demo světa.
 **Otevřené otázky:** Demo svět sdílený read-only, nebo kopie per uživatel? Průvodce přeskočitelný? Tipy odznačitelné („už nezobrazovat")?
 
-### - [ ] 22.4 Veřejná „výkladní skříň" světa (bývalý 17.3) — [C3 · dopad střední · náklad střední] 🔁
+### - [x] 22.4 Veřejná „výkladní skříň" světa (bývalý 17.3) — [C3 · dopad střední · náklad střední] 🔁
+> ✅ IMPLEMENTOVÁNO 2026-07-15 (BE+FE, e2e 14/14): opt-in `publicShowcase` + anonym=Čtenář read-only (novinky/stránky/postavy/mapy/bestiář/pravidla), ShowcaseBar, SEO (sitemap+prerender+OG). Spec: [arch/phase-22/spec-22.4-verejna-vykladni-skrin.md](arch/phase-22/spec-22.4-verejna-vykladni-skrin.md). Čeká commit + deploy + živé ověření.
 > Přesunuto z 17.3 (2026-07-05): publikace světa čtenářům = SEO/marketing páka, patří k finálnímu SEO dotažení Etapy II.
 **Cíl:** Přepínač „veřejná prezentace" — vybrané stránky/mapa/timeline viditelné i nepřihlášenému.
 **Proč:** Celý World Anvil stojí na publikování světa čtenářům; nový zájemce dnes nevidí ukázku, na kterou by se chytil. Marketing i pýcha autora; živí trychtýř (Příloha A, krok 1).

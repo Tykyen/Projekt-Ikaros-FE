@@ -294,6 +294,27 @@ const FAQ: FaqItem[] = [
   },
   {
     cat: 'svet',
+    q: 'Můžou se na můj svět podívat lidé bez účtu?',
+    a: (
+      <>
+        <p>
+          Ano — když PJ v <strong>Nastavení světa → Přístup</strong> zapne{' '}
+          <strong>Veřejné nahlížení (výkladní skříň)</strong>. Nepřihlášený
+          návštěvník pak vidí novinky, stránky, postavy, mapy, bestiář a pravidla —
+          přesně to, co člen v roli <strong>Čtenář</strong> — a nemůže nic měnit.
+          Chat, taktická mapa a herní nástroje zůstávají jen pro členy, utajené
+          stránky zůstávají skryté.
+        </p>
+        <p>
+          Ve výchozím stavu je nahlížení <strong>vypnuté</strong>: bez něj vidí
+          nečlen jen vizitku světa s tlačítkem Vstoupit / Požádat. Funguje jen u
+          veřejných světů a jde kdykoli vypnout.
+        </p>
+      </>
+    ),
+  },
+  {
+    cat: 'svet',
     q: 'Jak připravím scénu, aby ji hráči zatím neviděli nebo nehýbali tokeny?',
     a: (
       <>
