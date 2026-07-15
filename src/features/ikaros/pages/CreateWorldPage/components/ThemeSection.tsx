@@ -33,7 +33,7 @@ export function ThemeSection({
 
   return (
     <SectionCard
-      index={8}
+      index={9}
       title="Motiv světa"
       description="Vizuální styl světa. Výchozí motiv se odvozuje ze žánru — můžeš ho přepsat."
     >

@@ -21,6 +21,10 @@ export interface CreateWorldInput {
   techLevelMax?: number;
   /** 2.3e — tradice magie světa; seeduje stránku Magický systém. */
   magicTraditions?: string[];
+  /** 2.3g — role náboženství (0–14); seeduje stránku Náboženství. */
+  religionInfluence?: number;
+  /** 2.3g — typy náboženství světa; seeduje stránku Náboženství. */
+  religionTypes?: string[];
   /** 5.0 — motiv světa zvolený ve wizardu. */
   themeId?: string;
   /**

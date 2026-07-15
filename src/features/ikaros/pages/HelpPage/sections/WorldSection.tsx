@@ -223,9 +223,9 @@ export function WorldSection() {
 
       {/* ── Informace & lidé ───────────────────────────────────────────── */}
       <HelpAccordion icon={<Users size={20} />} title="Informace & lidé" accent="player">
-        <Tool icon={<BookOpen size={16} />} title="Pravidla, Magický systém, Technologie" audience={{ kind: 'vse', label: 'Členové (úpravy PJ)' }}>
+        <Tool icon={<BookOpen size={16} />} title="Pravidla, Magický systém, Technologie, Náboženství" audience={{ kind: 'vse', label: 'Členové (úpravy PJ)' }}>
           <p>
-            Tři referenční wiki stránky každého světa (menu Informace). Píše a
+            Čtyři referenční wiki stránky každého světa (menu Informace). Píše a
             upravuje je PJ stejným editorem jako ostatní stránky. Magický systém a
             Technologii může PJ z menu skrýt v Nastavení → Viditelnost modulů.
           </p>
@@ -233,10 +233,12 @@ export function WorldSection() {
             Nový svět dostane tyhle stránky rovnou s orientačním textem podle
             voleb z formuláře tvorby: <strong>Pravidla</strong> podle herního
             systému, <strong>Technologie</strong> podle zvoleného pásma
-            vyspělosti (TÚ 0–14) a <strong>Magický systém</strong> podle
-            zatržených tradic magie. Je to jen startovní bod — PJ text libovolně
-            přepíše. Tahle pásma a tradice se volí jen při tvorbě světa, ne
-            později v Nastavení.
+            vyspělosti (TÚ 0–14), <strong>Magický systém</strong> podle
+            zatržených tradic magie a <strong>Náboženství</strong> podle zvolené
+            role víry (škála 0–14) a typů náboženství — i s osnovou, co všechno
+            u víry ve světě promyslet. Je to jen startovní bod — PJ text
+            libovolně přepíše. Tahle pásma, tradice a role se volí jen při tvorbě
+            světa, ne později v Nastavení.
           </CalloutBox>
         </Tool>
         <Tool icon={<Users size={16} />} title="Hráči světa" audience={{ kind: 'vse', label: 'Členové' }}>

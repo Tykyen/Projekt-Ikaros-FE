@@ -45,7 +45,7 @@ export function CalendarsSection({
 
   return (
     <SectionCard
-      index={9}
+      index={10}
       title="Kalendáře"
       description="Vyber předpřipravené kalendáře, které tvůj svět bude používat. Můžeš upravit později v Nastavení."
     >

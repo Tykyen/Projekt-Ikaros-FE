@@ -15,6 +15,7 @@ import { AccessModeSection } from './components/AccessModeSection';
 import { SystemSection } from './components/SystemSection';
 import { TechnologySection } from './components/TechnologySection';
 import { MagicSection } from './components/MagicSection';
+import { ReligionSection } from './components/ReligionSection';
 import { ThemeSection } from './components/ThemeSection';
 import { CalendarsSection } from './components/CalendarsSection';
 import { GENRE_CUSTOM_LABEL, themeForGenre } from './constants/genres';
@@ -24,6 +25,7 @@ import {
   DEFAULT_TECH_MIN,
   DEFAULT_TECH_MAX,
 } from './constants/technologyLevels';
+import { DEFAULT_RELIGION_INFLUENCE } from './constants/religion';
 import { useWorldSlug } from './hooks/useWorldSlug';
 import s from './CreateWorldPage.module.css';
 
@@ -67,6 +69,12 @@ export default function CreateWorldPage() {
 
   // 2.3e — tradice magie světa (seeduje stránku Magický systém).
   const [magicTraditions, setMagicTraditions] = useState<string[]>([]);
+
+  // 2.3g — role náboženství (0–14) + typy (seeduje stránku Náboženství).
+  const [religionInfluence, setReligionInfluence] = useState(
+    DEFAULT_RELIGION_INFLUENCE,
+  );
+  const [religionTypes, setReligionTypes] = useState<string[]>([]);
 
   // 5.0 — motiv světa se odvozuje ze žánru; `themeOverride` = ruční přepis PJ
   // (null = odvozeno).
@@ -154,6 +162,8 @@ export default function CreateWorldPage() {
         techLevelMin: techMin,
         techLevelMax: techMax,
         magicTraditions: magicTraditions.length ? magicTraditions : undefined,
+        religionInfluence,
+        religionTypes: religionTypes.length ? religionTypes : undefined,
         themeId: effectiveTheme,
         calendars: calendarsPayload,
         ...(defaultCalendarSlug && selectedCalendarSlugs.has(defaultCalendarSlug)
@@ -233,6 +243,12 @@ export default function CreateWorldPage() {
         <MagicSection
           traditions={magicTraditions}
           onChange={setMagicTraditions}
+        />
+        <ReligionSection
+          influence={religionInfluence}
+          types={religionTypes}
+          onInfluenceChange={setReligionInfluence}
+          onTypesChange={setReligionTypes}
         />
         <ThemeSection
           genre={finalGenre}
