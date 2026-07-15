@@ -2112,3 +2112,12 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Příznak cyklení:** ladím scroll/skok a testuju jen v aktuálně otevřené konverzaci.
 
 ---
+
+### CH-074 — skok na zprávu „ujel" — obrázky dokreslené po skoku posunuly obsah (drift) · 2026-07-15
+**Kontext:** po CH-073 (stick vypnut při skoku) uživatel hlásí „stále se mi to nehodí na to místo" — skok proběhne, ale pohled skončí vedle cílové zprávy.
+**Co jsem udělal špatně:** považoval jsem `scrollIntoView` za konečný stav; pozice se ale počítá v okamžiku volání. Obrázky/avatary NAD cílem se dokreslují až po skoku (`.single` náhled má do stažení ~0 px), obsah povyroste a cíl odjede — u dohledané staré zprávy se nad ní dokreslují stovky zpráv, takže pohled klidně skončí zpátky u dna.
+**Proč to nefungovalo:** jednorázový scroll vs. průběžně rostoucí obsah — bez kotvy nikdo pozici nekoriguje (stick-to-bottom má tutéž mechaniku pro dno, cíl skoku ji neměl).
+**Poučení:** programový skok v obsahu s lazy-loaded obrázky = **kotva, ne jednorázový scroll**: po `JUMP_ANCHOR_MS` (4 s) drž cíl vycentrovaný při každém růstu obsahu (reuse ResizeObserver větev), zásah uživatele (wheel/touchmove — NE `onScroll`, ten střílí i programový scroll) kotvu ruší. Regresní test = mock ResizeObserver, po skoku callback → čekej `block:'center'`, ne dno.
+**Příznak cyklení:** ladím výpočet pozice skoku, zatímco kořen je obsah rostoucí PO skoku.
+
+---

@@ -18,6 +18,14 @@ const STICK_THRESHOLD_PX = 140;
 /** Jak dlouho po skoku z citace zvýraznit originál. */
 const HIGHLIGHT_MS = 1200;
 
+/**
+ * CH-074 — jak dlouho po skoku držet cílovou zprávu ukotvenou (vycentrovanou)
+ * při růstu obsahu. Obrázky/avatary NAD cílem se dokreslují až po skoku a
+ * posouvají obsah → bez kotvy cíl „ujede" a pohled skončí vedle. Zásah
+ * uživatele (kolečko/dotyk/klávesa) kotvu ruší okamžitě.
+ */
+const JUMP_ANCHOR_MS = 4000;
+
 interface MessageListProps {
   items: ChatItem[];
   currentUserId: string;
@@ -134,23 +142,45 @@ export function MessageList({
 
   // Skok na citovaný originál — scroll + krátké zvýraznění. Pokud originál
   // vypadl z načteného okna (starší 50 zpráv), klik nic neudělá.
-  const handleJump = useCallback((messageId: string) => {
-    const el = itemRefs.current.get(messageId);
-    if (!el) return;
-    // Skok = vědomé čtení historie → vypni přilepení ke dnu. Bez toho
-    // ResizeObserver (dokreslení obrázků po čerstvém mountu při přepnutí
-    // konverzace) stáhne pohled zpět na konec a skok se „neprojeví".
-    stickRef.current = false;
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setHighlightedId(messageId);
-    clearTimeout(highlightTimer.current);
-    highlightTimer.current = setTimeout(
-      () => setHighlightedId(null),
-      HIGHLIGHT_MS,
-    );
+  // CH-074 — aktivní kotva skoku (id cílové zprávy) + její expirace.
+  const jumpAnchorRef = useRef<string | null>(null);
+  const jumpAnchorTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const cancelJumpAnchor = useCallback(() => {
+    jumpAnchorRef.current = null;
+    clearTimeout(jumpAnchorTimer.current);
   }, []);
 
-  useEffect(() => () => clearTimeout(highlightTimer.current), []);
+  const handleJump = useCallback(
+    (messageId: string) => {
+      const el = itemRefs.current.get(messageId);
+      if (!el) return;
+      // Skok = vědomé čtení historie → vypni přilepení ke dnu. Bez toho
+      // ResizeObserver (dokreslení obrázků po čerstvém mountu při přepnutí
+      // konverzace) stáhne pohled zpět na konec a skok se „neprojeví".
+      stickRef.current = false;
+      // CH-074 — ukotvi cíl: dokreslující se obrázky nad ním posouvají obsah,
+      // ResizeObserver ho po dobu kotvy drží vycentrovaný.
+      jumpAnchorRef.current = messageId;
+      clearTimeout(jumpAnchorTimer.current);
+      jumpAnchorTimer.current = setTimeout(cancelJumpAnchor, JUMP_ANCHOR_MS);
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightedId(messageId);
+      clearTimeout(highlightTimer.current);
+      highlightTimer.current = setTimeout(
+        () => setHighlightedId(null),
+        HIGHLIGHT_MS,
+      );
+    },
+    [cancelJumpAnchor],
+  );
+
+  useEffect(
+    () => () => {
+      clearTimeout(highlightTimer.current);
+      clearTimeout(jumpAnchorTimer.current);
+    },
+    [],
+  );
 
   // 6.8 — mapa id zprávy → senderId, ať citace odpovědi umí dohledat, zda
   // citovaná zpráva je od vedení (→ zobrazit „PJ" místo uloženého jména).
@@ -251,6 +281,15 @@ export function MessageList({
     const content = contentRef.current;
     if (!content) return;
     const ro = new ResizeObserver(() => {
+      // CH-074 — aktivní kotva skoku má přednost: růst obsahu (dokreslení
+      // obrázků) drž cíl vycentrovaný, ne dno.
+      const anchorId = jumpAnchorRef.current;
+      if (anchorId) {
+        itemRefs.current
+          .get(anchorId)
+          ?.scrollIntoView({ behavior: 'auto', block: 'center' });
+        return;
+      }
       if (stickRef.current) endRef.current?.scrollIntoView({ behavior: 'auto' });
     });
     ro.observe(content);
@@ -262,7 +301,15 @@ export function MessageList({
   }
 
   return (
-    <div className={s.scroll} ref={scrollRef} onScroll={handleScroll}>
+    <div
+      className={s.scroll}
+      ref={scrollRef}
+      onScroll={handleScroll}
+      // CH-074 — zásah uživatele (kolečko/dotyk) ruší kotvu skoku; `onScroll`
+      // k tomu nestačí, střílí ho i programový scrollIntoView.
+      onWheel={cancelJumpAnchor}
+      onTouchMove={cancelJumpAnchor}
+    >
       <div className={s.content} ref={contentRef}>
         {hasMoreOlder && (
           <button

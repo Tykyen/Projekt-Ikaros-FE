@@ -81,6 +81,32 @@ describe('MessageList — deep-link skok na zprávu (13.2a)', () => {
     renderList('neznama-zprava');
     expect(jumpCalled(spy)).toBe(false);
   });
+
+  // CH-074 — obrázky dokreslené po skoku posouvají obsah; kotva musí cíl
+  // držet vycentrovaný (ne dno, kam by táhl stick-to-bottom).
+  it('po skoku drží kotva cíl při růstu obsahu (RO → center, ne dno)', () => {
+    const callbacks: ResizeObserverCallback[] = [];
+    class MockRO {
+      constructor(cb: ResizeObserverCallback) {
+        callbacks.push(cb);
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+    vi.stubGlobal('ResizeObserver', MockRO);
+    try {
+      const spy = vi.spyOn(Element.prototype, 'scrollIntoView');
+      renderList('m2'); // mount → skok na m2 (kotva aktivní)
+      spy.mockClear();
+      // Simulace růstu obsahu (dokreslení obrázku) → RO callback.
+      callbacks.forEach((cb) => cb([], {} as unknown as ResizeObserver));
+      // Kotva recentruje cíl (block: center) místo scrollu na dno.
+      expect(jumpCalled(spy)).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
 
 describe('MessageList — tlačítko „Zobrazit starší" (SC-33)', () => {
