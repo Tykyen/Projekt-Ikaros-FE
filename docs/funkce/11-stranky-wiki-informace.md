@@ -169,8 +169,8 @@ Plnohodnotný editor pro tvorbu i úpravu stránek, panelová struktura.
 - BE `POST /worlds/:worldId/pages` (create), `PATCH /worlds/:worldId/pages/:id` (update).
 
 ### Kdo
-- FE: dvojitý guard — route `memberOnly(Čtenář)` + interní `if (userRole < PomocnyPJ) Navigate` (`PageEditorPage.tsx:27`).
-- BE: `assertCanWrite` = platform Admin+ NEBO world role >= PomocnyPJ (`pages.service.ts:924`). Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
+- FE: dvojitý guard — route `memberOnly(Čtenář)` + interní guard v `PageEditorPage.tsx`. **15.11:** práh snížen na **Hráč+** (`userRole < Hrac` → redirect); hráč smí navrhovat obsah (viz „Návrhy obsahu hráčů" níže). BE je autoritativní.
+- BE: `assertCanWrite` = platform Admin+ NEBO world role ≥ PomocnyPJ. **15.11 relaxace (`resolveCreateMode`):** hráč (role ≥ Hrac) navrhující **whitelist typ** (NPC/Lokace/Ostatní/Seznam/Galerie/Rodokmen) → `create` s `pageStatus:'pending'`, `proposedBy=self` (jinak 403); moderátor (≥PomocnyPJ/elevovaný) tvoří rovnou `approved`. `assertCanEditPage`: autor smí editovat SVŮJ pending. Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
 
 ### Co jde dělat (VŠE)
 Panely (`PageEditor.tsx:397`):
@@ -209,6 +209,40 @@ Save flow:
 FE `PageEditor/PageEditor.tsx:70`, `panels/ContentPanel.tsx:30`; BE `pages.service.ts:187` (create), `:298` (update).
 
 ---
+
+## Návrhy obsahu hráčů (15.11)
+
+### Co to je
+Hráč (role Hráč+) smí **navrhnout** vlastní obsah — NPC, Lokaci, wiki stránku, Galerii, Rodokmen — jako **pending** (vidí jen on + PJ). PJ ho pak schválí (→ živé), vrátí k přepracování, nebo zahodí. Řízená spoluúčast hráčů na světě.
+
+### Kde
+- Hráč: tlačítko **„+ Navrhnout"** v hlavičce světa (`WorldLayout`, jen `!isPJ && role≥Hrac`) → wizard v propose-variantě (whitelist typy) → editor → pending návrh.
+- PJ: fronta **„ke zpracování"** (typ `page-review` v `getWorldPendingActions`) — na stránce Hráči / v draweru / zvonečku (15.10 multi-typ fronta). `PageReviewRow`: **Schválit** / **Vrátit** (rework) / **Zahodit** (discard, s potvrzením) + odkaz na náhled.
+
+### Kdo
+- Navrhovat: **role Hráč (2)+** + whitelist typ (`PLAYER_PROPOSABLE_PAGE_TYPES` = NPC, Lokace, Ostatní, Seznam, Galerie, Rodokmen). NE Postava hráče (řeší 15.10 „Chci hrát"), Noviny, Obrazovka, systémové.
+- Schvalovat/upravovat: moderátor (≥ PomocnyPJ / owner / elevovaný admin) — `assertCanWrite`.
+
+### Co jde dělat
+- Hráč: vytvořit návrh (`create` → pending); editovat SVŮJ pending (`assertCanEditPage`); po schválení edituje naostro.
+- PJ: `POST …/pages/:slug/approve` (→ approved + do search indexu) · `.../reject {mode: rework|discard}`.
+
+### Hranice / co neumí
+- Návrh úprav CIZÍ existující stránky NE (jen tvorba vlastních nových). Per-svět toggle „hráči smí navrhovat" NE (vždy zapnuto Hráč+). Verzování NE. Postava hráče NE (15.10). Globální „Zpracovat" tab pro page-review NE (jen world-scoped fronta).
+
+### Zvláštnosti / bezpečnost
+- **Viditelnost pending:** jen autor (`proposedBy`) + moderátor. Gate v `assertAccess` PŘED early-return na prázdné accessRequirements + vlastní filtr ve `findDirectory` (2 oddělené read cesty). Cizí → 404.
+- **Search:** pending se NEindexuje (až approve) — jinak leak přes vyhledávání.
+- **NPC spawn:** pending NPC vyloučen z `NpcCharacterPalette` (FE filtr dle directory `pageStatus`) — nejde spawnnout na taktickou mapu. Mention N/A (NPC nejsou `world_membership`).
+- **`proposedBy` ≠ `ownerUserId`** (autor návrhu vs vlastník PC) — pending NPC neprosákne do „Tvé postavy".
+- **WS:** `world:page-review-changed` (PJ fronta) + `world:page-review-resolved` (autor toast: schváleno/vráceno/zahozeno).
+- **Badge:** „⏳ Čeká na schválení PJ" na detailu stránky (`PageHeader`).
+
+### Stav
+✅ funguje (BE typecheck+lint+247 jest+smoke boot; FE tsc-b+eslint+14 vitest).
+
+### Kód
+FE `PageEditorPage` (guard Hrac), `NewPageWizardModal` (proposeMode), `WorldLayout` („+ Navrhnout"), `RequestsList` (PageReviewRow), `useWorldPageReview`, `NpcCharacterPalette` (filtr), `PageHeader` (badge). BE `pages.service` (`resolveCreateMode`/`assertCanEditPage`/`approveProposal`/`rejectProposal`/`findPendingProposals`), `assertAccess`+`findDirectory` (viditelnost), `pages.controller` (`:slug/approve|reject`), `worlds.service.getWorldPendingActions` (page-review), `worlds.gateway` (WS).
 
 ## Sjednocení Page + Character (spec 9.1 / 9.2)
 

@@ -7,8 +7,8 @@ import { api } from '@/shared/api/client';
  * (žádost o vstup); fáze C přidá `character-request` (návrh postavy).
  */
 export interface WorldPendingActionItem {
-  type: 'access-request';
-  /** ID podkladové entity (accessRequestId). */
+  type: 'access-request' | 'page-review';
+  /** ID podkladové entity (accessRequestId; u page-review slug stránky). */
   id: string;
   userId: string;
   displayName: string;
@@ -20,6 +20,10 @@ export interface WorldPendingActionItem {
    * zvolil „Chci hrát". Jinak prostá žádost o vstup.
    */
   characterName?: string;
+  /** 15.11 — u `page-review`: název, typ a slug navržené stránky. */
+  pageTitle?: string;
+  pageType?: string;
+  pageSlug?: string;
 }
 
 /** Sdílený query key — používá stránka Hráči, drawer i zvoneček. */

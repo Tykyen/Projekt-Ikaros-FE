@@ -65,7 +65,7 @@ export function WorldRequestsDrawer({
         </header>
 
         <div className={s.content}>
-          <RequestsList worldId={worldId} items={items} />
+          <RequestsList worldId={worldId} worldSlug={worldSlug} items={items} />
         </div>
 
         <footer className={s.footer}>

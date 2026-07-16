@@ -207,6 +207,15 @@ export function WorldSection() {
             prázdného textu, takže ti nikdy nepřepíše, co už máš napsané.
           </p>
         </Tool>
+        <Tool icon={<FileText size={16} />} title="Navrhnout obsah (hráč)" audience={{ kind: 'hrac', label: 'Hráč+' }}>
+          <p>
+            Jsi hráč a napadlo tě NPC, lokace nebo stránka do světa? V hlavičce
+            světa máš <strong>„+ Navrhnout"</strong> — vybereš typ (NPC, lokace,
+            stránka, galerie, rodokmen), vyplníš ho a odešleš. Návrh uvidíš{' '}
+            <strong>jen ty a PJ</strong>, dokud ho PJ neschválí. PJ ho pak může
+            přijmout (stane se živým), vrátit ti k doladění, nebo zahodit.
+          </p>
+        </Tool>
         <Tool icon={<Network size={16} />} title="Rodokmen — strom rodiny" audience={{ kind: 'pjasst', label: 'Pomocný PJ+' }} accent="corrector">
           <p>
             Stránka typu <strong>Rodokmen</strong> je vizuální strom rodiny. Každá

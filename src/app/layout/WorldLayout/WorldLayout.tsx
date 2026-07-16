@@ -262,6 +262,8 @@ export function WorldLayout() {
   }, [drawerOpen]);
   // 9.1 — wizard pro tvorbu nového obsahu (Wiki / PC / NPC).
   const [wizardOpen, setWizardOpen] = useState(false);
+  // 15.11 — wizard v režimu „hráč navrhuje" (whitelist typy → pending).
+  const [proposeMode, setProposeMode] = useState(false);
   // 13.1 — vyhledávací modal světa (otevírá pole „Hledat…" i Ctrl/Cmd+K).
   const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
@@ -276,12 +278,19 @@ export function WorldLayout() {
       return;
     }
     const base = `/svet/${worldSlug}/nova-stranka`;
+    // 15.11 — propose whitelist typy (Lokace/Galerie/Rodokmen) + PC/NPC/wiki.
     const typeParam =
       choice === 'pc'
         ? '?type=PostavaHrace'
         : choice === 'npc'
           ? '?type=NPC'
-          : '';
+          : choice === 'lokace'
+            ? '?type=Lokace'
+            : choice === 'galerie'
+              ? '?type=Galerie'
+              : choice === 'rodokmen'
+                ? '?type=Rodokmen'
+                : '';
     navigate(`${base}${typeParam}`);
   }
   const currentUser = useAtomValue(currentUserAtom);
@@ -607,10 +616,27 @@ export function WorldLayout() {
                   {isPJ && (
                     <button
                       type="button"
-                      onClick={() => setWizardOpen(true)}
+                      onClick={() => {
+                        setProposeMode(false);
+                        setWizardOpen(true);
+                      }}
                       className={s.newPageBtn}
                     >
                       + Nová stránka
+                    </button>
+                  )}
+                  {/* 15.11 — hráč (Hráč+) navrhne obsah ke schválení PJ. */}
+                  {!isPJ && navRole >= WorldRole.Hrac && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProposeMode(true);
+                        setWizardOpen(true);
+                      }}
+                      className={s.newPageBtn}
+                      title="Navrhnout NPC, lokaci nebo stránku — schválí PJ"
+                    >
+                      + Navrhnout
                     </button>
                   )}
                   <Link
@@ -795,9 +821,13 @@ export function WorldLayout() {
         {/* 9.1 — wizard pro tvorbu nového obsahu (Wiki / PC / NPC). */}
         <NewPageWizardModal
           open={wizardOpen}
-          onClose={() => setWizardOpen(false)}
+          onClose={() => {
+            setWizardOpen(false);
+            setProposeMode(false);
+          }}
           onChoose={handleWizardChoice}
           canUseBestiary={isPJ}
+          proposeMode={proposeMode}
         />
 
         {/* 13.1 — vyhledávání stránek světa (worldId filtr = izolace světů).

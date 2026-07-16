@@ -1,8 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { FileText, User, Skull, Library, X } from 'lucide-react';
+import { FileText, User, Skull, Library, MapPin, Image, Network, X } from 'lucide-react';
 import s from './NewPageWizardModal.module.css';
 
-export type NewPageChoice = 'wiki' | 'pc' | 'npc' | 'npc-bestiary';
+export type NewPageChoice =
+  | 'wiki'
+  | 'pc'
+  | 'npc'
+  | 'npc-bestiary'
+  | 'lokace'
+  | 'galerie'
+  | 'rodokmen';
 
 interface Props {
   open: boolean;
@@ -10,6 +17,11 @@ interface Props {
   onChoose: (choice: NewPageChoice) => void;
   /** 9.1 D — PJ+ má 4. volbu „NPC z bestiáře" (import šablony). */
   canUseBestiary?: boolean;
+  /**
+   * 15.11 — režim „hráč navrhuje". Ukáže jen whitelist typy (NPC, Lokace,
+   * Stránka, Galerie, Rodokmen) → vzniknou jako pending ke schválení PJ.
+   */
+  proposeMode?: boolean;
 }
 
 /**
@@ -28,6 +40,7 @@ export function NewPageWizardModal({
   onClose,
   onChoose,
   canUseBestiary = false,
+  proposeMode = false,
 }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +76,9 @@ export function NewPageWizardModal({
         tabIndex={-1}
       >
         <header className={s.header}>
-          <h2 id="new-page-wizard-title">Co chceš vytvořit?</h2>
+          <h2 id="new-page-wizard-title">
+            {proposeMode ? 'Co chceš navrhnout?' : 'Co chceš vytvořit?'}
+          </h2>
           <button
             type="button"
             className={s.closeBtn}
@@ -75,37 +90,75 @@ export function NewPageWizardModal({
         </header>
 
         <div className={s.choices}>
-          <ChoiceCard
-            icon={<FileText size={28} aria-hidden />}
-            title="Wiki stránka"
-            subtitle="Lokace, Noviny, Galerie, Zoom, Rodokmen, …"
-            onClick={() => onChoose('wiki')}
-          />
-          <ChoiceCard
-            icon={<User size={28} aria-hidden />}
-            title="Postava hráče (PC)"
-            subtitle="Hratelná postava přiřazená hráči"
-            onClick={() => onChoose('pc')}
-          />
-          <ChoiceCard
-            icon={<Skull size={28} aria-hidden />}
-            title="NPC"
-            subtitle="Nehratelná postava — spravuje PJ"
-            onClick={() => onChoose('npc')}
-          />
-          {canUseBestiary && (
-            <ChoiceCard
-              icon={<Library size={28} aria-hidden />}
-              title="Bestiář"
-              subtitle="Otevři Bestiář světa — vytvoř a spravuj bestie pro mapu"
-              onClick={() => onChoose('npc-bestiary')}
-            />
+          {proposeMode ? (
+            <>
+              <ChoiceCard
+                icon={<Skull size={28} aria-hidden />}
+                title="NPC"
+                subtitle="Nehratelná postava"
+                onClick={() => onChoose('npc')}
+              />
+              <ChoiceCard
+                icon={<MapPin size={28} aria-hidden />}
+                title="Lokace"
+                subtitle="Místo ve světě"
+                onClick={() => onChoose('lokace')}
+              />
+              <ChoiceCard
+                icon={<FileText size={28} aria-hidden />}
+                title="Stránka"
+                subtitle="Wiki text / poznámka"
+                onClick={() => onChoose('wiki')}
+              />
+              <ChoiceCard
+                icon={<Image size={28} aria-hidden />}
+                title="Galerie"
+                subtitle="Sada obrázků"
+                onClick={() => onChoose('galerie')}
+              />
+              <ChoiceCard
+                icon={<Network size={28} aria-hidden />}
+                title="Rodokmen"
+                subtitle="Strom rodiny"
+                onClick={() => onChoose('rodokmen')}
+              />
+            </>
+          ) : (
+            <>
+              <ChoiceCard
+                icon={<FileText size={28} aria-hidden />}
+                title="Wiki stránka"
+                subtitle="Lokace, Noviny, Galerie, Zoom, Rodokmen, …"
+                onClick={() => onChoose('wiki')}
+              />
+              <ChoiceCard
+                icon={<User size={28} aria-hidden />}
+                title="Postava hráče (PC)"
+                subtitle="Hratelná postava přiřazená hráči"
+                onClick={() => onChoose('pc')}
+              />
+              <ChoiceCard
+                icon={<Skull size={28} aria-hidden />}
+                title="NPC"
+                subtitle="Nehratelná postava — spravuje PJ"
+                onClick={() => onChoose('npc')}
+              />
+              {canUseBestiary && (
+                <ChoiceCard
+                  icon={<Library size={28} aria-hidden />}
+                  title="Bestiář"
+                  subtitle="Otevři Bestiář světa — vytvoř a spravuj bestie pro mapu"
+                  onClick={() => onChoose('npc-bestiary')}
+                />
+              )}
+            </>
           )}
         </div>
 
         <p className={s.hint}>
-          U postav uvidíš stejný editor + záložky Bio, Inventář, Finance,
-          Kalendář a Deník — sjednoceno s wiki stránkami (spec 9.1).
+          {proposeMode
+            ? 'Návrh se odešle PJ ke schválení. Než ho schválí, uvidíš ho jen ty a PJ.'
+            : 'U postav uvidíš stejný editor + záložky Bio, Inventář, Finance, Kalendář a Deník — sjednoceno s wiki stránkami (spec 9.1).'}
         </p>
       </div>
     </div>

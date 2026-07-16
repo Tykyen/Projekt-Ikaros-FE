@@ -17,6 +17,7 @@ import {
   writeSpawnPayload,
 } from '../../utils/spawnPayload';
 import type { MapScene, MapOperation } from '../../types';
+import type { PageDirectoryEntry } from '@/features/world/pages/api/pages.types';
 import styles from './BestiePalette.module.css';
 
 interface NpcCharacter {
@@ -50,10 +51,20 @@ export function NpcCharacterPalette({
 
   const charsQuery = useQuery({
     queryKey: ['characters', worldId, 'npc'],
-    queryFn: () =>
-      api
-        .get<NpcCharacter[]>(`/worlds/${worldId}/characters`)
-        .then((all) => all.filter((c) => c.isNpc)),
+    queryFn: async () => {
+      const [all, dir] = await Promise.all([
+        api.get<NpcCharacter[]>(`/worlds/${worldId}/characters`),
+        api.get<PageDirectoryEntry[]>(`/worlds/${worldId}/pages/directory`, {
+          type: 'NPC',
+        }),
+      ]);
+      // 15.11 — pending NPC návrh nesmí jít spawnovat, dokud ho PJ neschválí.
+      // Vyluč podle slugu (directory vrací pageStatus; pending vidí jen PJ/autor).
+      const pendingSlugs = new Set(
+        dir.filter((d) => d.pageStatus === 'pending').map((d) => d.slug),
+      );
+      return all.filter((c) => c.isNpc && !pendingSlugs.has(c.slug));
+    },
     enabled: Boolean(worldId),
   });
 

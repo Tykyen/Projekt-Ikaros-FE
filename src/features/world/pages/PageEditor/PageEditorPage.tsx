@@ -32,8 +32,12 @@ export default function PageEditorPage() {
   // Permission guard — elevation (`world.elevated`) obchází membership stejně
   // jako BE `worldAdminBypass`, jinak by nahozený admin dostal hard redirect
   // pryč z editoru, přestože BE zápis povolí.
+  // 15.11 — práh snížen na Hráč: hráč (role ≥ Hrac) smí NAVRHNOUT obsah
+  // (whitelist typ → pending) i editovat svůj pending návrh. BE je autoritativní:
+  // create odvodí pending/403 (resolveCreateMode), update ověří autora pending
+  // (assertCanEditPage). Ne-whitelist / cizí stránka → BE vrátí 403 (friendly toast).
   const isElevatedHere = world?.elevated === true;
-  if (!isElevatedHere && (userRole ?? -1) < WorldRole.PomocnyPJ) {
+  if (!isElevatedHere && (userRole ?? -1) < WorldRole.Hrac) {
     return <Navigate to={`/svet/${worldSlug}`} replace />;
   }
 

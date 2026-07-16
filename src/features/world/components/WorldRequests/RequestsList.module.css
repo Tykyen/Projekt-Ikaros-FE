@@ -77,6 +77,33 @@
   color: var(--text-muted);
 }
 
+.discard {
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--danger);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: filter var(--transition-fast), opacity var(--transition-fast);
+}
+.discard:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.discard:not(:disabled):hover {
+  text-decoration: underline;
+}
+
+.pageLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: var(--weight-semi);
+}
+.pageLink:hover {
+  text-decoration: underline;
+}
+
 .empty {
   padding: var(--sp-5) var(--sp-3);
   text-align: center;

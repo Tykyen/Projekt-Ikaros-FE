@@ -257,7 +257,11 @@ export function PageEditor({
           familyTree: state.type === 'Rodokmen' ? state.familyTree : undefined,
         });
         clearLocalDraft();
-        toast.success('Stránka vytvořena');
+        toast.success(
+          created.pageStatus === 'pending'
+            ? 'Návrh odeslán ke schválení PJ.'
+            : 'Stránka vytvořena',
+        );
         navigate(`/svet/${worldSlug}/${created.slug}`);
       }
     } catch (err: unknown) {

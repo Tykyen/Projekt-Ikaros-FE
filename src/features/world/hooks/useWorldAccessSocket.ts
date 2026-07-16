@@ -70,6 +70,29 @@ export function useWorldAccessSocket(): void {
     qc.invalidateQueries({ queryKey: ['worlds', p.worldId, 'pending-actions'] });
   });
 
+  // 15.11 — návrhy obsahu hráčů (page-review) žijí ve stejné world-scoped frontě.
+  useSocketEvent<{ worldId: string }>('world:page-review-changed', (p) => {
+    qc.invalidateQueries({
+      queryKey: ['worlds', p.worldId, 'pending-actions'],
+    });
+  });
+  useSocketEvent<{
+    worldId: string;
+    action: 'approved' | 'rework' | 'discard';
+  }>('world:page-review-resolved', (p) => {
+    qc.invalidateQueries({
+      queryKey: ['worlds', p.worldId, 'pending-actions'],
+    });
+    qc.invalidateQueries({ queryKey: ['pages'] });
+    toast.info(
+      p.action === 'approved'
+        ? 'PJ schválil tvůj návrh — je teď živý.'
+        : p.action === 'rework'
+          ? 'PJ vrátil tvůj návrh k přepracování.'
+          : 'PJ zahodil tvůj návrh.',
+    );
+  });
+
   // S-RUN-01 — access eventy jdou do user:{id} (server re-joinne sám), ale
   // vyslané během výpadku jsou pryč → po reconnectu refetch dotčených klíčů
   // (vzor S-05 z useFriendshipsSocket). Bez toho PJ neuvidí novou žádost ani

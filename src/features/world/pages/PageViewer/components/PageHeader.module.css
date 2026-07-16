@@ -57,6 +57,20 @@
   flex-shrink: 0;
 }
 
+/* 15.11 — badge pending návrhu (vidí jen autor + PJ). */
+.pendingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--frame-border);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
 .woodWide {
   display: inline-flex;
   align-items: center;

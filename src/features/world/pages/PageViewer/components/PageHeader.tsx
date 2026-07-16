@@ -79,6 +79,14 @@ export function PageHeader({ page, readTimeMinutes }: Props) {
         <h1 className={s.title}>{page.title}</h1>
 
         <div className={s.actions}>
+          {page.pageStatus === 'pending' && (
+            <span
+              className={s.pendingBadge}
+              title="Návrh čeká na schválení PJ — vidíš ho jen ty a PJ."
+            >
+              ⏳ Čeká na schválení PJ
+            </span>
+          )}
           {page.isWoodWide && (
             <span
               className={s.woodWide}

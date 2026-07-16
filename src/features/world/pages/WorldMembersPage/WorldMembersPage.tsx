@@ -154,7 +154,11 @@ export default function WorldMembersPage() {
               <h2 className={s.sectionTitle}>Čekající žádosti</h2>
               <span className={s.count}>{pendingItems.length}</span>
             </header>
-            <RequestsList worldId={worldId} items={pendingItems} />
+            <RequestsList
+              worldId={worldId}
+              worldSlug={worldSlug}
+              items={pendingItems}
+            />
           </section>
         )}
 

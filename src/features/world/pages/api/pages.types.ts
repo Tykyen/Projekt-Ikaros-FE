@@ -225,6 +225,10 @@ export interface Page {
   characterRef?: { characterId: string };
   /** AKJ chráněné záložky — BE-filtrované (viewer dostane jen dostupné). */
   akjTabs?: AkjTab[];
+  /** 15.11 — `pending` = návrh hráče čekající na schválení PJ; `approved`/chybí = živé. */
+  pageStatus?: 'pending' | 'approved';
+  /** 15.11 — autor návrhu (u pending). */
+  proposedBy?: string;
 }
 
 /** Lehká položka pro `GET /worlds/:worldId/pages/directory`. */
@@ -257,6 +261,9 @@ export interface PageDirectoryEntry {
    * má přístup. Raw accessRequirements se nevrací (privacy).
    */
   shieldedBy?: ShieldedRequirement[];
+  /** 15.11 — návrh hráče čekající na schválení (autor + PJ ho vidí v adresáři). */
+  pageStatus?: 'pending' | 'approved';
+  proposedBy?: string;
 }
 
 /** Backlink karta — `GET /worlds/:worldId/pages/:slug/backlinks` (BE 7.1l). */
