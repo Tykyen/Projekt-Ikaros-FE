@@ -179,7 +179,9 @@ export function WorldSection() {
         </Tool>
         <Tool icon={<FileText size={16} />} title="Wiki stránky — čtení" audience={{ kind: 'vse', label: 'Členové' }} accent="corrector">
           <p>
-            Encyklopedie světa — lokace, lore, novinky, galerie, rodokmen. Layout se
+            Encyklopedie světa — lokace, lore, novinky, galerie, rodokmen, a také{' '}
+            <strong>frakce, organizace a státy</strong> (obyčejné wiki stránky bez
+            deníku, na které se dá napojit Pavučina). Layout se
             mění podle typu stránky. V hlavičce drobečky, hvězdička pro přidání do tvých
             <strong> oblíbených</strong> (klávesa <code>f</code>) a (s oprávněním) Upravit;
             pravý panel má profilový obrázek, datovou tabulku
@@ -211,7 +213,8 @@ export function WorldSection() {
           <p>
             Jsi hráč a napadlo tě NPC, lokace nebo stránka do světa? V hlavičce
             světa máš <strong>„+ Navrhnout"</strong> — vybereš typ (NPC, lokace,
-            stránka, galerie, rodokmen), vyplníš ho a odešleš. Návrh uvidíš{' '}
+            stránka, galerie, rodokmen, <strong>frakce, organizace, stát</strong>),
+            vyplníš ho a odešleš. Návrh uvidíš{' '}
             <strong>jen ty a PJ</strong>, dokud ho PJ neschválí. PJ ho pak může
             přijmout (stane se živým), vrátit ti k doladění, nebo zahodit.
           </p>
@@ -726,6 +729,23 @@ export function WorldSection() {
             Síť (2D silový graf) a Linky (příběhové linie). PJ vidí Pavučinu každého
             hráče jen pro čtení.
           </p>
+          <p>
+            <strong>Tvoř přímo z grafu (záložka Síť):</strong> tlačítkem{' '}
+            <strong>„+ Subjekt"</strong> přidáš nový uzel bez odskoku jinam.{' '}
+            <strong>Kontextové menu uzlu</strong> (pravý klik na počítači; na dotyku
+            druhé ťuknutí na už zaměřený uzel) nabídne <strong>Detail subjektu</strong>,{' '}
+            <strong>Vyvolat stránku</strong>, <strong>+ Vztah odsud</strong>,{' '}
+            <strong>Upravit</strong> a <strong>Smazat</strong>.
+          </p>
+          <CalloutBox variant="tip" title="Vyvolat a založit reálnou stránku">
+            <strong>Vyvolat</strong> = jedním klikem přeskočíš na skutečnou stránku
+            (postavu, NPC, lokaci, frakci…) napojenou na subjekt. Když subjekt zatím
+            žádnou stránku nemá, v jeho detailu je{' '}
+            <strong>„Založit reálnou stránku"</strong> — vytvoří ji a rovnou napojí,
+            takže ji pak jde vyvolat. PJ ji založí živě; hráč ji odešle PJ{' '}
+            <strong>jako návrh ke schválení</strong> (svou vlastní postavu takto
+            zakládat nemůže).
+          </CalloutBox>
           <ScreenshotSlot media="svet.pavucina" />
         </Tool>
         <Tool icon={<ScrollText size={16} />} title="Storyboard (scénáře)" audience={{ kind: 'pj', label: 'Jen PJ' }} accent="pj">

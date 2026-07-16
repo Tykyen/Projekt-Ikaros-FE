@@ -15,6 +15,9 @@ export function SubjectDetail({
   onEdit,
   onDelete,
   onCopy,
+  materializeLabel,
+  materializePending,
+  onMaterialize,
 }: {
   subject: CampaignSubject;
   readOnly: boolean;
@@ -22,6 +25,10 @@ export function SubjectDetail({
   onEdit: () => void;
   onDelete: () => void;
   onCopy: () => void;
+  /** 11.5 — label akce „založit reálnou stránku"; undefined = nelze/skryté. */
+  materializeLabel?: string;
+  materializePending?: boolean;
+  onMaterialize?: () => void;
 }) {
   const { worldSlug } = useWorldContext();
   return (
@@ -56,13 +63,26 @@ export function SubjectDetail({
         </section>
       )}
 
-      {subject.linkedPageSlug && (
+      {(subject.linkedPageSlug || subject.linkedCharacterSlug) && (
         <Link
           className={s.link}
-          to={`/svet/${worldSlug}/${subject.linkedPageSlug}`}
+          to={`/svet/${worldSlug}/${
+            subject.linkedPageSlug || subject.linkedCharacterSlug
+          }`}
         >
-          → Wiki stránka
+          → Vyvolat stránku
         </Link>
+      )}
+
+      {!readOnly && materializeLabel && onMaterialize && (
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={onMaterialize}
+          loading={materializePending}
+        >
+          ✦ {materializeLabel}
+        </Button>
       )}
 
       <div className={s.detailActions}>

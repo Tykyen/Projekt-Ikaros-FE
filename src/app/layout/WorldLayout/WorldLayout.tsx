@@ -290,7 +290,13 @@ export function WorldLayout() {
               ? '?type=Galerie'
               : choice === 'rodokmen'
                 ? '?type=Rodokmen'
-                : '';
+                : choice === 'frakce'
+                  ? '?type=Frakce'
+                  : choice === 'organizace'
+                    ? '?type=Organizace'
+                    : choice === 'stat'
+                      ? '?type=Stat'
+                      : '';
     navigate(`${base}${typeParam}`);
   }
   const currentUser = useAtomValue(currentUserAtom);

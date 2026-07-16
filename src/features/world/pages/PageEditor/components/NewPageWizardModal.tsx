@@ -1,5 +1,17 @@
 import { useEffect, useRef } from 'react';
-import { FileText, User, Skull, Library, MapPin, Image, Network, X } from 'lucide-react';
+import {
+  FileText,
+  User,
+  Skull,
+  Library,
+  MapPin,
+  Image,
+  Network,
+  Flag,
+  Building2,
+  Landmark,
+  X,
+} from 'lucide-react';
 import s from './NewPageWizardModal.module.css';
 
 export type NewPageChoice =
@@ -9,7 +21,11 @@ export type NewPageChoice =
   | 'npc-bestiary'
   | 'lokace'
   | 'galerie'
-  | 'rodokmen';
+  | 'rodokmen'
+  // 11.5 — kampaňové wiki-like typy (lze založit i z Pavučiny).
+  | 'frakce'
+  | 'organizace'
+  | 'stat';
 
 interface Props {
   open: boolean;
@@ -58,6 +74,30 @@ export function NewPageWizardModal({
   }, [open]);
 
   if (!open) return null;
+
+  // 11.5 — kampaňové wiki-like typy; stejné v obou režimech (PJ i hráč-návrh).
+  const campaignCards = (
+    <>
+      <ChoiceCard
+        icon={<Flag size={28} aria-hidden />}
+        title="Frakce"
+        subtitle="Skupina, řád, gilda…"
+        onClick={() => onChoose('frakce')}
+      />
+      <ChoiceCard
+        icon={<Building2 size={28} aria-hidden />}
+        title="Organizace"
+        subtitle="Instituce, firma, spolek"
+        onClick={() => onChoose('organizace')}
+      />
+      <ChoiceCard
+        icon={<Landmark size={28} aria-hidden />}
+        title="Stát"
+        subtitle="Země, národ, říše"
+        onClick={() => onChoose('stat')}
+      />
+    </>
+  );
 
   return (
     <div
@@ -122,6 +162,7 @@ export function NewPageWizardModal({
                 subtitle="Strom rodiny"
                 onClick={() => onChoose('rodokmen')}
               />
+              {campaignCards}
             </>
           ) : (
             <>
@@ -151,6 +192,7 @@ export function NewPageWizardModal({
                   onClick={() => onChoose('npc-bestiary')}
                 />
               )}
+              {campaignCards}
             </>
           )}
         </div>

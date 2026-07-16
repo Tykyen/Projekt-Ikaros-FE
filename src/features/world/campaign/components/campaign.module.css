@@ -686,6 +686,70 @@ button.tag:hover {
   pointer-events: none;
 }
 
+/* 11.5 — kontextové menu uzlu (pravý klik / 2. tap). Fixed = nad grafem i mimo
+   overflow wrapu; JS clampne pozici k okraji jen orientačně. */
+.nodeMenu {
+  position: fixed;
+  z-index: 30;
+  min-width: 170px;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-1);
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--depth-panel);
+}
+.nodeMenuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px; /* dotykový cíl (mobil) */
+  padding: var(--sp-1) var(--sp-2);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.nodeMenuItem:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.nodeMenuItem:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.nodeMenuDanger {
+  color: var(--danger, var(--cmp-val-neg));
+}
+.nodeMenuSep {
+  height: 1px;
+  margin: var(--sp-1) 0;
+  background: var(--frame-border);
+}
+
+/* 11.5 — přepínač „vytvořit i reálnou stránku" ve formuláři subjektu. */
+.materializeToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  border: 1px dashed var(--frame-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.materializeToggle input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: var(--accent);
+}
+
 /* ── Responsivita ── */
 @media (max-width: 1024px) {
   .subjektyLayout {

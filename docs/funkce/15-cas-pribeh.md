@@ -129,14 +129,20 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 ---
 
 ### Pavučina / kampaň
-- **Co to je:** PJ nástroj „**Pavučina**" — graf **vztahů** mezi subjekty kampaně (NPC/frakce/místa), příběhové **linky** (storylines), rychlé poznámky a dashboard „Dnes" (krizové vztahy, aktivní linky, připnuté poznámky). Vrstvený (per-hráč) přehled.
+- **Co to je:** PJ nástroj „**Pavučina**" — graf **vztahů** mezi subjekty kampaně (NPC/frakce/místa), příběhové **linky** (storylines), rychlé poznámky a dashboard „Dnes" (krizové vztahy, aktivní linky, připnuté poznámky). Vrstvený (per-hráč) přehled. **11.5:** graf je i pracovní plocha — tvorba subjektů/vztahů, „materializace" subjektu na reálnou stránku a „vyvolání" (přeskok na napojenou stránku).
 - **Kde:** route `/svet/:slug/pavucina` (`CampaignPage` → `CampaignView`). Menu „Pavučina" (group „Svět"). BE `@Controller('campaign')` s `worldId` v query.
 - **Kdo:**
   - FE — route `memberOnly` (Hrac+). `isPJ = PJ+` → přepínač vrstev (LayerSwitcher = data jiných hráčů, read-only). Hráč/PomocnyPJ vidí vlastní + sdílená (`isShared`) data.
   - BE — `getWorldRole` vyžaduje **členství** (nečlen → 403 `NOT_A_MEMBER`, N-06 oprava); read/write scope dle role: **PJ** = celý svět, **PomocnyPJ** = vlastní + `isShared`, níže = jen vlastní (`resolveScope`). `canModify` = PJ vždy / PomocnyPJ na sdílených / jinak jen vlastník. `getPlayers` (vrstvy) = jen **PJ** (controller `< PJ` → 403). Changelog = **PomocnyPJ+**.
 - **Co jde dělat:**
   - **Taby:** „◉ Dnes" (dashboard — krize/aktivní linky/připnuté poznámky/recent changes), „Subjekty" (CRUD subjektů + vztahů, detail), „Linky" (storylines), „Síť" (interaktivní graf `PavucinaGraph`, filtr dle storyline, deeplink `?storyline=`).
-  - **Subjekty:** typ (NPC/…), avatar, štítky, status (active/…), vazba na stránku (`linkedPageSlug`) i postavu (`linkedCharacterSlug`), poznámky.
+  - **Graf jako pracovní plocha (11.5, tab „Síť"):**
+    - Tlačítko **„+ Subjekt"** v ovládacím pruhu grafu → otevře `SubjectForm` bez odskoku do tabu Subjekty (modal je zvednutý do `CampaignView`, sdílí ho graf i tab).
+    - **Kontextové menu uzlu** (pravý klik na desktopu; na dotyku 2. tap na už zaměřený uzel — 1. tap = fokus/ego-síť): **Detail subjektu · Vyvolat stránku · + Vztah odsud · Upravit · Smazat**. Tvorba/úprava/mazání jen když `!readOnly` (cizí vrstva = jen Detail + Vyvolat). Menu se pozicuje s clampem do viewportu.
+    - **„+ Vztah odsud"** předvyplní `RelationshipForm` daným subjektem jako A, výběr B = combobox. *(Drag-to-connect tažením není — mimo scope.)*
+  - **Vyvolání („Vyvolat stránku"):** navigace na `/svet/:slug/:pageOrCharSlug` — reálnou stránku napojenou přes `linkedPageSlug` **nebo** `linkedCharacterSlug` (11.5 fix N2 — dřív klikací odkaz jen z `linkedPageSlug`). Bez napojení je akce disabled (menu i tlačítko v `SubjectDetail`).
+  - **Materializace subjektu → reálná stránka (11.5 B1):** subjekt bez vazby a s materializovatelným typem (PC→Postava hráče, NPC, Lokace, Frakce, Organizace, Stát) má v detailu tlačítko **„Založit reálnou stránku"** (`useMaterializeSubject`) → `useCreatePage` (title=jméno, slug=slugify+kolizní `uniqueSlug` proti adresáři) → napojí `linkedPageSlug` (+ `linkedCharacterSlug` u person) zpět na subjekt (pak jde vyvolat). **Role-aware:** PJ/PomocnyPJ → stránka rovnou živá; řadový hráč → NPC/Lokace/Frakce/Org/Stát vznikají jako **návrh (pending)** ke schválení PJ (label „Navrhnout stránku ke schválení", toast „Návrh odeslán PJ"); **PC hráč založit nesmí** (tlačítko skryté; BE by vrátil 403). `OTHER` typ = nemateriaizovatelný. Gating vynucuje BE `resolveCreateMode`. Alternativní vstup (11.5 B1b): **checkbox „vytvořit ve světě i reálnou stránku a napojit ji"** přímo v `SubjectForm` při tvorbě subjektu — zobrazí se jen pro nenapojený materializovatelný typ, který viewer smí založit (role-aware `canMaterialize`).
+  - **Subjekty:** typ (NPC/…), avatar, štítky, status (active/…), vazba na stránku (`linkedPageSlug`) i postavu (`linkedCharacterSlug`), poznámky. Našeptávač `SubjectForm` napojí i **Frakci/Organizaci/Stát** (11.5 `pageTypeToSubjectType`).
   - **Vztahy:** mezi dvěma subjekty, status (vč. `crisis` → dashboard), vazba na storyline; mazání subjektu **kaskádně maže jeho vztahy** (`deleteBySubjectId`).
   - **Storylines:** level, status (`active` → dashboard), vazba na subjekty.
   - **Vrstvy (PJ):** přepnutí na hráčovu vrstvu = read-only badge „jen pro čtení".
@@ -147,9 +153,11 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - **`isShared` smí nastavit jen PomocnyPJ+** (`resolveIsShared`) — hráčovo `isShared` se vždy přepíše na false.
   - Dashboard „Dnes" je odvozený, ne konfigurovatelný (fixní: crisis vztahy ≤10, active storylines, pinned open notes, 20 recent changes).
   - Nečlen světa **nemá přístup** ani přes přímé API (oprava N-06 — dřív kdokoli přihlášený mohl zakládat data cizímu světu).
+  - **Materializace jen po jednom** subjektu (žádná dávka), jen materializovatelné typy (OTHER ne). **Vyvolání = navigační přeskok** na stránku, ne spawn NPC do chatu/na mapu. **Vztah z grafu jen přes menu** (žádný drag-to-connect tažením — `react-force-graph` to nemá nativně).
+  - Materializace hráče = posun soukromého subjektu do (pending) **světové** stránky — vědomý krok (label „Navrhnout ke schválení").
 - **Zvláštnosti:** Changelog je fire-and-forget (`logChange` `.catch()` ignoruje chybu). `getWorldRole` mapuje global Admin+ na `WorldRole.PJ`.
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/CampaignPage.tsx`, `campaign/components/CampaignView.tsx:27`, graf `PavucinaGraph.tsx`, dashboard `DnesTab.tsx`, API `campaign/api.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts:48`, service `campaign.service.ts` (`getWorldRole:63`, `resolveScope:86`, `canModify:113`, `getDashboard:1172`).
+- **Kód:** FE `src/features/world/pages/CampaignPage.tsx`, `campaign/components/CampaignView.tsx:60` (orchestrátor + sdílené modaly + `getMaterializeLabel`/`invokeSubject`), graf `PavucinaGraph.tsx:54` (context-menu `menu` stav, „+ Subjekt"), detail `SubjectDetail.tsx` („Vyvolat stránku" + materializace), materializace `campaign/useMaterializeSubject.ts` (`SUBJECT_TO_PAGE_TYPE`/`isMaterializable`), našeptávač `SubjectForm.tsx` (`pageTypeToSubjectType`), dashboard `DnesTab.tsx`, API `campaign/api.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts:48`, service `campaign.service.ts` (`getWorldRole:63`, `resolveScope:86`, `canModify:113`, `getDashboard:1172`); nové Page-typy + pending gating `backend/src/modules/pages/interfaces/page.interface.ts:18` (`PAGE_TYPES`/`PLAYER_PROPOSABLE_PAGE_TYPES`), `pages.service.resolveCreateMode`.
 
 ---
 

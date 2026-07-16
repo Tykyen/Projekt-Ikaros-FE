@@ -21,6 +21,11 @@ export const PAGE_TYPES = {
   Rodokmen: 'Rodokmen',
   Obrazovka: 'Obrazovka',
   Ostatni: 'Ostatní',
+  // 11.5 — wiki-like typy kampaňových subjektů (Pavučina). Jako `Ostatní` —
+  // čistá Page BEZ Character subdocu. Umožňují „vyvolat"/materializovat frakce.
+  Frakce: 'Frakce',
+  Organizace: 'Organizace',
+  Stat: 'Stát',
   // 9.1 — sjednocení Character → Page. PC = má `ownerUserId`, NPC = bez.
   PostavaHrace: 'Postava hráče',
   NPC: 'NPC',

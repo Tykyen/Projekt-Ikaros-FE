@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import clsx from 'clsx';
+import { Button } from '@/shared/ui';
 import { PrintButton } from '@/features/world/export/print';
 import { SUBJECT_TYPES, TYPE_LABELS } from '../labels';
 import {
@@ -57,7 +58,13 @@ export function PavucinaGraph({
   storylineFilter,
   onStorylineFilter,
   imageFor,
+  readOnly,
   onOpenSubject,
+  onInvokeSubject,
+  onNewSubject,
+  onEditSubject,
+  onDeleteSubject,
+  onNewRelationship,
 }: {
   subjects: CampaignSubject[];
   relationships: CampaignRelationship[];
@@ -65,7 +72,15 @@ export function PavucinaGraph({
   storylineFilter: string | null;
   onStorylineFilter: (id: string | null) => void;
   imageFor: (s: CampaignSubject) => string | undefined;
+  readOnly: boolean;
+  /** Přeskok do tabu Subjekty (detail uzlu). */
   onOpenSubject: (id: string) => void;
+  /** „Vyvolat" — navigace na reálnou stránku napojenou na subjekt. */
+  onInvokeSubject: (id: string) => void;
+  onNewSubject: () => void;
+  onEditSubject: (id: string) => void;
+  onDeleteSubject: (id: string) => void;
+  onNewRelationship: (fromId: string) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,6 +94,33 @@ export function PavucinaGraph({
   const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set());
   const [valFilter, setValFilter] = useState<ValenceFilter>('all');
   const [search, setSearch] = useState('');
+  // Kontextové menu uzlu (pravý klik / 2. tap na zaměřený uzel).
+  const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(
+    null,
+  );
+
+  const menuSubject = useMemo(
+    () => (menu ? subjects.find((sb) => sb.id === menu.id) ?? null : null),
+    [menu, subjects],
+  );
+  const menuCanInvoke = !!(
+    menuSubject?.linkedPageSlug || menuSubject?.linkedCharacterSlug
+  );
+
+  // Zavření menu při kliknutí kamkoli jinam / Escape / scroll.
+  useEffect(() => {
+    if (!menu) return;
+    const close = () => setMenu(null);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(null);
+    window.addEventListener('click', close);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', close, true);
+    return () => {
+      window.removeEventListener('click', close);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', close, true);
+    };
+  }, [menu]);
 
   const data = useMemo(() => {
     const g = buildGraphData(subjects, relationships);
@@ -214,6 +256,25 @@ export function PavucinaGraph({
       return next;
     });
 
+  function openMenu(id: string, event?: MouseEvent) {
+    event?.preventDefault?.();
+    // Clamp do viewportu, ať menu nevyteče u pravého/dolního okraje (mobil).
+    const MENU_W = 230;
+    const MENU_H = 300;
+    const cx = event?.clientX ?? Math.floor(size.w / 2);
+    const cy = event?.clientY ?? Math.floor(size.h / 2);
+    setMenu({
+      id,
+      x: Math.max(8, Math.min(cx, window.innerWidth - MENU_W)),
+      y: Math.max(8, Math.min(cy, window.innerHeight - MENU_H)),
+    });
+  }
+  // Provede akci menu a zavře ho.
+  const act = (fn: () => void) => {
+    fn();
+    setMenu(null);
+  };
+
   return (
     <div className={s.graphWrap} ref={wrapRef} data-print-scope>
       <div className={`${s.graphControls} print-hide`}>
@@ -300,6 +361,11 @@ export function PavucinaGraph({
             ✕ Zrušit fokus
           </button>
         )}
+        {!readOnly && (
+          <Button size="sm" onClick={onNewSubject}>
+            + Subjekt
+          </Button>
+        )}
         <PrintButton title="Vytisknout pavučinu (aktuální pohled)" />
       </div>
 
@@ -314,11 +380,19 @@ export function PavucinaGraph({
           nodeId="id"
           backgroundColor="transparent"
           cooldownTicks={120}
-          onNodeClick={(n: GraphNode) =>
-            setFocusId((prev) => (prev === n.id ? null : n.id))
+          onNodeClick={(n: GraphNode, event: MouseEvent) => {
+            // 1. tap = zaměření (ego-síť); 2. tap na zaměřený uzel = menu
+            // (dotyková náhrada pravého kliku).
+            if (focusId === n.id) openMenu(n.id, event);
+            else setFocusId(n.id);
+          }}
+          onNodeRightClick={(n: GraphNode, event: MouseEvent) =>
+            openMenu(n.id, event)
           }
-          onNodeRightClick={(n: GraphNode) => onOpenSubject(n.id)}
-          onBackgroundClick={() => setFocusId(null)}
+          onBackgroundClick={() => {
+            setFocusId(null);
+            setMenu(null);
+          }}
           nodeCanvasObject={(
             n: GraphNode,
             ctx: CanvasRenderingContext2D,
@@ -451,7 +525,68 @@ export function PavucinaGraph({
 
       {data.nodes.length === 0 && (
         <div className={s.graphEmpty}>
-          Zatím žádné subjekty — přidej je v záložce Subjekty.
+          {readOnly
+            ? 'Zatím žádné subjekty.'
+            : 'Zatím žádné subjekty — přidej první tlačítkem „+ Subjekt" nahoře.'}
+        </div>
+      )}
+
+      {menu && (
+        <div
+          className={s.nodeMenu}
+          style={{ left: menu.x, top: menu.y }}
+          role="menu"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className={s.nodeMenuItem}
+            onClick={() => act(() => onOpenSubject(menu.id))}
+          >
+            Detail subjektu
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={s.nodeMenuItem}
+            disabled={!menuCanInvoke}
+            title={
+              menuCanInvoke ? undefined : 'Subjekt nemá napojenou reálnou stránku'
+            }
+            onClick={() => act(() => onInvokeSubject(menu.id))}
+          >
+            Vyvolat stránku{!menuCanInvoke && ' (nenapojeno)'}
+          </button>
+          {!readOnly && (
+            <>
+              <div className={s.nodeMenuSep} />
+              <button
+                type="button"
+                role="menuitem"
+                className={s.nodeMenuItem}
+                onClick={() => act(() => onNewRelationship(menu.id))}
+              >
+                + Vztah odsud
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className={s.nodeMenuItem}
+                onClick={() => act(() => onEditSubject(menu.id))}
+              >
+                Upravit
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className={clsx(s.nodeMenuItem, s.nodeMenuDanger)}
+                onClick={() => act(() => onDeleteSubject(menu.id))}
+              >
+                Smazat
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

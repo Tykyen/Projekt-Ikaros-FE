@@ -9,6 +9,9 @@ import {
   FileText,
   User,
   Skull,
+  Flag,
+  Building2,
+  Landmark,
   type LucideIcon,
 } from 'lucide-react';
 import type { PageType } from '../../api/pages.types';
@@ -23,6 +26,10 @@ export const PAGE_TYPE_ICON: Record<PageType, LucideIcon> = {
   Rodokmen: Network,
   Obrazovka: Monitor,
   Ostatní: FileText,
+  // 11.5 — kampaňové wiki-like typy.
+  Frakce: Flag,
+  Organizace: Building2,
+  Stát: Landmark,
   // 9.1 — sjednocení Character → Page přidalo 2 nové typy.
   'Postava hráče': User,
   NPC: Skull,

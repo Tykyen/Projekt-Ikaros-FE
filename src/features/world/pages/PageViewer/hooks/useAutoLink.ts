@@ -22,7 +22,16 @@ import type { PageType } from '../../api/pages.types';
  * přeskakuje, každá entita se linkuje max 1× (`linkedSlugs`).
  */
 
-const ENTITY_TYPES = new Set<PageType>(['Lokace', 'Ostatní', 'Postava hráče', 'NPC']);
+const ENTITY_TYPES = new Set<PageType>([
+  'Lokace',
+  'Ostatní',
+  'Postava hráče',
+  'NPC',
+  // 11.5 — kampaňové wiki-like typy (auto-link zmínek v textu).
+  'Frakce',
+  'Organizace',
+  'Stát',
+]);
 
 /** Obecná CZ slova — jednoslovný title se sem nesmí trefit (jinak linkuje běžná slova). */
 const BLACKLIST = new Set([

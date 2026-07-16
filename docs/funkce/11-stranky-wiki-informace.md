@@ -23,6 +23,7 @@ Definováno v `PAGE_TYPES` (`backend/src/modules/pages/interfaces/page.interface
 - `Rodokmen` — 17.7 vizuální **strom rodiny** (`familyTree: {people[], unions[]}`, `FamilyTreeLayout`). Osoby = volná data (jméno/foto/datum) + volitelný odkaz na stránku (`pageSlug`, klik→navigace); svazky = partneři A(+B)+děti. Editor v `PageEditor` (drag + „Srovnat" auto-layout). Vzhled dědí z motivu světa (`--theme-*`). Sdílí jméno s legacy typem — odlišen přítomností `familyTree` (`normalizePageType(type, hasFamilyTree)`).
 - `Obrazovka` — `videos[]` (YouTube).
 - `Ostatní` — default/fallback layout.
+- `Frakce` / `Organizace` / `Stát` (11.5) — wiki-like typy pro kampaňové subjekty Pavučiny. Chovají se **jako `Ostatní`**: čistá `Page`, **generický layout** (`OstatniLayout`), **BEZ** auto-`Character` subdocu (nejsou v auto-Character whitelistu → žádný deník/finance/výbava/kalendář). Existují, aby šly Frakce/Org/Stát z Pavučiny „materializovat" a „vyvolat" (viz kap. 15). Ikony `Flag`/`Building2`/`Landmark`.
 - `Postava hráče` — má `ownerUserId` + `characterRef` → Character `kind:'persona'` (5 subdoců).
 - `NPC` — `characterRef`, bez ownera.
 
@@ -87,7 +88,7 @@ Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read
 - BE: `findBySlug` projde 3 branami: `assertCanViewWorld` (R-09b — privátní svět jen pro členy/Admin+), `assertAccess` (page-level), `filterAkjTabsForViewer` (per-záložka). 403/404 dle auth-leak-policy.
 
 ### Co jde dělat (VŠE)
-- Render přes 9 layoutů (`LAYOUTS` mapa, `PageViewer.tsx:45`): Lokace, Noviny, Seznam, Galerie, Zoom, Rodokmen, Obrazovka, Ostatní, Postava/NPC.
+- Render přes 9 layoutů (`LAYOUTS` mapa, `PageViewer.tsx:47`): Lokace, Noviny, Seznam, Galerie, Zoom, Rodokmen, Obrazovka, Ostatní, Postava/NPC. Frakce/Organizace/Stát (11.5) mapují na generický `OstatniLayout`.
 - AKJ záložková lišta — flat typy přes `WithAkjTabs`, Lokace/Postava/NPC řeší vlastní lištu (`handlesOwnAkjTabs`, řádek 126).
 - Read-time minuty (220 slov/min z `plainText`), kromě Galerie.
 - Hash deeplink (`#anchor` → scroll), AutoTOC injekce `id` na h2/h3.
@@ -170,7 +171,7 @@ Plnohodnotný editor pro tvorbu i úpravu stránek, panelová struktura.
 
 ### Kdo
 - FE: dvojitý guard — route `memberOnly(Čtenář)` + interní guard v `PageEditorPage.tsx`. **15.11:** práh snížen na **Hráč+** (`userRole < Hrac` → redirect); hráč smí navrhovat obsah (viz „Návrhy obsahu hráčů" níže). BE je autoritativní.
-- BE: `assertCanWrite` = platform Admin+ NEBO world role ≥ PomocnyPJ. **15.11 relaxace (`resolveCreateMode`):** hráč (role ≥ Hrac) navrhující **whitelist typ** (NPC/Lokace/Ostatní/Seznam/Galerie/Rodokmen) → `create` s `pageStatus:'pending'`, `proposedBy=self` (jinak 403); moderátor (≥PomocnyPJ/elevovaný) tvoří rovnou `approved`. `assertCanEditPage`: autor smí editovat SVŮJ pending. Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
+- BE: `assertCanWrite` = platform Admin+ NEBO world role ≥ PomocnyPJ. **15.11 relaxace (`resolveCreateMode`):** hráč (role ≥ Hrac) navrhující **whitelist typ** (NPC/Lokace/Ostatní/Seznam/Galerie/Rodokmen + 11.5 Frakce/Organizace/Stát) → `create` s `pageStatus:'pending'`, `proposedBy=self` (jinak 403); moderátor (≥PomocnyPJ/elevovaný) tvoří rovnou `approved`. `assertCanEditPage`: autor smí editovat SVŮJ pending. Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
 
 ### Co jde dělat (VŠE)
 Panely (`PageEditor.tsx:397`):
@@ -213,14 +214,14 @@ FE `PageEditor/PageEditor.tsx:70`, `panels/ContentPanel.tsx:30`; BE `pages.servi
 ## Návrhy obsahu hráčů (15.11)
 
 ### Co to je
-Hráč (role Hráč+) smí **navrhnout** vlastní obsah — NPC, Lokaci, wiki stránku, Galerii, Rodokmen — jako **pending** (vidí jen on + PJ). PJ ho pak schválí (→ živé), vrátí k přepracování, nebo zahodí. Řízená spoluúčast hráčů na světě.
+Hráč (role Hráč+) smí **navrhnout** vlastní obsah — NPC, Lokaci, wiki stránku, Galerii, Rodokmen, Frakci/Organizaci/Stát (11.5) — jako **pending** (vidí jen on + PJ). PJ ho pak schválí (→ živé), vrátí k přepracování, nebo zahodí. Řízená spoluúčast hráčů na světě.
 
 ### Kde
 - Hráč: tlačítko **„+ Navrhnout"** v hlavičce světa (`WorldLayout`, jen `!isPJ && role≥Hrac`) → wizard v propose-variantě (whitelist typy) → editor → pending návrh.
 - PJ: fronta **„ke zpracování"** (typ `page-review` v `getWorldPendingActions`) — na stránce Hráči / v draweru / zvonečku (15.10 multi-typ fronta). `PageReviewRow`: **Schválit** / **Vrátit** (rework) / **Zahodit** (discard, s potvrzením) + odkaz na náhled.
 
 ### Kdo
-- Navrhovat: **role Hráč (2)+** + whitelist typ (`PLAYER_PROPOSABLE_PAGE_TYPES` = NPC, Lokace, Ostatní, Seznam, Galerie, Rodokmen). NE Postava hráče (řeší 15.10 „Chci hrát"), Noviny, Obrazovka, systémové.
+- Navrhovat: **role Hráč (2)+** + whitelist typ (`PLAYER_PROPOSABLE_PAGE_TYPES` = NPC, Lokace, Ostatní, Seznam, Galerie, Rodokmen + **11.5 Frakce, Organizace, Stát**). NE Postava hráče (řeší 15.10 „Chci hrát"), Noviny, Obrazovka, systémové.
 - Schvalovat/upravovat: moderátor (≥ PomocnyPJ / owner / elevovaný admin) — `assertCanWrite`.
 
 ### Co jde dělat

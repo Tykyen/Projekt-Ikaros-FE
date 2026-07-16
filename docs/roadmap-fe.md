@@ -1913,6 +1913,17 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 - Integrace `<CurrencySelect>` do AccountPanel = **8.x** (Character finance)
 - Drag-reorder měn, currency icon picker, audit log změn kurzu, cascade integrity check (shop/finance ref) — všechno explicitně out-of-scope
 
+### - [x] 11.5 Pavučina — tvorba a materializace entit + vyvolávání ✅ (2026-07-16)
+
+**Spec:** `docs/arch/phase-11/spec-11.5-pavucina-tvorba-entit.md` ✅ · **Plán:** `docs/arch/phase-11/plan-11.5.md` ✅
+
+*Z Pavučiny (dosud čtecí mapa vztahů) se stává pracovní plocha: tvorba a napojení entit přímo z grafu + „vyvolání" napojené reálné stránky jedním klikem. Tři vrstvy A → B1 → B2. FE build ✓ + BE typecheck ✓ + 68 FE testů ✓.*
+
+- [x] **11.5 A — Graf jako pracovní plocha:** v tabu **Síť** má uzel **kontextové menu** (pravý klik na desktopu / 2. tap na už zaměřený uzel na dotyku): *Detail subjektu · Vyvolat stránku · + Vztah odsud · Upravit · Smazat*. Tlačítko **„+ Subjekt"** přímo v grafu (nový uzel bez odskoku do tabu Subjekty). **„Vyvolat"** = přeskok na reálnou stránku napojenou na subjekt (`/svet/:slug`); nově funguje i z `linkedCharacterSlug` (dřív jen `linkedPageSlug`), bez napojení disabled. Modaly tvorby/editace subjektu i vztahu **zvednuty** ze `SubjektyTab` do `CampaignView` (sdílí je graf i tab — lifting state up).
+- [x] **11.5 B1 — Materializace subjektu → reálná stránka:** subjekt bez vazby a s materializovatelným typem (PC/NPC/Lokace/Frakce/Organizace/Stát) má v detailu **„Založit reálnou stránku"** (`useMaterializeSubject`) → vytvoří `Page` a napojí ji zpět na subjekt (pak jde vyvolat). **Role-aware:** PJ/PomocnyPJ → živě; hráč → NPC/Lokace/Frakce/Org/Stát jako **návrh (pending)** ke schválení PJ; **PC hráč založit nesmí** (skryté; BE 403). OTHER = nemateriaizovatelný. **B1b:** checkbox „vytvořit i reálnou stránku" přímo v `SubjectForm` při tvorbě (role-aware, jen nenapojený materializovatelný typ).
+- [x] **11.5 B2 — Nové wiki typy Frakce / Organizace / Stát:** 3 nové `PAGE_TYPES` (BE enum + FE zrcadlo), chovají se **jako „Ostatní"** — čistá wiki stránka **bez** deníku/financí/kalendáře (nezakládá Character), generický layout, ikony `Flag`/`Building2`/`Landmark`. Jdou založit z průvodce „+ Nová stránka" (i hráčův návrh → pending, jsou v `PLAYER_PROPOSABLE`), z Pavučiny (materializací) a auto-linkují se zmínky v textu; našeptávač Pavučiny je napojí (`pageTypeToSubjectType`).
+- [x] **11.5 — docs:** `funkce` (kap. 11 + 15) + `napoveda` (Pavučina, Wiki stránky, Navrhnout obsah) + `chybovy-denik`.
+
 ---
 
 **Napojení napříč systémy:**

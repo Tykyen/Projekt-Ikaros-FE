@@ -53,6 +53,10 @@ const LAYOUTS: Record<PageType, React.ComponentType<{ page: Page }>> = {
   Rodokmen: FamilyTreeLayout,
   Obrazovka: ObrazovkaLayout,
   Ostatní: OstatniLayout,
+  // 11.5 — kampaňové wiki-like typy = generický layout (jako Ostatní)
+  Frakce: OstatniLayout,
+  Organizace: OstatniLayout,
+  Stát: OstatniLayout,
   // 9.1 — sjednocení Character → Page
   'Postava hráče': PostavaLayout,
   NPC: PostavaLayout,

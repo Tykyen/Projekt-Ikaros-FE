@@ -2172,3 +2172,24 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 - 👍 FE průzkum (4 agenti) dal přesné `soubor:řádek` cíle → implementace bez tápání; a předem chytil 2 pasti (exhaustivní GROUP_TITLES, klon vyžaduje PJ ne PomocnyPJ).
 - 👍 Reuse hotových vzorů (WorldPickerModal, ArticleReviewRenderer, KomunitniHerbarPage) → konzistentní UX, malý originální kód.
 - 👎 Zůstaly 2 drobné BE gapy (cloneAllowed v katalogu, authorId pro self-hide reportu) — vědomě odloženo jako follow-up, ne dluh blokující MVP.
+
+---
+
+### ✅ ŘEŠENÍ — 11.5 Pavučina: tvorba entit z grafu a nový wiki-like Page-typ · 2026-07-16
+
+**Co zabralo — dvě netriviální věci:**
+
+**(a) Zvednutí stavu modálů ze `SubjektyTab` do `CampaignView` (lifting state up).** Modaly tvorby/editace subjektu (`SubjectForm`) a vztahu (`RelationshipForm`) + potvrzovací dialogy mazání dřív žily uvnitř `SubjektyTab`. Nová featura vyžaduje spustit tvorbu subjektu, editaci, mazání i „+ Vztah odsud" **i z grafu** (`PavucinaGraph`, tab Síť) — jenže graf je sourozenec tabu, ne jeho potomek, takže na jeho stav nedosáhl. Řešení: modaly + jejich stav (`subjectForm`/`relForm`/`delSubject`/`delRel`) + mutace zvednuty do společného rodiče `CampaignView`; `SubjektyTab` i `PavucinaGraph` teď dostávají jen callbacky (`onAddSubject`/`onEditSubject`/`onNewRelationship`/…). Pro uživatele **beze změny chování** — jen zpřístupnění stejné tvorby z druhého místa.
+
+**(b) Nový wiki-like Page-typ (Frakce/Organizace/Stát) byl levný, ale má jednu tvrdou past.** Přidání 3 nových `PAGE_TYPES` se ukázalo skoro zdarma, protože architektura je generická: auto-`Character` se zakládá jen pro **whitelist** typů (PC/NPC/Lokace v `pages.service`), takže nové typy Character prostě nedostanou (žádný deník/finance); directory endpoint, DTO (`@IsIn(Object.values(PAGE_TYPES))`), mongoose schema i editor jsou typově generické → 0 zásahů. **Jediná past = dva EXHAUSTIVNÍ `Record<PageType, …>`**: `LAYOUTS` v `PageViewer.tsx` a `PAGE_TYPE_ICON` v `pageTypeMeta.tsx`. Oba mají runtime fallback (`?? OstatniLayout` / `?? FileText`), ale jako exhaustivní `Record` **shodí `tsc -b`**, dokud nedostanou explicitní klíče pro každý nový typ. Ošetřeno rovnou (3× `OstatniLayout`, ikony `Flag`/`Building2`/`Landmark`). Stejná třída pasti jako `GROUP_TITLES` u 22.5 — exhaustivní `Record<enum>` je „vynucený checklist“, který build ohlídá za tebe.
+
+**Proč to je správně (a ne další variace):** lift state up je standardní React vzor pro sdílení stavu mezi sourozenci — alternativa (druhá kopie modálů v grafu, nebo Context jen kvůli 4 callbackům) by tříštila zdroj pravdy. U nového typu jsem se **nepustil do úpravy whitelistu** auto-Character — právě naopak, whitelist je důvod, proč nový typ nic nerozbil.
+
+**Jak ověřeno:** FE `npm run build` (tsc -b) ✓ + 68 FE testů zeleně; BE typecheck ✓. HelpPage vitest 25/25 po doplnění nápovědy. Živé ověření (screenshoty menu na mobilu/desktopu, materializace→vyvolání) = uživatel po deployi.
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Lift state up bez druhé kopie modálů → graf i tab Subjekty sdílí jednu tvorbu, žádný drift chování.
+- 👍 Nový Page-typ využil generickou architekturu (whitelist + generické DTO/directory) → BE 1 soubor, FE ~6, žádná migrace dat.
+- 👍 Past exhaustivních `Record<PageType>` byla zmapovaná už ve specu (riziko-tabulka) → chycená v designu, ne až červeným buildem.
+
+---

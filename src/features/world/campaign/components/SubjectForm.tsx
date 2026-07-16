@@ -21,6 +21,12 @@ function pageTypeToSubjectType(pageType: string): CampaignSubjectType | null {
       return 'NPC';
     case 'Lokace':
       return 'LOCATION';
+    case 'Frakce':
+      return 'FACTION';
+    case 'Organizace':
+      return 'ORG';
+    case 'Stát':
+      return 'STATE';
     default:
       return null;
   }
@@ -40,6 +46,7 @@ export function SubjectForm({
   worldId,
   initial,
   isPending,
+  canMaterialize,
   onClose,
   onSubmit,
 }: {
@@ -47,8 +54,10 @@ export function SubjectForm({
   worldId: string;
   initial?: Partial<CampaignSubject>;
   isPending?: boolean;
+  /** 11.5 — smí viewer pro daný typ založit i reálnou stránku? (role-aware). */
+  canMaterialize?: (type: CampaignSubjectType) => boolean;
   onClose: () => void;
-  onSubmit: (input: CreateSubjectInput) => void;
+  onSubmit: (input: CreateSubjectInput, alsoMaterialize?: boolean) => void;
 }) {
   // Stav se inicializuje z `initial` při mountu; rodič komponentu remountuje
   // přes `key` při každém otevření (React-doporučená alternativa k reset-efektu).
@@ -68,6 +77,8 @@ export function SubjectForm({
   const [avatarUrl, setAvatarUrl] = useState(initial?.avatarUrl ?? '');
   const [error, setError] = useState('');
   const [showSuggest, setShowSuggest] = useState(false);
+  // 11.5 — při tvorbě založit rovnou i reálnou stránku a napojit ji.
+  const [alsoMaterialize, setAlsoMaterialize] = useState(false);
 
   // Dva zdroje: persona adresář (PC/NPC — to co je v Postavách) + adresář
   // stránek (lokace a ostatní). Sloučeno dedupem dle slugu (persona má přednost).
@@ -116,24 +127,32 @@ export function SubjectForm({
     }
   }
 
+  // Nabídnout „vytvořit i stránku" jen při tvorbě nenapojeného subjektu typu,
+  // který má reálný Page-typ a viewer ho smí založit (role-aware zvenčí).
+  const showMaterialize =
+    !initial?.id && !linkedPageSlug.trim() && !!canMaterialize?.(type);
+
   function submit() {
     if (!name.trim()) {
       setError('Jméno je povinné');
       return;
     }
-    onSubmit({
-      name: name.trim(),
-      type,
-      status,
-      tags: tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
-      linkedPageSlug: linkedPageSlug.trim() || undefined,
-      linkedCharacterSlug: linkedCharacterSlug.trim() || undefined,
-      avatarUrl: avatarUrl.trim() || undefined,
-      notes: notes.trim() || undefined,
-    });
+    onSubmit(
+      {
+        name: name.trim(),
+        type,
+        status,
+        tags: tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
+        linkedPageSlug: linkedPageSlug.trim() || undefined,
+        linkedCharacterSlug: linkedCharacterSlug.trim() || undefined,
+        avatarUrl: avatarUrl.trim() || undefined,
+        notes: notes.trim() || undefined,
+      },
+      showMaterialize && alsoMaterialize,
+    );
   }
 
   return (
@@ -250,6 +269,17 @@ export function SubjectForm({
             placeholder="Interní poznámka…"
           />
         </label>
+
+        {showMaterialize && (
+          <label className={s.materializeToggle}>
+            <input
+              type="checkbox"
+              checked={alsoMaterialize}
+              onChange={(e) => setAlsoMaterialize(e.target.checked)}
+            />
+            <span>Vytvořit ve světě i reálnou stránku a napojit ji</span>
+          </label>
+        )}
       </div>
     </Modal>
   );
