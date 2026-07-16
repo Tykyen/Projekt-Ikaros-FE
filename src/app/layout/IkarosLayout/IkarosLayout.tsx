@@ -60,6 +60,7 @@ import { usePresenceInit } from '@/shared/presence/usePresence';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
+import { useWorldInviteSocket } from '@/features/world/hooks/useWorldInviteSocket';
 import { useAdminChatLive } from '@/features/admin/chat/api/useAdminChatLive';
 import { useAdminChatUnreadTotal } from '@/features/admin/chat/api/useAdminChat';
 import {
@@ -855,6 +856,7 @@ export function IkarosLayout() {
   usePresenceInit();
   useFriendshipsSocket();
   useWorldAccessSocket();
+  useWorldInviteSocket();
   // 4.2d §4 — chat heartbeat běží globálně: presence drží i mimo `ChatRoom`.
   // FIX-3 — gate na member NEBO host (anon), ne jen člen.
   usePresenceHeartbeat(isPresent);

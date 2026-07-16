@@ -1327,6 +1327,8 @@ export enum PendingActionType {
   UsernameRequest = 'username_request',
   FriendRequest = 'friend_request',
   WorldAccessRequest = 'world_access_request',
+  /** 15.10 fáze B — cílená pozvánka do světa čekající na přijetí pozvaným. */
+  WorldInvite = 'world_invite',
   ArticlePendingReview = 'article_pending_review',
   GalleryPendingReview = 'gallery_pending_review',
   DiscussionPendingReview = 'discussion_pending_review',
@@ -1468,6 +1470,31 @@ export interface WorldAccessRequestListItem {
     username: string;
     avatarUrl?: string;
   };
+  /** 15.10 fáze C — jméno navržené postavy („chce hrát jako …"); jinak žádost o vstup. */
+  characterName?: string;
+}
+
+/** 15.10 fáze B — pozvánka POZVANÉMU ve Zpracovat tabu (`world_invite`). */
+export interface WorldInvitePendingItem {
+  inviteId: string;
+  worldId: string;
+  worldName: string;
+  worldSlug: string;
+  invitedBy?: { id: string; username: string; avatarUrl?: string };
+  createdAt: string;
+}
+
+/** 15.10 fáze B — aktivní pozvánka v PJ přehledu světa. `token` jen u odkazu. */
+export interface WorldInviteListItem {
+  id: string;
+  kind: 'user' | 'link';
+  status: 'pending' | 'accepted' | 'declined' | 'revoked' | 'expired';
+  token?: string;
+  invitedUser?: { id: string; username: string; avatarUrl?: string };
+  expiresAt?: string;
+  maxUses?: number;
+  usedCount: number;
+  createdAt?: string;
 }
 
 // ── Spec 1.8 — Přátelé ─────────────────────────────────────────────────────

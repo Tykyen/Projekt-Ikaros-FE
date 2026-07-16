@@ -47,6 +47,8 @@ export function useWorldAccessSocket(): void {
 
   useSocketEvent<AccessRequestedPayload>('world:access-requested', (p) => {
     qc.invalidateQueries({ queryKey: ['pending-actions'] });
+    // 15.10 — world-scoped fronta (stránka Hráči, drawer, badge) live.
+    qc.invalidateQueries({ queryKey: ['worlds', p.worldId, 'pending-actions'] });
     toast.info(`Nová žádost o vstup do světa „${p.worldName}".`);
   });
 
@@ -63,8 +65,9 @@ export function useWorldAccessSocket(): void {
     toast.info(`Tvá žádost o vstup do „${p.worldName}" byla odmítnuta.`);
   });
 
-  useSocketEvent<AccessCancelledPayload>('world:access-cancelled', () => {
+  useSocketEvent<AccessCancelledPayload>('world:access-cancelled', (p) => {
     qc.invalidateQueries({ queryKey: ['pending-actions'] });
+    qc.invalidateQueries({ queryKey: ['worlds', p.worldId, 'pending-actions'] });
   });
 
   // S-RUN-01 — access eventy jdou do user:{id} (server re-joinne sám), ale

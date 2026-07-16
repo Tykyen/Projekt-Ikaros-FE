@@ -8,6 +8,15 @@
 
 ## Otevřené
 
+### D-065 — `request-character` slepá kostra (endpoint bez FE + mrtvý event), redundantní po 15.10 var. A
+**Soubor:** BE `backend/src/modules/worlds/worlds.service.ts:1169` (`requestCharacter`), controller `:150` (`POST /worlds/:id/request-character`); emit `world.character.requested` bez listenera.
+**Problém:** Endpoint `request-character` sníží roli Čtenář→Žadatel a emituje event `world.character.requested`, který **nikdo neposlouchá** (žádný pending-action provider) a **žádný FE ho nevolá** (chybí tlačítko). 15.10 fáze C (varianta A) zavedla primární cestu ke hraní přes „Chci hrát" (access-request s `characterDraft` → přímo Hráč + živá Page), takže `request-character` je teď redundantní mrtvý kód. Komentář u metody slibuje „vzniká PJ pending action" — nepravda.
+**Dopad:** Nízký — mrtvý endpoint + mrtvý event; matoucí (vypadá jako funkční flow). Žádný funkční dopad na uživatele.
+**Řešení:** Buď (a) odstranit `requestCharacter` endpoint + `world.character.requested` event + role-demote logiku (Čtenář zůstává Čtenářem; „chci hrát" řeší 15.10), nebo (b) pokud má zůstat cesta pro už-členy „vytvořit postavu bez nové žádosti o vstup", dokončit ji (FE tlačítko + pending-action provider). Doporučeno (a) — 15.10 var. A use-case pokrývá.
+**Kdy:** Při příští práci na členství/postavách ve světě, nebo úklidu mrtvého kódu.
+
+---
+
 ### D-064 — World.themeId schema default ('modre-nebe') ≠ FE DEFAULT_WORLD_THEME ('ikaros')
 **Soubor:** BE `backend/src/modules/worlds/schemas/world.schema.ts:52` (`@Prop({ default: 'modre-nebe' })`) vs. FE `src/themes/registry.ts:40` (`DEFAULT_WORLD_THEME = 'ikaros'`)
 **Problém:** Svět vytvořený bez explicitního `themeId` dostane od Mongoose default `'modre-nebe'` — což je **platformový** motiv (scope `platform`), ne světový. FE ale očekává jako výchozí vzhled světa `'ikaros'`. Dva zdroje pravdy pro „výchozí motiv světa" se rozcházejí. (Pokud `CreateWorld` vždy nastaví `themeId` dle žánru, schema default se v praxi neuplatní — je pak jen mrtvá/matoucí hodnota; nutno ověřit tok vytvoření světa.)

@@ -35,6 +35,7 @@ import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 import { AdminElevationToggle } from '@/features/world/components/AdminElevationToggle';
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 import { ShowcaseBar } from '@/features/world/components/ShowcaseBar/ShowcaseBar';
+import { WorldRequestsBell } from '@/features/world/components/WorldRequests';
 import { resolvePersona } from './resolvePersona';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { WorldVoiceHost } from '@/features/voice/components/WorldVoiceHost';
@@ -596,6 +597,13 @@ export function WorldLayout() {
                   >
                     <Search size={16} aria-hidden="true" />
                   </button>
+                  {/* 15.10 — zvoneček „ke zpracování" (žádosti o vstup); jen PJ/co-PJ. */}
+                  {isPJ && (
+                    <WorldRequestsBell
+                      worldId={realWorldId}
+                      worldSlug={worldSlug}
+                    />
+                  )}
                   {isPJ && (
                     <button
                       type="button"

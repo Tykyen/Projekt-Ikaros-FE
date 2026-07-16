@@ -14,6 +14,7 @@ const GROUP_TITLES: Record<PendingActionType, string> = {
   [PendingActionType.UsernameRequest]: 'Žádosti o změnu přezdívky',
   [PendingActionType.FriendRequest]: 'Žádosti o přátelství',
   [PendingActionType.WorldAccessRequest]: 'Žádosti o vstup do světa',
+  [PendingActionType.WorldInvite]: 'Pozvánky do světa',
   [PendingActionType.ArticlePendingReview]: 'Články ke schválení',
   [PendingActionType.GalleryPendingReview]: 'Obrázky ke schválení',
   [PendingActionType.DiscussionPendingReview]: 'Diskuze ke schválení',

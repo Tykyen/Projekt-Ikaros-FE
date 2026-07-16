@@ -117,6 +117,14 @@ export function WorldSection() {
             <strong>X</strong>. Sdílí se jen adresa světa; u veřejného světa se host
             rovnou podívá, u soukromého požádá o vstup.
           </p>
+          <p>
+            <strong>Když žádáš o vstup</strong> (veřejný se schválením nebo
+            soukromý), máš na výběr: <strong>„Chci hrát"</strong> — rovnou napíšeš
+            jméno postavy a pár slov o ní; PJ jedním schválením pustí dovnitř a
+            schválí i postavu, takže začínáš rovnou jako hráč. Nebo{' '}
+            <strong>„Jen číst"</strong> — přidáš se jako čtenář a postavu vyřešíš
+            později.
+          </p>
         </Tool>
         <Tool icon={<Eye size={16} />} title="Veřejné nahlížení (výkladní skříň)" audience={{ kind: 'pj', label: 'Zapíná PJ' }}>
           <p>
@@ -241,12 +249,24 @@ export function WorldSection() {
             světa, ne později v Nastavení.
           </CalloutBox>
         </Tool>
-        <Tool icon={<Users size={16} />} title="Hráči světa" audience={{ kind: 'vse', label: 'Členové' }}>
+        <Tool icon={<Users size={16} />} title="Hráči světa" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }}>
           <p>
             Adresář hráčů: nahoře vedení (PJ, Pomocní PJ), pak skupiny a jejich
-            členové. Zobrazují se jen ti s přiřazenou postavou nebo vedení. Karta s
-            avatarem vede na osobní kartu; pokud hráč hraje za postavu, je tu i řádek
-            „Hraje za &lt;postava&gt;" s odkazem na ni.
+            členové, dole <strong>Nováčci</strong> (kdo se přidal, ale ještě nemá
+            postavu). U každého svítí <strong>tečka online / offline</strong>.
+            Karta vede na osobní kartu; kdo hraje za postavu, má i řádek „Hraje za
+            &lt;postava&gt;" s odkazem na ni.
+          </p>
+          <p>
+            <strong>PJ tu spravuje jeskyni:</strong> nahoře vidí{' '}
+            <strong>čekající žádosti</strong> o vstup a rovnou je přijme nebo
+            odmítne (u přihlášky s postavou schválení rovnou založí hráčovu
+            stránku postavy). Tlačítkem <strong>Přidat hráče</strong> může někoho
+            pozvat — buď vybere konkrétního uživatele (přijde mu pozvánka ke
+            zpracování), nebo vytvoří <strong>pozvací odkaz</strong> a pošle ho
+            kamkoli; kdo klikne a přihlásí se, přidá se do světa. Na čekající
+            žádosti PJ dosáhne i přes <strong>zvoneček</strong> v horní liště
+            světa, takže je nemusí hledat.
           </p>
         </Tool>
         <Tool icon={<Users size={16} />} title="Skupiny" audience={{ kind: 'vse', label: 'Členové' }}>

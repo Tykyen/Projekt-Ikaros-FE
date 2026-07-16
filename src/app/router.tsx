@@ -64,6 +64,7 @@ const GalleryDetailPage = lazy(() => import('@/features/ikaros/pages/GalleryDeta
 const DiscussionsPage  = lazy(() => import('@/features/ikaros/pages/DiscussionsPage'));
 const DiscussionDetailPage = lazy(() => import('@/features/ikaros/pages/DiscussionDetailPage'));
 const MailPage             = lazy(() => import('@/features/ikaros/pages/MailPage'));
+const InvitePage           = lazy(() => import('@/features/world/pages/InvitePage/InvitePage'));
 const HelpPage             = lazy(() => import('@/features/ikaros/pages/HelpPage/HelpPage'));
 // 15B.4a — veřejné landing stránky RPG systémů (hub + detail)
 const SystemsHubPage       = lazy(() => import('@/features/ikaros/pages/SystemLanding/SystemsHubPage'));
@@ -338,6 +339,10 @@ export const router = createBrowserRouter([
       // Spec 1.4 — `/ikaros/uzivatele` dostupné každému přihlášenému
       // (page sama řeší tab visibility per role; admin-only taby jsou skryté).
       { path: 'ikaros/uzivatele',       element: p(UsersPage),        loader: requireAuth },
+
+      // 15.10 fáze B — přijetí pozvacího odkazu do světa (login-required;
+      // requireAuth uloží intent → po loginu se vrátí a accept doběhne).
+      { path: 'invite/:token',          element: p(InvitePage),       loader: requireAuth },
 
       // 3.1b — `/ikaros/novinky` veřejná stránka (anon povolen, bez loaderu).
       { path: 'ikaros/novinky', element: p(NovinkyPage) },

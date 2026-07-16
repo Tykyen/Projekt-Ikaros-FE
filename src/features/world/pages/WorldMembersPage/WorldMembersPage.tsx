@@ -1,12 +1,15 @@
-import { useMemo, type ReactNode } from 'react';
-import { Crown, Shield, Users } from 'lucide-react';
-import { Spinner } from '@/shared/ui';
+import { useMemo, useState, type ReactNode } from 'react';
+import { Crown, Shield, Users, UserPlus, Inbox } from 'lucide-react';
+import { Spinner, Button } from '@/shared/ui';
 import { WorldRole, type WorldMembership } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
+import { useWorldPendingActions } from '@/features/world/api/useWorldPendingActions';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import { isWorldPlayer } from '@/features/world/lib/isWorldPlayer';
+import { RequestsList } from '@/features/world/components/WorldRequests';
+import { InvitePanel } from '@/features/world/components/InvitePanel';
 import { MemberCard } from './MemberCard';
 import s from './WorldMembersPage.module.css';
 
@@ -76,10 +79,13 @@ function Section({
  * správa rolí/skupin je v nastavení světa.
  */
 export default function WorldMembersPage() {
-  const { worldId, worldSlug, loading } = useWorldContext();
+  const { worldId, worldSlug, isPJ, loading } = useWorldContext();
   const membersQuery = useWorldMembers(worldId);
   const settingsQuery = useWorldSettings(worldId);
   const directoryQuery = useCharacterDirectory(worldId);
+  // 15.10 — fronta „ke zpracování" (žádosti o vstup) jen pro PJ/co-PJ.
+  const pending = useWorldPendingActions(worldId, isPJ);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   // characterPath (slug) → jméno + avatar postavy (pro „Hraje za" na kartě).
   const charBySlug = useMemo<CharBySlug>(() => {
@@ -117,55 +123,95 @@ export default function WorldMembersPage() {
     (m) => !m.group || !customGroups.includes(m.group),
   );
 
-  const isEmpty = members.length === 0;
+  // 15.10 R10 — členové bez postavy a bez staff role (Čtenáři/Žadatelé, které
+  // dnešní isWorldPlayer skryje). PJ i hráči tak vidí každého, kdo je v jeskyni.
+  const newcomers = all.filter((m) => !isWorldPlayer(m));
+  const pendingItems = pending.data ?? [];
+  const isEmpty = members.length === 0 && newcomers.length === 0;
 
   return (
     <article className={s.page}>
       <header className={s.pageHead}>
         <h1 className={s.title}>Hráči světa</h1>
+        {isPJ && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setInviteOpen(true)}
+          >
+            <UserPlus size={16} aria-hidden="true" /> Přidat hráče
+          </Button>
+        )}
       </header>
 
-      {isEmpty ? (
-        <p className={s.empty}>Svět zatím nemá žádné hráče.</p>
-      ) : (
-        <div className={s.sections}>
-          <Section
-            icon={<Crown size={18} />}
-            title="Pán jeskyně"
-            members={pj}
-            delayMs={0}
-            worldSlug={worldSlug}
-            charBySlug={charBySlug}
-          />
-          <Section
-            icon={<Shield size={18} />}
-            title="Pomocní PJ"
-            members={pomocni}
-            delayMs={80}
-            worldSlug={worldSlug}
-            charBySlug={charBySlug}
-          />
-          {groupSections.map((g, i) => (
+      <div className={s.sections}>
+        {isPJ && pendingItems.length > 0 && (
+          <section className={s.section}>
+            <header className={s.sectionHead}>
+              <span className={s.sectionIcon} aria-hidden>
+                <Inbox size={18} />
+              </span>
+              <h2 className={s.sectionTitle}>Čekající žádosti</h2>
+              <span className={s.count}>{pendingItems.length}</span>
+            </header>
+            <RequestsList worldId={worldId} items={pendingItems} />
+          </section>
+        )}
+
+        {isEmpty ? (
+          <p className={s.empty}>Svět zatím nemá žádné hráče.</p>
+        ) : (
+          <>
             <Section
-              key={g.name}
-              icon={<Users size={18} />}
-              title={g.name}
-              color={g.color}
-              members={g.members}
-              delayMs={160 + i * 80}
+              icon={<Crown size={18} />}
+              title="Pán jeskyně"
+              members={pj}
+              delayMs={0}
               worldSlug={worldSlug}
               charBySlug={charBySlug}
             />
-          ))}
-          <Section
-            icon={<Users size={18} />}
-            title="Bez skupiny"
-            members={ungrouped}
-            delayMs={160 + groupSections.length * 80}
-            worldSlug={worldSlug}
-            charBySlug={charBySlug}
-          />
-        </div>
+            <Section
+              icon={<Shield size={18} />}
+              title="Pomocní PJ"
+              members={pomocni}
+              delayMs={80}
+              worldSlug={worldSlug}
+              charBySlug={charBySlug}
+            />
+            {groupSections.map((g, i) => (
+              <Section
+                key={g.name}
+                icon={<Users size={18} />}
+                title={g.name}
+                color={g.color}
+                members={g.members}
+                delayMs={160 + i * 80}
+                worldSlug={worldSlug}
+                charBySlug={charBySlug}
+              />
+            ))}
+            <Section
+              icon={<Users size={18} />}
+              title="Bez skupiny"
+              members={ungrouped}
+              delayMs={160 + groupSections.length * 80}
+              worldSlug={worldSlug}
+              charBySlug={charBySlug}
+            />
+            <Section
+              icon={<UserPlus size={18} />}
+              title="Nováčci"
+              members={newcomers}
+              delayMs={240 + groupSections.length * 80}
+              worldSlug={worldSlug}
+              charBySlug={charBySlug}
+            />
+          </>
+        )}
+      </div>
+
+      {inviteOpen && (
+        <InvitePanel worldId={worldId} onClose={() => setInviteOpen(false)} />
       )}
     </article>
   );

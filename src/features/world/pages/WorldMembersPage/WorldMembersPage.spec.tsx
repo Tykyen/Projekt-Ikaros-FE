@@ -20,11 +20,15 @@ vi.mock('@/features/world/context/WorldContext', () => ({
   useWorldContext: () => ({
     worldId: 'w1',
     worldSlug: 'svet-vil',
+    isPJ: false,
     loading: false,
   }),
 }));
 vi.mock('@/features/world/api/useWorldMembers', () => ({
   useWorldMembers: () => ({ data: membersData.items, isLoading: false }),
+}));
+vi.mock('@/features/world/api/useWorldPendingActions', () => ({
+  useWorldPendingActions: () => ({ data: [] }),
 }));
 vi.mock('@/features/world/api/useWorldSettings', () => ({
   useWorldSettings: () => ({
@@ -138,7 +142,9 @@ describe('WorldMembersPage', () => {
     expect(screen.getByText('Tulák')).toBeInTheDocument();
   });
 
-  it('Zadatel (pending) se nezobrazí', () => {
+  // 15.10 R10 — Zadatel/Čtenář/Hráč bez postavy jsou nově v sekci „Nováčci"
+  // (dřív skrytí), ať PJ i hráči vidí každého, kdo je v jeskyni.
+  it('Zadatel (pending) je v sekci Nováčci', () => {
     membersData.items = [
       makeMember({
         role: WorldRole.Zadatel,
@@ -147,26 +153,27 @@ describe('WorldMembersPage', () => {
     ];
     settingsData.customGroups = [];
     renderR(<WorldMembersPage />);
-    expect(screen.queryByText('Čekatel')).not.toBeInTheDocument();
-    expect(screen.getByText('Svět zatím nemá žádné hráče.')).toBeInTheDocument();
+    expect(screen.getByText('Nováčci')).toBeInTheDocument();
+    expect(screen.getByText('Čekatel')).toBeInTheDocument();
   });
 
-  it('hráč/čtenář BEZ postavy se nezobrazí', () => {
+  it('hráč/čtenář BEZ postavy je v sekci Nováčci', () => {
     membersData.items = [
       makeMember({
         role: WorldRole.Hrac,
         user: { id: 'f', username: 'BezPostavy' },
       }),
       makeMember({
+        // username schválně != role label „Čtenář", ať getByText necílí chip.
         role: WorldRole.Ctenar,
-        user: { id: 'g', username: 'Čtenář' },
+        user: { id: 'g', username: 'NovyClen' },
       }),
     ];
     settingsData.customGroups = [];
     renderR(<WorldMembersPage />);
-    expect(screen.queryByText('BezPostavy')).not.toBeInTheDocument();
-    expect(screen.queryByText('Čtenář')).not.toBeInTheDocument();
-    expect(screen.getByText('Svět zatím nemá žádné hráče.')).toBeInTheDocument();
+    expect(screen.getByText('Nováčci')).toBeInTheDocument();
+    expect(screen.getByText('BezPostavy')).toBeInTheDocument();
+    expect(screen.getByText('NovyClen')).toBeInTheDocument();
   });
 
   it('Korektor se zobrazí i bez postavy (staff)', () => {

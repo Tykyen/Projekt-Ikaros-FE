@@ -2,12 +2,12 @@ import { Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button, UserAvatar } from '@/shared/ui';
-import type { WorldAccessRequestListItem } from '@/shared/types';
+import type { WorldInvitePendingItem } from '@/shared/types';
 import {
-  useApproveAccessRequest,
-  useRejectAccessRequest,
-} from '@/features/world/api/useWorldJoin';
-import s from './WorldAccessRequestRenderer.module.css';
+  useAcceptInvite,
+  useDeclineInvite,
+} from '@/features/world/api/useWorldInvites';
+import s from './WorldInviteRenderer.module.css';
 
 function formatRelative(iso: string): string {
   try {
@@ -26,38 +26,34 @@ function formatRelative(iso: string): string {
 }
 
 interface PartProps {
-  item: WorldAccessRequestListItem;
+  item: WorldInvitePendingItem;
 }
 
-export function WorldAccessRequestLeft({ item }: PartProps) {
+export function WorldInviteLeft({ item }: PartProps) {
   return (
     <UserAvatar
-      src={item.requester.avatarUrl}
+      src={item.invitedBy?.avatarUrl}
       size="md"
-      alt={item.requester.username}
+      alt={item.invitedBy?.username ?? 'PJ'}
     />
   );
 }
 
-export function WorldAccessRequestMid({ item }: PartProps) {
+export function WorldInviteMid({ item }: PartProps) {
   return (
     <>
       <div className={s.metaRow}>
-        <span className={s.typeLabel}>
-          {item.characterName ? 'Přihláška s postavou' : 'Žádost o vstup do světa'}
-        </span>
-        <span className={s.timestamp}>{formatRelative(item.requestedAt)}</span>
+        <span className={s.typeLabel}>Pozvánka do světa</span>
+        <span className={s.timestamp}>{formatRelative(item.createdAt)}</span>
       </div>
       <p className={s.title}>
-        <strong>{item.requester.username}</strong>{' '}
-        {item.characterName ? (
-          <>
-            chce hrát jako <strong>{item.characterName}</strong> ve světě{' '}
-          </>
+        {item.invitedBy ? (
+          <strong>{item.invitedBy.username}</strong>
         ) : (
-          <>žádá o vstup do světa </>
-        )}
-        <Link to={`/svet/${item.worldId}`} className={s.worldLink}>
+          <strong>Vypravěč</strong>
+        )}{' '}
+        tě zve do světa{' '}
+        <Link to={`/svet/${item.worldSlug}`} className={s.worldLink}>
           {item.worldName}
         </Link>
       </p>
@@ -66,19 +62,19 @@ export function WorldAccessRequestMid({ item }: PartProps) {
 }
 
 interface ActionsProps {
-  item: WorldAccessRequestListItem;
+  item: WorldInvitePendingItem;
   onResolve: () => void;
   isLoading: boolean;
 }
 
-export function WorldAccessRequestActions({
+export function WorldInviteActions({
   item,
   onResolve,
   isLoading,
 }: ActionsProps) {
-  const approve = useApproveAccessRequest();
-  const reject = useRejectAccessRequest();
-  const busy = isLoading || approve.isPending || reject.isPending;
+  const accept = useAcceptInvite();
+  const decline = useDeclineInvite();
+  const busy = isLoading || accept.isPending || decline.isPending;
 
   return (
     <>
@@ -88,11 +84,11 @@ export function WorldAccessRequestActions({
         disabled={busy}
         onClick={async () => {
           try {
-            await reject.mutateAsync({
+            await decline.mutateAsync({
               worldId: item.worldId,
-              requestId: item.accessRequestId,
+              inviteId: item.inviteId,
             });
-            toast.info('Žádost odmítnuta.');
+            toast.info('Pozvánka odmítnuta.');
           } catch {
             toast.error('Odmítnutí se nezdařilo.');
           }
@@ -106,13 +102,11 @@ export function WorldAccessRequestActions({
         disabled={busy}
         onClick={async () => {
           try {
-            await approve.mutateAsync({
+            await accept.mutateAsync({
               worldId: item.worldId,
-              requestId: item.accessRequestId,
+              inviteId: item.inviteId,
             });
-            toast.success(
-              `${item.requester.username} byl přijat do světa ${item.worldName}.`,
-            );
+            toast.success(`Přidal ses do světa ${item.worldName}.`);
           } catch {
             toast.error('Přijetí se nezdařilo.');
           }

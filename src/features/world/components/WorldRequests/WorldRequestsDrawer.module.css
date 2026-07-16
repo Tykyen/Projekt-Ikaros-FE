@@ -1,0 +1,88 @@
+/* 15.10 — vysunovací panel „ke zpracování" (side drawer zprava). */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* nad hlavičkou světa i fullscreen mapou */
+  background: var(--bg-overlay);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: min(420px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  border-left: 1px solid var(--frame-border);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--frame-border);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--text-strong);
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.closeBtn:hover {
+  background: var(--surface-3);
+  color: var(--text-strong);
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-4);
+}
+
+.footer {
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--frame-border);
+}
+
+.manageLink {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--accent);
+  text-decoration: none;
+}
+.manageLink:hover {
+  text-decoration: underline;
+}

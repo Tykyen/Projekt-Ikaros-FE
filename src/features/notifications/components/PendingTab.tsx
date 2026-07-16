@@ -14,6 +14,7 @@ const LABELS: Partial<Record<PendingActionType, string>> = {
   [PendingActionType.ModerationAppeal]: 'Odvolání proti rozhodnutí',
   [PendingActionType.DiscussionJoinRequest]: 'Žádosti do diskuze',
   [PendingActionType.WorldAccessRequest]: 'Žádosti o vstup do světa',
+  [PendingActionType.WorldInvite]: 'Pozvánky do světa',
   [PendingActionType.FriendRequest]: 'Žádosti o přátelství',
   [PendingActionType.UsernameRequest]: 'Žádosti o přezdívku',
 };

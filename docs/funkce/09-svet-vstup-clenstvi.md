@@ -40,12 +40,12 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 - **Co to je** CTA blok pro non-membery; varianty dle `accessMode`.
 - **Co jde dělat**
   - `public` → „Vstoupit do světa" → `useJoinWorld` → `POST /worlds/:id/join` → membership `Ctenar`.
-  - `open` / `private` → „Požádat o vstup" → `useRequestAccess` → `POST /worlds/:id/access-request` (pending AR).
+  - `open` / `private` → **dvě volby (15.10 fáze C, var. A):** **„Chci hrát"** = mini-formulář (jméno postavy + krátká poznámka pro PJ) → `useRequestAccess` s `characterDraft` → approve vytvoří **živou stránku postavy + roli Hráč**; **„Jen číst"** → prostá žádost (`characterDraft` prázdný) → approve dá `Ctenar` (dnešní chování).
   - `closed` → bez tlačítka, info „Uzavřený svět".
   - anon → tlačítko místo akce otevře login modal.
-- **Hranice/co neumí** Žádný vstup s konkrétní rolí na výběr — vždy začínáš jako `Ctenar`. Žádné pozvánky e-mailem ani invite-link s předschválením (private = jen „kdo má odkaz, může požádat", schvaluje PJ).
+- **Hranice/co neumí** Návrh postavy = jen **jméno + poznámka** (data u žádosti, ne živá `Page` — ta vzniká až při approve PJ-em, viz Schválení). Přímé pozvání konkrétního hráče / pozvací odkaz řeší **„Přidat hráče"** na stránce Hráči (15.10 fáze B), ne JoinCTA. Výběr role při vstupu není — vždy Čtenář nebo (s postavou) Hráč.
 - **Stav** ✅
-- **Kód** FE `JoinCTA.tsx:28`, `useWorldJoin.ts:9-34`. BE `joinPublic` (`worlds.service.ts:573`), `requestAccess` (`:629`).
+- **Kód** FE `JoinCTA.tsx:28` (charMode formulář), `useWorldJoin.ts` (`useRequestAccess` s `characterDraft`). BE `joinPublic` (`worlds.service.ts:573`), `requestAccess` (charDraft trim/limit).
 
 ### Sdílení světa — ShareButton (15B.6)
 - **Co to je** Tlačítko „Sdílet" v hlavičce detailu světa; šíří pozvánkovou URL `/svet/:slug`. Sdílí se holá URL (žádné API klíče / OAuth) — náhled (obrázek + titulek) si síť stáhne z OG meta tagů cílové stránky (15B.2 `<Seo>`).
@@ -94,27 +94,42 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 - **Kód** `worlds.service.ts:573`.
 
 ### Žádost o vstup (open/private)
-- **Akce** `POST /worlds/:id/access-request` → vytvoří `WorldAccessRequest` (pre-membership, samostatná kolekce, unique index user+world). Emit `world.access.requested` (→ pending-actions / push PJ).
+- **Akce** `POST /worlds/:id/access-request` (volitelné tělo `RequestAccessDto`) → vytvoří `WorldAccessRequest` (pre-membership, samostatná kolekce, unique index user+world). **15.10 fáze C:** volitelné pole `characterDraft { name, note? }` = návrh postavy („Chci hrát"); prázdné = prostá žádost. Emit `world.access.requested` (→ pending-actions / push PJ).
 - **Hranice/chyby** `WORLD_CLOSED` (403), `WORLD_IS_PUBLIC` (400, public → použij /join), `WORLD_ALREADY_MEMBER` (409). Duplicitní AR = Conflict (unique index).
 - **Zrušení vlastní žádosti** `DELETE /worlds/:id/access-request` (204) → `cancelAccessRequest`. 404 `ACCESS_REQUEST_NOT_FOUND` když není.
 - **Kód** `worlds.service.ts:629` (request), `:678` (cancel), FE `AccessRequestPending.tsx`.
 
 ### Schválení / zamítnutí žádosti (PJ)
-- **Co to je** PJ vyřizuje pending AR. UI žije v platformovém **Zpracovat / pending-actions** panelu (renderer `WorldAccessRequestRenderer`), ne v Nastavení světa.
-- **Kdo** BE `assertCanModerateAccessRequests` (`worlds.service.ts:1048`): **vlastník světa NEBO člen s rolí `PJ`** (co-PJ) **NEBO elevovaný platform Admin/Superadmin** (`worldAdminBypass` — doplněno FIX-19/RUN-2026-07-05, dřív elevace tuhle bránu vůbec nepokrývala, viz sekce I níže). PomocnyPJ pořád nemůže. FE renderer volá approve/reject hooky bez vlastního role gate — gating je čistě BE.
+- **Co to je** PJ vyřizuje pending AR. UI je na **třech místech (15.10 fáze A):** (1) platformový **Zpracovat / pending-actions** panel (`WorldAccessRequestRenderer`, napříč světy), (2) sekce **„Čekající žádosti"** na stránce Hráči světa, (3) **zvoneček + drawer** v hlavičce světa (rychlý přístup odkudkoli, `WorldRequestsBell`/`WorldRequestsDrawer`). Všechny sdílí `RequestsList` / stejné approve/reject endpointy.
+- **Kdo** BE `assertCanModerateAccessRequests` (`worlds.service.ts`): **vlastník světa NEBO člen role `PJ`** (co-PJ) **NEBO elevovaný platform Admin/Superadmin** (`worldAdminBypass`, FIX-19). PomocnyPJ pořád nemůže. **15.10 co-PJ fix:** dřív co-PJ měl právo schválit, ale žádost ve frontě neviděl (`WorldAccessRequestProvider.scopeForUser` scopoval jen `findByOwnerId`) → opraveno na „vlastník NEBO člen role ≥ PJ". FE renderer bez vlastního role gate — gating čistě BE.
 - **Co jde dělat**
-  - Přijmout → `POST /worlds/:worldId/access-requests/:requestId/approve` → smaže AR + vytvoří membership `Ctenar` (atomicky přes Mongo transaction když je replica set; jinak sekvenční fallback D-061). Emit `world.access.approved` + `world.membership.changed`.
+  - Přijmout **prostou žádost** → `POST /worlds/:worldId/access-requests/:requestId/approve` → smaže AR + vytvoří membership `Ctenar` (Mongo tx / sekvenční fallback D-061). Emit `world.access.approved` + `world.membership.changed`.
+  - Přijmout **žádost s postavou** (`characterDraft`, 15.10 fáze C) → tentýž endpoint → `pagesService.create` živou Page „Postava hráče" (owner = žadatel) + membership **`Hrac`** + `characterPath` + smaže AR. „Jedno schválení pustí dovnitř i schválí postavu."
   - Odmítnout → `POST …/reject` → smaže AR; žadatel může požádat znovu. Emit `world.access.rejected`.
-- **Hranice** Approve vždy dává `Ctenar` (ne výběr role). 403 `FORBIDDEN`, 404 `ACCESS_REQUEST_NOT_FOUND`.
+- **Per-world fronta** `GET /worlds/:id/pending-actions` (multi-typ, moderátor-gated) napájí sekci na stránce Hráči + drawer + badge (dlaždice/zvoneček).
+- **Hranice** Prostá žádost → `Ctenar`; s postavou → `Hrac`. Žádný „reader-only" mezirežim (přijmout s postavou = rovnou Hráč). 403 `FORBIDDEN`, 404 `ACCESS_REQUEST_NOT_FOUND`.
 - **Stav** ✅
-- **Kód** FE `WorldAccessRequestRenderer.tsx`, `useWorldJoin.ts:53-95`. BE `worlds.service.ts:864` (approve), `:989` (reject), `:1048` (gate).
+- **Kód** FE `WorldAccessRequestRenderer.tsx`, `useWorldJoin.ts`, `WorldRequests/` (RequestsList/Bell/Drawer), `useWorldPendingActions.ts`. BE `approveAccessRequest` + `approveAccessRequestWithCharacter`, `getWorldPendingActions`, `world-access-request.provider.ts` (scope fix).
 
 ### Žádost o postavu (Ctenar → Zadatel)
 - **Co to je** Čtenář bez postavy požádá o postavu; spadne na roli `Zadatel`(0) (pending na přiřazení postavy PJ). Idempotentní.
 - **Akce** `POST /worlds/:id/request-character`. 404 nečlen, 400 `ALREADY_HAS_CHARACTER_ROLE` (role ≥ Hrac).
-- **Zvláštnost** Demotuje role NÍŽE (Ctenar 1 → Zadatel 0). Zadatel = člen čekající na postavu, ne žadatel o vstup (to je `WorldAccessRequest`).
-- **Stav** ✅
+- **Zvláštnost** Demotuje role NÍŽE (Ctenar 1 → Zadatel 0). Zadatel = člen čekající na postavu, ne žadatel o vstup (to je `WorldAccessRequest`). **15.10:** primární cesta ke hraní je teď „Chci hrát" v JoinCTA (access-request s `characterDraft` → přímo Hráč + živá Page). `request-character` (D-062) zůstává separátní slabší cesta bez FE tlačítka — varianta A ji nevyužila.
+- **Stav** ⚠️ stub (endpoint žije, ale žádný FE ho nevolá; event `world.character.requested` nemá listenera).
 - **Kód** `worlds.service.ts:1169`, controller `:150`.
+
+### Pozvánky do světa (15.10 fáze B)
+- **Co to je** PJ proaktivně přidá hráče — cílenou pozvánkou konkrétního uživatele NEBO pozvacím odkazem. Entita `WorldInvite` (`kind: 'user' | 'link'`).
+- **Kde** Tlačítko **„Přidat hráče"** na stránce Hráči (jen PJ) → modal `InvitePanel`. Pozvaný přijímá v platformové frontě „Ke zpracování" (renderer `WorldInviteRenderer`). Odkaz se přijímá na route `/invite/:token`.
+- **Kdo** Create/list/revoke: BE `assertCanModerateAccessRequests` (vlastník / co-PJ / elevovaný Admin). Přijetí cílené: jen adresát (`invitedUserId === já`); odkaz: kdokoli přihlášený.
+- **Co jde dělat**
+  - **Pozvat uživatele** → `POST /worlds/:id/invites {kind:'user', invitedUserId}` → pozvánka pozvanému (pending-action `world_invite` + WS `world:invite-received` toast). Přijmout → `…/accept` → membership `Ctenar`; Odmítnout → `…/decline`.
+  - **Pozvací odkaz** → `POST … {kind:'link', expiresInDays?, maxUses?}` → token; přijetí `POST /worlds/invite-token/:token/accept` → `Ctenar` (pre-approved, bez schvalování).
+  - **Přehled + revoke** → `GET /worlds/:id/invites`, `DELETE …/:inviteId` (status → `revoked`).
+- **Hranice/co neumí** Role po přijetí vždy `Ctenar` (PJ pak povýší). Nelze pozvat existujícího člena ani duplicitně (`WORLD_ALREADY_MEMBER` / `PENDING_INVITE`, partial-unique index). Odkaz: expirace + `maxUses` + revoke; vypršelý/vyčerpaný/zrušený → 410 (`INVITE_EXPIRED`/`INVITE_EXHAUSTED`/`INVITE_INACTIVE`). E-mailová pozvánka neregistrovanému NENÍ (odkaz sdílí PJ sám). Souhlas příjemce vždy povinný — žádné „tvrdé přidání".
+- **Zvláštnosti** Odkaz login-required (`/invite/:token` přes `requireAuth` → login-intent → accept po přihlášení). Token `randomBytes(24)`, sparse-unique index.
+- **Stav** ✅
+- **Kód** FE `InvitePanel/`, `WorldInviteRenderer/`, `useWorldInvites.ts`, `pages/InvitePage/`, `useWorldInviteSocket.ts`. BE `world-invite.schema.ts`, `world-invite.repository.ts`, `world-invite.provider.ts`, `createInvite`/`acceptUserInvite`/`declineUserInvite`/`acceptLinkInvite`/`revokeInvite` (`worlds.service.ts`), controller `/worlds/:id/invites*` + `/worlds/invite-token/:token/accept`.
 
 ### Odchod / odebrání člena
 - **Akce** `DELETE /worlds/:worldId/members/:membershipId`. Self = odchod; cizí = odebrání. BE `leave` (`worlds.service.ts:1647`): self vždy smí (kromě vlastníka), cizí jen `canManageMembers` (PomocnyPJ+).
@@ -173,13 +188,15 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 
 ## F. Správa hráčů — stránka „Hráči" (WorldMembersPage)
 
-- **Co to je** Read-only adresář členů světa. Vedení (PJ, Pomocní PJ) zvlášť nahoře, pak skupiny a jejich členové, nakonec „Bez skupiny".
+- **Co to je** Adresář členů + **domov správy hráčů** (15.10). Vedení (PJ, Pomocní PJ) nahoře, pak skupiny, „Bez skupiny" a nově sekce **„Nováčci"** (Čtenáři/Žadatelé bez postavy — dřív skrytí). Karty členů mají **online tečku** (`OnlineDot`).
 - **Kde** `/svet/:slug/hraci` (router `:276`), nav položka „Hráči". memberOnly (Ctenar+).
-- **Kdo** FE Ctenar+ (memberOnly). BE `GET /worlds/:id/members` přes `OptionalJwtAuthGuard` + `findByIdForRequester` access check (N-7 — private nečlen = 404).
-- **Co jde dělat** Jen prohlížení: karta člena (avatar, jméno, role, „Hraje za" postavu), proklik na postavu. Zadatelé (pending vstup) a hráči bez postavy/staff se NEzobrazují (`isWorldPlayer`).
-- **Hranice/co neumí** ŽÁDNÁ správa odtud — žádné měnění rolí, vyhazování, schvalování. Vše to je v Nastavení (tab Členové) a pending-actions panelu. (Zadání ke kapitole zmiňuje „akce PJ" zde — v kódu nejsou, jsou jinde.)
-- **Stav** ✅ (jako adresář)
-- **Kód** FE `pages/WorldMembersPage/WorldMembersPage.tsx`, `MemberCard.tsx`. BE `worlds.service.ts:913` (getMembers).
+- **Kdo** FE Ctenar+ (memberOnly). BE `GET /worlds/:id/members` přes `OptionalJwtAuthGuard` + `findByIdForRequester` (N-7 — private nečlen = 404). PJ-only prvky (žádosti, „Přidat hráče") gated `isPJ` (FE) + BE moderátor gate.
+- **Co jde dělat**
+  - Všichni: prohlížet karty (avatar, jméno, role, online tečka, „Hraje za" postavu), proklik na postavu. **Nováčci** = členové mimo `isWorldPlayer` (bez postavy, ne-staff) — vidí je každý.
+  - **PJ (15.10 fáze A+B):** nahoře sekce **„Čekající žádosti"** (`RequestsList` — Přijmout/Odmítnout inline, vč. žádostí s postavou) + tlačítko **„Přidat hráče"** (→ `InvitePanel`, pozvat uživatele / vytvořit odkaz).
+- **Hranice/co neumí** Měnění rolí, skupin, vyhazování zůstává v Nastavení (tab Členové). Odtud jen: schválit/odmítnout žádost + pozvat. Rychlý přístup k žádostem i mimo tuto stránku = zvoneček/drawer v hlavičce světa (15.10 fáze A).
+- **Stav** ✅
+- **Kód** FE `pages/WorldMembersPage/WorldMembersPage.tsx` (sekce žádosti/Nováčci + „Přidat hráče"), `MemberCard.tsx` (OnlineDot), `WorldRequests/`, `InvitePanel/`. BE `worlds.service.ts` (getMembers, getWorldPendingActions).
 
 ---
 
@@ -268,7 +285,9 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 
 1. ✅ VYŘEŠENO 2026-07-05 (FIX-19, RUN-2026-07-05) — **DeleteWorldTab text vs. realita.** Do 2026-06-18 šlo jen o nepřesný JSDoc komentář (text „PJ vlastník i Admin" byl tehdy prostě špatně, BE Admina nepouštěl vůbec). Skutečná mezera byla hlubší: i PO zavedení elevace (2026-06-21) `canAdminWorld` elevaci ignoroval (nepoužité parametry) — elevovaný Admin dostal 403 i s aktivním "Admin režimem". Teď `canAdminWorld` čte `worldAdminBypass` → text „PJ vlastník i Admin" je konečně pravdivý, ale jen pro **elevovaného** Admina (ne pro kohokoli s globální rolí Admin bez nahození).
 
-2. **„Hráči" stránka bez akcí PJ.** Zadání kapitoly očekává na `/svet/:slug/hraci` „akce PJ (role, vyhození, schválení)". V kódu je stránka striktně read-only adresář (`WorldMembersPage.tsx:75` komentář „Jen pro čtení"). Veškerá správa je v Nastavení#clenove + pending-actions panelu. Není to bug, ale rozpor s očekáváním zadání — pro průvodce nasměrovat uživatele správně.
+2. ✅ VYŘEŠENO 2026-07-15 (15.10) — **„Hráči" stránka bez akcí PJ.** Stránka byla read-only adresář; teď nese sekci „Čekající žádosti" (schválit/odmítnout, vč. přihlášek s postavou) + „Přidat hráče" (pozvat / odkaz) + online tečky + sekci Nováčci. Měnění rolí/vyhazování zůstává v Nastavení#clenove (záměrně).
+
+2b. ✅ VYŘEŠENO 2026-07-15 (15.10) — **co-PJ neviděl frontu žádostí.** `WorldAccessRequestProvider.scopeForUser` scopoval pending frontu jen `findByOwnerId` → co-PJ (člen role ≥ PJ) měl právo schválit (`assertCanModerateAccessRequests`), ale žádost ve frontě „Zpracovat" vůbec neviděl. Opraveno: scope = „vlastník NEBO člen role ≥ PJ" (sjednoceno s gate). Provider + nový world-scoped `getWorldPendingActions` sdílí stejný scope.
 
 3. **Approve žádostí = PJ, ne PomocnyPJ.** `assertCanModerateAccessRequests` (`:1048`) pouští owner + membership PJ + (od FIX-19) elevovaný Admin/Superadmin. PomocnyPJ (který jinak spravuje členy přes `canManageMembers`) žádosti o vstup schvalovat pořád NEMŮŽE. Asymetrie vůči ostatní správě členů — záměr? Pro průvodce explicitně uvést.
 

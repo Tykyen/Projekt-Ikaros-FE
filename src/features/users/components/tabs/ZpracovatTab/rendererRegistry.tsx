@@ -3,6 +3,7 @@ import {
   type AdminUsernameRequestListItem,
   type FriendRequestListItem,
   type WorldAccessRequestListItem,
+  type WorldInvitePendingItem,
   type ArticleReviewListItem,
   type GalleryReviewListItem,
   type DiscussionReviewListItem,
@@ -27,6 +28,11 @@ import {
   WorldAccessRequestLeft,
   WorldAccessRequestMid,
 } from '@/features/world/components/WorldAccessRequestRenderer';
+import {
+  WorldInviteActions,
+  WorldInviteLeft,
+  WorldInviteMid,
+} from '@/features/world/components/WorldInviteRenderer';
 import {
   ArticleReviewActions,
   ArticleReviewLeft,
@@ -103,6 +109,20 @@ const worldAccessRequestRenderer: PendingActionRenderer<WorldAccessRequestListIt
       />
     ),
   };
+
+// 15.10 fáze B — world_invite (pozvaný přijme/odmítne pozvánku do světa).
+const worldInviteRenderer: PendingActionRenderer<WorldInvitePendingItem> = {
+  type: PendingActionType.WorldInvite,
+  renderLeft: (item) => <WorldInviteLeft item={item} />,
+  renderMid: (item) => <WorldInviteMid item={item} />,
+  renderActions: (item, helpers) => (
+    <WorldInviteActions
+      item={item}
+      onResolve={helpers.onResolve}
+      isLoading={helpers.isLoading}
+    />
+  ),
+};
 
 // 3.2d — article_pending_review (SpravceClanku/Admin/Superadmin schvalují pending články).
 const articleReviewRenderer: PendingActionRenderer<ArticleReviewListItem> = {
@@ -198,6 +218,8 @@ export const PENDING_ACTION_RENDERERS: Partial<
     friendRequestRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.WorldAccessRequest]:
     worldAccessRequestRenderer as PendingActionRenderer<unknown>,
+  [PendingActionType.WorldInvite]:
+    worldInviteRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.ArticlePendingReview]:
     articleReviewRenderer as PendingActionRenderer<unknown>,
   [PendingActionType.GalleryPendingReview]:

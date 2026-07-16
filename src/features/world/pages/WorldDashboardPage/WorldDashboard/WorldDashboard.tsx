@@ -1,7 +1,9 @@
 import { Users, MessageSquare } from 'lucide-react';
 import type { World } from '@/shared/types';
+import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
 import { useWorldChatUnread } from '@/features/world/api/useWorldChat';
+import { useWorldPendingActions } from '@/features/world/api/useWorldPendingActions';
 import { isWorldPlayer } from '@/features/world/lib/isWorldPlayer';
 import { EventsColumn } from './columns/EventsColumn';
 import { NewsColumn } from './columns/NewsColumn';
@@ -19,8 +21,11 @@ interface Props {
  * Novinky. Pravý: Oblíbené stránky přes plnou výšku.
  */
 export function WorldDashboard({ world }: Props) {
+  const { isPJ } = useWorldContext();
   const members = useWorldMembers(world.id);
   const chatUnread = useWorldChatUnread(world.id);
+  // 15.10 — badge s počtem čekajících žádostí (jen PJ/co-PJ).
+  const pending = useWorldPendingActions(world.id, isPJ);
 
   return (
     <div className={s.grid}>
@@ -30,6 +35,7 @@ export function WorldDashboard({ world }: Props) {
         label="Hráči"
         to={`/svet/${world.slug}/hraci`}
         value={members.data?.filter(isWorldPlayer).length ?? 0}
+        badge={isPJ ? pending.data?.length : undefined}
       />
       <DashTile
         className={`${s.cell} ${s.tileChat}`}

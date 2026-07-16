@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Drama } from 'lucide-react';
 import type { WorldMembership } from '@/shared/types';
 import { UserAvatar } from '@/shared/ui';
+import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { WorldRoleChip } from '@/features/world/components/WorldRoleChip';
 import { worldMemberAvatar } from '@/features/world/lib/worldMemberAvatar';
 import s from './MemberCard.module.css';
@@ -33,7 +34,10 @@ export function MemberCard({ member, worldSlug, character }: Props) {
         className={s.main}
         aria-label={`Otevřít osobní kartu hráče ${name}`}
       >
-        <UserAvatar src={worldMemberAvatar(member)} size="lg" alt={name} />
+        <span className={s.avatarWrap}>
+          <UserAvatar src={worldMemberAvatar(member)} size="lg" alt={name} />
+          <OnlineDot userId={member.userId} />
+        </span>
         <span className={s.name}>{name}</span>
         <WorldRoleChip role={member.role} size="sm" />
       </Link>
