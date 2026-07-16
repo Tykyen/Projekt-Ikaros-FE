@@ -52,7 +52,10 @@ export interface CreateNaborDto {
   title: string;
   body: string;
   imageUrl?: string;
+  /** Canonical id z `PLATFORM_SYSTEMS` (19.3b). */
   system?: string;
+  /** Label z `GENRES` (19.3b); povinný u `hledam-hrace` (svět žánr má). */
+  genre?: string;
   mode: NaborMode;
   place?: string;
   seatsTotal?: number;
@@ -70,7 +73,10 @@ export interface PatchNaborDto {
   title?: string;
   body?: string;
   motiv?: NaborMotiv;
+  /** Canonical id z `PLATFORM_SYSTEMS` (19.3b). */
   system?: string;
+  /** Label z `GENRES` (19.3b). */
+  genre?: string;
   mode?: NaborMode;
   place?: string;
   imageUrl?: string;

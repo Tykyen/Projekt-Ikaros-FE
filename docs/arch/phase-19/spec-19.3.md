@@ -118,6 +118,80 @@ Nový modul `nabory` (vzor dle `discussions`): schema `Nabor`, DTO, service, con
 | R10 | Lístek = motiv KOMPLETNĚ (tvar+font+barva) přes inline `getTheme(motiv).vars`; deska = globální skin | ✅ (uživatel 2026-07-08) |
 | R8 | Pre- vs post-moderace | 🔎 návrh post |
 | R9 | „Ozvat se" kanál (DM vs žádost) | 🔎 návrh DM |
+| R11 | Systém = **canonical id z registru** (select), NE volný text | 🔎 návrh (§12) |
+| R12 | Registry systémů+žánrů přesunout do `shared/rpg/`, konzumenti re-exportují | 🔎 návrh (§12) |
+| R13 | Nová osa **žánr** (11 z registru); PJ dědí z `world.genre`, hráči volitelný | 🔎 návrh (§12) |
+| R14 | Filtry systém+žánr **vždy viditelné** (z registru, ne z dat) | 🔎 návrh (§12) |
+| R15 | Nábor **nemá „Vlastní" žánr** — jen 11 registry hodnot nebo prázdno | 🔎 návrh (§12) |
+
+---
+
+## 12. Sub-krok 19.3b — tříditelnost dle systému a žánru
+
+**Podnět:** žádost testera 2026-07-16 („nábory by měly jít třídit i podle systémů či podle žánrů").
+
+### 12.1 Proč to dnes nefunguje
+
+| # | Problém | Místo |
+|---|---|---|
+| A | Filtr systému **existuje, ale je skrytý** — `{systems.length > 0 && …}`, nabídka se odvozuje z načtených náborů → na prázdné/řídké desce zmizí. Tester ho nikdy neviděl. | [NaboryPage.tsx:80](../../../src/features/ikaros/pages/NaboryPage.tsx#L80) |
+| B | **Systém je volný text** (`<input placeholder="DrD, JaD, D&D 5e…">`), ale `pickWorld` do něj nalije `world.system` = **id** (`dnd5e`). PJ → „dnd5e", hráč → „D&D 5e", třetí → „DnD 5E" = **tři různé systémy ve filtru**. Filtr, který netrefí. | [NaborNovaPage.tsx:191](../../../src/features/ikaros/pages/NaborNovaPage.tsx#L191), [:42](../../../src/features/ikaros/pages/NaborNovaPage.tsx#L42) |
+| C | **Žánr na náboru neexistuje** vůbec, ačkoliv svět ho má povinně (`world.genre`, 11 hodnot). | [types/index.ts:434](../../../src/shared/types/index.ts#L434), [genres.ts](../../../src/features/ikaros/pages/CreateWorldPage/constants/genres.ts) |
+
+⚠️ **B není chybějící featura, ale rozbitá data.** Náprava je teď zadarmo (deska prázdná / řídká — ověřit `db.nabory.count()`), s každým dalším lístkem dráž.
+
+### 12.2 Žánr ≠ motiv
+
+Motiv lístku (12 tvarů) se s žánry (11) skoro kryje — **nesmí se sloučit**. Motiv je **vizuální osa** (hráč si vybírá volně, PJ smí přepsat); žánr je **datový fakt**. Filtrovat podle motivu = „chci horor" vrátí lístky podle toho, komu se líbil rámeček. Dvě osy, jako strana × motiv v §4.
+
+### 12.3 Registr systémů — dnes 3 kopie (⚠️ nález)
+
+| Zdroj | Id | Rozsah | Konzument |
+|---|---|---|---|
+| [`RPG_SYSTEMS`](../../../src/features/ikaros/pages/CreateWorldPage/constants/systems.ts) | **dlouhá** (`drd-plus`, `call-of-cthulhu`) | 14 + `vlastni` | wizard světa, nastavení světa |
+| [`BESTIE_SYSTEMS`](../../../src/features/ikaros/bestiar/components/systems.ts) | **canonical** (`drdplus`, `coc`) | 14 + `generic` | komunitní bestiář (platformový katalog) |
+| [`SYSTEM_ALIASES` / `resolveSystemId`](../../../src/features/world/systemId.ts) | most mezi nimi | — | diary/map/combat registry |
+
+`resolveSystemId` je deklarovaná „jediná zdrojová pravda aliasů", ale **nabídky** jsou dvě. Nábor je platformový katalog jako komunitní bestiář → **canonical id** je správná osa. Vyrobit čtvrtou kopii pro nábory = past [[link_picker]].
+
+**Návrh (R12):** `BESTIE_SYSTEMS`+`systemLabel` přesunout do `shared/rpg/systems.ts` jako `PLATFORM_SYSTEMS`; `GENRES`+`themeForGenre` do `shared/rpg/genres.ts`. Bestiář a `CreateWorldPage` **re-exportují** → nulová změna chování, žádný velký diff. `RPG_SYSTEMS` (dlouhá id) zůstává vlastnictvím wizardu — to je world-scope kontrakt s BE `SystemPresetsService`, nesahat.
+
+### 12.4 Změny — FE
+
+- **Entita** `Nabor`: `system?: string` = **canonical id** (`PLATFORM_SYSTEMS`), + nové `genre?: string` (label z `GENRES`).
+- **Tvorba** ([NaborNovaPage](../../../src/features/ikaros/pages/NaborNovaPage.tsx)):
+  - Systém: `<input>` → **`<select>`** z `PLATFORM_SYSTEMS`.
+  - `pickWorld` ukládá **`resolveSystemId(world.system)`** (`drd-plus` → `drdplus`) — tím mizí drift B u kořene.
+  - Žánr: nový `<select>` z 11 `GENRES` (**bez „Vlastní"**, R15). PJ dědí `world.genre`; pokud má svět custom žánr, dědění se nechytne → PJ vybere z 11 ručně. Povinný u `hledam-hrace` (svět žánr povinně má), volitelný u `hledam-hru`.
+- **Deska** ([NaboryPage](../../../src/features/ikaros/pages/NaboryPage.tsx)):
+  - Filtry systém + žánr **vždy viditelné**, plněné z registru (R14) — už nikdy nezmizí na prázdné desce.
+  - Nabídku systémů zúžit na hodnoty **přítomné v datech**? **Ne** — prázdný výsledek je platná odpověď („nikdo teď nehraje CoC"), skrytá volba je matoucí. Zvážit jen odšednutí (`disabled`) prázdných.
+  - Filtry se skládají **průnikem** (`filterNabory` už tak funguje, jen přibude `genre`).
+- **Lístek** ([NaborListek](../../../src/features/ikaros/components/NaborListek.tsx)): meta zobrazí **label**, ne id (`systemLabel(n.system)`), + žánr.
+- **Testy**: `nabory.spec.ts` — filtr žánru, průnik systém×žánr; parita `PLATFORM_SYSTEMS` × `resolveSystemId` (analog [registry.test.ts](../../../src/features/world/map-systems/__tests__/registry.test.ts)).
+
+### 12.5 Změny — BE ([[be_field_check]], 4 místa)
+
+- `nabor.schema.ts`: `@Prop() genre?: string`.
+- `create-nabor.dto.ts` + `patch-nabor.dto.ts`: `genre?` s `@IsIn(GENRES)`; `system?` z volného `@IsString() @MaxLength(60)` → **`@IsIn(SYSTEM_IDS)`** (uzavře drift natvrdo).
+- `repositories` `toEntity` whitelist: přidat `genre`.
+- ~~`GET /nabory` query filtr: `system`, `genre`~~ → **ZAMÍTNUTO při implementaci** (2026-07-16). Důvod: nástěnka **potřebuje celý aktivní seznam** i po zafiltrování — jinak nepozná, které volby nemají jediný lístek (zešednutí, §12.4), a musela by na to druhý request nebo facety. Objem je desítky lístků, ne feed. Server-side filtr by tedy byl mrtvý kód, který FE nezavolá. Filtr zůstává client-side ve `filterNabory`; až nástěnka poroste přes ~stovky lístků, přijde na řadu paginace + facety **naráz** (dluh).
+- **Migrace — NEblokující** (korekce 2026-07-16): `@IsIn` je validace **vstupu**, ne čtení → staré volnotextové záznamy v DB přežijí a normálně se načtou; jen se nechytnou do filtru (najdou se fulltextem). Nové zápisy i patche jdou ze selectu, takže projdou. `db.nabory.count()` tedy není podmínkou nasazení — při nenulovém počtu dodat jednorázovou normalizaci přes `resolveSystemId` samostatně. **Restart BE** ([[fb_be_restart]]).
+- ⚠️ **Enum na 2 místech** (FE `shared/rpg` + BE DTO) — stejná past jako [[theme_ids_dual]]; zmínit v komentáři obou.
+
+### 12.6 Zamítnuté alternativy
+
+- **Autocomplete nad volným textem** — sjednotí zápis jen u těch, kdo si vyberou z nabídky; drift se vrátí zadními vrátky.
+- **Filtrovat podle motivu místo žánru** — viz §12.2, filtr by lhal.
+- **Čtvrtá kopie registru v `features/ikaros/nabory`** — [[link_picker]].
+
+### 12.7 Postup
+
+1. 🚧 Spec (tato sekce) → **schválení**.
+2. `shared/rpg/` (systems+genres) + re-exporty; build+testy zelené (čistý refaktor, 0 změn chování).
+3. FE: entita, tvorba (2 selecty + `resolveSystemId`), deska (2 filtry), lístek (labely), testy.
+4. BE: schema+DTO+toEntity+query, jest, **restart**.
+5. `mobil-desktop` (filtrová lišta má nově 4 skupiny — riziko zalomení na mobilu) · `funkce` · `napoveda` · ruční commit.
 
 ---
 

@@ -2193,3 +2193,33 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 - 👍 Past exhaustivních `Record<PageType>` byla zmapovaná už ve specu (riziko-tabulka) → chycená v designu, ne až červeným buildem.
 
 ---
+
+### ✅ ŘEŠENÍ — 19.3b nábory: filtr systém+žánr; kořen = volný text vedle registru („skrytá featura" byla jen příznak) · 2026-07-16
+
+**Co nakonec zabralo:** Žádost testera zněla „nábory by měly jít třídit i podle systémů či podle žánrů" — jenže **filtr systému už existoval**. Nešel vidět (`{systems.length > 0 && …}` + nabídka odvozená z načtených dat → na prázdné desce zmizel) a i kdyby šel, netrefil by: `system` bylo **volnotextové pole**, do kterého `pickWorld` sypal `world.system` **id** (`dnd5e`), zatímco člověk vedle psal „D&D 5e". Jeden systém = několik hodnot = filtr, co nikdy nesedne.
+
+Řešení ve třech vrstvách:
+1. **Registr místo volného textu** — `system` = canonical id ze selectu, `genre` = label z 11 `GENRES` (nová datová osa). Dědění PJ přes **`resolveSystemId`** (world drží „dlouhá" id `drd-plus`, katalog canonical `drdplus`). BE `@IsIn` uzavřel drift i pro curl.
+2. **Filtry z registru, ne z dat** — nabídky jsou vždy viditelné; volba bez lístku zešedne, ale zůstane vybratelná (prázdný výsledek = platná odpověď).
+3. **Paritní testy** (`shared/rpg/systems.spec.ts`) — pro každý systém z wizardu ověří, že `resolveSystemId` vrátí id přítomné v `PLATFORM_SYSTEMS`. Nový systém, co by tiše vypadl z filtru náborů, teď shodí testy.
+
+**Nález cestou: registr systémů byl v projektu 3×** — `RPG_SYSTEMS` (dlouhá id, wizard, kontrakt s BE `SystemPresetsService`), `BESTIE_SYSTEMS` (canonical, komunitní bestiář), `SYSTEM_ALIASES`/`resolveSystemId` (most, sám o sobě deklarovaný jako „jediná zdrojová pravda aliasů" — jenže pravda byla jen o aliasech, ne o nabídkách). Nábory by byly **čtvrtá kopie**. Místo toho `BESTIE_SYSTEMS`+`GENRES` → `shared/rpg/`, původní místa **re-exportují** (0 změn chování, malý diff, bestiář nedotčen). `RPG_SYSTEMS` schválně **nesloučeno** — dlouhá id jsou world-scope kontrakt s BE presety, sloučení by byla migrace, ne refaktor.
+
+**Proč to je správně (a ne další variace):** nabízelo se „jen odkrýt filtr" (smazat `systems.length > 0`) — kosmetika nad rozbitými daty, tester by pak filtroval mezi „dnd5e" a „D&D 5e". Druhá varianta „autocomplete nad volným textem" sjednotí zápis jen u těch, kdo si vyberou z nabídky. Třetí past — **filtrovat podle `motiv`** (12 tvarů se skoro kryje s 11 žánry) — by filtr rovnou proměnila ve lež: motiv je vizuální volba (hráč si vybírá, co se mu líbí), žánr je datový fakt. Dvě osy, které se nesmí slít, přesně jako `strana` × `motiv` v původní specifikaci.
+
+**Korekce vlastního specu při implementaci (2×, obojí zapsané):**
+- §12.5 tvrdilo „`@IsIn` odmítne staré volnotextové hodnoty → ověřit `db.nabory.count()`". **Nepřesné:** `@IsIn` validuje **vstup**, ne čtení → staré záznamy se načtou dál, jen se nechytnou do filtru. Migrace tedy nebyla blokující a počet záznamů jsem k nasazení nepotřeboval.
+- §12.5 slibovalo **BE query filtr** `?system=&genre=`. **Zamítnuto při implementaci:** deska potřebuje celý aktivní seznam i po zafiltrování, aby poznala, které volby nemají lístek (zešednutí) — server-side filtr by si vyžádal druhý request nebo facety a dnes by byl mrtvý kód. Filtr zůstal client-side, paginace+facety **naráz** až s objemem → **D-066**.
+
+**Jak ověřeno:** FE `npm run build` (tsc -b) ✓ 2× · vitest cíleně 29/29 (vč. 14 paritních) a 366/366 na `features/ikaros`+`shared/rpg` · BE typecheck ✓ lint ✓ jest 11/11 (+2 nové: `genre` projde create i patch). Plná FE sada spuštěna na stabilním stromu. Responsivita **staticky** (`.bar`/`.row` mají `flex-wrap: wrap`; doplněn `min-width: 0` na `.field` + `max-width: 100%` na kontroly — flex item se jinak nezmenší pod obsah selectu) — živé screenshoty u uživatele.
+
+**Past cestou (ne chyba, ale stálo čas):** background `vitest run` spuštěný **během** editů nahlásil 4 soubory / 6 testů červeně (`workspaceStore`, `dice-log` panely) — samostatně 17/17 zeleně. Vitest četl soubory v rozepsaném stavu. **Poučení: brána = běh na stabilním stromu; testy spuštěné souběžně s edity nejsou důkaz ani červeně, ani zeleně.**
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Žádost testera („chybí filtr") byla jen **příznak**; kořen (rozbitá data + trojí registr) byl o patro níž. Vyplatilo se přečíst kód dřív, než jsem začal psát filtr, který tam už byl.
+- 👍 Náprava dat teď stála ~nic (deska prázdná/řídká) — za měsíc provozu by to byla migrace.
+- 👍 Paritní test je levný a hlídá přesně tu třídu chyby, co se stala (drift mezi nabídkami).
+- 👎 Spec jsem musel korigovat 2× **až při psaní kódu** (`@IsIn` sémantika, mrtvý BE filtr). Obojí se dalo domyslet u stolu; příště u „přidám validaci" vždy nejdřív oddělit **vstup** od **čtení**, a u „přidám BE endpoint" ověřit, že ho FE vůbec zavolá.
+- 🚧 Zbývá: FE+BE commit (ruční), **BE restart**, živé ověření + screenshoty (mobil 375 / desktop) — deska je prázdná, takže tester musí nejdřív připnout lístek, aby filtr měl co třídit.
+
+---

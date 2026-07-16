@@ -1,10 +1,11 @@
-/* Side-task layout — Hráči+Akce | Chat+Novinky | Oblíbené (plná výška). */
+/* Side-task layout — Hráči+Akce | Novinky | Oblíbené (obě přes plnou výšku).
+   Chat dlaždice zrušená (duplicita nav lišty), Novinky převzaly její řádek. */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1.1fr;
   grid-template-rows: auto 1fr;
   grid-template-areas:
-    'hraci   chat     oblibene'
+    'hraci   novinky  oblibene'
     'akce    novinky  oblibene';
   gap: 20px;
   align-items: start;
@@ -12,9 +13,6 @@
 
 .tileHraci {
   grid-area: hraci;
-}
-.tileChat {
-  grid-area: chat;
 }
 .colAkce {
   grid-area: akce;
@@ -34,17 +32,14 @@
 .tileHraci {
   animation-delay: 0ms;
 }
-.tileChat {
+.colAkce {
   animation-delay: 60ms;
 }
-.colAkce {
+.colNovinky {
   animation-delay: 120ms;
 }
-.colNovinky {
-  animation-delay: 180ms;
-}
 .colOblibene {
-  animation-delay: 240ms;
+  animation-delay: 180ms;
 }
 
 @keyframes fadeUp {
@@ -68,21 +63,22 @@
 /* Tablet — 2 sloupce, Oblíbené plnou šířkou pod. */
 @media (max-width: 1024px) {
   .grid {
+    grid-template-rows: auto 1fr auto;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      'hraci   chat'
-      'akce    novinky'
+      'hraci    novinky'
+      'akce     novinky'
       'oblibene oblibene';
   }
 }
 
-/* Mobil — 1 sloupec; Chat hned pod Hráči (obě dlaždice nad fold), pak boxy. */
+/* Mobil — 1 sloupec; dlaždice Hráči nad fold, pak boxy. */
 @media (max-width: 768px) {
   .grid {
+    grid-template-rows: none;
     grid-template-columns: 1fr;
     grid-template-areas:
       'hraci'
-      'chat'
       'akce'
       'novinky'
       'oblibene';

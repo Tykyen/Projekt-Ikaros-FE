@@ -1,8 +1,7 @@
-import { Users, MessageSquare } from 'lucide-react';
+import { Users } from 'lucide-react';
 import type { World } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
-import { useWorldChatUnread } from '@/features/world/api/useWorldChat';
 import { useWorldPendingActions } from '@/features/world/api/useWorldPendingActions';
 import { isWorldPlayer } from '@/features/world/lib/isWorldPlayer';
 import { EventsColumn } from './columns/EventsColumn';
@@ -17,13 +16,12 @@ interface Props {
 
 /**
  * 5.2 + side-task layout — dashboard úvodní stránky světa.
- * Levý sloupec: dlaždice Hráči + box Akce. Střední: dlaždice Chat + box
- * Novinky. Pravý: Oblíbené stránky přes plnou výšku.
+ * Levý sloupec: dlaždice Hráči + box Akce. Střední: box Novinky přes plnou
+ * výšku. Pravý: Oblíbené stránky přes plnou výšku.
  */
 export function WorldDashboard({ world }: Props) {
   const { isPJ } = useWorldContext();
   const members = useWorldMembers(world.id);
-  const chatUnread = useWorldChatUnread(world.id);
   // 15.10 — badge s počtem čekajících žádostí (jen PJ/co-PJ).
   const pending = useWorldPendingActions(world.id, isPJ);
 
@@ -36,15 +34,6 @@ export function WorldDashboard({ world }: Props) {
         to={`/svet/${world.slug}/hraci`}
         value={members.data?.filter(isWorldPlayer).length ?? 0}
         badge={isPJ ? pending.data?.length : undefined}
-      />
-      <DashTile
-        className={`${s.cell} ${s.tileChat}`}
-        icon={<MessageSquare size={20} />}
-        label="Chat"
-        to={`/svet/${world.slug}/chat`}
-        badge={chatUnread}
-        accent
-        cta="Otevřít"
       />
       <div className={`${s.cell} ${s.colAkce}`}>
         <EventsColumn worldId={world.id} />

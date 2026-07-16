@@ -10,17 +10,22 @@ export { timeAgo } from './discussions';
 export interface NaboryFilter {
   /** `undefined` / `'vse'` = obě strany. */
   strana?: NaborStrana | 'vse';
+  /** Canonical id z `PLATFORM_SYSTEMS` (19.3b). */
   system?: string;
+  /** Label z `GENRES` (19.3b). */
+  genre?: string;
   mode?: NaborMode;
   query?: string;
 }
 
+/** Filtry se skládají PRŮNIKEM (systém ∧ žánr ∧ strana ∧ režim ∧ fulltext). */
 export function filterNabory(list: Nabor[], f: NaboryFilter): Nabor[] {
   const q = f.query?.trim().toLowerCase();
   return list.filter((n) => {
     if (n.status === 'expired') return false;
     if (f.strana && f.strana !== 'vse' && n.strana !== f.strana) return false;
     if (f.system && n.system !== f.system) return false;
+    if (f.genre && n.genre !== f.genre) return false;
     if (f.mode && n.mode !== f.mode) return false;
     if (
       q &&

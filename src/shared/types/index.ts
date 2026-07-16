@@ -1031,8 +1031,18 @@ export interface Nabor {
   body: string;
   /** Volitelný drobný obrázek (Cloudinary; kvóta 19.2). */
   imageUrl?: string;
-  /** RPG systém; u PJ náboru zdědí z `world.system`. */
+  /**
+   * 19.3b — RPG systém jako **canonical id** z `PLATFORM_SYSTEMS`
+   * (`shared/rpg/systems.ts`), NE volný text. U PJ náboru zdědí z
+   * `world.system` přes `resolveSystemId` (world drží „dlouhá" id).
+   */
   system?: string;
+  /**
+   * 19.3b — žánr = **label** z `GENRES` (`shared/rpg/genres.ts`), 11 hodnot
+   * bez „Vlastní". U PJ náboru zdědí z `world.genre`. Datová osa pro filtr —
+   * neplést s `motiv` (vizuální osa, viz spec 19.3 §12.2).
+   */
+  genre?: string;
   mode: NaborMode;
   /** Město u `zivo`. */
   place?: string;

@@ -106,8 +106,12 @@ export function PlatformSection() {
             tlačítkem <strong>„Hledá se"</strong> pod přehledem světů. Připneš si
             vlastní lístek: jako hráč <strong>hledám hru</strong> (vybereš si
             vzhled lístku z 12 motivů), jako vypravěč <strong>hledám hráče</strong>{' '}
-            do svého světa (lístek převezme motiv toho světa). Nástěnku filtruješ
-            podle strany, systému a toho, jestli se hraje online nebo naživo.
+            do svého světa (lístek převezme motiv, systém i žánr toho světa).
+            Nástěnku filtruješ podle strany, <strong>systému</strong> (D&amp;D 5e,
+            Jeskyně a draci, Dračí doupě…), <strong>žánru</strong> (fantasy,
+            cyberpunk, horor…) a toho, jestli se hraje online nebo naživo. Filtry
+            se sčítají — „Volání Cthulhu" + „Horor" ti nechá jen lístky, co sedí
+            na obojí.
           </p>
           <p>
             Každý lístek vypadá <strong>podle motivu svého světa</strong> (tvar,

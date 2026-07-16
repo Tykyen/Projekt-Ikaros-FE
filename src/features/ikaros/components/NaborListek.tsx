@@ -1,5 +1,6 @@
 import { getTheme } from '@/themes/registry';
 import { ReportButton } from '@/shared/moderation';
+import { systemLabel } from '@/shared/rpg/systems';
 import type { Nabor } from '@/shared/types';
 import {
   timeAgo,
@@ -56,7 +57,12 @@ export function NaborListek({ nabor, onOzvatSe }: Props): React.ReactElement {
       <div className={s.meta}>
         {nabor.system && (
           <span className={s.k}>
-            Systém: <b>{nabor.system}</b>
+            Systém: <b>{systemLabel(nabor.system)}</b>
+          </span>
+        )}
+        {nabor.genre && (
+          <span className={s.k}>
+            Žánr: <b>{nabor.genre}</b>
           </span>
         )}
         <span className={s.k}>

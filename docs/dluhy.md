@@ -8,6 +8,15 @@
 
 ## Otevřené
 
+### D-066 — Nástěnka náborů filtruje client-side; při růstu potřeba paginace + BE facety NARÁZ
+**Soubor:** FE `src/features/ikaros/pages/NaboryPage.tsx` (`useNabory` → celý aktivní seznam), `src/features/ikaros/lib/nabory.ts` (`filterNabory`); BE `GET /nabory` (bez query filtru).
+**Problém:** 19.3b přidalo filtry systém+žánr, ale filtruje se **klient-side nad celým aktivním seznamem**. BE query filtr byl při implementaci **vědomě zamítnut** (spec 19.3 §12.5): nástěnka potřebuje i po zafiltrování celý seznam, aby poznala, které volby nemají jediný lístek (zešednutí `optEmpty`) — server-side filtr by si vyžádal druhý request nebo facety, a byl by dnes mrtvý kód. Při desítkách lístků správně; při stovkách začne růst payload i čas do prvního renderu.
+**Dopad:** Nízký (dnes) — nástěnka je nová a řídká. Střední, až bude náborů hodně: roste přenášený objem, filtr ale zůstane svižný (je v paměti).
+**Řešení:** Až přijde čas, udělat **naráz**: BE `GET /nabory?system=&genre=&strana=&mode=&q=&page=` + **facet counts** (počty per systém/žánr v jednom průchodu agregací) → FE zahodí `present` sety a čte counts z BE (bonus: může ukázat „D&D 5e (12)"). Půlka řešení (filtr bez facet) rozbije zešednutí voleb — proto naráz.
+**Kdy:** Až nástěnka překročí ~200–300 aktivních lístků, nebo když `GET /nabory` začne být viditelně pomalý. Sledovat po spuštění 19.3 naživo.
+
+---
+
 ### D-065 — `request-character` slepá kostra (endpoint bez FE + mrtvý event), redundantní po 15.10 var. A
 **Soubor:** BE `backend/src/modules/worlds/worlds.service.ts:1169` (`requestCharacter`), controller `:150` (`POST /worlds/:id/request-character`); emit `world.character.requested` bez listenera.
 **Problém:** Endpoint `request-character` sníží roli Čtenář→Žadatel a emituje event `world.character.requested`, který **nikdo neposlouchá** (žádný pending-action provider) a **žádný FE ho nevolá** (chybí tlačítko). 15.10 fáze C (varianta A) zavedla primární cestu ke hraní přes „Chci hrát" (access-request s `characterDraft` → přímo Hráč + živá Page), takže `request-character` je teď redundantní mrtvý kód. Komentář u metody slibuje „vzniká PJ pending action" — nepravda.

@@ -4,6 +4,8 @@ import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
 import { Spinner, EmptyState } from '@/shared/ui';
+import { PLATFORM_SYSTEMS } from '@/shared/rpg/systems';
+import { GENRES } from '@/shared/rpg/genres';
 import type { Nabor, NaborStrana, NaborMode } from '@/shared/types';
 import { useNabory, useOzvatSe } from '../api/useNabory';
 import { filterNabory } from '../lib/nabory';
@@ -13,35 +15,58 @@ import s from './NaboryPage.module.css';
 /**
  * 19.3 — nástěnka náborů (LFG). Deska (pozadí) = globální skin diváka
  * (`:root` `--theme-*`); lístky nesou motiv svého světa (viz NaborListek).
+ *
+ * 19.3b — filtry systém/žánr se plní z REGISTRU, ne z načtených dat. Dřív se
+ * nabídka systémů odvozovala z `nabory` → na prázdné desce filtr úplně zmizel
+ * a nikdo o něm nevěděl. Prázdný výsledek je platná odpověď („teď nikdo nehraje
+ * CoC"); zmizelá volba je matoucí.
  */
 export default function NaboryPage() {
   const { data: nabory = [], isLoading } = useNabory();
 
   const [strana, setStrana] = useState<NaborStrana | 'vse'>('vse');
   const [system, setSystem] = useState('');
+  const [genre, setGenre] = useState('');
   const [mode, setMode] = useState<NaborMode | ''>('');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 250);
   const [ozvat, setOzvat] = useState<Nabor | null>(null);
 
-  const systems = useMemo(
-    () =>
-      Array.from(new Set(nabory.map((n) => n.system))).filter(
-        (x): x is string => !!x,
-      ),
-    [nabory],
-  );
+  // Volby bez jediného lístku zůstávají v nabídce, jen zešednou (`disabled`
+  // by je udělal nevybratelnými → uživatel nepozná „nic tu není" od „chyba").
+  const present = useMemo(() => {
+    const sys = new Set<string>();
+    const gen = new Set<string>();
+    for (const n of nabory) {
+      if (n.status === 'expired') continue;
+      if (n.system) sys.add(n.system);
+      if (n.genre) gen.add(n.genre);
+    }
+    return { sys, gen };
+  }, [nabory]);
 
   const filtered = useMemo(
     () =>
       filterNabory(nabory, {
         strana,
         system: system || undefined,
+        genre: genre || undefined,
         mode: mode || undefined,
         query: debouncedQuery,
       }),
-    [nabory, strana, system, mode, debouncedQuery],
+    [nabory, strana, system, genre, mode, debouncedQuery],
   );
+
+  const anyFilter =
+    strana !== 'vse' || !!system || !!genre || !!mode || !!debouncedQuery.trim();
+
+  function resetFilters() {
+    setStrana('vse');
+    setSystem('');
+    setGenre('');
+    setMode('');
+    setQuery('');
+  }
 
   return (
     <div className={s.board}>
@@ -77,24 +102,47 @@ export default function NaboryPage() {
           </Chip>
         </div>
 
-        {systems.length > 0 && (
-          <label className={s.grp}>
-            <span className={s.lbl}>Systém</span>
-            <select
-              value={system}
-              onChange={(e) => setSystem(e.target.value)}
-              className={s.select}
-              aria-label="Filtr systému"
-            >
-              <option value="">Vše</option>
-              {systems.map((sys) => (
-                <option key={sys} value={sys}>
-                  {sys}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
+        <label className={s.grp}>
+          <span className={s.lbl}>Systém</span>
+          <select
+            value={system}
+            onChange={(e) => setSystem(e.target.value)}
+            className={s.select}
+            aria-label="Filtr systému"
+          >
+            <option value="">Vše</option>
+            {PLATFORM_SYSTEMS.map((sys) => (
+              <option
+                key={sys.id}
+                value={sys.id}
+                className={present.sys.has(sys.id) ? undefined : s.optEmpty}
+              >
+                {sys.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className={s.grp}>
+          <span className={s.lbl}>Žánr</span>
+          <select
+            value={genre}
+            onChange={(e) => setGenre(e.target.value)}
+            className={s.select}
+            aria-label="Filtr žánru"
+          >
+            <option value="">Vše</option>
+            {GENRES.map((g) => (
+              <option
+                key={g.label}
+                value={g.label}
+                className={present.gen.has(g.label) ? undefined : s.optEmpty}
+              >
+                {g.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <div className={s.grp}>
           <span className={s.lbl}>Režim</span>
@@ -130,15 +178,15 @@ export default function NaboryPage() {
         <EmptyState
           size="hero"
           illustration="messages"
-          title={debouncedQuery ? 'Nic neodpovídá hledání' : 'Zatím tu nikdo nehledá'}
+          title={anyFilter ? 'Nic neodpovídá filtru' : 'Zatím tu nikdo nehledá'}
           description={
-            debouncedQuery
-              ? 'Zkus jiné klíčové slovo nebo filtr.'
+            anyFilter
+              ? 'Zkus jiný systém, žánr nebo klíčové slovo.'
               : 'Buď první a připni svůj nábor.'
           }
           action={
-            debouncedQuery
-              ? undefined
+            anyFilter
+              ? { label: 'Zrušit filtry', onClick: resetFilters }
               : { label: 'Přidat nábor', to: '/ikaros/nabory/nova' }
           }
         />

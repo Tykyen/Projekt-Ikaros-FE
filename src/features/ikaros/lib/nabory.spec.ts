@@ -35,11 +35,36 @@ describe('filterNabory', () => {
 
   it('filtruje podle systému a režimu', () => {
     const list = [
-      mk({ id: '1', system: 'DrD', mode: 'online' }),
-      mk({ id: '2', system: 'JaD', mode: 'zivo' }),
+      mk({ id: '1', system: 'drd16', mode: 'online' }),
+      mk({ id: '2', system: 'jad', mode: 'zivo' }),
     ];
-    expect(filterNabory(list, { system: 'DrD' }).map((n) => n.id)).toEqual(['1']);
+    expect(filterNabory(list, { system: 'drd16' }).map((n) => n.id)).toEqual([
+      '1',
+    ]);
     expect(filterNabory(list, { mode: 'zivo' }).map((n) => n.id)).toEqual(['2']);
+  });
+
+  it('filtruje podle žánru', () => {
+    const list = [
+      mk({ id: '1', genre: 'Fantasy' }),
+      mk({ id: '2', genre: 'Cyberpunk' }),
+      mk({ id: '3' }), // bez žánru — do konkrétního filtru nespadne
+    ];
+    expect(filterNabory(list, { genre: 'Cyberpunk' }).map((n) => n.id)).toEqual([
+      '2',
+    ]);
+    expect(filterNabory(list, {})).toHaveLength(3);
+  });
+
+  it('systém a žánr se skládají PRŮNIKEM, ne sjednocením', () => {
+    const list = [
+      mk({ id: '1', system: 'dnd5e', genre: 'Fantasy' }),
+      mk({ id: '2', system: 'dnd5e', genre: 'Horor' }),
+      mk({ id: '3', system: 'coc', genre: 'Horor' }),
+    ];
+    expect(
+      filterNabory(list, { system: 'dnd5e', genre: 'Horor' }).map((n) => n.id),
+    ).toEqual(['2']);
   });
 
   it('fulltext hledá v nadpisu i popisu', () => {

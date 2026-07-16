@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getTheme } from '@/themes/registry';
 import { useMyWorlds } from '@/features/world/api/useWorlds';
+import { resolveSystemId } from '@/features/world/systemId';
+import { PLATFORM_SYSTEMS } from '@/shared/rpg/systems';
+import { GENRES, isKnownGenre } from '@/shared/rpg/genres';
 import {
   NABOR_MOTIVY,
   NABOR_MOTIV_LABELS,
@@ -15,8 +18,13 @@ import s from './NaborNovaPage.module.css';
 
 /**
  * 19.3 — tvorba náboru. „Hledám hráče" (PJ) → výběr světa dědí motiv
- * (`world.themeId`) + systém; motiv smí PJ přepsat. „Hledám hru" (hráč) →
+ * (`world.themeId`), systém i žánr; motiv smí PJ přepsat. „Hledám hru" (hráč) →
  * motiv si vybírá z 12.
+ *
+ * 19.3b — systém i žánr jsou **selecty z registru**, ne volný text: dřív sem
+ * `pickWorld` sypal `world.system` id (`dnd5e`) do textového pole, kam člověk
+ * psal „D&D 5e" → jeden systém se ve filtru rozpadl na několik. Proto
+ * `resolveSystemId` (world drží „dlouhá" id, katalog canonical).
  */
 export default function NaborNovaPage() {
   const nav = useNavigate();
@@ -29,6 +37,7 @@ export default function NaborNovaPage() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [system, setSystem] = useState('');
+  const [genre, setGenre] = useState('');
   const [mode, setMode] = useState<NaborMode>('online');
   const [place, setPlace] = useState('');
   const [seatsTotal, setSeatsTotal] = useState('');
@@ -39,17 +48,29 @@ export default function NaborNovaPage() {
     if (entry) {
       const t = entry.world.themeId as NaborMotiv | undefined;
       if (t && (NABOR_MOTIVY as readonly string[]).includes(t)) setMotiv(t);
-      if (entry.world.system) setSystem(entry.world.system);
+      if (entry.world.system) setSystem(resolveSystemId(entry.world.system));
+      // Svět s vlastním žánrem („Vlastní" ve wizardu) se do 11 nevejde → PJ
+      // vybere ručně; nábor custom žánry nemá (spec 19.3 R15).
+      if (isKnownGenre(entry.world.genre)) setGenre(entry.world.genre ?? '');
+      else setGenre('');
     }
   }
 
   const canSubmit =
     title.trim().length > 0 &&
     body.trim().length > 0 &&
-    (strana === 'hledam-hru' || worldId.length > 0);
+    (strana === 'hledam-hru' || (worldId.length > 0 && genre.length > 0));
+
+  // Disabled tlačítko musí říct proč (vzor `CreateWorldPage`).
+  const missing: string[] = [];
+  if (!title.trim()) missing.push('Nadpis');
+  if (!body.trim()) missing.push('Popis');
+  if (strana === 'hledam-hrace') {
+    if (!worldId) missing.push('Svět');
+    if (!genre) missing.push('Žánr');
+  }
 
   async function submit() {
-    const entry = myWorlds.find((w) => w.world.id === worldId);
     try {
       await create.mutateAsync({
         strana,
@@ -57,7 +78,8 @@ export default function NaborNovaPage() {
         worldId: strana === 'hledam-hrace' ? worldId : undefined,
         title: title.trim(),
         body: body.trim(),
-        system: system.trim() || entry?.world.system || undefined,
+        system: system || undefined,
+        genre: genre || undefined,
         mode,
         place: mode === 'zivo' ? place.trim() || undefined : undefined,
         seatsTotal:
@@ -119,7 +141,7 @@ export default function NaborNovaPage() {
             ))}
           </select>
           <span className={s.hint}>
-            Lístek převezme motiv a systém světa (motiv můžeš níže přepsat).
+            Lístek převezme motiv, systém i žánr světa (dole můžeš přepsat).
           </span>
         </div>
       )}
@@ -184,17 +206,46 @@ export default function NaborNovaPage() {
         />
       </div>
 
-      {/* systém + režim */}
+      {/* systém + žánr — datové osy pro filtr nástěnky (19.3b) */}
       <div className={s.row}>
-        <div className={s.field}>
+        <label className={s.field}>
           <span className={s.label}>Systém</span>
-          <input
-            className={s.input}
+          <select
+            className={s.select}
             value={system}
             onChange={(e) => setSystem(e.target.value)}
-            placeholder="DrD, JaD, D&D 5e…"
-          />
-        </div>
+          >
+            <option value="">— nezáleží —</option>
+            {PLATFORM_SYSTEMS.map((sys) => (
+              <option key={sys.id} value={sys.id}>
+                {sys.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={s.field}>
+          <span className={s.label}>
+            Žánr{strana === 'hledam-hru' && ' (nepovinné)'}
+          </span>
+          <select
+            className={s.select}
+            value={genre}
+            onChange={(e) => setGenre(e.target.value)}
+          >
+            <option value="">
+              {strana === 'hledam-hru' ? '— nezáleží —' : '— vyber žánr —'}
+            </option>
+            {GENRES.map((g) => (
+              <option key={g.label} value={g.label}>
+                {g.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {/* režim */}
+      <div className={s.row}>
         <div className={s.field}>
           <span className={s.label}>Režim</span>
           <div className={s.toggle}>
@@ -253,6 +304,7 @@ export default function NaborNovaPage() {
           type="button"
           className={s.primaryBtn}
           disabled={!canSubmit || create.isPending}
+          title={canSubmit ? undefined : `Doplň: ${missing.join(', ')}`}
           onClick={submit}
         >
           Připnout nábor

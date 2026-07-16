@@ -660,7 +660,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 ### - [x] 19.3 LFG / nábory (objevování her a hráčů) — [analýza sekce 5] 🔁
 **Cíl:** Lehké „hledám hru / hledám hráče" — nábory navázané na přehled světů + adresář.
 **Proč:** Reálná potřeba i v ČR, kterou nikdo česky neřeší; pomáhá proti prázdné platformě (krok 5 trychtýře).
-**Otevřené otázky:** Samostatná featura, nebo rozšíření přehledu světů? Moderace náborů?
+**Otevřené otázky:** ~~Samostatná featura, nebo rozšíření přehledu světů? Moderace náborů?~~ → vyřešeno: vlastní entita `Nabor` (R6), post-moderace přes generickou frontu (20.1).
+**19.3b — třídění dle systému a žánru** (žádost testera 2026-07-16): systém = select z registru (canonical id, `resolveSystemId`) místo volného textu, nová osa **žánr** (11 z `GENRES`), filtry vždy viditelné z registru. Registry systémů/žánrů sjednoceny do `src/shared/rpg/` (bestiář + wizard re-exportují); paritní testy proti driftu. Spec [arch/phase-19/spec-19.3.md §12](arch/phase-19/spec-19.3.md). 🚧 čeká commit + BE restart + živé ověření. Dluh D-066 (paginace+facety až s objemem).
 
 ---
 

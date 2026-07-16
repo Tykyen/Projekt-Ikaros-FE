@@ -111,6 +111,12 @@
   color: var(--theme-text);
   border: 1px solid var(--theme-border-soft, rgba(255, 255, 255, 0.12));
 }
+/* 19.3b — volba bez jediného lístku: zešedne, ale zůstává vybratelná (prázdný
+   výsledek je platná odpověď). Stylování <option> je omezené a na iOS se
+   ignoruje — proto jen kosmetika, nikdy nositel informace. */
+.optEmpty {
+  color: var(--theme-text-muted, var(--theme-text));
+}
 .spacer {
   flex: 1;
   min-width: 12px;
