@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
-import { Spinner, ConfirmDialog } from '@/shared/ui';
+import { ConfirmDialog } from '@/shared/ui';
 import { currentUserAtom } from '@/shared/store/authStore';
 import {
   WorldRole,
@@ -114,13 +114,14 @@ export default function MembersTab() {
 
   return (
     <>
+      {/* `query={membersQ}` — bez něj chyba čtení spadla do větve „žádní členové"
+          níže, takže PJ viděl prázdný svět místo chybové hlášky. */}
       <SettingsPanel
         title="Členové světa"
         description="Role, skupiny a AKJ úrovně členů. Změny se ukládají okamžitě."
+        query={membersQ}
       >
-        {membersQ.isLoading ? (
-          <Spinner center />
-        ) : membersQ.data && membersQ.data.length > 0 ? (
+        {membersQ.data && membersQ.data.length > 0 ? (
           <div className={s.table}>
             {membersQ.data.map((m) => (
               <MemberRow
@@ -143,10 +144,11 @@ export default function MembersTab() {
         )}
       </SettingsPanel>
 
-      {viewerRole >= WorldRole.PJ && !settingsQ.isLoading && (
+      {viewerRole >= WorldRole.PJ && (
         <SettingsPanel
           title="Skupiny a barvy"
           description="Skupiny člení party/frakce světa. Barva je odlišuje v chatu a seznamech. Tady je založíš (název + barva), pak je můžeš nahoře přidělit členům."
+          query={settingsQ}
         >
           <GroupColorEditor worldId={world.id} settings={editorSettings} />
         </SettingsPanel>

@@ -8,7 +8,7 @@ import {
   CalendarDays,
   StickyNote,
 } from 'lucide-react';
-import { Button, Spinner } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import {
   CHARACTER_TAB_IDS,
   type CharacterTabId,
@@ -118,11 +118,9 @@ export default function CharacterTabsVisibilityTab() {
       description={
         'Vyber, které sekce se zobrazí na detailu Postavy a NPC. Skrytí je vratné — data se nemažou, jen zmizí z UI. Tab „Profil“ je vždy povinný.'
       }
+      query={settingsQ}
     >
-      {settingsQ.isLoading ? (
-        <Spinner center />
-      ) : (
-        <>
+      <>
           {/* Desktop matrix */}
           <div className={s.matrix} role="grid" aria-label="Matice viditelnosti">
             <div className={`${s.row} ${s.head}`} role="row">
@@ -205,8 +203,7 @@ export default function CharacterTabsVisibilityTab() {
               {saving ? 'Ukládám…' : 'Uložit změny'}
             </Button>
           </footer>
-        </>
-      )}
+      </>
     </SettingsPanel>
   );
 }

@@ -111,12 +111,11 @@ Hloubková, kódem ověřená inventura. Pokrývá vše kolem vstupu do světa, 
 - **Stav** ✅
 - **Kód** FE `WorldAccessRequestRenderer.tsx`, `useWorldJoin.ts`, `WorldRequests/` (RequestsList/Bell/Drawer), `useWorldPendingActions.ts`. BE `approveAccessRequest` + `approveAccessRequestWithCharacter`, `getWorldPendingActions`, `world-access-request.provider.ts` (scope fix).
 
-### Žádost o postavu (Ctenar → Zadatel)
-- **Co to je** Čtenář bez postavy požádá o postavu; spadne na roli `Zadatel`(0) (pending na přiřazení postavy PJ). Idempotentní.
-- **Akce** `POST /worlds/:id/request-character`. 404 nečlen, 400 `ALREADY_HAS_CHARACTER_ROLE` (role ≥ Hrac).
-- **Zvláštnost** Demotuje role NÍŽE (Ctenar 1 → Zadatel 0). Zadatel = člen čekající na postavu, ne žadatel o vstup (to je `WorldAccessRequest`). **15.10:** primární cesta ke hraní je teď „Chci hrát" v JoinCTA (access-request s `characterDraft` → přímo Hráč + živá Page). `request-character` (D-062) zůstává separátní slabší cesta bez FE tlačítka — varianta A ji nevyužila.
-- **Stav** ⚠️ stub (endpoint žije, ale žádný FE ho nevolá; event `world.character.requested` nemá listenera).
-- **Kód** `worlds.service.ts:1169`, controller `:150`.
+### Žádost o postavu — ❌ ZRUŠENO (D-065, 2026-07-16)
+- **Co bývalo** `POST /worlds/:id/request-character` (D-062): Čtenář požádá o postavu → role klesla na `Zadatel`(0) + emit `world.character.requested`.
+- **Proč pryč** Slepá kostra: **žádný FE ji nevolal** (nikdy nevzniklo tlačítko) a event **neměl listenera** (slíbená „PJ pending action" neexistovala). 15.10 var. A cestu ke hraní pokryla líp — „Chci hrát" v JoinCTA (access-request s `characterDraft` → rovnou `Hrac` + živá Page). Smazán endpoint, service metoda i error kód `ALREADY_HAS_CHARACTER_ROLE`.
+- **Co zůstalo a proč** Role **`Zadatel`(0) v enumu zůstává** — nikdo ji už nepřiřazuje, ale má dvě živé funkce: (1) FE ji na 11 místech používá jako sentinel „žádná role" (`userRole ?? WorldRole.Zadatel` = spodní mez oprávnění); (2) `role === Zadatel` checky (chat/emotes/sounds/game-events/timeline/maps) drží venku historická data z `migrate:d053` (staré `Pending` → 0). Nejsou mrtvý kód, jsou pojistka — viz hlavička `world-membership.interface.ts`.
+- **Dnešní cesta ke hraní** „Chci hrát" → access-request s postavou → `Hrac`. Viz sekce Žádost o vstup výše.
 
 ### Pozvánky do světa (15.10 fáze B)
 - **Co to je** PJ proaktivně přidá hráče — cílenou pozvánkou konkrétního uživatele NEBO pozvacím odkazem. Entita `WorldInvite` (`kind: 'user' | 'link'`).

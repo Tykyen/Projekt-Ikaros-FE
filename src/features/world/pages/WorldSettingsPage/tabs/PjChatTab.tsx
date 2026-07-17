@@ -1,4 +1,3 @@
-import { Spinner } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
@@ -31,6 +30,7 @@ export default function PjChatTab() {
     <SettingsPanel
       title="PJ v chatu"
       description="Jak vystupuje vedení světa v chatu i v hlavičce."
+      query={settingsQ}
     >
       <p
         style={{
@@ -46,9 +46,9 @@ export default function PjChatTab() {
         Když PJ píše „za bytost" (NPC režim), zůstává tou bytostí.
       </p>
 
-      {settingsQ.isLoading || !settingsQ.data ? (
-        <Spinner center />
-      ) : (
+      {/* Panel řeší loading i chybu; `data` guard zůstává kvůli typu (editory
+          chtějí settings non-undefined). */}
+      {settingsQ.data && (
         <>
           {isPJ && (
             <PjChatPersonaEditor worldId={world.id} settings={settingsQ.data} />

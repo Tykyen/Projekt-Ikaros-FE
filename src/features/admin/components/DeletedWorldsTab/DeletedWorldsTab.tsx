@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { RotateCcw } from 'lucide-react';
-import { Button, Spinner, ConfirmDialog, EmptyState } from '@/shared/ui';
+import {
+  Button,
+  Spinner,
+  ConfirmDialog,
+  EmptyState,
+  ErrorState,
+} from '@/shared/ui';
 import {
   useDeletedWorlds,
   useRestoreWorld,
@@ -22,11 +28,25 @@ function daysLeft(deletedAt: string): number {
  * obnovit (`POST /worlds/:id/restore`). Po vypršení je cron trvale smaže.
  */
 export function DeletedWorldsTab() {
-  const { data: worlds = [], isLoading } = useDeletedWorlds();
+  const { data: worlds = [], isLoading, isError, refetch } = useDeletedWorlds();
   const restore = useRestoreWorld();
   const [toRestore, setToRestore] = useState<World | null>(null);
 
   if (isLoading) return <Spinner center />;
+
+  // Chyba MUSÍ předcházet prázdnému stavu: `data = []` platí i při 500, takže
+  // bez téhle větve admin uviděl „žádný svět nečeká na obnovu" a mohl propásnout
+  // 30denní recovery okno — po něm svět maže cron nevratně.
+  if (isError) {
+    return (
+      <ErrorState
+        size="panel"
+        title="Smazané světy se nepodařilo načíst"
+        description="Nevíme, jestli nějaký svět čeká na obnovu. Zkus to prosím znovu — obnovit jde jen do 30 dní od smazání."
+        onRetry={() => void refetch()}
+      />
+    );
+  }
 
   if (worlds.length === 0) {
     return (

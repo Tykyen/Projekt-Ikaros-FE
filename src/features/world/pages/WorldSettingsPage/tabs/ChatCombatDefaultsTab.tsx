@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Button, Spinner } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import type { ChatCombatDefaults } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
@@ -65,11 +65,9 @@ export default function ChatCombatDefaultsTab() {
     <SettingsPanel
       title="Souboj v chatu — viditelnost HP"
       description="Komu se ukazují životy bojovníků v liště souboje (záložka „Souboj“ v chatu). Výchozí pro nové konverzace; každou konverzaci lze přepnout přímo v jejím panelu Souboj (👁)."
+      query={settingsQ}
     >
-      {settingsQ.isLoading ? (
-        <Spinner center />
-      ) : (
-        <div className={s.form}>
+      <div className={s.form}>
           <div className={s.checks}>
             <label className={s.check}>
               <input
@@ -109,8 +107,7 @@ export default function ChatCombatDefaultsTab() {
               {saving ? 'Ukládám…' : 'Uložit změny'}
             </Button>
           </footer>
-        </div>
-      )}
+      </div>
     </SettingsPanel>
   );
 }

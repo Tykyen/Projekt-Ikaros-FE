@@ -377,7 +377,6 @@
 .roleCardCorrector     { --role-card-color: var(--role-world-corrector); }
 .roleCardPlayer        { --role-card-color: var(--role-world-player); }
 .roleCardReader        { --role-card-color: var(--role-world-reader); }
-.roleCardApplicant     { --role-card-color: var(--role-world-applicant); }
 
 .matrixWrap {
   overflow-x: auto;

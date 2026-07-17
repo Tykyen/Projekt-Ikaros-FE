@@ -70,7 +70,7 @@ Citace testera (2026-07-15): *„Vidím počet hráčů… hlavně by bylo super
 - **Postava = Page** (`type='Postava hráče'`) + auto-Character kontejner (`pages.service.ts:328-355`), vazba na člena přes `WorldMembership.characterPath` (= Character.slug). Tvorba: `NewPageWizardModal` → `/svet/:slug/nova-stranka?type=PostavaHrace`.
 - **Žádný stav postavy** — `character.interface.ts:49-83` nemá `status/draft/pending/approved`. Postava je živá hned. Žádný schvalovací krok.
 - **Žádost o vstup a postava jsou oddělené** — `approveAccessRequest` dělá jen Čtenáře bez postavy; `WorldAccessRequest` nese jen `{worldId,userId,requestedAt}`.
-- **D-062 `requestCharacter`** (`worlds.service.ts:1443-1490`, `POST /worlds/:id/request-character`) = slepá kostra: sníží `Ctenar→Zadatel`, emituje **mrtvý** event `world.character.requested` (žádný listener, žádný FE). → recyklujeme jako hák, nestavíme duplicitu.
+- ~~**D-062 `requestCharacter`** (`POST /worlds/:id/request-character`) = slepá kostra: sníží `Ctenar→Zadatel`, emituje **mrtvý** event `world.character.requested` (žádný listener, žádný FE). → recyklujeme jako hák, nestavíme duplicitu.~~ **Neplatí — varianta A hák nakonec nevyužila** (cesta ke hraní vede přes access-request s `characterDraft` → rovnou `Hrac`), takže endpoint zůstal mrtvý a **2026-07-16 byl smazán (D-065)**. Role `Zadatel`(0) v enumu zůstává jako sentinel „žádná role" + obranná hrana nad historickými daty — viz `docs/funkce/09-svet-vstup-clenstvi.md`.
 - **`AccessRequirement`** (`AccessRequirementEditor.tsx`, `pages.service.ts:passesAccess`) = kdo smí VIDĚT stránku (privacy/shielding, spec 8.1) — **nesouvisí** se vstupem/schválením. Nezaměňovat.
 
 ---

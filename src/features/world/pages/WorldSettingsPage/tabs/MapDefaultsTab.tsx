@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Button, Spinner } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import type { MapDefaults } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
@@ -78,11 +78,9 @@ export default function MapDefaultsTab() {
     <SettingsPanel
       title="Výchozí nastavení map"
       description="Co se nastaví u každé nově založené scény. Existující scény zůstávají; každou scénu lze pak individuálně přepsat v „Upravit scénu“."
+      query={settingsQ}
     >
-      {settingsQ.isLoading ? (
-        <Spinner center />
-      ) : (
-        <div className={s.form}>
+      <div className={s.form}>
           <div className={s.field}>
             <span className={s.label}>Typ mřížky</span>
             <div className={s.segmented}>
@@ -193,8 +191,7 @@ export default function MapDefaultsTab() {
               {saving ? 'Ukládám…' : 'Uložit změny'}
             </Button>
           </footer>
-        </div>
-      )}
+      </div>
     </SettingsPanel>
   );
 }

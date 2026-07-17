@@ -1,23 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import { renderWithQuery } from '@/shared/test/renderWithQuery';
 import { OverviewTab } from '../OverviewTab';
 import { useAdminStats } from '../../../api/useAdminStats';
 
 vi.mock('../../../api/useAdminStats', () => ({
   useAdminStats: vi.fn(),
 }));
-// 15B.7 — OverviewTab nově embeduje AnalyticsSection (vlastní React Query hook).
-// Test je o metrikách z useAdminStats, ne o analytics → stub (jinak „No QueryClient").
-vi.mock('../../AnalyticsSection/AnalyticsSection', () => ({
-  AnalyticsSection: () => null,
-}));
-// 19.1/19.2 — stejný důvod pro GrowthSection + CostsSection (React Query hooky).
-vi.mock('../../GrowthSection/GrowthSection', () => ({
-  GrowthSection: () => null,
-}));
-vi.mock('../../CostsSection/CostsSection', () => ({
-  CostsSection: () => null,
+// D-067 — OverviewTab embeduje sekce s vlastními React Query hooky
+// (AnalyticsSection, GrowthSection, CostsSection, ThemeUsageSection, …).
+// Dřív tu byl ruční `vi.mock` na každou z nich a přidání páté shodilo celý
+// soubor na „No QueryClient set". Místo toho: provider z renderWithQuery +
+// jeden mock síťové vrstvy, kterou všechny sdílejí. Nikdy nedoručený příslib
+// drží sekce v loading stavu → nefetchují, neshodí se a do assertions níže
+// nemluví. Nová sekce sem už nic přidávat nemusí.
+vi.mock('@/shared/api/client', () => ({
+  api: {
+    get: vi.fn(() => new Promise(() => {})),
+    post: vi.fn(() => new Promise(() => {})),
+    put: vi.fn(() => new Promise(() => {})),
+    patch: vi.fn(() => new Promise(() => {})),
+    delete: vi.fn(() => new Promise(() => {})),
+  },
 }));
 
 const mockHook = vi.mocked(useAdminStats);
@@ -31,11 +35,7 @@ const DATA = {
 };
 
 function renderTab() {
-  return render(
-    <MemoryRouter>
-      <OverviewTab />
-    </MemoryRouter>,
-  );
+  return renderWithQuery(<OverviewTab />);
 }
 
 describe('OverviewTab (12.1 dashboard)', () => {
@@ -60,7 +60,14 @@ describe('OverviewTab (12.1 dashboard)', () => {
       isError: true,
     } as ReturnType<typeof useAdminStats>);
     renderTab();
-    expect(screen.getByRole('alert')).toBeTruthy();
+    // Hledáme vlastní alert Přehledu, ne „nějaký" — embedované sekce mají
+    // při chybě také `role="alert"` a getByRole by na dvou spadl.
+    const alerts = screen.getAllByRole('alert');
+    expect(
+      alerts.some((a) =>
+        a.textContent?.includes('Statistiky se nepodařilo načíst'),
+      ),
+    ).toBe(true);
   });
 
   it('fronta odkazuje do Zpracovat', () => {

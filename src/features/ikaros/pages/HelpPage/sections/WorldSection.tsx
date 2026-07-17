@@ -104,7 +104,7 @@ export function WorldSection() {
             <strong>Akce</strong>, uprostřed <strong>Novinky</strong> světa, vpravo tvoje{' '}
             <strong>Oblíbené stránky</strong> — osobní seznam, který si každý člen tvoří
             sám (hvězdičkou u stránek) a může v něm přetahováním měnit pořadí.
-            Anonym a Žadatel vidí pre-join verzi s tlačítkem Vstoupit / Požádat.
+            Kdo ještě není členem, vidí pre-join verzi s tlačítkem Vstoupit / Chci hrát.
           </p>
           <ScreenshotSlot media="svet.prehled" />
         </Tool>
@@ -141,9 +141,9 @@ export function WorldSection() {
         </Tool>
         <Tool icon={<Crown size={16} />} title="Role ve světě" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>
-            Ve světě jsou role PJ, Pomocný PJ, Korektor, Hráč, Čtenář a Žadatel —
-            určují, co kdo smí. Roli ti přiděluje PJ. Plný rozpis pravomocí i matici
-            oprávnění najdeš v tabu <strong>Role &amp; oprávnění</strong>.
+            Ve světě jsou role PJ, Pomocný PJ, Korektor, Hráč a Čtenář — určují, co
+            kdo smí. Roli ti přiděluje PJ. Plný rozpis pravomocí i matici oprávnění
+            najdeš v tabu <strong>Role &amp; oprávnění</strong>.
           </p>
         </Tool>
         <Tool icon={<Palette size={16} />} title="Můj vzhled — uprav si svět pro sebe" audience={{ kind: 'vse', label: 'Členové' }}>

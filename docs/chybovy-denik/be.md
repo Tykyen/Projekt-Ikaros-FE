@@ -214,3 +214,43 @@
 **Reuse:** page-review = nový typ v **15.10 multi-typ frontě** (`getWorldPendingActions` + `RequestsList` + zvoneček/drawer) — bez separátní pending-action třídy; **globální „Zpracovat" tab vynechán** (world-scoped fronta v kontextu světa pokrývá PJ). worlds→pages přes existující `PagesService` inject (15.10 fáze C).
 
 **Zhodnocení — DOBŘE:** (1) průzkum pages chokepointů (`assertCanWrite`/`assertAccess`/`findDirectory`/search/spawn/mention) PŘED kódem = přesná mapa všech leak cest; (2) reuse 15.10 fronty ušetřil provider+renderer; (3) `smoke-full-app` boot znovu ověřil DI (ne jen tsc). **Rutina/drobnosti:** interface `Pick<>` v `pages-repository.interface` omezuje return typ → nové pole (`pageStatus`/`proposedBy`) nutno přidat i tam (ne jen do impl), jinak tsc `Property does not exist`. Ověřeno: BE typecheck+lint+247 jest (pages 82 + worlds 165)+smoke boot; FE tsc-b+eslint+14 vitest. **Zbývá Z (funkce/napoveda).**
+
+---
+
+## ✅ ŘEŠENÍ — úklid dluhů D-065 (mrtvý `request-character`) + D-064 (dvojí default motivu světa) — 2026-07-16
+
+**Zadání:** „D-064..D-067 nejsou vyřešené? Naprav to, nechci žádné dluhy." Ověřeno kódem: všechny čtyři reálně otevřené (vznikly při 19.3/20.6/dnes; hromadná oprava 12.–13. 7. je nezahrnovala). D-067 zvlášť (viz fe.md `renderWithQuery`), D-066 → **Odložené** (řešení = BE facety, dnes mrtvý kód; trigger ~200–300 lístků).
+
+**D-065 — past, která zabránila regresi (hlavní poučení dne):**
+Dluh doporučoval variantu **(a) odstranit endpoint + roli-demote logiku**. Průzkum před smazáním ukázal, že (a) v naivní podobě vyrobí NOVÝ dluh:
+- `requestCharacter` je **jediný producent** `WorldRole.Zadatel`(0) v celém produkčním BE (ověřeno na všech 6 `membershipRepo.save()` + seedu — ostatní dávají `Ctenar`/`Hrac`/`PJ`). Smazat jen endpoint → ~10 checků `role === Zadatel` (chat/emotes/sounds/game-events/timeline/maps) se stane mrtvým kódem.
+- Domyšlená (a) = „smazat i roli" → **rozbila by 11 FE míst**: `const viewerRole = userRole ?? WorldRole.Zadatel` — enum hodnota `0` slouží zároveň jako **sentinel „žádná role"** (spodní mez oprávnění). Smazání by otevřelo přístupy.
+- Navíc `migrate:d053` historicky mapovala `Pending → 0`, takže `role: 0` v DB legitimně vzniknout mohla → checky jsou **pojistka nad daty**, ne mrtvý kód.
+→ Zvolena **(b)**: smazán endpoint + service metoda + error kód `ALREADY_HAS_CHARACTER_ROLE`; **role `Zadatel` ponechána** a její dvě živé funkce (sentinel + obranná hrana) natvrdo zdokumentovány v hlavičce `world-membership.interface.ts`, aby ji příští audit zase neoznačil za dluh.
+
+**D-064 — `modre-nebe` byl na DVOU místech, ne jednom:** dluh znal jen `@Prop({ default: 'modre-nebe' })` ve `world.schema.ts`. Grep našel i **druhý fallback v `toEntity`** (`worlds.repository.ts:260` `?? 'modre-nebe'`) — přesně vzor z `project_be_field_checklist` („začni od toEntity"). Fix: schema bez defaultu (`themeId?: string`), toEntity bez fallbacku, interface optional → **`undefined` = PJ nevybral**, výchozí vzhled dopočítá jediné místo (FE `resolveWorldTheme` → `DEFAULT_WORLD_THEME='ikaros'`; wizard `themeId` stejně vždy posílá). Ověřeno, že 20.6 `toDimension` řadí `null/undefined` → `noChoice` → přehled teď říká pravdu.
+
+**Vedlejší nález (mimo zadání):** regenerace error-kontraktu (`node scripts/error-contract-scan.mjs --emit`, skript žije ve **FE** repu a generuje obě zrcadla) odhalila, že generovaný soubor byl **zastaralý o 13 kódů** z 15.10/22.4/22.5 (`INVITE_*`, `SHOWCASE_*`, `TEMPLATE_*`, `PROPOSAL_NOT_FOUND`, `NOT_CURATOR`, …) — někdo přidal `throw` s novým `code` a kontrakt nepřegeneroval. Guard `audit:errors` po regeneraci zelený (FE→BE drift: žádný).
+
+**Zhodnocení — DOBŘE:** (1) *průzkum před `rm`* — u obou dluhů popis podceňoval rozsah (D-065 sentinel, D-064 druhý fallback); grep „kdo to **zapisuje**" vs. „kdo to **čte**" je levnější než revert; (2) zastavení a dotaz na `countDocuments({role:0})` místo tichého smazání; (3) záměr zapsán do kódu (hlavička enumu), ne jen do deníku. **ŠPATNĚ:** uživateli jsem řekl „jedeme (a)" **dřív**, než jsem prověřil FE stranu — souhlas tak stál na neúplném obrázku a musel jsem couvnout na (b). Pořadí mělo být: domapovat OBĚ strany → teprve pak nabídnout volbu. **Ověřeno:** BE typecheck ✓ · lint ✓ · jest 216/216 (worlds 12 souborů + theme-usage) ✓ · FE build ✓ · FE plná sada **3736/3736, 0 failed** ✓. **Zbývá:** BE restart + FE deploy, pak živé ověření.
+
+---
+
+## ✅ ŘEŠENÍ — 26 SCALE-RT: WS rate-limit existoval, ale 2 gateways ho neměly (vč. „nejhorších write eventů") — 2026-07-17
+
+**Výchozí tvrzení (D-AUDIT, report:35):** *„WS **ZCELA** bez rate-limitu (0 throttle na gateways)"* — 🔴, poslední otevřená z původních osmi.
+
+**Realita na HEAD:** rate-limit **existuje od 12. 7.** — `common/ws/ws-rate-limit.ts` (sliding window per socket × event, stav v `client.data` → zaniká s GC socketu, tichý drop + warn, disconnect při ≥10× limitu) včetně 24 testů. Pokrýval `app` / `chat` / `maps` / `presence` gateway. **Chyběl ale ve dvou:**
+- **`global-chat.gateway`** — 10 eventů, 0 stropů. Mezi nimi `ikaros:whisper` a `chat:reaction:toggle`, tedy **přesně ty dva, které checkpoint označil za „nejhorší write eventy = Mongo write bez stropu"**. Fix se udělal všude jinde a na tuhle gateway se zapomnělo.
+- **`platform-chat.gateway`** — 3 eventy, 0 stropů. **Audit o ní nevěděl**: 20.5 admin chat vznikl PO běhu 11. 7. Nový kód se do starého reportu nedostane — což je argument pro guard, ne pro další audit.
+
+**Málem jsem napsal druhou implementaci téhož.** Grep `rateLimit|throttle|Throttle` nad `chat.gateway`/`socket-io.adapter` nevrátil nic (volá se `allowWsEvent(client, 'typing:start')` uvnitř handlerů), takže jsem usoudil „chybí" a začal psát `common/ws/ws-rate-limit.ts` — **soubor toho jména už existoval**. Zachránil mě Write tool („File has not been read yet"), ne moje ověření. Přesně [[CH-078]] pošesté: grep dokazuje jen to, na co se ptáš.
+
+**Řešení:**
+1. **`global-chat.gateway`** — `allowWsEvent` na všech 10 eventů. Limity dle povahy: `ikaros:whisper` 10/10 s (Mongo write, nad reálným psaním člověka), `chat:reaction:toggle` 30 (rychlé přepínání emoji je legitimní), `voice:state` 30 (**každý stav broadcastuje roster O(N) → smyčka = O(N²)**), heartbeat 60, join/leave 30.
+2. **`platform-chat.gateway`** — 3 eventy (join ověřuje přístup = DB dotaz, typing 60).
+3. **`maxHttpBufferSize` 5 MB → 1 MB** (`socket-io.adapter:72`). Ověřeno, že přes WS **nechodí binární data**: uploady jedou HTTP (`upload.controller` `@Post`), mapové operace taky (`POST /maps/:id/operations`, vč. fog s `@ArrayMaxSize(50000)` ≈ 1 MB). WS nese jen join/typing/ping/ruler(4 čísla)/sound/whisper/reaction. **Kdyby fog šel přes WS, 1 MB by ho utnul** — proto se to ověřovalo, ne odhadovalo.
+4. **`THROTTLER_REDIS: "1"`** do `docker-compose.prod.yml`. Kód to podporoval (D-028 opt-in), prod flag chyběl → při N replikách by byl HTTP limit N× volnější. Dnes 1 replika = beze změny chování; zapnuto dopředu. Fallback bezpečný (bez Redisu varuje a jede in-memory).
+5. **Guard `ws-rate-limit-coverage.spec.ts`** — statická kontrola VŠECH `*.gateway.ts`: každý `@SubscribeMessage` musí mít `allowWsEvent`. Plus self-test „nejsem no-op" a pojistka na počet nalezených souborů (aby test tiše neprošel při špatné cestě). Výjimky přes `EXEMPT` s odůvodněním (dnes prázdné).
+
+**Zhodnocení — DOBŘE:** (1) guard řeší **kořen**, ne symptom — obě mezery vznikly tím, že se strop aplikuje ručně per handler a nic to nevynucuje; `platform-chat` navíc dokazuje, že audit nový kód nepokryje, ale guard ano; (2) `maxHttpBufferSize` ověřen proti reálným payloadům (fog 50k hexů!), ne odhadem; (3) limity odvozené od povahy eventu (write vs. broadcast vs. ephemeral), ne jedno číslo pro vše. **ŠPATNĚ:** grep → „chybí" → málem duplicitní implementace; ověřit jsem měl `find`em soubor, ne grepem volání. **Ověřeno:** typecheck ✓ lint ✓ prettier ✓ **jest 2951/2951** (180 suites, +19 nových: 24 stávajících ws + 4 coverage guard). **Zbývá (strukturální, diskuze):** presence room-scoping (`server.emit` globální O(N²) — `presence.gateway:107,153,157`), Redis-backed presence (D-051), connection cap per IP, `volatile.emit` na ephemeral.

@@ -2223,3 +2223,44 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 - 🚧 Zbývá: FE+BE commit (ruční), **BE restart**, živé ověření + screenshoty (mobil 375 / desktop) — deska je prázdná, takže tester musí nejdřív připnout lístek, aby filtr měl co třídit.
 
 ---
+
+### ✅ ŘEŠENÍ — Jak odlišit flaky od vlastní regrese, když je plná sada červená (+ D-067 renderWithQuery) · 2026-07-16
+
+**Kontext:** Po 19.3b hlásila plná FE sada 8 souborů / 19 testů červeně. Cílené běhy těch samých souborů zelené (277/277, 366/366). Otázka: rozbil jsem to já?
+
+**Postup, co zabral (v tomhle pořadí):**
+1. **JSON reportér místo čtení konzole** — `--reporter=json --outputFile=…`. Dot/default reportér přepisuje řádky přes `\r`, takže v log souboru zbyde jen souhrn a **názvy failujících souborů se nedozvíš**. JSON dal přesný seznam + `failureMessages`.
+2. **Typ selhání = první třídička.** `No QueryClient set` (assertion/setup) ≠ `STACK_TRACE_ERROR`/timeout. Assertion → skutečná chyba; timeout → podezření na zátěž.
+3. **Cílený běh těch samých souborů.** 3 ze 4 prošly → flaky (viz [[CH-076]] — shodil jsem je vlastní souběžnou zátěží). OverviewTab padal i sám → reálné.
+4. **Git forenzika místo hádání:** `git show --stat <můj commit> | grep admin` → **prázdné**; `grep -rn "shared/rpg" src/features/admin/` → **prázdné**. Tedy: můj commit se adminu nedotkl a admin nemá na mé změny vazbu ⇒ **není to moje regrese**. `git log -3 -- <soubor>` ukázal viníka: `ef82c208` (20.6 statistika).
+5. **Až pak oprava.**
+
+**Kořen (D-067):** `OverviewTab.spec` renderoval bez `QueryClientProvider` a každou embedovanou sekci s React Query hookem ručně `vi.mock`-oval. 20.6 přidalo `ThemeUsageSection` a stub nedoplnilo → 3 testy červené **od té doby**, aniž si kdo všiml (admin modul nikdo cíleně nepouštěl; plná sada se běžně nepouští).
+
+**Řešení lepší než moje první:** já přidal 4. stub do řady (funguje, ale past zůstává). Finální podoba = **`src/shared/test/renderWithQuery.tsx`** (provider + `MemoryRouter` + `retry:false`/`gcTime:0`, nová `QueryClient` na render) + **jeden mock `@/shared/api/client`** s nikdy nedoručeným příslibem → sekce uvíznou v loading, nefetchují, do assertions nemluví. **Ruční seznam stubů zmizel — pátá sekce test neshodí.** Bonus: alert-assertion zpřesněna přes `getAllByRole` + hledání vlastního textu (embedované sekce mají `role="alert"` taky → `getByRole` by na dvou spadl).
+
+**Jak ověřeno:** OverviewTab 3/3 ✓ · **plná FE sada 3736/3736, 0 failed, exit 0** (exkluzivní běh, nic souběžně).
+
+**Zhodnocení — dobře/špatně.**
+- 👍 Neopravoval jsem naslepo „svoji" domnělou regresi — 2 grepy (dotkl se můj commit té oblasti? má ta oblast vazbu na mé změny?) daly odpověď za pár sekund a levněji než `git stash` + 30min běh.
+- 👍 JSON reportér je jediná spolehlivá cesta k názvům failujících testů u velké sady.
+- 👎 Moje první oprava (4. stub) řešila příznak, ne past. Správně = odstranit důvod, proč seznam vůbec existuje.
+- 📌 **Vzor k převzetí:** komponenta (i nepřímo přes vnořené sekce) volá React Query → `renderWithQuery`, **ne** další `vi.mock` na souseda.
+
+---
+
+---
+
+## ✅ ŘEŠENÍ — tichá ztráta nastavení světa: chybová cesta vykreslila formulář s defaulty a „Uložit" je zapsal přes reálná data — 2026-07-17
+
+**Jak se to našlo:** zadání „dotáhni D-17.8 / D-DATA-SYNC / D-DROBNE / D-SEC-GAP / D-LAUNCH-GAP / D-AUDIT / D-066" → 4 paralelní read-only průzkumy stavu kódu. Nejzávažnější nález **nebyl v žádném dluhu jako bug** — seděl v D-SEC-GAP jako poslední odrážka „FE vzor »prázdný stav místo chyby« na části starších ploch", tedy jako kosmetika.
+
+**Skutečná závažnost — destrukce dat, ne kosmetika:** taby nastavení světa čtou přes `normalize(settingsQ.data?.x)`. `normalize` je total funkce s hardcoded defaulty (`gridType: 'hex'`, `size: 40`…). Na chybové cestě je `data === undefined` → `normalize(undefined)` vrátí **defaulty**. Taby měly `isLoading` guard, ale **`isError` ani jeden** → při 500 se vykreslil plný formulář s defaulty, tvářil se jako uložený stav, a aktivní „Uložit" je zapsal **přes reálná nastavení v DB**. PJ o tom neměl jak vědět.
+
+**Řešení — centralizace do `SettingsPanel`, ne 6× ručně:** `SettingsPanel` (obal, který všechny taby už používaly) dostal volitelný `query?: { isLoading, isError, refetch }` — když ho tab předá, panel sám řeší spinner, `ErrorState` + retry, a **children i `action` (Uložit) rendruje jen nad načtenými daty**. Vědomě NE `UseQueryResult` (panel nemá vědět nic o typu dat, jen o stavu). Důvod pro centralizaci: ruční `isError` v každém tabu je přesně vzor [[project_fe_test_precommit]]/D-067 — seznam, který nic nevynucuje a 7. tab ho zapomene. Takhle nový tab stačí předat `query`.
+
+**Opraveno:** `MapDefaultsTab`, `ChatCombatDefaultsTab`, `CharacterTabsVisibilityTab` (normalize→defaulty = ztráta dat) · `AkjTab` (`?? []` → uložení by smazalo AKJ úrovně) · `PjChatTab` (`isLoading || !data` → při chybě **nekonečný spinner**) · `MembersTab` **dva** panely: seznam členů při chybě tvrdil „Tento svět zatím nemá žádné členy" (lež), panel skupin by uložil prázdné `customGroups`/`groupColors`. Dále mimo taby: `DeletedWorldsTab` (`data = []` při 500 → admin viděl „žádný svět nečeká na obnovu" a mohl **propásnout 30denní recovery okno**, pak maže cron nevratně) · `TrustedDevicesCard` (chyba → „Žádná důvěryhodná zařízení" = **falešné bezpečnostní ujištění**, uživatel může mít aktivní 2FA bypass a nevědět o něm).
+
+**Test na PANELU, ne na tabech** (`__tests__/SettingsPanel.spec.tsx`, 5 testů): kontrakt „při chybě nepouštěj formulář ani Uložit ven" platí pro všechny současné i budoucí taby naráz. Testovat 6× tentýž ternár v tabech = zase ruční seznam.
+
+**Zhodnocení — DOBŘE:** (1) průzkum PŘED prací opět odhalil, že dluh podceňuje (vzor už potřetí — D-064 druhý fallback, D-065 sentinel, teď „kosmetika" = destrukce dat); (2) fix šel do společného obalu, takže vada nejde zopakovat; (3) `action` se skrývá taky — jinak by Uložit zůstal klikací nad ErrorState. **ŠPATNĚ / zbývá:** průzkum hlásil u combat panelů jen `FateCombatPanel`; grep ukázal, že **`isError` nemá ani jeden z 12** (`Coc/Dnd/Drd16/Drd2/Drdh/DrdPlus/Fate/Gurps/Jad/Matrix/Pi/Shadowrun`) — hráč edituje nad nulami z `diary?.customData ?? {}`. Dopad menší (patch je per-klíč, neztratí celý deník), ale je to tentýž vzor. Nemají sdílený obal (každý má vlastní `*CombatBodyLoading`) → samostatná dávka, ne půlka téhle. **Ověřeno:** tsc -b ✓ eslint ✓ vitest 134/134 (25 souborů) ✓. Živé ověření (screenshot chybového stavu) čeká na uživatele.

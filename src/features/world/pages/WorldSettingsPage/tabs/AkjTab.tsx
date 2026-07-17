@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Spinner } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import { SettingsPanel } from '../components/SettingsPanel';
@@ -27,6 +26,7 @@ export default function AkjTab() {
     <SettingsPanel
       title="AKJ úrovně"
       description="Stupňovaná prověrka řídící viditelnost wiki stránek."
+      query={settingsQ}
     >
       <p className={s.note}>
         AKJ je stupňovaná prověrka. Určuje, které stránky světa hráč uvidí a
@@ -35,11 +35,7 @@ export default function AkjTab() {
         prověrka</em>. Přiřazení úrovně jednotlivým členům řeší tab Členové.
       </p>
 
-      {settingsQ.isLoading ? (
-        <Spinner center />
-      ) : (
-        <AkjLevelEditor worldId={world.id} initial={akjTypes} />
-      )}
+      <AkjLevelEditor worldId={world.id} initial={akjTypes} />
     </SettingsPanel>
   );
 }

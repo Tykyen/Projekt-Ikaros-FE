@@ -177,6 +177,12 @@ function FatePanelImpl({
   ).filter((s) => s.name);
 
   if (isLoading) return <FateCombatBodyLoading />;
+  // Bez tohohle guardu (jako jediný z 12 combat panelů) padal panel na chybové
+  // cestě do `diary?.customData ?? {}` → stres/následky/FP se vykreslily jako
+  // prázdné a klik uložil ABSOLUTNÍ hodnotu spočtenou z té nuly → přepsal
+  // reálný deník. Ostatní panely mají `if (!diary)` hned za loadingem — tohle
+  // je dorovnání na jejich vzor (chytá i chybu i „deník neexistuje").
+  if (!diary) return <FateCombatBodyUnavailable />;
 
   return (
     <FateCombatBody
@@ -215,6 +221,14 @@ function FatePanelImpl({
 
 function FateCombatBodyLoading(): React.ReactElement {
   return <div style={{ padding: 16, color: '#9b8a6c' }}>Načítám statblok…</div>;
+}
+
+function FateCombatBodyUnavailable(): React.ReactElement {
+  return (
+    <div style={{ padding: 16, color: '#9b8a6c' }} role="alert">
+      Deník postavy není dostupný.
+    </div>
+  );
 }
 
 /** Fate Accelerated PC combat panel (prefix `fae_`). */

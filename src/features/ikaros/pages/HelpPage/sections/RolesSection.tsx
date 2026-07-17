@@ -141,15 +141,6 @@ const WORLD_CARDS: WorldCard[] = [
       'Jen prohlíží obsah světa. Nemůže spravovat ani svou postavu. ' +
       'Dříve označovaný jako „Nezařazený".',
   },
-  {
-    key: 'applicant',
-    cardCls: s.roleCardApplicant,
-    title: 'Žadatel',
-    badge: 'Čeká na schválení (v přípravě)',
-    desc:
-      'Požádal o přístup do uzavřeného světa a čeká na schválení od PJ. ' +
-      'Zatím není členem světa.',
-  },
 ];
 
 // ── Matice oprávnění (data-driven) ─────────────────────────────────────
@@ -179,17 +170,16 @@ const WORLD_COLUMNS: PermissionColumn[] = [
   { key: 'corrector', label: 'Korektor', colorVar: '--role-world-corrector', icon: <WorldRoleIcon role="corrector" size="md" /> },
   { key: 'player', label: 'Hráč', colorVar: '--role-world-player', icon: <WorldRoleIcon role="player" size="md" /> },
   { key: 'reader', label: 'Čtenář', colorVar: '--role-world-reader', icon: <WorldRoleIcon role="reader" size="md" /> },
-  { key: 'applicant', label: 'Žadatel', colorVar: '--role-world-applicant', icon: <WorldRoleIcon role="applicant" size="md" /> },
 ];
 
 const WORLD_ROWS: PermissionRow[] = [
-  { action: 'Prohlížení obsahu', allow: { pj: true, 'pj-asst': true, corrector: true, player: true, reader: true, applicant: false } },
-  { action: 'Správa své postavy', allow: { pj: true, 'pj-asst': true, corrector: true, player: true, reader: false, applicant: false } },
-  { action: 'Úprava dat světa', allow: { pj: true, 'pj-asst': true, corrector: true, player: false, reader: false, applicant: false } },
-  { action: 'Vytváření obsahu', allow: { pj: true, 'pj-asst': true, corrector: false, player: false, reader: false, applicant: false } },
-  { action: 'Správa členů', allow: { pj: true, 'pj-asst': true, corrector: false, player: false, reader: false, applicant: false } },
-  { action: 'Mazání obsahu', allow: { pj: true, 'pj-asst': false, corrector: false, player: false, reader: false, applicant: false } },
-  { action: 'Nastavení světa', allow: { pj: true, 'pj-asst': false, corrector: false, player: false, reader: false, applicant: false } },
+  { action: 'Prohlížení obsahu', allow: { pj: true, 'pj-asst': true, corrector: true, player: true, reader: true } },
+  { action: 'Správa své postavy', allow: { pj: true, 'pj-asst': true, corrector: true, player: true, reader: false } },
+  { action: 'Úprava dat světa', allow: { pj: true, 'pj-asst': true, corrector: true, player: false, reader: false } },
+  { action: 'Vytváření obsahu', allow: { pj: true, 'pj-asst': true, corrector: false, player: false, reader: false } },
+  { action: 'Správa členů', allow: { pj: true, 'pj-asst': true, corrector: false, player: false, reader: false } },
+  { action: 'Mazání obsahu', allow: { pj: true, 'pj-asst': false, corrector: false, player: false, reader: false } },
+  { action: 'Nastavení světa', allow: { pj: true, 'pj-asst': false, corrector: false, player: false, reader: false } },
 ];
 
 // ── Karta role ─────────────────────────────────────────────────────────
@@ -366,7 +356,13 @@ export function RolesSection() {
         />
         <p className={s.matrixNote}>
           Matice je orientační — některé sekce mají jemnější práh (viz Nastavení
-          světa). Plná funkčnost rolí Korektor, Čtenář a Žadatel se ještě dotváří.
+          světa). Plná funkčnost rolí Korektor a Čtenář se ještě dotváří.
+        </p>
+        <p className={s.matrixNote}>
+          Než tě PJ do světa pustí, žádnou roli nemáš — čekáš na schválení a svět
+          vidíš jen zvenku (název, popis, tlačítko Vstoupit / Chci hrát). Po
+          schválení dostaneš rovnou <strong>Hráče</strong> (když jsi poslal
+          postavu), nebo <strong>Čtenáře</strong>.
         </p>
 
         <h3>Přístup k nastavení světa</h3>

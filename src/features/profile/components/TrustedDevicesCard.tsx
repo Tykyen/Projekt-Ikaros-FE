@@ -22,7 +22,7 @@ function formatDate(iso: string): string {
 export function TrustedDevicesCard() {
   const { data: profile } = useMyProfile();
   const enabled = profile?.totpEnabled ?? false;
-  const { data: devices } = useTrustedDevices(enabled);
+  const { data: devices, isError, refetch } = useTrustedDevices(enabled);
   const revoke = useRevokeTrustedDevice();
 
   if (!enabled) return null;
@@ -45,7 +45,19 @@ export function TrustedDevicesCard() {
         )}
       </header>
 
-      {!hasDevices ? (
+      {/* Chyba PŘED prázdným stavem: `devices` je undefined i při 500, takže bez
+          téhle větve karta tvrdila „žádná důvěryhodná zařízení" = falešné
+          bezpečnostní ujištění (uživatel může mít aktivní 2FA bypass a nevědět
+          o něm). U bezpečnostní plochy je nejistota lepší než klidná lež. */}
+      {isError ? (
+        <p className={styles.empty} role="alert">
+          Seznam zařízení se nepodařilo načíst — <strong>nevíme tedy, jestli
+          nějaké zařízení 2FA přeskakuje</strong>.{' '}
+          <Button type="button" variant="ghost" onClick={() => void refetch()}>
+            Zkusit znovu
+          </Button>
+        </p>
+      ) : !hasDevices ? (
         <p className={styles.empty}>
           Žádná důvěryhodná zařízení. Při přihlášení můžeš zařízení označit jako
           důvěryhodné — pak na něm 2FA na 30 dní přeskočí.
