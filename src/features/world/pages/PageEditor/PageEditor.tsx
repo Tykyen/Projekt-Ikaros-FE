@@ -274,6 +274,8 @@ export function PageEditor({
         toast.error('Slug už existuje. Zvol jiný.');
       } else if (status === 409 || code === 'PAGE_CONFLICT') {
         setConflictModalOpen(true);
+      } else if (status === 403) {
+        toast.error('Nemáš oprávnění tuhle stránku upravit.');
       } else {
         toast.error('Uložení selhalo');
       }

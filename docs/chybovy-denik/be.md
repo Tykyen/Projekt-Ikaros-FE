@@ -312,3 +312,20 @@ out[key] = typeof value === 'string' ? sanitizeRichText(value) : value; // ne-st
 **Zhodnocení — DOBŘE:** (1) povinný parametr = zámek nejde vynechat omylem; (2) zvolena lehčí ze dvou navržených cest, a v komentáři je napsáno **proč** (jeden zápis ≠ dvoufázový commit); (3) opraven lživý komentář, který vadu maskoval; (4) test hlídá i to, že se do repa předává `updatedAt` **ze snapshotu, ze kterého se počítalo**. **Pozn.:** existující `mockAccount` neměl `updatedAt` → doplněn fixní (`ACCOUNT_UPDATED_AT`), reálné schema má `timestamps: true`. **Ověřeno:** typecheck ✓ lint ✓ prettier ✓ **jest 2955/2955** (+3 testy: lock předán, 409 při souběhu, 404 při smazání).
 
 **Zbývá z RC-E7/E8:** `removeFromInventory` (E8) — full-sections `$set` v `campaign-purchase.removeFromInventory` → `character-subdocs.updateInventory`. Tatáž třída, jiný uzel; chce stejný zámek nebo `$pull` místo přepisu sekcí.
+
+---
+
+## ✅ ŘEŠENÍ — vlastník postavy (hráč) nemohl uložit profil/Bio: FE/BE drift oprávnění — 2026-07-17
+
+**Symptom (tester):** hráč u své postavy (Postava hráče) klikne „Upravit Bio", uloží → toast **„Uložení selhalo"**. PJ/Adminovi ukládání téže postavy funguje. Rozdíl PJ-ano / hráč-ne byl klíč k příčině.
+
+**Příčina — autorizační drift FE↔BE:** FE `PostavaLayout.tsx:70-77` ukazuje „Upravit Bio" i **vlastníkovi** (`canEdit = role≥PomocnyPJ || isOwner`, `isOwner = ownerUserId===currentUser.id`), odkaz vede na `/edit/<slug>` → `PageEditor` → `pages.update`. BE `pages.service.assertCanEditPage` ale vlastníka vůbec neřešil: povolí jen moderátora (≥PomocnyPJ) a autora **pending** návrhu; approved PC vlastníka-hráče propadlo do `assertCanWrite` → role Hráč < PomocnyPJ → **403 PAGE_FORBIDDEN**. FE `PageEditor` na to hlásil generické „Uložení selhalo" (žádná 403 větev) → nikdo neviděl, že jde o oprávnění.
+
+**Řešení:**
+1. BE `assertCanEditPage` — přidána větev pro vlastníka: `type==='Postava hráče' && ownerUserId===requester.id && role≥Hrac` → povolit. Metoda nově vrací `{ ownerScoped }` (= ne-moderátorská editace: vlastník PC / autor návrhu).
+2. BE `update` — pro `ownerScoped` **osekne citlivá pole** (`accessRequirements`, `akjTabs`, `ownerUserId`, `type`, `slug`) z `persistDto` → vlastník mění jen obsah, nejde eskalovat přístup, přepsat AKJ PJ záložky, předat vlastnictví, obejít gating typem ani ukrást URL. (Zpřísňuje i autora pending návrhu — správně.)
+3. FE `PageEditor` — 403 větev → „Nemáš oprávnění tuhle stránku upravit." místo „Uložení selhalo".
+
+**Rozhodnutí (uživatel):** volba „owner smí plný update" (přes moje doporučení zamknout pole). Když se ale ukázalo, že to plodí dluh (přepis AKJ/přístupů), rozhodli jsme dodělat zúžení rovnou → žádný dluh nezůstal.
+
+**Zhodnocení — DOBŘE:** (1) rozdíl „PJ ano / hráč ne" ukázal na roli hned, žádné hádání; (2) místo dluhu na eskalaci dořešeno v jednom zátahu (osekání polí) → nezůstala bezpečnostní půdička; (3) `ownerScoped` sjednotil vlastníka i autora návrhu do jedné brány. **ŠPATNĚ:** generické „Uložení selhalo" bez 403 rozlišení zdrželo diagnostiku — chybová hláška, co spolkne status, je past. **Ověřeno:** BE typecheck ✓, `pages.service.spec` **87/87** (+3: vlastník smí, cizí hráč 403, citlivá pole osekána, moderátor je měnit smí); FE `tsc -b` ✓. Čeká **BE restart + deploy** + živé ověření testerem.
