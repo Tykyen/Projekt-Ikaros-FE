@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { toast } from 'sonner';
 import { Bookmark } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import {
   useMyFavoriteDiscussions,
   useTogglePinDiscussion,
@@ -160,15 +160,34 @@ function EmptyTab() {
   );
 }
 
+/**
+ * FE-failure (styl 37) — protějšek `EmptyTab` pro chybovou cestu. Všechny tři
+ * záložky měly `if (!items || items.length === 0) return <EmptyTab />`, jenže
+ * `items` je `undefined` i při 500 → výpadek se tvářil jako „nic tu nemáš"
+ * a uživatel mohl usoudit, že o oblíbené přišel. Chyba proto musí PŘEDCHÁZET
+ * prázdnému stavu.
+ */
+function ErrorTab({ onRetry }: { onRetry: () => void }) {
+  return (
+    <ErrorState
+      size="panel"
+      title="Oblíbené se nepodařilo načíst"
+      description="Nic se neztratilo — jen to teď nedokážeme zobrazit. Zkus to prosím znovu."
+      onRetry={onRetry}
+    />
+  );
+}
+
 // ─── Tab: Diskuze ──────────────────────────────────────────────────────────
 
 function DiscussionsTab() {
   const user = useAtomValue(currentUserAtom);
-  const { data: items, isLoading } = useMyFavoriteDiscussions();
+  const { data: items, isLoading, isError, refetch } = useMyFavoriteDiscussions();
   const togglePin = useTogglePinDiscussion();
   const pinned = user?.pinnedDiscussionIds ?? [];
 
   if (isLoading) return <Spinner center />;
+  if (isError) return <ErrorTab onRetry={() => void refetch()} />;
   if (!items || items.length === 0) return <EmptyTab />;
 
   return (
@@ -200,11 +219,12 @@ function DiscussionsTab() {
 
 function ArticlesTab() {
   const user = useAtomValue(currentUserAtom);
-  const { data: items, isLoading } = useMyFavoriteArticles();
+  const { data: items, isLoading, isError, refetch } = useMyFavoriteArticles();
   const togglePin = useTogglePinArticle();
   const pinned = user?.pinnedArticleIds ?? [];
 
   if (isLoading) return <Spinner center />;
+  if (isError) return <ErrorTab onRetry={() => void refetch()} />;
   if (!items || items.length === 0) return <EmptyTab />;
 
   return (
@@ -236,11 +256,12 @@ function ArticlesTab() {
 
 function GalleryTab() {
   const user = useAtomValue(currentUserAtom);
-  const { data: items, isLoading } = useMyFavoriteGallery();
+  const { data: items, isLoading, isError, refetch } = useMyFavoriteGallery();
   const togglePin = useTogglePinGallery();
   const pinned = user?.pinnedGalleryIds ?? [];
 
   if (isLoading) return <Spinner center />;
+  if (isError) return <ErrorTab onRetry={() => void refetch()} />;
   if (!items || items.length === 0) return <EmptyTab />;
 
   return (

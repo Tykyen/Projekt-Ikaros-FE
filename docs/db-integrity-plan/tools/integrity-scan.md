@@ -76,11 +76,21 @@ const calIds    = await idSet('world_calendar_configs');
 const calSlugs  = await idSet('world_calendar_configs', 'slug');
 
 // ---------- 1) OR — orphans (child s worldId mimo worlds) ----------
-const WORLD_SCOPED = ['pages','characters','chatchannels','chatgroups','chatmessages','mapScenes',
-  'worldMapEntries','worldMapFolders','game_events','timeline_events','worldnews','worldsettings',
-  'worldmemberships','custom_emotes','sounds','world_currencies','bestiae','world_calendar_configs',
-  'world_gm_notes','world_page_templates','scheduledMessages','campaignSubjects','campaignScenarios',
-  'campaignShopGroups','campaignShopItems','campaignPurchases','world_weather_generators','universeMaps'];
+// ⚠️ ZDROJ PRAVDY = `backend/src/modules/worlds/services/world-hard-delete.service.ts`
+// (`WORLD_SCOPED_COLLECTIONS`). Seznam sem NEOPISUJ ručně — PŘED během scanu ho
+// z toho souboru zkopíruj.
+//
+// Proč: seznam tu byl duplikovaný a zamrzl na 2026-06-13 → do 2026-07-17 se
+// rozešel na 28 vs. 46 kolekcí. Scan tedy na 18 kolekcích hlásil 0 orphanů
+// **ne proto, že je čisto, ale protože se na ně nedíval** (systematické
+// false-negative, `db-integrity` audit). Cascade list se přitom udržuje
+// (CD-RUN-5/6, FIX-26) — proto je autoritativní on, ne tenhle dokument.
+//
+// Kontrola před během (má vypsat 0):
+//   comm -13 <(node -e "…vypiš WORLD_SCOPED_COLLECTIONS…" | sort) <(printf '%s\n' "${WORLD_SCOPED[@]}" | sort)
+const WORLD_SCOPED = [
+  /* ↓ zkopíruj `WORLD_SCOPED_COLLECTIONS` z world-hard-delete.service.ts ↓ */
+];
 for (const coll of WORLD_SCOPED) {
   try { push(`${coll}.worldId ∉ worlds`, await countDangling(coll, 'worldId', worldIds), 'OR'); }
   catch (e) { push(`${coll}.worldId`, -1, `chyba: ${e.message}`); }

@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import { isAuthenticatedAtom, currentUserAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import {
   useArticles,
@@ -96,7 +96,7 @@ export default function ArticlesPage() {
 // ─── Přehled tab ─────────────────────────────────────────────────────────
 
 function PrehledTab() {
-  const { data: articles = [], isLoading } = useArticles();
+  const { data: articles = [], isLoading, isError, refetch } = useArticles();
   const { data: categories = [] } = useArticleCategories();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 250);
@@ -118,6 +118,18 @@ function PrehledTab() {
   );
 
   if (isLoading) return <Spinner center />;
+  // FE-failure (styl 37) — chyba MUSÍ předcházet prázdnému stavu: `articles = []`
+  // platí i při 500, takže bez téhle větve čtenář viděl „Archiv zatím čeká",
+  // jako by nebyl publikovaný žádný článek. Prázdno a výpadek nejsou totéž.
+  if (isError)
+    return (
+      <ErrorState
+        size="hero"
+        title="Články se nepodařilo načíst"
+        description="Nevíme, co je v archivu — zkus to prosím znovu."
+        onRetry={() => void refetch()}
+      />
+    );
 
   return (
     <>
@@ -198,11 +210,23 @@ function PrehledTab() {
 // ─── Moje tab ────────────────────────────────────────────────────────────
 
 function MojeTab() {
-  const { data: articles = [], isLoading } = useMyArticles();
+  const { data: articles = [], isLoading, isError, refetch } = useMyArticles();
   const { data: stats } = useArticleStats();
   const { data: categories = [] } = useArticleCategories();
 
   if (isLoading) return <Spinner center />;
+  // FE-failure (styl 37) — bez téhle větve tvrdil výpadek autorovi „Zatím jsi
+  // nenapsal žádný článek" a nabídl mu napsat první. U VLASTNÍHO obsahu je
+  // taková lež nejhorší: vypadá, že se práce ztratila.
+  if (isError)
+    return (
+      <ErrorState
+        size="hero"
+        title="Tvoje články se nepodařilo načíst"
+        description="Nic se neztratilo — jen je teď nedokážeme zobrazit. Zkus to prosím znovu."
+        onRetry={() => void refetch()}
+      />
+    );
 
   return (
     <>

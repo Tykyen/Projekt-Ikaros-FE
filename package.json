@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/stamp-pwa-icons.mjs && tsc -b && vite build && node scripts/check-csp-hash.mjs",
+    "build": "node scripts/stamp-pwa-icons.mjs && tsc -b && vite build && node scripts/check-csp-hash.mjs && node scripts/check-bundle-budget.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
@@ -21,6 +21,7 @@
     "audit:ws": "node scripts/ws-audit.mjs",
     "audit:config": "node scripts/prod-config-scan.mjs",
     "audit:csp": "node scripts/check-csp-hash.mjs",
+    "audit:bundle": "node scripts/check-bundle-budget.mjs",
     "audit:errors": "node scripts/error-contract-scan.mjs --contract",
     "audit:logs": "node scripts/log-hygiene-scan.mjs --docker",
     "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs",

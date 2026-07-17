@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import {
   useGalleryImages,
@@ -81,7 +81,7 @@ export default function GalleryPage() {
 // ─── Přehled tab ─────────────────────────────────────────────────────────
 
 function PrehledTab() {
-  const { data: images = [], isLoading } = useGalleryImages();
+  const { data: images = [], isLoading, isError, refetch } = useGalleryImages();
   const { data: categories = [] } = useGalleryCategories();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 250);
@@ -104,6 +104,17 @@ function PrehledTab() {
   );
 
   if (isLoading) return <Spinner center />;
+  // FE-failure (styl 37) — chyba PŘED prázdným stavem: `images = []` platí i při
+  // 500 → bez téhle větve vypadá výpadek jako prázdná galerie.
+  if (isError)
+    return (
+      <ErrorState
+        size="hero"
+        title="Galerii se nepodařilo načíst"
+        description="Obrázky tu jsou, jen je teď nedokážeme zobrazit. Zkus to prosím znovu."
+        onRetry={() => void refetch()}
+      />
+    );
 
   return (
     <>
@@ -195,11 +206,28 @@ function PrehledTab() {
 // ─── Moje obrázky tab ────────────────────────────────────────────────────
 
 function MojeTab() {
-  const { data: images = [], isLoading } = useMyGalleryImages();
+  const {
+    data: images = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useMyGalleryImages();
   const { data: stats } = useGalleryStats();
   const { data: categories = [] } = useGalleryCategories();
 
   if (isLoading) return <Spinner center />;
+  // FE-failure (styl 37) — bez téhle větve tvrdil výpadek autorovi „Ještě jsi
+  // nic nenahrál" a nabídl nahrát první obrázek. U vlastní tvorby to vypadá,
+  // že se práce ztratila.
+  if (isError)
+    return (
+      <ErrorState
+        size="hero"
+        title="Tvoje obrázky se nepodařilo načíst"
+        description="Nic se neztratilo — jen je teď nedokážeme zobrazit. Zkus to prosím znovu."
+        onRetry={() => void refetch()}
+      />
+    );
 
   return (
     <>

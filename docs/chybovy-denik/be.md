@@ -254,3 +254,61 @@ Dluh doporučoval variantu **(a) odstranit endpoint + roli-demote logiku**. Prů
 5. **Guard `ws-rate-limit-coverage.spec.ts`** — statická kontrola VŠECH `*.gateway.ts`: každý `@SubscribeMessage` musí mít `allowWsEvent`. Plus self-test „nejsem no-op" a pojistka na počet nalezených souborů (aby test tiše neprošel při špatné cestě). Výjimky přes `EXEMPT` s odůvodněním (dnes prázdné).
 
 **Zhodnocení — DOBŘE:** (1) guard řeší **kořen**, ne symptom — obě mezery vznikly tím, že se strop aplikuje ručně per handler a nic to nevynucuje; `platform-chat` navíc dokazuje, že audit nový kód nepokryje, ale guard ano; (2) `maxHttpBufferSize` ověřen proti reálným payloadům (fog 50k hexů!), ne odhadem; (3) limity odvozené od povahy eventu (write vs. broadcast vs. ephemeral), ne jedno číslo pro vše. **ŠPATNĚ:** grep → „chybí" → málem duplicitní implementace; ověřit jsem měl `find`em soubor, ne grepem volání. **Ověřeno:** typecheck ✓ lint ✓ prettier ✓ **jest 2951/2951** (180 suites, +19 nových: 24 stávajících ws + 4 coverage guard). **Zbývá (strukturální, diskuze):** presence room-scoping (`server.emit` globální O(N²) — `presence.gateway:107,153,157`), Redis-backed presence (D-051), connection cap per IP, `volatile.emit` na ephemeral.
+
+---
+
+## ✅ ŘEŠENÍ — PERF 25: N+1 v `enrichMembers` (50 hráčů = 50 dotazů na jeden request); zbytek položky ověřen jako hotový/ops — 2026-07-17
+
+**Ověření proti HEAD PŘED prací** (poučení CH-081) rozpustilo většinu položky `25 PERF-BE` i sousedních 🟠:
+- **`33 resilience` — 6 outbound bez timeoutu: HOTOVO.** Všechny mají „RES (styl 33)" — `captcha.service`, `smtp-mailer.provider`, `meili-search.service`, `upload.service` (Cloudinary, 60 s), `push.service` (10 s).
+- **`db-integrity` — moderation kolekce bez indexů: HOTOVO.** `content-report.schema:59` `{status,category,createdAtUtc}`, `moderation-decision.schema:53,55`.
+- **`compression`: NEPATŘÍ do kódu.** Caddy (reverse proxy) to zvládne v Go efektivněji než Node event loop; kdyby komprimovalo obojí, plýtvá se CPU. Caddyfile ale **není v repu** (žije na serveru, runbook §7 ho chce do IaC) → přesunuto k ops jako `encode gzip zstd`, ne jako `app.use(compression())`.
+- **`autoIndex` ON v prod: NEDĚLÁNO ZÁMĚRNĚ.** Vypnutí je jednořádkové, ale bez náhrady (`syncIndexes` krok v deploji) by **nové indexy v produkci nikdy nevznikly** → tiše horší než dnešek. Dnešní dopad = pomalejší start (155 index buildů), ne díra. Chce deploy krok = samostatná dávka.
+
+**Skutečná vada — N+1:** `worlds.service.enrichMembers` volal `usersService.publicProfile(m.userId)` uvnitř `members.map(async …)` → **N dotazů pro N členů**. Při 50 hráčích v jeskyni = 50 dotazů na jeden `GET /worlds/:id/members`, a SLO míří přesně na 50 hráčů.
+
+**Řešení:** `usersService.publicProfilesByIds(ids): Promise<Map<string, PublicUser>>` — jeden `$in` (vzor už v repu: `findManyTombstoneInfo` → `repo.findByIds`). Mapování `User → PublicUser` vytaženo do privátní `toPublicProfile`, takže `publicProfile` i batch sdílí **jedno** místo (jinak by se rozešly, např. u `hiddenPresence`). `enrichMembers` = 1 dotaz + `Map.get`.
+
+**Zachované chování:** člen se smazaným účtem zůstane **bez `user`** (výpis nespadne). Dřív to dělal `catch {}` kolem `USER_NOT_FOUND`, teď prostě chybí v Map — proto batch **záměrně nehází** `USER_NOT_FOUND`, na rozdíl od `publicProfile`; volající chce zbytek seznamu i tak. Zdokumentováno v JSDoc obou metod.
+
+**Test-first efekt:** dva stávající testy `getMembers` **správně zčervenaly** (mockovaly starou cestu) — hlídaly chování „připojí summary" a „smazaný účet nespadne", obojí zachováno. Přidán třetí, který zamyká to podstatné: 50 členů → `publicProfilesByIds` právě 1× se všemi id. ⚠️ První verze assertu (`publicProfile` nesmí být volán **vůbec**) byla moc přísná a zčervenala: `getMembers` → `findByIdForRequester` → `enrichWithOwner` legitimně tahá profil **vlastníka světa** (1 dotaz, ne per člen). Opraveno na `toBeLessThanOrEqual(1)` s vysvětlením — a je to dobrá připomínka, že „0 volání" je často špatná laťka; správná je „ne per prvek".
+
+**Zhodnocení — DOBŘE:** (1) ověření proti HEAD před prací zase ušetřilo většinu práce (4 z 5 podpoložek hotové/ops); (2) `toPublicProfile` jako jediné místo mapování = batch a single se nemůžou rozejít; (3) odmítnuté `compression`/`autoIndex` mají v dluhu napsané **proč**, ne jen „neděláno". **ŠPATNĚ:** assert „nesmí být volán vůbec" bez ověření, co ještě je v cestě → zbytečná červená. **Ověřeno:** typecheck ✓ lint ✓ prettier ✓ **jest 2952/2952** (180 suites).
+
+---
+
+## ✅ ŘEŠENÍ — N-RUN-08-02: stored XSS přes type-confusion v `customData` (a test našel vadu i v mém fixu) — 2026-07-17
+
+**Díra (ověřena na HEAD):** `pages.service.sanitizeCustomData` sanitizovala **jen string větev**:
+```ts
+out[key] = typeof value === 'string' ? sanitizeRichText(value) : value; // ne-string projde RAW
+```
+`customData` je `Record<string, string>` **jen v TypeScriptu**; DTO má pouhé `@IsObject()`, per-value validace žádná. Autor (PomocnyPJ+) tedy mimo UI pošle `customData: { "Stát": ["<img src=x onerror=…>"] }` → `typeof !== 'string'` → sanitizace **přeskočena** → uloží se raw → FE `NovinyLayout:66` to nasadí do `dangerouslySetInnerHTML` jako `array.toString()` → **stored XSS u KAŽDÉHO diváka stránky včetně PJ/Admina** (krádež session, převzetí účtu). Stejná třída jako PT-36a (`table.title`), ale **mimo sanitizovanou větev** — proto to sink-sanitizer audit minul a proto bylo označeno „⭐ nový".
+
+**Poučení o tvaru díry:** sanitizace, která má **větev podle typu**, je obejitelná volbou typu. Správně je *coercni → pak sanitizuj*, ne *pokud je to string, sanitizuj*. `@IsObject()` bez `@IsString({ each: true })` je u `Record<string,string>` falešný pocit bezpečí — TS typ na hranici HTTP neplatí.
+
+**Test-first se vyplatil doslova: gap-fill test (audit ho žádal jako „M7") shodil MŮJ VLASTNÍ fix.** První verze coercla přes holé `String(value)` — jenže `String({ toString: undefined })` (nebo `Object.create(null)`) hodí `TypeError: Cannot convert object to primitive value` → **500 místo sanitizace**. Útočník by XSS neprotlačil, ale **shodil by ukládání stránky**. Kdybych fix jen napsal a spustil existující testy (83 zelených), tuhle regresi bych vyrobil. Finální `coerceCustomValue` má `try/catch` → nekonvertovatelná hodnota se **zahodí** (`''`), nikdy neprojde.
+
+**Řešení:** `coerceCustomValue(value)` (null/undefined → `''`; string → sám sebe; jinak `String()` v `try/catch` → `''`) a **teprve pak** `sanitizeRichText`. Test pokrývá pole, objekt bez `toString`, i to, že neškodné HTML ve string větvi (`<b>Aragorn</b>`) přežije — sanitizace ≠ mazání všeho.
+
+**Zhodnocení — DOBŘE:** (1) test **před** fixem chytil vadu fixu — přesně proto se píše první; (2) fix odstranil větvení podle typu, takže díru nejde otevřít jiným typem; (3) `try/catch` řeší i DoS variantu, kterou audit nezmínil. **Ověřeno:** typecheck ✓ lint ✓ prettier ✓ **jest 2953/2953**.
+
+**Ve stejné dávce (FE):** `DiceBox3D` WebGL context leak (styl 29) — `host.innerHTML=''` canvas jen odpojí, GPU context visí do GC; prohlížeč jich drží ~16 → po pár otevřeních kostek začne rušit nejstarší (jinde zčerná mapa) a nakonec init selže. Knihovna `destroy()` nemá → uvolňujeme sami přes `WEBGL_lose_context.loseContext()` nad všemi canvasy hosta před `innerHTML=''`. Čeká na živé ověření (opakované otevření/zavření kostek).
+
+---
+
+## ✅ ŘEŠENÍ — RC-E7: `changeCurrency` přepisoval souběžné transakce (lost update peněz) — 2026-07-17
+
+**Vada (ověřena na HEAD):** `changeCurrency(convert:true)` je klasický read-modify-write nad **všemi** peněžními poli: `getAccount()` → přepočet `transactions`/`income`/`expense` kurzem → `replaceMoneyFields()` s **full `$set`**. Mezi readem a writem stihne souběžný `adjust` / `debitIfSufficient` (nákup) / `transfer` udělat atomický `$push`+`$inc` — a ten se **přepíše starou verzí pole**. Transakce zmizí bez stopy a rozbije se invariant `balance = Σ delta`, tedy **peníze se ztratí** (u výběru naopak „vrátí").
+
+⚠️ **Zavádějící komentář byl součástí problému:** repo tvrdilo *„Single-doc update = atomický (žádná tx potřeba)"*. To je pravda o `$set` — a **lež o celé operaci**, protože hodnoty pocházejí ze stale readu. Přesně ten typ komentáře, který příštího čtenáře ukolébá.
+
+**Řešení — optimistic lock, POVINNÝ parametr:** `replaceMoneyFields(id, fields, expectedUpdatedAt)` → `findOneAndUpdate({ _id, updatedAt: expectedUpdatedAt })`. Ze souběhu uspěje právě jeden; druhý dostane `null` → **409 `ACCOUNT_CONFLICT`** („načti znovu a zopakuj"). Vzor RC-P1 `pages.updateIfUnchanged`. `expectedUpdatedAt` je **povinný argument**, ne volitelný — u peněz nesmí jít zámek vynechat zapomenutím (u `pages` je volitelný přes DTO, tam to dává smysl; tady ne).
+
+**Proč ne `withTransaction`** (vzor RC-E5 `refund`): tam se **musí** commitnout dva zápisy pohromadě (flip statusu + kredit). Tady je zápis **jediný**, jen nesmí přepsat cizí práci → stačí podmínka ve filtru, bez závislosti na replica setu a bez fallback větve.
+
+**Rozlišení 409 vs. 404:** `null` z filtru znamená „účet zmizel" NEBO „změnil se". Service to po neúspěchu dotáhne dotazem (`findById`) a hodí správný kód — jinak by staff dostal „účet nenalezen" u účtu, který existuje. Plus pojistka: chybějící `updatedAt` (staré doky) → raději 409 než zápis bez zámku.
+
+**Zhodnocení — DOBŘE:** (1) povinný parametr = zámek nejde vynechat omylem; (2) zvolena lehčí ze dvou navržených cest, a v komentáři je napsáno **proč** (jeden zápis ≠ dvoufázový commit); (3) opraven lživý komentář, který vadu maskoval; (4) test hlídá i to, že se do repa předává `updatedAt` **ze snapshotu, ze kterého se počítalo**. **Pozn.:** existující `mockAccount` neměl `updatedAt` → doplněn fixní (`ACCOUNT_UPDATED_AT`), reálné schema má `timestamps: true`. **Ověřeno:** typecheck ✓ lint ✓ prettier ✓ **jest 2955/2955** (+3 testy: lock předán, 409 při souběhu, 404 při smazání).
+
+**Zbývá z RC-E7/E8:** `removeFromInventory` (E8) — full-sections `$set` v `campaign-purchase.removeFromInventory` → `character-subdocs.updateInventory`. Tatáž třída, jiný uzel; chce stejný zámek nebo `$pull` místo přepisu sekcí.

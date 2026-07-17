@@ -60,47 +60,36 @@ Zbývá (nízká priorita, vyžaduje živou kontrolu):
 **Dopad:** střední (veřejná 15+ platforma). **Kdy:** rozhodovací položky = až rozhodneš; technické = první běh stylů 32–41.
 
 ### D-LAUNCH-GAP-2026-07-11 — launch-hardening zbytky (styly 42–46)
-**⭐/~ VYSOKÉ+STŘEDNÍ:**
-- **Vizuální regrese = 0 automatická brána** — 96 skin CSS (ověřeno), edit tokenu tiše rozbije skin. **ROZHODNUTO 2026-07-17: bránu zatím NESTAVĚT**, krýt `+render` vrstvou plny-auditu před většími nasazeními. Důvody: (a) **Chromatic nikdy nebyl živý** — v `package.json:84` je jen `@chromatic-com/storybook` (Storybook addon ze scaffoldu), **CLI `chromatic` ani `CHROMATIC_PROJECT_TOKEN` nikdy neexistovaly**, žádný workflow (`grep chromatic .github/` → nic); navíc ten samý addon je **viník D-033** (ESM/CJS race na Node 24 shazoval unit testy → storybook testy odděleny z `vitest run`); (b) vlastní Playwright screenshot diff = 96 skinů × N ploch = velká matice + baseline úložiště. ⚠️ Playwright je dnes **1 test celkem** (`e2e/smoke.spec.ts`, jediný projekt chromium/desktop, BE mockovaný) — „mobil overflow neasertován" je eufemismus, neasertuje se skoro nic. **Kandidát na úklid:** zvážit odstranění mrtvého `@chromatic-com/storybook` — zavřel by D-033 u kořene.
-- **SMTP bounce** — outbox fronta + denní cap + retry hotové (✅ 2026-07-13); plná async bounce detekce (inbound handling / přechod na transakční službu s webhooky) zůstává — „předáno SMTP" ≠ doručeno.
-**OPS (mimo kód — runbook připraven):** `docs/ops-runbook.md` (BE repo) — Mongo/Redis auth (koordinované okno, keyFile postup), backend port jen pro proxy, SPF/DKIM/DMARC, TLS/Caddyfile do IaC, firewall, deploy rollback (návrh §8 — neimplementován, nejde otestovat bez ostrého deploye).
-**Dopad:** střední — doručitelnost + ops hardening. **Kdy:** vizuál = první běh stylů 42–46; ops = s tebou u serveru dle runbooku.
+- **Testovací pokrytí e2e je téměř nulové** — Playwright má **1 test** (`e2e/smoke.spec.ts`), jediný projekt chromium/desktop, BE mockovaný. Původní formulace „mobil overflow neasertován" byla eufemismus: neasertuje se skoro nic. Mobilní viewport = 1 řádek configu, ale s jedním testem nemá cenu.
+- **Mrtvý `@chromatic-com/storybook`** (`package.json:84`) — Storybook addon ze scaffoldu; **CLI `chromatic` ani token nikdy neexistovaly**, žádný workflow. Je to zároveň **viník D-033** (ESM/CJS race na Node 24 shazoval unit testy → storybook testy odděleny z `vitest run`). Odstranění by zavřelo D-033 u kořene. *(Vizuální brána: **rozhodnuto 17. 7. nestavět** — 96 skinů × N ploch = velká matice; kryje `+render` vrstva plny-auditu.)*
+- **SMTP bounce** — outbox fronta + denní cap + retry hotové; chybí **async bounce detekce** („předáno SMTP" ≠ doručeno). Přes Gmail SMTP prakticky nejde (chce inbound mailbox parsing) → reálná volba je transakční služba s webhooky (Resend/Postmark/SES) = náklad + migrace, ne fix.
+**OPS (mimo kód — runbook připraven):** `docs/ops-runbook.md` (BE repo) — Mongo/Redis auth (koordinované okno, keyFile postup), backend port jen pro proxy, SPF/DKIM/DMARC, TLS/Caddyfile do IaC, firewall, deploy rollback (§8 — neimplementován, nejde otestovat bez ostrého deploye).
+**Dopad:** střední — doručitelnost + ops hardening. **Kdy:** ops = s tebou u serveru dle runbooku; zbytek při práci na dané ploše.
 
 ### D-AUDIT-2026-07-11 — zbylé nálezy plného auditu (46 stylů)
-> ⚠️ **Přepsáno 2026-07-17 (CH-079 → CH-081), třikrát — poučení stojí za přečtení.** (1) Dluh celý zbytek shrnoval jako *„položky nižší priority"* — lež, byly mezi nimi 🔴. (2) Oprava opsala severity **od průzkumného agenta**, ne ze `report.md` → RC-E7/E8 nafouknuto na 🔴, dvě reálné 🔴 vynechány. (3) Třetí verze opsala `report.md` pečlivě — jenže **report je snímek k 11. 7., ne stav kódu**: ověření proti HEAD ukázalo, že **7 z 8 „🔴" bylo dávno opravených** (dávky 12.–13. 7., `2778408`). Níže je stav **ověřený proti kódu**; vyřešené smazány dle konvence souboru (historie v git logu).
+> Stav **ověřený proti HEAD 17. 7.**, ne opsaný z reportu (ten je snímek k 11. 7. — viz CH-081). **Žádná 🔴 nezbyla.**
 
-**🔴 OTEVŘENÉ — ověřeno proti HEAD 2026-07-17:**
-1. **`@all/@here` bez role-gate** (`chat.service:1343`) — zbytek anti-abuse (styl 34); ostatní části té položky hotové (cap `assertUnderCreationLimit`, `STORAGE_FULL`, `REPORT_DUPLICATE`).
-
-**🟠 SCALE-RT — zbytek po opravě 17. 7. (strukturální, chce diskuzi):**
-- **presence room-scoping** — `presence.gateway:107,153,157` `server.emit('presence:update')` jde **globálně všem** → O(N²) při N online. Fix = scope na relevantní room/přátele. Strukturální (mění, kdo koho vidí online).
+**🟠 Realtime / škála** (zbytek SCALE-RT po opravě 17. 7. — strukturální, chce diskuzi):
+- **presence room-scoping** — `presence.gateway:107,153,157` `server.emit('presence:update')` jde **globálně všem** → O(N²) při N online. Mění, kdo koho vidí online → produktové.
 - **Redis-backed presence** ([[D-NEW-chat-presence-scale]], D-051) — in-memory presence × více instancí BE.
-- **connection cap per IP** — dnes bez stropu; per-USER/IP napříč sockety by chtěl Redis (per-socket bucket ho nepotřebuje, socket je sticky).
+- **connection cap per IP** — bez stropu; per-USER/IP napříč sockety chce Redis (per-socket bucket ne — socket je sticky).
 - **`volatile.emit` na ephemeral** (typing/ping/ruler/presence) — drop místo bufferování pro pomalé klienty.
 
-**🟠 STŘEDNÍ — otevřené (report to říká explicitně; NEnafukovat na 🔴):**
-- **RC-E7/E8** `changeCurrency`/`removeFromInventory` full `$set` read-modify-write → lost update. report:30 je **bez markeru**, `checkpoints/race__01-ekonomika.md:16` říká doslova *„Pravděpodobnost: nižší (trigger = staff mění měnu účtu právě když na účtu závodí jiná operace), **proto 🟠 ne 🔴**"*. Fix: `withTransaction` (vzor RC-E3) nebo `updatedAt`-guard (vzor RC-P1 `updateIfUnchanged`). Pokrytí: žádný test. ⚠️ Nezaměňovat s `refund()`/`$inc` cestami — ty atomické **jsou**.
-- **DUN-1** systemStats validace přeskočena pro alias-systémy (drd-plus/coc) — **sníženo 🔴→🟠** (report:84): PJ-scoped, hráč zápis nemá → ne exploit.
-- **25 PERF-BE** autoIndex ON v prod (155 index buildů/start), N+1 `enrichMembers`/`notifyUsers`/`getUnreadCounts`, `GET /worlds+pages` bez limitu, chybí compression. report:37.
-- **33 resilience** 6 outbound bez timeoutu (captcha/SMTP/cloudinary/meili/push). report:36.
-- **db-integrity** moderation kolekce bez indexů; orphan-scan WORLD_SCOPED list zastaralý (~15 nových kolekcí → false-negatives). report:32.
-- **37 FE-failure** 7 stránek bez `isError` (Articles/Gallery/Favorites). report:42. **Tatáž třída jako tichá ztráta dat opravená 17. 7.** — prověřit, jestli i tam nejde o zápis nad defaulty.
-- **29 stab** DiceBox3D WebGL context leak. report:44.
-- **bug-01/03** SecuritySection čte 401, BE vrací 400 → chyba se nezobrazí. report:45.
-- **17 a11y** reduced-motion 19 drobností → 1 globální CSS pravidlo. report:46.
-- **N-RUN-08-02** XSS customData bypass sink-sanitizeru. report:53.
-- **AR-META-1** `anti-regression-map.json` = 0 ručních guardů (vše string-match auto-discovery); F-20 tiše degradoval G3→G0, R-02 G3→G2; CI guard (jen crit/high) to nechytá. report:87.
+**🟠 Ostatní otevřené** (severity dle reportu — NEnafukovat na 🔴):
+- **RC-E8** `removeFromInventory` full-sections `$set` → lost update souběžného nákupu. `campaign-purchase.removeFromInventory` (volají `refund` + kompenzace `purchaseSequentialFallback`) → `character-subdocs.updateInventory` → `inventoryRepo.update` (přepis celých sekcí). *(RC-E7 `changeCurrency` ✅ vyřešen 17. 7. povinným `expectedUpdatedAt` → 409 `ACCOUNT_CONFLICT`; E8 je tatáž třída, jiný uzel — chce stejný zámek nebo `$pull` místo přepisu sekcí.)* Severity 🟠 dle `race__01-ekonomika.md:16` (*„proto 🟠 ne 🔴"*). ⚠️ Nezaměňovat s `refund()`/`$inc` — ty atomické **jsou**.
+- **DUN-1** systemStats validace přeskočena pro alias-systémy (drd-plus/coc) — sníženo 🔴→🟠 (report:84): PJ-scoped, hráč zápis nemá → ne exploit.
+- **25 PERF-BE — zbytek po opravě 17. 7.** (`enrichMembers` N+1 ✅ vyřešen batch `publicProfilesByIds`): **`autoIndex` ON v prod** (155 index buildů/start) — ⚠️ vypnutí je jednořádkové, ale bez `syncIndexes` kroku v deploji by **nové indexy v produkci nikdy nevznikly** = tiše horší než dnešek; dnešní dopad je jen pomalejší start, ne díra → chce samostatnou dávku s deploy krokem. Dále: **N+1 `notifyUsers`/`getUnreadCounts`** (neověřeno do hloubky), **`GET /worlds+pages` bez limitu/projekce** (paginace = může být breaking pro FE). **`compression` NEPATŘÍ do kódu** — Caddy to udělá v Go efektivněji než Node event loop; patří do Caddyfile (`encode gzip zstd`), který ale není v repu → viz OPS v [[D-LAUNCH-GAP-2026-07-11]].
+- **db-integrity** — ⚠️ **kořen opraven 17. 7.**: `WORLD_SCOPED` v `db-integrity-plan/tools/integrity-scan.md` byl **duplikát** seznamu z `world-hard-delete.service.ts` a zamrzl na 13. 6. → rozešel se na **28 vs. 46 kolekcí**, takže scan na 18 z nich hlásil 0 orphanů *ne protože je čisto, ale protože se nedíval*. Dokument teď na kód odkazuje jako na zdroj pravdy místo kopie. **Zbývá: rerun scanu** proti běžícímu Mongu s plným seznamem (čísla z `proof__db.md` jsou pravdivá jen pro dřívějších 28 kolekcí) + zvážit `characterId`-styl subdoc scan pro user-scoped kolekce (♻️ přesah CD-RUN-14/15). *(Indexy moderation kolekcí ✅ hotové.)*
+- **AR-META-1** `anti-regression-map.json` = 0 ručních guardů (vše string-match auto-discovery); F-20 tiše degradoval G3→G0, R-02 G3→G2; CI guard (jen crit/high) to nechytá.
 
-**⚪ NENAFUKOVAT — report si to sám vyvrátil (report:82-85 „KOREKCE severity"). Nechává se tu, aby to příští čtenář znovu neotevřel jako 🔴:**
-- **N-TM-01 / S-RUN-07** socket-swap listener leak — **sníženo 🔴 → LATENTNÍ nízké**: oba spouštěče `reconnectSocket()` (login `useAuth`, toggle Neviditelný `PrivacySection`) mapu **odmountují** → listenery se uklidí, remount re-registruje. *„Reálný trigger dnes NEEXISTUJE."* Fix vhodný pro robustnost, ne urgentní.
-- **RC-P3** slug souběh 500→409 — **není reálný** (izolace 5/5, E11000→409 přes globální filtr funguje).
+**⚪ NEOTVÍRAT jako 🔴 — report si to sám vyvrátil (report:82-85 „KOREKCE severity"):**
+- **N-TM-01 / S-RUN-07** socket-swap listener leak — sníženo 🔴 → latentní nízké: oba spouštěče `reconnectSocket()` mapu **odmountují** → listenery se uklidí. *„Reálný trigger dnes NEEXISTUJE."*
+- **RC-P3** slug souběh 500→409 — **není reálný** (izolace 5/5, E11000→409 funguje).
 
-**Bundle — SLO se PLNÍ:** SLO existuje (`plny-audit` skill S5: eager entry graf ≤ **350 kB gzip**), měřeno 16. 7. = **299 kB gzip** (rezerva ~51 kB; report ze 11. 7. hlásil ❌ 457 kB kvůli eager TipTapu, opraveno). Motivy ~155 kB a auth modaly ~120 kB jsou tedy **optimalizace nad rámec brány, ne nutnost**. **Zbývající mezera: SLO nikde nevynucuje CI** — číslo žije jen ve skillu, `npm run build` spouští jen `check-csp-hash`.
+**Blokováno na uživateli:** DB zálohy — `db-backup.yml` hotový, cron **záměrně vynechán** (bez off-site cíle by zálohy zaplnily tentýž disk, na kterém běží Mongo; byly disk incidenty 07/2026). Volba **B2 / R2 / scp** (runbook §6) → pak rclone krok + `schedule:`.
 
-**DB zálohy:** `db-backup.yml` hotový (mongodump + retence + disková pojistka); cron **záměrně vynechán** — zálohy leží na tomtéž disku jako Mongo, bez off-site cíle by ho zaplnily (byly disk incidenty 07/2026). **Blokováno na volbě uživatele: B2 / R2 / scp** (runbook §6), pak rclone krok + `schedule:`.
-
-**Nedoběhlé proof-vrstvy** (report:66): `+teeth` Stryker, `+load`, `+perf` live, `+render`, `+fault`, `+authz-runtime`. SLO S1–S4 neměřené.
-**Kdy:** 🔴 položky = další dávka (rozhodnuto 2026-07-17: dluh podceňoval, jedou se); zálohy = po volbě cíle.
+**Neproběhlé proof-vrstvy** (report:66): `+teeth` Stryker, `+load`, `+perf` live, `+render`, `+fault`, `+authz-runtime`. SLO S1–S4 neměřené.
+**Kdy:** 🟠 při práci na dané ploše nebo jako samostatná dávka; zálohy po volbě cíle; SLO guard při dalším výkonovém zátahu.
 
 ---
 

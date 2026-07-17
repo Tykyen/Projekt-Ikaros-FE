@@ -2264,3 +2264,39 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Test na PANELU, ne na tabech** (`__tests__/SettingsPanel.spec.tsx`, 5 testů): kontrakt „při chybě nepouštěj formulář ani Uložit ven" platí pro všechny současné i budoucí taby naráz. Testovat 6× tentýž ternár v tabech = zase ruční seznam.
 
 **Zhodnocení — DOBŘE:** (1) průzkum PŘED prací opět odhalil, že dluh podceňuje (vzor už potřetí — D-064 druhý fallback, D-065 sentinel, teď „kosmetika" = destrukce dat); (2) fix šel do společného obalu, takže vada nejde zopakovat; (3) `action` se skrývá taky — jinak by Uložit zůstal klikací nad ErrorState. **ŠPATNĚ / zbývá:** průzkum hlásil u combat panelů jen `FateCombatPanel`; grep ukázal, že **`isError` nemá ani jeden z 12** (`Coc/Dnd/Drd16/Drd2/Drdh/DrdPlus/Fate/Gurps/Jad/Matrix/Pi/Shadowrun`) — hráč edituje nad nulami z `diary?.customData ?? {}`. Dopad menší (patch je per-klíč, neztratí celý deník), ale je to tentýž vzor. Nemají sdílený obal (každý má vlastní `*CombatBodyLoading`) → samostatná dávka, ne půlka téhle. **Ověřeno:** tsc -b ✓ eslint ✓ vitest 134/134 (25 souborů) ✓. Živé ověření (screenshot chybového stavu) čeká na uživatele.
+
+---
+
+## ✅ ŘEŠENÍ — FE-failure (styl 37): 7 míst hlásilo výpadek jako „nic tu nemáš"; 3 z 5 položek dávky byly hotové — 2026-07-17
+
+**Ověření proti HEAD PŘED prací** (CH-081) opět rozpustilo většinu dávky:
+- **`bug-01/03` SecuritySection 401 vs 400: HOTOVO** — `:112` „EC-RUN-07-01 fix — BE `changePassword` vrací 400 `INVALID_PASSWORD` (FIX-50), ne 401 → čteme přes doménový kód (vzor ChangeEmailModal)".
+- **`17 a11y` reduced-motion: HOTOVO** — `app/index.css:25-36` globální `@media (prefers-reduced-motion: reduce)` na `*`, s komentářem „pokryje 19 pulzů/spinnerů/shimmerů bez per-místo guardu". Přesně to, co report navrhoval.
+- **`29 stab` DiceBox3D: OTEVŘENO, ale jiné, než dluh psal** — cleanup existuje (`:277`), volá `clearDice()` + `host.innerHTML=''`; komentář sám přiznává *„knihovna nemá destroy(); aspoň uvolni kostky"*. WebGL context tedy zůstane viset až do GC (prohlížeč jich unese ~16). Fix = `WEBGL_lose_context.loseContext()` před odstraněním z DOM. Necháno na samostatnou dávku (chce živé ověření v prohlížeči, který neotvírám).
+
+**Skutečná vada — 7 míst, tatáž třída jako tichá ztráta dat z rána:** `data = []` / `data: undefined` platí i při 500, takže chybová cesta spadla do **prázdného stavu**:
+- `ArticlesPage` Přehled → „Archiv zatím čeká — žádný publikovaný článek tu ještě není"
+- `ArticlesPage` Moje → **„Zatím jsi nenapsal žádný článek"** + CTA „Napsat první"
+- `GalleryPage` Přehled → prázdná galerie
+- `GalleryPage` Moje → **„Ještě jsi nic nenahrál"** + CTA „Nahrát obrázek"
+- `FavoritesPage` ×3 (diskuze/články/obrázky) → „V oblíbených zatím nic nemáš"
+
+⚠️ **U „Moje" záložek je ta lež nejhorší:** autorovi 20 článků tvrdí, že nemá žádný, a nabízí mu napsat první — vypadá to, že se práce ztratila. Texty proto explicitně říkají „**Nic se neztratilo** — jen to teď nedokážeme zobrazit".
+
+**Řešení:** `isError` větev **PŘED** prázdným stavem + `ErrorState` s `onRetry`. Ve `FavoritesPage` přidán `ErrorTab` jako protějšek existující `EmptyTab` (3 záložky měly identický `if (!items || items.length === 0)`), aby to nebylo 3× to samé.
+
+**Zhodnocení — DOBŘE:** (1) ověření předem ušetřilo 3 z 5 položek; (2) `ErrorTab` vedle `EmptyTab` = vzor, který další záložka převezme sama; (3) texty rozlišují „prázdno" a „výpadek" i slovy, ne jen ikonou. **Pozorování:** tohle je **třetí** výskyt téhož vzoru za den (`SettingsPanel` taby, `DeletedWorldsTab`/`TrustedDevicesCard`, teď 7 stránek) — `data = []` fallback + prázdný stav bez `isError` je systémová past celého FE, ne náhoda. Zbývá ~190 call-sitů (viz D-SEC-GAP „FE prázdný stav"); priorita = plochy, kde prázdno znamená **ztrátu** (vlastní obsah, admin recovery, bezpečnostní stavy), ne katalogy. **Ověřeno:** tsc -b ✓ eslint ✓ vitest 349/349 (51 souborů).
+
+---
+
+## ✅ ŘEŠENÍ — SLO bundle guard v CI + orphan-scan seznam přestal být duplikát — 2026-07-17
+
+**1. Bundle SLO se plnilo, ale nikdo ho nehlídal.** `plny-audit` skill definuje S5 = eager entry graf ≤ **350 kB gzip**; číslo ale žilo **jen ve skillu** a `npm run build` spouštěl pouze `check-csp-hash`. SLO, které nikdo nevynucuje, drží do prvního nešťastného importu — přesně to se stalo: audit 11. 7. našel **457 kB** (eager TipTap z news feedu), fix na 299 kB vydržel jen do dalšího barrel re-exportu.
+
+**Řešení:** `scripts/check-bundle-budget.mjs` (vzor `check-csp-hash.mjs`) — po `vite build` čte **reálný `dist/index.html`**, sečte gzip eager grafu (`<script src>` + `stylesheet` + `modulepreload`; lazy chunky ne — ty se stahují až při navigaci a rozpočet by kazily) a nad SLO → `exit 1` → shodí build i Docker/deploy. Naměřeno **300,7 kB / 350 kB (86 %)**, sedí s auditem. Chybová hláška rovnou vypíše 3 nejtěžší kusy + obvyklou příčinu (barrel `export *`, vždy-mounted komponenta) a řešení (React.lazy / import z konkrétního modulu) — guard, který jen řekne „je to moc", stojí za nic. `npm run audit:bundle -- --print` dá rozpad po souborech.
+⚠️ **Pojistka proti tichému projití:** když v `index.html` nenajde jediný lokální asset (změna tvaru výstupu), **selže** místo aby prošel s 0 kB. Guard, který mlčí, když se rozbije, je horší než žádný.
+
+**2. `db-integrity` orphan-scan — problém nebyl „zastaralý seznam", ale že existoval dvakrát.** `WORLD_SCOPED` v `docs/db-integrity-plan/tools/integrity-scan.md` byl **ruční kopie** `WORLD_SCOPED_COLLECTIONS` z `world-hard-delete.service.ts` a zamrzl na 13. 6. Do 17. 7. se rozešly na **28 vs. 46 kolekcí** → scan na 18 kolekcích hlásil 0 orphanů **ne protože je čisto, ale protože se na ně nedíval** (systematický false-negative; čísla v `proof__db.md` platí jen pro pokrytých 28). Cascade list v kódu se přitom udržuje (CD-RUN-5/6, FIX-26) — proto je autoritativní **on**.
+**Řešení:** doc už seznam **neduplikuje** — odkazuje na kód jako zdroj pravdy + kontrola před během. Doplnit dnešní stav by dluh jen odložil o měsíc.
+
+**Zhodnocení — DOBŘE:** (1) obojí míří na kořen (vynucení místo čísla v dokumentu; jeden zdroj pravdy místo kopie) — dnešek ukázal třikrát, že *dokument, který nikdo nevynucuje, se rozejde s realitou a pak lže*; (2) guard testován proti reálnému `dist` i s `--print`; (3) hláška učí, ne jen soudí. **Zbývá:** rerun orphan-scanu proti Mongu s plným seznamem (potřebuje běžící DB).

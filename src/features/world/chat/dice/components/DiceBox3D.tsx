@@ -281,7 +281,26 @@ export default function DiceBox3D({
       } catch {
         /* knihovna nemá destroy(); aspoň uvolni kostky */
       }
-      if (host) host.innerHTML = '';
+      // STAB (styl 29) — WebGL context leak: `host.innerHTML = ''` canvas jen
+      // odpojí z DOM, ale GPU context na něm visí až do GC. Prohlížeč jich drží
+      // jen ~16 → po pár otevřeních kostek začne rušit ty NEJSTARŠÍ (jinde v
+      // appce zčerná mapa/kostky) a nakonec init selže. Knihovna `DiceBox`
+      // `destroy()` nemá, takže context uvolňujeme sami přes standardní
+      // `WEBGL_lose_context` — jediná cesta, jak ho zahodit deterministicky.
+      if (host) {
+        host.querySelectorAll('canvas').forEach((canvas) => {
+          const gl =
+            canvas.getContext('webgl2') ??
+            canvas.getContext('webgl') ??
+            canvas.getContext('experimental-webgl');
+          if (gl && 'getExtension' in gl) {
+            (gl as WebGLRenderingContext)
+              .getExtension('WEBGL_lose_context')
+              ?.loseContext();
+          }
+        });
+        host.innerHTML = '';
+      }
       boxRef.current = null;
       setReady(false);
     };
