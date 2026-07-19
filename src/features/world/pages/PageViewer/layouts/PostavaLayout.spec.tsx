@@ -58,6 +58,13 @@ vi.mock('@tanstack/react-query', async (orig) => {
 });
 // AkjBanner dělá vlastní useQuery (pages directory) — v testu nepotřebné.
 vi.mock('../components/AkjBanner', () => ({ AkjBanner: () => null }));
+// AKJ render cesty — stub, ať test AKJ gate neřeší jejich fetch/DOM závislosti.
+vi.mock('../components/AkjLockedPanel', () => ({
+  AkjLockedPanel: () => <div>akj-locked</div>,
+}));
+vi.mock('./OstatniLayout', () => ({
+  OstatniLayout: () => <div>ostatni-layout</div>,
+}));
 vi.mock('@/shared/ui/RichTextEditor', () => ({
   RichTextEditor: () => null,
 }));
@@ -108,6 +115,28 @@ vi.mock('../../CharacterDetailPage/components/DiaryTab', () => ({
   },
 }));
 
+// AKJ inline editor — stub, ať test neřeší jeho závislosti (upload/mutace);
+// zajímá nás integrace PostavaLayout ↔ editor (zobrazení + cancel/saved).
+vi.mock('../components/AkjOwnerInlineEditor', () => ({
+  AkjOwnerInlineEditor: ({
+    onCancel,
+    onSaved,
+  }: {
+    onCancel: () => void;
+    onSaved: () => void;
+  }) => (
+    <div>
+      akj-inline-editor
+      <button type="button" onClick={onCancel}>
+        akj-cancel
+      </button>
+      <button type="button" onClick={onSaved}>
+        akj-saved
+      </button>
+    </div>
+  ),
+}));
+
 import { PostavaLayout } from './PostavaLayout';
 
 const page = {
@@ -119,6 +148,19 @@ const page = {
   characterRef: { characterId: 'c1' },
   akjTabs: [],
 } as unknown as Page;
+
+function akjPage(tab: Record<string, unknown>): Page {
+  return {
+    id: 'p1',
+    slug: 'hrdina',
+    title: 'Hrdina',
+    type: 'Postava hráče',
+    ownerUserId: 'u1',
+    characterRef: { characterId: 'c1' },
+    updatedAt: '2026-07-19T00:00:00.000Z',
+    akjTabs: [tab],
+  } as unknown as Page;
+}
 
 function renderLayout() {
   return render(<PostavaLayout page={page} />);
@@ -183,5 +225,102 @@ describe('PostavaLayout — horní „Hotovo" ukládá rozeditovaný tab', () =>
       ).toBeInTheDocument(),
     );
     expect(saveSpy).not.toHaveBeenCalled();
+  });
+});
+
+// spec-akj-owner-editable-content §6 — inline edit AKJ záložky vlastníkem.
+describe('PostavaLayout — AKJ inline edit (vlastník)', () => {
+  it('ownerEditable záložka: vlastník vidí „Upravit záložku" a otevře editor', async () => {
+    render(
+      <PostavaLayout
+        page={akjPage({
+          id: 'akj1',
+          name: 'Tajné',
+          order: 0,
+          access: [],
+          ownerEditable: true,
+        })}
+      />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: /Tajné/ }));
+    const btn = await screen.findByRole('button', { name: 'Upravit záložku' });
+    fireEvent.click(btn);
+    expect(await screen.findByText('akj-inline-editor')).toBeInTheDocument();
+    // Otevřený editor skryje spouštěcí tlačítko.
+    expect(
+      screen.queryByRole('button', { name: 'Upravit záložku' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('ownerEditable:false → žádné „Upravit záložku"', async () => {
+    render(
+      <PostavaLayout
+        page={akjPage({
+          id: 'akj1',
+          name: 'Tajné',
+          order: 0,
+          access: [],
+          ownerEditable: false,
+        })}
+      />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: /Tajné/ }));
+    await waitFor(() =>
+      expect(screen.getByRole('tab', { name: /Tajné/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Upravit záložku' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('locked záložka → žádné „Upravit záložku"', async () => {
+    render(
+      <PostavaLayout
+        page={akjPage({
+          id: 'akj1',
+          name: 'Tajné',
+          order: 0,
+          access: [{ type: 'AKJ', value: '10' }],
+          ownerEditable: true,
+          locked: true,
+        })}
+      />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: /Tajné/ }));
+    await waitFor(() =>
+      expect(screen.getByRole('tab', { name: /Tajné/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Upravit záložku' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('Zrušit (bez změn) zavře editor a vrátí tlačítko', async () => {
+    render(
+      <PostavaLayout
+        page={akjPage({
+          id: 'akj1',
+          name: 'Tajné',
+          order: 0,
+          access: [],
+          ownerEditable: true,
+        })}
+      />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: /Tajné/ }));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Upravit záložku' }),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'akj-cancel' }));
+    expect(
+      await screen.findByRole('button', { name: 'Upravit záložku' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('akj-inline-editor')).not.toBeInTheDocument();
   });
 });

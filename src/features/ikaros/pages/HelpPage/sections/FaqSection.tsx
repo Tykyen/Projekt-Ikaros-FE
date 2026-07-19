@@ -384,6 +384,13 @@ const FAQ: FaqItem[] = [
           — PJ ti tam nechá soukromý vzkaz. Nová postava proto rovnou dostane
           záložku „Soukromé".
         </p>
+        <p>
+          U některých svých záložek ti PJ může navíc povolit i{' '}
+          <strong>úpravu obsahu</strong>. Pak na té záložce uvidíš tlačítko{' '}
+          <strong>„Upravit záložku"</strong> a můžeš si sám měnit text, obrázek i
+          údaje. Záložka „Soukromé" to má zapnuté rovnou. Kdo záložku vidí a jak
+          se jmenuje, nastavuje dál jen PJ.
+        </p>
       </>
     ),
   },

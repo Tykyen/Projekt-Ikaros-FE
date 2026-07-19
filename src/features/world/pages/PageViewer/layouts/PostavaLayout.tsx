@@ -34,16 +34,20 @@ import { CalendarTab } from '../../CharacterDetailPage/components/CalendarTab';
 import { useCharacter } from '../../api/useCharacter';
 import { AkjBanner } from '../components/AkjBanner';
 import { AkjLockedPanel } from '../components/AkjLockedPanel';
+import { AkjOwnerInlineEditor } from '../components/AkjOwnerInlineEditor';
 import { OstatniLayout } from './OstatniLayout';
 import { resolveAkjTabPage, sortedAkjTabs } from '../lib/resolveAkjTab';
-import type { Page, InfoBlock } from '../../api/pages.types';
+import type { Page, InfoBlock, AkjTab } from '../../api/pages.types';
 import s from './PostavaLayout.module.css';
 
 interface Props {
   page: Page;
 }
 
-type PendingNav = { type: 'tab'; id: string } | { type: 'exit' };
+type PendingNav =
+  | { type: 'tab'; id: string }
+  | { type: 'exit' }
+  | { type: 'exit-akj' };
 
 /**
  * 9.1 — Layout pro typ `PostavaHrace` (PC) a `NPC`. Page-driven viewer
@@ -104,6 +108,9 @@ export function PostavaLayout({ page }: Props) {
   const [editMode, setEditMode] = useState(false);
   const [activeTabDirty, setActiveTabDirty] = useState(false);
   const [pendingNav, setPendingNav] = useState<PendingNav | null>(null);
+  // AKJ inline editor — vlastník edituje contentOverride jedné AKJ záložky
+  // (spec-akj-owner-editable-content §6). null = jen prohlížení.
+  const [akjEditTab, setAkjEditTab] = useState<AkjTab | null>(null);
   const { triggerPrint } = usePrint();
   const [printIncludeCalendar, setPrintIncludeCalendar] = useState(false);
   // „Tisk všech záložek" = LOKÁLNÍ přepnutí (ne globální printMode). Tisk
@@ -154,18 +161,32 @@ export function PostavaLayout({ page }: Props) {
     return () => window.clearTimeout(id);
   }, [printAllTabs, isFetching, triggerPrint]);
 
-  const blocker = useBlocker(editMode && activeTabDirty);
+  const blocker = useBlocker((editMode || !!akjEditTab) && activeTabDirty);
   const guardOpen = pendingNav !== null || blocker.state === 'blocked';
 
   function requestTabChange(id: string) {
     if (id === activeTab) return;
-    if (editMode && activeTabDirty) {
+    if ((editMode || akjEditTab) && activeTabDirty) {
       setPendingNav({ type: 'tab', id });
       return;
     }
     setActiveTab(id);
     // Při přepnutí mimo subdoc tab vypnout edit mode (Bio nemá inline edit).
     if (id === 'profil') setEditMode(false);
+  }
+
+  // Zrušit v AKJ inline editoru — při neuložených změnách přes discard guard.
+  function requestCloseAkj() {
+    if (activeTabDirty) {
+      setPendingNav({ type: 'exit-akj' });
+      return;
+    }
+    setAkjEditTab(null);
+  }
+
+  function handleAkjSaved() {
+    setActiveTabDirty(false);
+    setAkjEditTab(null);
   }
 
   async function requestToggleEdit() {
@@ -215,6 +236,9 @@ export function PostavaLayout({ page }: Props) {
       setPendingNav(null);
     } else if (pendingNav?.type === 'exit') {
       setEditMode(false);
+      setPendingNav(null);
+    } else if (pendingNav?.type === 'exit-akj') {
+      setAkjEditTab(null);
       setPendingNav(null);
     }
     if (blocker.state === 'blocked') blocker.proceed();
@@ -282,6 +306,12 @@ export function PostavaLayout({ page }: Props) {
     setEditMode(false);
   }
 
+  // Přepnutí na jiný tab zavře rozeditovaný AKJ editor (render-phase adjust,
+  // stejný pattern jako auto-switch výše). Neuložené změny hlídá requestTabChange.
+  if (akjEditTab && akjEditTab.id !== activeTab) {
+    setAkjEditTab(null);
+  }
+
   const tabMode = editMode ? 'edit' : 'view';
   const subdocTabActive = activeTab !== 'profil';
 
@@ -292,6 +322,14 @@ export function PostavaLayout({ page }: Props) {
         playerName={playerName}
         canEdit={canEdit && activeTab === 'profil'}
         showEditBtn={subdocTabActive && !activeAkjTab && canEdit}
+        showAkjEditBtn={
+          !!activeAkjTab &&
+          !activeAkjTab.locked &&
+          activeAkjTab.ownerEditable === true &&
+          isOwner &&
+          !akjEditTab
+        }
+        onAkjEdit={() => activeAkjTab && setAkjEditTab(activeAkjTab)}
         editMode={editMode}
         onToggleEdit={requestToggleEdit}
         worldSlug={worldSlug}
@@ -491,6 +529,14 @@ export function PostavaLayout({ page }: Props) {
                 accessRequirements={activeAkjTab.access}
                 isWoodWide={page.isWoodWide}
               />
+            ) : akjEditTab && akjEditTab.id === activeAkjTab.id ? (
+              <AkjOwnerInlineEditor
+                page={page}
+                tab={akjEditTab}
+                onDirtyChange={setActiveTabDirty}
+                onSaved={handleAkjSaved}
+                onCancel={requestCloseAkj}
+              />
             ) : (
               <OstatniLayout page={resolveAkjTabPage(page, activeAkjTab)} />
             ))}
@@ -518,6 +564,8 @@ function PostavaHero({
   playerName,
   canEdit,
   showEditBtn,
+  showAkjEditBtn,
+  onAkjEdit,
   editMode,
   onToggleEdit,
   worldSlug,
@@ -526,6 +574,8 @@ function PostavaHero({
   playerName?: string;
   canEdit: boolean;
   showEditBtn: boolean;
+  showAkjEditBtn: boolean;
+  onAkjEdit: () => void;
   editMode: boolean;
   onToggleEdit: () => void;
   worldSlug: string;
@@ -591,6 +641,11 @@ function PostavaHero({
             aria-pressed={editMode}
           >
             {editMode ? 'Hotovo' : 'Upravit záložku'}
+          </button>
+        )}
+        {showAkjEditBtn && (
+          <button type="button" className={s.editTabBtn} onClick={onAkjEdit}>
+            <Pencil size={14} aria-hidden /> Upravit záložku
           </button>
         )}
       </div>

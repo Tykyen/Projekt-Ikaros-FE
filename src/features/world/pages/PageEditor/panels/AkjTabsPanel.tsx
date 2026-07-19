@@ -75,6 +75,8 @@ function freshTab(preset?: 'pj' | 'soukrome'): AkjTab {
       // Bez grantu — vlastníka pustí owner-výjimka, PJ bypass, ostatní ne.
       access: [],
       ownerHidden: false,
+      // „Soukromé" = hráčův prostor i ke psaní (spec-akj-owner-editable-content Q1).
+      ownerEditable: true,
     };
   }
   return { id: crypto.randomUUID(), name: 'Nová AKJ záložka', order: 0, access: [] };
@@ -253,9 +255,36 @@ function AkjTabCard({
             <input
               type="checkbox"
               checked={!tab.ownerHidden}
-              onChange={(e) => onUpdate({ ownerHidden: !e.target.checked })}
+              onChange={(e) => {
+                const hidden = !e.target.checked;
+                // Skrytou záložku vlastník nevidí → nelze ji ani editovat;
+                // při skrytí vynuluj i ownerEditable (konzistence + BE guard).
+                onUpdate(
+                  hidden
+                    ? { ownerHidden: true, ownerEditable: false }
+                    : { ownerHidden: false },
+                );
+              }}
             />
             <span>Vlastník postavy vidí tuto záložku</span>
+          </label>
+        )}
+        {ownerControlled && (
+          <label
+            className={s.ownerToggle}
+            title={
+              tab.ownerHidden
+                ? 'Nejdřív povol vlastníkovi záložku vidět.'
+                : undefined
+            }
+          >
+            <input
+              type="checkbox"
+              checked={tab.ownerEditable === true && !tab.ownerHidden}
+              disabled={tab.ownerHidden === true}
+              onChange={(e) => onUpdate({ ownerEditable: e.target.checked })}
+            />
+            <span>Vlastník smí upravovat obsah</span>
           </label>
         )}
         <label className={s.field}>

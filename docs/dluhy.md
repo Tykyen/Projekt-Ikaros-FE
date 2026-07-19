@@ -124,3 +124,10 @@
 
 > _(Shop-purchase atomicita přesunuta jako `FA` cíl do
 > [`seed-scenario-plan/00-cross-cutting.md`](seed-scenario-plan/00-cross-cutting.md) — opraví se tam s důkazem rollbacku.)_
+
+---
+
+## Vyřešené
+
+### D-067 — PomocnyPJ full-replace ničil skryté AKJ záložky ✅ 2026-07-19
+Založeno a vyřešeno v jednom zátahu (`spec-akj-owner-editable-content`, sjednocený AKJ merge). `pages.service.ts update()` už neposílá full-replace `akjTabs` od editora **bez `seesAll`**: `resolveAkjTabsPatch` mergne příchozí do uložené DB verze podle `id` a přebírá **jen `contentOverride`** záložek, které editor plně vidí (PomocnyPJ → `passesAccess`) / smí editovat (vlastník → `ownerEditable`). PJ-only i nadúrovňové/locked záložky zůstávají nedotčené. Regresní testy: `pages.service.spec.ts` — „D-067: PomocnyPJ edituje jen viditelné, PJ-only a nadúrovňové zůstanou" + „PJ (seesAll) full-replace akjTabs beze změny".

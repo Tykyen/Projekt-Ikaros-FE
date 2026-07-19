@@ -184,6 +184,11 @@ export interface AkjTab {
   /** Skryje záložku i vlastníkovi postavy (page.ownerUserId). Default/undefined
    *  = false = vlastník PC ji vidí i bez grantu. Mimo PC bez efektu. */
   ownerHidden?: boolean;
+  /** Vlastník postavy smí inline editovat `contentOverride` této záložky
+   *  (text/obrázek/boxy). Default/undefined = false = jen PJ. Platí jen pro PC
+   *  a dokud `!ownerHidden`. NIKDY nedovoluje měnit access/název/pořadí (BE to
+   *  vynucuje — čte flag z DB). Viz spec-akj-owner-editable-content. */
+  ownerEditable?: boolean;
   contentOverride?: AkjTabContentOverride;
   /** Runtime-only z BE (per viewer, NEukládá se). `true` = viewer nemá přístup
    *  → vidí jen zamčenou záložku (jméno + úroveň, `access` má jen AKJ, obsah

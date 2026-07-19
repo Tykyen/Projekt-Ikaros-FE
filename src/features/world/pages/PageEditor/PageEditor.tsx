@@ -103,6 +103,8 @@ export function PageEditor({
                       order: 0,
                       access: [],
                       ownerHidden: false,
+                      // Hráčův prostor i ke psaní (spec-akj-owner-editable-content Q1).
+                      ownerEditable: true,
                     },
                   ]
                 : INITIAL_PAGE_STATE.akjTabs,

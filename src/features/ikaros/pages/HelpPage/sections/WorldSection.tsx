@@ -303,7 +303,8 @@ export function WorldSection() {
             soukromých — <strong>Deník, Finance, Výbava, Kalendář, Poznámky</strong>{' '}
             (vidí PJ, Pomocný PJ a vlastník). Finance a Výbavu mají jen postavy hráčů;
             u NPC a Lokací se tyto dvě záložky nezobrazí. Postava může mít chráněné (AKJ) záložky;
-            nová rovnou dostane záložku „Soukromé". Deník vypadá podle herního systému
+            nová rovnou dostane záložku „Soukromé", kterou si vlastník smí sám upravovat
+            (u dalších záložek tuhle úpravu povoluje PJ). Deník vypadá podle herního systému
             světa (12 dedikovaných šablon, jinak generická).
           </p>
           <CalloutBox variant="tip" title="Finance">

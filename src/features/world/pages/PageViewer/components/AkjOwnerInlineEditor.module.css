@@ -1,0 +1,49 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-strong, #fff);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, rgba(200, 210, 230, 0.7));
+}
+
+/* Uploader nemá zabrat celou šířku textu — drž ho v rozumném boxu. */
+.imageWrap {
+  max-width: 320px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-soft, rgba(120, 140, 180, 0.25));
+}
+
+@media (max-width: 768px) {
+  .imageWrap {
+    max-width: 100%;
+  }
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .actions > * {
+    width: 100%;
+  }
+}

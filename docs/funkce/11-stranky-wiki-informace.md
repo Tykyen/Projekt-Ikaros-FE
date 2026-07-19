@@ -172,7 +172,7 @@ Plnohodnotný editor pro tvorbu i úpravu stránek, panelová struktura.
 ### Kdo
 - FE: dvojitý guard — route `memberOnly(Čtenář)` + interní guard v `PageEditorPage.tsx`. **15.11:** práh snížen na **Hráč+** (`userRole < Hrac` → redirect); hráč smí navrhovat obsah (viz „Návrhy obsahu hráčů" níže). BE je autoritativní.
 - BE: `assertCanWrite` = platform Admin+ NEBO world role ≥ PomocnyPJ. **15.11 relaxace (`resolveCreateMode`):** hráč (role ≥ Hrac) navrhující **whitelist typ** (NPC/Lokace/Ostatní/Seznam/Galerie/Rodokmen + 11.5 Frakce/Organizace/Stát) → `create` s `pageStatus:'pending'`, `proposedBy=self` (jinak 403); moderátor (≥PomocnyPJ/elevovaný) tvoří rovnou `approved`. Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
-- **`assertCanEditPage`** (update) povolí tři skupiny a vrací `ownerScoped`: (a) **moderátor** (≥PomocnyPJ/admin, `ownerScoped:false`) — plný update; (b) **autor svého pending návrhu** (whitelist typ, role ≥ Hrac); (c) **vlastník své Postavy hráče** (`ownerUserId===requester.id`, role ≥ Hrac) — edituje Bio i approved postavy (FE mu ukazuje „Upravit Bio"). Skupiny (b)+(c) jsou `ownerScoped:true` → update jim **oseká citlivá pole** (`accessRequirements`, `akjTabs`, `ownerUserId`, `type`, `slug`) → mění jen obsah, nejde eskalovat přístup, přepsat AKJ PJ záložky, předat vlastnictví ani obejít gating typem. Bez skupiny (c) hráč-vlastník dostával 403 „Uložení selhalo" (viz chybový deník be.md).
+- **`assertCanEditPage`** (update) povolí tři skupiny a vrací `ownerScoped`: (a) **moderátor** (≥PomocnyPJ/admin, `ownerScoped:false`) — plný update; (b) **autor svého pending návrhu** (whitelist typ, role ≥ Hrac); (c) **vlastník své Postavy hráče** (`ownerUserId===requester.id`, role ≥ Hrac) — edituje Bio i approved postavy (FE mu ukazuje „Upravit Bio"). Skupiny (b)+(c) jsou `ownerScoped:true` → update jim **oseká citlivá pole** (`accessRequirements`, `ownerUserId`, `type`, `slug`) → mění jen obsah, nejde eskalovat přístup, předat vlastnictví ani obejít gating typem. **`akjTabs` se od 2026-07-19 NEosekávají paušálně** — řeší je selektivní merge `resolveAkjTabsPatch` (viz „AKJ chráněné záložky → Editace obsahu vlastníkem"): editor **bez `seesAll`** (vlastník-hráč i **PomocnyPJ**) nesmí full-replace, jen `contentOverride` záložek, které smí. Bez skupiny (c) hráč-vlastník dostával 403 „Uložení selhalo" (viz chybový deník be.md).
 
 ### Co jde dělat (VŠE)
 Panely (`PageEditor.tsx:397`):
@@ -293,21 +293,29 @@ Záložky vedle základního obsahu stránky, viditelné jen tomu, kdo splní `a
 - Role záložky („PJ informace") a prázdné/jen-jmenovité („Soukromé") zůstávají úplně SKRYTÉ.
 - `locked` je read-time enrich — na write path se zahazuje (`sanitizeAkjTabs`, `:69`).
 
-### Co jde editovat
+### Co jde editovat (PJ v `AkjTabsPanel`)
 - Název, pořadí (move up/down).
 - „Kdo vidí": clearance (AKJ úroveň) + konkrétní hráči (UserId chips). Presety „PJ informace" (Role=PomocnyPJ, ownerHidden) a „Soukromé".
 - Override obsahu (sparse): obrázek, text (TipTap), atributová tabulka — prázdné dědí ze základní stránky.
 - Přepínač „Vlastník postavy vidí" (jen u PC, `ownerControlled`).
+- Přepínač **„Vlastník smí upravovat obsah"** (`ownerEditable`, jen u PC) — disabled/vynulovaný když je záložka pro vlastníka skrytá. Preset „Soukromé" ho má zapnutý.
+
+### Editace obsahu vlastníkem (spec-akj-owner-editable-content, 2026-07-19)
+- **Kdo:** vlastník své PC (`isOwner`), na záložce s `ownerEditable===true` a `!locked`. FE gate `PostavaLayout` `showAkjEditBtn`; tlačítko „Upravit záložku" → inline editor `AkjOwnerInlineEditor` (reuse RichText / `HeroUploadCard` / `TablePanel`).
+- **Co smí:** jen `contentOverride` té záložky (text/obrázek/boxy). Ukládá PATCH s **jedinou** záložkou; BE ji spáruje podle `id`.
+- **BE bezpečnost (`resolveAkjTabsPatch` + `mergeAkjTabContentOnly`):** editor bez `seesAll` (vlastník i PomocnyPJ) → base = uložené `akjTabs` z DB, z payloadu se přebírá **jen `contentOverride`** záložek, které smí editovat (vlastník: `ownerEditable && !ownerHidden`; PomocnyPJ: `passesAccess` = plně vidí). Flag/`access`/`name`/`order` **vždy z DB, ne z DTO** → žádná eskalace, žádné přidání/smazání/přejmenování, cizí i skryté záložky zůstanou. PJ/elevated (`seesAll`) → full-replace beze změny.
+- **D-067 tímto vyřešen:** PomocnyPJ dřív full-replacem nenávratně mazal PJ-only a strhával locked záložky (četl osekaný seznam) — teď mergne. Viz `docs/dluhy.md → Vyřešené`.
+- `contentOverride.imageUrl` u AKJ prochází URL guardem (`sanitizeAkjImageUrl`, odmítne `data:`/`javascript:`).
 
 ### Hranice — co neumí
 - Editor (`AkjTabsPanel`) ručně exponuje jen **AKJ clearance + UserId**; `Role` a `AKJType` requirementy přidává jen preset „PJ informace" — UI nemá obecný picker rolí/AKJType pro AKJ záložky (page-level `accessRequirements` je řeší přes `AccessRequirementEditor`, ale to je jiný editor).
 - Backend přijímá v `tab.access` i AKJType/Role (passesAccess je vyhodnotí), ale editor je běžně nenabízí.
 
 ### Stav
-✅ Funkční, BE-enforced.
+✅ Funkční, BE-enforced. Editace obsahu vlastníkem/PomocnymPJ ✅ (2026-07-19, čeká BE restart + FE deploy + živé ověření).
 
 ### Kód
-BE `pages.service.ts:875` (filter), `:93` (isBroadcastable), `:106` (lockedAkjTab); FE `PageEditor/panels/AkjTabsPanel.tsx`, `PageViewer/components/WithAkjTabs.tsx:27`.
+BE `pages.service.ts:1435` (filterAkjTabsForViewer), `:225` (isBroadcastable), `:238` (lockedAkjTab), `:154` (sanitizeAkjTabs), `:1361` (mergeAkjTabContentOnly), `:1385` (resolveAkjTabsPatch); FE `PageEditor/panels/AkjTabsPanel.tsx`, `PageViewer/components/WithAkjTabs.tsx:27`, `PageViewer/layouts/PostavaLayout.tsx` (gate + inline), `PageViewer/components/AkjOwnerInlineEditor.tsx`.
 
 ---
 
