@@ -1,0 +1,159 @@
+name: Server Hardening (23.6)
+
+# Oprava nálezů z 23.6 (viz spec-23.6 + runbook §1):
+#   ① matrix-mongodb publikuje 27017 na 0.0.0.0 → bind na 127.0.0.1 (stará .NET DB
+#      nesmí být dosažitelná z interní sítě poskytovatele; kontejnery spolu mluví
+#      přes docker síť matrix_matrix-network, publish nikdo nepotřebuje).
+#   ② iptables DOCKER-USER: publikované porty (3001/8081/8080/…) smí z interní
+#      sítě 10.10.10.0/24 používat JEN edge proxy poskytovatele (10.10.10.104)
+#      a host sám (10.10.10.111); sousední kontejnery cizích zákazníků NE.
+#      Persistence přes systemd oneshot unit (iptables pravidla reboot nepřežijí).
+#
+# mode=diagnose: NIC nemění, jen vypíše, co by se dělalo.
+# mode=apply: provede ①+②, ověří web přes edge (3 pokusy) a při selhání
+#             AUTOMATICKY vrátí compose i firewall zpět.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'diagnose = jen vypíše stav a plán · apply = provede opravy'
+        required: true
+        default: diagnose
+        type: choice
+        options:
+          - diagnose
+          - apply
+
+env:
+  EDGE_PROXY_IP: 10.10.10.104
+  HOST_IP: 10.10.10.111
+  INTERNAL_NET: 10.10.10.0/24
+
+jobs:
+  hardening:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Diagnostika (vždy)
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -s << 'ENDSSH'
+          echo "===== matrix compose — řádky s 27017 ====="
+          grep -nE "27017" /opt/matrix/docker-compose*.y*ml 2>/dev/null || echo "žádný compose s 27017 v /opt/matrix!"
+          echo ""
+          echo "===== DOCKER-USER — současná pravidla ====="
+          iptables -L DOCKER-USER -n -v
+          echo ""
+          echo "===== port 27017 — na čem poslouchá ====="
+          ss -tlnp | grep 27017 || echo "27017 neposlouchá"
+          ENDSSH
+
+      - name: Apply — ① mongo loopback + ② DOCKER-USER + persistence
+        if: ${{ github.event.inputs.mode == 'apply' }}
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} \
+            EDGE_PROXY_IP='${{ env.EDGE_PROXY_IP }}' HOST_IP='${{ env.HOST_IP }}' INTERNAL_NET='${{ env.INTERNAL_NET }}' \
+            'bash -s' << 'ENDSSH'
+          set -e
+
+          echo "===== ① matrix-mongodb 27017 → 127.0.0.1 ====="
+          FILE=$(grep -lE '27017:27017' /opt/matrix/docker-compose*.y*ml | head -1)
+          if [ -z "$FILE" ]; then
+            if ss -tln | grep -q '0.0.0.0:27017'; then
+              echo "CHYBA: 27017 je na 0.0.0.0, ale mapping v compose nenalezen — STOP (ruční kontrola)"; exit 1
+            fi
+            echo "mapping už upraven dřív — přeskakuji"
+          else
+            cp "$FILE" "$FILE.bak-23-6"
+            sed -i -E 's/([" ])27017:27017/\1127.0.0.1:27017:27017/' "$FILE"
+            grep -nE "27017" "$FILE"
+            grep -qE '127\.0\.0\.1:27017:27017' "$FILE" || { echo "CHYBA: sed nezabral — vracím zálohu"; cp "$FILE.bak-23-6" "$FILE"; exit 1; }
+            cd /opt/matrix
+            (docker compose up -d 2>/dev/null || docker-compose up -d)
+            sleep 5
+            docker restart matrix-backend
+          fi
+
+          echo ""
+          echo "===== ② DOCKER-USER pravidla + systemd persistence ====="
+          mkdir -p /opt/ikaros-hardening
+          cat > /opt/ikaros-hardening/docker-user.sh << EOF
+          #!/bin/bash
+          # 23.6 — publikované docker porty smí z interní sítě poskytovatele používat
+          # jen edge proxy a host; sousedi (kontejnery cizích zákazníků) ne.
+          # Při změně IP edge proxy (web najednou nedostupný): systemctl disable --now
+          # docker-user-hardening && iptables -F DOCKER-USER && iptables -A DOCKER-USER -j RETURN
+          iptables -F DOCKER-USER
+          iptables -A DOCKER-USER -s $EDGE_PROXY_IP -j RETURN
+          iptables -A DOCKER-USER -s $HOST_IP -j RETURN
+          iptables -A DOCKER-USER -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
+          iptables -A DOCKER-USER -s $INTERNAL_NET -j DROP
+          iptables -A DOCKER-USER -j RETURN
+          EOF
+          chmod 755 /opt/ikaros-hardening/docker-user.sh
+
+          cat > /etc/systemd/system/docker-user-hardening.service << 'EOF'
+          [Unit]
+          Description=DOCKER-USER hardening (23.6) - interni sit jen pres edge proxy
+          After=docker.service
+          Requires=docker.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/opt/ikaros-hardening/docker-user.sh
+          RemainAfterExit=yes
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+          systemctl daemon-reload
+          systemctl enable --now docker-user-hardening.service
+          iptables -L DOCKER-USER -n -v
+          ENDSSH
+
+      - name: Ověření přes edge (web + API) — při selhání rollback
+        if: ${{ github.event.inputs.mode == 'apply' }}
+        run: |
+          ok=0
+          for i in 1 2 3; do
+            code_fe=$(curl -s -o /dev/null -m 15 -w "%{http_code}" https://www.projekt-ikaros.com/ || echo 000)
+            body_api=$(curl -s -m 15 https://www.projekt-ikaros.com/api/health || echo fail)
+            echo "pokus $i: FE=$code_fe API=$body_api"
+            if [ "$code_fe" = "200" ] && echo "$body_api" | grep -q '"status"'; then ok=1; break; fi
+            sleep 5
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::Web přes edge NEODPOVÍDÁ — provádím ROLLBACK"
+            ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -s << 'ENDSSH'
+            systemctl disable --now docker-user-hardening.service 2>/dev/null || true
+            iptables -F DOCKER-USER; iptables -A DOCKER-USER -j RETURN
+            FILE=$(ls /opt/matrix/docker-compose*.y*ml.bak-23-6 2>/dev/null | head -1)
+            if [ -n "$FILE" ]; then cp "$FILE" "${FILE%.bak-23-6}"; cd /opt/matrix; (docker compose up -d 2>/dev/null || docker-compose up -d); fi
+            echo "rollback hotov — stav DOCKER-USER:"; iptables -L DOCKER-USER -n
+          ENDSSH
+            exit 1
+          fi
+          echo "OK — web i API přes edge fungují."
+
+      - name: Finální stav (jen apply)
+        if: ${{ github.event.inputs.mode == 'apply' }}
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -s << 'ENDSSH'
+          echo "===== 27017 po zásahu ====="
+          ss -tlnp | grep 27017 || echo "27017 neposlouchá"
+          echo ""
+          echo "===== DOCKER-USER po zásahu ====="
+          iptables -L DOCKER-USER -n -v
+          echo ""
+          echo "===== matrix kontejnery ====="
+          docker ps --format '{{.Names}}\t{{.Status}}\t{{.Ports}}' | grep matrix
+          ENDSSH
