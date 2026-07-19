@@ -20,14 +20,6 @@
 
 ---
 
-### D-SENTRY-DSN — Error telemetrie: kód hotový, chybí DSN v GitHubu
-*(dřív součást D-SEC-GAP, „akce uživatele")*
-**Soubory:** FE `src/shared/ui/GlobalErrorBoundary.tsx` + `src/shared/lib/monitoring.ts` (ověřeno 2026-07-19: kód existuje); BE Sentry/GlitchTip boundary + unhandled + 5xx + non-HTTP výjimky.
-**Stav:** BE+FE Sentry/GlitchTip kód **kompletní**, deploy řetěz protažený. Zbývá jediné: nastavit `SENTRY_DSN` (BE secret) + `VITE_SENTRY_DSN` (FE var) v GitHub. Bez DSN telemetrie tiše neposílá.
-**Trigger:** teď / před spuštěním. **Blokováno na akci uživatele** (přístup do GitHub secrets/vars).
-
----
-
 ### D-NAMESORT — Řazení českých názvů: „Čáp" až za „Zebra" v 8 katalozích (BE)
 *(dřív součást D-SEC-GAP; ROZHODNUTO 2026-07-17, 0 implementace k 2026-07-19)*
 **Soubory:** BE katalogové repozitáře/agregace 8 kolekcí (bestiae, spells, items, potions, plants, pricelists, riddles, namesets); collation dnes v BE **nikde** (0 výskytů `nameSort` v celém repu).
