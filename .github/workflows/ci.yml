@@ -122,11 +122,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # 23.7 — route scanner v `--ci` režimu (reálný FE↔BE route drift shodí CI;
+      # po vylepšení resolveru 0 falešných pozitiv). ws/config jsou informativní
+      # (nemají exit gate), errors/logs shodí na porušení kontraktu/hygieny.
       - name: Contract scanners (routes/ws/config/errors/logs)
         env:
           IKAROS_BE_ROOT: ${{ github.workspace }}/be-repo
         run: |
-          npm run audit:routes
+          npm run audit:routes -- --ci
           npm run audit:ws
           npm run audit:config
           npm run audit:errors
