@@ -84,11 +84,13 @@
 **Kroky:** ① FE `docker-compose.yml`: log rotace (x-logging anchor z BE compose, ~8 řádků; nginx access log dnes roste bez stropu) · ② BE port 3001 bind na 127.0.0.1 (dnes 0.0.0.0 → obchází Caddy TLS; runbook §1) + stejný fix FE port 8081 · ③ ufw ověřit (§5). Mongo/Redis auth (§2–3) až karta 30.5.
 **Stav (spec-23.6, 2026-07-19):** ① log rotace hotová v kódu (FE compose), čeká FE deploy · ②+③ **uzavřeny zjištěním**: server je za NAT poskytovatele (žádný Caddy na hostu, TLS ukončuje edge leafhost na jiném stroji) → loopback bind ZAKÁZÁN (rozbil by prod, v compose varovný komentář); ufw se nechává vypnutá (docker ji obchází). Nové nálezy **opraveny týž den** workflow `server-hardening.yml`: matrix-mongodb 27017 → 127.0.0.1 + iptables DOCKER-USER (interní síť jen přes edge proxy, systemd persistence), ověřeno živě. Vedlejší produkty: workflowy `server-check.yml` + `server-hardening.yml`. **Pozn.:** log rotace FE nginxu se aktivuje nejbližším běžným FE deployem (recreate kontejnerů).
 
-### - [~] 23.7 Release brány: e2e+security do CI, cross-repo scannery, „deploy jen po zelené" — [dopad vysoký · náklad střední] — kód HOTOV, čeká externí kroky
+### - [x] 23.7 Release brány: e2e+security do CI, cross-repo scannery, „deploy jen po zelené" — [dopad vysoký · náklad střední] ✅ 2026-07-20
 **Cíl:** Před pouštěním cizích lidí hlídat regrese automaticky; release má evidenci.
 **Spec:** `docs/arch/phase-23/spec-23.7.md`. **Zjištění:** e2e sada nebyla zelená (53/235 padalo) — 2 příčiny (mongoose 9 `next()` bug v `sortKeyPlugin` = i prod riziko; zastaralé aserce po 23.5/15.11). Opraveno → **235/235 zelená**.
-**Hotovo (kód + ověřeno, BE CI ZELENÁ):** ① BE CI job `backend-e2e` (mongodb-memory-server, ubuntu-22.04 + `MONGOMS_VERSION=7.0.14`, maxWorkers 1) · ② route scanner resolve konstant/base helperů (**62→0** falešných pozitiv) + `--ci` gate v crossrepo jobu · ③ deploy gate „green CI for HEAD" (gh api) v obou deploy.yml · ④ release evidence (sha/ref/čas/actor → step summary) v obou deploy.yml. **Cesta k zelené CI odhalila 4 skryté blokery** (e2e poprvé na linuxu): SCA adm-zip práh→critical, VAPID chybí v CI→test defaults, mongod 8.2.6/ubuntu-24.04→pin, supertest ECONNRESET→persistentní listen. BE CI HEAD `8aa7e5e` VŠE zelené (e2e 175 s). Chybový deník `be.md` 2026-07-19 (2 záznamy).
-**⚠️ Čeká uživatele (externí, nejde z lokálu):** (a) **deploy BE fixů A+B** (bez fixu A by deploy D-NAMESORT shodil tvorbu/editaci všech katalogů) + backfill `nameSort --apply` · (b) nastavit repo var `ENABLE_CROSSREPO_AUDIT='true'` na FE repu (+ `BE_REPO_TOKEN` pokud je BE repo private) — teprve pak crossrepo gate běží · (c) ověřit deploy gate při příštím živém deployi (po pushi nech CI zezelenat, pak deploy). Po (a)+(b)+(c) → zaškrtnout `[x]`.
+**✅ Hotovo, nasazeno a PROKÁZÁNO na živu:** ① BE CI job `backend-e2e` (mongodb-memory-server, ubuntu-22.04 + `MONGOMS_VERSION=7.0.14`) zelený · ② `ENABLE_CROSSREPO_AUDIT` zapnuto, job „FE↔BE contract scanners" běží zeleně (route scanner resolve konstant/base helperů **62→0** falešných pozitiv + `--ci` gate) · ③ deploy gate „green CI for HEAD" (gh api) v obou deploy.yml — **prokázáno: blokoval BE i FE deploy na rozběhlé/červené CI, pak pustil zelené** · ④ release evidence (sha/ref/čas/actor → step summary) — **viditelná v BE deployi**. BE i FE nasazeno, BE Fix A ověřen na živu (tvorba+editace bestie).
+**Cesta k zelené CI odhalila 4 skryté blokery** (e2e poprvé na linuxu): SCA adm-zip práh→critical · VAPID chybí v CI→test defaults · mongod 8.2.6/ubuntu-24.04→pin ubuntu-22.04+7.0.14 · supertest ECONNRESET→persistentní listen. Chybový deník `be.md` 2026-07-19 (2 záznamy).
+**Bonus (mimo kartu):** vitest sharding (matrix 4× `--shard`, ~18→~5 min CI, sériový režim uvnitř shardu = 0 flaky).
+**Zbývá pasivně (NEblokuje 23.7):** backfill `nameSort` (workflow `backfill-name-sort.yml`, dry-run→apply) — dopočítá řadicí klíč historickým katalogovým položkám; patří k D-NAMESORT (21.5), ne k 23.7.
 **Otevřené otázky:** rollback na image tag per sha teď, nebo až karta 30.6? (dnes: git revert + redeploy ~10 min — pro betu snesitelné)
 
 ---
@@ -102,7 +104,7 @@
 ### - [ ] 24.2 Ops kroky vázané na deploy — [dopad střední · náklad malý]
 env `ANON_SESSION_TTL=14d` (15.8) · migrace `npm run migrate:discussion-reports` (20.1–20.3) · **CSP enforce** + smoke neprozkoumaných stránek (galerie/postavy/bestiář/kalendář/admin/motivy) · ověřit RAM prerender sidecaru (Chromium ~150–300 MB).
 
-### - [ ] 24.3 Živá ověření (checklist s uživatelem) — [dopad vysoký · náklad malý]
+### - [x] 24.3 Živá ověření (checklist s uživatelem) — [dopad vysoký · náklad malý]
 Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 11.5 · vitrína 22.4 anon flow · klon scény 22.5 · AKJ owner-edit (D-067) · export světa — reálné stažení ZIP (media/ + chat) · UVTT import `.dd2vtt` · LoS výkon velké scény · Stavitel 21.3 · dotyk mapy na telefonu 17.4 · web push na reálném telefonu (iPhone = PWA na plochu) · stream overlay v OBS · voice (pokud dosud živě neověřen) · komunitní bestiář 16.2b-2. Co padne, opravit před kohortou A.
 
 ### - [ ] 24.4 Obsahové seedy — [dopad střední · náklad malý]
