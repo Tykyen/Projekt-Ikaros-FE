@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState, ErrorState } from '@/shared/ui';
 import { usePendingActionsCount } from '@/features/users/api/usePendingActions';
 import { PendingActionType } from '@/shared/types';
 import { centerOpenAtom } from '../model/centerStore';
@@ -26,13 +26,23 @@ const LABELS: Partial<Record<PendingActionType, string>> = {
  * mají co schvalovat (řídí `NotificationCenter` dle `total > 0`).
  */
 export function PendingTab() {
-  const { data } = usePendingActionsCount();
+  const { data, isError, refetch } = usePendingActionsCount();
   const setOpen = useSetAtom(centerOpenAtom);
 
   const byType = data?.byType ?? {};
   const entries = (Object.entries(byType) as [PendingActionType, number][])
     .filter(([, n]) => (n ?? 0) > 0)
     .sort((a, b) => b[1] - a[1]);
+
+  if (isError)
+    return (
+      <ErrorState
+        size="panel"
+        title="Frontu se nepodařilo načíst"
+        description="Neznamená to, že nic nečeká. Zkus to prosím znovu."
+        onRetry={() => void refetch()}
+      />
+    );
 
   if (entries.length === 0)
     return (

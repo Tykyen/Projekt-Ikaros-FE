@@ -2326,3 +2326,54 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Past chycená testem:** `useMediaQuery` guard `'matchMedia' in window` prošel i pro `window.matchMedia = undefined` (operátor `in` testuje klíč, ne hodnotu) → `TypeError` při SSR/starém prohlížeči. Zpřísněno na `typeof window.matchMedia === 'function'` (robustnější než původní idiom v `useCoarsePointer`).
 
 **Zhodnocení — DOBŘE:** (1) initial-focus concern z dluhu (TipTap → fokus na křížek) vyřešen konzistencí s `Modal` (bez form pole taky fokusuje křížek), ne vymýšlením křehkého editor-autofocusu s TipTap-ready race — méně kódu, míň rizika; (2) breakpoint gate = jedna appka, dvě chování (sloupec vs. šuplík) korektně odděleno JS media query sladěnou s CSS; (3) SSR past chycena testem před nasazením. **Zbývá:** dluh smazatelný až padne D-033 (Storybook axe) — jediná otevřená položka; živá kontrola mobilu/mapy = běžný krok uživatele. Build ✓ eslint ✓ nové testy 25/25 ✓.
+
+---
+
+## ✅ ŘEŠENÍ — D-FE-ERROR-STATES uzavřen: „prázdný stav / defaulty místo chyby" napříč FE (44 souborů) — 2026-07-19
+
+**Zadání:** „vyřeš D-FE-ERROR-STATES, po vyřešení vymaž." Dluh tvrdil „~190 call-sitů ve ~150 souborech, 4 třídy (datová vrstva 13 hooků · ~90 katalogů · ~7 ploch ztráty dat · ~40 pickerů)".
+
+**Průzkum PŘED prací (2 read-only agenti + ověření proti HEAD) opět rozpustil velkou část dluhu (vzor už poněkolikáté — CH-081):**
+- **12 combat panelů = BEZPEČNÝCH** — dluh je značil „další dávka, isError nemá ani jeden z 12". Realita: všech 12 má `if (!diary)` hned za loadingem, což **chytá i chybovou cestu** (`useCharacterDiary` bez `placeholderData` → na erroru `diary===undefined`). Žádná ztráta dat. Zápis 17.7 „isError nemá ani jeden" byl technicky pravdivý, ale zavádějící.
+- **„13 hooků `placeholderData:[]`"** existuje (11 hooků/18 call-sitů), ale **jde o opačné riziko, než dluh psal**: `placeholderData:[]` znamená, že `data` je i na chybě `[]` (ne `undefined`) → `data ?? []` guard je k ničemu, chybu chytá **jen `isError`**. Rizikoví jsou jen konzumenti bez `isError` (CharacterDirectory, PagesListPage, EventsPage).
+- **„~90 katalogů"** — většina `isError` už měla; jen renderovala plain `<p className={s.state}>Nepodařilo načíst</p>` bez retry a bez sdíleného `ErrorState`.
+
+**Rozdělení na dvě třídy a fix:**
+1. **BUG — tichá ztráta dat (4):** A1 `WorldHeadlineAdminPage` (editor lišty světa nad defaulty → Uložit přepíše navigaci/menu/lastInfo), A2 `WorldEntitySchemaEditorPage` (prázdný editor → klik založí novou verzi, BE archivuje reálné schéma bestie), A3 `ArticleEditorPage` (prázdný editor → Uložit přepíše článek), A4 `GroupMembersPage` (upload znaku spread nad `groupImages ?? {}` → přepíše znaky všech skupin). Fix = `if (isError) return <ErrorState onRetry>` PŘED editorem, resp. gate uploadu na `!isError && !isLoading`.
+2. **BUG — falešná nepřítomnost (lež, bez ztráty):** B1 `TotpCard` (na chybě „2FA Vypnuto" i když zapnuté → nový setup resetuje secret), B2 `WorldMembersPage`, B3 `GroupMembersPage`, B4 `InvitePanel`, + ~11 katalogů/listů (Discussions, Mail, Nabory, Worlds, CharacterDirectory, PagesListPage, UniverseMapView, Friends, AuditLog, Events, DiscussionDetail-posts) + 3 pickery (Npc/BestiePalette, InsertToBestiaryModal).
+3. **UX (kosmetika):** ~19 komunitních katalogů plain `<p>` → sdílený `ErrorState`+retry (list) / status 404 + akce zpět (detail).
+
+**Klíčové poučení — guard `isError && !data`, ne holé `isError`:** u query, které DRŽÍ cache mezi background-refetchi (TotpCard `/users/me`, WorldsPage `usePublicWorlds`), by holé `if (isError)` skrylo funkční UI při přechodném blipu (data zůstávají). Vzor převzat z opraveného `TrustedDevicesCard`. Použito v TotpCard (`statusUnknown = profileError && profile===undefined`) a WorldsPage (`worldsUnavailable = isError && data===undefined`).
+
+**Ověření nálezů proti HEAD, ne naslepo:** A2 — `useActiveEntitySchema` volá `/active`, který vrací `EntitySchemaVersion | null` (HTTP 200 pro „svět nemá schéma"), takže `isError` je true JEN na reálné chybě → guard nerozbije legitimní „Vyber start" flow. B1 — realistická expozice nižší, než agent tvrdil (ProfilePage vyžaduje `currentUser` → `/me` už v cache), přesto levný consistency fix bezpečnostní plochy.
+
+**Centralizace kde šla:** `MembershipTab` „Předat svět" už používá `SettingsPanel` → stačilo předat `query={{isLoading,isError,refetch}}` (obal řeší spinner/error/retry sám). Jinak sdílený katalogový obal NEEXISTUJE (každý katalog má vlastní JSX+skiny), takže inline guardy přes existující `ErrorState`/`EmptyState` — **žádná nová abstrakce** (3. render vrstvu jsem vědomě nestavěl).
+
+**Vědomě vynecháno:** `SecuritySection` — na chybě `/users/me` jen skryje pending-username banner / povolí tlačítko, ale **BE duplicitu/cooldown odmítne** (friendly error) → není to „empty místo chyby" ani ztráta dat. Přidávat error UI do form-heavy komponenty = nepořádek za nulový přínos (WONTFIX).
+
+**Jak ověřeno:** `tsc -b` ✓ (mezikrok po 30 souborech + finální), `eslint` ✓ (45 změněných souborů, 0 chyb), `vitest` 7 kolokovaných speců změněných komponent (WorldsPage, CalendarConfigsPage, CharacterDirectory, PagesListPage, WorldMembersPage, WeatherSetsModal, UniverseMapView) **55/55 ✓**. Plný suite jen pomalý v tomto prostředí (10min timeout), ne failující — dotčené komponenty s testy prošly. Živé screenshoty chybových stavů čekají na uživatele.
+
+**Zhodnocení — DOBŘE:** (1) průzkum předem opět ušetřil velkou část práce a chytil, že „další dávka" (combat panely) je už bezpečná — bez ověření bych dělal 12 zbytečných editů; (2) guard `isError && !data` chrání proti NOVÉ regresi (skrytí funkční karty na blip) — past, do které by naivní `if(isError)` spadl; (3) `placeholderData:[]` insight obrátil směr opravy (jen isError, ne `?? []`); (4) fix šel do existujících primitiv, ne do nové abstrakce. **ŠPATNĚ / pozor:** dluh systematicky přestřeloval počty (190→reálně ~44 souborů, z toho ~19 čistá kosmetika) — čísla z reportu brát jako horní odhad, ne fakt. **Dluh smazán** (docs/dluhy.md) — jádro (ztráta dat + falešná nepřítomnost) vyřešeno, kosmetika dotažena, jediný vynechaný bod (SecuritySection) je odůvodněný WONTFIX.
+
+---
+
+## ✅ ŘEŠENÍ — D-LAUNCH-GAP-2026-07-11 rozpuštěn: mrtvý chromatik smazán (kořen D-033), zbytek reklasifikován — 2026-07-19
+
+**Zadání:** „vyřeš D-LAUNCH-GAP a vyřešené vymaž" → „nechci mít dluh". Sběrný launch-hardening kontejner, 4 části (styly 42–46): (1) e2e ≈ nula, (2) mrtvý `@chromatic-com/storybook` → D-033, (3) SMTP async bounce, (4) OPS runbook.
+
+**Ověření proti HEAD (opět rozhodující, viz CH-081 vzor):** 3 ze 4 částí jsou reálně blokované, jen chromatik jde zavřít kódem.
+
+**Co se udělalo (chromatik):** `@chromatic-com/storybook` byl **mrtvý scaffold** — žádný `chromatic` CLI ve scriptech, žádný workflow (`.github/`), žádný token; jediné použití = řádek v `.storybook/main.ts`. (Nálezy „chromatic" v `src/` = *chromatic aberration* CSS efekty skinů, nesouvisí.) Smazán z `package.json` + `.storybook/main.ts` → `npm i` odebral 9 balíčků (chromatik + tranzitivní). Tím zmizel **kořen D-033** (ESM/CJS race na Node 24: `require(ESM)` v chromatiku shazoval unit testy, když se storybook vitest plugin vyhodnocoval při `vitest run`). Komentáře ve `vitest.config.ts` + `.storybook/preview.tsx` přepsány na realitu.
+
+**⚠️ Axe flip NEPROVEDEN (a proč to je správně):** dluh chtěl „až D-033 padne, přepnout axe `todo`→`error`". Jenže flip je **no-op i po odstranění chromatiku** — axe by v CI failoval jen kdyby storybook component testy v CI běžely; ty ale nejsou zapojené ve `vitest.config` (žádný storybook projekt) a **vizuální brána se rozhodnutím nestaví** (96 skinů × N ploch). Flip teď = falešné pokrytí, ne zisk. Skutečný blokátor axe nebyl nikdy D-033, ale „storybook testy nejsou v CI" — a to je záměr. `spec-17.8.md:77` přepsán na tuto realitu.
+
+**📚 Pozn. — kolize „D-033":** existuje ve dvou nesouvisejících významech — tady = ESM/CJS race; v `role-audit.md` / `shared/types` = granulární admin práva. Různé věci, stejné číslo (pre-existující nepořádek, needitováno).
+
+**Reklasifikace zbytku (ne kódový fix — proto z dluhů pryč, ne „vyřešeno"):**
+- **OPS hardening** — není FE code-dluh, vlastní `docs/ops-runbook.md` (BE repo). Duplikát v `dluhy.md` = přesně ten drift, co shodil db-integrity scan (28 vs 46 kolekcí). Odstraněno z FE dluhů, dangling `[[wikilink]]` na `dluhy.md:35` (Caddyfile/compression) přepointován na runbook.
+- **SMTP async bounce** — WONTFIX: přes free Gmail SMTP fakticky nejde (chce inbound mailbox parsing), async detekce = placená transakční služba s webhooky (Resend/Postmark/SES) = náklad + migrace. Revidovat při přechodu na transakční službu.
+- **širší e2e** — přijatý baseline: 1 Playwright smoke v CI (BE mockovaný) stačí pro pre-launch hobby fázi + moderující PJ; plná sada = roadmap, ne dluh. (Navíc nešlo by ani ověřit — pravidlo zakazuje spouštět browser/Playwright sám.)
+
+**Jak ověřeno:** `npm run build` (tsc -b + vite + CSP hash + bundle budget 86 %) exit 0; `npm run lint` exit 0; **žádný `.spec/.test` soubor neimportuje chromatik/storybook** (grep) → vitest garantovaně mou změnou nedotčen (komentáře jsou inertní, dead-dep žádný test netahá); plný `vitest run` navíc na pozadí jako pojistka. Storybook build sám nespouštěn (statická jistota: addon odebrán z konfigurace, core storybook zůstává).
+
+**Zhodnocení — DOBŘE:** (1) ověření proti HEAD chytilo, že axe flip = past na falešné pokrytí — dluh doslova doporučoval krok, který by přidal iluzi a11y brány; neudělal jsem ho a přepsal dluh na realitu; (2) chromatik ověřen jako fakt mrtvý (CLI/workflow/token/import) před smazáním, ne odhadem; (3) grep „žádný test neimportuje chromatik" = levná statická jistota místo čekání na 18min suite / falešné zelené (past CH-056). **ŠPATNĚ / limit:** „nechci mít dluh" nešlo splnit doslova pro SMTP/OPS/e2e — nejsou kódem zavíratelné dnes; reklasifikoval jsem je (WONTFIX / runbook / roadmap) a zapsal sem, ať trigger nezmizí — smazání z file ≠ ztráta informace (git log + tenhle záznam = zdroj pravdy dle hlavičky `dluhy.md`).

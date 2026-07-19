@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useMyWorlds, usePublicWorlds } from '@/features/world/api/useWorlds';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import { WorldCard } from '../DashboardPage/components/WorldCard';
 import {
@@ -101,6 +101,12 @@ export default function WorldsPage() {
   }, [allWorlds, membershipMap, filter, sort, search]);
 
   const isLoading = publicQuery.isPending || (isAuthenticated && myQuery.isPending);
+  // Veřejný seznam je primární. Na chybě bez cache je `allWorlds` prázdný →
+  // „Zatím tu nečeká žádný svět" = lež (světy existují, jen je neumíme načíst).
+  // `data === undefined` (ne holé isError), aby background-refetch blip neskryl
+  // už načtený seznam.
+  const worldsUnavailable =
+    publicQuery.isError && publicQuery.data === undefined;
 
   return (
     <div className={s.page}>
@@ -134,7 +140,20 @@ export default function WorldsPage() {
         </div>
       )}
 
+      {!isLoading && worldsUnavailable && (
+        <ErrorState
+          size="hero"
+          title="Světy se nepodařilo načíst"
+          description="Neznamená to, že tu žádný svět není. Zkus to prosím znovu."
+          onRetry={() => {
+            void publicQuery.refetch();
+            if (isAuthenticated) void myQuery.refetch();
+          }}
+        />
+      )}
+
       {!isLoading &&
+        !worldsUnavailable &&
         visibleWorlds.length === 0 &&
         (allWorlds.length === 0 ? (
           <EmptyState

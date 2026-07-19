@@ -5,7 +5,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { Button } from '@/shared/ui';
+import { Button, ErrorState } from '@/shared/ui';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { useNameSetsList } from '../hooks/useNameSets';
 import { NameSetEditorModal } from './NameSetEditorModal';
@@ -23,7 +23,12 @@ export function SadyTab() {
   const [search, setSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
 
-  const { data: sets = [], isLoading, isError } = useNameSetsList({ status });
+  const {
+    data: sets = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useNameSetsList({ status });
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -99,7 +104,12 @@ export function SadyTab() {
       {isLoading ? (
         <p className={s.state}>Načítám…</p>
       ) : isError ? (
-        <p className={s.state}>Sady se nepodařilo načíst.</p>
+        <ErrorState
+          size="panel"
+          title="Sady se nepodařilo načíst"
+          description="Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
       ) : filtered.length === 0 ? (
         <p className={s.state}>
           {status === 'approved' ? 'Žádné schválené sady.' : 'Žádné návrhy.'}

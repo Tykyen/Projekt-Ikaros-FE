@@ -19,8 +19,17 @@ type Mode = 'idle' | 'setup' | 'disable' | 'regenerate';
  * vypnutí a regeneraci záložních kódů (oboje re-auth heslem).
  */
 export function TotpCard() {
-  const { data: profile } = useMyProfile();
+  const { data: profile, isError: profileError, refetch: refetchProfile } =
+    useMyProfile();
   const enabled = profile?.totpEnabled ?? false;
+  // Když `/users/me` selže bez cache (`profile === undefined`), `enabled` spadne
+  // na false → bez guardu níže by karta tvrdila „Vypnuto" a nabídla „Zapnout
+  // 2FA" i uživateli, který 2FA MÁ → nový setup přepíše TOTP secret a zneplatní
+  // jeho authenticator. Na neznámém stavu proto nelžeme ani nepouštíme setup.
+  // (Na background-refetch chybě s cache `profile` zůstává → karta jede dál —
+  // proto `&& profile === undefined`, ne holé `isError`; jinak by blip skryl
+  // funkční kartu.)
+  const statusUnknown = profileError && profile === undefined;
 
   const [mode, setMode] = useState<Mode>('idle');
   const [password, setPassword] = useState('');
@@ -61,6 +70,24 @@ export function TotpCard() {
   }
 
   function renderBody() {
+    if (statusUnknown) {
+      return (
+        <div className={styles.intro} role="alert">
+          <p>
+            Stav dvoufaktorového ověření teď neumíme zjistit. Radši s ním
+            nehýbeme — kdyby bylo zapnuté, nový setup by přepsal tvůj
+            authenticator.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => void refetchProfile()}
+          >
+            Zkusit znovu
+          </Button>
+        </div>
+      );
+    }
     if (regenerated) {
       return (
         <BackupCodesPanel
@@ -168,9 +195,9 @@ export function TotpCard() {
       <header className={sectionStyles.headerRow}>
         <h2 className={sectionStyles.sectionTitle}>Dvoufaktorové ověření</h2>
         <span
-          className={`${styles.statusBadge} ${enabled ? styles.statusOn : styles.statusOff}`}
+          className={`${styles.statusBadge} ${enabled && !statusUnknown ? styles.statusOn : styles.statusOff}`}
         >
-          {enabled ? '🔒 Aktivní' : 'Vypnuto'}
+          {statusUnknown ? 'Nezjištěno' : enabled ? '🔒 Aktivní' : 'Vypnuto'}
         </span>
       </header>
       {renderBody()}

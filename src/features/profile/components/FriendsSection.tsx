@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { UserAvatar, EmptyState } from '@/shared/ui';
+import { UserAvatar, EmptyState, ErrorState } from '@/shared/ui';
 import { useFriends } from '@/features/friendships/api/useFriends';
 import styles from './ProfileSections.module.css';
 
@@ -10,7 +10,7 @@ import styles from './ProfileSections.module.css';
  * zůstává na stránce Uživatelé → Přátelé.
  */
 export function FriendsSection() {
-  const { data, isLoading } = useFriends();
+  const { data, isLoading, isError, refetch } = useFriends();
   // Pojistka proti záznamu bez protějšku (viz FriendsTab).
   const friends = (data?.items ?? []).filter((f) => f.friend);
 
@@ -29,6 +29,13 @@ export function FriendsSection() {
 
       {isLoading ? (
         <p className={styles.empty}>Načítám přátele…</p>
+      ) : isError ? (
+        <ErrorState
+          size="panel"
+          title="Přátele se nepodařilo načíst"
+          description="Neznamená to, že žádné nemáš. Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
       ) : friends.length === 0 ? (
         <EmptyState
           size="panel"

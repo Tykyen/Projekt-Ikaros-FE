@@ -4,14 +4,14 @@
  * Login-required (BE `GET /map-templates/catalog` je za JwtAuthGuard).
  */
 import { Link } from 'react-router-dom';
-import { Breadcrumbs } from '@/shared/ui';
+import { Breadcrumbs, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import { useSceneCatalog } from './hooks/useSceneCatalog';
 import type { SceneCatalogEntry } from './api/sceneCatalogApi';
 import s from './KomunitniSceny.module.css';
 
 export default function KomunitniScenyPage() {
-  const { data, isLoading, isError } = useSceneCatalog();
+  const { data, isLoading, isError, refetch } = useSceneCatalog();
   const items = data?.items ?? [];
 
   const crumbs = [
@@ -47,7 +47,12 @@ export default function KomunitniScenyPage() {
       {isLoading ? (
         <p className={s.state}>Načítám…</p>
       ) : isError ? (
-        <p className={s.state}>Katalog se nepodařilo načíst.</p>
+        <ErrorState
+          size="panel"
+          title="Katalog se nepodařilo načíst"
+          description="Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
       ) : items.length === 0 ? (
         <p className={s.state}>
           V katalogu zatím žádná scéna není. Buď první — publikuj scénu ze své

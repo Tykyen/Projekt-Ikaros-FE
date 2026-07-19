@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -38,9 +38,12 @@ export default function KomunitniPlantDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !plant)
     return (
-      <p className={s.state}>
-        Rostlina nenalezena. <Link to="/ikaros/herbar">Zpět na knihovnu</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Rostlina nenalezena"
+        action={{ label: 'Zpět na knihovnu', to: '/ikaros/herbar' }}
+      />
     );
 
   const isAuth = Boolean(user);

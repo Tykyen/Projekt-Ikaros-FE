@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -45,9 +45,12 @@ export default function KomunitniBestieDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !bestie)
     return (
-      <p className={s.state}>
-        Bytost nenalezena. <Link to="/ikaros/bestiar">Zpět na knihovnu</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Bytost nenalezena"
+        action={{ label: 'Zpět na knihovnu', to: '/ikaros/bestiar' }}
+      />
     );
 
   const systemIds = bestie.statblocks ? Object.keys(bestie.statblocks) : [];

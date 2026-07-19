@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { PLATFORM_SYSTEMS } from '@/shared/rpg/systems';
 import { GENRES } from '@/shared/rpg/genres';
 import type { Nabor, NaborStrana, NaborMode } from '@/shared/types';
@@ -22,7 +22,7 @@ import s from './NaboryPage.module.css';
  * CoC"); zmizelá volba je matoucí.
  */
 export default function NaboryPage() {
-  const { data: nabory = [], isLoading } = useNabory();
+  const { data: nabory = [], isLoading, isError, refetch } = useNabory();
 
   const [strana, setStrana] = useState<NaborStrana | 'vse'>('vse');
   const [system, setSystem] = useState('');
@@ -174,6 +174,13 @@ export default function NaboryPage() {
 
       {isLoading ? (
         <Spinner center />
+      ) : isError ? (
+        <ErrorState
+          size="hero"
+          title="Nástěnku se nepodařilo načíst"
+          description="Neznamená to, že tu nikdo nehledá. Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
       ) : filtered.length === 0 ? (
         <EmptyState
           size="hero"

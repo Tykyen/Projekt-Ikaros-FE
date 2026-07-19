@@ -51,6 +51,7 @@ import {
   ConfirmDialog,
   Tabs,
   KebabMenu,
+  ErrorState,
   type TabItem,
   type KebabMenuItem,
 } from '@/shared/ui';
@@ -415,7 +416,20 @@ export function WeatherSetsModal({
                 </div>
               )}
 
-              {mineSubTab === 'list' && customDisplays.length === 0 && (
+              {mineSubTab === 'list' && setsQuery.isError && (
+                <div className={s.emptyState}>
+                  <ErrorState
+                    size="panel"
+                    title="Vlastní sety se nepodařilo načíst"
+                    description="Neznamená to, že žádné nemáš. Zkus to prosím znovu."
+                    onRetry={() => void setsQuery.refetch()}
+                  />
+                </div>
+              )}
+
+              {mineSubTab === 'list' &&
+                !setsQuery.isError &&
+                customDisplays.length === 0 && (
                 <div className={s.emptyState} data-testid="sets-mine-empty">
                   <Package
                     size={48}

@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { Plus, Search, ArrowUpDown, Lock, MessageCircle, Heart } from 'lucide-react';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { useDiscussions } from '../api/useDiscussions';
 import { filterDiscussions, timeAgo, type DiscussionSort } from '../lib/discussions';
 import type { IkarosDiscussion } from '@/shared/types';
@@ -15,7 +15,8 @@ type Tab = 'prehled' | 'moje';
 export default function DiscussionsPage() {
   const [tab, setTab] = useState<Tab>('prehled');
   const user = useAtomValue(currentUserAtom);
-  const { data: discussions = [], isLoading } = useDiscussions();
+  const { data: discussions = [], isLoading, isError, refetch } =
+    useDiscussions();
 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 250);
@@ -95,6 +96,13 @@ export default function DiscussionsPage() {
 
       {isLoading ? (
         <Spinner center />
+      ) : isError ? (
+        <ErrorState
+          size="panel"
+          title="Diskuze se nepodařilo načíst"
+          description="Neznamená to, že tu žádná není. Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
       ) : filtered.length === 0 ? (
         debouncedQuery ? (
           <EmptyState

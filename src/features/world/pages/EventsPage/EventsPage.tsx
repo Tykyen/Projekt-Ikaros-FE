@@ -104,6 +104,8 @@ export default function EventsPage() {
       <EventsList
         events={filteredEvents}
         loading={loading}
+        error={activeQ.isError}
+        onRetry={() => void activeQ.refetch()}
         view={view}
         viewerRole={viewerRole}
         worldId={worldId}

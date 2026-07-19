@@ -17,7 +17,7 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { usePagesDirectory } from '../api/usePagesDirectory';
@@ -42,7 +42,12 @@ function normalize(str: string): string {
  */
 export default function PagesListPage() {
   const { worldId, worldSlug, userRole, world, loading } = useWorldContext();
-  const { data: directory = [], isLoading } = usePagesDirectory(worldId);
+  const {
+    data: directory = [],
+    isLoading,
+    isError,
+    refetch,
+  } = usePagesDirectory(worldId);
   const favorites = useFavoritePages(worldId);
 
   const [search, setSearch] = useState('');
@@ -135,6 +140,15 @@ export default function PagesListPage() {
 
       {isLoading ? (
         <Spinner center />
+      ) : isError ? (
+        // `usePagesDirectory` má `placeholderData: []` → na chybě je `directory`
+        // pořád `[]`; bez `isError` by prázdno tvrdilo „nepopsaný list" (lež).
+        <ErrorState
+          size="hero"
+          title="Stránky se nepodařilo načíst"
+          description="Neznamená to, že je svět prázdný. Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
       ) : directory.length === 0 ? (
         <EmptyState
           size="hero"

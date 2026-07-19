@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -37,9 +37,12 @@ export default function NameSetDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !set)
     return (
-      <p className={s.state}>
-        Sada nenalezena. <Link to="/ikaros/generatory">Zpět na generátory</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Sada nenalezena"
+        action={{ label: 'Zpět na generátory', to: '/ikaros/generatory' }}
+      />
     );
 
   const isCurator = !!user && CURATOR_ROLES.includes(user.role);

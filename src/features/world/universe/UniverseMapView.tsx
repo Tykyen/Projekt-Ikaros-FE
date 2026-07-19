@@ -2,7 +2,7 @@
 // real-time sync (s předností draftu v edit módu) a PJ mutace.
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState, ErrorState } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { PrintButton, usePrintMode } from '@/features/world/export/print';
 import {
@@ -48,7 +48,7 @@ export function UniverseMapView() {
   const fgRef = useRef<UniverseGraphHandle | undefined>(undefined);
   const printMode = usePrintMode();
 
-  const { data: serverMap, isLoading } = useUniverse(worldId);
+  const { data: serverMap, isLoading, isError, refetch } = useUniverse(worldId);
   const draft = useUniverseDraft();
   const updateUniverse = useUpdateUniverse(worldId);
   const updateVisibility = useUpdateNodeVisibility(worldId);
@@ -207,7 +207,17 @@ export function UniverseMapView() {
             >
               🔭 Zobrazit vše
             </button>
-            {map.nodes.length === 0 && !isLoading && (
+            {/* Na chybě spadne `map` na EMPTY_MAP → bez `!isError` by prázdno
+                tvrdilo „Mapa je prázdná" (lež — vesmír tělesa mít může). */}
+            {isError && !isLoading && (
+              <ErrorState
+                size="panel"
+                title="Mapu se nepodařilo načíst"
+                description="Neznamená to, že je vesmír prázdný. Zkus to prosím znovu."
+                onRetry={() => void refetch()}
+              />
+            )}
+            {map.nodes.length === 0 && !isLoading && !isError && (
               <EmptyState
                 size="panel"
                 illustration="worlds"

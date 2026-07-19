@@ -5,7 +5,7 @@
  */
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Breadcrumbs, Button, Spinner } from '@/shared/ui';
+import { Breadcrumbs, Button, Spinner, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import { ReportButton } from '@/shared/moderation';
 import { useSceneCatalogEntry } from './hooks/useSceneCatalog';
@@ -21,10 +21,13 @@ export default function KomunitniScenaDetailPage() {
   if (isError || !entry) {
     return (
       <article className={s.page}>
-        <p className={s.state}>Scéna nenalezena nebo už není v katalogu.</p>
-        <Link to="/ikaros/sceny" className={s.backLink}>
-          ← Zpět do katalogu scén
-        </Link>
+        <ErrorState
+          size="panel"
+          status={404}
+          title="Scéna nenalezena"
+          description="Možná už není v katalogu, nebo byla odebrána."
+          action={{ label: 'Zpět do katalogu scén', to: '/ikaros/sceny' }}
+        />
       </article>
     );
   }

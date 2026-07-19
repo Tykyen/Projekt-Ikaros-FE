@@ -27,7 +27,11 @@ export function InsertToBestiaryModal({
   onClose,
   onInserted,
 }: Props) {
-  const { data: myWorlds } = useMyWorlds();
+  const {
+    data: myWorlds,
+    isError: worldsError,
+    refetch: refetchWorlds,
+  } = useMyWorlds();
   const { clone } = useKomunitniBestiarMutations();
   const sys = resolveSystemId(systemId);
 
@@ -108,7 +112,21 @@ export function InsertToBestiaryModal({
         </select>
       </div>
 
-      {worldTargets.length === 0 ? (
+      {worldsError ? (
+        // `myWorlds` je undefined i při chybě → bez tohohle by „žádný svět"
+        // tvrdilo, že nemáš svět daného systému, i když se jen nenačetl seznam.
+        <p className={s.hint}>
+          Seznam tvých světů se teď nepodařilo načíst — vložit do osobního můžeš
+          i tak.{' '}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void refetchWorlds()}
+          >
+            Zkusit znovu
+          </Button>
+        </p>
+      ) : worldTargets.length === 0 ? (
         <p className={s.hint}>
           Žádný tvůj svět neběží na systému {systemLabel(systemId)} — vlož zatím
           do osobního.

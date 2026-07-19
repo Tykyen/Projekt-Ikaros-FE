@@ -7,7 +7,7 @@
 import { useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
@@ -73,9 +73,12 @@ export default function KomunitniCenikDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !cenik)
     return (
-      <p className={s.state}>
-        Ceník nenalezen. <Link to="/ikaros/ceniky">Zpět na knihovnu</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Ceník nenalezen"
+        action={{ label: 'Zpět na knihovnu', to: '/ikaros/ceniky' }}
+      />
     );
 
   const isAuth = Boolean(user);

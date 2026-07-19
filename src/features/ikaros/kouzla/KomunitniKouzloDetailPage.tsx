@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -48,9 +48,12 @@ export default function KomunitniKouzloDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !spell)
     return (
-      <p className={s.state}>
-        Kouzlo nenalezeno. <Link to="/ikaros/kouzla">Zpět na knihovnu</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Kouzlo nenalezeno"
+        action={{ label: 'Zpět na knihovnu', to: '/ikaros/kouzla' }}
+      />
     );
 
   const systemIds = spell.statblocks ? Object.keys(spell.statblocks) : [];

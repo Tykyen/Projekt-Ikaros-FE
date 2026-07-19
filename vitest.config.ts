@@ -6,10 +6,12 @@ import { fileURLToPath } from 'node:url';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // `vitest run` = jen unit testy (jsdom). Storybook component testy
-// (@storybook/addon-vitest, browser/playwright) byly odděleny — jejich plugin
-// se vyhodnocoval i při běžném `vitest run` a padal na ESM/CJS race v
-// @chromatic-com/storybook (Node 24 require(ESM)), čímž shazoval i unit testy
-// (D-033). Storybook jako vizuální katalog běží dál přes `npm run storybook`.
+// (@storybook/addon-vitest, browser/playwright) do `vitest run` ZÁMĚRNĚ
+// nezapojujeme — vizuální brána se rozhodnutím nestaví (96 skinů × N ploch =
+// velká matice; kryje `+render` vrstva plny-auditu). Storybook jako vizuální
+// katalog běží přes `npm run storybook`.
+// (Pozn.: bývalý ESM/CJS race na Node 24 — viník `@chromatic-com/storybook`,
+// require(ESM) — odstraněn 2026-07-19 smazáním té mrtvé závislosti.)
 //
 // react() plugin se NEuvádí — vitest auto-merguje root vite.config.ts (react je
 // odtud); duplicitní react() rozbíjel test context („failed to find current

@@ -3,7 +3,7 @@ import { Clock, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button, Modal, Spinner } from '@/shared/ui';
+import { Button, Modal, Spinner, ErrorState } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import {
   calendarConfigsKey,
@@ -29,7 +29,12 @@ import s from './CalendarConfigsPage.module.css';
 export default function CalendarConfigsPage() {
   const { worldId, world } = useWorldContext();
   const qc = useQueryClient();
-  const { data: configs = [], isLoading } = useCalendarConfigs(worldId);
+  const {
+    data: configs = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useCalendarConfigs(worldId);
   const create = useCreateCalendarConfig(worldId);
   const deleteMutation = useDeleteCalendarConfig(worldId);
   const setDefaults = useUpdateCalendarDefaults(worldId);
@@ -98,6 +103,20 @@ export default function CalendarConfigsPage() {
   }
 
   if (isLoading) return <Spinner center />;
+  // Na chybě je `configs = []` → sidebar by vypadal jako svět bez kalendářů
+  // (lež — každý svět má aspoň výchozí). Editor přitom pracuje jen nad
+  // `selected`, takže o ztrátu dat nejde, jen o matoucí prázdno.
+  if (isError)
+    return (
+      <article className={s.page}>
+        <ErrorState
+          size="panel"
+          title="Kalendáře se nepodařilo načíst"
+          description="Neznamená to, že svět žádné nemá. Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
+      </article>
+    );
 
   return (
     <article className={s.page}>

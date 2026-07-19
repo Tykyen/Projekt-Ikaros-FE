@@ -74,5 +74,5 @@ Roadmapa říká „průběžné zlepšování" (🔁), ne WCAG AA certifikace. 
   - Migrace **všech** deníkových systémů na `IconButton` (jen jmenované hotspoty teď).
   - `KebabMenu` roving-tabindex / šipková navigace.
   - ~~Extrakce `useFocusTrap`/`Drawer` z `Modal` a napojení na NotifCenter + drawery~~ — ✅ **2026-07-18:** `useFocusTrap` extrahován + napojen (Modal/NotifCenter/drawery), doplněn i do modálních overlayů `MapNotebookOverlay` a mobilních chat drawerů (`WorldChatRoom`, gated `useMediaQuery('(max-width: 1024px)')`); selektor rozšířen o `[contenteditable]` (TipTap). 25 testů. ⚠️ `TokenInfoPanel`/`ChatContextRail` **záměrně BEZ trapu** (nemodální). Viz [[../../dluhy.md]] D-17.8-A11Y (guard-rails) + chybový deník.
-  - Storybook axe `todo`→`error` — blokováno na D-033 (jediná zbylá položka D-17.8-A11Y).
+  - Storybook axe `todo`→`error` — ~~blokováno na D-033~~ **2026-07-19:** D-033 kořen (ESM/CJS race) odstraněn smazáním mrtvého `@chromatic-com/storybook`, ale flip zůstává **no-op**: storybook component testy v CI neběží (vizuální brána se rozhodnutím nestaví). Přepnout jen spolu s browser-mode axe v CI. Statiku nese `eslint-plugin-jsx-a11y`.
 - **Mimo:** plná WCAG 2.2 AA certifikace, kontrast (běží `audit:contrast`), ARIA pro komplexní widgety (grid, tree), screen-reader QA na reálné čtečce.

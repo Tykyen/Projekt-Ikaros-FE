@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { Spinner } from '@/shared/ui';
+import { Spinner, ErrorState } from '@/shared/ui';
 import { useGlobalEmotes } from '@/features/world/chat/emotes/api/useGlobalEmotes';
 import { useDeleteGlobalEmote } from '@/features/world/chat/emotes/api/useDeleteGlobalEmote';
 import { EmoteGrid } from '@/features/world/chat/emotes/components/EmoteGrid';
@@ -49,7 +49,12 @@ export default function IkarosEmotesAdminPage() {
       )}
 
       {emotes.isError && (
-        <div className={s.state}>Globální emoty se nepodařilo načíst.</div>
+        <ErrorState
+          size="panel"
+          title="Globální emoty se nepodařilo načíst"
+          description="Zkus to prosím znovu."
+          onRetry={() => void emotes.refetch()}
+        />
       )}
 
       {isEmpty && (

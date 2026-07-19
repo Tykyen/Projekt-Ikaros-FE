@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { useParams } from 'react-router-dom';
 import { Users, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { Spinner, EmptyState } from '@/shared/ui';
+import { Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { WorldRole } from '@/shared/types';
 import { useUploadImage } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -45,8 +45,14 @@ export default function GroupMembersPage() {
   // Znak může nahrát jen PJ (BE `updateSettings` = canAdminWorld ≥ PJ) a jen
   // pro reálnou skupinu (ne „Nezařazení", které kanál ani znak nemá). Var. B.
   // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
+  // `!isError && !isLoading`: na chybě/při načítání je `groupImages = {}` (viz
+  // níže) — upload by pak poslal mapu s JEDINÝM klíčem a BE (`$set groupImages`)
+  // by přepsal znaky VŠECH ostatních skupin. Editaci proto pouštíme jen nad
+  // reálně načtenými nastaveními (legit prázdná mapa u nového světa je OK).
+  const settingsReady = !settingsQuery.isError && !settingsQuery.isLoading;
   const canEditEmblem =
     groupName !== null &&
+    settingsReady &&
     (world?.elevated === true || (userRole ?? -1) >= WorldRole.PJ);
 
   async function pickEmblem(file: File | undefined) {
@@ -75,6 +81,19 @@ export default function GroupMembersPage() {
   }, [directoryQuery.data]);
 
   if (loading || membersQuery.isLoading) return <Spinner center />;
+  // `membersQuery.data` je `undefined` i při 500 → bez tohohle guardu by prázdný
+  // seznam tvrdil „Ve skupině zatím nikdo není" (lež o složení skupiny).
+  if (membersQuery.isError)
+    return (
+      <article className={s.page}>
+        <ErrorState
+          size="panel"
+          title="Skupinu se nepodařilo načíst"
+          description="Členy téhle skupiny teď neumíme zobrazit. Nic se nestalo — zkus to prosím znovu."
+          onRetry={() => void membersQuery.refetch()}
+        />
+      </article>
+    );
 
   const members = membersInGroup(
     membersQuery.data ?? [],

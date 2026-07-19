@@ -156,7 +156,21 @@ export function InvitePanel({ worldId, onClose }: Props) {
 
         <section className={s.section}>
           <h3 className={s.sectionTitle}>Aktivní pozvánky</h3>
-          {activeInvites.length === 0 ? (
+          {invites.isError ? (
+            // `invites.data` je undefined i při chybě → bez téhle větve by se
+            // aktivní pozvánky tvářily jako prázdné → PJ nevidí co zrušit a může
+            // vytvořit duplicitní.
+            <p className={s.hint} role="alert">
+              Aktivní pozvánky se teď nepodařilo načíst — nemusíš vidět všechny.{' '}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void invites.refetch()}
+              >
+                Zkusit znovu
+              </Button>
+            </p>
+          ) : activeInvites.length === 0 ? (
             <p className={s.hint}>Žádné aktivní pozvánky.</p>
           ) : (
             <ul className={s.inviteList}>

@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -50,9 +50,12 @@ export default function KomunitniLektvarDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !potion)
     return (
-      <p className={s.state}>
-        Lektvar nenalezen. <Link to="/ikaros/lektvary">Zpět na knihovnu</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Lektvar nenalezen"
+        action={{ label: 'Zpět na knihovnu', to: '/ikaros/lektvary' }}
+      />
     );
 
   const systemIds = potion.statblocks ? Object.keys(potion.statblocks) : [];

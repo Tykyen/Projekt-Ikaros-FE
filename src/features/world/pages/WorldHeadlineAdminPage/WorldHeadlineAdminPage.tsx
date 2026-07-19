@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Button, Spinner } from '@/shared/ui';
+import { Button, Spinner, ErrorState } from '@/shared/ui';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldSettings } from '@/features/world/api/useWorldSettings';
 import { useUpdateWorldSettings } from '@/features/world/api/useUpdateWorldSettings';
@@ -72,6 +72,21 @@ export default function WorldHeadlineAdminPage() {
 
   if (!world) return null;
   if (settingsQ.isLoading) return <Spinner center />;
+  // `useWorldSettings` na chybě vrací `data === undefined` → `initial` výše
+  // spadne na prázdné hodnoty (navigace/menu/lastInfo vypadají smazané) a po
+  // jakékoli editaci by `save()` přepsal reálnou hlavní lištu v DB. Editor proto
+  // nad chybou vůbec nepouštíme (stejný kontrakt jako opravený SettingsPanel).
+  if (settingsQ.isError)
+    return (
+      <div className={s.page}>
+        <ErrorState
+          size="panel"
+          title="Hlavní lištu se nepodařilo načíst"
+          description="Editor radši neukazujeme — mohl by zobrazit prázdné hodnoty místo tvé navigace a uložením ji přepsat. Zkus to prosím znovu."
+          onRetry={() => void settingsQ.refetch()}
+        />
+      </div>
+    );
 
   const dirty = JSON.stringify({ hidden, headline, templates, lastInfo })
     !== JSON.stringify({

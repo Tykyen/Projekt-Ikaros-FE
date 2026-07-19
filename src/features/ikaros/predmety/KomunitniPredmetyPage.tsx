@@ -8,7 +8,7 @@ import { useState, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { useAtomValue } from 'jotai';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { Seo } from '@/shared/seo';
 import { isAuthenticatedAtom } from '@/shared/store/authStore';
 import { InsertToShopModal } from '../herbar/components/InsertToShopModal';
@@ -197,7 +197,12 @@ export default function KomunitniPredmetyPage() {
       {active.isLoading ? (
         <p className={s.state}>Načítám…</p>
       ) : active.isError ? (
-        <p className={s.state}>Knihovnu se nepodařilo načíst.</p>
+        <ErrorState
+          size="panel"
+          title="Knihovnu se nepodařilo načíst"
+          description="Zkus to prosím znovu."
+          onRetry={() => void active.refetch()}
+        />
       ) : filtered.length === 0 ? (
         <p className={s.state}>
           {library === 'approved'

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, EmptyState, Spinner } from '@/shared/ui';
+import { Button, EmptyState, Spinner, ErrorState } from '@/shared/ui';
 import { useAdminAuditLog } from '../../api/useAdminUsers';
 import type { AdminAuditAction } from '@/shared/types';
 import s from './AuditLogTab.module.css';
@@ -91,7 +91,7 @@ export function AuditLogTab() {
   const [action, setAction] = useState<AdminAuditAction | ''>('');
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useAdminAuditLog({
+  const { data, isLoading, isError, refetch } = useAdminAuditLog({
     page,
     limit: LIMIT,
     action: action || undefined,
@@ -126,6 +126,15 @@ export function AuditLogTab() {
         {isLoading ? (
           <div className={s.empty}>
             <Spinner /> Načítám audit log…
+          </div>
+        ) : isError ? (
+          <div className={s.empty}>
+            <ErrorState
+              size="inline"
+              title="Audit log se nepodařilo načíst"
+              description="Neznamená to, že jsou záznamy prázdné. Zkus to prosím znovu."
+              onRetry={() => void refetch()}
+            />
           </div>
         ) : items.length === 0 ? (
           <EmptyState

@@ -9,12 +9,12 @@ const preview: Preview = {
       // 'error' - fail CI on a11y violations
       // 'off' - skip a11y checks entirely
       //
-      // 17.8 (dluh D-17.8): ZÁMĚRNĚ zůstává 'todo', ne 'error'. Storybook
-      // component testy (@storybook/addon-vitest, browser/playwright) jsou
-      // odděleny z `vitest run` kvůli D-033 (ESM/CJS race shazoval unit testy),
-      // takže axe se v CI vůbec nespouští → 'error' by byl no-op (falešné
-      // pokrytí). Přepnout až s browser-mode axe v CI (vyřešení D-033) +
-      // ověřenou čistotou stories. Statické a11y hlídání zatím nese jsx-a11y lint.
+      // ZÁMĚRNĚ zůstává 'todo', ne 'error'. Storybook component testy
+      // (@storybook/addon-vitest, browser/playwright) v CI neběží — vizuální
+      // brána se rozhodnutím nestaví (viz vitest.config.ts), takže axe by v CI
+      // nikdy neproběhl → 'error' by byl no-op (falešné pokrytí). Přepnout jen
+      // spolu s browser-mode axe v CI + ověřenou čistotou stories. Statické
+      // a11y hlídání zatím nese jsx-a11y lint.
       test: 'todo',
     },
   },

@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { Breadcrumbs, Button } from '@/shared/ui';
+import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
 import { ReportButton } from '@/shared/moderation/ReportButton';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
@@ -38,9 +38,12 @@ export default function KomunitniHadankaDetailPage() {
   if (isLoading) return <p className={s.state}>Načítám…</p>;
   if (isError || !riddle)
     return (
-      <p className={s.state}>
-        Hádanka nenalezena. <Link to="/ikaros/hadanky">Zpět na knihovnu</Link>
-      </p>
+      <ErrorState
+        size="panel"
+        status={404}
+        title="Hádanka nenalezena"
+        action={{ label: 'Zpět na knihovnu', to: '/ikaros/hadanky' }}
+      />
     );
 
   const isAuth = Boolean(user);

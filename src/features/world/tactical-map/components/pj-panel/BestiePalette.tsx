@@ -15,6 +15,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ErrorState } from '@/shared/ui';
 import { useBestiar } from '@/features/world/bestiar/hooks/useBestiar';
 import { postMapOperation } from '../../api/mapApi';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
@@ -147,7 +148,18 @@ export function BestiePalette({
 
       {query.isLoading && <p className={styles.empty}>Načítání…</p>}
 
-      {!query.isLoading && activeList.length === 0 && (
+      {/* `query.data` je undefined i při chybě → bez `!isError` guardu by prázdný
+          katalog tvrdil „žádné bestie" a zablokoval „+ z katalogu". */}
+      {!query.isLoading && query.isError && (
+        <ErrorState
+          size="inline"
+          title="Bestie se nepodařilo načíst"
+          description="Zkus to prosím znovu."
+          onRetry={() => void query.refetch()}
+        />
+      )}
+
+      {!query.isLoading && !query.isError && activeList.length === 0 && (
         <p className={styles.empty}>
           {catalogEmpty
             ? 'Žádné bestie. Vytvoř v sekci Bestiář.'

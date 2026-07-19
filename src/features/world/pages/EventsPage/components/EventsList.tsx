@@ -1,12 +1,16 @@
 import type { GameEvent, WorldRole } from '@/shared/types';
 import { GameEventCard } from '@/features/world/components/GameEventCard/GameEventCard';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState, ErrorState } from '@/shared/ui';
 import type { EventsView } from './EventsToolbar';
 import s from './EventsList.module.css';
 
 interface Props {
   events: GameEvent[];
   loading: boolean;
+  /** Dotaz na akce selhal — `useGameEvents` má `placeholderData: []`, takže
+      `events` je i při chybě `[]` a bez tohohle by prázdno tvrdilo „žádné akce". */
+  error?: boolean;
+  onRetry?: () => void;
   view: EventsView;
   viewerRole: WorldRole;
   worldId: string;
@@ -23,6 +27,8 @@ interface Props {
 export function EventsList({
   events,
   loading,
+  error,
+  onRetry,
   view,
   viewerRole,
   worldId,
@@ -38,6 +44,17 @@ export function EventsList({
           <div key={i} className={s.skeleton} aria-hidden="true" />
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        size="hero"
+        title="Akce se nepodařilo načíst"
+        description="Neznamená to, že žádné nejsou. Zkus to prosím znovu."
+        onRetry={onRetry}
+      />
     );
   }
 

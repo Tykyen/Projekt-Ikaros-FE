@@ -5,7 +5,7 @@
  */
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Button, Spinner } from '@/shared/ui';
+import { Button, Spinner, ErrorState } from '@/shared/ui';
 import { parseApiError } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { genericBestieSchema } from '@/features/world/tactical-map/schemas/generic';
@@ -27,6 +27,21 @@ export default function WorldEntitySchemaEditorPage() {
   const createMut = useCreateEntitySchemaVersion(worldId);
 
   if (activeQ.isLoading) return <Spinner center />;
+  // `/active` vrací `null` (HTTP 200) když svět vlastní šablonu nemá → EditorSection
+  // legitimně nabídne „Vyber start". Na CHYBĚ je ale `data === undefined` (nerozlišitelné
+  // od legit-prázdna bez tohohle guardu) → PJ by viděl „Vyber start", klik založil NOVOU
+  // verzi a BE by jeho existující statblok archivoval. Chybu proto oddělíme.
+  if (activeQ.isError)
+    return (
+      <div className={s.page}>
+        <ErrorState
+          size="panel"
+          title="Šablonu bestie se nepodařilo načíst"
+          description="Editor radši neukazujeme — mohl by tvou existující šablonu zobrazit jako prázdnou a uložením ji nahradit novou verzí. Zkus to prosím znovu."
+          onRetry={() => void activeQ.refetch()}
+        />
+      </div>
+    );
 
   return (
     <div className={s.page}>

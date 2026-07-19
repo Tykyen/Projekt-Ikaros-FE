@@ -9,7 +9,11 @@ import {
   LayoutGrid,
   X,
 } from 'lucide-react';
-import { Button, EmptyState as SharedEmptyState } from '@/shared/ui';
+import {
+  Button,
+  EmptyState as SharedEmptyState,
+  ErrorState as SharedErrorState,
+} from '@/shared/ui';
 import { WorldRole, type World, type WorldMembership } from '@/shared/types';
 import { usePersonaDirectory } from '../api/usePersonaDirectory';
 import { useWorldMembers } from '../../api/useWorldMembers';
@@ -125,7 +129,12 @@ export function CharacterDirectory({
   // 9.1 — Pages directory s filterem type ∈ {PostavaHrace, NPC}. Sjednoceno
   // s Page entity; nové postavy z wizardu se objevují ihned (legacy
   // useCharacterDirectory by je nevracel).
-  const { data: pageEntries, isLoading } = usePersonaDirectory(worldId);
+  const {
+    data: pageEntries,
+    isLoading,
+    isError,
+    refetch,
+  } = usePersonaDirectory(worldId);
   const entries = useMemo(
     () => (pageEntries ?? []).map(pageEntryToCharacterEntry),
     [pageEntries],
@@ -223,6 +232,31 @@ export function CharacterDirectory({
             <div key={i} className={s.skeletonCard} aria-hidden />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  // ── Chyba ───────────────────────────────────────────────────────────
+  // `usePersonaDirectory` má `placeholderData: []` → na chybě je `pageEntries`
+  // pořád `[]` (ne undefined), takže `all.length === 0` níže by spadlo do
+  // pozvánky „Tvá družina tu chybí" = lež (svět postavy mít může). Jediné, co
+  // chybu odliší, je `isError`.
+  if (isError) {
+    return (
+      <div className={s.page}>
+        <Header canManage={canManage} onCreate={() => setCreateOpen(true)} />
+        <SharedErrorState
+          size="hero"
+          title="Postavy se nepodařilo načíst"
+          description="Neznamená to, že je svět prázdný. Zkus to prosím znovu."
+          onRetry={() => void refetch()}
+        />
+        <NewPageWizardModal
+          open={createOpen}
+          onClose={() => setCreateOpen(false)}
+          onChoose={handleWizardChoice}
+          canUseBestiary={canManage}
+        />
       </div>
     );
   }

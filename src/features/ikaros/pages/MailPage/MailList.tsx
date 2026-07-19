@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Button, Spinner, EmptyState } from '@/shared/ui';
+import { Button, Spinner, EmptyState, ErrorState } from '@/shared/ui';
 import { useMailFolder } from '@/features/ikaros/api/useMail';
 import { MailListItem } from './MailListItem';
 import type { MailFolder } from '@/shared/types';
@@ -47,6 +47,15 @@ export function MailList({
       {q.isLoading ? (
         <div className={s.stateBox}>
           <Spinner />
+        </div>
+      ) : q.isError ? (
+        <div className={s.stateBox}>
+          <ErrorState
+            size="panel"
+            title="Zprávy se nepodařilo načíst"
+            description="Neznamená to, že schránka je prázdná. Zkus to prosím znovu."
+            onRetry={() => void q.refetch()}
+          />
         </div>
       ) : messages.length === 0 ? (
         <EmptyState

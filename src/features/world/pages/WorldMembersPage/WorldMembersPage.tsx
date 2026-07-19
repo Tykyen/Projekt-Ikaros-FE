@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Crown, Shield, Users, UserPlus, Inbox } from 'lucide-react';
-import { Spinner, Button } from '@/shared/ui';
+import { Spinner, Button, ErrorState } from '@/shared/ui';
 import { WorldRole, type WorldMembership } from '@/shared/types';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useWorldMembers } from '@/features/world/api/useWorldMembers';
@@ -98,6 +98,20 @@ export default function WorldMembersPage() {
 
   if (loading || membersQuery.isLoading) {
     return <Spinner center />;
+  }
+  // `membersQuery.data` je `undefined` i při 500 → bez tohohle guardu adresář
+  // tvrdil „Svět zatím nemá žádné hráče" (lež o složení světa).
+  if (membersQuery.isError) {
+    return (
+      <article className={s.page}>
+        <ErrorState
+          size="panel"
+          title="Hráče světa se nepodařilo načíst"
+          description="Adresář teď neumíme zobrazit — neznamená to, že je svět prázdný. Zkus to prosím znovu."
+          onRetry={() => void membersQuery.refetch()}
+        />
+      </article>
+    );
   }
 
   const all = membersQuery.data ?? [];

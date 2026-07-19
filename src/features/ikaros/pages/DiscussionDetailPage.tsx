@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { Spinner, ConfirmDialog, EmptyState } from '@/shared/ui';
+import { Spinner, ConfirmDialog, EmptyState, ErrorState } from '@/shared/ui';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { ReportButton } from '@/shared/moderation';
 import { UserRole, type IkarosDiscussion, type IkarosDiscussionPost } from '@/shared/types';
@@ -105,7 +105,12 @@ function UnavailableNotice({
 
 function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
   const user = useAtomValue(currentUserAtom);
-  const { data: posts = [], isLoading: postsLoading } = useDiscussionPosts(d.id);
+  const {
+    data: posts = [],
+    isLoading: postsLoading,
+    isError: postsError,
+    refetch: refetchPosts,
+  } = useDiscussionPosts(d.id);
   const toggleLike = useToggleLikeDiscussion();
   const toggleFav = useToggleFavoriteDiscussion();
 
@@ -195,6 +200,13 @@ function DiscussionDetail({ discussion: d }: { discussion: IkarosDiscussion }) {
         <h2 className={s.threadTitle}>Vlákno příspěvků</h2>
         {postsLoading ? (
           <Spinner center />
+        ) : postsError ? (
+          <ErrorState
+            size="panel"
+            title="Příspěvky se nepodařilo načíst"
+            description="Neznamená to, že je vlákno prázdné. Zkus to prosím znovu."
+            onRetry={() => void refetchPosts()}
+          />
         ) : posts.length === 0 ? (
           <EmptyState
             size="panel"

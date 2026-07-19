@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { ArrowLeft, Send, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { currentUserAtom } from '@/shared/store/authStore';
-import { Spinner, Modal } from '@/shared/ui';
+import { Spinner, Modal, ErrorState } from '@/shared/ui';
 import { RichTextEditor, useDraftAutoSave } from '@/shared/ui/RichTextEditor';
 import {
   useArticle,
@@ -26,7 +26,12 @@ export default function ArticleEditorPage() {
   const isEdit = !!id;
   const navigate = useNavigate();
   const user = useAtomValue(currentUserAtom);
-  const { data: article, isLoading: loadingArticle } = useArticle(id);
+  const {
+    data: article,
+    isLoading: loadingArticle,
+    isError: articleError,
+    refetch: refetchArticle,
+  } = useArticle(id);
   const { data: categories = [] } = useArticleCategories();
   const uploadImage = useUploadImage();
 
@@ -78,6 +83,21 @@ export default function ArticleEditorPage() {
   }
 
   if (isEdit && loadingArticle) return <Spinner center />;
+  // Bez tohohle guardu spadl načtený článek na chybě do `article === undefined`
+  // → hydratace (výše) neproběhla → editor prázdný → „Uložit koncept" by
+  // `update.mutateAsync` přepsal reálný obsah prázdným. Zároveň lež autorovi
+  // („článek zmizel"). Nic se neztratilo — jen ho teď neumíme otevřít.
+  if (isEdit && articleError)
+    return (
+      <div className={s.page}>
+        <ErrorState
+          size="panel"
+          title="Článek se nepodařilo načíst"
+          description="Nic se neztratilo — jen ho teď nedokážeme otevřít k úpravě. Prázdný editor bychom pustit nechtěli, uložení by tvůj text přepsalo. Zkus to prosím znovu."
+          onRetry={() => void refetchArticle()}
+        />
+      </div>
+    );
 
   async function handleSaveDraft() {
     if (!title.trim()) {

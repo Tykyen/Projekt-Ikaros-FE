@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ErrorState } from '@/shared/ui';
 import { api } from '@/shared/api/client';
 import { postMapOperation } from '../../api/mapApi';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
@@ -127,6 +128,18 @@ export function NpcCharacterPalette({
 
   if (charsQuery.isLoading) {
     return <p className={styles.empty}>Načítání NPC postav…</p>;
+  }
+  // `data` je undefined i při chybě → bez tohohle by prázdný katalog tvrdil
+  // „žádné NPC ve světě" a zablokoval „+ z katalogu".
+  if (charsQuery.isError) {
+    return (
+      <ErrorState
+        size="inline"
+        title="NPC postavy se nepodařilo načíst"
+        description="Zkus to prosím znovu."
+        onRetry={() => void charsQuery.refetch()}
+      />
+    );
   }
   const catalogEmpty = fullCatalog.length === 0;
 

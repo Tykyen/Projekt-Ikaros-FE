@@ -72,6 +72,13 @@ export default function MembershipTab() {
         <SettingsPanel
           title="Předat svět"
           description="Předání vlastnictví světa jinému členovi."
+          query={{
+            // Bez tohohle by `candidates = membersQ.data ?? []` na chybě spadlo
+            // na prázdno → „Svět nemá jiného člena" (lež) a předání zablokované.
+            isLoading: membersQ.isLoading,
+            isError: membersQ.isError,
+            refetch: membersQ.refetch,
+          }}
         >
           <p className={s.note}>
             Jako vlastník můžeš svět předat jinému členovi — ten se stane PJ,
