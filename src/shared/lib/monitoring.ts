@@ -30,8 +30,15 @@ function scrubValue(value: unknown, depth = 0): unknown {
 export function initMonitoring(): void {
   const dsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
   if (dsn) {
+    // Tunnel: adblockery blokují přímé requesty na *.ingest.sentry.io
+    // (ERR_BLOCKED_BY_ADBLOCKER) → eventy jdou přes vlastní BE endpoint,
+    // který je přepošle. Stejná base logika jako apiClient.
+    const apiBase =
+      (import.meta.env.VITE_API_URL as string | undefined) ??
+      'http://localhost:3000';
     Sentry.init({
       dsn,
+      tunnel: `${apiBase}/api/monitoring/tunnel`,
       environment: import.meta.env.PROD ? 'production' : 'development',
       tracesSampleRate: 0,
       // Prohlížečový šum bez diagnostické hodnoty (benigní, chrání kvótu 5k/měs).

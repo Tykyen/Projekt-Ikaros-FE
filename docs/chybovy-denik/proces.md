@@ -479,3 +479,11 @@ Pokaždé jsem si myslel, že jsem u zdroje. **Ptej se rovnou: co je nejblíž r
 **Příznak cyklení:** hook hlásí `prettier/prettier Insert …` u souboru, který jsem „právě naformátoval"; skript tiskne „OK" u commitů, které v `git log` nejsou.
 
 ---
+### CH-123 — `npm run typecheck | tail` v paralelní dávce = falešně zelený exit code · 2026-07-19
+**Kontext:** 23.4 tunnel — ověřovací dávka na pozadí: `prettier --check … && npm run typecheck 2>&1 | tail -3 && npm run lint:check 2>&1 | tail -3`. Dávka skončila exit 0, prohlásil jsem BE za zelené. Pre-commit hook vzápětí spadl na reálné TS chybě (`Buffer` není `BodyInit`).
+**Co jsem udělal špatně:** exit code pipeline v bashi (bez `pipefail`) je exit code POSLEDNÍHO příkazu — `tail` uspěje vždy, i když typecheck spadl. `&&` řetěz tím pádem pokračoval a celek skončil 0.
+**Proč to je problém:** „ověřeno zeleně" bylo nepravdivé; zachránil to až hook. Bez hooku by šel rozbitý kód do repa s čistým svědomím.
+**Poučení:** exit code chci od NÁSTROJE, ne od tailu: buď `set -o pipefail`, nebo `npx tsc --noEmit; echo "exit: $?"` a ořezávat výstup až jindy, nebo výstup do souboru a `tail` až po vyhodnocení. Rodina CH-014/CH-077 („falešný zelený z procesní vaty") — třetí výskyt, pokaždé jiná mechanika (cwd · echo OK · pipe).
+**Příznak cyklení:** hook/CI spadne na chybě, kterou „právě ověřený" krok neviděl; v příkazu ověření je `| tail`/`| head`/`| grep` bez `pipefail`.
+
+---
