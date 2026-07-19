@@ -67,7 +67,7 @@
 **Infra ready:** Redis + Socket.IO Redis adapter opt-in (`SOCKET_IO_REDIS=1`). Chybí migrace presence Map → Redis hash (~8-16 h). **Dělat dřív = mrtvý kód.**
 
 ### D-RT-SCALE — Realtime broadcast/škála (presence globálně · žádný connection cap)
-*(dřív „🟠 Realtime / škála" v D-AUDIT-2026-07-11; `volatile.emit` část vyřešena — zbývají 2 body)*
+*(dřív „🟠 Realtime / škála" v D-AUDIT-2026-07-11)*
 **Soubory:** BE `presence.gateway.ts:84,107,153,157`, `socket-io.adapter.ts:92-98`, `ws-rate-limit.ts`.
 **Stav (zbylé 2 body, sdílený trigger = škála):**
 - **presence room-scoping** — `presence.gateway.ts:107/153/157` `this.server.emit('presence:update')` broadcastuje **všem** připojeným socketům (`:84` nový příchozí `client.broadcast.emit` taky globálně, jen bez sebe), žádná `.to(room)` → O(N²) při N online **a** mění, kdo koho vidí online (**produktové rozhodnutí**, ne jen výkon → čeká na vstup).
@@ -106,24 +106,12 @@
 **Trigger:** až CZ fulltext začne viditelně bolet (relevance komunitních katalogů).
 **Co bude potřeba (jedna z voleb):** (1) `synonyms` + `stopWords` (dnes tam nejsou; ruční kurace), (2) upgrade v1.6→v1.10+, (3) zapnout `EmbeddingSearchService` (kód existuje, vypnutý `EMBEDDING_ENABLED=0` kvůli ~2,46 GB RSS, viz [[rss_memory_embedding]]).
 
-### D-PERF-BE — Zbytek perf nálezů (N+1 · seznamy bez limitu)
-*(dřív „25 PERF-BE" v D-AUDIT-2026-07-11; `enrichMembers` N+1 ✅ 17.7.; `compression` ✅ řeší Caddy; **`autoIndex` ✅ vyřešeno 2026-07-19** — off v prod + background `syncIndexes` služba, viz níže)*
-**Soubory:** BE notifikace `notifyUsers`/`getUnreadCounts`, `GET /worlds` + `/pages`.
-**Stav (sdílený trigger = výkonový zátah):**
-- **N+1 `notifyUsers`/`getUnreadCounts`** — neověřeno do hloubky.
-- **`GET /worlds`+`/pages` bez limitu/projekce** — paginace = může být breaking pro FE.
-**✅ Vyřešeno 2026-07-19:** `autoIndex: false` v prod (`database.module.ts` — off na `NODE_ENV==='production'`, dev/test ON) + `DatabaseIndexSyncService` (`OnApplicationBootstrap`) spustí `connection.syncIndexes()` **na pozadí** (neblokuje start → rychlý boot; nové indexy stále vznikají; escape hatch `DB_SYNC_INDEXES=0`). Všech 88 indexů je schema-level → `syncIndexes` bezpečný.
-**Trigger:** viditelně pomalý endpoint, nebo škála (SLO 500 světů).
-**Co bude potřeba:** batch notifikace; paginace seznamů (breaking → koordinovat s FE).
-
-### D-AUDIT-HARDENING — Zbytky auditu: db-integrity rerun · proof-vrstvy · SLO
-*(zbytek D-AUDIT-2026-07-11 sledovaný v BE audit-plánech; ne code-dluh, verifikační/hardening kroky. **AR-META F-20/R-02 ✅ vyřešeno 2026-07-19**)*
-**Stav:**
-- **db-integrity rerun** — kořen ✅ 17.7. (dokument `db-integrity-plan/tools/integrity-scan.md` teď odkazuje na `world-hard-delete.service.ts` = 46 kolekcí jako zdroj pravdy, ne zamrzlá kopie 28). **Zbývá:** rerun scanu proti běžícímu Mongu s plným seznamem + `characterId`-styl subdoc scan user-scoped kolekcí (♻️ přesah CD-RUN-14/15).
-- **Neproběhlé proof-vrstvy** (report:66): `+teeth` Stryker, `+load`, `+perf` live, `+render`, `+fault`, `+authz-runtime`; SLO S1–S4 neměřené.
-**✅ Vyřešeno 2026-07-19 (AR-META-1 cílené guardy):** F-20 (canary test `create-bestie.dto.spec.ts` — spadne, když se top-level `abilities` vrátí jako validované pole) + R-02 (anotace krycího testu `characters.service.spec.ts` `isWorldStaff`) + oba mají cílený manuální guard v `anti-regression-map.json`. Scanner: F-20/R-02 **G0→G3** (G3=146, fixed&G0 12→2). *(Systémový „0 ručních guardů" pro zbytek map = mimo rozsah — řeší se per-nález při dalším auditu.)*
-**Trigger:** před dalším velkým auditem / nasazením, nebo prokázaná regrese.
-**Co bude potřeba:** rerun db-integrity scanu s živým Mongem; doběh proof-vrstev + změření SLO.
+### D-PERF-BE — Katalog `GET /worlds`+`/pages` bez limitu (paginace)
+*(dřív „25 PERF-BE" v D-AUDIT-2026-07-11)*
+**Soubory:** BE `worlds.controller.ts:54` `@Get()` → `worlds.repository.findAll()` (VŠECHNY aktivní světy bez limitu/projekce), obdobně `GET /pages`.
+**Stav:** katalog vrací celý seznam aktivních světů jedním requestem. Při SLO cíli 500 světů = velký payload + čas do renderu. **Vědomě neděláno teď:** paginace je **breaking pro FE** (katalog čeká celý seznam kvůli klient-side filtru/řazení) → chce koordinovanou FE+BE změnu, ne tichý BE limit.
+**Trigger:** katalog naroste (viditelně pomalý `/worlds`), nebo škála 500 světů.
+**Co bude potřeba (naráz, ne půlku):** BE `?page=&limit=` + projekce lehkých polí + FE přechod na stránkovaný katalog.
 
 ### D-DB-BACKUP-CRON — DB zálohy: cron záměrně vynechán (blokováno na uživateli)
 *(dřív „Blokováno na uživateli" v D-AUDIT-2026-07-11)*
