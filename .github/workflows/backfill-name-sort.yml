@@ -1,0 +1,42 @@
+name: Backfill nameSort (řadicí klíč katalogů)
+
+# D-NAMESORT — dopočítá řadicí klíč (nameSort / questionSort) existujícím
+# dokumentům 8 komunitních katalogů (bestiae/spells/community_items/potions/
+# plants/price_lists/riddles/name_sets). Nutné AŽ PO deployi BE s D-NAMESORT.
+# Idempotentní; default DRY-RUN, skutečný zápis zaškrtnutím `apply`.
+# Mechanismus jako seedy: docker cp skriptu do BE kontejneru + docker exec node.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Zapsat změny? (nezaškrtnuto = jen dry-run výpočet)'
+        type: boolean
+        default: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy backfill script to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/backfill-name-sort.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/backfill-name-sort.js
+
+      - name: Run backfill in BE container
+        # Skript do /app (kvůli node_modules resolution), pak docker exec s env
+        # APPLY dle inputu. Bez `apply` = dry-run (jen spočítá, nezapíše).
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/backfill-name-sort.js projekt-ikaros-be:/app/backfill-name-sort.js && docker exec -w /app -e APPLY=${{ inputs.apply && '1' || '0' }} projekt-ikaros-be node backfill-name-sort.js"

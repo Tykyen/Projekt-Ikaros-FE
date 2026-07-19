@@ -269,6 +269,11 @@ export function PlatformSection() {
             <strong>správce může staty opravit i později</strong> (errata,
             vyvážení), takže i u ověřené bytosti se čísla časem mohou změnit.
           </p>
+          <p>
+            Když se ti návrh nepovede, <strong>svůj vlastní návrh</strong> můžeš
+            v jeho detailu <strong>smazat</strong> (tlačítko 🗑). Schválené
+            bytosti a cizí návrhy maže jen <strong>správce</strong>.
+          </p>
         </Tool>
         <Tool icon={<Leaf size={16} />} title="Herbář" audience={{ kind: 'vse', label: 'Čtení všichni' }} accent="corrector">
           <p>

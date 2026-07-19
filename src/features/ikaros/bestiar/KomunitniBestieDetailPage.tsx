@@ -6,7 +6,7 @@
  * motiv-aware; tvarové skiny per motiv v SK-* přes data-atributy.
  */
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 import { Breadcrumbs, Button, ErrorState } from '@/shared/ui';
@@ -34,9 +34,10 @@ const CURATOR_ROLES = [
 
 export default function KomunitniBestieDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: bestie, isLoading, isError } = useKomunitniBestie(id ?? null);
   const user = useAtomValue(currentUserAtom);
-  const { approveSb, approveBst } = useKomunitniBestiarMutations();
+  const { approveSb, approveBst, remove } = useKomunitniBestiarMutations();
   const [activeSystem, setActiveSystem] = useState<string | null>(null);
   const [modal, setModal] = useState<
     null | 'editLore' | 'insert' | 'propose' | 'editStats'
@@ -67,6 +68,15 @@ export default function KomunitniBestieDetailPage() {
   const isCurator = !!user && CURATOR_ROLES.includes(user.role);
   const isAuthor = !!user && user.id === bestie.authorId;
   const canEditLore = isAuthor || isCurator;
+  // Sjednoceno s 7 katalogy: autor maže svůj návrh (draft), kurátor cokoli.
+  const canDelete = isCurator || (isAuthor && bestie.status === 'draft');
+
+  const onDelete = () => {
+    if (!window.confirm(`Opravdu smazat bytost „${bestie.name}"?`)) return;
+    remove.mutate(bestie.id, {
+      onSuccess: () => navigate('/ikaros/bestiar'),
+    });
+  };
 
   const desc = (bestie.description ?? '').trim();
   const crumbs = [
@@ -111,6 +121,15 @@ export default function KomunitniBestieDetailPage() {
                 onClick={() => approveBst.mutate(bestie.id)}
               >
                 ✔ Schválit bytost
+              </Button>
+            ) : null}
+            {canDelete ? (
+              <Button
+                variant="ghost"
+                loading={remove.isPending}
+                onClick={onDelete}
+              >
+                🗑 Smazat
               </Button>
             ) : null}
             {/* D-066a — nahlásit bestii (BE enforcement B5 byl ready, chybělo

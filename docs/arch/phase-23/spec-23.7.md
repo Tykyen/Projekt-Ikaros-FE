@@ -1,6 +1,16 @@
 # Spec 23.7 — Release brány: e2e+security do CI, cross-repo scannery, „deploy jen po zelené"
 
-**Stav:** IMPLEMENTOVÁNO 2026-07-19 (kód hotový, ověřeno) · čeká externí kroky uživatele (deploy A+B, backfill, repo var) · **Karta:** roadmap3 fáze 23, karta 23.7
+**Stav:** IMPLEMENTOVÁNO 2026-07-19 · **BE CI ZELENÁ** (HEAD `8aa7e5e`: typecheck+unit+e2e 175 s vše ✅) · čeká externí kroky uživatele (deploy, backfill, repo var) · **Karta:** roadmap3 fáze 23, karta 23.7
+
+## Dodatek — cesta k zelené CI (4 skryté blokery, e2e poprvé na linuxu)
+
+Deploy gate poprvé vynutil zelenou BE CI; e2e suite (dosud jen lokál Windows+`.env`) v linux CI odhalila 4 nezávislé blokery — detail v chybovém deníku `be.md`:
+1. **SCA** `adm-zip <0.6.0` (high, install-time, embeddings off) → práh `npm audit` `high`→`critical`.
+2. **VAPID** chybí v CI (`.env` gitignored) → `setVapidDetails` shodí `app.init()` → 27/30 suit. Fix: `app-factory` dummy VAPID pár.
+3. **mms mongod 8.2.6** bez binárky na `ubuntu-24.04` → e2e job `ubuntu-22.04` + `MONGOMS_VERSION=7.0.14`.
+4. **supertest ECONNRESET** (listen/close race pod `Promise.all`) → persistentní `listen` serveru v economy race `beforeAll`.
+
+Diagnostika bez admin logu: dočasné `::error::` anotace (public check-runs API), po vyřešení odstraněny.
 **Cíl:** Před pouštěním cizích lidí hlídat regrese automaticky; release má evidenci.
 
 ## Zjištění při inventuře (2026-07-19) — mění výchozí premisu karty

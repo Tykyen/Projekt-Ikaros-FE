@@ -61,6 +61,17 @@ export function approveBeast(id: string): Promise<GlobalBestie> {
   return api.post<GlobalBestie>(`/bestiae/community/${id}/approve`);
 }
 
+/**
+ * Smazání community bytosti. Na rozdíl od ostatních 7 katalogů (dedikovaný
+ * `DELETE /X/community/:id`, hard-delete) reusuje bestiář generický
+ * `DELETE /bestiae/:id` = SOFT delete (restorovatelný). Autorizaci řeší BE
+ * `assertCanWrite` (autor smí svůj draft, kurátor cokoli). Soft-smazaná bytost
+ * mizí ze seznamu (community query filtruje `deletedAt: null`).
+ */
+export function deleteCommunityBestie(id: string): Promise<void> {
+  return api.delete<void>(`/bestiae/${id}`);
+}
+
 /** „Vlož do mého bestiáře" — vrací nově vzniklou single-system bestii. */
 export function cloneCommunityBestie(
   id: string,

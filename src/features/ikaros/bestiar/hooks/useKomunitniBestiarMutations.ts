@@ -10,6 +10,7 @@ import {
   approveStatblock,
   approveBeast,
   cloneCommunityBestie,
+  deleteCommunityBestie,
   addBestieComment,
 } from '../api/komunitniBestiarApi';
 import type {
@@ -63,7 +64,12 @@ export function useKomunitniBestiarMutations() {
       cloneCommunityBestie(vars.id, vars.payload),
   });
 
-  return { create, updateLore, propose, approveSb, approveBst, clone };
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteCommunityBestie(id),
+    onSuccess: invalidateAll,
+  });
+
+  return { create, updateLore, propose, approveSb, approveBst, clone, remove };
 }
 
 export function useAddBestieComment() {
