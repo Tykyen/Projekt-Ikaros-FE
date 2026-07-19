@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { SYSTEM_LANDINGS_PUBLIC } from '@/features/ikaros/pages/SystemLanding/flag';
 import { Provider as JotaiProvider, createStore } from 'jotai';
 import { MemoryRouter } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
@@ -39,7 +40,12 @@ describe('SidebarContent — anon gating (15.7 / 21.5)', () => {
     expect(screen.queryByText('Vytvořit svět')).toBeNull();
     expect(screen.queryByText('Fantasy camp')).toBeNull();
     expect(screen.getByText('Úvodník')).toBeInTheDocument();
-    expect(screen.getByText('RPG systémy')).toBeInTheDocument();
+    // R3 25.8 — „RPG systémy" v nav jen při zapnutém flagu (spec-25.8)
+    if (SYSTEM_LANDINGS_PUBLIC) {
+      expect(screen.getByText('RPG systémy')).toBeInTheDocument();
+    } else {
+      expect(screen.queryByText('RPG systémy')).toBeNull();
+    }
     expect(screen.getByText('Společná tvorba')).toBeInTheDocument();
     expect(screen.getByText('Putyka')).toBeInTheDocument();
   });

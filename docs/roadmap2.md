@@ -6,6 +6,7 @@
 **Vznik:** 2026-06-14, odvozeno z *Hloubkové strategické analýzy* (PDF v `~/Downloads/Ikaros-hloubkova-analyza.pdf` + `Ikaros-analyza-vylepseni.pdf`)
 **Revize:** 2026-06-15 — sladěno s master-planem *Návrh budoucích změn* (6 horizontů H0–H5, ~50 karet). Doplněny mezery (SEO, export, homepage, prázdné stavy, streamer overlay, docking), opravena nesrovnalost Dungeon Builderu, přidána křížová tabulka H0–H5 ↔ fáze, rozpad systémů (16.2) per systém a, b, c…, appendixy KPI a Vizuální design systém.
 **Revize:** 2026-06-18 — doplněn **Průřez Ú (Úklid dluhů & nesrovnalostí)** z kódem ověřené inventury funkcí [`docs/funkce/`](funkce/00-prehled.md); cíl Etapy II = 0 otevřených nesrovnalostí v inventuře. 9 nových seskupených dluhů D-NEW-INV-* v `docs/dluhy.md`.
+**Revize:** 2026-07-19 — Etapa II implementačně uzavřena; otevřené zbytky **překlopeny do [`roadmap3.md`](roadmap3.md)** (Etapa III — úplná beta): 14.4→23.1 · 14.8→23.3+29.10 · 19.2 kvóty→29.6 · 22.3→25.5+26.x. Karty 22.1/22.2 zůstávají zde (vážou na 16.2/licence → Etapa IV). Ops poznámky „čeká deploy/restart" napříč kartami řeší R3 fáze 24.
 **Navazuje na:** `docs/roadmap-fe.md` (Etapa I, fáze 0–13 — jádro platformy)
 **Repo:** FE `Projekt-ikaros-FE` · BE `Projekt-ikaros`
 
@@ -112,7 +113,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 **Otevřené otázky:** Report-only fáze nejdřív (sběr porušení) než tvrdé vynucení? Které externí domény musí být na allowlistu?
 **✅ Implementováno (2026-06-19, `spec-14.3`):** Klíčová oprava zadání: **hlavní XSS-CSP patří na FE nginx** (servíruje HTML dokument), ne na BE (vrací jen JSON/obrázky). Rozděleno: **FE [default.conf.template](../../default.conf.template)** = jádro (CSP, HSTS, Referrer-Policy, Permissions-Policy; per-env `BACKEND_HOST` přes nginx envsubst; inline pre-hydration skript přes **SHA-256 hash** + build guard [check-csp-hash.mjs](../../scripts/check-csp-hash.mjs) + `.gitattributes` LF, ať hash sedí napříč Win/Linux). **BE [main.ts](../../../Projekt-ikaros/backend/src/main.ts)** = `helmet()` hardening (API `default-src 'none'`, HSTS, nosniff, `frame-ancestors 'none'`, `crossOriginResourcePolicy:false` kvůli PixiJS `/static/` texturám). **Report-only fáze proběhla na produkci** → allowlist doladěn z reálných nálezů: `script-src 'unsafe-eval'`+youtube (YT IFrame API/zvuky), `style-src 'unsafe-inline'`, `connect-src` res.cloudinary.com+data:, `worker-src blob:`, `frame-src` youtube. **Enforce je teď default** (`CSP_HEADER_NAME`, rollback na report-only přes GitHub var). **ZBÝVÁ provoz:** redeploy (enforce) + smoke neprozkoumaných stránek (galerie/postavy/bestiář/kalendář/admin/motivy). Follow-up **14.3-a**: serverový `report-uri` sběr · **14.3-b**: nahradit YT IFrame API lite-embedem → odpadne `'unsafe-eval'`. Související: dluh **D-NEW-WS-UPGRADE** (WS upgrade na edge proxy, nesouvisí s CSP).
 
-### - [ ] 14.4 Zálohy & plán obnovy (DR) — [A4 · dopad vysoký · náklad střední] 👑provoz
+### - [ ] 14.4 Zálohy & plán obnovy (DR) — [A4 · dopad vysoký · náklad střední] 👑provoz → **PŘESUN do R3 (karta 23.1)**
 **Cíl:** Automatická noční záloha DB s rotací na oddělené úložiště + ověřená obnova + 1stránkový runbook.
 **Proč:** Tichá ztráta dat je jediná chyba, ze které se komunita nevzpamatuje. Stovky hodin práce ve světech.
 **Návrh přípravy:** zvolit úložiště (mimo hlavní server), rozvrh rotace (např. 7 denních + 4 týdenní), naplánovat čtvrtletní test obnovy.
@@ -157,7 +158,7 @@ Master-plan *Návrh budoucích změn* (6/2026) krájí stejnou práci na 6 horiz
 >
 > **✅ Hotovo 2026-06-20:** tisk reálně ověřen na hlavních entitách (postava/stránka/lokace/bestiář/kalendář/Matrix deník). **🧪 Zbývá user-ověřit:** reálné stažení ZIP (zkontrolovat `media/` + chat uvnitř).
 
-### - [ ] 14.8 Odstřižení od starého webu (SMTP + embedding model) — [H0-08 · dopad střední · náklad střední] 🔁 *(přesun z 19.3)*
+### - [ ] 14.8 Odstřižení od starého webu (SMTP + embedding model) — [H0-08 · dopad střední · náklad střední] 🔁 *(přesun z 19.3)* → **PŘESUN do R3 (karty 23.3 + 29.10)**
 **Cíl:** Žádná závislost na umírajícím `patrikzplzne.cz` — přesun embedding modelu vyhledávání na vlastní hosting, maily přes vlastní SMTP do produkce, ověřit web push na reálném telefonu (iPhone PWA na plochu).
 **Proč:** Když starý web zhasne, něco tiše přestane fungovat (riziko **R5**). Proto patří do **pojistky**, ne až do růstu — PDF to řadí do H0. Dluhy **PC-02** (mailer), **PC-21** (model); SMTP rozpracován (`project_smtp_email_setup`).
 **Návrh přípravy:** vybrat hosting modelu; dotáhnout GitHub vars/secret pro SMTP v env production + deploy; push self-test (iPhone nutně PWA na plochu — váže na 15.1).
@@ -638,7 +639,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** rozhodnout, co a jak měřit (i ručně/odhadem stačí); respektovat soukromí (žádné invazivní trackování).
 **Otevřené otázky:** ~~Vlastní lehké metriky, nebo žádný externí analytics kvůli soukromí? Co přesně sledovat?~~ → vyřešeno: **cesta A** (odvozené z DB, žádný externí analytics), funnel 5 milníků + retence snapshot. Pravá retence = dluh (chybí historie aktivity).
 
-### - [x] 19.2 Náklady & limity (storage kvóta, AI limity) — [Příloha B] 🔁
+### - [x] 19.2 Náklady & limity (storage kvóta, AI limity) — [Příloha B] 🔁 *(zbytek — vynucování kvót → R3 karta 29.6)*
 **Stav:** **měření ✅ (2026-07-08), vynucování limitů 🚧 (další krok).**
 
 > ✅ **Měření implementováno 2026-07-08 (BE+FE).** Sekce **„Náklady"** v admin Přehledu ([CostsSection](../../src/features/admin/components/CostsSection/CostsSection.tsx)): **počty blobů** per typ + nejnáročnější světy (odvozené z DB), **přesné byty** kde je DB má (chat přílohy + admin PDF), **skutečný provoz Cloudinary** (`api.usage()` — úložiště/přenos/kredity, když jsou creds; jinak skryté). BE `GET /admin/stats/costs` (`AdminCostsService`, cache 1 h). Spec [19.2](arch/phase-19/spec-19.2.md). BE 5/5 + FE 5/5 testy, build zelený.
@@ -791,7 +792,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Obsah/FE:** redakční obsah (🔁 článkový modul) + perf optimalizace (lazy loading, image pipeline, code splitting).
 **Otevřené otázky:** Kdo píše obsah? Dávkovat udržitelně (vyžaduje průběžnou údržbu).
 
-### - [ ] 22.3 Onboarding nového PJ + demo svět (bývalý 16.4) — [D2 · dopad vysoký · náklad střední] 👑adopce
+### - [ ] 22.3 Onboarding nového PJ + demo svět (bývalý 16.4) — [D2 · dopad vysoký · náklad střední] 👑adopce → **PŘESUN do R3 (karty 25.5 + 26.1–26.4; plný wizard = pozdější rozšíření)**
 > Přesunuto z 16.4 (2026-07-03): onboarding = ÚPLNÝ ZÁVĚR; nový uživatel má vidět hotový produkt, ne rozdělanou appku.
 **Cíl:** Průvodce při založení světa + volitelný předvyplněný „demo svět" (ukázková stránka, postava, scéna, chat) + kontextové tipy.
 **Proč:** Strmá křivka učení je napříč oborem stížnost č. 1; **37 % nováčků odchází do 6 měsíců** kvůli ní. Přímá páka na retenci (viz Příloha A — trychtýř). Nápověda je výborná — tohle je její aktivní, vtažená verze.

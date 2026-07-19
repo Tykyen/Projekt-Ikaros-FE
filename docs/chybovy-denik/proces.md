@@ -470,3 +470,12 @@ Pokaždé jsem si myslel, že jsem u zdroje. **Ptej se rovnou: co je nejblíž r
 **Příznak cyklení:** třetí `Edit` do téže sekce během jednoho dne · uživatel se ptá na stav dokumentu, který jsem právě „uklidil" · v souboru pro otevřené věci jsou ✅ položky.
 
 ---
+
+### CH-077 — `npx prettier --write` z root monorepa použil default config → hook 6× selhal · 2026-07-19
+**Kontext:** Úklid 36 rozpracovaných BE souborů do 6 tématických commitů. Před commity jsem pustil `npx prettier --write` z **root** repa (`Projekt-ikaros/`, git toplevel), ne z `backend/`. Root nemá `package.json` ani `.prettierrc` → npx stáhl čistý prettier a použil **default** styl. Reformátoval `campaign-purchase.service.spec.ts` jinak, než chce backendí `.prettierrc`. Precommit hook (`eslint` s `prettier/prettier`) to pak odmítl u **každého** z 6 commitů.
+**Co jsem udělal špatně:** (1) formátoval jsem nástrojem z jiného cwd, než kde žije jeho config; (2) `set -e` v bash skriptu commity **nezastavilo** (git commit vrátil 1, ale skript běžel dál a tiskl „### commit N OK" u selhaných commitů) → falešný dojem úspěchu. Reálně se nezacommitovalo nic.
+**Proč to je problém:** prettier default ≠ projektový config → „naformátováno" bylo hůř než předtím; a `echo OK` bez kontroly exit kódu maskuje 6 selhání.
+**Poučení:** (1) BE formátování VŽDY z `backend/` cwd, nebo rovnou `npx eslint --fix <soubor>` (použije projektový `prettier/prettier`) — ne `prettier --write` z rootu. (2) V commit skriptech nespoléhat na `set -e`; za každý `git commit` dát explicitní `|| { echo FAIL; exit 1; }`. (3) Úspěch commitu ověřit `git log`/`git status`, ne echo.
+**Příznak cyklení:** hook hlásí `prettier/prettier Insert …` u souboru, který jsem „právě naformátoval"; skript tiskne „OK" u commitů, které v `git log` nejsou.
+
+---

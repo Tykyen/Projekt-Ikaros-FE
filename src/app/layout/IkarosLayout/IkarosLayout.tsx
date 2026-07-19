@@ -58,6 +58,7 @@ import { UserAvatar, useFocusTrap } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
+import { SYSTEM_LANDINGS_PUBLIC } from '@/features/ikaros/pages/SystemLanding/flag';
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
 import { useWorldInviteSocket } from '@/features/world/hooks/useWorldInviteSocket';
@@ -116,7 +117,10 @@ const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
   { navKey: 'podporovatele', label: 'Podporovatelé', to: '/ikaros/podporovatele',             icon: <HandHeart size={18} /> },
   // 15B.4a — veřejný rozcestník landing stránek RPG systémů (anon i člen)
-  { navKey: 'systemy',       label: 'RPG systémy',   to: '/ikaros/systemy',                   icon: <Dices size={18} /> },
+  // R3 25.8 — skryto za flag do rozhodnutí licencí (spec-25.8)
+  ...(SYSTEM_LANDINGS_PUBLIC
+    ? [{ navKey: 'systemy',  label: 'RPG systémy',   to: '/ikaros/systemy',                   icon: <Dices size={18} /> }]
+    : []),
   // 21.5 — Diskuze/Články/Galerie sloučeny do rozcestníku „Společná tvorba";
   // badge = součet jejich pending-review typů, ať moderace nezmizí z nav.
   { navKey: 'tvorba',        label: 'Společná tvorba', to: '/ikaros/tvorba',                  icon: <Palette size={18} />,       pendingTypes: [PendingActionType.DiscussionPendingReview, PendingActionType.ArticlePendingReview, PendingActionType.GalleryPendingReview] },

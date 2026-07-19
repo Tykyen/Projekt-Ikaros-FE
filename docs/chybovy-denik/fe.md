@@ -2377,3 +2377,19 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Jak ověřeno:** `npm run build` (tsc -b + vite + CSP hash + bundle budget 86 %) exit 0; `npm run lint` exit 0; **žádný `.spec/.test` soubor neimportuje chromatik/storybook** (grep) → vitest garantovaně mou změnou nedotčen (komentáře jsou inertní, dead-dep žádný test netahá); plný `vitest run` navíc na pozadí jako pojistka. Storybook build sám nespouštěn (statická jistota: addon odebrán z konfigurace, core storybook zůstává).
 
 **Zhodnocení — DOBŘE:** (1) ověření proti HEAD chytilo, že axe flip = past na falešné pokrytí — dluh doslova doporučoval krok, který by přidal iluzi a11y brány; neudělal jsem ho a přepsal dluh na realitu; (2) chromatik ověřen jako fakt mrtvý (CLI/workflow/token/import) před smazáním, ne odhadem; (3) grep „žádný test neimportuje chromatik" = levná statická jistota místo čekání na 18min suite / falešné zelené (past CH-056). **ŠPATNĚ / limit:** „nechci mít dluh" nešlo splnit doslova pro SMTP/OPS/e2e — nejsou kódem zavíratelné dnes; reklasifikoval jsem je (WONTFIX / runbook / roadmap) a zapsal sem, ať trigger nezmizí — smazání z file ≠ ztráta informace (git log + tenhle záznam = zdroj pravdy dle hlavičky `dluhy.md`).
+
+---
+
+## ✅ ŘEŠENÍ — Feature-flag skrytí veřejných rout (R3 25.8 landing systémů): gate loader místo podmíněné registrace — 2026-07-19
+
+**Zadání:** skrýt veřejné landing pages RPG systémů (veřejný slib DrD/JaD bez licence) tak, aby kód zůstal a zpětné zapnutí bylo triviální (spec-25.8).
+
+**První pokus NEZABRAL:** podmíněná registrace rout ternárem (`...(FLAG ? [routy] : [redirect routy])`) v `router.tsx` → **`audit:nav` FAIL na ambiguitu** — statický scanner (`scripts/nav-audit.mjs`) regexem vidí OBĚ větve ternáru, takže vzor `ikaros/systemy` existoval 2× (stejný rank v jednom shellu).
+
+**Co zabralo — gate loader:** routy zůstávají registrované JEDNOU, flag rozhoduje v loaderu: `loader: systemLandingsGate` → `SYSTEM_LANDINGS_PUBLIC ? null : redirect('/')`. Bonus: zpětné zapnutí = jen flip flagu (router se needituje). Redirect (ne 404), protože stránky byly živé/indexované. Flag v samostatném tiny modulu `SystemLanding/flag.ts` — router/nav/help importují jen flag, ne 10KB datový registr (bundle budget: eager graf zůstal 300,7 kB).
+
+**Poučení (obecné):** feature-flag viditelnost rout v tomhle repu řeš **gate loaderem, ne podmíněnou registrací** — nav-audit je statický a duplicitní vzory neodpustí. Druhé: gating test (`IkarosLayout.gating.spec.tsx`) i registr testy psát **flag-aware** (větvit očekávání podle flagu), ať flip flagu nerozbije suite.
+
+**Jak ověřeno:** FE `npm run build` (tsc+vite+CSP hash+bundle budget) ✓ · `audit:nav` ✅ OK (ambiguita 0; 3 orphany pre-existující, nefailují) · vitest cílené 120/120 ✓ · eslint dotčených 0 ✓ · BE typecheck + seo jest 7/7 ✓ (STATIC_ROUTES −4 záznamy).
+
+**Zhodnocení — DOBŘE:** (1) audit:nav chytil ambiguitu hned lokálně, ne až v CI; (2) finální vzor je čistší než původní záměr (jeden zdroj pravdy = flag, nulový diff v routeru při flipu); (3) rozsah skrytí držen na veřejném claimu (nav+routy+sitemap+prerender+meta), in-app funkčnost netknutá. **POZOR:** BE sitemap je dual-source s FE registrem — při zpětném zapnutí nezapomenout vrátit STATIC_ROUTES (návod ve flag.ts, 3 kroky).

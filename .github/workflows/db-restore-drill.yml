@@ -1,0 +1,102 @@
+name: DB Restore Drill
+
+# Měsíční zkušební obnova zálohy (karta 23.1, spec docs/arch/phase-23/spec-23.1.md).
+# „Záloha není záloha, dokud nebyla obnovena": stáhne nejnovější daily zálohu z B2,
+# ověří stáří < 48 h (= denní cron reálně běží), obnoví do čistého mongo:7
+# (stejná verze jako prod, docker-compose.prod.yml v BE repu) a zkontroluje počty
+# kolekcí/dokumentů. Produkční data žijí jen po dobu runu v efemérním runneru.
+# Výsledek (vč. časů download/restore) → Discord.
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 1. den v měsíci 03:30 UTC (po denní záloze z 02:00 UTC)
+    - cron: "30 3 1 * *"
+
+jobs:
+  drill:
+    runs-on: ubuntu-latest
+    env:
+      RCLONE_CONFIG_B2_TYPE: b2
+      RCLONE_CONFIG_B2_ACCOUNT: ${{ secrets.B2_KEY_ID }}
+      RCLONE_CONFIG_B2_KEY: ${{ secrets.B2_APP_KEY }}
+      B2_BUCKET: ${{ vars.B2_BUCKET }}
+
+    steps:
+      - name: Instalace rclone
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rclone
+
+      - name: Stažení nejnovější zálohy z B2 + kontrola stáří
+        run: |
+          LATEST=$(rclone lsf "b2:$B2_BUCKET/mongo/daily" --files-only | sort | tail -1)
+          [ -n "$LATEST" ] || { echo "V B2 není žádná záloha!"; exit 1; }
+          echo "Nejnovější záloha: $LATEST"
+          FILE_DATE=$(echo "$LATEST" | sed 's/^ikaros-//; s/\.archive\.gz$//' | cut -d- -f1-3)
+          AGE_DAYS=$(( ( $(date +%s) - $(date -d "$FILE_DATE" +%s) ) / 86400 ))
+          echo "Stáří: $AGE_DAYS dní"
+          if [ "$AGE_DAYS" -gt 2 ]; then
+            echo "ZÁLOHA STARŠÍ NEŽ 2 DNY — denní cron db-backup.yml nejspíš neběží nebo padá!"
+            exit 1
+          fi
+          T0=$(date +%s)
+          rclone copyto "b2:$B2_BUCKET/mongo/daily/$LATEST" backup.archive.gz
+          T1=$(date +%s)
+          gzip -t backup.archive.gz
+          ls -lh backup.archive.gz
+          echo "BACKUP_NAME=$LATEST" >> "$GITHUB_ENV"
+          echo "DOWNLOAD_SECS=$((T1 - T0))" >> "$GITHUB_ENV"
+
+      - name: Start MongoDB (mongo:7 = verze produkce)
+        run: |
+          docker run -d --name drill-mongo mongo:7
+          for i in $(seq 1 30); do
+            docker exec drill-mongo mongosh --quiet --eval 'db.runCommand({ping:1})' >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec drill-mongo mongosh --quiet --eval 'db.runCommand({ping:1})'
+
+      - name: mongorestore
+        run: |
+          T0=$(date +%s)
+          docker exec -i drill-mongo mongorestore --archive --gzip --drop < backup.archive.gz
+          T1=$(date +%s)
+          echo "RESTORE_SECS=$((T1 - T0))" >> "$GITHUB_ENV"
+
+      - name: Verifikace obnovených dat
+        run: |
+          set -o pipefail
+          docker exec drill-mongo mongosh ikaros --quiet --eval '
+            const cols = db.getCollectionNames().sort();
+            let total = 0;
+            for (const c of cols) {
+              const n = db.getCollection(c).countDocuments();
+              total += n;
+              print(c + ": " + n);
+            }
+            const users = db.users.countDocuments();
+            const worlds = db.worlds.countDocuments();
+            print("---");
+            print("kolekci: " + cols.length + " | dokumentu: " + total + " | users: " + users + " | worlds: " + worlds);
+            if (cols.length < 10) { print("FAIL: podezrele malo kolekci"); quit(1); }
+            if (users < 1) { print("FAIL: users prazdne"); quit(1); }
+            if (worlds < 1) { print("FAIL: worlds prazdne"); quit(1); }
+            print("OK: obnova overena");
+          ' | tee verify.log
+          SUMMARY=$(grep '^kolekci:' verify.log)
+          echo "VERIFY_SUMMARY=$SUMMARY" >> "$GITHUB_ENV"
+
+      - name: Discord souhrn při úspěchu
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_ALERT_WEBHOOK }}
+        run: |
+          [ -n "$WEBHOOK" ] || { echo "DISCORD_ALERT_WEBHOOK nenastaven — přeskakuji"; exit 0; }
+          curl -sS -H "Content-Type: application/json" -X POST "$WEBHOOK" \
+            -d "{\"content\":\"🟢 **Restore drill OK** — $BACKUP_NAME · download ${DOWNLOAD_SECS}s · restore ${RESTORE_SECS}s · $VERIFY_SUMMARY\"}"
+
+      - name: Discord alert při selhání
+        if: failure()
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_ALERT_WEBHOOK }}
+        run: |
+          [ -n "$WEBHOOK" ] || { echo "DISCORD_ALERT_WEBHOOK nenastaven — přeskakuji"; exit 0; }
+          curl -sS -H "Content-Type: application/json" -X POST "$WEBHOOK" \
+            -d "{\"content\":\"🔴 **Restore drill SELHAL** — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"

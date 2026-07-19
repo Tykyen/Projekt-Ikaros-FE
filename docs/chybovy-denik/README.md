@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-077.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-078.**
 
 ## Jak je deník členěný
 
@@ -16,6 +16,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 | ID | Oblast | Stručně | Příznak cyklení |
 |----|--------|---------|-----------------|
+| [✅ ŘEŠENÍ](fe.md#-řešení--feature-flag-skrytí-veřejných-rout-r3-258-landing-systémů-gate-loader-místo-podmíněné-registrace--2026-07-19) | fe | feature-flag routy = gate loader, NE podmíněná registrace (statický nav-audit vidí obě větve ternáru → ambiguita); testy psát flag-aware | audit:nav FAIL ambiguita po přidání flagu |
 | [CH-001](tisk.md#ch-001) | tisk | `visibility:hidden`+`absolute;inset:0` → ořez na 1 stránku | ladím inset/position, obsah se ořezává |
 | [CH-002](tisk.md#ch-002) | tisk | klon do `<body>` měl obsah, ale celý neviditelný | „klon má obsah", ale tisk prázdný |
 | [CH-003](tisk.md#ch-003) | tisk | řešil jsem barvu, ač skryté bylo úplně vše | ladím barvy, ale nevidím vůbec nic |
@@ -329,3 +330,4 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](audit.md#-řešení--návazně-5-relokovaných-audit-nálezů-reálně-opraveno-kódem-be--2026-07-19) | audit/be | **návazně 5 fixů kódem** (uživatel: „myslel jsem že je vyřešíš"): RC-E8 (`$pull` symetrie k RC-E4) · DUN-1 (BE resolveSystemId v registry `get()` hrdle → token+bestie) · autoIndex off+background syncIndexes · volatile na typing/ping/ruler · AR-META F-20/R-02 G0→G3. 275 jest + tsc + lint + AR scanner zelené; D-RC-E8/D-DUN-1 smazány | před relokací dluhu do „Odložené" nejdřív roztřídit řešitelné-teď vs. blokované — relokovat řešitelný = zbytečně odložená práce; triage byla půl-práce |
 | [✅ ŘEŠENÍ](be.md#-řešení--vlastník-pc-smí-editovat-obsah-svých-akj-záložek--fix-d-067-sjednocený-merge--2026-07-19) | be+fe | vlastník PC edituje `contentOverride` svých AKJ záložek (`ownerEditable` + inline editor) + **fix D-067**: sjednocený `resolveAkjTabsPatch` — editor bez `seesAll` (vlastník i PomocnyPJ) mergne dle `id` nad DB, jen povolené záložky (flag/access z DB, ne DTO); recon fleet předem chytil past „FE `akjTabs` je BE-filtrované" | — |
 | [✅ ŘEŠENÍ](be.md#-řešení--r-20-scope-platform-adminsuperadmin-přestal-vidět-cizí-žádosti-o-vstup-ve-frontě-zpracovat--2026-07-19) | be | superadminovi-hráči svítila cizí žádost o vstup ve „Zpracovat" → `scopeForUser` dával platform roli `undefined`=**global scope** (starý spec 2.4), ale schvalovací brána ho bez elevace 403 → fronta a brána **rozešlé**. Fix: žádný global bypass, scope=owner/co-PJ i pro admina; dohled přes elevaci. „Ignorovat" tlačítko zamítnuto = zakrytí symptomu | feature-request byl ve skutečnosti bug; scope providera se rozešel se schvalovací bránou (2 místa 1 pravidla) |
+| [CH-077](proces.md#ch-077--npx-prettier---write-z-root-monorepa-použil-default-config--hook-6-selhal--2026-07-19) | proces | `prettier --write` z root repa (bez `.prettierrc`) = default styl → hook `prettier/prettier` odmítl 6× commit; `set -e` commity nezastavilo (echo „OK" u selhaných) | hook hlásí `Insert …` u „právě naformátovaného" souboru; skript tiskne OK u commitů, co nejsou v `git log` |

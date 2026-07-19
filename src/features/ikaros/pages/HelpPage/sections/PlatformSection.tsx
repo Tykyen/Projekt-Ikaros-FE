@@ -34,6 +34,7 @@ import {
   Contact,
 } from 'lucide-react';
 import { HelpAccordion, HelpSubAccordion, TagChip, ScreenshotSlot, type TagKind } from '../components';
+import { SYSTEM_LANDINGS_PUBLIC } from '../../SystemLanding/flag';
 
 // Pomocný „nástroj" = pod-sekce s audience štítkem v hlavičce.
 function Tool({
@@ -90,16 +91,19 @@ export function PlatformSection() {
             <Link to="/ikaros/vesmiry">Přehledu vesmírů</Link>.
           </p>
         </Tool>
-        <Tool icon={<Dices size={16} />} title="RPG systémy" audience={{ kind: 'vse', label: 'Všichni' }}>
-          <p>
-            Rozcestník stránek o jednotlivých herních systémech — co pro daný
-            systém Ikaros umí (deníkový list, taktická mapa, kalendář, chat za
-            postavu), jak začít a jak založit svět. Zatím{' '}
-            <strong>Dračí Doupě 1.6</strong>, <strong>Dračí Doupě II</strong> a{' '}
-            <strong>Jeskyně a Draci</strong>; další systémy přibydou. Najdeš v{' '}
-            <Link to="/ikaros/systemy">RPG systémech</Link>.
-          </p>
-        </Tool>
+        {/* R3 25.8 — sekce skryta s landing stránkami do rozhodnutí licencí (spec-25.8) */}
+        {SYSTEM_LANDINGS_PUBLIC && (
+          <Tool icon={<Dices size={16} />} title="RPG systémy" audience={{ kind: 'vse', label: 'Všichni' }}>
+            <p>
+              Rozcestník stránek o jednotlivých herních systémech — co pro daný
+              systém Ikaros umí (deníkový list, taktická mapa, kalendář, chat za
+              postavu), jak začít a jak založit svět. Zatím{' '}
+              <strong>Dračí Doupě 1.6</strong>, <strong>Dračí Doupě II</strong> a{' '}
+              <strong>Jeskyně a Draci</strong>; další systémy přibydou. Najdeš v{' '}
+              <Link to="/ikaros/systemy">RPG systémech</Link>.
+            </p>
+          </Tool>
+        )}
         <Tool icon={<Users size={16} />} title="Nástěnka náborů (Hledá se)" audience={{ kind: 'vse', label: 'Přihlášení' }}>
           <p>
             Vývěska „<strong>hledám hru / hledám hráče</strong>" — najdeš ji

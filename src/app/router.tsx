@@ -12,6 +12,7 @@ import { Spinner } from '@/shared/ui';
 import { RoleGuard } from '@/features/admin/components/RoleGuard';
 import { WorldMembershipGuard } from '@/features/admin/components/WorldMembershipGuard';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
+import { SYSTEM_LANDINGS_PUBLIC } from '@/features/ikaros/pages/SystemLanding/flag';
 import { applyStartupRestore, saveLastRoute } from '@/shared/lib/lastRoute';
 import { UserRole, WorldRole } from '@/shared/types';
 import NotFoundPage from '@/pages/errors/NotFoundPage';
@@ -232,6 +233,13 @@ export function requireAuth({ request }: LoaderFunctionArgs) {
   return redirect('/?openLogin=1');
 }
 
+// R3 25.8 — landing systémů za flagem do rozhodnutí licencí (spec-25.8):
+// vypnutý flag ⇒ redirect na úvod (stránky byly indexované, 404 nechceme).
+// Zpětné zapnutí = jen flip `SYSTEM_LANDINGS_PUBLIC` (routy zůstávají).
+function systemLandingsGate() {
+  return SYSTEM_LANDINGS_PUBLIC ? null : redirect('/');
+}
+
 // ── Router ────────────────────────────────────────────────────────────────
 // PWA „obnov poslední místo": přepíše URL na poslední route PŘED inicializací
 // routeru (cold open standalone PWA na rootu) → router naběhne rovnou tam, bez
@@ -294,8 +302,10 @@ export const router = createBrowserRouter([
       { path: 'ikaros/napoveda',        element: p(HelpPage) },
       { path: 'ikaros/podporovatele',   element: p(SupportersPage) },
       // 15B.4a — landing systémů (veřejné, bez requireAuth); specifické před :slug
-      { path: 'ikaros/systemy',         element: p(SystemsHubPage) },
-      { path: 'ikaros/systemy/:slug',   element: p(SystemLandingPage) },
+      // R3 25.8 — za flagem do rozhodnutí licencí (spec-25.8): gate loader při
+      // vypnutém flagu redirectuje na úvod (stránky byly živé/indexované → ne 404).
+      { path: 'ikaros/systemy',         element: p(SystemsHubPage),    loader: systemLandingsGate },
+      { path: 'ikaros/systemy/:slug',   element: p(SystemLandingPage), loader: systemLandingsGate },
       { path: 'podminky',               element: p(TermsPage) },
       // 20A (Příloha C) — Zásady OÚ (GDPR čl. 13), Pravidla komunity, Kontakt
       { path: 'soukromi',               element: p(PrivacyPage) },

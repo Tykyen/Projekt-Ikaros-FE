@@ -23,7 +23,8 @@ map $uri $prerender_path {
     "~^/podminky/?$"                                       1;
     "~^/ikaros/(napoveda|novinky|vesmiry)/?$"              1;
     "~^/ikaros/(clanky|galerie)(/[^/]+)?/?$"               1;
-    "~^/ikaros/systemy(/[^/]+)?/?$"                        1;
+    # R3 25.8 — landing systémů skryty do rozhodnutí licencí (spec-25.8):
+    # "~^/ikaros/systemy(/[^/]+)?/?$"                      1;
     "~^/svet/[^/]+/?$"                                     1;
     # 22.4 vitrína — veřejné sekce světa + wiki stránky (jedna úroveň pod
     # slugem). Sekce vyjmenované explicitně (NE wildcard — chat/takticka-mapa/

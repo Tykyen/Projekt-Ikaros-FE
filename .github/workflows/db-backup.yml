@@ -1,24 +1,41 @@
 name: DB Backup (Mongo)
 
-# Ruční záloha produkční MongoDB (D-AUDIT „nula DB záloh").
-# mongodump --archive --gzip do /opt/backups/mongo/ + retence + disková pojistka.
-# ZÁMĚRNĚ jen workflow_dispatch (ruční): zálohy leží na TOMTÉŽ disku jako Mongo —
-# automatický cron zapnout až po vyřešení cíle mimo server (rclone/B2/R2),
-# viz docs/ops-runbook.md §6 v BE repu. Bez off-site cíle by cron jen plnil disk.
+# Denní záloha produkční MongoDB (karta 23.1, spec docs/arch/phase-23/spec-23.1.md):
+# mongodump --archive --gzip → /opt/backups/mongo/ (lokální retence, rychlý přístup)
+# → rclone upload do Backblaze B2 (off-site; env-var config přes SSH stdin —
+# na serveru nezůstává žádný secret). B2 retence: daily/ 7 dní + weekly/ 4 týdny
+# (nedělní server-side kopie). Test obnovy: db-restore-drill.yml (měsíčně).
+# Postup ostré obnovy: BE repo docs/ops-runbook.md §6.
 on:
   workflow_dispatch:
     inputs:
       keep:
-        description: "Kolik posledních záloh ponechat (retence)"
+        description: "Kolik posledních záloh ponechat lokálně na serveru (retence)"
         required: true
         default: "5"
         type: string
+  schedule:
+    # 02:00 UTC = 04:00 CEST (léto) / 03:00 CET (zima). GitHub cron mívá zpoždění
+    # v řádu desítek minut; po 60 dnech bez aktivity repa ho GitHub vypne.
+    - cron: "0 2 * * *"
 
 jobs:
   backup:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Kontrola B2 konfigurace
+        env:
+          B2_KEY_ID: ${{ secrets.B2_KEY_ID }}
+          B2_APP_KEY: ${{ secrets.B2_APP_KEY }}
+          B2_BUCKET: ${{ vars.B2_BUCKET }}
+        run: |
+          if [ -z "$B2_KEY_ID" ] || [ -z "$B2_APP_KEY" ] || [ -z "$B2_BUCKET" ]; then
+            echo "CHYBÍ B2 KONFIGURACE — nastav secrets B2_KEY_ID + B2_APP_KEY a var B2_BUCKET (FE repo)."
+            echo "Bez off-site cíle nesmí záloha projít zeleně (karta 23.1)."
+            exit 1
+          fi
+
       - name: Setup SSH key
         uses: webfactory/ssh-agent@v0.10.0
         with:
@@ -29,11 +46,21 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Záloha + retence
+      - name: Záloha + off-site upload + retence
+        env:
+          B2_KEY_ID: ${{ secrets.B2_KEY_ID }}
+          B2_APP_KEY: ${{ secrets.B2_APP_KEY }}
+          B2_BUCKET: ${{ vars.B2_BUCKET }}
+          KEEP: ${{ github.event.inputs.keep }}
         run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -s -- "${{ github.event.inputs.keep }}" << 'ENDSSH'
+          {
+            printf 'export RCLONE_CONFIG_B2_TYPE=b2\n'
+            printf 'export RCLONE_CONFIG_B2_ACCOUNT=%q\n' "$B2_KEY_ID"
+            printf 'export RCLONE_CONFIG_B2_KEY=%q\n' "$B2_APP_KEY"
+            printf 'export B2_BUCKET=%q\n' "$B2_BUCKET"
+            printf 'export KEEP=%q\n' "${KEEP:-5}"
+            cat << 'ENDSSH'
           set -e
-          KEEP="${1:-5}"
           BACKUP_DIR=/opt/backups/mongo
           mkdir -p "$BACKUP_DIR"
 
@@ -46,8 +73,15 @@ jobs:
             exit 1
           fi
 
+          echo "===== rclone (jednorázová instalace, pokud chybí) ====="
+          if ! command -v rclone >/dev/null 2>&1; then
+            apt-get update -qq && apt-get install -y -qq rclone
+          fi
+          rclone version | head -1
+
           STAMP=$(date +%F-%H%M)
-          FILE="$BACKUP_DIR/ikaros-$STAMP.archive.gz"
+          NAME="ikaros-$STAMP.archive.gz"
+          FILE="$BACKUP_DIR/$NAME"
           echo "===== mongodump → $FILE ====="
           docker exec projekt-ikaros-mongo mongodump --archive --gzip --db ikaros > "$FILE"
           ls -lh "$FILE"
@@ -56,10 +90,40 @@ jobs:
           gzip -t "$FILE"
           [ -s "$FILE" ] || { echo "PRÁZDNÁ ZÁLOHA"; rm -f "$FILE"; exit 1; }
 
-          echo "===== retence (ponechat posledních $KEEP) ====="
+          echo "===== off-site upload → B2 daily/ ====="
+          rclone copyto "$FILE" "b2:$B2_BUCKET/mongo/daily/$NAME"
+          LOCAL_SIZE=$(stat -c%s "$FILE")
+          REMOTE_SIZE=$(rclone lsl "b2:$B2_BUCKET/mongo/daily/$NAME" | awk '{print $1}')
+          echo "lokální: $LOCAL_SIZE B · B2: $REMOTE_SIZE B"
+          [ "$REMOTE_SIZE" = "$LOCAL_SIZE" ] || { echo "VELIKOST NESEDÍ — upload selhal"; exit 1; }
+
+          if [ "$(date +%u)" = "7" ]; then
+            echo "===== neděle → týdenní kopie (server-side copy v B2) ====="
+            rclone copyto "b2:$B2_BUCKET/mongo/daily/$NAME" "b2:$B2_BUCKET/mongo/weekly/$NAME"
+          fi
+
+          echo "===== B2 retence (daily > 8 dní, weekly > 29 dní; hard-delete, B2 jinak jen skrývá) ====="
+          rclone delete --min-age 8d --b2-hard-delete "b2:$B2_BUCKET/mongo/daily"
+          rclone delete --min-age 29d --b2-hard-delete "b2:$B2_BUCKET/mongo/weekly"
+
+          echo "===== lokální retence (ponechat posledních $KEEP; NENÍ záloha — tentýž disk) ====="
           ls -1t "$BACKUP_DIR"/ikaros-*.archive.gz | tail -n +$((KEEP + 1)) | xargs -r rm -v --
 
-          echo "===== stav záloh ====="
+          echo "===== stav ====="
           ls -lh "$BACKUP_DIR"
+          echo "--- B2 daily ---"
+          rclone lsl "b2:$B2_BUCKET/mongo/daily"
+          echo "--- B2 weekly ---"
+          rclone lsl "b2:$B2_BUCKET/mongo/weekly"
           df -h /
           ENDSSH
+          } | ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -s
+
+      - name: Discord alert při selhání
+        if: failure()
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_ALERT_WEBHOOK }}
+        run: |
+          [ -n "$WEBHOOK" ] || { echo "DISCORD_ALERT_WEBHOOK nenastaven — přeskakuji"; exit 0; }
+          curl -sS -H "Content-Type: application/json" -X POST "$WEBHOOK" \
+            -d "{\"content\":\"🔴 **DB Backup selhal** — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"

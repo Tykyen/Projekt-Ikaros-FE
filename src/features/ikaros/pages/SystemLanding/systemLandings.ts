@@ -14,6 +14,8 @@
  * (zná systémy líp). People-first, ne keyword-stuffing.
  */
 
+import { SYSTEM_LANDINGS_PUBLIC } from './flag';
+
 export interface LandingFeature {
   title: string;
   body: string;
@@ -185,8 +187,11 @@ export const SYSTEM_LANDINGS: SystemLanding[] = [
   stub('pribehy-imperia', 'pi', 'Příběhy Impéria'),
 ];
 
+// R3 25.8 — při vypnutém flagu se navenek nepublikuje nic (spec-25.8).
 export const getPublishedLandings = (): SystemLanding[] =>
-  SYSTEM_LANDINGS.filter((s) => s.published);
+  SYSTEM_LANDINGS_PUBLIC ? SYSTEM_LANDINGS.filter((s) => s.published) : [];
 
 export const getLandingBySlug = (slug: string): SystemLanding | undefined =>
-  SYSTEM_LANDINGS.find((s) => s.slug === slug && s.published);
+  SYSTEM_LANDINGS_PUBLIC
+    ? SYSTEM_LANDINGS.find((s) => s.slug === slug && s.published)
+    : undefined;

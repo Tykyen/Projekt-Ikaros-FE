@@ -51,7 +51,7 @@ export default function DashboardPage() {
       <Seo
         rawTitle
         title="Ikaros — online platforma pro RPG světy a vyprávění"
-        description="Tvoř a hraj RPG světy online: postavy, deníky, mapy, kalendáře, chat a komunitní obsah. Dračí Doupě, D&D i vlastní systémy."
+        description="Tvoř a hraj RPG světy online: postavy, deníky, mapy, kalendáře, chat a komunitní obsah — česky a zdarma."
       />
       {/* 15B.3 — brand uzly WebSite + Organization. */}
       {siteJsonLd(window.location.origin).map((node) => (
