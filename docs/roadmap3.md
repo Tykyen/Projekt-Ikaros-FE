@@ -132,27 +132,23 @@ Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 
 **Cíl:** Jednorázový dismissable banner po loginu: co je beta, co smí být rozbité, kde hlásit chyby (25.1), kde je changelog (25.4).
 **Rešerše:** riziko rozdílného očekávání 60–75 % — web říká „beta", interně teprve certifikujeme. **Otevřená otázka:** do splnění fází 23–25 používat štítek „testovací provoz / raný náhled" a „beta" nasadit až s kohortou A?
 
-### - [ ] 25.4 Changelog + „Známé problémy" z Novinek — [dopad střední · náklad malý]
-Nástroj existuje (/ikaros/novinky + admin CRUD). **FE:** odkaz Novinky do levé navigace/patičky. **Proces:** při každém deployi novinka „Co je nové"; jedna přišpendlená „Známé problémy" (šetří duplicitní reporty). Jmenovitě děkovat testerům, jejichž report vedl k opravě — nejlevnější retence testerů.
-
-### - [ ] 25.5 Ukázkové světy & klonovatelné šablony — [dopad vysoký · náklad střední] 👑obsah
+### - [ ] 25.4 Ukázkové světy & klonovatelné šablony — [dopad vysoký · náklad střední] 👑obsah
 **Cíl (dle rešerše):** 2–3 **kompletní ukázkové světy** (různé žánry, hotová cesta — „takhle vypadá živá hra") + 3–5 **malých světů ke klonování** (PJ nezačíná z prázdné stránky) + 8–12 krátkých scénářů/prvních sezení.
 **Mechanika hotová:** `publicShowcase` (anon = Čtenář), sdílení scén 22.5, šablony stránek 15.5, generátory a knihovny 21.x. Zbývá **obsah** + odkazy z dashboardu/nápovědy.
 **Otevřené otázky:** které žánry (fantasy + sci-fi/Matrix + …)? kdo plní — autor, admin síť („správce ukázkového světa" role, 28.3)?
 
-### - [ ] 25.6 Úklid prvního dojmu — [dopad střední · náklad malý]
+### - [ ] 25.5 Úklid prvního dojmu — [dopad střední · náklad malý]
 Z rešerše živého webu: ① skrýt/přejmenovat veřejně viditelný svět s `/test/` v názvu · ② skrýt nulové indikátory (Putyka „0 online" apod. — prázdnota nesmí být první signál) · ③ **PWA install prompt odložit**, dokud uživatel nezažil hodnotu (dnes hned; odhad −5–15 % první konverze) · ④ prověřit ~3s spinner nápovědy (první dojem) · ⑤ patička/beta štítek viditelný i v layoutech, kde se dnes nerenderuje.
 
-### - [ ] 25.7 Kurátorský první výběr motivů — [dopad střední · náklad malý]
+### - [ ] 25.6 Kurátorský první výběr motivů — [dopad střední · náklad malý]
 **Rešerše:** 33 motivů = rozhodovací zátěž + vizuální QA plocha; kyberpunk default polarizuje.
 **Návrh:** v prvním výběru 4–6 „podpisových" motivů (zbytek za „Další motivy…"), žádné mazání. **Otevřené otázky:** neutrálnější default, nebo rychlá volba dle žánru při registraci/založení světa? Kterých 4–6? *(Kvalita skinů zůstává princip — tady jde o kurátorství nabídky, ne o šetření na grafice.)*
+### - [ ] 25.7 Registrační brzda (volitelné) — [dopad nízký · náklad malý]
+Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whitelist neexistuje. Pro kohorty A/B stačí nešířit URL. Env-flag invite kód / kapacitní cap připravit, jen kdyby se to zvrhlo. **Otevřená otázka:** chceme pro kohortu C pozvánkové kódy (měřitelné „přišel doporučením"), nebo volný vstup s capem?
 
 ### - [x] 25.8 Ohraničení systémových slibů ⚠️ — [dopad vysoký · náklad malý] ✅ 2026-07-19
 **Kolize (rešerše):** veřejná stránka „RPG systémy" slibovala hraní DrD 1.6, DrD II a JaD vč. deníku a taktické mapy — mantinel projektu ale říká „licence čekají, systémy neřešíme".
 **✅ Implementováno (spec [spec-25.8](arch/phase-25/spec-25.8.md)):** rozhodnuto uživatelem „skryj" (generická stránka zamítnuta). Vše za flagem `SystemLanding/flag.ts` (`SYSTEM_LANDINGS_PUBLIC=false`): routy `/ikaros/systemy*` → gate loader redirect na `/` (stránky byly indexované, ne 404) · nav položka + sekce nápovědy skryty · BE sitemap bez 4 záznamů · prerender řádek zakomentován · dashboard meta bez názvů systémů. In-app funkčnost (výběr systému, deníky) beze změny — není to veřejný claim. Vědomě neskryto: TermsPage „např." výčet (právní popisný text → advokát, 31.1) a zmínky v nápovědě světa (dokumentace reálné funkce). Zpětné zapnutí po licencích = 3 kroky (návod ve flag.ts). Ověřeno: FE build+budget+CSP ✓, audit:nav ✓, vitest 120 ✓, BE typecheck + seo 7/7 ✓. **Čeká FE+BE deploy.**
-
-### - [ ] 25.9 Registrační brzda (volitelné) — [dopad nízký · náklad malý]
-Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whitelist neexistuje. Pro kohorty A/B stačí nešířit URL. Env-flag invite kód / kapacitní cap připravit, jen kdyby se to zvrhlo. **Otevřená otázka:** chceme pro kohortu C pozvánkové kódy (měřitelné „přišel doporučením"), nebo volný vstup s capem?
 
 ---
 
