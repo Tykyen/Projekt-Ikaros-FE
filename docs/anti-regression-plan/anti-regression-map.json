@@ -299,8 +299,15 @@
       "class": "role",
       "severity": "med",
       "status": "fixed",
-      "note": "",
-      "guards": []
+      "note": "Admin/staff bypass v ekonomice přes isWorldStaff (world-scoped). Cílený guard 2026-07-19.",
+      "guards": [
+        {
+          "kind": "test",
+          "repo": "be",
+          "file": "src/modules/characters/characters.service.spec.ts",
+          "symbol": "R-02"
+        }
+      ]
     },
     "R-03": {
       "class": "role",
@@ -929,8 +936,15 @@
       "class": "data",
       "severity": "med",
       "status": "fixed",
-      "note": "Opraveno 2026-06-15 (dluhová vlna) + regresní test / ověřeno.",
-      "guards": []
+      "note": "Top-level `abilities` zrušeno (obsolete) → systemStats.abilities. Cílený guard 2026-07-19.",
+      "guards": [
+        {
+          "kind": "test",
+          "repo": "be",
+          "file": "src/modules/bestiae/dto/create-bestie.dto.spec.ts",
+          "symbol": "F-20"
+        }
+      ]
     },
     "F-21": {
       "class": "validace",

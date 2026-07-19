@@ -36,13 +36,6 @@
 **Trigger:** stížnost na „zmizelé HP" v boji, nebo souběžná editace deníku začne bolet.
 **Co bude potřeba (rozhodnutí + BE, naráz — ne půlku):** jedna ze tří cest — (a) generický `customDataDelta` (naráží na string hodnoty + JSON pole → schema-driven typová brána), (b) jen HP klíče (úzké, bezpečné), (c) dodělat D-073 `expectedUpdatedAt` (dnes half-wired: `updatedAt` se vrací, nikde neověřuje). **Doporučeno (c)** — optimistic-lock chrání všechny deník patche, ne jen HP.
 
-### D-RC-E8 — Inventář: odebrání položky = last-write-wins (chybí atomický `$pull`/lock)
-*(dřív součást D-AUDIT-2026-07-11; ověřeno proti HEAD 2026-07-19)*
-**Soubory:** BE `campaign-purchase.service.ts:710-732` (`removeFromInventory`) → `character-subdocs.service.ts:629` (`updateInventory`) → `character-inventory.repository.ts:50-51` (`findOneAndUpdate` s `$set: data` = přepis **celého** pole `sections`).
-**Stav:** odebrání položky přečte celý inventář, přemapuje sekce v JS (`sec.items.filter`) a zapíše je zpět přes `$set` bez optimistic locku → souběžné odebrání + jiná mutace inventáře = jeden zápis tiše zmizí. Opačná cesta (přidání) **je** atomická (`appendInventoryItem` `$push`/`arrayFilters`, RC-E4), měnová cesta má lock (RC-E7 `changeCurrency` → `expectedUpdatedAt` → 409 `ACCOUNT_CONFLICT`). Interface `character-inventory.repository.ts:184` už `updatedAt` token nese (D-073), ale `update()` ho ignoruje. Tatáž třída jako [[D-DIARY-HP-DELTA]], jiný uzel. Severity 🟠 (`race__01-ekonomika.md:16`).
-**Trigger:** souběžné nákupy/refundy nad stejným inventářem začnou bolet, nebo kompetitivní ekonomika.
-**Co bude potřeba (naráz, ne půlku):** buď `$pull` konkrétní položky místo přepisu sekcí, nebo dotáhnout `expectedUpdatedAt` v `update()` (→ 409 jako u currency). Doporučeno lock — chrání všechny inventory patche.
-
 ### D-066 — Nástěnka náborů filtruje client-side; paginace + BE facety až naráz
 **Soubory:** FE `src/features/ikaros/pages/NaboryPage.tsx` (`useNabory` → celý aktivní seznam), `src/features/ikaros/lib/nabory.ts` (`filterNabory`); BE `GET /nabory` (bez query filtru).
 **Stav:** 19.3b přidalo filtry systém+žánr, filtruje se **klient-side nad celým aktivním seznamem**. BE query filtr byl **vědomě zamítnut** (spec 19.3 §12.5): nástěnka potřebuje i po zafiltrování celý seznam, aby poznala, které volby nemají jediný lístek (zešednutí `optEmpty`) — server-side filtr by si vyžádal druhý request nebo facety a byl by dnes mrtvý kód. Při desítkách lístků je současné řešení správné; při stovkách poroste payload a čas do prvního renderu (filtr sám zůstane svižný, je v paměti).
@@ -73,16 +66,15 @@
 **Trigger:** nasazení víc instancí BE (load balancer / horizontální scaling).
 **Infra ready:** Redis + Socket.IO Redis adapter opt-in (`SOCKET_IO_REDIS=1`). Chybí migrace presence Map → Redis hash (~8-16 h). **Dělat dřív = mrtvý kód.**
 
-### D-RT-SCALE — Realtime broadcast/škála (presence globálně · žádný connection cap · plain emit)
-*(dřív „🟠 Realtime / škála" v D-AUDIT-2026-07-11; ověřeno proti HEAD 2026-07-19)*
-**Soubory:** BE `presence.gateway.ts:84,107,153,157`, `socket-io.adapter.ts:92-98`, `ws-rate-limit.ts`, ephemeral emity `chat.gateway.ts` / `maps.gateway.ts`.
-**Stav (3 body, sdílený trigger = škála):**
-- **presence room-scoping** — `presence.gateway.ts:107/153/157` `this.server.emit('presence:update')` broadcastuje **všem** připojeným socketům (`:84` nový příchozí `client.broadcast.emit` taky globálně, jen bez sebe), žádná `.to(room)` → O(N²) při N online **a** mění, kdo koho vidí online (**produktové rozhodnutí**, ne jen výkon).
-- **connection cap per IP/uživatel** — žádný strop; `socket-io.adapter.ts:92` gate řeší jen ban/deleted účet, `ws-rate-limit` limituje frekvenci EVENTŮ na už navázaném socketu, ne počet socketů. Per-user/IP strop napříč sockety chce Redis (per-socket bucket nestačí — socket je sticky, multi-tab je záměrně podporovaný).
-- **`volatile.emit` na ephemeral** — `volatile` se nikde nepoužívá; typing/ping/ruler/presence jdou plain `emit` → bufferují se a doručí i po reconnectu (u drop-old-frame dat zbytečné).
+### D-RT-SCALE — Realtime broadcast/škála (presence globálně · žádný connection cap)
+*(dřív „🟠 Realtime / škála" v D-AUDIT-2026-07-11; `volatile.emit` část vyřešena — zbývají 2 body)*
+**Soubory:** BE `presence.gateway.ts:84,107,153,157`, `socket-io.adapter.ts:92-98`, `ws-rate-limit.ts`.
+**Stav (zbylé 2 body, sdílený trigger = škála):**
+- **presence room-scoping** — `presence.gateway.ts:107/153/157` `this.server.emit('presence:update')` broadcastuje **všem** připojeným socketům (`:84` nový příchozí `client.broadcast.emit` taky globálně, jen bez sebe), žádná `.to(room)` → O(N²) při N online **a** mění, kdo koho vidí online (**produktové rozhodnutí**, ne jen výkon → čeká na vstup).
+- **connection cap per IP/uživatel** — žádný strop; `socket-io.adapter.ts:92` gate řeší jen ban/deleted účet, `ws-rate-limit` limituje frekvenci EVENTŮ na už navázaném socketu, ne počet socketů. Per-user/IP strop napříč sockety chce Redis (per-socket bucket nestačí — socket je sticky, multi-tab je záměrně podporovaný) → **mrtvý kód na 1 instanci**.
 **Redis-backed presence** je stejný trigger → sledováno v [[D-NEW-chat-presence-scale]] (+ D-051), zde neduplikuji.
 **Trigger:** roste počet souběžně online (broadcast bolí), nebo nasazení víc instancí BE.
-**Co bude potřeba:** scope presence emitů na svět/skupinu room; per-user connection cap přes Redis; `.volatile` na ephemeral eventy. Produktové: kdo koho vidí online.
+**Co bude potřeba:** scope presence emitů na svět/skupinu room; per-user connection cap přes Redis. Produktové: kdo koho vidí online.
 
 ### D-NEW-color-tokens — Hardcoded barvy → theme tokeny (chrome drift)
 **Plán:** [n2-color-mapping.md](n2-color-mapping.md).
@@ -114,31 +106,24 @@
 **Trigger:** až CZ fulltext začne viditelně bolet (relevance komunitních katalogů).
 **Co bude potřeba (jedna z voleb):** (1) `synonyms` + `stopWords` (dnes tam nejsou; ruční kurace), (2) upgrade v1.6→v1.10+, (3) zapnout `EmbeddingSearchService` (kód existuje, vypnutý `EMBEDDING_ENABLED=0` kvůli ~2,46 GB RSS, viz [[rss_memory_embedding]]).
 
-### D-PERF-BE — Zbytek perf nálezů (autoIndex v prod · N+1 · seznamy bez limitu)
-*(dřív „25 PERF-BE" v D-AUDIT-2026-07-11; `enrichMembers` N+1 ✅ 17.7. batch `publicProfilesByIds`; `compression` ✅ v kódu není, řeší Caddy — smazáno)*
-**Soubory:** BE `database.module.ts` (žádný `autoIndex` klíč), notifikace `notifyUsers`/`getUnreadCounts`, `GET /worlds` + `/pages`.
+### D-PERF-BE — Zbytek perf nálezů (N+1 · seznamy bez limitu)
+*(dřív „25 PERF-BE" v D-AUDIT-2026-07-11; `enrichMembers` N+1 ✅ 17.7.; `compression` ✅ řeší Caddy; **`autoIndex` ✅ vyřešeno 2026-07-19** — off v prod + background `syncIndexes` služba, viz níže)*
+**Soubory:** BE notifikace `notifyUsers`/`getUnreadCounts`, `GET /worlds` + `/pages`.
 **Stav (sdílený trigger = výkonový zátah):**
-- **`autoIndex` ON v prod** — `database.module.ts` nenastavuje `autoIndex` → mongoose default `true`, negateováno přes `NODE_ENV` → v prod běží zapnutý (index buildy/start). ⚠️ **Vypnutí je jednořádkové, ale bez `syncIndexes` kroku v deploji by nové indexy v produkci nikdy nevznikly = tiše horší než dnešek.** Dnešní dopad = jen pomalejší start, ne díra → **samostatná dávka s deploy krokem**.
 - **N+1 `notifyUsers`/`getUnreadCounts`** — neověřeno do hloubky.
 - **`GET /worlds`+`/pages` bez limitu/projekce** — paginace = může být breaking pro FE.
-**Trigger:** viditelně pomalý start/endpoint, nebo škála (SLO 500 světů).
-**Co bude potřeba:** `autoIndex:false` **+ `syncIndexes` v deploji naráz** (ne půlku); batch notifikace; paginace seznamů (breaking → koordinovat s FE). *(`compression` do kódu nepatří — Caddyfile `encode gzip zstd`, viz ops-runbook BE repo.)*
+**✅ Vyřešeno 2026-07-19:** `autoIndex: false` v prod (`database.module.ts` — off na `NODE_ENV==='production'`, dev/test ON) + `DatabaseIndexSyncService` (`OnApplicationBootstrap`) spustí `connection.syncIndexes()` **na pozadí** (neblokuje start → rychlý boot; nové indexy stále vznikají; escape hatch `DB_SYNC_INDEXES=0`). Všech 88 indexů je schema-level → `syncIndexes` bezpečný.
+**Trigger:** viditelně pomalý endpoint, nebo škála (SLO 500 světů).
+**Co bude potřeba:** batch notifikace; paginace seznamů (breaking → koordinovat s FE).
 
-### D-DUN-1 — systemStats validace přeskočena pro alias-systémy (drd-plus/coc)
-*(dřív v D-AUDIT-2026-07-11; ověřeno proti HEAD 2026-07-19; sníženo 🔴→🟠 — PJ-scoped, hráč zápis nemá → ne exploit)*
-**Soubory:** BE `map-operations.service.ts:1736,1739-1752,1771-1779` (soft-mode skip `if(!result.valid && !result.errors._schema)`), `schema-registry.service.ts:63` (přesný match `` `${systemId}:${entityType}` ``).
-**Stav:** validace bere `world.system` **syrově, bez alias-normalizace**; schémata jsou pod kanonickými klíči (`coc-token.json`→`coc`, `drdplus-token.json`→`drdplus`), ale `world.system` drží alias formu (`drd-plus` apod.) → registry vrátí null → `_schema` error → soft-mode tiše přeskočí. BE `resolveSystemId` (FE ekvivalent) **neexistuje** — normalizaci umí jen `SYSTEM_TO_PRESET`, token-stats cesta ji neaplikuje. Není to explicitní „skip pro drd-plus/coc", je to generický soft-skip při nesouladu alias↔kanonický klíč, který tyto systémy trefuje.
-**Trigger:** hráči dostanou zápis do `systemStats` u těchto systémů, nebo alias systém potřebuje tvrdou validaci.
-**Co bude potřeba:** port `resolveSystemId` (alias→kanonický) do BE před schema lookup v `map-operations.service.ts`.
-
-### D-AUDIT-HARDENING — Zbytky auditu: anti-regrese guardy · db-integrity rerun · proof-vrstvy · SLO
-*(zbytek D-AUDIT-2026-07-11 sledovaný v BE audit-plánech; ne code-dluh, verifikační/hardening kroky)*
+### D-AUDIT-HARDENING — Zbytky auditu: db-integrity rerun · proof-vrstvy · SLO
+*(zbytek D-AUDIT-2026-07-11 sledovaný v BE audit-plánech; ne code-dluh, verifikační/hardening kroky. **AR-META F-20/R-02 ✅ vyřešeno 2026-07-19**)*
 **Stav:**
-- **AR-META-1** — `docs/anti-regression-plan/anti-regression-map.json`: **0 ručních guardů** (všech 267 nálezů `guards:[]`, krytí jen runtime string-match ID v testech + hrubý class-scanner). F-20 fakticky **G0** (opraveno, žádný test/scanner necituje „F-20" → může tiše regredovat), R-02 jen netargetované class-level (`audit:routes` hlídá routes obecně, ne konkrétně R-02). CI guard (crit/high) to nechytá. *(Formát ručních guardů podporován — `kind: test|scanner|lint|mutation` — jen nenaplněn.)*
 - **db-integrity rerun** — kořen ✅ 17.7. (dokument `db-integrity-plan/tools/integrity-scan.md` teď odkazuje na `world-hard-delete.service.ts` = 46 kolekcí jako zdroj pravdy, ne zamrzlá kopie 28). **Zbývá:** rerun scanu proti běžícímu Mongu s plným seznamem + `characterId`-styl subdoc scan user-scoped kolekcí (♻️ přesah CD-RUN-14/15).
 - **Neproběhlé proof-vrstvy** (report:66): `+teeth` Stryker, `+load`, `+perf` live, `+render`, `+fault`, `+authz-runtime`; SLO S1–S4 neměřené.
+**✅ Vyřešeno 2026-07-19 (AR-META-1 cílené guardy):** F-20 (canary test `create-bestie.dto.spec.ts` — spadne, když se top-level `abilities` vrátí jako validované pole) + R-02 (anotace krycího testu `characters.service.spec.ts` `isWorldStaff`) + oba mají cílený manuální guard v `anti-regression-map.json`. Scanner: F-20/R-02 **G0→G3** (G3=146, fixed&G0 12→2). *(Systémový „0 ručních guardů" pro zbytek map = mimo rozsah — řeší se per-nález při dalším auditu.)*
 **Trigger:** před dalším velkým auditem / nasazením, nebo prokázaná regrese.
-**Co bude potřeba:** cílené guardy pro F-20/R-02 (test cituje ID nebo dedikovaný scanner); rerun db-integrity scanu s živým Mongem; doběh proof-vrstev + změření SLO.
+**Co bude potřeba:** rerun db-integrity scanu s živým Mongem; doběh proof-vrstev + změření SLO.
 
 ### D-DB-BACKUP-CRON — DB zálohy: cron záměrně vynechán (blokováno na uživateli)
 *(dřív „Blokováno na uživateli" v D-AUDIT-2026-07-11)*
