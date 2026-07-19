@@ -1,6 +1,6 @@
 # Spec 23.5 — Sliding session v produkci (oprava refresh race)
 
-**Stav:** schváleno uživatelem 2026-07-19 · implementováno (BE jest 80/80, FE vitest 3/3 + build zelený) · čeká deploy + živé ověření
+**Stav:** schváleno uživatelem 2026-07-19 · implementováno (BE jest 80/80, FE vitest 3/3 + build zelený) · zaškrtnuto s hlídkou: samovolné odhlášení do 2 dní od nasazení = bod se znovu otevře
 **Karta:** roadmap3 fáze 23, karta 23.5 · **Původ:** inventura funkcí 01 (refresh) + pozorování „odhlásí mě do 3 dnů"
 
 ## Problém

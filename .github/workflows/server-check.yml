@@ -1,0 +1,40 @@
+name: Server Check (23.6)
+
+# Diagnostika pro kartu 23.6 (infra hardening) — JEN ČTE, nic na serveru nemění.
+# Vypíše: kde běží Caddy, kam proxuje (Caddyfile), na jakých adresách poslouchají
+# porty 3001/8081 a stav ufw firewallu. Slouží k ověření PŘED deployem
+# loopback bindů (spec-23.6): cíle Caddy MUSÍ být localhost/127.0.0.1.
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Diagnostika (Caddy · porty · ufw)
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -s << 'ENDSSH'
+          echo "===== 1) Caddy — běží jako host služba? ====="
+          systemctl status caddy --no-pager 2>/dev/null | head -5 || echo "systemctl caddy nic nevrátil (Caddy možná běží jinak — viz docker ps níž)"
+          docker ps --format '{{.Names}}\t{{.Image}}' 2>/dev/null | grep -i caddy || echo "(žádný caddy kontejner — dobře, čekáme host službu)"
+          echo ""
+          echo "===== 2) Caddyfile — KAM proxuje (klíčové: localhost/127.0.0.1 = OK, veřejná IP = STOP) ====="
+          grep -nE "reverse_proxy|3001|8081" /etc/caddy/Caddyfile 2>/dev/null || echo "/etc/caddy/Caddyfile nenalezen!"
+          echo ""
+          echo "===== 3) Porty 3001/8081 — na jaké adrese poslouchají (dnes čekáme 0.0.0.0) ====="
+          ss -tlnp | grep -E "3001|8081" || echo "porty 3001/8081 nikdo neposlouchá?!"
+          echo ""
+          echo "===== 4) ufw firewall — stav (runbook §5) ====="
+          sudo -n ufw status verbose 2>/dev/null || ufw status verbose 2>/dev/null || echo "ufw příkaz nedostupný nebo chybí práva"
+          ENDSSH
