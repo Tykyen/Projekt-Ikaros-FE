@@ -17,6 +17,8 @@ services:
       CSP_HEADER_NAME: ${CSP_HEADER_NAME:-Content-Security-Policy}
       # 15B.1 — host:port prerender sidecaru pro nginx upstream.
       PRERENDER_HOST: ${PRERENDER_HOST:-prerender:3000}
+      # 23.4 — holý Sentry ingest host pro CSP connect-src, odvozeno z VITE_SENTRY_DSN při deployi.
+      SENTRY_HOST: ${SENTRY_HOST:-}
     ports:
       - "${FRONTEND_PORT:-8081}:80"
     # nginx resolvuje upstream `prerender` při startu → sidecar musí existovat dřív.

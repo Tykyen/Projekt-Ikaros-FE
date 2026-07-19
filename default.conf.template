@@ -5,6 +5,8 @@
 #                         V connect-src kryje https (REST/polling) i wss (Socket.IO) naráz.
 #   ${CSP_HEADER_NAME}  — "Content-Security-Policy-Report-Only" (sběr) / "Content-Security-Policy" (enforce).
 #   ${PRERENDER_HOST}   — host:port prerender sidecaru (15B.1), default prerender:3000.
+#   ${SENTRY_HOST}      — holý ingest host Sentry/GlitchTip (23.4), odvozeno z VITE_SENTRY_DSN
+#                         při deployi; prázdné = error tracking vypnutý (v CSP jen zmizí).
 
 # 15B.1 — prerender pro crawlery. Tyto map/upstream MUSÍ být v http kontextu;
 # conf.d/*.conf je include-ováno uvnitř http {}, takže patří sem (před server).
@@ -121,7 +123,7 @@ server {
         # krčma přes Jitsi iframe); bez toho rodič feature nedeleguje a A/V v iframe
         # se zablokuje i s allow atributem.
         add_header Permissions-Policy "geolocation=(), camera=(self \"https://meet.jit.si\"), microphone=(self \"https://meet.jit.si\"), display-capture=(self \"https://meet.jit.si\"), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" always;
-        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com https://meet.jit.si; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://i.ytimg.com; connect-src 'self' data: ${BACKEND_HOST} https://res.cloudinary.com https://challenges.cloudflare.com https://meet.jit.si wss://meet.jit.si; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://meet.jit.si; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;
+        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com https://meet.jit.si; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://i.ytimg.com; connect-src 'self' data: ${BACKEND_HOST} ${SENTRY_HOST} https://res.cloudinary.com https://challenges.cloudflare.com https://meet.jit.si wss://meet.jit.si; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://meet.jit.si; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;
     }
 
     # 15B.1 — interní cíl prerenderu (zvenčí nedostupný; jen rewrite z location /).

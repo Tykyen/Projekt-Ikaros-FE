@@ -1,6 +1,6 @@
 # Spec 23.1 — Zálohy s off-site cílem + test obnovy
 
-**Stav:** schváleno uživatelem 2026-07-19 · implementováno (čeká na B2 setup + první běh)
+**Stav:** schváleno uživatelem 2026-07-19 · implementováno · **ověřeno 2026-07-19** (první záloha v B2 + zelený restore drill: 110 kolekcí / 43 127 dokumentů, download ~10 s, restore ~7 s)
 **Karta:** roadmap3 fáze 23, karta 23.1 · **Původ:** roadmap2 karta 14.4 + dluh D-DB-BACKUP-CRON
 
 ## Problém

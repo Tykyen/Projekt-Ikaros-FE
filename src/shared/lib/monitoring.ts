@@ -2,13 +2,30 @@ import * as Sentry from '@sentry/react';
 
 let initialized = false;
 
+// LH-13 — scrubber: axios error nese config.headers.Authorization (JWT),
+// config.data (na loginu heslo) a response.data; Sentry serializuje enumerable
+// pole erroru do eventu → bez scrubberu by JWT/hesla egresovala do agregátoru.
+const SENSITIVE_KEY_RE = /authorization|cookie|password|token|secret|api[-_]?key/i;
+const SCRUB_MAX_DEPTH = 8;
+
+function scrubValue(value: unknown, depth = 0): unknown {
+  if (depth > SCRUB_MAX_DEPTH || value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map((v) => scrubValue(v, depth + 1));
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    out[k] = SENSITIVE_KEY_RE.test(k) ? '[scrubbed]' : scrubValue(v, depth + 1);
+  }
+  return out;
+}
+
 /**
  * Monitoring (3. noha, FE) — error tracking do GlitchTip/Sentry + globální
  * záchyt chyb, které dnes MIZÍ (`unhandledrejection`, `window.onerror`) —
  * GlobalErrorBoundary chytá jen render chyby, ne async/event/promise.
  *
  * Init jen když je `VITE_SENTRY_DSN` (prázdné = vypnuto). DSN je veřejný (jde
- * do bundlu) — to je u Sentry/GlitchTip designově OK.
+ * do bundlu) — to je u Sentry/GlitchTip designově OK; odchozí data kryje
+ * beforeSend scrubber.
  */
 export function initMonitoring(): void {
   const dsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
@@ -17,6 +34,17 @@ export function initMonitoring(): void {
       dsn,
       environment: import.meta.env.PROD ? 'production' : 'development',
       tracesSampleRate: 0,
+      // Prohlížečový šum bez diagnostické hodnoty (benigní, chrání kvótu 5k/měs).
+      ignoreErrors: [
+        'ResizeObserver loop limit exceeded',
+        'ResizeObserver loop completed with undelivered notifications.',
+      ],
+      beforeSend(event) {
+        if (event.request) event.request = scrubValue(event.request) as typeof event.request;
+        if (event.extra) event.extra = scrubValue(event.extra) as typeof event.extra;
+        if (event.contexts) event.contexts = scrubValue(event.contexts) as typeof event.contexts;
+        return event;
+      },
     });
     initialized = true;
   }

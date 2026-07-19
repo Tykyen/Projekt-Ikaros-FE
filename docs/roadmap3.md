@@ -55,27 +55,24 @@
 ## Fáze 23 — Provozní pojistky
 **Jediná kategorie, kde beta dnes reálně hoří.** Vše jsou hodiny až dny práce; bez 23.1–23.4 nelze pozvat nikoho cizího.
 
-### - [ ] 23.1 Zálohy s off-site cílem + test obnovy — [dopad vysoký · náklad malý] 👑provoz *(překlopeno z 14.4 + dluh D-DB-BACKUP-CRON)*
+### - [x] 23.1 Zálohy s off-site cílem + test obnovy — [dopad vysoký · náklad malý] 👑provoz *(překlopeno z 14.4 + dluh D-DB-BACKUP-CRON)* ✅ 2026-07-19
 **Cíl:** Denní automatická záloha DB mimo server + jedna ověřená obnova + rotace.
-**Stav:** `db-backup.yml` (FE repo) hotový — mongodump+gzip, retence, integrita, disková pojistka. Chybí `schedule:`, off-site upload; **obnova nikdy netestována**; záloha leží na disku, který měl incidenty 07/2026.
-**Rozhodnuto:** cíl = **Backblaze B2** (S3-kompatibilní, pro naše objemy ~zdarma, rclone nativně).
-**Kroky:** ① uživatel založí B2 bucket + klíče (~30 min) · ② rclone krok + `schedule:` denně ~04:00 · ③ retence 7 denních + 4 týdenní · ④ **restore drill**: jedna zkušební obnova `mongorestore` na lokální instanci (runbook §6 ji vyžaduje) · ⑤ do runbooku zapsat postup obnovy s časy.
+**✅ Implementováno a ověřeno (spec [spec-23.1](arch/phase-23/spec-23.1.md)):** `db-backup.yml` — denní cron 02:00 UTC + rclone upload do **Backblaze B2** (bucket `projekt-ikaros-backups`, EU, SSE, lifecycle last-version; klíče jen v GitHub secrets, na serveru nic) · retence 7 denních (`daily/`) + 4 týdenní (`weekly/`, nedělní server-side kopie) + 5 lokálních · **restore drill = nový `db-restore-drill.yml`** (měsíčně + ručně): obnova do čistého mongo:7 v runneru + verifikace počtů + hlídání stáří zálohy < 48 h · selhání i úspěch → Discord (`DISCORD_ALERT_WEBHOOK`). **První ostrý běh + drill 2026-07-19 zelené:** 110 kolekcí / 43 127 dokumentů, download ~10 s, restore ~7 s; postup obnovy s časy v runbooku §6. Zbývá jen pasivně: ráno po prvním nočním cronu mrknout do Actions, že běžel sám.
 **Pozn.:** mongodump kryje jen DB — `uploads-data` volume a Meili ne; média primárně na Cloudinary (off-site z podstaty), Meili se reindexuje. Vědomé, jen to vědět.
 
-### - [ ] 23.2 Externí uptime monitoring — [dopad vysoký · náklad nulový]
+### - [x] 23.2 Externí uptime monitoring — [dopad vysoký · náklad nulový] ✅ 2026-07-19
 **Cíl:** Nezávislá služba hlídá FE doménu + `GET /api/health` a píše do Discordu.
 **Proč:** Vnitřní monitoring (Discord alerty, heartbeat, 5xx, brute-force, disk, RSS) je nadprůměrný, ale neumí ohlásit vlastní smrt; heartbeat kryje s latencí až 24 h.
-**Kroky:** UptimeRobot free (nebo obdoba) — 2 monitory, notifikace do stejného Discord webhooku. **Akce uživatele** (~15 min).
+**✅ Hotovo:** **HetrixTools free** (ne UptimeRobot — free tier má Discord/webhooky za paywallem + ToS od 10/2024 zakazuje komerční užití): 2 monitory à 1 min ze 4 EU lokací (Amsterdam/London/Frankfurt/Warsaw, trigger 50 %+1) — `Ikaros API health` = `/api/health` s keyword checkem `"status":"ok"` (chytá i `degraded`, který vrací HTTP 200) · `Ikaros FE` = root. Notifikace → Discord webhook „Uptime" (kanál ops alertů), test doručen. Detaily v runbooku §9 (BE repo).
 
-### - [ ] 23.3 E-maily do produkce — ověřit a dotáhnout — [dopad vysoký · náklad malý] *(překlopeno z 14.8, část SMTP; dluh PC-02)*
+### - [x] 23.3 E-maily do produkce — ověřit a dotáhnout — [dopad vysoký · náklad malý] *(překlopeno z 14.8, část SMTP; dluh PC-02)*
 **Cíl:** Reset hesla a ověřovací maily reálně chodí.
 **Stav:** kód kompletní (SMTP provider, Mongo outbox, denní cap 400, priorita reset hesla, retry/backoff). Nasazení vars možná už proběhlo — **ověřit prakticky**.
 **Kroky:** ① test „Zapomenuté heslo" na reálný mail · ② pokud nechodí: GitHub env production vars `SMTP_HOST/PORT/USER/MAIL_FROM` + secret `SMTP_PASS`, deploy, retest · ③ ověřit `FRONTEND_URL` (jinak odkazy do localhost) · ④ `MAIL_FROM` vlastní doména ⇒ SPF/DKIM/DMARC DNS, jinak spam.
 
 ### - [ ] 23.4 Error tracking reálně zapnutý — [dopad vysoký · náklad malý]
 **Cíl:** Pády testerů vidíme, i když je nenahlásí (většina nenahlásí — mlčky odejdou).
-**Stav:** FE @sentry/react i BE hooky gated na DSN; bez něj no-op.
-**Kroky:** ověřit SENTRY_DSN/GlitchTip v produkci (je co vidět v dashboardu?); pokud ne → Sentry free tier (5k eventů/měs. stačí), DSN do env FE+BE, testovací error.
+**Stav:** kód KOMPLET (spec 23.4, 2026-07-19): FE+BE `beforeSend` scrubber (LH-13 — jinak by JWT/hesla egresovala) + CSP `connect-src` `${SENTRY_HOST}` odvozený v deployi z DSN (jinak by enforce CSP eventy tiše zahodila). **Zbývá ops (uživatel):** Sentry free tier **EU region**, 2 projekty → FE var `VITE_SENTRY_DSN` + BE secret `SENTRY_DSN`, deploy FE+BE, testovací error dle runbooku §10.
 
 ### - [ ] 23.5 Refresh token v produkci (sliding session) — [dopad vysoký · náklad malý]
 **Cíl:** Tester není po ~3 dnech nečekaně odhlášen.

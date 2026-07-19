@@ -84,7 +84,11 @@ Odchytí i to, co interní monitoring nevidí (celý server/proxy dole).
 - **Komunitní oznámení** — nový svět / postava → `DISCORD_EVENTS_WEBHOOK` (`94197e3`).
 - Env vše zadrátováno do `deploy.yml` + compose (`350eb40`, `7765de1`). Log rotace (LH-05). Webhooky živě OK (204).
 **Zbývá (JEN tvoje infra/akce):** GitHub secrety `DISCORD_*`/`SENTRY_DSN` · GlitchTip instance → DSN ·
-UptimeRobot účet (externí dead-man switch) · commit FE + `VITE_SENTRY_DSN` · deploy.
+commit FE + `VITE_SENTRY_DSN` · deploy.
+- **Externí uptime ✅ (23.2, 2026-07-19)** — HetrixTools free (NE UptimeRobot: Discord/webhooky za
+  paywallem + ToS zákaz komerčního užití). 2 monitory à 1 min / 4 EU lokace / trigger 50 %+1:
+  `/api/health` s keywordem `"status":"ok"` (kryje i degraded = HTTP 200) + FE root. Alerty →
+  Discord webhook „Uptime". Detaily: BE `docs/ops-runbook.md` §9.
 
 ## Incident-response runbook (co dělat, když to hoří)
 

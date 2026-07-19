@@ -1,0 +1,21 @@
+# Chybový deník — oblast: ops (provoz, zálohy, monitoring, CI)
+
+Detailní záznamy. Index: [README.md](README.md).
+
+---
+
+### ✅ ŘEŠENÍ — 23.1 zálohy s off-site cílem + automatizovaný restore drill · 2026-07-19
+**Co nakonec zabralo:** `db-backup.yml` rozšířen o denní cron (02:00 UTC) + rclone upload server→B2 přímo; klíče tečou z GitHub secrets přes SSH **stdin** jako `RCLONE_CONFIG_B2_*` env (printf exports + quoted heredoc pipnuté do `ssh bash -s`) → na serveru žádný secret, nic v argv. Retence v B2 `--min-age` + `--b2-hard-delete` (B2 jinak soubory jen skrývá a účtuje) + bucket lifecycle „keep last version" jako pojistka. Test obnovy NE jednorázově, ale **trvalý workflow** `db-restore-drill.yml` (měsíčně): nejnovější záloha z B2 → čistý `mongo:7` v runneru → verifikace počtů kolekcí/dokumentů + hlídání stáří zálohy < 48 h (drill tak zároveň hlídá, že cron žije). Fail-fast krok bez B2 konfigurace (záloha bez off-site nesmí být zelená).
+**Proč to je správně (a ne další variace):** jednorázový „otestoval jsem obnovu" degraduje s časem — drill jako cron dává trvalou evidenci (červený signál 28.1 „neověřený restore" má automatickou kontrolu). Přímý upload server→B2 (ne přes runner) = data tečou jednou. Env-var config rclone řeší „žádné secrets na serveru" bez kompromisu.
+**Jak ověřeno:** YAML parse (js-yaml) + `bash -n` extrahovaného SSH skriptu předem; pak ostrý běh: první záloha v B2 `daily/` (shoda velikostí lokál/B2) + zelený drill — 110 kolekcí / 43 127 dokumentů, download ~10 s, restore ~7 s + 🟢 Discord souhrn. Fail-fast krok se sám potvrdil: první run spadl na chybějící secrets (uživatel je vkládal jinam), po doplnění zeleno.
+**Zhodnocení:** zabralo napoprvé (jediný zádrhel = secrets v UI, což pojistka chytila přesně dle návrhu). Zbývá pasivní kontrola: ráno po prvním nočním cronu mrknout do Actions; časy zapsány do runbooku §6 (BE `507e303`).
+
+---
+
+### ✅ ŘEŠENÍ — 23.4 error tracking: 2 skryté blockery před zapnutím DSN · 2026-07-19
+**Co nakonec zabralo:** karta vypadala jako čistě ops úkol („jen nastav DSN"), ale recon před zapnutím našel 2 věci, které by tracking rozbily/otrávily: ① **LH-13** (z full-auditu 07-11) — FE `Sentry.init` bez `beforeSend`: axios error nese `config.headers.Authorization` (JWT) + `config.data` (heslo na loginu) → v okamžiku zapnutí DSN by citlivá data egresovala do agregátoru; ② **CSP** — `connect-src` neznal Sentry ingest host → enforce CSP by envelope requesty **tiše zahodila** a dashboard by zůstal prázdný při zdánlivě zapnutém trackingu. Fix: rekurzivní scrubber (`authorization/cookie/password/token/secret/api[-_]?key` → `[scrubbed]`) v FE `monitoring.ts` i BE `main.ts` + `${SENTRY_HOST}` v CSP šabloně odvozený v deployi z `VITE_SENTRY_DSN` (stejný vzor jako `BACKEND_HOST` z `VITE_API_URL`).
+**Proč to je správně:** scrubber PŘED prvním eventem (ne po incidentu); CSP host z DSN = jeden zdroj pravdy, prázdný DSN → prázdná substituce → nulový dopad. Bare host (bez `https://` prefixu v šabloně) — prázdná hodnota nezanechá invalidní `https://` token v policy.
+**Jak ověřeno:** BE typecheck+lint zeleně, FE build zeleně; ostrý test (event v dashboardu + Network tab envelope + kontrola scrubbed polí) čeká na DSN od uživatele — postup v runbooku §10.
+**Zhodnocení:** dobře — „hodinový ops task" měl 2 miny, obě našel statický recon před zapnutím (žádné cyklení na „proč je dashboard prázdný"). Poučení: u „jen zapni službu X" karet vždy zkontrolovat CSP/egress cestu a co poteče ven.
+
+---

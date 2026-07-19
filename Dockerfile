@@ -40,10 +40,12 @@ COPY --from=build /app/dist /usr/share/nginx/html
 #   BACKEND_HOST → prázdný (compose ho dodá z VITE_API_URL).
 COPY default.conf.template /etc/nginx/templates/default.conf.template
 # 15B.1 — + PRERENDER_HOST (host:port prerender sidecaru pro upstream).
-ENV NGINX_ENVSUBST_FILTER="^(BACKEND_HOST|CSP_HEADER_NAME|PRERENDER_HOST)$" \
+# 23.4 — + SENTRY_HOST (ingest host pro CSP connect-src; prázdný = tracking vypnutý).
+ENV NGINX_ENVSUBST_FILTER="^(BACKEND_HOST|CSP_HEADER_NAME|PRERENDER_HOST|SENTRY_HOST)$" \
     CSP_HEADER_NAME="Content-Security-Policy" \
     BACKEND_HOST="" \
-    PRERENDER_HOST="prerender:3000"
+    PRERENDER_HOST="prerender:3000" \
+    SENTRY_HOST=""
 
 EXPOSE 80
 

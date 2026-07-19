@@ -56,6 +56,15 @@ jobs:
           HOST=$(printf '%s' "${{ vars.VITE_API_URL }}" | sed -E 's#^[a-z]+://##; s#/.*$##')
           echo "host=$HOST" >> "$GITHUB_OUTPUT"
 
+      # 23.4 — SENTRY_HOST pro nginx CSP (connect-src): holý ingest host odvozený
+      # z VITE_SENTRY_DSN (jeden zdroj pravdy) — strip schématu + klíče (user@) + cesty.
+      # Prázdný DSN → prázdný host → CSP beze změny (tracking vypnutý).
+      - name: Derive SENTRY_HOST from VITE_SENTRY_DSN
+        id: sentry
+        run: |
+          HOST=$(printf '%s' "${{ vars.VITE_SENTRY_DSN }}" | sed -E 's#^[a-z]+://##; s#^[^@]*@##; s#/.*$##')
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+
       - name: Create .env file on server
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "cat > ${{ env.DEPLOY_PATH }}/.env << 'EOF'
@@ -64,6 +73,7 @@ jobs:
           VITE_TURNSTILE_SITE_KEY=${{ vars.VITE_TURNSTILE_SITE_KEY }}
           VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}
           BACKEND_HOST=${{ steps.backend.outputs.host }}
+          SENTRY_HOST=${{ steps.sentry.outputs.host }}
           CSP_HEADER_NAME=${{ vars.CSP_HEADER_NAME }}
           EOF"
 
