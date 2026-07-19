@@ -15,8 +15,12 @@ import { useEffect, type RefObject } from 'react';
  * Escape ZÁMĚRNĚ neřeší — každý konzument má vlastní close (atom / state /
  * onClose prop). Hook je čistě o fokusu, ať je zodpovědnost jednoznačná.
  */
+// `[contenteditable]` je tu záměrně: rich-text editory (TipTap) jsou fokusovatelné
+// contentEditable divy, ne <input>/<textarea>. Bez nich by trap kolem overlaye s
+// editorem „prosakoval" (Tab z editoru unikl mimo). `:not([contenteditable="false"])`
+// vyřadí read-only editory (TipTap při readOnly nastavuje false).
 const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [contenteditable]:not([contenteditable="false"]), [tabindex]:not([tabindex="-1"])';
 
 export function useFocusTrap<T extends HTMLElement>({
   active,

@@ -2300,3 +2300,29 @@ Tester: „log pořád průhledný a stále jsi je neudělal — pro každý ski
 **Řešení:** doc už seznam **neduplikuje** — odkazuje na kód jako zdroj pravdy + kontrola před během. Doplnit dnešní stav by dluh jen odložil o měsíc.
 
 **Zhodnocení — DOBŘE:** (1) obojí míří na kořen (vynucení místo čísla v dokumentu; jeden zdroj pravdy místo kopie) — dnešek ukázal třikrát, že *dokument, který nikdo nevynucuje, se rozejde s realitou a pak lže*; (2) guard testován proti reálnému `dist` i s `--print`; (3) hláška učí, ne jen soudí. **Zbývá:** rerun orphan-scanu proti Mongu s plným seznamem (potřebuje běžící DB).
+
+---
+
+## ✅ ŘEŠENÍ — D-17.8-A11Y-BACKLOG přeorán: `useFocusTrap` má test + dvě „mezery" byly mylné — 2026-07-18
+
+Dluh chtěl smazat, ale 3 ze 4 částí jsou legitimně blokované (D-033 + živý test) → smazat nelze. Co šlo bezpečně a úplně: **test primitivu `useFocusTrap`** (`shared/ui/useFocusTrap.spec.ts`, 12 případů — fokus dovnitř / Tab cyklus / návrat fokusu / Escape no-op; 12/12 zelené). Dluh to sám značil jako mezeru („primitiv uvězňující fokus bez testu").
+
+**⚠️ Poučení proti budoucí regresi:** dluh naváděl přidat focus trap do `TokenInfoPanel` a `ChatContextRail` — **oba jsou ZÁMĚRNĚ nemodální** (`TokenInfoPanel` komentář: *„modal blokoval mapu… mapa pod kartou zůstává interaktivní"*; `ChatContextRail` = trvalý sloupec u chatu). Trap tam = **regrese** (uvězní fokus, znemožní ovládat mapu/psát do chatu), ne oprava. Kdo to bude jednou dělat: trap patří **jen** do skutečného modalu (`MapNotebookOverlay` + mobilní drawery `WorldChatRoom`, podmíněně breakpointem) — a jen s živým mobilním/mapovým testem. IconButton adopce z dluhu **vyřazena** (HANDOFF.md 17.8 v1: vědomě nemigrovat, není a11y problém).
+
+**Zhodnocení — DOBŘE:** (1) ověření proti HEAD chytilo, že 2 z 4 „mezer" jsou naopak správný design → neudělal jsem naslepo regresi, kterou dluh doslova doporučoval; (2) uzavřel jsem přesně tu jednu část, co jde bez živého testu (pojistka primitivu), zbytek nechal blokovaný a **přepsal dluh na realitu** místo smazání. **Zhodnocení — co dál:** dluh smazatelný až po D-033 + živém testu modálních overlayů — pak už zbývá jen doplnit trap do 2 modalů.
+
+---
+
+## ✅ ŘEŠENÍ — D-17.8-A11Y bod 4: focus trap do modálních overlayů naimplementován + otestován — 2026-07-18
+
+Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementováno, vyřeš to kódem" → focus trap do 2 skutečných modalů **naimplementován a doložen testy** (ne odkázán na živý test).
+
+**Co se udělalo:**
+- `useFocusTrap` selektor rozšířen o `[contenteditable]:not([contenteditable="false"])` — bez toho trap kolem TipTap editoru „prosakoval" (Tab z contentEditable není `<input>`/`<textarea>`, hook ho neviděl → fokus unikl mimo). Bezpečné pro 6 stávajících konzumentů (contenteditable není form field → initial focus beze změny, jen přibude do Tab cyklu).
+- `MapNotebookOverlay` (mapa) — `useFocusTrap` + `aria-modal` + `tabIndex={-1}`. **Klíčové ověření předem:** notebook nemá Table extension (`enableTable=false`) → StarterKit nebinduje Tab → žádný konflikt trap × ProseMirror keymap. To byl důvod, proč to dluh značil „nedělat naslepo" — ověřeno v `extensions.ts`, ne odhadnuto.
+- Mobilní chat drawery (`WorldChatRoom`) — nový `useMediaQuery('(max-width: 1024px)')` gatuje trap JEN v šuplíkovém režimu (na desktopu jsou sidebar/rail trvalé sloupce — trap by je zamkl). Sidebar má přednost před railem (jinak by se dva document-level Tab handlery praly). `role=dialog`/`aria-modal`/Escape jen na mobilu.
+- Testy: `useFocusTrap.spec.ts` 14 (vč. contenteditable), `MapNotebookOverlay.test.tsx` 6 (trap wrap obousměrně, aria-modal, Escape→onClose, focus restore), `useMediaQuery.spec.ts` 5 (breakpoint, resize, cleanup, SSR).
+
+**Past chycená testem:** `useMediaQuery` guard `'matchMedia' in window` prošel i pro `window.matchMedia = undefined` (operátor `in` testuje klíč, ne hodnotu) → `TypeError` při SSR/starém prohlížeči. Zpřísněno na `typeof window.matchMedia === 'function'` (robustnější než původní idiom v `useCoarsePointer`).
+
+**Zhodnocení — DOBŘE:** (1) initial-focus concern z dluhu (TipTap → fokus na křížek) vyřešen konzistencí s `Modal` (bez form pole taky fokusuje křížek), ne vymýšlením křehkého editor-autofocusu s TipTap-ready race — méně kódu, míň rizika; (2) breakpoint gate = jedna appka, dvě chování (sloupec vs. šuplík) korektně odděleno JS media query sladěnou s CSS; (3) SSR past chycena testem před nasazením. **Zbývá:** dluh smazatelný až padne D-033 (Storybook axe) — jediná otevřená položka; živá kontrola mobilu/mapy = běžný krok uživatele. Build ✓ eslint ✓ nové testy 25/25 ✓.

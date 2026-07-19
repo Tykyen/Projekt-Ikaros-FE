@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Spinner } from '@/shared/ui';
+import { Spinner, useFocusTrap } from '@/shared/ui';
+import { useMediaQuery } from '@/shared/lib/useMediaQuery';
 import { WorldRole } from '@/shared/types';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { useWorldContext } from '@/features/world/context/WorldContext';
@@ -113,6 +114,31 @@ export function WorldChatRoom() {
     if (railOpen) localStorage.setItem(membersKey, '1');
     else localStorage.removeItem(membersKey);
   }, [railOpen, membersKey]);
+
+  // 17.8 / D-17.8-A11Y — sidebar a rail jsou na desktopu trvalé sloupce, ale pod
+  // 1024px (viz .module.css) se mění na modální šuplíky přes scrim. JEN v tom
+  // režimu je smysl uvěznit fokus (na desktopu by trap zamkl fokus v pořád
+  // viditelném sloupci). Sidebar má přednost — když je otevřený, rail trap
+  // vypneme, ať se dva document-level Tab handlery nervou.
+  const isNarrow = useMediaQuery('(max-width: 1024px)');
+  const sidebarSlotRef = useRef<HTMLDivElement | null>(null);
+  const membersSlotRef = useRef<HTMLDivElement | null>(null);
+  const sidebarDrawer = isNarrow && sidebarOpen;
+  const railDrawer = isNarrow && railOpen && !sidebarOpen;
+  useFocusTrap({ active: sidebarDrawer, containerRef: sidebarSlotRef });
+  useFocusTrap({ active: railDrawer, containerRef: membersSlotRef });
+
+  // Escape zavře otevřený šuplík (parita s klikem na scrim; jen mobil).
+  useEffect(() => {
+    if (!isNarrow || (!sidebarOpen && !railOpen)) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setSidebarOpen(false);
+      setRailOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isNarrow, sidebarOpen, railOpen]);
   const [groupDialog, setGroupDialog] = useState<{
     mode: 'create' | 'edit';
     initial?: ChatGroup;
@@ -281,7 +307,14 @@ export function WorldChatRoom() {
       data-chat-skin={chatSkin.skin}
       style={chatSkinStyle}
     >
-      <div className={s.sidebarSlot}>
+      <div
+        className={s.sidebarSlot}
+        ref={sidebarSlotRef}
+        tabIndex={-1}
+        role={sidebarDrawer ? 'dialog' : undefined}
+        aria-modal={sidebarDrawer || undefined}
+        aria-label={sidebarDrawer ? 'Kanály' : undefined}
+      >
         <ChannelSidebar
           worldId={worldId}
           groups={groupList}
@@ -338,7 +371,14 @@ export function WorldChatRoom() {
       </div>
 
       {active && (
-        <div className={s.membersSlot}>
+        <div
+          className={s.membersSlot}
+          ref={membersSlotRef}
+          tabIndex={-1}
+          role={railDrawer ? 'dialog' : undefined}
+          aria-modal={railDrawer || undefined}
+          aria-label={railDrawer ? 'Postranní panel' : undefined}
+        >
           <ChatContextRail
             worldId={worldId}
             channel={active}

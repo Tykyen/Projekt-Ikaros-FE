@@ -2,7 +2,7 @@
 
 > Soubor obsahuje **pouze otevřené a odložené** dluhy.
 > Historie uzavřených dluhů dohledatelná v git logu (`git log --all -- docs/dluhy.md`).
-> Stav k **2026-07-17**. Vyřešené se **mažou** (historie v git logu + chybový deník ✅ ŘEŠENÍ): 16. 7. D-064/D-065/D-067; 17. 7. undo `scene.image`, `npm audit` kritické, `chatSkin` gate (rozhodnuto: prémiové motivy nebudou), a **7 z 8 „🔴" v D-AUDIT** (byly opravené už od 12.–13. 7., jen to nikdo nezapsal — viz CH-081).
+> Stav k **2026-07-19**. Vyřešené se **mažou** (historie v git logu + chybový deník ✅ ŘEŠENÍ): 16. 7. D-064/D-065/D-067; 17. 7. undo `scene.image`, `npm audit` kritické, `chatSkin` gate (rozhodnuto: prémiové motivy nebudou), a **7 z 8 „🔴" v D-AUDIT** (byly opravené už od 12.–13. 7., jen to nikdo nezapsal — viz CH-081); 18. 7. **D-DATA-SYNC-ZBYTKY (a)** — legacy HTTP route `GET /characters/directory` + import `OptionalJwtAuthGuard` smazány (část b = herní sémantika HP mapování přesunuta do **Odložené** jako `D-HP-MAP-SYSTEMS`); 19. 7. **D-DROBNE-2026-07-13** rozpuštěno — DrdPlus injury strop 3×mez zavřen jako **kosmetika/WONTFIX** (ověřeno proti HEAD: TM panel `DrdPlusBestiePanel:125` už deltu posílá; „bonus" chat nález je slepý — chat bestie = **combatant**, nemá `injuryDelta` cestu vůbec, celý `systemStats` patch je last-write-wins jako u všech combatant editů → sladění jen injury neúměrné, zásahy se navíc neztrácejí), HP-deník lost-update přesunut do **Odložené** jako `D-DIARY-HP-DELTA`; 19. 7. **D-SEC-GAP-2026-07-11 rozpuštěn** (byl to sběrný kontejner na 7 nesouvisejících položek, nešel řešit jako celek) → **Account-enumeration odepsán** (`{available}` prozrazuje existenci účtu **by design**, throttle 10/min je jediná možná mitigace a je nasazen — nic k udělání), **Erasure obsahu zpráv** sloučeno pod trigger [[D-063]] (advokát/spolek), zbytek rozštěpen na samostatné dluhy: `D-SENTRY-DSN` (Otevřené, akce uživatele), `D-NAMESORT` (Otevřené BE), `D-FE-ERROR-STATES` (Otevřené FE), `D-ECON-FLOAT-MIGRACE` + `D-MEILI-CZ` (Odložené).
 >
 > ⚠️ **Než něco z tohoto souboru začneš řešit, ověř to proti HEAD.** Dnešek (CH-079→CH-081) ukázal, že popisy dluhů systematicky **podceňují i nadceňují** rozsah a že položky mohou být dávno hotové. Report z auditu je snímek v čase, ne stav; **zdroj pravdy je kód**.
 
@@ -16,52 +16,39 @@
 **Dopad:** Vysoký (blokuje **veřejné spuštění**) — GDPR čl. 13 vyžaduje totožnost správce, DSA čl. 11/12 kontaktní místa; bez nich nelze web pustit veřejně. NEblokuje implementaci ani beta.
 **Řešení:** Až uživatel/advokát dodá údaje spolku, nahradit všechny `[DOPLNIT]` (grep `dopisat` / `DOPLNIT`), potvrdit seznam zpracovatelů a u každé US služby uvést DPF/SCC. Poté bumpnout verzi dokumentů.
 **Kdy:** Před veřejným spuštěním (spolek se teprve zakládá). Součást Přílohy C (20.1–20.3). **Blokováno na vstupu uživatele/advokáta.**
+**⤷ Sloučeno sem (stejný trigger):** plná **content-erasure zpráv** — dnes se při mazání účtu odstraní PII, ale **autorství + obsah zpráv zůstávají** (`users.repository.ts:266-300` drží `username/usernameLower/displayName`, tombstone `'Smazaný účet'` je jen zobrazovací vrstva v `users.service.ts:180`). ROZHODNUTO 2026-07-17 držet dnešní stav; plná content-erasure = právní rozhodnutí → otevře se **s advokátem u zakládání spolku**, stejný trigger jako výše.
 
 ---
 
-### D-17.8-A11Y-BACKLOG — Přístupnost: odložené vrstvy nad rámec 17.8 v1
-Zbývá (nízká priorita, vyžaduje živou kontrolu):
-- **IconButton adopce** — ~16 ručních `<button>+lucide` (chat: `ChannelItem/Group/View`, `EmoteCard`, rail `*Panel`…) má aria-label, ale neadoptovalo primitiv. Čistě konzistenční refactor; POZOR `IconButton .iconBtn` = ghost/transparent styl → migrace MĚNÍ vzhled → nutný `mobil-desktop` per skin, ne slepě.
-- **Storybook axe** (`.storybook/preview.tsx`) — zůstává `test:'todo'`. Přepnutí na `error` je **no-op**, dokud jsou storybook component testy mimo `vitest run` (D-033, ESM/CJS race) → axe se v CI nespouští. Trigger: browser-mode axe v CI (vyřešení D-033) + ověřená čistota 14 stories.
-- **Focus trap do in-app overlayů** — ověřeno 2026-07-17: `useFocusTrap` (`shared/ui/useFocusTrap.ts`) opravdu **je připravený** a živý (6 konzumentů vč. `Modal`), API `{active, containerRef}`, Escape záměrně neřeší. ⚠️ **Nemá ale jediný test** — u primitivu, který uvězňuje fokus, je to samo o sobě mezera. Stav overlayů (dluh tvrdil, že dva mají Escape): `WorldChatRoom` mobilní sidebar **nemá nic** (trap/dialog/Escape) · `ChatContextRail` **nemá nic** · `MapNotebookOverlay` má `role=dialog`+Escape, chybí trap/restore · `TokenInfoPanel` má `role=dialog`, **Escape nemá** (dluh tvrdil opak). **Odloženo:** vyžaduje živý mobilní/mapový test (trap ve špatně posouzeném kontextu zhorší UX), proto ne naslepo.
-**Dopad:** Nízký — základní a11y funguje, hlídá lint. Roadmap 17.8 značené 🔁 (průběžné).
-**Kdy:** IconButton+overlaye při příští práci na daných plochách (s `mobil-desktop`); axe s D-033.
+### D-SENTRY-DSN — Error telemetrie: kód hotový, chybí DSN v GitHubu
+*(dřív součást D-SEC-GAP, „akce uživatele")*
+**Soubory:** FE `src/shared/ui/GlobalErrorBoundary.tsx` + `src/shared/lib/monitoring.ts` (ověřeno 2026-07-19: kód existuje); BE Sentry/GlitchTip boundary + unhandled + 5xx + non-HTTP výjimky.
+**Stav:** BE+FE Sentry/GlitchTip kód **kompletní**, deploy řetěz protažený. Zbývá jediné: nastavit `SENTRY_DSN` (BE secret) + `VITE_SENTRY_DSN` (FE var) v GitHub. Bez DSN telemetrie tiše neposílá.
+**Trigger:** teď / před spuštěním. **Blokováno na akci uživatele** (přístup do GitHub secrets/vars).
 
 ---
 
-### D-DATA-SYNC-ZBYTKY — zbytky po D-NEW-INV-DATA-SYNC (2026-07-12)
-**Soubory:** BE `characters/characters.repository.ts` + controller (legacy directory), `maps/operations/token-hp-diary-map.ts` (sync mapa).
-**Problém:** (a) legacy `GET /worlds/:id/characters/directory` žil vedle Pages directory (dvojí zdroj); (b) token→deník HP sync přeskočen u systémů s nejednoznačným mapováním: shadowrun (odvozenina `sr_attr_bod`+`sr_cond_phys`), fae/fate (stress boxy = pole), drdplus (pásma zranění), drd2 (3 zdroje) + pole `systemStats`/`injury`/`initiative` (nemají v deníku domov).
-**Dopad:** Nízký/střední — (a) už jen mrtvá HTTP route na BE; HP z mapy se u 5 systémů nepropíše (chování jako dřív).
-**Řešení:** (a) FE migrace `useCharacterDirectory` → Pages directory ✅, pak smazat legacy endpoint; (b) per-system rozhodnutí mapování (produktové — jak má HP z mapy zapisovat do stress boxů / pásem).
-**Stav (a) 2026-07-13 — FE MIGROVÁNO, zbývá smazat legacy route po živém ověření.** BE doplnil: `characterId: string | null` v pages directory entry (z `characterRef`; entry.id zůstává page ID — past `directory_id`) + `OptionalJwtAuthGuard` a `assertCanViewWorld` vždy (anonym: veřejný svět 200, privátní 403 — parita s legacy `assertCanViewDirectory`). FE: `useCharacterDirectory` = adapter nad `GET /pages/directory?type=Postava hráče,NPC,Lokace` se STEJNÝM výstupním tvarem (`id`=**characterId** → finance selecty v `SettingsAccountSection` bezpečné; `userId`=`ownerUserId` → oživena dřív mrtvá sekce „Tvé postavy" v `MapEmptyState` — legacy `userId` nevracel) i queryKey (`charactersQueryKey.directory` → C-15 invalidace z useCreate/Update/DeletePage + useCharacterMutations beze změny); všech 9 call-sites nedotčeno; testy `useCharacterDirectory.spec.tsx`. **Zbývá:** po ověření na živém webu smazat BE `GET /worlds/:id/characters/directory` HTTP route (interní `characters.service.getDirectory` pro `chat.service` enrich ZŮSTÁVÁ).
-**Ověřeno 2026-07-17 (grep FE `src` + `e2e` + BE `src` + `test`):** legacy route má **nula callerů** — `useCharacterDirectory.spec.tsx:121` dokonce negativně asertuje `not.toContain('/characters/directory')`. Ke smazání přesně: `characters.controller.ts:71-92` + import `OptionalJwtAuthGuard` (`:19`, route je jeho jediný uživatel). ⚠️ **`findDirectory` (repo) ani `characters.service.getDirectory` smazat NELZE** — visí na nich enrich portrétů v `chat.service:320`; dřívější formulace v `docs/funkce/12` („route + `findDirectory` se smaže") byla nepřesná, opraveno. **Podmínka:** nasazený FE bundle už musí být ten s adapterem (commit `368d3c78`+), jinak starý bundle dostane 404 — viz [[fe_deploy_stale_bundle]].
-**Pozn. k (b) — mapování by dnes bylo mrtvý kód:** sync se spouští jen z `map-operations.service:798` (ne-bestie token + `patch.currentHp|maxHp`) a **jediný FE producent** `patch.currentHp` pro PC/NPC je `TokenSystemSheet.tsx:429` (matrix) — a `matrix` namapovaný **je**. Pro chybějící 4 rodiny žádný caller neexistuje → doplnit až s callerem. Komentář „zrcadlo FE `resolveCharacterHp`" v `token-hp-diary-map.ts` opraven (FE mezitím ty rodiny doplnil, BE je zapsat neumí = asymetrie čtení/zápis).
-**Kdy:** (a) BE smazání route po živém ověření uživatelem; (b) až vznikne FE caller + padne rozhodnutí o herní sémantice (SR: fyzický vs. omračovací track? DrdPlus: `currentHp=0` → `val=mez` nebo `3×mez`? fae/fate: který stres box? drd2: který ze 3 zdrojů?).
-
-### D-DROBNE-2026-07-13 — drobné follow-upy z noční dávky
-- **Souběžné HP úpravy PC přes deník** — ⚠️ **wording opraven 2026-07-17:** repo zápis `updateWithCustomDataPatch` (`character-diary.repository.ts:61-85`) je **atomický `findOneAndUpdate`** s flat `$set` — read-modify-write to na serveru NENÍ. Skutečná příčina: **neexistuje server-side delta cesta pro deník**, hodnota přiletí jako absolutní, spočítaná na klientovi ze stale cache (`GurpsCombatPanel` → `{gurps_hp:'7'}` apod.) → dva souběžné zásahy = last-write-wins. Bestie to mají vyřešené (`applyTokenDelta`, aggregation pipeline + race e2e). **Blokováno rozhodnutím:** generický `customDataDelta` (naráží na string hodnoty + JSON pole → nutná schema-driven typová brána) vs. jen HP klíče (úzké, bezpečné) vs. dodělat D-073 `expectedUpdatedAt` (dnes half-wired: `updatedAt` se vrací, ale nikde neověřuje).
-- **DrdPlus injury strop 3×mez pod souběhem** — mez žije v `systemStats`, BE ji nezná (`injuryDelta` DTO ji nenese) → clamp jen dolní (`map-operations:1611`), souběh strop mírně přeteče (zásahy se neztrácejí). **Blokováno rozhodnutím:** klientem poslaný strop (XS, ale porušuje server-authoritativní princip stylu 46) vs. BE si mez načte ze `systemStats` (M) vs. nechat (kosmetické). ⚠️ **Bonus nález:** `DrdPlusChatBestiePanel.tsx:143` posílá **absolutní** `injury`, ne deltu → lost-update fix z `DrdPlusBestiePanel:125` chat panel minul.
-**Dopad:** Nízký. **Kdy:** příležitostně při práci na daných plochách.
+### D-NAMESORT — Řazení českých názvů: „Čáp" až za „Zebra" v 8 katalozích (BE)
+*(dřív součást D-SEC-GAP; ROZHODNUTO 2026-07-17, 0 implementace k 2026-07-19)*
+**Soubory:** BE katalogové repozitáře/agregace 8 kolekcí (bestiae, spells, items, potions, plants, pricelists, riddles, namesets); collation dnes v BE **nikde** (0 výskytů `nameSort` v celém repu).
+**Stav:** binární pořadí z Monga je finální (FE obchod nad katalogy neexistuje) → diakritika řadí za ASCII. **Řešení: `nameSort`** — denormalizovaný lowercase+ASCII-fold klíč + běžný index.
+⚠️ **Proč ne Mongo `cs` collation** (ač „správnější"): index s jinou collation nejde použít **ani pro string filtr** → `.collation()` bez collation-indexů shodí `{status:1,kind:1}` z plánu = COLLSCAN na komunitních katalozích.
+⚠️ **`users.usernameLower` z dávky VYJMOUT** — unique index, collation mění co je duplicita (`capek` vs `čapek`): build může spadnout + mění registrační pravidla.
+💡 **Bonus:** 6 z 8 kolekcí dnes sortuje `name` **bez indexu** → 32 MB in-memory sort limit hrozí už teď.
+**Trigger:** teď (rozhodnuto, ohraničeno) / první výkonový zátah. **Co bude potřeba:** přidat `nameSort` do 8 schémat + toEntity, index, backfill migrace existujících dokumentů, přepnout `.sort({name})` → `.sort({nameSort})`.
 
 ---
 
-### D-SEC-GAP-2026-07-11 — bezpečnostní/compliance nálezy čekající na rozhodnutí nebo infra krok
-**⭐ ROZHODNUTÍ UŽIVATELE:**
-- **Erasure: `content` zpráv + `username` tombstone** — plná content-erasure = právní rozhodnutí. **ROZHODNUTO 2026-07-17: držíme dnešní stav** (PII pryč, autorství + obsah zpráv zůstávají) a otevře se až s advokátem u zakládání spolku — stejný trigger jako [[D-063]]. Dnešek: `users.repository.ts:266-300` zachovává `username/usernameLower/displayName`, tombstone `'Smazaný účet'` je jen zobrazovací vrstva (`users.service.ts:180`).
-- **Account enumeration** přes `/auth/check-email`/`check-username` — throttle 10/min/IP potvrzen (`auth.controller.ts:153,165). ⚠️ Formulace „konstantní response" byla **nepřesná**: endpoint z podstaty vrací `{ available: boolean }`, takže existenci účtu **prozrazuje by design** — jediná mitigace je throttle. Redesign = otevřít, až bude registrace bolet jinak.
-**⚙️ AKCE UŽIVATELE (kód hotový, zbývá nastavení):**
-- **Error telemetrie** — BE+FE Sentry/GlitchTip kód kompletní (boundary, unhandled, 5xx, non-HTTP výjimky) a deploy řetěz protažený; zbývá nastavit `SENTRY_DSN` (BE secret) + `VITE_SENTRY_DSN` (FE var) v GitHub.
-**~ TECHNICKÉ (větší zásah / migrace):**
-- **Ekonomika na float** — mitigace hotová (✅ 2026-07-13 `money.util`: round na 4 des., epsilon guard, NaN reject; drift se už nehromadí, historický drift v DB tolerován epsilonem). Plná migrace na celočíselné minor units = volitelný budoucí krok (migrace dat + FE formátování).
-- **Řazení českých názvů** — dnes „Čáp" až za „Zebra" v **8 katalozích** (bestiae, spells, items, potions, plants, pricelists, riddles, namesets; FE obchod nad nimi neexistuje → binární pořadí z Monga je finální). Collation v BE **nikde** (0 výskytů). **ROZHODNUTO 2026-07-17: `nameSort`** — denormalizovaný lowercase+ASCII-fold klíč + běžný index. ⚠️ Proč ne Mongo `cs` collation, ač je „správnější": index s jinou collation nejde použít **ani pro string filtr** → `.collation()` bez collation-indexů shodí `{status:1,kind:1}` z plánu = COLLSCAN na komunitních katalozích. `users.usernameLower` z dávky **vyjmout** (unique index — collation mění, co je duplicita: `capek` vs `čapek`, build může spadnout a mění registrační pravidla). Bonus: 6 z 8 kolekcí dnes sortuje `name` **bez indexu** → 32 MB in-memory limit hrozí už teď.
-- **MeiliSearch — přeformulováno 2026-07-17** (dřív „chybí český stemming" = zavádějící): stemming pro češtinu v Meili **neexistuje** — není zapomenutý přepínač, čeština není v Charabii mezi jazyky s dedikovanou tokenizací, padá na default Latin pipeline. `localizedAttributes` (locale `ces`) chce server **v1.10+**, běží **v1.6** (`docker-compose.prod.yml:64`) — a ani po upgradu by stemming nepřidal, jen zafixoval detekci jazyka. Reálné volby: (1) `synonyms` + `stopWords` v `meili-search.service.ts:40-62` (dnes tam nejsou; ruční kurace, ne přepínač), (2) upgrade v1.6→v1.10+, (3) zapnout `EmbeddingSearchService` (`embedding-search.service.ts:38` — kód existuje, vypnutý `EMBEDDING_ENABLED=0` kvůli ~2,46 GB RSS, viz [[rss_memory_embedding]]). Tichý skew: klient `meilisearch@^0.58` cílí na server v1.15.
-- **FE „prázdný stav místo chyby"** — ⚠️ **částečně vyřešeno 2026-07-17, a nebyla to kosmetika:** třída „zápis nad defaulty" = **tichá destrukce dat** (`normalize(q.data?.x)` na chybě → hardcoded defaulty → „Uložit" přepíše DB). Opraveno: `SettingsPanel` + 6 tabů nastavení světa, `DeletedWorldsTab`, `TrustedDevicesCard`, `FateCombatPanel` (viz chybový deník ✅ ŘEŠENÍ 17. 7.). **Zbývá ~190 call-sitů ve ~150 souborech** (plný ErrorState+retry má jen ~15 ploch; `admin/`, `users/` a `world/` mimo `pages/` nemá retry ani jednou) — 4 třídy: datová vrstva (13 hooků `placeholderData: []` + 12 bez `isError`), ~90 mechanických katalogů, ~7 ploch se ztrátou dat, ~40 pickerů. **Priorita: dohledat zbylé plochy třídy „ztráta dat"** (viz i D-AUDIT ⭐ `isError` stránky), zbytek je UX.
-**Dopad:** střední (veřejná 15+ platforma). **Kdy:** rozhodovací položky = až rozhodneš; technické = první běh stylů 32–41.
+### D-FE-ERROR-STATES — FE „prázdný stav místo chyby": zbývá ~190 call-sitů (FE)
+*(dřív součást D-SEC-GAP; částečně vyřešeno 2026-07-17)*
+**Soubory:** ~150 FE souborů; hotové referenční plochy `SettingsPanel`, 6 tabů nastavení světa, `DeletedWorldsTab`, `TrustedDevicesCard`, `FateCombatPanel`; sdílená `ErrorState` v `src/shared/ui/StatePlaceholder/`.
+**Stav:** ⚠️ **nebyla to kosmetika** — třída „zápis nad defaulty" = **tichá destrukce dat** (`normalize(q.data?.x)` na chybě → hardcoded defaulty → „Uložit" přepíše DB). Opraveno 17. 7. na 5 plochách (viz chybový deník ✅ ŘEŠENÍ). **Zbývá ~190 call-sitů ve ~150 souborech** (plný ErrorState+retry má jen ~15 ploch; `admin/`, `users/` a `world/` mimo `pages/` nemá retry ani jednou) — 4 třídy: datová vrstva (13 hooků `placeholderData: []` + 12 bez `isError`), ~90 mechanických katalogů, ~7 ploch se ztrátou dat, ~40 pickerů.
+**Priorita:** dohledat zbylé plochy třídy **„ztráta dat"** (viz i [[#D-AUDIT-2026-07-11]] ⭐ `isError` stránky) — zbytek je UX.
+**Trigger:** při práci na dané ploše nebo samostatná dávka; „ztráta dat" podmnožina přednostně. **Dopad:** střední (veřejná 15+ platforma).
 
 ### D-LAUNCH-GAP-2026-07-11 — launch-hardening zbytky (styly 42–46)
 - **Testovací pokrytí e2e je téměř nulové** — Playwright má **1 test** (`e2e/smoke.spec.ts`), jediný projekt chromium/desktop, BE mockovaný. Původní formulace „mobil overflow neasertován" byla eufemismus: neasertuje se skoro nic. Mobilní viewport = 1 řádek configu, ale s jedním testem nemá cenu.
-- **Mrtvý `@chromatic-com/storybook`** (`package.json:84`) — Storybook addon ze scaffoldu; **CLI `chromatic` ani token nikdy neexistovaly**, žádný workflow. Je to zároveň **viník D-033** (ESM/CJS race na Node 24 shazoval unit testy → storybook testy odděleny z `vitest run`). Odstranění by zavřelo D-033 u kořene. *(Vizuální brána: **rozhodnuto 17. 7. nestavět** — 96 skinů × N ploch = velká matice; kryje `+render` vrstva plny-auditu.)*
+- **Mrtvý `@chromatic-com/storybook`** (`package.json:84`) — Storybook addon ze scaffoldu; **CLI `chromatic` ani token nikdy neexistovaly**, žádný workflow. Je to zároveň **viník D-033** (ESM/CJS race na Node 24 shazoval unit testy → storybook testy odděleny z `vitest run`). Odstranění by zavřelo D-033 u kořene. *(Vizuální brána: **rozhodnuto 17. 7. nestavět** — 96 skinů × N ploch = velká matice; kryje `+render` vrstva plny-auditu.)* ⤷ **Až D-033 padne, přepnout i `.storybook/preview.tsx` axe `test:'todo'`→`'error'`** (jedinná zbylá položka bývalého D-17.8-A11Y; dokud storybook testy neběží v CI, je `'error'` no-op). A11y focus trap z 17.8 už DOKONČEN + otestován (25 testů 18. 7., viz chybový deník) — trap NEPŘIDÁVAT do `TokenInfoPanel`/`ChatContextRail` (záměrně nemodální) ani nemigrovat na IconButton (kosmetika, HANDOFF „nevzkřísit").
 - **SMTP bounce** — outbox fronta + denní cap + retry hotové; chybí **async bounce detekce** („předáno SMTP" ≠ doručeno). Přes Gmail SMTP prakticky nejde (chce inbound mailbox parsing) → reálná volba je transakční služba s webhooky (Resend/Postmark/SES) = náklad + migrace, ne fix.
 **OPS (mimo kód — runbook připraven):** `docs/ops-runbook.md` (BE repo) — Mongo/Redis auth (koordinované okno, keyFile postup), backend port jen pro proxy, SPF/DKIM/DMARC, TLS/Caddyfile do IaC, firewall, deploy rollback (§8 — neimplementován, nejde otestovat bez ostrého deploye).
 **Dopad:** střední — doručitelnost + ops hardening. **Kdy:** ops = s tebou u serveru dle runbooku; zbytek při práci na dané ploše.
@@ -94,6 +81,20 @@ Zbývá (nízká priorita, vyžaduje živou kontrolu):
 ---
 
 ## Odložené (čeká na trigger)
+
+### D-HP-MAP-SYSTEMS — token→deník HP sync chybí u 5 systémů (blokováno herní sémantikou)
+*(dřív D-DATA-SYNC-ZBYTKY část b; část a — smazání legacy route — vyřešena 2026-07-18)*
+**Soubory:** BE `maps/operations/token-hp-diary-map.ts` (sync mapa), spouštěč `map-operations.service.ts:798`.
+**Stav:** HP z tokenu na taktické mapě se do deníku propíše jen u systémů s jednoznačným mapováním (dnes `matrix`). Přeskočeno u: shadowrun (odvozenina `sr_attr_bod`+`sr_cond_phys`), fae/fate (stress boxy = pole), drdplus (pásma zranění), drd2 (3 zdroje); + pole `systemStats`/`injury`/`initiative` nemají v deníku domov. **Doplnit dřív = mrtvý kód:** jediný FE producent `patch.currentHp` pro PC/NPC je `TokenSystemSheet.tsx:429` (matrix), pro ostatní 4 rodiny žádný caller neexistuje. Asymetrie: FE `resolveCharacterHp` ty rodiny číst umí, BE je zapsat ne.
+**Trigger:** vznikne FE caller (`patch.currentHp` pro non-matrix PC/NPC) **a** padne produktové rozhodnutí o herní sémantice: SR fyzický vs. omračovací track? DrdPlus `currentHp=0` → `val=mez` nebo `3×mez`? fae/fate který stress box? drd2 který ze 3 zdrojů?
+**Co bude potřeba:** per-system zápisové mapování v `token-hp-diary-map.ts` dle rozhodnuté sémantiky (naráz s callerem, ne půlku).
+
+### D-DIARY-HP-DELTA — Deník PC: souběžné HP úpravy = last-write-wins (chybí server-side delta)
+*(dřív část D-DROBNE-2026-07-13; sesterský injury-strop nález zavřen jako kosmetika 2026-07-19)*
+**Soubory:** BE `character-diary.repository.ts:61-85` (`updateWithCustomDataPatch` = atomický `findOneAndUpdate` s flat `$set`); FE producenti absolutní hodnoty (`GurpsCombatPanel` → `{gurps_hp:'7'}` apod.).
+**Stav:** repo zápis je atomický, ale **neexistuje server-side delta cesta pro deník** → HP přiletí jako absolutní hodnota spočítaná na klientovi ze **stale cache** → dva souběžné zásahy (PJ dá damage + hráč edituje) = last-write-wins, jeden zásah tiše zmizí. Bestie **tokeny** to mají vyřešené (`hpDelta`/`injuryDelta` na `token.update`, aggregation pipeline + race e2e); **deník ne** (asymetrie: FE `resolveCharacterHp` číst umí, BE zapsat deltou ne). Na rozdíl od zavřeného injury-stropu to **NENÍ kosmetika** — reálná ztráta zásahu.
+**Trigger:** stížnost na „zmizelé HP" v boji, nebo souběžná editace deníku začne bolet.
+**Co bude potřeba (rozhodnutí + BE, naráz — ne půlku):** jedna ze tří cest — (a) generický `customDataDelta` (naráží na string hodnoty + JSON pole → schema-driven typová brána), (b) jen HP klíče (úzké, bezpečné), (c) dodělat D-073 `expectedUpdatedAt` (dnes half-wired: `updatedAt` se vrací, nikde neověřuje). **Doporučeno (c)** — optimistic-lock chrání všechny deník patche, ne jen HP.
 
 ### D-066 — Nástěnka náborů filtruje client-side; paginace + BE facety až naráz
 **Soubory:** FE `src/features/ikaros/pages/NaboryPage.tsx` (`useNabory` → celý aktivní seznam), `src/features/ikaros/lib/nabory.ts` (`filterNabory`); BE `GET /nabory` (bez query filtru).
@@ -147,6 +148,19 @@ Zbývá (nízká priorita, vyžaduje živou kontrolu):
 **Stav:** GI díra „klient je autorita nad total" zavřena Cestou A 2026-07-12. NEzavřené zbytky: (a) re-rolling (hráč hází lokálně dokola, pošle „šťastný" validní hod); (b) cílené podvody uvnitř systémových hodů (2d6+/roll-under/percentile/mixed); (c) kosmetická pod-pole (d100 `tens`/`ones`, `crit`, `breakdown`) se nevalidují proti faces.
 **Trigger:** potřeba kompetitivní/turnajové integrity (dnes hobby + moderující PJ = přijatelné).
 **Co bude potřeba:** Cesta B — FE pošle záměr, server hodí svým RNG, FE 3D přehraje přes `@` notaci. Vyžaduje port roll enginu na BE — pozor na `2d6+` (`sum≠Σfaces`) a nesčítání modifieru u GURPS/CoC/flat.
+
+### D-ECON-FLOAT-MIGRACE — Ekonomika na float: mitigace hotová, plná migrace na minor units volitelná
+*(dřív součást D-SEC-GAP, „technické")*
+**Soubory:** BE `money.util` (mitigace) + peněžní pole napříč ekonomikou; FE formátování cen.
+**Stav:** ✅ mitigace hotová 2026-07-13 (`money.util`: round na 4 des., epsilon guard, NaN reject) → drift se **už nehromadí**, historický drift v DB tolerován epsilonem. Nic nehoří.
+**Trigger:** až bude potřeba přesná celočíselná aritmetika (účetnictví / reálné platby). **Co bude potřeba:** migrace peněžních polí na celočíselné minor units (migrace dat + přepis FE formátování) — volitelný budoucí krok, ne fix.
+
+### D-MEILI-CZ — MeiliSearch: čeština padá na default Latin pipeline (bez stemmingu)
+*(dřív součást D-SEC-GAP, „technické"; přeformulováno 2026-07-17 — „chybí český stemming" bylo zavádějící)*
+**Soubory:** BE `meili-search.service.ts:40-62`, `embedding-search.service.ts:38`, `docker-compose.prod.yml:64`.
+**Stav:** stemming pro češtinu v Meili **neexistuje** (není zapomenutý přepínač — čeština není v Charabii mezi jazyky s dedikovanou tokenizací). `localizedAttributes` (locale `ces`) chce server **v1.10+**, běží **v1.6** — a ani po upgradu by stemming nepřidal, jen zafixoval detekci jazyka. ⚠️ Tichý skew: klient `meilisearch@^0.58` cílí na server v1.15.
+**Trigger:** až CZ fulltext začne viditelně bolet (relevance komunitních katalogů).
+**Co bude potřeba (jedna z voleb):** (1) `synonyms` + `stopWords` (dnes tam nejsou; ruční kurace), (2) upgrade v1.6→v1.10+, (3) zapnout `EmbeddingSearchService` (kód existuje, vypnutý `EMBEDDING_ENABLED=0` kvůli ~2,46 GB RSS, viz [[rss_memory_embedding]]).
 
 ---
 

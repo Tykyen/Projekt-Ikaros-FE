@@ -7,8 +7,9 @@
  * Jádro (papír + autosave + status) sdílí s `WorldGmDiaryPage` přes
  * `useNotebookAutosave` + `NotebookPaper`. Tady navíc backdrop/book chrome.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { useFocusTrap } from '@/shared/ui';
 import {
   NotebookPaper,
   NotebookStatus,
@@ -36,6 +37,12 @@ export function MapNotebookOverlay({
     onSave,
   );
 
+  // 17.8 / D-17.8-A11Y — plný modal (ztmavená mapa) → uvěznit fokus + vrátit ho
+  // po zavření. `useFocusTrap` zahrnuje i TipTap contentEditable (viz selektor),
+  // takže Tab cyklí přes editor a křížek a neuteče do mapy pod overlayem.
+  const bookRef = useRef<HTMLDivElement | null>(null);
+  useFocusTrap({ active: true, containerRef: bookRef });
+
   // Zavření: flush nezapsaných změn, pak zavři.
   const handleClose = () => {
     flush();
@@ -60,10 +67,13 @@ export function MapNotebookOverlay({
       {/* Obsahový obal: onClick jen stopPropagation; zavření přes Esc/křížek. */}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <div
+        ref={bookRef}
         className={s.book}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
+        aria-modal
         aria-label={title}
+        tabIndex={-1}
       >
         <header className={s.header}>
           <div className={s.titleWrap}>
