@@ -82,7 +82,7 @@
 
 ### - [ ] 23.6 Drobný infra hardening — [dopad střední · náklad malý]
 **Kroky:** ① FE `docker-compose.yml`: log rotace (x-logging anchor z BE compose, ~8 řádků; nginx access log dnes roste bez stropu) · ② BE port 3001 bind na 127.0.0.1 (dnes 0.0.0.0 → obchází Caddy TLS; runbook §1) + stejný fix FE port 8081 · ③ ufw ověřit (§5). Mongo/Redis auth (§2–3) až karta 30.5.
-**Stav (spec-23.6):** ①+② hotové v kódu (FE compose logging+bind, BE compose bind, runbook §1/§5 aktualizován; `docker compose config` ověřeno lokálně). **Před deployem NUTNÉ na serveru ověřit** Caddy → localhost:3001/8081 (příkazy ve spec — jinak výpadek!) · pak deploy OBOU repo · ③ ufw ručně dle runbooku §5 · pak zaškrtnout.
+**Stav (spec-23.6, 2026-07-19):** ① log rotace hotová v kódu (FE compose), čeká FE deploy · ②+③ **uzavřeny zjištěním**: server je za NAT poskytovatele (žádný Caddy na hostu, TLS ukončuje edge leafhost na jiném stroji) → loopback bind ZAKÁZÁN (rozbil by prod, v compose varovný komentář); porty 3001/8080/27017 zvenku stejně filtrované; ufw inactive a nechává se tak (docker ji obchází). Nové nálezy (interní síť 10.10.10.0/24 + starý matrix-mongodb na 0.0.0.0:27017) → zdokumentováno v runbooku §1, řešit s kartou 30.5. Vedlejší produkt: workflow `server-check.yml` (read-only diagnostika serveru).
 
 ### - [ ] 23.7 Release brány: e2e+security do CI, cross-repo scannery, „deploy jen po zelené" — [dopad vysoký · náklad střední]
 **Cíl:** Před pouštěním cizích lidí hlídat regrese automaticky; release má evidenci.

@@ -49,4 +49,20 @@ jobs:
           echo ""
           echo "===== 8) Reverse-proxy služby na hostu? ====="
           systemctl list-units --type=service --state=running 2>/dev/null | grep -iE 'caddy|nginx|apache|traefik|haproxy' || echo "žádná proxy služba na hostu neběží"
+          echo ""
+          echo "===== 9) Kde žijí compose stacky (cesty k compose souborům) ====="
+          for c in matrix-mongodb matrix-backend matrix-frontend projekt-ikaros-be projekt-ikaros-fe; do
+            echo "$c → $(docker inspect $c --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}} (projekt {{index .Config.Labels "com.docker.compose.project"}})' 2>/dev/null || echo 'bez compose labelů (ruční docker run?)')"
+          done
+          echo ""
+          echo "===== 10) Z jakých IP chodí requesty na FE nginx (hledáme zdrojovou IP edge proxy) ====="
+          docker logs projekt-ikaros-fe --tail 300 2>&1 | grep -oE '^[0-9]{1,3}(\.[0-9]{1,3}){3}' | sort | uniq -c | sort -rn | head -5
+          echo ""
+          echo "===== 11) iptables DOCKER-USER — současná pravidla ====="
+          iptables -L DOCKER-USER -n -v 2>/dev/null || echo "iptables nedostupné"
+          echo ""
+          echo "===== 12) Sítě matrix kontejnerů (jak spolu mluví) ====="
+          for c in matrix-backend matrix-mongodb; do
+            echo "$c → sítě: $(docker inspect $c --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}} {{end}}' 2>/dev/null)"
+          done
           ENDSSH

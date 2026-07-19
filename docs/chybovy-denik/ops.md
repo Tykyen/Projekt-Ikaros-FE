@@ -21,3 +21,11 @@ Detailní záznamy. Index: [README.md](README.md).
 **Finální ověření živě (2026-07-19):** testovací event `sentry-test-fe` dorazil do dashboardu přes tunnel se ZAPNUTÝM adblockem; probe s cizí DSN → 400 (validace org drží, zároveň důkaz `SENTRY_DSN` v BE prod env). 23.4 zaškrtnuto.
 
 ---
+
+### ✅ ŘEŠENÍ — 23.6 ověřovací brána před deployem odhalila mylnou premisu runbooku (žádný Caddy, server za NAT) · 2026-07-19
+**Co nakonec zabralo:** karta žádala bind 3001 (a po rozšíření i 8081) na 127.0.0.1 dle runbooku §1 („Caddy na hostu proxuje na localhost"). Do spec jsem dal **blokující předpoklad**: před deployem ověřit Caddyfile na serveru. Uživatel neumí SSH → postaven `server-check.yml` (workflow_dispatch, read-only diagnostika přes tentýž SSH klíč jako deploy). Výsledek: **žádný Caddy neexistuje**, stroj má jen privátní IP (10.10.10.111) — TLS ukončuje edge proxy POSKYTOVATELE (leafhost) na jiném stroji a na porty chodí po interní síti. Loopback bind by odřízl produkci → změna VRÁCENA (v obou compose zůstal varovný komentář), runbook §1/§5/§7 přepsán podle reality, zbytkové riziko (interní síť + starý matrix-mongodb na 0.0.0.0:27017) → runbook §1 / karta 30.5.
+**Proč to je správně (a ne další variace):** doktrína „ověř PŘED zásahem" z runbooku zafungovala přesně jak má — bez ní by šel na prod slepý deploy podle zastaralé dokumentace a web by spadl (a rollback by dělal uživatel bez SSH znalostí). Testy zvenku (`/dev/tcp` na 5.39.203.33) navíc vyvrátily i původní hrozbu — NAT porty 3001/8080/27017 do internetu vůbec nepouští.
+**Jak ověřeno:** server-check výstup (hostname -I jen privátní IP, žádná proxy služba/kontejner, ufw inactive) + porty testované zvenku z lokálu; `docker compose config` po revertu = původní mapping.
+**Zhodnocení:** dobře — nulové cyklení, žádný výpadek; karta se z „udělej X" překlopila na „zjisti proč X nejde a zdokumentuj realitu". Poučení: ops dokumentace psaná od stolu (runbook vznikl 2026-07-12 hromadně) může popisovat infrastrukturu, která nikdy neexistovala — před KAŽDÝM serverovým zásahem nejdřív diagnostika reality, ne důvěra v dokument. Vedlejší produkt `server-check.yml` je teď trvalý nástroj pro budoucí ops karty.
+
+---

@@ -1,6 +1,6 @@
 # Spec 23.6 — Drobný infra hardening
 
-**Stav:** schváleno uživatelem 2026-07-19 (vč. rozšíření o FE port 8081) · implementováno · **čeká:** ověření Caddyfile na serveru → deploy FE+BE → ufw
+**Stav:** schváleno uživatelem 2026-07-19 (vč. rozšíření o FE port 8081) · **② a ③ UZAVŘENY ZJIŠTĚNÍM** (viz Výsledek ověření — loopback bind na této infra zakázán, ufw bez přínosu) · ① implementováno, čeká FE deploy
 **Karta:** roadmap3 fáze 23, karta 23.6 · **Původ:** runbook §1 (port bind) + §5 (ufw) + LH-05 (log rotace, FE polovina)
 
 ## Problém
@@ -47,13 +47,22 @@ ufw enable                         # POZOR: až po ověření, že OpenSSH pravi
 ufw status verbose                 # 3001 NESMÍ být v povolených
 ```
 
-## Ověření po deployi
+## Výsledek ověření (2026-07-19, server-check workflow + testy zvenku)
 
-1. `docker inspect projekt-ikaros-fe --format '{{json .HostConfig.LogConfig}}'` → `max-size 10m, max-file 3` (totéž prerender).
-2. `ss -tlnp | grep -E "3001|8081"` → jen `127.0.0.1`.
-3. Z jiného stroje: `curl -m 5 http://SERVER_IP:3001/api/health` → timeout/refused (dnes odpovídá!); totéž `http://SERVER_IP:8081/`.
-4. Živý web: login + načtení světa funguje (= Caddy → loopback BE OK).
-5. `ufw status verbose` → active, jen OpenSSH/80/443.
+Blokující předpoklad **NEPLATÍ** — a odhalil, že celá premisa ② byla mylná:
+
+- Na hostu ŽÁDNÝ Caddy není (žádná služba, žádný kontejner, `/etc/caddy` neexistuje).
+- Stroj má jen privátní IP (10.10.10.111); veřejnou 5.39.203.33 drží **NAT/edge proxy poskytovatele (leafhost) na jiném stroji** — ta ukončuje TLS a routuje `/api` → 3001, zbytek → 8081 po interní síti.
+- → **Loopback bind by odřízl produkci. ② se NENASAZUJE**, mapping vrácen na původní (v obou compose zůstává varovný komentář, aby se to nezkusilo znovu).
+- Testy zvenku na 5.39.203.33: port 3001/8080/27017 timeout, 8081 refused → **NAT porty do internetu nepouští**, původní hrozba runbooku §1 veřejně neexistuje.
+- ③ ufw: `Status: inactive`. Rozhodnutí NEZAPÍNAT: docker-proxy porty ufw obcházejí (iptables DOCKER chain), z internetu je stejně filtruje NAT, a hrozí odříznutí SSH. 
+- **Nové nálezy (zdokumentováno v runbooku §1, řešit s kartou 30.5):** interní síť poskytovatele 10.10.10.0/24 dosáhne na publikované porty; navíc na serveru běží starý matrix stack a `matrix-mongodb` publikuje **27017 na 0.0.0.0** (stará .NET DB). Řešení = DOCKER-USER chain + úklid matrix stacku.
+- Vedlejší produkt: workflow `server-check.yml` (FE repo, `workflow_dispatch`) — read-only diagnostika serveru bez nutnosti SSH z lokálu; runbook §1/§5/§7 přepsán podle reality.
+
+## Ověření po FE deployi (zbývá jen ①)
+
+1. `docker inspect projekt-ikaros-fe --format '{{json .HostConfig.LogConfig}}'` → `max-size 10m, max-file 3` (totéž prerender) — jde vyčíst i přes server-check workflow po přidání kroku, nebo stačí `docker compose ps` + kontrola, že web běží.
+2. Živý web funguje beze změny (log rotace nemá funkční dopad).
 
 ## Vědomě nekryto
 
