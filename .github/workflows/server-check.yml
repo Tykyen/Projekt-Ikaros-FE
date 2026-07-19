@@ -37,4 +37,16 @@ jobs:
           echo ""
           echo "===== 4) ufw firewall — stav (runbook §5) ====="
           sudo -n ufw status verbose 2>/dev/null || ufw status verbose 2>/dev/null || echo "ufw příkaz nedostupný nebo chybí práva"
+          echo ""
+          echo "===== 5) KDO poslouchá na 80/443 (TLS terminátor?) ====="
+          ss -tlnp | grep -E ':80 |:443 ' || echo "na 80/443 na TOMHLE stroji nikdo → TLS ukončuje jiný stroj (proxy poskytovatele)"
+          echo ""
+          echo "===== 6) IP adresy stroje (5.39.203.33 = veřejná; jen privátní = NAT/kontejner) ====="
+          hostname -I
+          echo ""
+          echo "===== 7) Všechny kontejnery ====="
+          docker ps --format '{{.Names}}\t{{.Ports}}'
+          echo ""
+          echo "===== 8) Reverse-proxy služby na hostu? ====="
+          systemctl list-units --type=service --state=running 2>/dev/null | grep -iE 'caddy|nginx|apache|traefik|haproxy' || echo "žádná proxy služba na hostu neběží"
           ENDSSH
