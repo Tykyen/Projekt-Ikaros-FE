@@ -32,8 +32,8 @@ services:
     # 23.6 — POZOR: NEbindovat na 127.0.0.1! Server je za NAT poskytovatele
     # (jen privátní IP); TLS ukončuje edge proxy na JINÉM stroji a sem chodí
     # po interní síti → loopback bind by odřízl produkci. Port není veřejný
-    # (NAT ho nepouští, ověřeno 2026-07-19); zbytkové riziko interní sítě
-    # řeší runbook §1 / karta 30.5.
+    # (NAT ho nepouští, ověřeno 2026-07-19); interní síť zavřená přes iptables
+    # DOCKER-USER (runbook §1, systemd docker-user-hardening).
     ports:
       - "${FRONTEND_PORT:-8081}:80"
     # nginx resolvuje upstream `prerender` při startu → sidecar musí existovat dřív.
