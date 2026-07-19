@@ -70,14 +70,15 @@
 **Stav:** kód kompletní (SMTP provider, Mongo outbox, denní cap 400, priorita reset hesla, retry/backoff). Nasazení vars možná už proběhlo — **ověřit prakticky**.
 **Kroky:** ① test „Zapomenuté heslo" na reálný mail · ② pokud nechodí: GitHub env production vars `SMTP_HOST/PORT/USER/MAIL_FROM` + secret `SMTP_PASS`, deploy, retest · ③ ověřit `FRONTEND_URL` (jinak odkazy do localhost) · ④ `MAIL_FROM` vlastní doména ⇒ SPF/DKIM/DMARC DNS, jinak spam.
 
-### - [ ] 23.4 Error tracking reálně zapnutý — [dopad vysoký · náklad malý]
+### - [x] 23.4 Error tracking reálně zapnutý — [dopad vysoký · náklad malý] ✅ 2026-07-19
 **Cíl:** Pády testerů vidíme, i když je nenahlásí (většina nenahlásí — mlčky odejdou).
-**Stav:** kód KOMPLET (spec 23.4, 2026-07-19): FE+BE `beforeSend` scrubber (LH-13 — jinak by JWT/hesla egresovala) + CSP `connect-src` `${SENTRY_HOST}` odvozený v deployi z DSN (jinak by enforce CSP eventy tiše zahodila). **Zbývá ops (uživatel):** Sentry free tier **EU region**, 2 projekty → FE var `VITE_SENTRY_DSN` + BE secret `SENTRY_DSN`, deploy FE+BE, testovací error dle runbooku §10.
+**✅ Hotovo:** Sentry SaaS free (org EU region, projekty `ikaros-fe`+`ikaros-be`; FE var `VITE_SENTRY_DSN`, BE secret `SENTRY_DSN`). Cestou 3 miny (spec 23.4): ① LH-13 → `beforeSend` scrubber FE+BE (jinak by JWT/hesla egresovala) · ② CSP `connect-src` → `${SENTRY_HOST}` odvozený v deployi z DSN · ③ adblock blokuje `*.ingest.sentry.io` → **tunnel** `POST /api/monitoring/tunnel` (BE relay pinovaný na vlastní org). Ověřeno živě: testovací event v dashboardu přes tunnel i se zapnutým adblockem; postupy v runbooku §10 (BE repo).
 
 ### - [ ] 23.5 Refresh token v produkci (sliding session) — [dopad vysoký · náklad malý]
-**Cíl:** Tester není po ~3 dnech nečekaně odhlášen.
-**Stav:** inventura funkcí přiznává „v prod refresh nejspíš nejede (cross-site cookie)".
-**Kroky:** živě ověřit na prod (doména API vs web, SameSite); oprava dle nálezu (pravděpodobně doménová konfigurace, ne kód).
+**Cíl:** Aktivní tester není nikdy odhlášen; logout až po 60 dnech nečinnosti zařízení.
+**Stav:** kořen nalezen a opraven 2026-07-19 (kód hotový, čeká deploy + živé ověření). Cross-site hypotéza z inventury byla vyvrácená už 2026-06-24 (same-origin přes Caddy, cookie first-party, TTL 60 d aktivní — GitHub vars nenastavené ⇒ compose defaulty `1d`/`60`). Skutečný kořen = race souběžných refreshů: FE spouštěl vlastní `POST /auth/refresh` pro každý 401 → druhý z paralelních refreshů trefil reuse-detection → revoke celé rodiny tokenů → odhlášení po ~1 dni (první expirace access tokenu).
+**Oprava (spec-23.5):** ① FE single-flight (souběžné 401 sdílí jeden refresh promise, `client.ts`) · ② BE grace okno 60 s (reuse čerstvě zrotovaného jti vrátí týž nástupnický pár místo revoke rodiny, `auth.service.ts`). Testy: jest 80/80, vitest single-flight 3/3.
+**Zbývá:** deploy BE+FE · živě: po >1 dni od loginu otevřít svět s Network tabem — právě 1 `POST /auth/refresh` → 200, žádný `REFRESH_TOKEN_ABUSED`, žádné odhlášení.
 
 ### - [ ] 23.6 Drobný infra hardening — [dopad střední · náklad malý]
 **Kroky:** ① FE `docker-compose.yml`: log rotace (x-logging anchor z BE compose, ~8 řádků; nginx access log dnes roste bez stropu) · ② BE port 3001 bind na 127.0.0.1 (dnes 0.0.0.0 → obchází Caddy TLS; runbook §1) · ③ ufw ověřit (§5). Mongo/Redis auth (§2–3) až karta 30.5.

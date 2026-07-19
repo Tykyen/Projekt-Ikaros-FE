@@ -1,6 +1,6 @@
 # Spec 23.4 — Error tracking reálně zapnutý
 
-**Stav:** schváleno uživatelem 2026-07-19 · kód implementován (FE+BE) · čeká ops krok uživatele (DSN) + ostré ověření
+**Stav:** schváleno uživatelem 2026-07-19 · implementováno · **ověřeno živě 2026-07-19** (testovací event `sentry-test-fe` v dashboardu přes tunnel se zapnutým adblockem; validace tunnel relaye vrací 400 pro cizí org)
 **Karta:** roadmap3 fáze 23, karta 23.4
 
 ## Problém

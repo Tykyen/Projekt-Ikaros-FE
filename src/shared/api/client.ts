@@ -61,6 +61,42 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// 23.5 — single-flight refresh: souběžné 401 (paralelní dotazy při načtení
+// stránky po expiraci access tokenu) sdílí JEDEN běžící refresh request.
+// Bez toho každý 401 rotoval refresh token vlastním voláním → race → BE
+// reuse-detection → revoke celé rodiny tokenů → odhlášení aktivního uživatele
+// (sliding session nepřežila první expiraci). Toast + logout při failu proběhne
+// právě jednou tady; čekající requesty dostanou jen reject.
+let refreshPromise: Promise<string> | null = null;
+
+/** Exportováno kvůli testu single-flight chování. */
+export function refreshAccessToken(): Promise<string> {
+  if (!refreshPromise) {
+    // PC-18: refresh token je v httpOnly cookie → prázdné body + withCredentials.
+    // Cookie rozhoduje (po reloadu žádný token v JS, cookie přesto platí).
+    refreshPromise = axios
+      .post<RefreshResponse>(
+        `${apiBase}/api/auth/refresh`,
+        {},
+        { withCredentials: true },
+      )
+      .then(({ data }) => {
+        getDefaultStore().set(accessTokenAtom, data.accessToken);
+        return data.accessToken;
+      })
+      .catch((err: unknown) => {
+        // EC-09 (F6): dej uživateli vědět, proč ho to odhlásilo (dřív tichý redirect).
+        toast.info('Přihlášení vypršelo, přihlas se prosím znovu.');
+        logoutAndRedirectToLogin();
+        throw err;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 // Response — 401 → pokus o refresh, pak retry. BANNED → instant logout (1.3b)
 apiClient.interceptors.response.use(
   (res) => {
@@ -115,24 +151,13 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
-      const store = getDefaultStore();
-
       try {
-        // PC-18: refresh token je v httpOnly cookie → prázdné body + withCredentials.
-        // Cookie rozhoduje (po reloadu žádný token v JS, cookie přesto platí).
-        const { data: refreshData } = await axios.post<RefreshResponse>(
-          `${apiBase}/api/auth/refresh`,
-          {},
-          { withCredentials: true },
-        );
-        store.set(accessTokenAtom, refreshData.accessToken);
+        const accessToken = await refreshAccessToken();
         original.headers = original.headers ?? {};
-        original.headers.Authorization = `Bearer ${refreshData.accessToken}`;
+        original.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(original);
       } catch {
-        // EC-09 (F6): dej uživateli vědět, proč ho to odhlásilo (dřív tichý redirect).
-        toast.info('Přihlášení vypršelo, přihlas se prosím znovu.');
-        logoutAndRedirectToLogin();
+        // Toast + logout už proběhly v refreshAccessToken (právě jednou).
         return Promise.reject(error);
       }
     }

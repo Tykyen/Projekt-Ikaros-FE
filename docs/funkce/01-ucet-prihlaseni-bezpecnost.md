@@ -249,10 +249,11 @@
 ---
 
 ### Refresh token rotace + reuse detection
-- **Co to je:** Rotace refresh tokenu s detekcí krádeže.
-- **Co jde dělat / vlastnosti:** `POST /auth/refresh` (cookie má přednost, body fallback). Při použití revokovaného tokenu → revoke celé rodiny + 401 `REFRESH_TOKEN_ABUSED`. **Sliding session:** každý refresh razí NOVÝ token s expirací od teď (`generateTokenPair`) → aktivní uživatel se neodhlásí. **TTL 3 dny** (`JWT_REFRESH_TTL_DAYS`, dřív 30) = 3 dny nečinnosti → logout (2026-06-21). ⚠️ V prod refresh nejspíš nejede (cross-site cookie) → reálný kořen předčasného odhlašování = deploy (domény API vs web), viz deník.
-- **Stav:** ✅ funguje.
-- **Kód:** BE `auth.controller.ts:168`, `auth.service.ts:364`.
+- **Co to je:** Rotace refresh tokenu s detekcí krádeže + sliding session.
+- **Co jde dělat / vlastnosti:** `POST /auth/refresh` (cookie má přednost, body fallback). Při použití revokovaného tokenu → revoke celé rodiny + 401 `REFRESH_TOKEN_ABUSED`. **Sliding session:** každý refresh razí NOVÝ token s expirací od teď (`generateTokenPair`) → aktivní uživatel se neodhlásí; logout až po **60 dnech** nečinnosti zařízení (`JWT_REFRESH_TTL_DAYS`, default 60; access `JWT_EXPIRES_IN` default 1d — GitHub vars nenastavené, platí compose defaulty). Prod je **same-origin** přes Caddy (cookie first-party; cross-site hypotéza vyvrácena 2026-06-24 živým curlem).
+- **Zvláštnosti (23.5, 2026-07-19):** souběžné refreshe neodhlašují. **FE single-flight** — paralelní 401 sdílí jeden refresh promise (`client.ts refreshAccessToken`); toast+logout při failu právě 1×. **BE grace okno 60 s** — reuse čerstvě zrotovaného jti (multi-tab, PWA, síťový retry) vrátí týž nástupnický pár z in-memory cache místo revoke rodiny; reuse PO okně = reuse-detection jako dřív (detekce krádeže zpožděna max o 60 s). Cache in-memory: při 2+ replikách BE nutný Redis (vzor `THROTTLER_REDIS`).
+- **Stav:** ✅ funguje (kód; živé ověření po deployi — viz roadmap3 23.5).
+- **Kód:** BE `auth.controller.ts:174`, `auth.service.ts:456` (`refresh`, `rememberGracePair`). FE `src/shared/api/client.ts` (`refreshAccessToken`).
 
 ---
 
