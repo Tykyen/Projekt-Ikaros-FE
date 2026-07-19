@@ -16,6 +16,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 | ID | Oblast | Stručně | Příznak cyklení |
 |----|--------|---------|-----------------|
+| [✅ ŘEŠENÍ](ops.md#-řešení--236-ověřovací-brána-před-deployem-odhalila-mylnou-premisu-runbooku-žádný-caddy-server-za-nat--2026-07-19) | ops | 23.6: runbook lhal (žádný Caddy, server za NAT leafhostu) — ověřovací brána před deployem zachránila prod; loopback bind ZAKÁZÁN; opravy přes server-check/server-hardening workflowy (diagnose/apply + auto-rollback) | serverový zásah dle runbooku bez diagnostiky reality |
 | [✅ ŘEŠENÍ](fe.md#-řešení--feature-flag-skrytí-veřejných-rout-r3-258-landing-systémů-gate-loader-místo-podmíněné-registrace--2026-07-19) | fe | feature-flag routy = gate loader, NE podmíněná registrace (statický nav-audit vidí obě větve ternáru → ambiguita); testy psát flag-aware | audit:nav FAIL ambiguita po přidání flagu |
 | [CH-001](tisk.md#ch-001) | tisk | `visibility:hidden`+`absolute;inset:0` → ořez na 1 stránku | ladím inset/position, obsah se ořezává |
 | [CH-002](tisk.md#ch-002) | tisk | klon do `<body>` měl obsah, ale celý neviditelný | „klon má obsah", ale tisk prázdný |

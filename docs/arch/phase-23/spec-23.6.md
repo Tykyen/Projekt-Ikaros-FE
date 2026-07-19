@@ -56,8 +56,10 @@ Blokující předpoklad **NEPLATÍ** — a odhalil, že celá premisa ② byla m
 - → **Loopback bind by odřízl produkci. ② se NENASAZUJE**, mapping vrácen na původní (v obou compose zůstává varovný komentář, aby se to nezkusilo znovu).
 - Testy zvenku na 5.39.203.33: port 3001/8080/27017 timeout, 8081 refused → **NAT porty do internetu nepouští**, původní hrozba runbooku §1 veřejně neexistuje.
 - ③ ufw: `Status: inactive`. Rozhodnutí NEZAPÍNAT: docker-proxy porty ufw obcházejí (iptables DOCKER chain), z internetu je stejně filtruje NAT, a hrozí odříznutí SSH. 
-- **Nové nálezy (zdokumentováno v runbooku §1, řešit s kartou 30.5):** interní síť poskytovatele 10.10.10.0/24 dosáhne na publikované porty; navíc na serveru běží starý matrix stack a `matrix-mongodb` publikuje **27017 na 0.0.0.0** (stará .NET DB). Řešení = DOCKER-USER chain + úklid matrix stacku.
-- Vedlejší produkt: workflow `server-check.yml` (FE repo, `workflow_dispatch`) — read-only diagnostika serveru bez nutnosti SSH z lokálu; runbook §1/§5/§7 přepsán podle reality.
+- **Nové nálezy — OPRAVENO TÝŽ DEN** (uživatel nechtěl odkládat jako dluh) přes `server-hardening.yml` (diagnose/apply, auto-rollback při selhání edge ověření):
+  - `matrix-mongodb` (stará .NET DB) publikovala 27017 na 0.0.0.0 → **127.0.0.1** (interní komunikace přes docker síť `matrix_matrix-network` netknutá, backend restart).
+  - interní síť 10.10.10.0/24 → iptables **DOCKER-USER**: RETURN edge proxy 10.10.10.104 + host + ESTABLISHED, DROP zbytek /24; persistence systemd `docker-user-hardening.service`. Ověřeno živě: pravidly tečou pakety, web+API přes edge zelené.
+- Vedlejší produkty: workflow `server-check.yml` (read-only diagnostika serveru) + `server-hardening.yml` (opravy s pojistkou) — oba FE repo, `workflow_dispatch`, bez nutnosti SSH z lokálu; runbook §1/§5/§7 přepsán podle reality.
 
 ## Ověření po FE deployi (zbývá jen ①)
 
