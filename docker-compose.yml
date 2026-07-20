@@ -55,7 +55,15 @@ services:
       # 24.2 — po kolika renderech Chromium recyklovat (0 = nikdy). Headless
       # Chromium při dlouhém běhu roste; sdílená instance jinak žije, dokud
       # nespadne. Recyklace řeší PŘÍČINU, mem_limit níž je jen zábrana.
-      RECYCLE_AFTER: ${PRERENDER_RECYCLE_AFTER:-200}
+      #
+      # 200 → 50 (2026-07-20, po prvním měření): `docker stats` ukázal 419 MiB
+      # z 768MiB limitu (54,6 %) po ~11 renderech — karta přitom počítala s
+      # „Chromium ~150–300 MB". Jestli RSS s počtem renderů roste, 200 renderů
+      # by se do stropu nemuselo vejít. Recyklace je levná (Chromium startuje
+      # 1–2 s a čeká na ni jen crawler, ne uživatel; cache HIT se jí netýká),
+      # takže radši častěji. POZOR: jeden snímek trend nedokazuje — až druhé
+      # měření řekne, jestli šlo o růst, nebo o baseline Chromia.
+      RECYCLE_AFTER: ${PRERENDER_RECYCLE_AFTER:-50}
     # 24.2 — strop paměti. Sidecar dosud běžel bez limitu na stroji, kde BE drží
     # RSS ~2,4 GB baseline (ONNX embedding) → ujetý Chromium by tlačil na celý
     # host. 768m je velkorysá POJISTKA, ne přesné ladění: doladí se podle měření

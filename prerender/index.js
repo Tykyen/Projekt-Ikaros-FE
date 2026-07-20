@@ -21,7 +21,9 @@ const READY_TIMEOUT = Number(process.env.READY_TIMEOUT ?? 8000);
 const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT ?? 15000);
 // 24.2 — po kolika renderech Chromium recyklovat (0 = nikdy). Sdílená instance
 // jinak žije, dokud nespadne, a headless Chromium přitom postupně roste.
-const RECYCLE_AFTER = Number(process.env.RECYCLE_AFTER ?? 200);
+// Default 50 (sníženo z 200 po prvním měření: 419 MiB / 768 MiB po ~11
+// renderech). Hodnotu přebíjí `RECYCLE_AFTER` z compose.
+const RECYCLE_AFTER = Number(process.env.RECYCLE_AFTER ?? 50);
 
 // TTL cache per skupina rout (ms): statické stránky se mění zřídka → dlouho,
 // dynamický obsah (světy/články/galerie) → krátce, ať náhled nezastará.
