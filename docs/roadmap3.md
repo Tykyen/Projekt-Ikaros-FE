@@ -98,11 +98,26 @@
 ## Fáze 24 — Nasazovací fronta & úklid
 **Kód je pushnutý (oba main == origin), ale ~20 hotových věcí čeká na deploy/restart/živé ověření.** Bez odbavení uvidí testeři FE↔BE drift a nahlásí náš nasazovací dluh jako bugy.
 
-### - [ ] 24.1 Deploy obou částí nad HEAD + ověření zvenku — [dopad vysoký · náklad malý]
-⚠️ **Pořadí: FE deploy PŘED BE** (BE už nemá legacy route `GET /characters/directory` — starý FE bundle by dostal 404 na adresář postav). Ověřit zvenku dle zavedeného postupu (grep chunků / Last-Modified — viz `project_fe_deploy_stale_bundle`).
+### - [x] 24.1 Deploy obou částí nad HEAD + ověření zvenku — [dopad vysoký · náklad malý] ✅ 2026-07-20
+**Uzavřeno ověřením, ne novým deployem** — obě poloviny nad HEAD běžely už od 19. 7. večer.
+- **FE ✅ tvrdý důkaz:** živý chunk `HelpPage-DKC64IbD.js` obsahuje marker `„Když se ti návrh nepovede"` z `f693bd48` = posledního commitu dotýkajícího se `src/`. Novější `89c9d371`+`dce3113f` mění jen `docs/`+`ci.yml` → nulový dopad na bundle. `index.html` Last-Modified 19. 7. 22:02:50 UTC.
+- **BE ✅ řetěz uzavřen:** commit `8b2e3b6` 21:48:09 → **push 21:49:30** (git reflog `origin/main`) → deploy run #162 start 21:55 → restart kontejneru 21:56:49 (dopočet z `uptimeSec`) → konec ~21:57. Checkout tedy vzal HEAD; past „run běžel před pushem" (stale bundle 07-14) vyloučena.
+- **Health zvenku:** `/api/health` 10/10 ok (backend, mongo, redis, meili, env, cloudinary, vapid, smtp, memory, disk).
+- **Vedlejší zjištění:** log rotace FE nginxu (23.6, čekala na „nejbližší běžný deploy") **je aktivní** — `x-logging` v compose od 17:28 UTC < deploy 22:02 UTC.
+- **Pořadí FE-před-BE bezpředmětné:** FE legacy `GET /characters/directory` už nevolá, hlídá negativní test `useCharacterDirectory.spec.tsx:121`.
 
-### - [ ] 24.2 Ops kroky vázané na deploy — [dopad střední · náklad malý]
-env `ANON_SESSION_TTL=14d` (15.8) · migrace `npm run migrate:discussion-reports` (20.1–20.3) · **CSP enforce** + smoke neprozkoumaných stránek (galerie/postavy/bestiář/kalendář/admin/motivy) · ověřit RAM prerender sidecaru (Chromium ~150–300 MB).
+**✅ Nález uzavřen týž den — `/api/health` → `version: { sha, builtAt }` (BE repo):** verzi BE dosud nešlo ověřit zvenku (FE se grepnout dá, BE ne) → každé „deploy nezabral" se u BE dopočítávalo z uptime, což je **falešně pozitivní metoda** (restart z OOM vypadá jako čerstvý deploy; RSS baseline ~2,4 GB). Nově: `deploy.yml` krok „Stamp build metadata" → `.env` (`IMAGE_SHA=${{ github.sha }}`, `BUILT_AT`) → compose → health. **`uptimeSec` = poslední restart, `builtAt` = poslední deploy; rozdíl mezi nimi odhalí restart bez deploye.** Zvoleno env (ne build `ARG` — ten invaliduje docker cache při každém sha). PC-08: `sha` zkrácený na 7 znaků a vrácený i v produkci (smysl je neautentizovaný `curl`; privátní repo). Ověřeno: unit 9/9, e2e 2/2, typecheck+lint+prettier, `compose config` substituce s hodnotami i bez. **Čeká na nejbližší BE deploy** — pak `curl -s https://www.projekt-ikaros.com/api/health` musí vrátit `version.sha` = 7 znaků nasazeného commitu (dnes `unknown`, protože běžící image proměnnou nezná).
+
+### - [ ] 24.2 Ops kroky vázané na deploy — [dopad střední · náklad malý] 🟡 kód hotov 2026-07-20, čeká deploy + smoke
+env `ANON_SESSION_TTL=14d` (15.8) · migrace `migrate:discussion-reports` (20.1–20.3) · **CSP enforce** + smoke neprozkoumaných stránek (galerie/postavy/bestiář/kalendář/admin/motivy) · ověřit RAM prerender sidecaru (Chromium ~150–300 MB).
+**Spec:** `docs/arch/phase-24/spec-24.2.md`. **Rešerše rozbila zadání — dva ze čtyř bodů byly jinak, než karta tvrdila:**
+- **① TTL ✅** — kód má default `'14d'`, produkce **už tak běžela**; chyběl jen explicitní zápis (prod compose + `deploy.yml` + `.env.example`), aby hodnota šla ladit bez zásahu do zdrojáku.
+- **② migrace ✅ SPUSTITELNÁ** — původní skript byl v produkci **nespustitelný**: BE image nese jen `dist/` + prod `node_modules` (bez `scripts/`, `ts-node` padne přes `npm prune --omit=dev`). Přepsán na čistý JS (`scripts/seed-migrace/migrate-discussion-reports.js`) + workflow `migrate-discussion-reports.yml` (docker cp → `docker exec node`, **default dry-run**, idempotentní dedupe). Mapper ověřen proti dnešnímu `content-report.schema.ts` (enumy `discussion_post`+`other` sedí). Dry-run zároveň odpoví „je vůbec co migrovat?" — vypíše počet legacy dokumentů. **D-074 zrušen** (nevznikl dluh, práce se udělala).
+- **③ CSP ✅ + REÁLNÝ NÁLEZ** — enforce **už běžel** (ověřeno `curl -I`), ale **naslepo**: statický audit odhalil, že `img-src` whitelistuje nikdy nevolaný `i.ytimg.com`, zatímco reálně používaný `img.youtube.com` (`VideosPanel.tsx`, náhledy YT v editoru stránek) v něm **chybí** → enforce tiše lámal náhledy videí. Opraveno + přidán BE `POST /api/csp-report` (oba formáty `report-uri`/`report-to`, rate-limit 30/min, dedupe 10 min) — bez něj byl jediným detektorem porušení tester s rozbitou stránkou.
+- **④ RAM ✅** — sidecar neměl `mem_limit` a sdílený Chromium se recykloval jen při pádu (na stroji, kde BE drží RSS ~2,4 GB). Přidán `mem_limit: 768m` + recyklace po 200 renderech + LRU `maxSize` 64 MB; **měření** doplněno do `server-check.yml` (kroky 13/14: `docker stats` + restarty/OOM).
+
+**Ověřeno:** BE unit 14/14 · e2e 4/4 (těžiště = body parser, ne logika — reporty chodí pod content-types, které expressí json parser sám nečte) · e2e regrese 9/9 · typecheck+lint+prettier · FE build + `check-csp-hash` + bundle budget. Deník: `CH-124` (race v recyklaci Chromia, nalezena vlastní kontrolou) + `✅ ŘEŠENÍ` v `ops.md`.
+**Zbývá:** ① deploy BE+FE → ověřit hlavičky zvenku · ② spustit workflow **Migrace nahlášených příspěvků** (dry-run; zápis jen když něco najde) · ③ **živý smoke stránek s DevTools konzolí** (checklist ve spec §7; prioritní je editor stránek → panel Videa).
 
 ### - [x] 24.3 Živá ověření (checklist s uživatelem) — [dopad vysoký · náklad malý]
 Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 11.5 · vitrína 22.4 anon flow · klon scény 22.5 · AKJ owner-edit (D-067) · export světa — reálné stažení ZIP (media/ + chat) · UVTT import `.dd2vtt` · LoS výkon velké scény · Stavitel 21.3 · dotyk mapy na telefonu 17.4 · web push na reálném telefonu (iPhone = PWA na plochu) · stream overlay v OBS · voice (pokud dosud živě neověřen) · komunitní bestiář 16.2b-2. Co padne, opravit před kohortou A.
@@ -145,6 +160,7 @@ Z rešerše živého webu: ① skrýt/přejmenovat veřejně viditelný svět s 
 ### - [ ] 25.6 Kurátorský první výběr motivů — [dopad střední · náklad malý]
 **Rešerše:** 33 motivů = rozhodovací zátěž + vizuální QA plocha; kyberpunk default polarizuje.
 **Návrh:** v prvním výběru 4–6 „podpisových" motivů (zbytek za „Další motivy…"), žádné mazání. **Otevřené otázky:** neutrálnější default, nebo rychlá volba dle žánru při registraci/založení světa? Kterých 4–6? *(Kvalita skinů zůstává princip — tady jde o kurátorství nabídky, ne o šetření na grafice.)*
+
 ### - [ ] 25.7 Registrační brzda (volitelné) — [dopad nízký · náklad malý]
 Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whitelist neexistuje. Pro kohorty A/B stačí nešířit URL. Env-flag invite kód / kapacitní cap připravit, jen kdyby se to zvrhlo. **Otevřená otázka:** chceme pro kohortu C pozvánkové kódy (měřitelné „přišel doporučením"), nebo volný vstup s capem?
 

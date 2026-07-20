@@ -19,6 +19,9 @@ const CHROMIUM_PATH = process.env.CHROMIUM_PATH ?? "/usr/bin/chromium-browser";
 const READY_TIMEOUT = Number(process.env.READY_TIMEOUT ?? 8000);
 // Tvrdý strop na celý render (goto + wait), ať jedna zaseklá stránka neblokuje.
 const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT ?? 15000);
+// 24.2 — po kolika renderech Chromium recyklovat (0 = nikdy). Sdílená instance
+// jinak žije, dokud nespadne, a headless Chromium přitom postupně roste.
+const RECYCLE_AFTER = Number(process.env.RECYCLE_AFTER ?? 200);
 
 // TTL cache per skupina rout (ms): statické stránky se mění zřídka → dlouho,
 // dynamický obsah (světy/články/galerie) → krátce, ať náhled nezastará.
@@ -34,45 +37,103 @@ function ttlForPath(pathname) {
 
 // Cache klíč = jen path (žádný uživatel/token) — privátní se stejně nerenderuje,
 // takže nemůže dojít k záměně odpovědí mezi uživateli (spec §3 bod 4).
-const cache = new LRUCache({ max: 500, ttl: TTL_DYNAMIC });
+// 24.2 — `max` (počet položek) o paměti neříká nic: 500 velkých HTML může být
+// klidně 200 MB. `maxSize` v bajtech je skutečný strop, `max` zůstává jako
+// druhá pojistka proti tisícům drobných odpovědí.
+const CACHE_MAX_BYTES = 64 * 1024 * 1024;
+const cache = new LRUCache({
+  max: 500,
+  maxSize: CACHE_MAX_BYTES,
+  sizeCalculation: (html) => Buffer.byteLength(html) || 1,
+  ttl: TTL_DYNAMIC,
+});
 
 // Jeden sdílený prohlížeč pro všechny požadavky (drahé je startovat ho znovu);
 // per request otevřeme jen novou kartu (page) a zase ji zavřeme.
 let browserPromise = null;
+// 24.2 — kolik renderů odbavil SOUČASNÝ browser + kolik jich právě běží.
+// Recyklovat smíme jen na nule, jinak bychom zavřeli prohlížeč pod rukama
+// requestu, který na něm má otevřenou kartu.
+let renderCount = 0;
+let inflight = 0;
+
 async function getBrowser() {
   if (!browserPromise) {
-    browserPromise = puppeteer.launch({
+    const launched = puppeteer.launch({
       executablePath: CHROMIUM_PATH,
       headless: true,
       // --no-sandbox je v kontejneru nutné (běží jako root, žádný user namespace);
       // bezpečnostní hranice je sám kontejner.
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
     });
+    browserPromise = launched;
+    renderCount = 0;
     // Když prohlížeč spadne, zahodíme promise → příští request ho nastartuje znovu.
-    browserPromise.then((b) => b.on("disconnected", () => (browserPromise = null)));
+    // Porovnání s `launched` je nutné: při recyklaci zavíráme browser ručně a
+    // mezitím už může běžet nový. Bez téhle podmínky by opožděný `disconnected`
+    // starého prohlížeče zahodil promise toho NOVÉHO a osiřel by běžící proces.
+    launched.then((b) =>
+      b.on("disconnected", () => {
+        if (browserPromise === launched) browserPromise = null;
+      }),
+    );
   }
   return browserPromise;
 }
 
-async function renderPage(pathname) {
-  const browser = await getBrowser();
-  const page = await browser.newPage();
+// 24.2 — recyklace vysloužilého prohlížeče. Volá se po každém renderu; zabere
+// až když doběhnou všechny souběžné requesty. Nový prohlížeč nastartuje líně
+// příští `getBrowser()`, takže tady nic nepředstartováváme.
+async function maybeRecycleBrowser() {
+  if (RECYCLE_AFTER <= 0 || renderCount < RECYCLE_AFTER || inflight > 0) return;
+  const current = browserPromise;
+  if (!current) return;
+  browserPromise = null;
+  renderCount = 0;
   try {
-    page.setDefaultNavigationTimeout(NAV_TIMEOUT);
-    // 15B.7 — marker v UA, ať analytics ping z renderované SPA BE odfiltruje
-    // (sidecar = headless Chrome, jinak by každý render nafoukl návštěvnost).
-    const ua = await browser.userAgent();
-    await page.setUserAgent(`${ua} Ikaros-Prerender`);
-    // Render jako anonym — žádné hlavičky uživatele se nepřenášejí.
-    await page.goto(FRONTEND_INTERNAL + pathname, { waitUntil: "domcontentloaded" });
-    // Počkáme na signál, že SPA dořešila data; když nepřijde, vrátíme co je
-    // (graceful degradation — radši neúplné HTML než 5xx, spec OO6).
-    await page
-      .waitForFunction("window.__PRERENDER_READY__ === true", { timeout: READY_TIMEOUT })
-      .catch(() => {});
-    return await page.content();
+    const browser = await current;
+    await browser.close();
+    console.log(`[prerender] Chromium recyklován po ${RECYCLE_AFTER} renderech`);
+  } catch (err) {
+    // Zavření selhalo → promise je stejně zahozená, příští request nastartuje
+    // čerstvý prohlížeč. Osiřelý proces uklidí nejpozději restart kontejneru.
+    console.error("[prerender] recyklace selhala:", err?.message ?? err);
+  }
+}
+
+async function renderPage(pathname) {
+  // 24.2 — inflight se zvedá jako PRVNÍ, ještě před `await getBrowser()`.
+  // Kdyby se zvedal až po něm, vzniklo by okno pro race: request B čeká na
+  // `await`, mezitím request A doběhne, uvidí inflight === 0 a zavře prohlížeč —
+  // a B by pak volal `newPage()` nad zavřeným browserem. Vnější `finally` čítač
+  // vždy sníží, takže ani selhání `getBrowser()` ho nenechá viset.
+  inflight++;
+  try {
+    const browser = await getBrowser();
+    const page = await browser.newPage();
+    try {
+      page.setDefaultNavigationTimeout(NAV_TIMEOUT);
+      // 15B.7 — marker v UA, ať analytics ping z renderované SPA BE odfiltruje
+      // (sidecar = headless Chrome, jinak by každý render nafoukl návštěvnost).
+      const ua = await browser.userAgent();
+      await page.setUserAgent(`${ua} Ikaros-Prerender`);
+      // Render jako anonym — žádné hlavičky uživatele se nepřenášejí.
+      await page.goto(FRONTEND_INTERNAL + pathname, { waitUntil: "domcontentloaded" });
+      // Počkáme na signál, že SPA dořešila data; když nepřijde, vrátíme co je
+      // (graceful degradation — radši neúplné HTML než 5xx, spec OO6).
+      await page
+        .waitForFunction("window.__PRERENDER_READY__ === true", { timeout: READY_TIMEOUT })
+        .catch(() => {});
+      return await page.content();
+    } finally {
+      await page.close().catch(() => {});
+    }
   } finally {
-    await page.close().catch(() => {});
+    inflight--;
+    // Počítáme i neúspěšné rendery — prohlížeč zatížily stejně jako povedené.
+    renderCount++;
+    // Nečekáme: recyklace nesmí zdržet odpověď crawlerovi (chyby si řeší sama).
+    void maybeRecycleBrowser();
   }
 }
 

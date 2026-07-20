@@ -30,3 +30,66 @@ Detailní záznamy. Index: [README.md](README.md).
 **Dodatek (oprava nálezů týž den):** uživatel nechtěl dluh → `server-hardening.yml` (diagnose/apply): matrix-mongodb publish → 127.0.0.1 (compose záloha `.bak-23-6`, backend restart) + DOCKER-USER (RETURN edge 10.10.10.104 + host + ESTABLISHED, DROP zbytek /24, systemd persistence) s auto-rollbackem gated na curl web+API přes edge z runneru. Apply zelený napoprvé, pravidly hned tekly pakety. Vzor „diagnose/apply + auto-rollback" = použitelný pro budoucí serverové zásahy bez SSH.
 
 ---
+
+### ✅ ŘEŠENÍ — 24.1 jak zvenku dokázat, který commit je nasazený · 2026-07-20
+
+**Co nakonec zabralo:** karta 24.1 zněla „deploy obou částí nad HEAD", ale správná první otázka byla „**běží už HEAD?**" — a odpověď byla ano, bez jediného deploye. Tři nezávislé techniky ověření zvenku:
+- **FE (tvrdý důkaz):** z posledního commitu dotýkajícího se `src/` (`f693bd48`) vytáhnout **uživatelský text**, který přežije minifikaci („Když se ti návrh nepovede"), najít v živém `index-*.js` název lazy chunku (`HelpPage-DKC64IbD.js`), stáhnout a grepnout. Marker sedí → bundle prokazatelně obsahuje ten commit.
+- **BE (řetěz):** `/api/health` `uptimeSec` → dopočet času startu kontejneru (21:56:49 UTC); `git log -g refs/remotes/origin/main` → **čas reálného pushe** (`update by push` 21:49:30 UTC, v commitu ho nenajdeš); čas deploy runu z Actions (21:55). Push < start deploye < restart → checkout musel vzít HEAD.
+- **Odlišení, které repo screenshot Actions ukazuje:** živý FE `index.html` měl `Last-Modified` **pozdější** než nejnovější run na screenshotu → screenshot je z BE repa.
+
+**Proč to je správně (a ne další variace):** `Last-Modified` a „deploy proběhl" dokazují jen *že se něco buildilo*, ne *co v tom je* — přesně tahle nejednoznačnost stála 2 falešné runy 2026-07-14 (www servírovalo starý bundle, protože runy #332/#333 běžely PŘED pushem; čas commitu ≠ čas pushe). Marker z konkrétního commitu + reflog push-čas tuhle mezeru zavírají. Deploy gate z 23.7 ji **nezavírá**: kontroluje jen zelenou CI pro checked-out sha, takže „nasadil starší sha, protože nový nebyl pushnutý" by prošlo zeleně.
+
+**Jak ověřeno:** `curl --ssl-no-revoke` na www (apex míří na Vercel — jiná věc); marker nalezen 1× v živém chunku; health 10/10 ok; reflog + Actions screenshot od uživatele.
+
+**Zhodnocení:** dobře — karta uzavřena bez zásahu do produkce, deploy by nasadil jen `docs/`+`ci.yml`. Vedlejší zjištění: log rotace FE nginxu (23.6) je aktivní (compose 17:28 < deploy 22:02). **Vlastní chyba:** v roadmapě jsem tuhle past nejdřív přiřkl „CH-073" — to je ale scroll bug v chatu; záznam o stale bundlu v deníku vůbec nebyl (žil jen v paměti `project_fe_deploy_stale_bundle`), proto teď vzniká tenhle. Poučení: než odcituju ID z deníku, ověřit ho grepem.
+
+**Dodatek — mezera zavřena týž den (`/api/health` → `version`):** dopočet z `uptimeSec` není jen nepohodlný, je **falešně pozitivní** — dává čas posledního *restartu*, takže restart z jiné příčiny (OOM; RSS baseline ~2,4 GB) vypadá jako čerstvý deploy. Proto do health přibylo `version: { sha, builtAt }`: `deploy.yml` krok „Stamp build metadata" (samostatný — heredoc `.env` je quoted, `$(date)` by se v něm neexpandovalo, a odquotovat nelze kvůli secrets s `$`) → `.env` → compose → controller. **Klíčové rozlišení: `uptimeSec` = poslední restart, `builtAt` = poslední deploy; rozdíl mezi nimi = restart bez deploye.** Zvoleno env, ne build `ARG` (ARG mění vrstvu image při každém sha → invaliduje docker cache za nulový přínos). Fallback přes `||` ne `??` — compose dosadí prázdný `""`, ne undefined (ověřeno `compose config` bez hodnot). PC-08 vědomě: `sha` zkrácený na 7 a vrácený i v produkci, protože autentizovaný endpoint by zabil celý use-case (`curl` bez tokenu); privátní repo → neodemyká nic. Ověřeno: unit 9/9 (vč. prázdné var a ne-strip v produkci), e2e 2/2, typecheck+lint+prettier. **Účinek se projeví až prvním BE deployem** — do té doby běžící image proměnnou nezná a vrací `unknown`.
+
+**Poučení navíc:** „záměr" (Actions: co se nasadit mělo) a „realita" (health: co běží) jsou dvě různé veličiny a stale bundle 07-14 byl přesně jejich rozpor. Zelený deploy run realitu nedokazuje.
+
+---
+
+### CH-124 — recyklace Chromia: `inflight++` až za `await` = okno pro zavření prohlížeče pod běžícím requestem · 2026-07-20
+
+**Kontext:** karta 24.2 bod ④ — prerender sidecar (`prerender/index.js`) držel jednu instanci headless Chromia, která se restartovala jen při pádu. Přidával jsem recyklaci po N renderech, aby se řešila příčina růstu paměti, ne jen symptom přes `mem_limit`.
+
+**Co jsem udělal špatně:** čítač souběžných renderů jsem zvedal až **po** získání prohlížeče:
+
+```js
+const browser = await getBrowser();   // ← await uvolní event loop
+inflight++;                            // ← až tady
+```
+
+**Proč to nefungovalo:** `await` uvolní kontrolu event loopu. Request B mohl uváznout přesně mezi těmi dvěma řádky, zatímco request A doběhl, v `finally` uviděl `inflight === 0`, uzavřel podmínku „nikdo nerenderuje" a zavřel prohlížeč. B pak pokračoval a volal `newPage()` nad zavřeným browserem → 503 pro crawlera. Okno je úzké, takže by se to v testu ani při ručním zkoušení skoro jistě neprojevilo a spadlo by to až v produkci pod souběžným provozem botů.
+
+**Oprava:** `inflight++` jako **první příkaz funkce**, ještě před `await getBrowser()`; vnější `finally` čítač vždy sníží, takže ani selhání `getBrowser()` ho nenechá viset.
+
+**Poučení:** u sdíleného zdroje s počítadlem „kdo ho zrovna používá" musí inkrement předcházet **každému** `await` na cestě k jeho použití. Jinak si mezi rezervaci a použití vklíní cizí cleanup. Obecně: `await` není jen čekání, je to bod, kde smí běžet cizí kód — a otázka zní „co se stane, když se právě tady vystřídám?"
+
+**Příznak cyklení:** píšu úklidovou logiku (close/dispose/recycle) podmíněnou čítačem nebo flagem a ptám se „stačí to takhle?" — pak projít každý `await` mezi rezervací zdroje a jeho použitím. Nalezeno vlastní kontrolou před dodáním, ne za běhu.
+
+---
+
+### ✅ ŘEŠENÍ — 24.2 ops kroky: dva ze čtyř bodů byly jinak, než karta tvrdila · 2026-07-20
+
+**Co nakonec zabralo:** začít **rešerší stavu místo implementací zadání**. Karta 24.2 vypadala na čtyři drobné ops úkony; po ověření proti kódu a živé produkci se rozpadla jinak:
+
+| bod | co karta čekala | realita |
+| --- | --- | --- |
+| ① `ANON_SESSION_TTL=14d` | nastavit env | kód má default `'14d'` → produkce **už tak běží**; chyběl jen explicitní zápis (compose/`.env.example`/deploy) |
+| ② migrace discussion-reports | spustit `npm run …` | **nespustitelné** — prod image nemá `scripts/` ani `ts-node` (devDep padne přes `npm prune`) → D-074, odloženo (uživatel: kolekce je nejspíš prázdná) |
+| ③ CSP enforce + smoke | přepnout na enforce | **enforce už běžel** (ověřeno `curl -I`) — a běžel **naslepo**, viz níž |
+| ④ RAM prerenderu | změřit | nešlo změřit (workflow RAM nesledoval) a kontejner neměl `mem_limit` |
+
+**Hlavní nález (③):** statický audit externích domén ve `src/` proti CSP whitelistu odhalil, že `img-src` povoluje `i.ytimg.com`, který kód **nikdy nevolá**, zatímco reálně používaný `img.youtube.com` ([VideosPanel.tsx](../../src/features/world/pages/PageEditor/panels/VideosPanel.tsx) — náhledy YT videí) ve whitelistu **chybí**. Oba hosty servírují tytéž thumbnaily, ale CSP porovnává hostname doslova. Enforce tedy v tichosti lámal náhledy videí v editoru stránek.
+
+**Proč to je správně (a ne jen ta jednořádková oprava):** samotná výměna hostu opraví jeden příznak a nechá příčinu — CSP neměla `report-uri` ani `report-to`, takže jediným detektorem porušení byl uživatel s rozbitou stránkou. Proto přibyl BE endpoint `POST /api/csp-report` (oba formáty, rate-limit 30/min, deduplikace 10 min, ořez polí do logu). Tenhle konkrétní nález by ohlásil sám.
+
+**Vedlejší zjištění (metodické):** e2e harness (`test/helpers/app-factory.ts`) staví app vlastní cestou a **neregistruje body parsery z `main.ts`**. Test s `Content-Type: application/csp-report` by tedy ověřoval svou vlastní kopii konfigurace — tedy přesně to místo, kde by se drift schoval. Řešení: parser vytažen do sdílené `csp-report.body-parser.ts` (volá ji `main.ts` i test) + volitelný `configure` hook ve factory.
+
+**Jak ověřeno:** BE unit 14/14, e2e 4/4 (těžiště na parseru, ne na logice), `typecheck` + `lint:check` + prettier, e2e regrese sdíleného harnessu 9/9. FE `npm run build` + `check-csp-hash` + bundle budget zelené. Živé hlavičky ověřeny `curl -sSI --ssl-no-revoke`.
+
+**Zhodnocení:** dobře — ale poučení je o **zadání, ne o kódu**: dvě ze čtyř položek roadmapy neodpovídaly realitě a slepá implementace by u ① duplikovala hotové, u ② narazila na nespustitelný skript a u ③ „přepínala" už přepnuté, aniž by kdokoli našel rozbité náhledy. **Ops karty psané dopředu stárnou tiše** — mezi jejich napsáním a odbavením se stav změní a nikdo to nepozná. Vlastní chyba během práce: CH-124 (race v recyklaci). **Zbývá:** živý smoke stránek (nemůžu — zákaz prohlížeče) + BE/FE deploy, teprve pak se `report-uri` a `mem_limit` reálně projeví.
+
+---

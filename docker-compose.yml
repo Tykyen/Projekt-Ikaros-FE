@@ -52,6 +52,17 @@ services:
     environment:
       # interní adresa SPA (nginx), kam chodí headless prohlížeč pro stránky
       FRONTEND_INTERNAL: http://frontend:80
+      # 24.2 — po kolika renderech Chromium recyklovat (0 = nikdy). Headless
+      # Chromium při dlouhém běhu roste; sdílená instance jinak žije, dokud
+      # nespadne. Recyklace řeší PŘÍČINU, mem_limit níž je jen zábrana.
+      RECYCLE_AFTER: ${PRERENDER_RECYCLE_AFTER:-200}
+    # 24.2 — strop paměti. Sidecar dosud běžel bez limitu na stroji, kde BE drží
+    # RSS ~2,4 GB baseline (ONNX embedding) → ujetý Chromium by tlačil na celý
+    # host. 768m je velkorysá POJISTKA, ne přesné ladění: doladí se podle měření
+    # z `server-check.yml` (krok „docker stats"). Při dosažení stropu kernel
+    # kontejner zabije a `restart: unless-stopped` ho zvedne — proto je limit
+    # bezpečnější než jeho absence, i kdyby byl trochu nízký.
+    mem_limit: 768m
     expose:
       - "3000"
     healthcheck:

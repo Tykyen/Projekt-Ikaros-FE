@@ -4,6 +4,10 @@ name: Server Check (23.6)
 # Vypíše: kde běží Caddy, kam proxuje (Caddyfile), na jakých adresách poslouchají
 # porty 3001/8081 a stav ufw firewallu. Slouží k ověření PŘED deployem
 # loopback bindů (spec-23.6): cíle Caddy MUSÍ být localhost/127.0.0.1.
+#
+# 24.2 — přibyly kroky 13/14 (paměť kontejnerů + restarty/OOM). Tím se z workflow
+# stal i průběžný měřicí nástroj pro prerender sidecar, ne jen jednorázová
+# diagnostika 23.6.
 on:
   workflow_dispatch:
 
@@ -64,5 +68,19 @@ jobs:
           echo "===== 12) Sítě matrix kontejnerů (jak spolu mluví) ====="
           for c in matrix-backend matrix-mongodb; do
             echo "$c → sítě: $(docker inspect $c --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}} {{end}}' 2>/dev/null)"
+          done
+          echo ""
+          echo "===== 13) Paměť kontejnerů (24.2) — MEM USAGE / LIMIT + % ====="
+          # Karta 24.2 chtěla „ověřit RAM prerender sidecaru (Chromium ~150–300 MB)".
+          # Sledovat: projekt-ikaros-prerender proti limitu 768m (compose mem_limit).
+          # Když se dlouhodobě drží hluboko pod ním, limit se dá stáhnout; když se
+          # o něj otírá, je málo agresivní RECYCLE_AFTER (default 200 renderů).
+          docker stats --no-stream --format 'table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.CPUPerc}}' 2>/dev/null || echo "docker stats nedostupné"
+          echo ""
+          echo "===== 14) Restarty kontejnerů (24.2) — OOM kill se projeví tady ====="
+          # Nenulový RestartCount u prerenderu + ExitCode 137 = kernel ho zabil na
+          # mem_limitu. To NENÍ normální provozní stav; znamená doladit limit.
+          for c in projekt-ikaros-prerender projekt-ikaros-fe projekt-ikaros-be; do
+            echo "$c → $(docker inspect $c --format 'restartů={{.RestartCount}} poslední_exit={{.State.ExitCode}} OOMKilled={{.State.OOMKilled}}' 2>/dev/null || echo 'kontejner neběží')"
           done
           ENDSSH

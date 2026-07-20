@@ -180,6 +180,7 @@ Panely (`PageEditor.tsx:397`):
 - **DataTemplatePanel** — stripe karet datových šablon (per-svět `WorldPageTemplate`); „Volný text" + per-svět šablony aplikují headers + defaultTitle; šablona s osnovou (15.5) navíc vloží `contentOutline` do prázdného `content`.
 - **TablePanel** — atributová tabulka (headers/values, rich-text buňky s inline odkazy).
 - **GalleryPanel** (typ Galerie), **VideosPanel** (Obrazovka), **MenuPanel** (Seznam), **CustomDataPanel** (Noviny), **PostavaPanel** (PC/NPC — výběr ownera).
+  - ⚠️ **VideosPanel — náhledy videí byly v produkci rozbité** (do 24.2). Panel bere thumbnail z `https://img.youtube.com/vi/{id}/mqdefault.jpg` (`VideosPanel.tsx:104`), ale CSP `img-src` whitelistovala **jiný** host (`i.ytimg.com`, který kód nikdy nevolal) — a enforce CSP běžel. Oba hosty servírují tytéž náhledy, jenže CSP porovnává hostname doslova. Opraveno v `default.conf.template` (24.2); ⏳ projeví se až po FE deployi. Poučení pro budoucí panely: **každá nová externí doména v `src/` musí přibýt i do CSP whitelistu**, jinak ji enforce tiše zablokuje.
 - **ContentPanel** — TipTap rich-text: B/I/U/S/sup/sub, nadpisy H2/H3, seznamy, citace, **tabulky** (`enableTable`), barvy, bloky. Wikilink `[[` dropdown (`useWikilinkExtension`), broken-link dekorace, image upload (Cloudinary), `StyleRail` (permanentní toolbar) + bubble menu, `LinkPickerPopover` pro vkládání odkazů (`linkDirectory` + `linkMakeSlug`).
 - **SectionsPanel** — strukturované sekce (collapsible, items).
 - **AkjTabsPanel** — chráněné záložky (viz níže).

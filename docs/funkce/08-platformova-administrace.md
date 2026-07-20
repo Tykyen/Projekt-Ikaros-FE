@@ -416,6 +416,20 @@ Generický subsystém pro nahlašování jakéhokoli UGC a jeho moderaci (DSA č
 
 ---
 
+## Provozní endpointy bez UI (telemetrie)
+
+### Sběr porušení CSP (24.2)
+- **Co to je:** sběrné místo pro hlášení prohlížeče o tom, že Content-Security-Policy něco zablokovala. Slouží k odhalení **vlastních chyb ve whitelistu** — do 24.2 běžel enforce naslepo a jediným detektorem byl uživatel s rozbitou stránkou.
+- **Kde:** `POST /api/csp-report`. **Žádné UI** — volá ho přímo prohlížeč na základě direktiv `report-uri` / `report-to` v CSP hlavičce z FE nginxu (`default.conf.template`).
+- **Kdo:** **veřejný, bez autentizace** — reporty posílá prohlížeč, který u nich neposílá cookies ani hlavičky. Kompenzace: `@Throttle` 30 req/min/IP (`csp-report.controller.ts:38`), ořez všech logovaných polí na 200 znaků, body limit 64 kB.
+- **Co jde dělat:** přijímá **oba** formáty — `report-uri` (`application/csp-report`, objekt `{"csp-report":{…}}`, kebab-case) i `report-to` (`application/reports+json`, pole reportů, camelCase). Normalizuje je na trojici direktiva / blokovaná URL / stránka a zapíše `logger.warn` (`CSP blok: img-src → … (na …)`).
+- **Hranice / co neumí:** **neukládá do DB** — jen log, žádná fronta ani UI přehled. Deduplikace 10 min per porušení (max 500 klíčů in-memory, klíč bez query stringu) → opakované porušení se v logu neobjeví. Čítač je **per instance BE**, při více replikách by se dedupe rozešel. Vrací vždy 204, i na nesmyslné tělo (prohlížeč odpověď nečte).
+- **Zvláštnosti:** ① Content-types `application/csp-report` a `application/reports+json` expressí json parser **sám nečte** → parser je registrovaný zvlášť (`csp-report.body-parser.ts`, sdílený s e2e testem, aby konfigurace nedriftovala). ② Controller bere `body: unknown` **schválně** — globální `ValidationPipe` má `forbidNonWhitelisted`, takže jakékoli DTO by na kebab-case polích vracelo 400. ③ Reporty CSP nepodléhají `connect-src`, doména se whitelistovat nemusí.
+- **Stav:** ✅ funguje (BE bez FE — UI se neplánuje). ⏳ účinek až po deployi FE (hlavička) i BE (endpoint).
+- **Kód:** BE `common/csp-report/csp-report.controller.ts:19`, `csp-report.service.ts:33` (normalizace + dedupe `:112`), `csp-report.body-parser.ts`; FE `default.conf.template` (direktivy `report-uri`/`report-to` + hlavička `Reporting-Endpoints`).
+
+---
+
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
 1. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-ADMIN-UI) — **Reset hesla má UI.** Tlačítko „Reset hesla" v tabulce uživatelů (Superadmin-only, ne self) → `ResetPasswordModal` s generovaným heslem + copy. (`useAdminResetPassword`)

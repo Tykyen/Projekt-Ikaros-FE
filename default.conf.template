@@ -98,13 +98,24 @@ server {
     #     scripts/check-csp-hash.mjs hlídá, že hash sedí se skriptem).
     #     Externí povolení: challenges.cloudflare.com (Turnstile), fonts.google*
     #     (fonty), res.cloudinary.com (obrázky+dice textury fetch), www.youtube.com
-    #     + i.ytimg.com (YT IFrame API: zvuky světa + video embedy), ${BACKEND_HOST}.
+    #     + img.youtube.com (YT IFrame API: zvuky světa + video embedy), ${BACKEND_HOST}.
+    #     24.2 — v img-src byl do té doby `i.ytimg.com`, který kód NIKDY nevolal,
+    #     zatímco reálně používaný `img.youtube.com` (náhledy v PageEditor →
+    #     VideosPanel) ve whitelistu chyběl → enforce lámal náhledy videí. Oba
+    #     hosty servírují tytéž thumbnaily, ale CSP porovnává hostname doslova.
     #     Ústupky doložené report-only fází (2026-06-19):
     #       'unsafe-inline' v style-src — knihovny (router ap.) injektují inline <style>.
     #       'unsafe-eval' v script-src — YouTube www-widgetapi volá eval (3rd party,
     #         CSP nemá per-doménový eval → musí být globální). Skripty jinak tvrdé.
     #   • HSTS: vynutí HTTPS (ctěno jen po HTTPS; preload zatím NE — nevratné).
     #   • X-XSS-Protection "0": legacy auditor je deprecated + děravý; CSP ho nahrazuje.
+    #   • 24.2 — hlášení porušení na BE `/api/csp-report`. Do 24.2 běžel enforce
+    #     NASLEPO: co CSP zablokovala, se dozvěděl jen uživatel v konzoli. Posíláme
+    #     obojí, protože prohlížeče se neshodnou:
+    #       report-uri  — deprecated, ale drží ho Firefox/Safari (body `{"csp-report":{…}}`)
+    #       report-to   — moderní Chrome; vyžaduje hlavičku `Reporting-Endpoints` níž
+    #         (body je POLE reportů `application/reports+json` — BE umí obojí).
+    #     Reporty CSP nepodléhají connect-src, doména se sem whitelistovat nemusí.
     location / {
         # 15B.1 — crawler na veřejné routě → interní přesměrování na prerender.
         # `if` obsahuje jen `rewrite ... last` (jedna z bezpečných operací uvnitř
@@ -123,7 +134,8 @@ server {
         # krčma přes Jitsi iframe); bez toho rodič feature nedeleguje a A/V v iframe
         # se zablokuje i s allow atributem.
         add_header Permissions-Policy "geolocation=(), camera=(self \"https://meet.jit.si\"), microphone=(self \"https://meet.jit.si\"), display-capture=(self \"https://meet.jit.si\"), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" always;
-        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com https://meet.jit.si; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://i.ytimg.com; connect-src 'self' data: ${BACKEND_HOST} ${SENTRY_HOST} https://res.cloudinary.com https://challenges.cloudflare.com https://meet.jit.si wss://meet.jit.si; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://meet.jit.si; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;
+        add_header Reporting-Endpoints "csp-endpoint=\"https://${BACKEND_HOST}/api/csp-report\"" always;
+        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com https://meet.jit.si; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://img.youtube.com; connect-src 'self' data: ${BACKEND_HOST} ${SENTRY_HOST} https://res.cloudinary.com https://challenges.cloudflare.com https://meet.jit.si wss://meet.jit.si; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://meet.jit.si; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests; report-uri https://${BACKEND_HOST}/api/csp-report; report-to csp-endpoint" always;
     }
 
     # 15B.1 — interní cíl prerenderu (zvenčí nedostupný; jen rewrite z location /).

@@ -1,0 +1,49 @@
+name: Migrace nahlášených příspěvků (discussion_reports → content_reports)
+
+# B4d / karta 24.2 — přenese legacy nahlášené příspěvky z kolekce
+# `ikaros_discussion_reports` do generické `content_reports` (modul moderation).
+# Bez toho jsou nevyřízené legacy reporty neviditelné — admin fronta „Zpracovat"
+# čte už jen `content_reports`.
+#
+# Idempotentní (dedupe dle targetId+createdAtUtc); legacy kolekci NEMAŽE.
+# Default DRY-RUN, skutečný zápis zaškrtnutím `apply`.
+# Mechanismus jako seedy/backfill: docker cp skriptu do BE kontejneru + docker exec node
+# (BE image nemá `scripts/` ani `ts-node`, proto ne `npm run migrate:*` — viz 24.2).
+#
+# DRY-RUN je zároveň odpověď na otázku „je vůbec co migrovat?" — vypíše počet
+# dokumentů v legacy kolekci. Nula = hotovo, nic dalšího není potřeba.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Zapsat změny? (nezaškrtnuto = jen dry-run výpočet)'
+        type: boolean
+        default: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ vars.SERVER_PORT }} -H ${{ vars.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy migration script to server
+        run: |
+          scp -P ${{ vars.SERVER_PORT }} scripts/seed-migrace/migrate-discussion-reports.js ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }}:/tmp/migrate-discussion-reports.js
+
+      - name: Run migration in BE container
+        # Skript do /app (kvůli node_modules resolution), pak docker exec s env
+        # APPLY dle inputu. Bez `apply` = dry-run (jen spočítá, nezapíše).
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker cp /tmp/migrate-discussion-reports.js projekt-ikaros-be:/app/migrate-discussion-reports.js && docker exec -w /app -e APPLY=${{ inputs.apply && '1' || '0' }} projekt-ikaros-be node migrate-discussion-reports.js"
