@@ -109,3 +109,25 @@ inflight++;                            // ← až tady
 **Příznak cyklení:** píšu „zbytek čistý / nic dalšího nenalezeno" po grepu — zkontrolovat, jestli vzorek (`src/` vs `dist/` vs runtime) pokrývá celý rozsah toho tvrzení. U CSP/závislostí vždy `dist/`.
 
 ---
+
+### ✅ ŘEŠENÍ — D-075: emoji data self-hostovaná, CSP whitelist zase úzký · 2026-07-20
+
+**Co nakonec zabralo:** místo trvalého rozšíření CSP o cizí CDN přesunout data na vlastní origin. `frimousse` má prop `emojibaseUrl`; skládá z něj `${emojibaseUrl}/${locale}/{data,messages}.json`. Stačilo tedy:
+
+1. `public/emojibase/en/` ← `data.json` (718 kB, 1941 emoji) + `messages.json` (6 kB) z `emojibase-data@16` (shodná major verze s tím, co používá frimousse),
+2. `<EmojiPicker.Root locale="en" emojibaseUrl="/emojibase">`,
+3. `cdn.jsdelivr.net` **pryč** z `connect-src` — data teď pokrývá `'self'`.
+
+**Proč to je správně (a ne ponechat rozšířenou CSP):** rozšíření whitelistu řešilo symptom a platilo se za něj natrvalo — závislost na dostupnosti cizí CDN (výpadek jsdelivr = rozbitá paleta), širší plocha v `connect-src` a odchozí požadavek třetí straně z prohlížeče uživatele (soukromí). Self-host všechny tři zároveň ruší a ještě je rychlejší (stejný origin, gzip z našeho nginxu — `application/json` je v `gzip_types`, ~150 kB po drátě).
+
+**Dvě věci, které stály za pozornost:**
+- `locale` předáno **explicitně**, ačkoli `"en"` je default knihovny — cesta k datům se z něj odvozuje, takže změna defaultu v budoucí verzi by fetch minula a paleta by se zase tiše rozbila. Přesně ten typ selhání, co tuhle sérii začal.
+- V bundlu **zůstává řetězec `cdn.jsdelivr.net`** jako defaultní větev uvnitř frimousse, kterou náš prop přebíjí. Grep nad buildem ho najde a bude vypadat jako regrese — proto je to popsané v `public/emojibase/README.md` a ověřuje se přítomností `emojibaseUrl:"/emojibase"` v témže bundlu. **Mrtvý řetězec ≠ aktivní volání.**
+
+**Jak ověřeno:** `npm run build` + `check-csp-hash` + bundle budget zelené (data jsou statika, do bundlu nejdou) · vitest `src/features/chat` **156/156** · data ověřena parsováním (1941 emoji, 10 skupin, 101 podskupin) · audit nad buildem (metoda `CH-125`) → žádný nový externí zdroj, `connect-src` bez jsdelivr · `emojibaseUrl:"/emojibase"` prokazatelně v dist.
+
+**Zhodnocení:** dobře, zabralo napoprvé. Hezky uzavírá sérii 24.2: nález 2 → rychlá záplata (whitelist) → trvalé řešení (self-host) → whitelist zpět zúžen. **Zbývá:** FE deploy + proklik pickeru (paleta se musí načíst; při chybě by konzole hlásila 404 na `/emojibase/en/data.json`, ne CSP blok).
+
+**⚠️ Past při commitu (nalezeno 2026-07-20 při R3 24.5):** změna je rozpadlá mezi **trackované** soubory (`default.conf.template` odebírá jsdelivr z `connect-src`, `EmojiPickerPopover.tsx` míří na `/emojibase`) a **untrackovaný** `public/emojibase/` (732 kB, 3 soubory) — tedy právě ta data, na která ta cesta ukazuje. **Commit bez `git add public/emojibase/` rozbije paletu hůř než původní stav:** CSP už jsdelivr nepustí a data na vlastním originu nebudou v buildu → picker nemá odkud číst vůbec. Všechny tři změny musí jít pohromadě. Obecně: **když fix přesouvá zdroj dat, ověř, že nový zdroj je verzovaný** — `public/` se podvědomě čte jako generovaná statika, tady je to ale zdrojové datum.
+
+---

@@ -27,7 +27,7 @@ Definováno v `PAGE_TYPES` (`backend/src/modules/pages/interfaces/page.interface
 - `Postava hráče` — má `ownerUserId` + `characterRef` → Character `kind:'persona'` (5 subdoců).
 - `NPC` — `characterRef`, bez ownera.
 
-### Klíčová pole (`Page` interface, řádek 130-169)
+### Klíčová pole (`Page` interface, `page.interface.ts:216`)
 `slug`, `worldId`, `type`, `title`, `content` (HTML), `quickRef`, `imageUrl` + výřez (`imageFocalX/Y`, `imageZoom`, `imageFit`, parita s GameEvent), `bigImage`, `table` (atributová tabulka), `sections[]`, `galleryImages[]`, `videos[]`, `menu[]`, `plainText` (extrahovaný text pro search/read-time), `isWoodWide`, `accessRequirements[]` (page-level gate), `customData`, `order`, `ownerUserId`, `characterRef`, `akjTabs[]`.
 
 ### Stav
@@ -41,13 +41,13 @@ Definováno v `PAGE_TYPES` (`backend/src/modules/pages/interfaces/page.interface
 Member-facing index („Encyklopedie světa") s kartami stránek.
 
 ### Kde
-- FE route `stranky` → `memberOnly(PagesListPage)` (`router.tsx:238`, minimální world role Čtenář).
+- FE route `stranky` → **`showcaseOrMember(PagesListPage)`** (`router.tsx:409`) — od 22.4 vitrínová sekce: člen Čtenář+, jinak anonym/nečlen read-only, když má svět zapnuté `publicShowcase`.
 - Komponenta `src/features/world/pages/PagesListPage/PagesListPage.tsx`.
-- BE data: `GET /worlds/:worldId/pages/directory` → `pages.service.findDirectory` (`pages.service.ts:496`).
+- BE data: `GET /worlds/:worldId/pages/directory` → `pages.service.findDirectory` (`pages.service.ts:807`).
 
 ### Kdo
-- FE: Čtenář+ (memberOnly). Tlačítko „Nová stránka" jen `userRole >= PomocnyPJ` (`PagesListPage.tsx:52`).
-- BE: directory má od 2026-07-13 `OptionalJwtAuthGuard` (`pages.controller.ts:62`, D-DATA-SYNC-ZBYTKY a — parita s legacy characters directory): **anonym smí adresář VEŘEJNÉHO světa**, privátní jen členové (brána `assertCanViewWorld` ve `findDirectory`; přihlášený nečlen privátního světa také neprojde, R-AUDIT). Gating obsahu přes `shieldedBy` enrich per entry. ⚠️ CH-120: Optional guard platí JEN pro tuhle routu — sourozenci v controlleru zůstávají na `JwtAuthGuard`. Entry nově nese i `characterId` + `ownerUserId` (adapter `useCharacterDirectory`, kap. 12).
+- FE: Čtenář+ (member) nebo vitrína (22.4). Tlačítko „Nová stránka" jen `world.elevated === true || userRole >= PomocnyPJ` (`PagesListPage.tsx:59`).
+- BE: directory má od 2026-07-13 `OptionalJwtAuthGuard` (`pages.controller.ts:58-63`, D-DATA-SYNC-ZBYTKY a — parita s legacy characters directory): **anonym smí adresář VEŘEJNÉHO světa**, privátní jen členové (brána `assertCanViewWorld` ve `findDirectory`; přihlášený nečlen privátního světa také neprojde, R-AUDIT). Gating obsahu přes `shieldedBy` enrich per entry. ⚠️ CH-120: Optional guard platí jen pro `directory` a `GET :slug` (`:149`) — ostatní sourozenci v controlleru zůstávají na `JwtAuthGuard`. Entry nově nese i `characterId` + `ownerUserId` (adapter `useCharacterDirectory`, kap. 12).
 
 ### Co jde dělat (VŠE)
 - Fulltextové hledání (název + slug, diakritika-insensitive `normalize`).
@@ -63,13 +63,14 @@ Member-facing index („Encyklopedie světa") s kartami stránek.
 - Directory NEvrací `accessRequirements` na FE (privacy) — jen agregát `shieldedBy`.
 
 ### Zvláštnosti
-- `shieldedBy` per-entry: BE počítá nesplněné podmínky JEDNÍM lookupem membershipu (ne N+1), jen když je vůbec nějaká stránka chráněná (`pages.service.ts:501`). `UserId` requirementy se do `shieldedBy` nikdy nedávají (neprozradit, kdo má přístup).
+- `shieldedBy` per-entry: BE počítá nesplněné podmínky JEDNÍM lookupem membershipu (ne N+1), jen když je vůbec nějaká stránka chráněná (`pages.service.ts:835`). `UserId` requirementy se do `shieldedBy` nikdy nedávají (neprozradit, kdo má přístup).
+- `findDirectory` NEvolá `assertAccess` → má **vlastní** filtr pending návrhů (15.11, `pages.service.ts:835`) — druhá read cesta vedle `assertAccess`.
 
 ### Stav
 ✅ Funkční.
 
 ### Kód
-FE `PagesListPage/PagesListPage.tsx:43`; BE `pages.service.ts:496` (findDirectory), `pages.controller.ts:48`.
+FE `PagesListPage/PagesListPage.tsx:44`; BE `pages.service.ts:807` (findDirectory), `pages.controller.ts:40`.
 
 ---
 
@@ -79,39 +80,39 @@ FE `PagesListPage/PagesListPage.tsx:43`; BE `pages.service.ts:496` (findDirector
 Typ-agnostický presenter, který podle `page.type` zvolí layout a provede read-time výpočty.
 
 ### Kde
-- FE route catch-all `:slug` (musí být poslední) → `memberOnly(PageViewerPage)` (`router.tsx:335`).
+- FE route catch-all `:slug` (musí být poslední) → **`showcaseOrMember(PageViewerPage)`** (`router.tsx:510`, 22.4 vitrína).
 - Entry `PageViewer/PageViewerPage.tsx`, presenter `PageViewer/PageViewer.tsx`.
-- BE `GET /worlds/:worldId/pages/:slug` → `pages.service.findBySlug` (`pages.service.ts:168`).
+- BE `GET /worlds/:worldId/pages/:slug` → `pages.service.findBySlug` (`pages.service.ts:318`).
 
 ### Kdo
-- FE: Čtenář+ (memberOnly).
-- BE: `findBySlug` projde 3 branami: `assertCanViewWorld` (R-09b — privátní svět jen pro členy/Admin+), `assertAccess` (page-level), `filterAkjTabsForViewer` (per-záložka). 403/404 dle auth-leak-policy.
+- FE: Čtenář+ (member) nebo vitrína (22.4).
+- BE: `findBySlug` projde 3 branami: `assertCanViewWorld` (R-09b — privátní svět jen pro členy/Admin+), `assertAccess` (`:344`, page-level), `filterAkjTabsForViewer` (`:352`, per-záložka). 403/404 dle auth-leak-policy. Nad tím vším **moderační skrytí** (`isModerationHiddenFor`) — 404 i pro PJ, zásah vidí jen platform reviewer (kap. 08).
 
 ### Co jde dělat (VŠE)
-- Render přes 9 layoutů (`LAYOUTS` mapa, `PageViewer.tsx:47`): Lokace, Noviny, Seznam, Galerie, Zoom, Rodokmen, Obrazovka, Ostatní, Postava/NPC. Frakce/Organizace/Stát (11.5) mapují na generický `OstatniLayout`.
-- AKJ záložková lišta — flat typy přes `WithAkjTabs`, Lokace/Postava/NPC řeší vlastní lištu (`handlesOwnAkjTabs`, řádek 126).
+- Render přes 9 layoutů (`LAYOUTS` mapa, `PageViewer.tsx:47-63`; 13 klíčů → 9 komponent): Lokace, Noviny, Seznam, Galerie, Zoom, Rodokmen (`FamilyTreeLayout`), Obrazovka, Ostatní, Postava/NPC (`PostavaLayout`). Frakce/Organizace/Stát (11.5) mapují na generický `OstatniLayout`.
+- AKJ záložková lišta — flat typy přes `WithAkjTabs`, Lokace/Postava/NPC řeší vlastní lištu (`handlesOwnAkjTabs`, `:135`).
 - Read-time minuty (220 slov/min z `plainText`), kromě Galerie.
 - Hash deeplink (`#anchor` → scroll), AutoTOC injekce `id` na h2/h3.
 - Auto-link zmínek entit (`useAutoLink`), broken-link detekce červeně (`useBrokenLinks`).
 - Inline image lightbox, citační popup pro výběr textu (`QuoteSelectionPopup`).
 - Klávesové zkratky: `Ctrl+K` paleta, `f` toggle oblíbené, `e` editor (jen canEdit), `Shift+?` nápověda, `g s` zpět na seznam.
-- Panel „Odkazuje sem" (backlinks) — JEN PomocnyPJ+ (`canEdit`, řádek 149).
-- **Tisk / PDF** (14.7a) — ikona 🖨 v hlavičce (`PageHeader.tsx`) → `window.print()` jen nad obsahem stránky (viz `## Tisk / PDF` níže).
-- **Nahlásit** (20.1) — tlačítko „Nahlásit" v hlavičce stránky (`PageHeader.tsx:120`, `ReportButton targetType="page"`, `worldId`) → platformová moderační fronta „Zpracovat" (kap. 08); nahlašování protiprávního obsahu je platformní věc, ne PJ governance (R-20).
+- Panel „Odkazuje sem" (backlinks) — JEN PomocnyPJ+ (`canEdit`, `PageViewer.tsx:71` def., `:174` render).
+- **Tisk / PDF** (14.7a) — ikona 🖨 v hlavičce (`PageHeader.tsx:45-50`, `usePrint().triggerPrint`) → tisk v samostatném okně jen nad obsahem stránky (viz `## Tisk / PDF` níže).
+- **Nahlásit** (20.1) — tlačítko „Nahlásit" v hlavičce stránky (`PageHeader.tsx:128`, `ReportButton targetType="page"`, `worldId`) → platformová moderační fronta „Zpracovat" (kap. 08); nahlašování protiprávního obsahu je platformní věc, ne PJ governance (R-20).
 
 ### Hranice — co neumí
 - **Tabulky v `content` se renderují i ve vieweru** (15.5-followup, D-NEW-INV-WIKI). `RichTextEditor` zapíná Table extension i v `readOnly` (`enableTable || readOnly`, `RichTextEditor.tsx`) + read CSS `.content .rte-table`. Jeden zásah pokryl všech 8 read layoutů; tabulka napsaná v editoru je teď ve čtení vidět. (Atributová `table` mimo `content` se renderuje samostatně přes `PageSidebar`.)
 - Backlinks panel je PJ-only — hráč nevidí, kdo na stránku odkazuje.
 
 ### Zvláštnosti
-- Matrix rulebook hub: `world.system === 'matrix'` + `Seznam` + slug `pravidla`/`magicka-pravidla` → speciální `RulebookHub` layout místo generického.
+- Matrix rulebook hub: `world.system === 'matrix'` + `Seznam` + slug `pravidla`/`magicka-pravidla` → speciální `RulebookHub` layout místo generického (`PageViewer.tsx:126-132`).
 - Error fallback: 403 → `AccessDenied`, 404 → `PageNotFound`, jiná chyba → též `PageNotFound`.
 
 ### Stav
 ✅ Funkční (vč. tabulek v obsahu — 15.5-followup).
 
 ### Kód
-FE `PageViewer/PageViewer.tsx:58`, `layouts/OstatniLayout.tsx:67`; BE `pages.service.ts:168`.
+FE `PageViewer/PageViewer.tsx:65`, `layouts/OstatniLayout.tsx`; BE `pages.service.ts:318`.
 
 ---
 
@@ -152,7 +153,7 @@ Tisk entity v **samostatném tiskovém okně** (`window.open` → prohlížeč n
 - **Emoji se v tisku netiskne** (prázdný obdélník) → nahrazeno textem (`(magická)`).
 
 ### Stav
-✅ funguje — **pilíř A tisk přepsán a reálně ověřen** (2026-06-20: postava/stránka/lokace/bestiář/kalendář/Matrix deník). Ostatních 11 diary sheetů + obchod/pavučina/hvězdná jedou ověřeným vzorem + build/133 testů, čekají reálný test. Pilíř B (ZIP) → kap. 10.
+✅ funguje — **pilíř A tisk přepsán** (2026-06-20: postava/stránka/lokace/bestiář/kalendář/Matrix deník). Ostatních 12 diary sheetů + obchod/pavučina/hvězdná jedou týmž vzorem (sdílený `printDoc.css` + `printMode`). Pilíř B (ZIP) → kap. 10.
 
 ### Kód
 FE `features/world/export/print/{printMode.ts,PrintButton.tsx,printDoc.css,print.css}`; integrace `PageHeader.tsx`, `PageSections.tsx`, `WithAkjTabs.tsx`, `layouts/{PostavaLayout,OstatniLayout}.tsx`, `CharacterDetailPage/components/{DiaryTab,InventoryTab}.tsx`, `diary-systems/sheets/*/{*Sheet}.tsx` + `_shared/FateLikeSheet.tsx` (tiskové views), `bestiar/components/BestieCard.tsx`, `tactical-map/components/schema-form/EntityStatbar.tsx`, `shop/components/ShopView.tsx`, `maps/WorldMapsPage.tsx`, `campaign/components/{PavucinaGraph,ScenarioEditor}.tsx`, `universe/UniverseMapView.tsx`, `pages/CalendarPage.tsx` + `CalendarPage/components/CalendarCell.tsx`. Offline náhled `scripts/print-preview/`.
@@ -165,14 +166,15 @@ FE `features/world/export/print/{printMode.ts,PrintButton.tsx,printDoc.css,print
 Plnohodnotný editor pro tvorbu i úpravu stránek, panelová struktura.
 
 ### Kde
-- FE routes `nova-stranka` + `edit/:slug` → `memberOnly(PageEditorPage)` (`router.tsx:239-240`).
+- FE routes `nova-stranka` + `edit/:slug` → `memberOnly(PageEditorPage)` (`router.tsx:410-411`).
 - Entry `PageEditor/PageEditorPage.tsx`, presenter `PageEditor/PageEditor.tsx`.
-- BE `POST /worlds/:worldId/pages` (create), `PATCH /worlds/:worldId/pages/:id` (update).
+- BE `POST /worlds/:worldId/pages` (create, `pages.controller.ts:170`), `PATCH /worlds/:worldId/pages/:id` (update, `:184`).
 
 ### Kdo
-- FE: dvojitý guard — route `memberOnly(Čtenář)` + interní guard v `PageEditorPage.tsx`. **15.11:** práh snížen na **Hráč+** (`userRole < Hrac` → redirect); hráč smí navrhovat obsah (viz „Návrhy obsahu hráčů" níže). BE je autoritativní.
-- BE: `assertCanWrite` = platform Admin+ NEBO world role ≥ PomocnyPJ. **15.11 relaxace (`resolveCreateMode`):** hráč (role ≥ Hrac) navrhující **whitelist typ** (NPC/Lokace/Ostatní/Seznam/Galerie/Rodokmen + 11.5 Frakce/Organizace/Stát) → `create` s `pageStatus:'pending'`, `proposedBy=self` (jinak 403); moderátor (≥PomocnyPJ/elevovaný) tvoří rovnou `approved`. Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
-- **`assertCanEditPage`** (update) povolí tři skupiny a vrací `ownerScoped`: (a) **moderátor** (≥PomocnyPJ/admin, `ownerScoped:false`) — plný update; (b) **autor svého pending návrhu** (whitelist typ, role ≥ Hrac); (c) **vlastník své Postavy hráče** (`ownerUserId===requester.id`, role ≥ Hrac) — edituje Bio i approved postavy (FE mu ukazuje „Upravit Bio"). Skupiny (b)+(c) jsou `ownerScoped:true` → update jim **oseká citlivá pole** (`accessRequirements`, `ownerUserId`, `type`, `slug`) → mění jen obsah, nejde eskalovat přístup, předat vlastnictví ani obejít gating typem. **`akjTabs` se od 2026-07-19 NEosekávají paušálně** — řeší je selektivní merge `resolveAkjTabsPatch` (viz „AKJ chráněné záložky → Editace obsahu vlastníkem"): editor **bez `seesAll`** (vlastník-hráč i **PomocnyPJ**) nesmí full-replace, jen `contentOverride` záložek, které smí. Bez skupiny (c) hráč-vlastník dostával 403 „Uložení selhalo" (viz chybový deník be.md).
+- FE: dvojitý guard — route `memberOnly(Čtenář)` + interní guard v `PageEditorPage.tsx:40`. **15.11:** práh snížen na **Hráč+** (`!isElevatedHere && userRole < Hrac` → redirect); hráč smí navrhovat obsah (viz „Návrhy obsahu hráčů" níže). BE je autoritativní.
+- BE: `assertCanWrite` (`pages.service.ts:1487`) = elevovaný platform Admin+ NEBO world role ≥ PomocnyPJ. **15.11 relaxace (`resolveCreateMode`, `:1521`):** hráč (role ≥ Hrac) navrhující **whitelist typ** (NPC/Lokace/Ostatní/Seznam/Galerie/Rodokmen + 11.5 Frakce/Organizace/Stát) → `create` s `pageStatus:'pending'`, `proposedBy=self` (jinak 403); moderátor (≥PomocnyPJ/elevovaný) tvoří rovnou `approved`. Vlastník světa NENÍ automaticky autorizován — rozhoduje membership.
+- **Kvóta:** `create` navíc kontroluje kumulativní strop stránek per svět (`assertUnderCreationLimit`, `MAX_PAGES_PER_WORLD`, D-SEC-GAP-2026-07-11, `pages.service.ts:377`).
+- **`assertCanEditPage`** (update, `:1555`) povolí tři skupiny a vrací `ownerScoped`: (a) **moderátor** (≥PomocnyPJ/admin, `ownerScoped:false`) — plný update; (b) **autor svého pending návrhu** (whitelist typ, role ≥ Hrac); (c) **vlastník své Postavy hráče** (`ownerUserId===requester.id`, role ≥ Hrac) — edituje Bio i approved postavy (FE mu ukazuje „Upravit Bio"). Skupiny (b)+(c) jsou `ownerScoped:true` → update jim **oseká citlivá pole** (`accessRequirements`, `ownerUserId`, `type`, `slug`) → mění jen obsah, nejde eskalovat přístup, předat vlastnictví ani obejít gating typem. **`akjTabs` se od 2026-07-19 NEosekávají paušálně** — řeší je selektivní merge `resolveAkjTabsPatch` (viz „AKJ chráněné záložky → Editace obsahu vlastníkem"): editor **bez `seesAll`** (vlastník-hráč i **PomocnyPJ**) nesmí full-replace, jen `contentOverride` záložek, které smí. Bez skupiny (c) hráč-vlastník dostával 403 „Uložení selhalo" (viz chybový deník be.md).
 
 ### Co jde dělat (VŠE)
 Panely (`PageEditor.tsx:397`):
@@ -180,15 +182,15 @@ Panely (`PageEditor.tsx:397`):
 - **DataTemplatePanel** — stripe karet datových šablon (per-svět `WorldPageTemplate`); „Volný text" + per-svět šablony aplikují headers + defaultTitle; šablona s osnovou (15.5) navíc vloží `contentOutline` do prázdného `content`.
 - **TablePanel** — atributová tabulka (headers/values, rich-text buňky s inline odkazy).
 - **GalleryPanel** (typ Galerie), **VideosPanel** (Obrazovka), **MenuPanel** (Seznam), **CustomDataPanel** (Noviny), **PostavaPanel** (PC/NPC — výběr ownera).
-  - ⚠️ **VideosPanel — náhledy videí byly v produkci rozbité** (do 24.2). Panel bere thumbnail z `https://img.youtube.com/vi/{id}/mqdefault.jpg` (`VideosPanel.tsx:104`), ale CSP `img-src` whitelistovala **jiný** host (`i.ytimg.com`, který kód nikdy nevolal) — a enforce CSP běžel. Oba hosty servírují tytéž náhledy, jenže CSP porovnává hostname doslova. Opraveno v `default.conf.template` (24.2); ⏳ projeví se až po FE deployi. Poučení pro budoucí panely: **každá nová externí doména v `src/` musí přibýt i do CSP whitelistu**, jinak ji enforce tiše zablokuje.
+  - ✅ **VideosPanel — náhledy videí (CSP host mismatch, opraveno 24.2).** Panel bere thumbnail z `https://img.youtube.com/vi/{id}/mqdefault.jpg` (`VideosPanel.tsx:104`), ale CSP `img-src` whitelistovala **jiný** host (`i.ytimg.com`, který kód nikdy nevolal) — a enforce CSP běžel. Oba hosty servírují tytéž náhledy, jenže CSP porovnává hostname doslova. `img-src` teď obsahuje `https://img.youtube.com` (`default.conf.template:145`, poznámka `:102`). Poučení pro budoucí panely: **každá nová externí doména v `src/` musí přibýt i do CSP whitelistu**, jinak ji enforce tiše zablokuje.
 - **ContentPanel** — TipTap rich-text: B/I/U/S/sup/sub, nadpisy H2/H3, seznamy, citace, **tabulky** (`enableTable`), barvy, bloky. Wikilink `[[` dropdown (`useWikilinkExtension`), broken-link dekorace, image upload (Cloudinary), `StyleRail` (permanentní toolbar) + bubble menu, `LinkPickerPopover` pro vkládání odkazů (`linkDirectory` + `linkMakeSlug`).
 - **SectionsPanel** — strukturované sekce (collapsible, items).
 - **AkjTabsPanel** — chráněné záložky (viz níže).
 - Live preview pane (`LivePreviewPane`), draft auto-save do localStorage (verzovaný klíč `page-draft:v2`), restore modal.
 
 Save flow:
-- `Ctrl/Cmd+S` uloží, optimistic concurrency (`expectedUpdatedAt` → 409 `PAGE_CONFLICT` → ConflictModal: Refresh / Overwrite).
-- Slug-kolize v new módu → „Uložit do <stránka>" (přepis existující po potvrzení).
+- `Ctrl/Cmd+S` uloží, optimistic concurrency (`expectedUpdatedAt` → 409 `PAGE_CONFLICT` → ConflictModal: Refresh / Overwrite) — `PageEditor.tsx:221`, `:277`.
+- Slug-kolize v new módu → FE nabídne „Uložit do &lt;stránka&gt;" (vědomý přepis existující, `PageEditor.tsx:148`, `:319`). BE na kolizi **nepadá** — `ensureAvailableSlug` auto-suffixuje (`mapa` → `mapa-2`, FIX-21, `pages.service.ts:385`); title zůstává, mění se jen skrytý slug. Řeší i rezervované world routy (`RESERVED_PAGE_SLUGS`).
 - Delete přes `DeletePageModal`.
 
 ### Co jde vkládat za odkazy
@@ -201,15 +203,16 @@ Save flow:
 - Type switch může ztratit data (warning modal `TypeSwitchWarningModal` to hlásí, ale neuchovává).
 
 ### Zvláštnosti
-- Nové PC dostanou předpřipravenou AKJ záložku „Soukromé" (vidí PJ + vlastník) (`PageEditor.tsx:96`).
+- Nové PC dostanou předpřipravenou AKJ záložku „Soukromé" (vidí PJ + vlastník) (`PageEditor.tsx:96-104`).
 - New mód čte query: `?type=`, `?owner=`, `?slug=` (předvyplní title z 404 „Vytvořit").
-- BE sanitizuje veškerý HTML (`sanitizeRichText`) na content, sections, table, AKJ override.
+- Draft klíč je verzovaný a per-uživatel: `page-draft:v2:{userId}:{worldId}:{pageId|new}` (`PageEditor.tsx:123`).
+- BE sanitizuje veškerý HTML (`sanitizeRichText`) na content, sections, table, AKJ override (`pages.service.ts:391-397`).
 
 ### Stav
 ✅ Bohatě funkční.
 
 ### Kód
-FE `PageEditor/PageEditor.tsx:70`, `panels/ContentPanel.tsx:30`; BE `pages.service.ts:187` (create), `:298` (update).
+FE `PageEditor/PageEditor.tsx`, `panels/*` (12 panelů + `FamilyTreeEditor`); BE `pages.service.ts:361` (create), `:541` (update).
 
 ---
 
@@ -253,25 +256,28 @@ FE `PageEditorPage` (guard Hrac), `NewPageWizardModal` (proposeMode), `WorldLayo
 Page je primární entita; pro typy `Postava hráče`, `NPC`, `Lokace` BE auto-vytvoří Character entity, která drží subdokumenty. Page → Character přes `characterRef.characterId`.
 
 ### Kde / Jak (BE)
-- `pages.service.create` (`:217-237`): persona (PC/NPC) i Lokace → `charactersService.create` s `kind: 'location'|'persona'`. Klient může předat existující `characterRef` (migrace).
-- `pages.service.update` (`:349-382`): transition wiki→persona/Lokace vytvoří Character pokud ještě není; změna typu Lokace ↔ PC/NPC volá `charactersService.syncKind` (jinak by taktická mapa odmítala token).
-- Subdoc kaskáda v `character-subdocs.service.onCharacterCreated` (`character-subdocs.service.ts:123`):
-  - Každá entita (persona i lokace): **calendar + finance + inventory**.
-  - Jen persona (NE lokace): **diary + notes**.
-- Finance/Výbava jsou ale **read-gated jen pro PC**: `getFinance`/`getInventory` vrací 404 `*_NOT_APPLICABLE` pro NPC i Lokaci (`character-subdocs.service.ts:407,486`).
+- `pages.service.create` (`:410-420`): persona (PC/NPC) i Lokace → `charactersService.create` s `kind: 'location'|'persona'`. Klient může předat existující `characterRef` (migrace).
+- `pages.service.update` (`:625-660`): transition wiki→persona/Lokace vytvoří Character pokud ještě není; změna typu Lokace ↔ PC/NPC volá `charactersService.syncKind` (`:654`, jinak by taktická mapa odmítala token).
+- Subdoc kaskáda v `character-subdocs.service.onCharacterCreated` (`character-subdocs.service.ts:141-170`) — **od 2026-07-12 (D-NEW-INV-DATA-SYNC) sladěná se čtením**:
+  - Každá entita (persona i lokace): **calendar**.
+  - Non-lokace (PC i NPC): **diary + notes**.
+  - **Jen PC** (`isPc = !isNpc && !isLocation`): **finance + inventory**.
+- Odpovídá read gatingu: `getFinance`/`getInventory` vrací 404 `*_NOT_APPLICABLE` pro NPC i Lokaci (`character-subdocs.service.ts:495`, `:602`) — už se tedy nezakládají subdocy, které nikdo nepřečte.
+- **Doplnění při změně typu:** `onCharacterConverted` (NPC→PC create-if-missing) + lazy-create v `getFinance`/`getInventory`.
 
 ### Hranice — co neumí
-- Spec text říká „Character drží 5 subdokumentů", reálně Lokace má použitelné jen calendar (+ notes self-healing); finance/inventory se sice vytvoří, ale GET je pro NPC/Lokaci blokuje. Nekonzistence vytvoř-vs-čti (viz dluhy).
-- Rollback při selhání: pokud page save selže po vytvoření Character, BE rolluje postavu zpět (DI-04, `:274`) — ale je to manuální kompenzace, ne transakce.
+- „Character drží 5 subdokumentů" platí **jen pro Postavu hráče**. NPC = calendar + diary + notes; Lokace = jen calendar. Není to bug, je to záměrné zúžení (viz výše).
+- Rollback při selhání: pokud page save selže po vytvoření Character, BE rolluje postavu zpět (DI-04, `pages.service.ts:462-483`) — ale je to manuální kompenzace, ne transakce.
 
 ### Zvláštnosti
 - Lazy-create + `rollbackIfParentGone` pro legacy postavy bez subdoců (self-healing prvním GET).
+- Historické orphany (finance/inventory NPC a Lokací z doby před 2026-07-12) uklízí `scripts/cleanup-npc-lokace-finance-inventory`.
 
 ### Stav
-✅ Funkční, ⚠️ asymetrie create vs. read u finance/inventory.
+✅ Funkční; asymetrie create vs. read **vyřešena** (D-NEW-INV-DATA-SYNC).
 
 ### Kód
-BE `pages.service.ts:217`, `character-subdocs.service.ts:123`.
+BE `pages.service.ts:410`, `character-subdocs.service.ts:141`.
 
 ---
 
@@ -281,18 +287,19 @@ BE `pages.service.ts:217`, `character-subdocs.service.ts:123`.
 Záložky vedle základního obsahu stránky, viditelné jen tomu, kdo splní `access[]` (OR logika). Nahradily dřívější `privateContent` i page-level AccessPanel.
 
 ### Kde
-- BE typ `AkjTab` (`page.interface.ts:112`), filtrování `filterAkjTabsForViewer` (`pages.service.ts:875`).
+- BE typ `AkjTab` (`page.interface.ts:193`), filtrování `filterAkjTabsForViewer` (`pages.service.ts:1435`).
 - FE editor `AkjTabsPanel.tsx`, viewer `WithAkjTabs.tsx` + `AkjLockedPanel`.
 
 ### Kdo (BE-enforced gating)
-- PJ + platform Admin+ vidí VŠE odemčené (`seesAll`, `:886`).
-- **PomocnyPJ NEMÁ auto-bypass** na AKJ záložky (jen co mu PJ grantoval přes `tab.access`) — odlišnost od page-level `assertAccess`, kde PomocnyPJ+ bypass MÁ (`:813`).
-- Vlastník postavy (`page.ownerUserId === userId`) vidí AKJ záložky své PC defaultně, dokud mu PJ nezvolí `ownerHidden` (`:908`).
+- PJ + **elevovaný** platform Admin+ vidí VŠE odemčené (`seesAll`, `pages.service.ts:1448-1452`).
+- **PomocnyPJ NEMÁ auto-bypass** na AKJ záložky (jen co mu PJ grantoval přes `tab.access`) — odlišnost od page-level `assertAccess`, kde PomocnyPJ+ bypass MÁ (`:1294`).
+- Vlastník postavy (`page.ownerUserId === userId`) vidí AKJ záložky své PC defaultně, dokud mu PJ nezvolí `ownerHidden` (`:1468`).
+- **Anonym (22.4 vitrína):** membership lookup se přeskočí (`:1443-1447`) — `findByUserAndWorld(undefined, …)` by kvůli mongoose strip-u undefined matchnul CIZÍ membership (leak role). Totéž v `assertAccess` (`:1291`).
 
 ### Chování zamčených záložek (spec-akj-locked-tabs-visible)
-- „In-fiction" clearance záložka (má AKJ/AKJType req, žádný Role) → hráč bez přístupu vidí ZAMČENOU: 🔒 jméno + úroveň, BEZ obsahu a bez jmenovitých klíčů (`lockedAkjTab`, `:106`). Po získání přístupu → 🔓 + obsah.
+- „In-fiction" clearance záložka (má AKJ/AKJType req, žádný Role) → hráč bez přístupu vidí ZAMČENOU: 🔒 jméno + úroveň, BEZ obsahu a bez jmenovitých klíčů (`lockedAkjTab`, `:238`; predikát `isBroadcastableAkjTab`, `:225`). Po získání přístupu → 🔓 + obsah.
 - Role záložky („PJ informace") a prázdné/jen-jmenovité („Soukromé") zůstávají úplně SKRYTÉ.
-- `locked` je read-time enrich — na write path se zahazuje (`sanitizeAkjTabs`, `:69`).
+- `locked` je read-time enrich — na write path se zahazuje (`sanitizeAkjTabs`, `:154`).
 
 ### Co jde editovat (PJ v `AkjTabsPanel`)
 - Název, pořadí (move up/down).
@@ -304,8 +311,8 @@ Záložky vedle základního obsahu stránky, viditelné jen tomu, kdo splní `a
 ### Editace obsahu vlastníkem (spec-akj-owner-editable-content, 2026-07-19)
 - **Kdo:** vlastník své PC (`isOwner`), na záložce s `ownerEditable===true` a `!locked`. FE gate `PostavaLayout` `showAkjEditBtn`; tlačítko „Upravit záložku" → inline editor `AkjOwnerInlineEditor` (reuse RichText / `HeroUploadCard` / `TablePanel`).
 - **Co smí:** jen `contentOverride` té záložky (text/obrázek/boxy). Ukládá PATCH s **jedinou** záložkou; BE ji spáruje podle `id`.
-- **BE bezpečnost (`resolveAkjTabsPatch` + `mergeAkjTabContentOnly`):** editor bez `seesAll` (vlastník i PomocnyPJ) → base = uložené `akjTabs` z DB, z payloadu se přebírá **jen `contentOverride`** záložek, které smí editovat (vlastník: `ownerEditable && !ownerHidden`; PomocnyPJ: `passesAccess` = plně vidí). Flag/`access`/`name`/`order` **vždy z DB, ne z DTO** → žádná eskalace, žádné přidání/smazání/přejmenování, cizí i skryté záložky zůstanou. PJ/elevated (`seesAll`) → full-replace beze změny.
-- **D-067 tímto vyřešen:** PomocnyPJ dřív full-replacem nenávratně mazal PJ-only a strhával locked záložky (četl osekaný seznam) — teď mergne. Viz `docs/dluhy.md → Vyřešené`.
+- **BE bezpečnost (`resolveAkjTabsPatch` `:1385` + `mergeAkjTabContentOnly` `:1361`):** editor bez `seesAll` (vlastník i PomocnyPJ) → base = uložené `akjTabs` z DB, z payloadu se přebírá **jen `contentOverride`** záložek, které smí editovat (vlastník: `ownerEditable && !ownerHidden`, `:1406`; PomocnyPJ: `passesAccess` = plně vidí, `:1420`). Flag/`access`/`name`/`order` **vždy z DB, ne z DTO** → žádná eskalace, žádné přidání/smazání/přejmenování, cizí i skryté záložky zůstanou. PJ/elevated (`seesAll`) → full-replace beze změny (`:1400`).
+- **✅ D-067 tímto vyřešen** (2026-07-19): PomocnyPJ dřív full-replacem nenávratně mazal PJ-only a strhával locked záložky (četl osekaný seznam) — teď mergne. Doloženo `pages.service.ts:1385-1422`; `docs/dluhy.md` je od 2026-07-19 prázdný (uzavřené dluhy se mažou, historie v git logu).
 - `contentOverride.imageUrl` u AKJ prochází URL guardem (`sanitizeAkjImageUrl`, odmítne `data:`/`javascript:`).
 
 ### Hranice — co neumí
@@ -313,10 +320,10 @@ Záložky vedle základního obsahu stránky, viditelné jen tomu, kdo splní `a
 - Backend přijímá v `tab.access` i AKJType/Role (passesAccess je vyhodnotí), ale editor je běžně nenabízí.
 
 ### Stav
-✅ Funkční, BE-enforced. Editace obsahu vlastníkem/PomocnymPJ ✅ (2026-07-19, čeká BE restart + FE deploy + živé ověření).
+✅ Funkční, BE-enforced. Editace obsahu vlastníkem/PomocnymPJ ✅ (2026-07-19).
 
 ### Kód
-BE `pages.service.ts:1435` (filterAkjTabsForViewer), `:225` (isBroadcastable), `:238` (lockedAkjTab), `:154` (sanitizeAkjTabs), `:1361` (mergeAkjTabContentOnly), `:1385` (resolveAkjTabsPatch); FE `PageEditor/panels/AkjTabsPanel.tsx`, `PageViewer/components/WithAkjTabs.tsx:27`, `PageViewer/layouts/PostavaLayout.tsx` (gate + inline), `PageViewer/components/AkjOwnerInlineEditor.tsx`.
+BE `pages.service.ts:1435` (filterAkjTabsForViewer), `:225` (isBroadcastableAkjTab), `:238` (lockedAkjTab), `:154` (sanitizeAkjTabs), `:1361` (mergeAkjTabContentOnly), `:1385` (resolveAkjTabsPatch); FE `PageEditor/panels/AkjTabsPanel.tsx`, `PageViewer/components/WithAkjTabs.tsx`, `PageViewer/layouts/PostavaLayout.tsx` (gate + inline), `PageViewer/components/AkjOwnerInlineEditor.tsx`.
 
 ---
 
@@ -326,17 +333,24 @@ BE `pages.service.ts:1435` (filterAkjTabsForViewer), `:225` (isBroadcastable), `
 Gate na celou stránku (vedle AKJ záložek). OR logika 4 typů: `UserId`, `AKJ` (číselná úroveň), `Role` (world role práh), `AKJType` (pojmenovaná clearance z WorldSettings).
 
 ### Kdo / gating (BE)
-- `assertAccess` (`pages.service.ts:798`): bez requirementů → projde. Platform Admin+ a world role >= PomocnyPJ → bypass. Jinak `passesAccess` (OR).
-- Aplikuje se v `findBySlug`, `findByWorld` (listing filtr), `findVisibleSlugs` (search), `findBacklinks`.
+- `assertAccess` (`pages.service.ts:1243`), pořadí bran:
+  1. **Moderační skrytí** (`isModerationHiddenFor`) → 404 i pro PJ (`:1252`).
+  2. **Pending návrh** (15.11) → jen autor / moderátor, jinak 404 (`:1262`); MUSÍ být před early-returnem.
+  3. Bez requirementů → projde (`:1279`).
+  4. **Elevovaný** platform Admin+ → bypass (`worldAdminBypass`, `:1284`) — ne Admin natvrdo (R-20).
+  5. World role >= PomocnyPJ → bypass (`:1294`).
+  6. Jinak `passesAccess` (OR, `:1204`) → 403 `PAGE_ACCESS_DENIED`.
+- Aplikuje se v `findBySlug`, `findByWorld` (listing filtr), `findVisibleSlugs` (search, `:914`), `findBacklinks` (`:1138`).
 
 ### Hranice
 - Page-level gate odfiltruje stránku z listingu silent (neukáže existenci). Search/backlinks respektují.
+- `findDirectory` `assertAccess` NEvolá — má vlastní filtr (dvě read cesty, viz „Seznam stránek").
 
 ### Stav
 ✅ Funkční.
 
 ### Kód
-BE `pages.service.ts:798` (assertAccess), `:769` (passesAccess).
+BE `pages.service.ts:1243` (assertAccess), `:1204` (passesAccess).
 
 ---
 
@@ -346,15 +360,15 @@ BE `pages.service.ts:798` (assertAccess), `:769` (passesAccess).
 Per-svět šablony **atributové tabulky** (NE celé stránky, NE deníkové schéma). PJ definuje např. „Postava", „Stát" → editor je nabízí jako stripe karet.
 
 ### Kde
-- BE modul `modules/world-page-templates`. Controller `POST/PATCH/DELETE /worlds/:worldId/page-templates`.
+- BE modul `modules/world-page-templates`. Controller `@Controller('worlds/:worldId/page-templates')` — `GET :38` / `POST :47` / `PATCH :id :61` / `DELETE :id :76`.
 - FE konzumace `DataTemplatePanel.tsx` (editor), správa v Nastavení světa (`#sablony`).
 
 ### Kdo (BE)
-- GET: každý přihlášený (`world-page-templates.service.ts:34`).
-- Create/Update/Delete: `assertCanManage` = platform Admin+ NEBO world role >= **Korektor** (`:130`). Pozn.: nižší práh než stránky (PomocnyPJ)! Komentář to zdůvodňuje konzistencí s tabem „Vzhled".
+- GET: `findByWorld` → `assertCanViewWorld` (**FIX-58**, `world-page-templates.service.ts:41-46`) — člen privátního světa / kdokoli přihlášený u veřejného. Dřív bez brány → nečlen privátního světa šablony četl.
+- Create/Update/Delete: `assertCanManage` = platform Admin+ NEBO world role >= **Korektor** (`:155-176`, práh na `:171`). Pozn.: nižší práh než stránky (PomocnyPJ)! Komentář to zdůvodňuje konzistencí s tabem „Vzhled".
 
 ### Co obsahuje šablona
-`key` (unique/svět), `label`, `headers[]` (hlavičky tabulky), `defaultTitle`, `contentOutline` (15.5 — obsahová osnova, sanitizovaný TipTap HTML), `icon` (whitelist 10 Lucide ikon), `order`. Matrix svět dostává 6 výchozích šablon v seedu (vč. osnov); ostatní startují prázdné.
+`key` (unique/svět), `label`, `headers[]` (hlavičky tabulky), `defaultTitle`, `contentOutline` (15.5 — obsahová osnova, sanitizovaný TipTap HTML), `icon` (whitelist 10 Lucide ikon: FileText/MapPin/Users/Sword/Coins/BookOpen/Globe/Building2/Crown/Network — `world-page-template.interface.ts:33-44`), `order`. Matrix svět dostává 6 výchozích šablon v seedu (`stat`, `mesto`, `noviny-meta`, `projekt`, `frakce`, `organizace`, vč. osnov); ostatní startují prázdné.
 
 ### Co jde dělat
 - Spravovat šablony (CRUD) v Nastavení světa → Šablony — modal `TemplateEditorModal` (label/key/defaultTitle/ikona/headers + **osnova přes `RichTextEditor` bez tabulek**).
@@ -376,7 +390,7 @@ Per-svět šablony **atributové tabulky** (NE celé stránky, NE deníkové sch
 ✅ Funkční (osnova obsahu = krok 15.5).
 
 ### Kód
-BE `world-page-templates.service.ts:40` (create+sanitize), interface `:8`, schema `contentOutline`, seed `world-page-templates.matrix-seed.ts`; FE editor `WorldSettingsPage/components/TemplateEditorModal.tsx`, vložení `PageEditor/panels/DataTemplatePanel.tsx:94`.
+BE `world-page-templates.service.ts:49` (create+sanitize), `:83` (update), `:155` (assertCanManage), interface `world-page-template.interface.ts`, seed `world-page-templates.matrix-seed.ts`; FE editor `WorldSettingsPage/components/TemplateEditorModal.tsx`, vložení `PageEditor/panels/DataTemplatePanel.tsx`.
 
 ---
 
@@ -386,7 +400,7 @@ BE `world-page-templates.service.ts:40` (create+sanitize), interface `:8`, schem
 Tabulkový přehled všech stránek světa pro hromadnou správu.
 
 ### Kde
-- FE route `admin/stranky` → `WorldMembershipGuard(minWorldRole=PomocnyPJ, fallback Admin+)` (`router.tsx:293`).
+- FE route `admin/stranky` → `WorldMembershipGuard(minWorldRole=PomocnyPJ, fallback Sa/Admin)` (`router.tsx:467-478`).
 - Komponenta `PagesAdminPage/PagesAdminPage.tsx`.
 
 ### Kdo
@@ -400,13 +414,13 @@ Tabulkový přehled všech stránek světa pro hromadnou správu.
 
 ### Hranice — co neumí
 - Žádná hromadná editace (jen mazání). Nelze hromadně měnit typ/přístup/order.
-- Mazání nemá undo (BE hard delete + `page.deleted` event pro úklid blobů/oblíbených, `pages.service.ts:479`).
+- Mazání nemá undo (BE hard delete + `page.deleted` event pro úklid blobů/oblíbených — CD-01/CD-08, `pages.service.ts:772`).
 
 ### Stav
 ✅ Funkční.
 
 ### Kód
-FE `PagesAdminPage/PagesAdminPage.tsx:30`; BE delete `pages.service.ts:460`.
+FE `PagesAdminPage/PagesAdminPage.tsx:30`; BE delete `pages.service.ts:758` (`assertCanWrite` → hard delete + event).
 
 ---
 
@@ -416,19 +430,21 @@ FE `PagesAdminPage/PagesAdminPage.tsx:30`; BE delete `pages.service.ts:460`.
 Speciální stránky seedované při tvorbě světa + dedikovaná „Pravidla" route.
 
 ### RulesPage (route `pravidla`)
-- FE route `pravidla` → `memberOnly(RulesPage)` (`router.tsx:277`).
-- Pravidla = wiki stránka s rezervovaným slugem `pravidla` (`RulesPage.tsx:14`). Existuje → render přes `PageViewer`; neexistuje → PomocnyPJ+ vidí CTA „Vytvořit pravidla" (založí prázdnou typ Ostatní), ostatní empty state.
+- FE route `pravidla` → **`showcaseOrMember(RulesPage)`** (`router.tsx:452`, 22.4 vitrína).
+- Pravidla = wiki stránka s rezervovaným slugem `pravidla` (`RulesPage.tsx:14`). Existuje → render přes `PageViewer`; neexistuje → PomocnyPJ+ **nebo elevovaný admin** (`RulesPage.tsx:28`) vidí CTA „Vytvořit pravidla" (`:69`, založí prázdnou typ Ostatní), ostatní empty state.
 
-### Seedování (BE `pages-world-seed.listener.ts`)
-Při `world.created` se založí (pokud neexistují):
+### Seedování (BE `pages-world-seed.listener.ts`, `PAGE_TEMPLATES :20-38`)
+Při `world.created` se založí (pokud neexistují) — **6 stránek**:
 - `pravidla` (Ostatní, order 0) — obsah dle `world.system` (`SYSTEM_RULES_TEMPLATES`).
 - `magicky-system` (Ostatní, order 1) — univerzální škála MÚ + zvolené `magicTraditions`.
 - `technologie` (Ostatní, order 2) — škála TÚ + rozsah `techLevelMin/Max`.
-- `faq` (Ostatní, order 3), `videa` (Obrazovka, order 4).
-- Matrix svět: `pravidla`/`magicky-system`/`technologie` nahrazuje Pravidlová kniha (`seedRulebook` — hub + kapitoly 1-9).
+- **`nabozenstvi` (Ostatní, order 3)** — 2.3g, třetí worldbuildingová osa vedle magie a technologie. Seeduje se **i pro Matrix** (Pravidlová kniha náboženství neřeší → není v `MATRIX_RULEBOOK_REPLACES`).
+- `faq` (Ostatní, order 4), `videa` (Obrazovka, order 5).
+- Matrix svět: `pravidla`/`magicky-system`/`technologie` nahrazuje Pravidlová kniha (`seedRulebook :121` — hub + kapitoly 1-9).
 
-### Menu „Informace" (FE `worldNavConfig.ts`)
-Skupina „Informace" (`buildWorldNav`) obsahuje: Skupiny (rozbalovací), Pravidla, Magický systém (`id`, skrývatelné), Technologie (`id`, skrývatelné). „Stránky" je v skupině „Svět". **15.5-followup (D-NEW-INV-WIKI):** odkazy Magický systém/Technologie se skryjí, když odpovídající stránka neexistuje — `buildWorldNav` bere `existingPageSlugs` (z `usePagesDirectory` ve `WorldLayout`); `pravidla` má vlastní route (RulesPage) → nefiltruje se.
+### Menu „Informace" (FE `worldNavConfig.ts:183-210`)
+Skupina „Informace" (`buildWorldNav`) obsahuje: Skupiny (rozbalovací), Pravidla, Magický systém (`id`, skrývatelné), Technologie (`id`, skrývatelné). „Stránky" je v skupině „Svět". **15.5-followup (D-NEW-INV-WIKI):** odkazy Magický systém/Technologie se skryjí, když odpovídající stránka neexistuje — `buildWorldNav` bere `existingPageSlugs` (z `usePagesDirectory` ve `WorldLayout:353-359`); `pravidla` má vlastní route (RulesPage) → nefiltruje se.
+- ⚠️ **`nabozenstvi` se seeduje, ale v menu „Informace" NENÍ** — dosažitelné jen přes katalog Stránky nebo přímou URL (`/svet/:slug/nabozenstvi`). Viz nesrovnalost 5 níže (přidání referenční stránky do menu = ruční zásah do `buildWorldNav`).
 
 ### Hranice — co neumí / nesrovnalost
 - **Dvě vrstvy:** seed zakládá OBSAH stránek (create-only), menu „Informace" je definované v `buildWorldNav`. Odkazy magicky-system/technologie se teď podmiňují existencí stránky (mrtvý odkaz vyřešen), ale **přidání nové referenční stránky** do menu je pořád ruční zásah do `buildWorldNav` (memory `project_world_informace_reference_pages`). Magický systém/Technologie jdou skrýt i ručně přes `hiddenNavItems` (`id`); Pravidla a Stránky jsou esenciály.
@@ -438,7 +454,7 @@ Skupina „Informace" (`buildWorldNav`) obsahuje: Skupiny (rozbalovací), Pravid
 ✅ Funkční.
 
 ### Kód
-FE `RulesPage.tsx:21`, `worldNavConfig.ts:168`; BE `pages-world-seed.listener.ts:71`.
+FE `RulesPage.tsx:26`, `worldNavConfig.ts:183`; BE `pages-world-seed.listener.ts:20` (PAGE_TEMPLATES), `:60-113` (obsah + seed).
 
 ---
 
@@ -448,8 +464,8 @@ FE `RulesPage.tsx:21`, `worldNavConfig.ts:168`; BE `pages-world-seed.listener.ts
 Osobní oblíbené stránky per svět (5.2-followup).
 
 ### Kde / Jak
-- BE: uloženo na User `favoritePageSlugs: Record<worldId, slug[]>` (pořadí významné) (`users/interfaces/user.interface.ts:125`).
-- Endpoint `PUT /users/me/favorite-pages/:worldId` (`users.controller.ts:174`).
+- BE: uloženo na User `favoritePageSlugs: Record<worldId, slug[]>` (pořadí významné) (`users/interfaces/user.interface.ts:154`).
+- Endpoint `PUT /users/me/favorite-pages/:worldId` (`users.controller.ts:213-226`).
 - FE hook `useFavoritePages`.
 
 ### Co jde dělat
@@ -465,7 +481,7 @@ Osobní oblíbené stránky per svět (5.2-followup).
 ✅ Funkční.
 
 ### Kód
-BE `users/interfaces/user.interface.ts:125`, `users.controller.ts:174`; FE `pages/api/useFavoritePages.ts`.
+BE `users/interfaces/user.interface.ts:154`, `users.controller.ts:213`; FE `pages/api/useFavoritePages.ts`.
 
 ---
 
@@ -480,22 +496,26 @@ BE `users/interfaces/user.interface.ts:125`, `users.controller.ts:174`; FE `page
 | `GET /pages/meta/:slug` | metadata + shieldedBy | přihlášený |
 | `GET /pages/:slug` | plný obsah | 3-branový gating; od 22.4 `OptionalJwt` — anonym JEN přes zapnutou vitrínu světa (`assertShowcaseViewable`, 403 `SHOWCASE_DISABLED`; AKJ/vyhrazené dál 403), viz kap. 09 |
 | `GET /pages/:slug/backlinks` | „Odkazuje sem" (7.1l) | access na cíl, filtr přístupných |
-| `POST/PATCH/DELETE` | CRUD | PomocnyPJ+ |
+| `POST /pages` | create | PomocnyPJ+, **nebo Hráč+ jako `pending` návrh** (15.11) |
+| `PATCH /pages/:id` · `DELETE /pages/:id` | update / hard delete | PomocnyPJ+ (update i autor pending návrhu / vlastník své PC — `ownerScoped`) |
+| `POST /pages/:slug/approve` · `/reject` | schválení / vrácení návrhu (15.11) | `assertCanWrite` = PomocnyPJ+ |
 
-Kód: `pages.controller.ts:36-176`.
+Kód: `pages.controller.ts:40-262`.
 
 ---
 
 ## ⚠️ Nesrovnalosti & dluhy (k ověření)
 
-1. **Asymetrie subdoc create vs. read (Lokace/NPC).** `onCharacterCreated` vytvoří finance+inventory i pro lokaci/NPC, ale `getFinance`/`getInventory` je pro ně blokuje (404 `*_NOT_APPLICABLE`). Vznikají subdokumenty, které nikdy nejdou přečíst → mírný dluh/leak dat v DB. Spec „Character drží 5 subdoců" tak pro Lokaci/NPC neplatí v praxi.
+1. ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-DATA-SYNC) — **Asymetrie subdoc create vs. read (Lokace/NPC).** `onCharacterCreated` už zakládá finance+inventory **jen pro PC** (`isPc = !isNpc && !isLocation`, `character-subdocs.service.ts:154-160`), takže create odpovídá read gatingu (`getFinance` `:495` / `getInventory` `:602` → 404 `*_NOT_APPLICABLE` pro NPC/Lokaci). Doplnění při konverzi typu řeší `onCharacterConverted` + lazy-create v GET; historické orphany uklízí `scripts/cleanup-npc-lokace-finance-inventory`.
 
-2. **Práh „šablon stránky" = Korektor, ale stránky samotné = PomocnyPJ.** `WorldPageTemplate` CRUD povolen Korektor+ (`world-page-templates.service.ts:146`), zatímco vytvoření/úprava stránky vyžaduje PomocnyPJ+. Korektor tedy může vytvořit šablonu tabulky, ale ne stránku, kde by ji použil. Záměr (komentář odkazuje na tab „Vzhled"), ale stojí za revizi konzistence.
+2. **Práh „šablon stránky" = Korektor, ale stránky samotné = PomocnyPJ.** **Stále platí** (ověřeno 2026-07-20): `WorldPageTemplate` CRUD povolen Korektor+ (`world-page-templates.service.ts:171`), zatímco vytvoření/úprava stránky vyžaduje PomocnyPJ+ (`pages.service.ts:1487`) — Hráč+ jen jako `pending` návrh. Korektor tedy může vytvořit šablonu tabulky, ale ne stránku, kde by ji použil (ani jako návrh ne — Korektor je role 3, tedy ≥ Hrac, takže návrh whitelist typu **projde**; stránku „naostro" ne). Záměr (komentář odkazuje na tab „Vzhled"), ale stojí za revizi konzistence.
 
-3. **Názvoslovný střet „Šablona".** „Datová šablona stránky" (`WorldPageTemplate`, atributová tabulka) vs. „Šablona deníku" (diary schema) v Nastavení světa jsou dvě různé věci se zaměnitelným názvem — riziko záměny v dokumentaci i UX.
+3. **Názvoslovný střet „Šablona".** Stále platí. „Datová šablona stránky" (`WorldPageTemplate`, atributová tabulka) vs. „Šablona deníku" (diary schema) — a nově i „Šablona bestie" (`entity_schema_versions`, kap. 10) — v Nastavení světa jsou tři různé věci se zaměnitelným názvem; riziko záměny v dokumentaci i UX.
 
-5. **Seed obsahu vs. nav menu jsou 2 nepropojené vrstvy.** Referenční stránky (`pravidla`/`magicky-system`/`technologie`) seeduje BE create-only, ale jejich přítomnost v menu „Informace" je hardcoded ve FE `buildWorldNav`. Pokud PJ stránku smaže, odkaz v menu vede na 404; pokud se seed nepovede, menu stále odkazuje. Skrytí jde jen u Magického systému/Technologie (mají `id`).
+4. ✅ VYŘEŠENO 2026-07-13 (FIX-58) — **Šablony stránek četl i nečlen privátního světa.** `findByWorld` dostal `assertCanViewWorld` (`world-page-templates.service.ts:41-46`), vzor `pages.service.findByWorld`.
 
-6. **PomocnyPJ rozdílné chování page-level vs. AKJ záložky.** Na page-level `accessRequirements` má PomocnyPJ+ bypass (vidí vše), ale na AKJ záložkách NEMÁ auto-bypass (jen explicitní grant). Záměr (spec-akj-protected-tabs), ale matoucí pro uživatele — PomocnyPJ může otevřít chráněnou stránku, ale ne nutně její AKJ záložky.
+5. **Seed obsahu vs. nav menu jsou 2 nepropojené vrstvy.** **Stále platí, a nově se to projevilo:** referenční stránky (`pravidla`/`magicky-system`/`technologie`/**`nabozenstvi`**) seeduje BE create-only (`pages-world-seed.listener.ts:20-38`), ale menu „Informace" je hardcoded ve FE `buildWorldNav` (`worldNavConfig.ts:183-210`) — a **`nabozenstvi` (2.3g) do menu nikdo nepřidal**, takže seedovaná stránka je z navigace nedosažitelná. Opačný směr (smazaná stránka = mrtvý odkaz) je od 15.5-followup ošetřen přes `existingPageSlugs`. Skrytí přes `hiddenNavItems` jde jen u Magického systému/Technologie (mají `id`).
 
-7. **Backlinks („Odkazuje sem") je PomocnyPJ+ only ve vieweru** (`PageViewer.tsx:149`), zatímco BE endpoint by ho dal i hráči s přístupem. FE záměrně skrývá (meta-vazby), ale je to FE-only restrikce, BE backlinks endpoint je dostupný každému členovi s přístupem na cíl.
+6. **PomocnyPJ rozdílné chování page-level vs. AKJ záložky.** Stále platí a je záměr: na page-level `accessRequirements` má PomocnyPJ+ bypass (`pages.service.ts:1294`), na AKJ záložkách NEMÁ auto-bypass (`seesAll` = jen PJ/elevovaný admin, `:1448`). Matoucí pro uživatele — PomocnyPJ otevře chráněnou stránku, ale ne nutně její AKJ záložky (spec-akj-protected-tabs).
+
+7. **Backlinks („Odkazuje sem") je PomocnyPJ+ only ve vieweru** (`PageViewer.tsx:174`, gate `canEdit` `:71`), zatímco BE endpoint (`pages.service.ts:1138`) ho dá i hráči s přístupem na cíl. FE záměrně skrývá (meta-vazby), ale je to FE-only restrikce. Stále platí.

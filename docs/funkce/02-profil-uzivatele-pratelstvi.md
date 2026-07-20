@@ -34,7 +34,7 @@
   - **Velikost rozhraní (5.9c)** = CSS `zoom` na `<html>` (aplikuje `ThemeProvider`, `--ui-scale` + `zoom`), zvětší CELÉ rozhraní (text, tlačítka, ikony) napříč platformou, světy i chaty (Putyka/Camp/svět) — jedno hrdlo, žádná změna chat komponent. Ukládá se do `themeSettings.uiScale` (BE volný objekt + shallow-merge → koexistuje s jas/kontrast). **Taktická mapa (PIXI) je z zoomu vyňata** (`.viewport { zoom: calc(1/var(--ui-scale)) }`) → plátno zůstává 1:1; mapové HUD overlaye uvnitř `.viewport` se také nezvětšují.
   - Změna username řešena dedikovaným flow `me/username-request` (vytvořit/získat/zrušit) + admin schválení; po loginu toast o rozhodnuté žádosti (D-028 `last-unseen-decided`).
 - **Stav:** ✅ funguje.
-- **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27` (`ModerationSection` `:90`), `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `ModerationSection.tsx:71`, `AccountSection.tsx:54`, `CommunitySections.tsx:32`, BE `users.controller.ts:60`/`:71`, `dto/update-user.dto.ts:14`.
+- **Kód:** FE `src/features/profile/pages/ProfilePage.tsx:27` (`ModerationSection` `:90`), `components/ProfileHeader.tsx:54`, `BioSection.tsx:13`, `CharacterSection.tsx:26`, `AppearanceSection.tsx:24`, `PrivacySection.tsx:19`, `SecuritySection.tsx:42`, `ModerationSection.tsx:71`, `AccountSection.tsx:54`, `CommunitySections.tsx:32`, BE `users.controller.ts:56` (`GET me`) / `:67` (`PATCH me`, blok username `:76`), `dto/update-user.dto.ts:15`.
 
 ---
 
@@ -45,7 +45,7 @@
 - **Co jde dělat:** Upload (`POST /users/me/avatar`, resize 512), smazat (`DELETE /users/me/avatar`); pro postavu `POST/DELETE /users/me/character/avatar` (resize 256). Bez souboru → 400 `NO_FILE`.
 - **Hranice / co neumí:** Max 5 MB, žádné cropování v UI; fallback default avatar dle `defaultAvatarType` (male/female/being).
 - **Stav:** ✅ funguje.
-- **Kód:** BE `users.controller.ts:84`/`:115`, FE `components/AvatarUploader/`.
+- **Kód:** BE `users.controller.ts:99` (POST avatar) / `:126` (DELETE avatar) / `:138`/`:165` (avatar postavy), FE `components/AvatarUploader/`.
 
 ---
 
@@ -54,7 +54,7 @@
 - **Kde:** Route `/ikaros/uzivatel/:id` (`PublicUserProfilePage`), chráněná `requireAuth`.
 - **Kdo:** Každý přihlášený. `GET /users/profile/v14/:id` (throttle 60/min).
 - **Co jde dělat:**
-  - Zobrazí: hlavička, karta (role, počet světů, lastSeenAt), bio, postava v Campu (characterName/Bio/avatar).
+  - Zobrazí: hlavička, karta (role, počet světů, lastSeenAt), bio, postava v Campu (characterName/Bio/avatar), **badge Podporovatele** (19.4 — `isSupporter`/`supporterSince`; renderuje se jen když role nemá vlastní hvězdu, `PublicProfileHeader.tsx:48`).
   - Self-banner pokud `id === me.id`. Tombstone banner (pending/deleted) JEN pro admina.
   - **Akce (`PublicProfileActions`):** dle friendship statusu — „Přidat do přátel" / „Žádost čeká · Zrušit" / „Přijmout"+„Odmítnout" / „Přátelé · Odebrat" (confirm) / „Odblokovat"; kebab „Blokovat uživatele" (confirm); „Napsat zprávu" (→ `/ikaros/posta?komu=`); admin: „Otevřít v administraci" (→ `/admin?tab=uzivatele&search=<username>`, předvyplní hledání v admin tabulce; do 2026-07-13 vedlo na zastaralou `/ikaros/uzivatele?view=table`, mrtvou od relokace 12.1).
 - **Kdo vidí (BE `publicProfileV14`):**
@@ -65,7 +65,7 @@
 - **Hranice / co neumí:** Veřejný profil NENÍ veřejný pro anonyma (route za `requireAuth`); čte se přes `profile/v14/:id` za JWT (nechráněná `profile/:id` odstraněna 2026-06-18).
 - **Zvláštnosti:** WS `user:identity:changed` (role/ban/username) invaliduje `public-user-profile` (role chip / overlay se obnoví).
 - **Stav:** ✅ funguje.
-- **Kód:** FE `users/pages/PublicUserProfilePage.tsx:21`, `components/PublicProfile/PublicProfileActions.tsx:56`, BE `users.controller.ts:240`, `users.service.ts:430`.
+- **Kód:** FE `users/pages/PublicUserProfilePage.tsx:21`, `components/PublicProfile/PublicProfileActions.tsx:56`, BE `users.controller.ts:267`, `users.service.ts:511` (tombstone gate `:528`, friend-only `:536-550`, lastSeenAt `:554-560`, admin-only lastLoginAt `:585-592`).
 
 ---
 
@@ -86,7 +86,7 @@
   - „Skrýt v adresáři" skryje uživatele jen pro ne-adminy.
 - **Zvláštnosti:** Silent redirect na fallback tab při nedostupném `?tab=`; reset page/view/sort/search při přepnutí tabu.
 - **Stav:** ✅ funguje.
-- **Kód:** FE `users/pages/UsersPage.tsx:30`, `usersPageTabs.helpers.ts:12`, `tabs/UsersTab/UsersTab.tsx:30`, `tabs/FriendsTab/FriendsTab.tsx:28`, `tabs/ZpracovatTab/ZpracovatTab.tsx:33`, BE `users.controller.ts:216` (listPublic).
+- **Kód:** FE `users/pages/UsersPage.tsx:30`, `users/components/usersPageTabs.helpers.ts:12` (`void role` `:13`, `defaultTabForRole` `:17`), `users/components/tabs/UsersTab/UsersTab.tsx:30`, `tabs/FriendsTab/FriendsTab.tsx:28`, `tabs/ZpracovatTab/ZpracovatTab.tsx:33`, BE `users.controller.ts:243` (listPublic).
 
 ---
 
@@ -98,17 +98,17 @@
   - **Poslat žádost:** `POST /friends/request {userId}`. Vznikne pending.
   - **Přijmout:** `POST /friends/:id/accept` (jen recipient).
   - **Odmítnout / zrušit / odebrat:** `DELETE /friends/:id` — recipient odmítá pending → mark rejected (cooldown); sender ruší pending nebo unfriend accepted → hard delete. `DELETE /friends/by-user/:userId` = podle partnera.
-  - **Stav vztahu:** `GET /friends/status/:userId` → `self`/`none`/`pending_outgoing`/`pending_incoming`/`accepted`/`blocked_by_me`/`cooldown`.
+  - **Stav vztahu:** `GET /friends/status/:userId` → `self`/`none`/`pending_outgoing`/`pending_incoming`/`accepted`/`blocked_by_me` (úplný výčet `FriendStatusKind`, `friendships/interfaces/friendship.interface.ts:20-26`). **Cooldown NENÍ stav** — projeví se až při odeslání žádosti (429 `REJECTED_RECENTLY`), status ho nevrací.
   - **Seznamy:** `GET /friends` (accepted, paginated), `GET /friends/requests/outgoing` (moje odeslané pending).
 - **Hranice / co neumí:**
-  - **Cooldown 7 dní** po odmítnutí: odmítnutý requester nesmí 7 dní znovu poslat (`REJECTED_RECENTLY`, HTTP 429). Asymetrický — recipient může poslat zpět kdykoli.
+  - **Cooldown 7 dní** po odmítnutí: odmítnutý requester nesmí 7 dní znovu poslat (`REJECTED_RECENTLY`, HTTP 429). Asymetrický — recipient může poslat zpět kdykoli. (`COOLDOWN_DAYS = 7` `friendships.service.ts:25`, kontrola `:105-121`.)
   - Žádost sám sobě → 400 `SELF_FRIEND`. Už přátelé → 409 `ALREADY_FRIENDS`. Existující pending → 409 `REQUEST_EXISTS`.
   - Žádné kategorie/skupiny přátel, žádné „nejlepší přátelé", žádná poznámka u přítele.
 - **Zvláštnosti:**
   - Friend systém je provázán s poštou a `profileVisibility:'friends'` (přátelé obejdou friend-only profil i poštu).
   - WS eventy (do `user:{id}` roomu): `friend:request:incoming` (toast + akce „Zobrazit"), `friend:request:accepted` (toast), `friend:request:declined`, `friend:request:canceled`, `friend:removed`, `friend:blocked` (tichá invalidace). FE invaliduje `['friends']`, `['friendship-status']`, `['pending-actions']`. Po reconnectu refetch dotčených seznamů.
 - **Stav:** ✅ funguje.
-- **Kód:** FE `friendships/api/useFriendshipMutations.ts:22`, `hooks/useFriendshipsSocket.ts:38`, BE `friendships/friendships.controller.ts:29`, `friendships.service.ts:36`, `friendships.gateway.ts:39`.
+- **Kód:** FE `friendships/api/useFriendshipMutations.ts:22`, `hooks/useFriendshipsSocket.ts:38`, BE `friendships/friendships.controller.ts:27` (`@Controller('friends')`; routy `:32`/`:42`/`:49`/`:61`/`:71`/`:85`/`:94`), `friendships.service.ts:40` (`sendRequest`), `friendships.gateway.ts:39`.
 
 ---
 
@@ -125,7 +125,7 @@
   - Blok ze MÉ strany při žádosti → 409 `ALREADY_BLOCKED`.
   - WS `friend:blocked` jde tiše (blokovanému se nepushuje „byl jsi zablokován").
 - **Stav:** ✅ funguje.
-- **Kód:** BE `friendships.service.ts:338` (block), `:271` (getStatus anti-stalk), FE `useFriendshipMutations.ts:99`.
+- **Kód:** BE `friendships.service.ts:358` (block), `:287` (getStatus; anti-stalk `:296-298`), `:51-61` (anti-stalk v `sendRequest` → `USER_NOT_FOUND`), `friendships.controller.ts:100`/`:106`/`:116`, FE `useFriendshipMutations.ts:99`.
 
 ---
 
@@ -145,4 +145,4 @@
 - **`displayName` trim DOPLNĚN** (2026-06-27, D-NEW-INV-PROFILE): FE `headerSchema` + BE `UpdateUserDto` (`@Transform` trim, `transform:true`) → „jen mezery" se normalizují na prázdné (→ fallback na username). Min/regex (jako username) záměrně NE — displayName smí být kratší/volnější.
 - ✅ VYŘEŠENO 2026-07-12 (D-NEW-INV-PROFILE) — **`FriendsTab` zobrazuje reálný počet světů přítele.** BE friend list shape nese `worldsCount` (1 batch aggregate pro celou stránku, žádný N+1 — `friendships.service.ts:248-277`); FE mapper `toPublicUserListItem` ho propaguje s `?? 0` runtime pojistkou proti staršímu BE (`FriendsTab.tsx:244`).
 - **Friend systém bez kategorií:** žádné skupiny/poznámky/oblíbení přátelé — pro expanzi.
-- **`getCalendarMonth`/`updateCalendarMonth` v users controlleru:** zdánlivě nesouvisející kalendářová pole na user endpointu (themeSettings.calendarMonth) — k ověření, zda nepatří jinam (možná legacy z .NET migrace).
+- **`getCalendarMonth`/`updateCalendarMonth` v users controlleru — POTVRZENO jako mrtvý legacy kód (ověřeno 2026-07-20).** Oba endpointy pořád existují (`users.controller.ts:417` GET, `:445` PUT), authz = self-or-admin (`requester.id !== id && requester.role > UserRole.Admin` → 403 `USER_FORBIDDEN`), zapisují do `themeSettings.calendarMonth`. **FE je nevolá vůbec** — grep `getCalendarMonth|updateCalendarMonth` napříč `src/` = 0 zásahů; jediné výskyty `calendarMonth` na FE patří k počasí světa (`world/api/usePreviewWeather.ts:161`, `WorldWeatherPage.tsx:214`), což je jiný koncept (měsíc herního kalendáře v generátoru počasí), ne tato user-pole. Zbývá tedy jako legacy z .NET migrace = kandidát na odstranění, ne funkce platformy.

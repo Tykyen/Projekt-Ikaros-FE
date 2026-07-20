@@ -156,6 +156,14 @@ function CzechAwareEmojiPicker({
         <EmojiPicker.Root
           className={s.root}
           onEmojiSelect={({ emoji }) => pick(emoji)}
+          // D-075 — data z VLASTNÍHO originu, ne z cizí CDN. Frimousse jinak
+          // fetchuje `cdn.jsdelivr.net/npm/emojibase-data@latest`, což enforce
+          // CSP blokovala (24.2) → paleta visela na „Načítám…". Skládá se jako
+          // `${emojibaseUrl}/${locale}/{data,messages}.json`, viz public/emojibase/.
+          // `locale` uvádíme explicitně, i když "en" je default — cesta k datům
+          // se z něj odvozuje, takže změna defaultu knihovnou by rozbila fetch.
+          locale="en"
+          emojibaseUrl="/emojibase"
         >
           <EmojiPicker.Search
             className={s.search}

@@ -182,12 +182,7 @@ Cíle fault injection (1 spy na kaskádu):
 - **04 persona page:** pád page save po character create → 0 orphanů (DI-04 pages.create rollback fix).
 - **03 approve:** pád uprostřed approve (membership + playerCount + případně chat) → konzistentní.
 - **09 hard-delete:** pád na kolekci #15 z ~40 (`safeDelete` best-effort) → mezistav (CD-06 `TX`).
-- **Obchod (campaign-purchase):** pád **po** přidání do inventáře, **před** odečtem z účtu (a obráceně) →
-  assert rollback **obojího** (inventář i účet). ⚠️ **Pořadí prací:** tenhle FA test je **předpoklad**
-  pro nasazení `session.withTransaction()` v [`campaign-purchase.service`](../../../Projekt-ikaros/backend/src/modules/campaign/services/campaign-purchase.service.ts)
-  (purchase/refund) — bez prokázaného rollbacku transakci nenasazovat (peněžní cesta). Fix = aditivně
-  `session?` ~8 metodami (accounts `appendTransaction` už umí; inventory `findByCharacterId`/`update`/`create`;
-  purchase `create`) + replica-set fallback (vzor `character-accounts.service.transfer`). _(přesunuto z dluhu shop-purchase-atomicity)_
+- **Obchod (campaign-purchase):** ✅ pokryto `RC-E5` v [`economy.race.e2e-spec.ts:317`](../../../Projekt-ikaros/backend/test/race/economy.race.e2e-spec.ts#L317) (rollback inventáře i účtu) + `withTransaction` v [`campaign-purchase.service.ts:248`](../../../Projekt-ikaros/backend/src/modules/campaign/services/campaign-purchase.service.ts#L248).
 
 ---
 

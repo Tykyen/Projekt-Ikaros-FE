@@ -103,12 +103,13 @@ server {
     #     zatímco reálně používaný `img.youtube.com` (náhledy v PageEditor →
     #     VideosPanel) ve whitelistu chyběl → enforce lámal náhledy videí. Oba
     #     hosty servírují tytéž thumbnaily, ale CSP porovnává hostname doslova.
-    #     24.2 — `cdn.jsdelivr.net` v connect-src: emoji picker `frimousse`
-    #     (chat reakce) si odtud `fetch`uje `emojibase-data` pro plnou paletu.
-    #     Lokální český quick-pick (~120 emoji, czechEmoji.ts) funguje i bez toho,
-    #     takže se výpadek tvářil jen jako „paleta visí na Načítám…". JEN
-    #     connect-src, NE script-src — jde o stažení JSON dat, ne o spuštění kódu.
-    #     Trvalejší řešení (self-host dat přes prop `emojibaseUrl`) = D-075.
+    #     D-075 — `cdn.jsdelivr.net` v connect-src už NENÍ potřeba a byl vrácen
+    #     pryč: emoji picker `frimousse` si data tahal odtud (a enforce CSP mu je
+    #     blokovala → paleta visela na „Načítám…", nález 2 karty 24.2). Data teď
+    #     servírujeme z vlastního originu (`public/emojibase/`, prop
+    #     `emojibaseUrl="/emojibase"`), takže je pokrývá 'self'. Whitelist zůstává
+    #     úzký a picker nezávisí na dostupnosti cizí CDN ani neposílá požadavek
+    #     třetí straně. Detaily: public/emojibase/README.md.
     #     Ústupky doložené report-only fází (2026-06-19):
     #       'unsafe-inline' v style-src — knihovny (router ap.) injektují inline <style>.
     #       'unsafe-eval' v script-src — YouTube www-widgetapi volá eval (3rd party,
@@ -141,7 +142,7 @@ server {
         # se zablokuje i s allow atributem.
         add_header Permissions-Policy "geolocation=(), camera=(self \"https://meet.jit.si\"), microphone=(self \"https://meet.jit.si\"), display-capture=(self \"https://meet.jit.si\"), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" always;
         add_header Reporting-Endpoints "csp-endpoint=\"https://${BACKEND_HOST}/api/csp-report\"" always;
-        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com https://meet.jit.si; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://img.youtube.com; connect-src 'self' data: ${BACKEND_HOST} ${SENTRY_HOST} https://res.cloudinary.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://meet.jit.si wss://meet.jit.si; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://meet.jit.si; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests; report-uri https://${BACKEND_HOST}/api/csp-report; report-to csp-endpoint" always;
+        add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self' 'sha256-aLzJ9M1HuC1LpYuRRSxecV5hSNtv9voRlyuEpOLPi28=' 'unsafe-eval' https://challenges.cloudflare.com https://www.youtube.com https://meet.jit.si; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://res.cloudinary.com https://${BACKEND_HOST} https://img.youtube.com; connect-src 'self' data: ${BACKEND_HOST} ${SENTRY_HOST} https://res.cloudinary.com https://challenges.cloudflare.com https://meet.jit.si wss://meet.jit.si; frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://meet.jit.si; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests; report-uri https://${BACKEND_HOST}/api/csp-report; report-to csp-endpoint" always;
     }
 
     # 15B.1 — interní cíl prerenderu (zvenčí nedostupný; jen rewrite z location /).

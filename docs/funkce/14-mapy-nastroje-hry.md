@@ -46,7 +46,7 @@ Všechny tři routy jsou `memberOnly` — vyžadují členství (Čtenář+). Ne
 - **Škála ~100 pinů:** shlukování při odzoomu (`clusterPins`) + panel „Vlaječky" (hledání + doskok na pin).
 - **Propojení s taktickou scénou (1:1):** `WorldMapEntry.linkedSceneId`. Nastaví PJ v editoru mapy (pole „Propojená scéna") nebo ve vieweru („Propojit scénu"). Na taktické mapě té scény se objeví **zelená pilulka „Příběhová mapa"** (`StoryMapPill`) — **jen** když je propojení aktivní a přístupné; klik otevře mapu. Reciproční skok viewer → taktická.
 - **Poslat do chatu:** tlačítko ve vieweru → výběr konverzace (hledání) + volitelná zpráva → zpráva s přílohou `mapRef` (`ChatMessage.mapRef`, odkaz ne obrázek). V chatu klikací karta `MapRefCard` → otevře viewer; respektuje viditelnost pinů příjemce.
-- **Stav:** ✅ implementováno (16.5); ⏳ čeká restart BE (nové pole `pins`/`linkedSceneId`/`mapRef`).
+- **Stav:** ✅ (16.5; BE pole `pins`/`linkedSceneId` ve whitelistu `world-maps.repository.ts:188-189` + pin CRUD `world-maps.controller.ts:129/144/160`, `mapRef` `chat-message.schema.ts:42`; nasazení ověř přes /api/health → version.sha)
 - **Spec:** `docs/arch/phase-16/spec-16.5.md` + návrh `proto-16.5-mapa-piny.html`.
 - **Kód:** FE `maps/viewer/{InteractiveMapViewer,PinLayer,PinMarker,PinEditorPopover,PinListPanel,SceneLinkPopover,SendToChatPopover}.tsx`, `maps/viewer/lib/clusterPins.ts`, `maps/constants/pinAppearance.ts`, `chat/components/MapRefCard.tsx`, `tactical-map/components/StoryMapPill.tsx`. BE `world-maps` (pin CRUD + `linkedSceneId`), `chat` (`mapRef`).
 
@@ -208,7 +208,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Co jde dělat:** vybrat soubor → `parseUvtt` (tolerantní k verzím 0.2–1.0) → base64 obrázek přes `useUploadImage` na Cloudinary → `POST /maps` (name z názvu souboru) → op `scene.config` (kalibrace: `gridType='square'`, `size=pixels_per_grid`, `backgroundScale=1`, geometrie `px = gridUnit×ppg`) → `scene.walls.replace` (z `line_of_sight`+`objects_line_of_sight` jako zdi, `portals` jako dveře) → `scene.lights.replace` → aktivace + self-assign.
 - **Hranice / co neumí:** import = **vždy nová scéna** (ne přepis); UVTT nenese tokeny/postavy (jen prostředí); půlbuňkový posun originu k doladění proti reálnému renderu; verze UVTT ověřeny zatím jen orientačně (ne na reálných vzorcích); bez ručního kreslení/editace zdí (jen import + toggle dveří přes 17.1).
 - **Zvláštnosti:** config jde přes op `scene.config` (obejde `CreateMapDto`/`HexConfigDto` whitelist, který zná jen size/originX/originY/showGrid); zdi/světla jsou „spící data" — opticky nic nedělají, dokud se nezapne `visionMode='dynamic'` (17.1). `scene.walls`/`scene.lights` musí být ve whitelistu `maps.repository.toEntity` (jinak GET vrací `[]`).
-- **Stav:** 🚧 funkční, **BE čeká restart** (nová schema pole `walls`/`lights`); reálný import `.dd2vtt` a kalibrace k ověření v živé appce.
+- **Stav:** ✅ kód kompletní (BE pole `walls`/`lights` `map-scene.schema.ts:46,52` + whitelist `maps.repository.ts:174-175`, ops `map-operations.service.ts:1132,1145`; FE `import/parseUvtt.ts`); reálný import `.dd2vtt` a kalibrace k ověření v živé appce.
 - **Kód:** FE `import/{parseUvtt,useImportUvttScene}.ts`, `components/pj-panel/MapPjPanel.tsx`, `components/WallsLayer.tsx`. BE `schemas/map-scene.schema.ts`, `interfaces/map-scene.interface.ts`, `dto/operations/{scene-ops.dto,index}.ts`, `operations/map-operations.service.ts`, `repositories/maps.repository.ts`.
 
 ### Dynamické světlo & linie pohledu — LoS (17.1)
@@ -218,7 +218,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Co jde dělat:** přepnout `manual`↔`dynamic`; zapnout temnou scénu → token vidí jen do dosvitu (`visionRange` buněk, default 4) nebo do dosahu světel; **PJ klikne na dveře** (úchyt na `WallsLayer`) → otevře/zavře → LoS se ihned přepočítá (op `scene.walls.replace`, optimistic).
 - **Hranice / co neumí:** buňkové rozlišení (ne pixel-perfect stíny); LoS ze **všech PC tokenů** (ne per-hráč individuální vidění); přepočet na změnu pozice/zdí (memoizováno), ne živě během dragu; vyžaduje `fogEnabled`; žádná „explored" paměť (jen aktuální LoS); **runtime FPS na velké scéně neověřen** (klient-side); barevné míchání světel / darkvision typy mimo scope.
 - **Zvláštnosti:** reuse `FogLayer` — LoS jen dodá `revealedSet` (derived) místo ručního štětce; otevřené dveře (`door.open`) `wallsToSegments` vynechá; `LightsLayer` glow (`blendMode='add'`) jen v `darkness`. Jádro `vision/raycast.ts` unit-testováno (za zeď nedohlédne, dveře propustí, temno ořízne).
-- **Stav:** 🚧 funkční, čeká **BE restart** (kvůli perzistenci `walls` z 17.2) + runtime ověření výkonu.
+- **Stav:** ✅ kód kompletní (`vision/raycast.ts` unit-testováno; perzistence `walls` z 17.2 v `map-scene.schema.ts:46`). Runtime FPS na velké scéně neověřen.
 - **Kód:** FE `vision/raycast.ts`, `TacticalMapView.tsx` (`revealedSet` memo + `handleToggleDoor`), `components/{WallsLayer,LightsLayer}.tsx`, `components/pj-panel/EditSceneModal.tsx`. Bez BE zásahu (config je volný objekt).
 
 ### Efekty + šablony oblastí (15.3)
@@ -281,7 +281,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 - **Co jde dělat:** publikovat (licence: `clone`/`read`, uvedení autora, AI původ), stáhnout z katalogu (klony zůstávají), naklonovat do světa, nahlásit (`ReportButton targetType=scene_template`), kurátor schválit/zamítnout.
 - **Hranice / leak-safe:** klon **nenese PC tokeny** (šablona je nemá) ani **svět-scoped zvuky** (`activeSoundIds` strippnuté při publikaci). Licence `cloneAllowed=false` (`read`) → klon 403 `TEMPLATE_CLONE_FORBIDDEN`. Cizí **nepublikovanou** šablonu nelze naklonovat (403 `TEMPLATE_NOT_SHARED`). Katalog vrací whitelist bez owner-privátních polí. **Poprvé napojena licenční karta 20D** (`content_licenses`): publish vytvoří kartu, unpublish → `withdrawn`.
 - **Otevřené (drobnosti):** `CatalogEntry.cloneAllowed` se z BE nevrací → FE zašednutí „read-only" scén chybí, odchytí se až 403 při klonu. `targetAuthorId` v katalogu není → ReportButton se autorovi nepředskryje (BE self-report blokuje).
-- **Stav:** ✅ (BE nasazeno, e2e 7/7; FE build ✓, čeká commit+deploy+živé ověření).
+- **Stav:** ✅ (BE e2e 7/7 — `maps/scene-template-sharing.service.ts` + `scene-template-review.provider.ts`; FE build ✓ — `features/ikaros/sceny/`). Živé ověření neproběhlo.
 - **Kód:** FE `features/ikaros/sceny/*` (KomunitniSceny/ScenaDetail Page + api + hooks + CloneToWorldModal + SceneTemplateReviewRenderer), `tactical-map/components/pj-panel/{PublishTemplateModal,MapLibraryModal}.tsx`, tile `SpolecnaTvorba/tiles.ts`, `shared/moderation/enums.ts`, `ZpracovatTab/rendererRegistry.tsx`. BE `maps/{scene-template-sharing.service,scene-template-moderation.listener,scene-template-review.provider}.ts`, `map-templates.controller.ts`, `maps.service.ts` (klon brána), `content-licenses` (napojení). Spec [arch/phase-22/spec-22.5](../arch/phase-22/spec-22.5-sdileni-klonovani-scen.md).
 
 ### Počasí na mapě
@@ -405,7 +405,7 @@ Nejkomplexnější funkce platformy. PixiJS v8 plátno (`@pixi/react`), real-tim
 
 1. ✅ VYŘEŠENO 2026-07-12 (doc-fix dle D-NEW-INV-MAPS) — **„A* pohyb" = jen dosah, ne pathfinding.** Princip 10.2 sliboval A* hledání cesty; v kódu `movement` stat určuje pouze range (`schemas/types.ts:59`) a bariéry pohyb fyzicky neblokují. Rozhodnutí: dokumentace/spec opraveny na skutečné chování (dosah/range-check, měření = přímá hex distance) — `takticka-mapa-matrix.md` §21.1 + §23.5 + zdejší kapitola. Skutečný pathfinding zůstává jako případné budoucí rozšíření 17.x.
 
-2. **Dvě role-úrovně správy map.** Atlas „Mapy" (`world-maps`) vyžaduje k editaci **plné PJ** (`>= WorldRole.PJ`, `world-maps.service.ts:47`), ale taktická mapa, zvuky a deník PJ běží na `>= PomocnyPJ`. PomocnyPJ tedy řídí bojiště, ale **nemůže** spravovat obrázkový atlas. Ověřit, zda je to záměr — působí nekonzistentně.
+2. ✅ VYŘEŠENO (D-NEW-INV-MAPS) — **Role-prahy správy map sjednoceny.** Atlas „Mapy" běží stejně jako taktická mapa, zvuky a deník PJ na `>= PomocnyPJ` — BE `world-maps.service.ts:59-61` (`canManage` = `membership.role >= WorldRole.PomocnyPJ`), FE `WorldLayout.tsx:386-389` (`isPJ` = owner ∨ elevovaný admin ∨ `>= PomocnyPJ`, N-16). PomocnyPJ tedy spravuje bojiště i obrázkový atlas. Dřívější práh „plné PJ" už neplatí; tělo kapitoly (§14.1 „Kdo") je s kódem v souladu.
 
 3. ✅ VYŘEŠENO 2026-07-14 (21.3a) — **Dungeon-maps čtení/write PJ-only.** Gating přepracován: CRUD = Hrac+ s vlastnictvím (tvorba navíc Podporovatel ∨ PJ+), PJ+ spravuje vše, exporty na TM zůstávají PJ+ (`assertCanManage`). Viz §14.6. Pozn.: PomocnyPJ tvoří jen jako Podporovatel (role < PJ) — vědomé rozhodnutí spec 21.3 §3.
 

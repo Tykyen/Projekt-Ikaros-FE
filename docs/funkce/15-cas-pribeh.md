@@ -10,7 +10,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Co to je:** Měsíční mřížka sjednocující **herní akce** (game-events) + **kalendářové události postav/NPC/Lokací** (character calendar subdoc agregát) do jednoho přehledu. Nazváno v UI „Kalendář světa — PJ pohled".
 - **Kde:** route `/svet/:slug/kalendar` (`CalendarPage`). Menu „Kalendář" (top-level, hideable).
 - **Kdo:**
-  - FE — route gate `memberOnly(PomocnyPJ)` (R-18 — viz `router.tsx:249`). V nav se položka zobrazí jen `canAccess(PomocnyPJ)`.
+  - FE — route gate `memberOnly(PomocnyPJ)` (R-18 — viz `router.tsx:420`). V nav se položka zobrazí jen `canAccess(PomocnyPJ)`.
   - BE — agregát `GET /worlds/:id/calendars/aggregate` přes `assertCanModerate` = **PomocnyPJ+** (nebo Admin+). Neexistující svět → 404, nečlen/nízká role → 403.
 - **Co jde dělat:**
   - Měsíční mřížka generovaná z aktivního `CalendarConfig` (počet sloupců = `daysOfWeek.length`), navigace šipkami ±měsíc, tlačítko „Dnes", **skok na rok+měsíc** přes popover (jump).
@@ -27,7 +27,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - „Dnes" se mapuje z reálného gregoriánského data přes absDay — **žádný posun in-game času** se zde nepromítá (in-game datum řeší modul Počasí).
 - **Zvláštnosti:** Agregát filtruje skryté kalendáře (`displaySettings.isHiddenInAggregate`). `kind`/`isNpc` se enrichuje z `Characters` adresáře (Lokace = `kind:'location'`).
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/CalendarPage.tsx:58`, buňka `CalendarPage/components/CalendarCell.tsx` (klik na číslo dne → `onExpandDay`), drawer `components/DayDetailDrawer.tsx`, hooks `CalendarPage/hooks/useDensity.ts`, `hooks/useEntityIndex.ts`, `hooks/usePersistedCalendarCursor.ts`. BE controller `backend/src/modules/calendars/calendars.controller.ts:13`, service `calendars.service.ts:39` (`aggregate`/`updateSettings`/`assertCanModerate`). Engine `src/shared/lib/calendarEngine/`.
+- **Kód:** FE `src/features/world/pages/CalendarPage.tsx:79`, buňka `CalendarPage/components/CalendarCell.tsx` (klik na číslo dne → `onExpandDay`), drawer `components/DayDetailDrawer.tsx`, hooks `CalendarPage/hooks/useDensity.ts`, `hooks/useEntityIndex.ts`, `hooks/usePersistedCalendarCursor.ts`. BE controller `backend/src/modules/calendars/calendars.controller.ts:8` (`@Controller('worlds/:worldId/calendars')`), `:13` (`@Get('aggregate')`), `:21` (`@Patch(':slug/settings')`), service `calendars.service.ts:36` (`aggregate`), `:83` (`updateSettings`), `:112` (`assertCanModerate`). Engine `src/shared/lib/calendarEngine/`.
 
 ---
 
@@ -51,7 +51,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - Mazání configu **nemaže** události, které na něj odkazují (`calendarConfigId`) — žádná migrace/sirotčí kontrola.
 - **Zvláštnosti:** Auto-seed `gregorian` configu při vzniku světa (`seedGregorianDefault`, idempotentní). Při tvorbě světa lze nasadit víc presetů naráz (`applyPresetTemplate`). BE schéma drží `months/celestialBodies/seasons` jako Mixed array (`MixedArraySubSchema`).
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/CalendarConfigsPage/CalendarConfigsPage.tsx:29`, editor `CalendarConfigEditor.tsx:26`, picker `components/CalendarPresetPicker.tsx`, presety `src/shared/lib/calendarEngine/presets/index.ts`, kalibrace `presets/calibration.ts`. BE controller `backend/src/modules/world-calendar-config/world-calendar-config.controller.ts:29`, service `world-calendar-config.service.ts:32`, schéma `schemas/world-calendar-config.schema.ts`, celestial utils `world-calendar-config.utils.ts`.
+- **Kód:** FE `src/features/world/pages/CalendarConfigsPage/CalendarConfigsPage.tsx:29`, editor `CalendarConfigEditor.tsx:26`, picker `components/CalendarPresetPicker.tsx`, presety `src/shared/lib/calendarEngine/presets/index.ts:17–31` (14 presetů), kalibrace `presets/calibration.ts`. BE controller `backend/src/modules/world-calendar-config/world-calendar-config.controller.ts:28` (`@Controller`), `:29` (class), service `world-calendar-config.service.ts:35` (class; `assertCanWrite:374`, `SLUG_TAKEN:105`, `DEFAULT_CONFIG_LOCKED:168`, `seedGregorianDefault:234`), schéma `schemas/world-calendar-config.schema.ts`, celestial utils `world-calendar-config.utils.ts`.
 
 ---
 
@@ -59,13 +59,13 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Co to je:** Vertikální **historická osa světa** — chronologie nejdůležitějších událostí, lidí a míst. Datum dle dedikovaného kalendáře pro timeline.
 - **Kde:** route `/svet/:slug/timeline` (`TimelinePage`). Menu „Časová osa" (group „Svět", hideable). Pozn.: BE controller je globální `@Controller('timeline')` s `worldId` v query, ne pod `/worlds/:id`.
 - **Kdo:**
-  - FE — route gate `memberOnly(Hrac)` (R-06, `router.tsx:252`). V nav skryto Čtenáři (N-05, jen `canAccess(Hrac)`). Zápis = `userRole >= PomocnyPJ` (`canWrite`).
+  - FE — route gate `memberOnly(Hrac)` (R-06, `router.tsx:423`). V nav skryto Čtenáři (N-05, jen `canAccess(Hrac)`). Zápis = `userRole >= PomocnyPJ` (`canWrite`).
   - BE — read (`GET` list / `year-counts` / `:id`) = **member Hrac+** (`assertMember`; Ctenar → 403 `INSUFFICIENT_ROLE`, Zadatel → 403 `PENDING_MEMBERSHIP`). Write (POST/PUT/DELETE) = **PomocnyPJ+** (`assertCanWrite`).
 - **Co jde dělat:**
   - **Cursor pagination** (infinite scroll, `useInfiniteTimelineEvents`, default sort `desc` = nejnovější rok nahoře, v rámci roku ASC). Filtry v URL: `fromYear`, `toYear`, `q` (fulltext title+text), `sort`.
   - **Year scrubber** (sidebar / drawer) z agregátu `{year, count}` (`year-counts`).
   - **Přidat/upravit/smazat událost** (PomocnyPJ+) přes `TimelineEventModal` + `ConfirmDialog`. Pole: rok/měsíc/den/hodina, název, rich-text text, obrázek (focal point), odkaz, `pageSlug` (vazba na stránku), **celestial overrides** (ruční přepis fáze nebeského tělesa pro daný den).
-  - **✅ OPRAVENO 2026-07-05 (FUNC-02, RUN-2026-07-05) — „odstranit obrázek".** Nastavení `imageUrl` na prázdno v editoru se dřív na BE neprojevilo (update ho tiše ignoroval) — obrázek zůstal viset i po „smazání". Teď `imageUrl: null` v těle requestu obrázek reálně smaže a uklidí storage (event `media.orphaned`), stejně jako u ostatních modulů s obrázkem (game-events/world-news).
+  - **✅ OPRAVENO 2026-07-05 (FUNC-02, RUN-2026-07-05) — „odstranit obrázek".** Nastavení `imageUrl` na prázdno v editoru se dřív na BE neprojevilo (update ho tiše ignoroval) — obrázek zůstal viset i po „smazání". Teď `imageUrl: null` v těle requestu obrázek reálně smaže a uklidí storage (event `media.orphaned`), stejně jako u ostatních modulů s obrázkem (game-events/world-news). Doloženo `timeline.service.ts:234–243` (v kódu nese marker **CD-RUN-1 / FIX-11b**) + úklid při smazání události `:264–267`.
   - **Nebeské stavy** se počítají read-time z aktivního configu (`calculateCelestialStates`) — lunární fáze u událostí.
   - **Konverze data** mezi kalendáři světa (`DateConversionPopup`).
 - **Hranice / co neumí:**
@@ -75,7 +75,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - Rich-text se **sanitizuje** na write i read (allowlist); `data:` base64 obrázky se v listu strhávají (`stripBase64`), v detailu se ponechávají.
 - **Zvláštnosti:** Timeline má **vlastní getter** `getTimelineConfig` (priorita: `timelineCalendarSlug` → `defaultCalendarConfigSlug` → `configs[0]`), záměrně oddělený od `getConfigInternal`. Route `year-counts` musí být před `:id`.
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/TimelinePage/TimelinePage.tsx:50`, osa `TimelineAxis.tsx`, modal `components/TimelineEventModal.tsx`, API `api/useTimelineEvents.ts`. BE controller `backend/src/modules/timeline/timeline.controller.ts:31`, service `timeline.service.ts:62`, cursor `lib/timeline-cursor.ts`, schéma `schemas/timeline-event.schema.ts`.
+- **Kód:** FE `src/features/world/pages/TimelinePage/TimelinePage.tsx:50`, osa `TimelineAxis.tsx`, modal `components/TimelineEventModal.tsx`, API `api/useTimelineEvents.ts`. BE controller `backend/src/modules/timeline/timeline.controller.ts:30` (`@Controller('timeline')`), `:31` (class), service `timeline.service.ts:65` (class; `assertMember:274`, `assertCanWrite:311`, `create:153`, `stripBase64:59`), cursor `lib/timeline-cursor.ts`, schéma `schemas/timeline-event.schema.ts`.
 
 ---
 
@@ -83,7 +83,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Co to je:** Generátory atmosférických podmínek per region světa — manuální i **simulované** počasí (Markovovy přechody, gaussovská teplota, Köppenovy zóny, sezónní interpolace), + řízení **in-game data** světa (advance-day).
 - **Kde:** route `/svet/:slug/pocasi` (`WorldWeatherPage`). Menu „Generátor počasí" (group „Hra", hideable). BE `worlds/:id/weather-generators`.
 - **Kdo:**
-  - FE — route gate `memberOnly(Hrac)` (R-18, `router.tsx:254`); v nav skryto Čtenáři. `canManage = PomocnyPJ+` (nebo global Admin), `canDelete = PJ+` (nebo Admin).
+  - FE — route gate `memberOnly(Hrac)` (R-18, `router.tsx:425`); v nav skryto Čtenáři. `canManage = PomocnyPJ+` (nebo global Admin), `canDelete = PJ+` (nebo Admin).
   - BE — read (list/detail/history) = **member Hrac+** (`assertMember`), všechny mutace (create/update/delete/generate/setCurrent/broadcast/advance-day/set-in-game-date/reorder/clearMapWeather) = **PomocnyPJ+** (`assertCanWrite`).
 - **Co jde dělat:**
   - **Vytvořit generátor** z reálného světa (Praha, Reykjavík…), archetypu (poušť, mírné oceánské, sci-fi/fantasy sady) nebo ručně — bohatý wizard (`WeatherPresetWizard`, fuzzy search, kategorie, naposledy použité).
@@ -95,12 +95,12 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Hranice / co neumí:**
   - Hráč/Čtenář (Čtenář ani nedojde) má **read-only** — žádné generování/broadcast/drag/sety/datum.
   - Oblíbené jsou **čistě FE** (localStorage), nesdílí se ani nepřežijí jiné zařízení.
-  - Advance-day rozsah **1–365 dní** (BE validace).
+  - Advance-day rozsah **1–365 dní** (BE validace v service `advanceDay`, `world-weather.service.ts:868` → 400 `WEATHER_ADVANCE_DAY_INVALID`; není to DTO validátor).
   - Simulace je **deterministická per seed**, ale není to fyzikální model — Markov/gauss aproximace; klimatické epochy jen orientační.
   - In-game datum je uloženo jako **storage-only Date** (UTC), zobrazení se interpretuje dle world kalendáře — pro custom kalendář může být UX „den X (Rok = real-world)".
 - **Zvláštnosti:** Simulační modul je **sdílený BE↔FE** (auto-copy přes `scripts/sync-simulation-to-fe.ts`, parity test gate v CI). Literal-path routes (`reorder`, `advance-day`, `set-in-game-date`, `map-weather/active`) musí být před `:id`.
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/WorldWeatherPage/WorldWeatherPage.tsx:92`, modaly `modals/`, wizard `modals/wizard/`, data `data/` (archetypy/realWorld/sety). BE controller `backend/src/modules/world-weather/world-weather.controller.ts:37`, service `world-weather.service.ts` (`generate:412`, `broadcast:1089`, `advanceDay:843`, `assertCanWrite:390`), simulace `simulation/index.ts`.
+- **Kód:** FE `src/features/world/pages/WorldWeatherPage/WorldWeatherPage.tsx:92`, modaly `modals/`, wizard `modals/wizard/`, data `data/` (archetypy/realWorld/sety). BE controller `backend/src/modules/world-weather/world-weather.controller.ts:36` (`@Controller('worlds/:worldId/weather-generators')`), `:37` (class), service `world-weather.service.ts` (`generate:424`, `broadcast:1101`, `advanceDay:855`, `setInGameDate:777`, `assertCanWrite:402`), simulace `simulation/index.ts`.
 
 ---
 
@@ -108,8 +108,8 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Co to je:** Nadcházející herní akce světa + **archiv** proběhlých, s RSVP účastí, komentáři (vlákna 1 úroveň) a reakcemi, push notifikacemi.
 - **Kde:** route `/svet/:slug/akce` (`EventsPage`); od **2026-06-20** v menu „Svět" (skrývatelné `id:'akce'`) i na úvodní stránce (levý sloupec „Akce" + footer „Všechny akce →"). Legacy redirect `/sprava-udalosti` **smazán 2026-06-20** (expiroval). BE `@Controller('game-events')` s `worldId` v query; smazání akce = **hard delete + `media.orphaned`** (CD-RUN-4b; dřív soft-delete bez obnovy).
 - **Kdo:**
-  - FE — route `memberOnly` (Hrac+ implicitně). Tab „Archiv" a tlačítko „Nová akce" jen **PomocnyPJ+** (`viewerRole >= PomocnyPJ`); hráč při `?view=archive` → silent redirect na upcoming.
-  - BE — read = člen ≥ Hrac (Zadatel → prázdno/false). **Archiv** (date < cutoff 24 h) = jen **PomocnyPJ+** (jinak 403 `ARCHIVE_PJ_ONLY`); hráč bez `fromDate` dostane auto-clamp na cutoff (vidí jen nadcházející). Mutace eventu = **PomocnyPJ+** (`assertManage`). Komentář/RSVP/reakce = každý, kdo event vidí (`canView`, respektuje groupOnly). Editace komentáře = jen autor; mazání = autor nebo PJ-mod.
+  - FE — route `memberOnly(p(EventsPage))` **bez druhého argumentu** → default `WorldRole.Ctenar` (`router.tsx:182` — `memberOnly` má `minWorldRole: WorldRole = WorldRole.Ctenar`), tj. **Čtenář+**, ne Hrac+. Tab „Archiv" a tlačítko „Nová akce" jen **PomocnyPJ+** (`viewerRole >= PomocnyPJ`); hráč při `?view=archive` → silent redirect na upcoming.
+  - BE — read = **kterýkoli člen kromě Zadatele** (`canView:122` → `if (!m || m.role === WorldRole.Zadatel) return false`, list `:186` stejně), tj. **Ctenar+** — parita s FE gate. **Archiv** (date < cutoff 24 h) = jen **PomocnyPJ+** (jinak 403 `ARCHIVE_PJ_ONLY`); hráč bez `fromDate` dostane auto-clamp na cutoff (vidí jen nadcházející). Mutace eventu = **PomocnyPJ+** (`assertManage`). Komentář/RSVP/reakce = každý, kdo event vidí (`canView`, respektuje groupOnly). Editace komentáře = jen autor; mazání = autor nebo PJ-mod.
 - **Co jde dělat:**
   - **Upcoming / Archiv** taby (URL `?view=`), **filtr podle skupiny** (`?group=`, klient-side dle `targetGroup` + barvy skupin z worldSettings).
   - **Vytvořit/upravit/smazat akci** (`GameEventModal`): název, datum+čas, popis, obrázek (focal/zoom/fit), cílová skupina + `groupOnly`, `confirmable` (RSVP). `groupOnly` vyžaduje `targetGroup` (jinak 400).
@@ -124,7 +124,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - Hard delete eventu maže přidružený obrázek (event `media.orphaned`), ale samotný event je **hard delete** (ne soft).
 - **Zvláštnosti:** Archive policy = varianta A (implicit filter dle date, ne separátní endpoint). `findList` limit default 100 / max 500. `confirmedBy` lze přepsat i přes update (PJ).
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/EventsPage/EventsPage.tsx:24`, toolbar/list `components/`, modal `src/features/world/components/GameEventModal/GameEventModal.tsx`, dashboard `pages/WorldDashboardPage/.../columns/EventsColumn.tsx`. BE controller `backend/src/modules/game-events/game-events.controller.ts:36`, service `game-events.service.ts` (`findList:123`, `create:239`, `notifyOnCreate`, archive gate `:135`), cron `game-event-reminder.job.ts` (à 15 min, dvě okna 24 h/1 h).
+- **Kód:** FE `src/features/world/pages/EventsPage/EventsPage.tsx:24`, toolbar/list `components/`, modal `src/features/world/components/GameEventModal/GameEventModal.tsx`, dashboard `pages/WorldDashboardPage/.../columns/EventsColumn.tsx`. BE controller `backend/src/modules/game-events/game-events.controller.ts:34` (`@Controller('game-events')`), `:36` (class), service `game-events.service.ts` (`findList:168`, `create:290`, `notifyOnCreate:623`, `assertManage:131`, archive gate `ARCHIVE_PJ_ONLY:201`, `ARCHIVE_SKEW_MS:40`, `ACTIVE_WINDOW_MS` z `common/constants/time.constants`), cron `game-event-reminder.job.ts:36` (`@Cron('*/15 * * * *')`, okna 24 h `:49` / 1 h `:56`, `CronLockService` proti dvojímu pushi při 2+ replikách).
 
 ---
 
@@ -132,8 +132,8 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Co to je:** PJ nástroj „**Pavučina**" — graf **vztahů** mezi subjekty kampaně (NPC/frakce/místa), příběhové **linky** (storylines), rychlé poznámky a dashboard „Dnes" (krizové vztahy, aktivní linky, připnuté poznámky). Vrstvený (per-hráč) přehled. **11.5:** graf je i pracovní plocha — tvorba subjektů/vztahů, „materializace" subjektu na reálnou stránku a „vyvolání" (přeskok na napojenou stránku).
 - **Kde:** route `/svet/:slug/pavucina` (`CampaignPage` → `CampaignView`). Menu „Pavučina" (group „Svět"). BE `@Controller('campaign')` s `worldId` v query.
 - **Kdo:**
-  - FE — route `memberOnly` (Hrac+). `isPJ = PJ+` → přepínač vrstev (LayerSwitcher = data jiných hráčů, read-only). Hráč/PomocnyPJ vidí vlastní + sdílená (`isShared`) data.
-  - BE — `getWorldRole` vyžaduje **členství** (nečlen → 403 `NOT_A_MEMBER`, N-06 oprava); read/write scope dle role: **PJ** = celý svět, **PomocnyPJ** = vlastní + `isShared`, níže = jen vlastní (`resolveScope`). `canModify` = PJ vždy / PomocnyPJ na sdílených / jinak jen vlastník. `getPlayers` (vrstvy) = jen **PJ** (controller `< PJ` → 403). Changelog = **PomocnyPJ+**.
+  - FE — route `memberOnly(p(CampaignPage))` **bez druhého argumentu** → default `WorldRole.Ctenar` (`router.tsx:182`), tj. **Čtenář+**, ne Hrac+. `isPJ = PJ+` → přepínač vrstev (LayerSwitcher = data jiných hráčů, read-only). Hráč/PomocnyPJ vidí vlastní + sdílená (`isShared`) data.
+  - BE — `getWorldRole:71` vyžaduje **jen členství** (žádný role-floor; nečlen → 403 `NOT_A_MEMBER`, N-06 oprava) — parita s FE Ctenar gate; read/write scope pak dle role: **PJ** = celý svět, **PomocnyPJ** = vlastní + `isShared`, níže = jen vlastní (`resolveScope`). `canModify` = PJ vždy / PomocnyPJ na sdílených / jinak jen vlastník. `getPlayers` (vrstvy) = jen **PJ** (controller `< PJ` → 403). Changelog = **PomocnyPJ+**.
 - **Co jde dělat:**
   - **Taby:** „◉ Dnes" (dashboard — krize/aktivní linky/připnuté poznámky/recent changes), „Subjekty" (CRUD subjektů + vztahů, detail), „Linky" (storylines), „Síť" (interaktivní graf `PavucinaGraph`, filtr dle storyline, deeplink `?storyline=`).
   - **Graf jako pracovní plocha (11.5, tab „Síť"):**
@@ -157,7 +157,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - Materializace hráče = posun soukromého subjektu do (pending) **světové** stránky — vědomý krok (label „Navrhnout ke schválení").
 - **Zvláštnosti:** Changelog je fire-and-forget (`logChange` `.catch()` ignoruje chybu). `getWorldRole` mapuje global Admin+ na `WorldRole.PJ`.
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/CampaignPage.tsx`, `campaign/components/CampaignView.tsx:60` (orchestrátor + sdílené modaly + `getMaterializeLabel`/`invokeSubject`), graf `PavucinaGraph.tsx:54` (context-menu `menu` stav, „+ Subjekt"), detail `SubjectDetail.tsx` („Vyvolat stránku" + materializace), materializace `campaign/useMaterializeSubject.ts` (`SUBJECT_TO_PAGE_TYPE`/`isMaterializable`), našeptávač `SubjectForm.tsx` (`pageTypeToSubjectType`), dashboard `DnesTab.tsx`, API `campaign/api.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts:48`, service `campaign.service.ts` (`getWorldRole:63`, `resolveScope:86`, `canModify:113`, `getDashboard:1172`); nové Page-typy + pending gating `backend/src/modules/pages/interfaces/page.interface.ts:18` (`PAGE_TYPES`/`PLAYER_PROPOSABLE_PAGE_TYPES`), `pages.service.resolveCreateMode`.
+- **Kód:** FE `src/features/world/pages/CampaignPage.tsx`, `campaign/components/CampaignView.tsx:60` (orchestrátor + sdílené modaly + `getMaterializeLabel`/`invokeSubject`), graf `PavucinaGraph.tsx:54` (context-menu `menu` stav, „+ Subjekt"), detail `SubjectDetail.tsx` („Vyvolat stránku" + materializace), materializace `campaign/useMaterializeSubject.ts` (`SUBJECT_TO_PAGE_TYPE`/`isMaterializable`), našeptávač `SubjectForm.tsx` (`pageTypeToSubjectType`), dashboard `DnesTab.tsx`, API `campaign/api.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts:41` (`@Controller('campaign')`), `:43` (class), `getPlayers:67` (PJ-only), service `campaign.service.ts` (`getWorldRole:71`, `resolveScope:95`, `canModify:122`, `getDashboard:1325`); nové Page-typy + pending gating `backend/src/modules/pages/interfaces/page.interface.ts:18` (`PAGE_TYPES`/`PLAYER_PROPOSABLE_PAGE_TYPES`), `pages.service.resolveCreateMode`.
 
 ---
 
@@ -180,7 +180,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - „Síť" zobrazení scénářů neexistuje — graf je jen pro vztahy (Pavučina); scénáře jsou strom.
 - **Zvláštnosti:** `isShared` opět jen PomocnyPJ+ (resolveIsShared). Tajná pole (gmNotes/cíl/výsledek) edituje `isGm` (PomocnyPJ+), ne pouhý PJ.
 - **Stav:** ✅
-- **Kód:** FE `src/features/world/pages/StorylinesPage.tsx`, `campaign/components/StoryboardView.tsx:55`, strom `ScenarioTree.tsx`, editor `ScenarioEditor.tsx`, provázání `ScenarioLinksPanel.tsx`, meta `campaign/scenarioMeta.ts`, šablony `scenarioTemplates.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts` (sekce Scenarios `:380`), service `campaign.service.ts` (`findScenarios`/`createScenario`), schéma `schemas/campaign-scenario.schema.ts`.
+- **Kód:** FE `src/features/world/pages/StorylinesPage.tsx`, `campaign/components/StoryboardView.tsx:55`, strom `ScenarioTree.tsx`, editor `ScenarioEditor.tsx`, provázání `ScenarioLinksPanel.tsx`, meta `campaign/scenarioMeta.ts`, šablony `scenarioTemplates.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts` (sekce Scenarios `:407` GET list, `:418` GET detail, `:432` POST + role-floor `< PomocnyPJ → 403 INSUFFICIENT_WORLD_ROLE` `:446`, `:459` PUT, `:483` DELETE), service `campaign.service.ts` (`findScenarios`/`createScenario`), schéma `schemas/campaign-scenario.schema.ts`.
 
 ---
 

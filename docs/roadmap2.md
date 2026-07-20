@@ -48,17 +48,20 @@ Etapa I postavila **platformu** (auth, komunita, světy, chat, postavy, mapy, ka
 
 | # | Název | Vlna z analýzy | Doména | Stav |
 |---|-------|----------------|--------|------|
-| 14 | Bezpečnost & provozní odolnost | Vlna 1 — Pojistka | Platforma | ⬜ |
-| 15 | Rychlé výhry & parita stolu | Vlna 2 — Rychlé výhry | Svět + Platforma | ⬜ |
-| 15B | SEO & objevitelnost | Vlna 2b — Objevitelnost | Platforma + Obsah | ⬜ |
-| 16 | Český příkop | Vlna 3 — Příkop | Svět + Komunita | ⬜ |
-| 17 | Vlajkové funkce | Vlna 4 — Vlajky | Svět | ⬜ |
-| 18 | AI asistence | Vlna 5 — AI horizont | Svět + Platforma | ⬜ |
-| 19 | Růst, metriky & udržitelnost | Příloha A + B | Platforma + Provoz | ⬜ |
-| 20 | Governance, právo & moderace | Příloha C | Platforma + Provoz | ⬜ |
-| 21 | Komunitní tvorba & sdílený obsah | Vize komunity | Svět + Komunita | ⬜ |
+| 14 | Bezpečnost & provozní odolnost | Vlna 1 — Pojistka | Platforma | ✅ *(14.4 + 14.8 → R3)* |
+| 15 | Rychlé výhry & parita stolu | Vlna 2 — Rychlé výhry | Svět + Platforma | ✅ |
+| 15B | SEO & objevitelnost | Vlna 2b — Objevitelnost | Platforma + Obsah | ✅ *(15B.5 → 22.2)* |
+| 16 | Český příkop | Vlna 3 — Příkop | Svět + Komunita | ✅ *(16.4 → 22.3)* |
+| 17 | Vlajkové funkce | Vlna 4 — Vlajky | Svět | 🟡 *(zbývá 17.11 · 17.12 · 17.13 · 17.14)* |
+| 18 | AI asistence | Vlna 5 — AI horizont | Svět + Platforma | ⬜ **nerealizováno** |
+| 19 | Růst, metriky & udržitelnost | Příloha A + B | Platforma + Provoz | ✅ *(vynucování kvót → R3)* |
+| 20 | Governance, právo & moderace | Příloha C | Platforma + Provoz | ✅ |
+| 21 | Komunitní tvorba & sdílený obsah | Vize komunity | Svět + Komunita | ✅ |
+| 22 | Finální SEO dotažení | Vlna závěr | Platforma + Obsah | 🟡 *(22.4/22.5 ✅; 22.1/22.2 čekají, 22.3 → R3)* |
 
 > Legenda: ✅ Hotovo &nbsp;|&nbsp; 🟡 Rozpracováno &nbsp;|&nbsp; ⬜ Čeká &nbsp;|&nbsp; 👑 vlajková priorita
+>
+> Stav sloupce ověřen proti kódu 2026-07-20 (inventura R3 karta 24.5).
 >
 > **Pořadí ≠ termíny.** Fáze 14 (zejména zálohy a 2FA) je urgentní a vyplatí se interleavovat **už teď**, nezávisle na dokončení Etapy I.
 
@@ -510,7 +513,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **Otevřené otázky:** Pořadí dotahování deníků (DrD 1.6 → JaD → DrD II → …)? Kdy/jak vrátit „dodatky k pravidlům" (vyřazeny z 16.2)? Pre/post moderace komunitního bestiáře (→ 21.4)?
 
-### - [x] 16.3 Migrace obsahu ze starých fórovek / Matrixu — [E3 · dopad vysoký · náklad střední] 🔁
+### - [x] 16.3 Migrace obsahu ze starých fórovek / Matrixu — [E3 · dopad vysoký · náklad střední] 🔁 ✅
+> ✅ **Realizováno jako migrace Matrixu F1–F12** (ověřeno kódem 2026-07-20). Skripty v BE repu `migration/` (`f10-import.js`, `f11-import.js`, `f12-images.js`, `f-pravidla-b.js`, datové dávky `f4a-pages`/`f4b-npc-pages`/`f4c-subdocs`/`f4d-akj`) + **25 workflow** `.github/workflows/import-matrix-*.yml` (users · pages · characters · chat · akj · calendars · campaign · shop · timeline · rulebook…) + opravné `fix-matrix-*.yml`. Dokumentace: [`docs/arch/migration-matrix/`](arch/migration-matrix/). **Otevřená otázka zodpovězena:** jen Matrix — generický phpBB/Webnode import se nestavěl. **Zbývá:** F11 chat (`project_matrix_full_migration`).
 **Cíl:** Import postav, stránek a vláken ze staré DB; ideálně generický import z phpBB/Webnode exportů.
 **Proč:** Komunity nepřejdou, když musí ručně přepsat roky obsahu. Snadný import = rozdíl mezi „zkusím" a „nemám čas"; získává **celé skupiny najednou** — přímá odpověď na síťový efekt. (Migrace uživatelů Matrixu už běží — viz `project_matrix_user_migration`.)
 **Návrh přípravy:** zmapovat strukturu staré Matrix DB; navrhnout mapování entit; one-off vs. opakovatelný import; dotáhnout krok 19 z Etapy I (migrace dat).
@@ -518,7 +522,7 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Otevřené otázky:** Jen Matrix, nebo i generický phpBB/Webnode? Mapovat staré účty na nové (vazba na běžící user migraci)? Jak řešit chybějící/nekonzistentní data?
 
 ### 16.4 → přesunuto na Fázi 22  — [D2 · dopad vysoký · náklad střední]
-> **Přesunuto na úplný konec (2026-07-03):** onboarding nového PJ + demo svět dává smysl teprve po dokončení všeho ostatního — nový uživatel má potkat **hotový** produkt, ne rozestavěnou appku. Plný popis viz **Fáze 23 → 23.1**.
+> **Přesunuto na úplný konec (2026-07-03):** onboarding nového PJ + demo svět dává smysl teprve po dokončení všeho ostatního — nový uživatel má potkat **hotový** produkt, ne rozestavěnou appku. Plný popis viz **Fáze 22 → 22.3** (odtud dál překlopeno do R3: karty 25.5 + 26.1–26.4, plný wizard = pozdější rozšíření).
 
 ### - [x] 16.5 Interaktivní mapa s body na stránky — [C1 · dopad vysoký · náklad střední] 🔁 ✅ 2026-07-04 (piny + editor + viewer + propojení scény + chat karta; čeká BE restart)
 **Cíl:** Na obrázek mapy připíchneš body; klik otevře wiki stránku té lokace.
@@ -558,11 +562,17 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE/FE:** parser + mapování na naši scénu/stěny.
 **Otevřené otázky:** Které varianty formátu podporovat? Kam s licencemi importovaných map (jen vlastní soubory)?
 
+### 17.3 → přesunuto na Fázi 22 (karta 22.4) — [C3 · dopad střední · náklad střední]
+> **Přesunuto 2026-07-05:** veřejná „výkladní skříň" světa = SEO/marketing páka závěru Etapy II. Plný popis viz **Fáze 22 → 22.4**.
+
 ### - [x] 17.4 Doladění mobilní hry na mapě — [D3 · dopad střední · náklad střední] ✅
 **Cíl:** Plné dotykové ovládání mapy (pinch-zoom, tažení tokenů, výběr) na malém displeji.
 **Proč:** Český hráč hraje hodně z mobilu; dotyk na mapě bývá u VTT bolavé místo (pravidlo projektu „mobil i desktop").
 **Hotovo:** 1-prst pan mapy (dřív vůbec nešlo), pinch = zoom+posun zároveň, long-tap na tokenu = akce (velký terč místo „i" badge), dotykové terče ≥44px (coarse), wheel bez Ctrl (desktop bonus). Disambiguace token vs. pan přes dvojitý gate. Unit testy + build zelené. Spec `docs/arch/phase-17/spec-17.4.md`, funkce kap. 14.
-**Zbývá:** živý „pocit pod palcem" na reálném telefonu (headless nemá pravý touchscreen); `mobil-desktop` panely na 375px. Rozhodnuto: **parita** s desktopem (zjednodušený mobilní layout = 17.11 companion mód).
+**Zbývá:** živý „pocit pod palcem" na reálném telefonu (headless nemá pravý touchscreen); `mobil-desktop` panely na 375px. Rozhodnuto: **parita** s desktopem (zjednodušený mobilní layout = 17.14 companion mód).
+
+### 17.5 → přesunuto na Fázi 22 (karta 22.5) — [E4 · dopad střední · náklad střední]
+> **Přesunuto 2026-07-05:** sdílení & klonování světů/šablon = veřejný katalog + síťový efekt, patří k závěru Etapy II. Plný popis viz **Fáze 22 → 22.5**.
 
 ### - [x] 17.6 Integrace hlasu a videa přes Jitsi — [D4 · dopad střední/vysoký · náklad malý až střední] ✅ *(2026-07-05)*
 
@@ -586,11 +596,12 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 
 **Otevřené otázky:** Začít pouze odkazem, nebo rovnou embed? Má být výchozí místnost per svět, nebo per scéna? Má být kamera výchozí, nebo má hráč vstupovat nejdřív s vypnutou kamerou? Má se později řešit self-host Jitsi?
 
-### - [ ] 17.7 Rodokmeny — [C2 · dopad nízký · náklad střední] 🔁 (volitelné)
+### - [x] 17.7 Rodokmeny — [C2 · dopad nízký · náklad střední] ✅
+> ✅ **Implementováno** (ověřeno kódem 2026-07-20) jako **samostatný typ stránky `familyTree`** — spec [spec-17.7](arch/phase-17/spec-17.7.md), **varianta A** (vlastní data, ne pohled nad Pavučinou). FE viewer `pages/PageViewer/layouts/familyTree/` (`FamilyTreeCanvas` + `FamilyNode` + `geometry` + `usePanZoom`, pan/zoom) + `layouts/FamilyTreeLayout.tsx`; editor `pages/PageEditor/panels/FamilyTreeEditor.tsx` (napojen v `NewPageWizardModal`, `usePageEditorState`, `useTypeSwitchGuard`); BE rozšíření modulu `pages` (schema · interface · DTO · service · repository). Osoba = volná data (jméno, narození, úmrtí, foto) + volitelný `pageSlug` → klik naviguje na stránku postavy. Vzhled dle motivu světa.
 **Cíl:** Vizuální strom „rodič → dítě / sňatek".
 **Proč:** World Anvil i Kanka to mají; fanoušci ság to milují. Naše Pavučina umí obecné vztahy, ne dedikovaný strom.
-**Návrh přípravy:** speciální layout nad existujícími `CampaignRelationship` (typy rodič/potomek/choť). Nižší priorita.
-**Otevřené otázky:** Samostatná featura, nebo jen nový pohled v Pavučině?
+**Odchylka od návrhu:** ~~speciální layout nad `CampaignRelationship`~~ → vlastní data. **Proč:** rodokmen běžně obsahuje předky bez vlastní stránky; vázat každý uzel na entitu Pavučiny by to znemožnilo. Pavučina zůstává nedotčená.
+**Otevřené otázky:** ~~Samostatná featura, nebo jen nový pohled v Pavučině?~~ (vyřešeno: **samostatná featura**, spec-17.7 varianta A)
 
 ### - [x] 17.8 Přístupnost (WCAG, klávesnice, čtečky) — [D5 · dopad nízký · náklad malý] 🔁 (první vrstva ✅)
 **Cíl:** Ovládání z klávesnice + popisky pro čtečky u ikonových tlačítek.
@@ -609,23 +620,54 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **FE:** stream-mode layout (skryté UI) + transparentní pozadí.
 **Otevřené otázky:** ~~Jen mapa, nebo i overlay deníku/iniciativy? Konfigurovatelné, co se skryje?~~ → vyřešeno: volitelné toggly (iniciativa/deník), zbytek skryt vždy.
 
-### - [x] 17.10 Docking / panelový workspace + kontextové palety — [H4-07 · dopad střední · náklad velký]
+### - [x] 17.10 Docking / panelový workspace + kontextové palety — [H4-07 · dopad střední · náklad velký] ✅ *(2026-07-07)*
+> ✅ **Implementováno 2026-07-07 — celý zátah A (fáze A1–A5).** Spec [spec-17.10](arch/phase-17/spec-17.10.md), deník [fe.md](chybovy-denik/fe.md) (3× ✅ ŘEŠENÍ). **A1+A2:** `tactical-map/workspace/` — `workspaceStore.ts` (jotai registr `open/collapsed/minimized/floating` + pořadí fokusu, persist `ikr-map-workspace-v1`), `MapPanel.tsx` shell (obaluje existující panely, nepřepisuje), `MapDock.tsx` spodní lišta, `MapTidyButton.tsx` („Uklidit vše"), `zLayers.ts` (z-index škála místo literálů) + rezervace okrajů `--map-inset-*` (řeší kolizi počasí × pravá lišta); zapojeno v `TacticalMapView.tsx` (`DOCK_META`, 8 panelů). **A3:** `DicePickerPopover` portálem + `useAnchoredPosition` clamp (konec ořezu kostek). **A4:** karta tokenu `TokenInfoPanel` = 2 módy 📌 dock ↔ 🪟 plovoucí (bez volného dragu — rozhodnutí 2026-07-06) + minimalizace do doku + otevření klikem na portrét v iniciativní liště. **A5:** pravý klik na token/mapu → menu u kurzoru. **Neprovedeno:** zátah B (server-side layout per uživatel) — zůstává jako výhled.
 **Cíl:** Encyklopedie/karta nestvůry se při hře otevře jako přesunovatelný boční panel nebo plovoucí okno (minimalizovat do lišty, obnovit) — místo opouštění mapy. Plus kontextové menu na pravý klik a plovoucí palety přesně u kurzoru (Fittsova ergonomie).
 **Proč:** PJ při bitvě překlikává spoustu oken — context switching ničí plynulost. Nejlepší webové appky (Notion, Figma) fungují jako operační systém, ne stránka.
 **Návrh přípravy:** state-management pro docking/plovoucí okna; **začít side-drawerem**, plovoucí okna později (komplexita stavu).
 **FE:** docking framework + kontextová menu.
 **Otevřené otázky:** Side-drawer napřed, nebo rovnou plovoucí okna? Ukládat rozložení panelů per uživatel?
 
+### - [ ] 17.11 Pop-out karty tokenu do samostatného okna (druhý monitor) — [navazuje na 17.10 · dopad střední · náklad střední]
+> **Spec hotový, čeká schválení:** [spec-17.11](arch/phase-17/spec-17.11.md) — cesta „2 — věrná" (kompaktní karta vč. bestií + hody do mapy). Implementace nezačala.
+**Cíl:** Hráč/PJ otevře **kartu tokenu ve vlastním okně prohlížeče** (`window.open`) a přesune ji na druhý monitor — na hlavním mapa, na druhém trvale postava / statblok nestvůry. Není to drag uvnitř okna (ten 17.10 vědomě vyřadilo), ale skutečné OS okno.
+**Proč jde levně (ověřeno kódem):** JWT je v `localStorage` same-origin → nové okno je automaticky přihlášené; vzor pop-outu už existuje (`VoiceKrcmaRoom` 17.6); PC/NPC data jdou složit jen z URL (`worldSlug` + `characterSlug`).
+**Známá překážka:** **bestie nemá slug ani URL** — data žijí jen ve snapshotu tokenu ve scéně → nutný klíč `sceneId + tokenId`. Nové okno nesdílí React strom ani jotai atomy → hody z okna do mapy přes `BroadcastChannel`.
+**Otevřené otázky:** Kolik oken naráz (1 karta, nebo N)? Přežije okno reload mapy? Skiny v pop-outu = plná parita, nebo zjednodušení?
 
-### - [x] 17.1 Živá příběhová mapa napojená na hru (chat / bojová scéna) — [nápad 2026-06-15 · dopad střední · náklad střední] 🔁
+### - [ ] 17.12 Živá příběhová mapa napojená na hru (chat / bojová scéna) — [nápad 2026-06-15 · dopad střední · náklad střední] 🔁
+> ⚠️ **Opraveno 2026-07-20 (inventura R3 24.5):** karta byla omylem vedená pod číslem **17.1** (kolize s „17.1 Dynamické světlo & LoS") a **zaškrtnutá jako hotová** — ověřením kódu se ukázalo, že featura **neexistuje**. Přečíslováno na 17.12 a odškrtnuto.
+> **Hotový je jen základ z 16.5b:** `WorldMapEntry.linkedSceneId` (vazba celé mapy na scénu) + `SceneLinkPopover` + pilulka `StoryMapPill` v doku taktické mapy (otevře atlas mapu propojenou s aktuální scénou). V kódu je označená jako **16.5b**, ne 17.x.
+> **Chybí celé jádro karty:** `WorldMapPin` nemá pole aktivní polohy (`activeSceneId`/`activePinId`); `PinMarker`/`PinLayer` nemají stav „rozsvíceno / tady jste"; modul `world-maps` nemá WS gateway (jediný emit = `media.orphaned`) → žádný živý signál polohy; žádný spec.
 **Cíl:** U vlajkové hry vidí hráči **aktivní mapu napojenou na probíhající hru** — na chat nebo přímo na bojovou scénu — kde koukají, **kde zrovna jsou v příběhu**. Mapa se „rozsvítí" u aktuální lokace/scény, kterou hra právě řeší.
 **Proč:** Spojuje příběh s geografií živě — hráč neztrácí orientaci v ságe; posiluje imerzi. Tvůj nápad (2026-06-15) — „zajímavá varianta". Staví na interaktivní mapě s piny (16.5) a propojuje ji se stavem hry (aktivní scéna / chat kanál → pin na mapě).
 **Návrh přípravy:** rozhodnout, co je „aktuální poloha v příběhu" (aktivní scéna? kanál světového chatu? ručně PJ?); navázání pin (16.5) ↔ scéna/kanál; 🔁 taktická mapa + per-player scene assignment (`project_takticka_mapa_assignment`), world-room WS signál (`project_map_world_room_join`).
 **BE/FE:** vazba aktivní scény/kanálu na pin mapy; živý ukazatel „tady jste" (push/WS); read-only pohled pro hráče.
 **Otevřené otázky:** Polohu nastavuje PJ ručně, nebo se odvozuje z aktivní scény/kanálu automaticky? Per hráč (každý jinde), nebo sdílená pozice družiny? Napojit na fórovku/Camp (16.1/16.6) i na světový chat?
 
+### - [ ] 17.13 Dedikovaná nápověda mapových panelů (Orchestrace + Efekty) — [zadání uživatele · dopad nízký · náklad malý] 🟡
+> 🚧 **Rozpracováno** — spec [spec-17.13](arch/phase-17/spec-17.13-napoveda-orchestrace.md). Vzor „?" v hlavičce panelu → `WorldHelpModal` (in-situ nápověda 13.6) už aplikován na **Orchestraci** i **Efekty & kreslení**; hák `onHelp` je součástí `MapPanel` shellu (17.10 A1).
+**Cíl:** Panel ⚙ Orchestrace (režisérský pult PJ) a 🎨 Efekty & kreslení mají **vlastní kontextovou nápovědu** u panelu — ne schovanou v jednom společném mapovém cheat-sheetu, kde je orchestrace shrnutá do řádku.
+**Proč:** Zadání uživatele: „Orchestrace ať má vlastní nápovědu — co je ve scéně, jak scénu nastavit, co orchestrace dokáže." Rozšířeno 2026-07-08 i na Efekty → jde o **sdílený mechanismus**, ne jednorázovku.
+**Zbývá:** dopsat obsah nápověd a projít zbylé mapové panely (Mlha · Zobrazení · Ambient · Počasí · Deník), zda si zaslouží vlastní „?".
+
+### - [ ] 17.14 Companion mód — zjednodušený mobilní layout mapy — [D3 navazuje na 17.4 · dopad střední · náklad střední]
+> ⚠️ **Přečíslováno 2026-07-20 (inventura R3 24.5):** dřív se v textu 17.4 uvádělo jako „17.11" — to číslo ale patří pop-out kartě tokenu (má vlastní spec-17.11). Companion mód dostal 17.14.
+**Cíl:** Alternativa k paritnímu mobilnímu layoutu — telefon jako **companion** k hlavní obrazovce (deník + hody + iniciativa), ne plnohodnotná mapa na 375px.
+**Stav rozhodnutí:** v 17.4 byla zvolena **parita** s desktopem; companion mód je otevřená alternativa, kdyby se parita v živém provozu neosvědčila. Bez spec, implementace nezačala.
+
 ---
 
+
+## Fáze 18 — AI asistence ⬜ NEREALIZOVÁNO
+
+> ⚠️ **Fáze 18 nikdy nevznikla a nemá karty** (ověřeno kódem 2026-07-08 při revizi 19.2, znovu 2026-07-20). Sekce je tu jen proto, aby odkazy z jiných karet nemířily do prázdna. **V produktu není žádná AI funkce.**
+>
+> Čísla **18.1** (AI text — uhlazení generovaného příběhu) a **18.3** (AI obrázek — ilustrace mapy) se v dokumentu používají jako **placeholdery pro budoucí rozšíření**, ne jako existující karty. Odkazují na ně: 19.2 (AI limity odpadly), 20.3 (AI art), 21.2 (procedurální = zdarma a výchozí, AI jen volitelná vrstva navíc), 21.3 (volitelný AI obrázek podzemí).
+>
+> **Vědomé rozhodnutí projektu:** obsah dělají **procedurální generátory zdarma** (21.2) a komunita (21.1/21.5), ne AI. AI zůstává horizontem H5 — pokud vůbec, tak jako volitelná nadstavba s tvrdými limity (19.2), nikdy jako závislost. Odložené AI-položky governance = dluh **D-20D**.
+
+---
 
 ## Fáze 19 — Růst, metriky & udržitelnost
 **Přílohy A + B.** Aby platforma nejen fungovala, ale **rostla a uživila se** (časem i tvého času). Většinou levné, vysoký nepřímý dopad.
@@ -650,19 +692,19 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE:** ~~kvóty +~~ počítadla (✅); kvóty/vynucení = další krok.
 **Otevřené otázky:** Výše kvót? Co dělat při překročení (blok vs. upozornění)? → řeší navazující krok vynucování.
 
-### - [x] 19.4 Model podpory (freemium „podporovatel") — [Příloha B]
-<!-- 2026-07-08: IMPLEMENTOVÁNO (spec-19.4, režim A2). Flag isSupporter+supporterSince na User; efektivní podporovatel = flag || tým-role; gating (3 světy / prémiové skiny kostek / vězení); odznak Ikara (IdentityBadge, priorita hvězda>odznak>nic); admin toggle + audit; veřejná stránka /ikaros/podporovatele + zeď (GET /users/supporters). BE typecheck + FE build zelené. Čeká BE restart + mobil-desktop + funkce/napoveda + commit. Kanál na dary = placeholder; provozní ukazatel odložen; právní review před ostrým během. -->
-
-<!-- 2026-07-08: přečíslováno z chybného „19.2" (kolize se 19.2 Náklady) na 19.4 — sedí na H5 v tabulce fází („19.4 dary"). -->
-**Cíl:** Dobrovolné dary/Patreon na provoz; drobná kosmetika jako poděkování (nikdy herní výhoda). + možnosti nástvby
-**Proč:** Komunita ráda přispěje na projekt, který má ráda; štědrý free základ zůstává konkurenční výhodou.
-**Otevřené otázky:** Vůbec teď, nebo až platforma žije (scénář A)? Jaká kosmetika je „fér" (odznak/barva), aby nerozdělila komunitu?
-
 ### - [x] 19.3 LFG / nábory (objevování her a hráčů) — [analýza sekce 5] 🔁
 **Cíl:** Lehké „hledám hru / hledám hráče" — nábory navázané na přehled světů + adresář.
 **Proč:** Reálná potřeba i v ČR, kterou nikdo česky neřeší; pomáhá proti prázdné platformě (krok 5 trychtýře).
 **Otevřené otázky:** ~~Samostatná featura, nebo rozšíření přehledu světů? Moderace náborů?~~ → vyřešeno: vlastní entita `Nabor` (R6), post-moderace přes generickou frontu (20.1).
 **19.3b — třídění dle systému a žánru** (žádost testera 2026-07-16): systém = select z registru (canonical id, `resolveSystemId`) místo volného textu, nová osa **žánr** (11 z `GENRES`), filtry vždy viditelné z registru. Registry systémů/žánrů sjednoceny do `src/shared/rpg/` (bestiář + wizard re-exportují); paritní testy proti driftu. Spec [arch/phase-19/spec-19.3.md §12](arch/phase-19/spec-19.3.md). 🚧 čeká commit + BE restart + živé ověření. Dluh D-066 (paginace+facety až s objemem).
+
+### - [x] 19.4 Model podpory (freemium „podporovatel") — [Příloha B]
+<!-- 2026-07-08: IMPLEMENTOVÁNO (spec-19.4, režim A2). Flag isSupporter+supporterSince na User; efektivní podporovatel = flag || tým-role; gating (3 světy / prémiové skiny kostek / vězení); odznak Ikara (IdentityBadge, priorita hvězda>odznak>nic); admin toggle + audit; veřejná stránka /ikaros/podporovatele + zeď (GET /users/supporters). BE typecheck + FE build zelené. Čeká BE restart + mobil-desktop + funkce/napoveda + commit. Kanál na dary = placeholder; provozní ukazatel odložen; právní review před ostrým během. -->
+
+<!-- 2026-07-08: přečíslováno z chybného „19.2" (kolize se 19.2 Náklady) na 19.4 — sedí na H5 v tabulce fází („19.4 dary"). 2026-07-20: blok přesunut za 19.3, aby pořadí karet sedělo s číslováním. -->
+**Cíl:** Dobrovolné dary/Patreon na provoz; drobná kosmetika jako poděkování (nikdy herní výhoda). + možnosti nástvby
+**Proč:** Komunita ráda přispěje na projekt, který má ráda; štědrý free základ zůstává konkurenční výhodou.
+**Otevřené otázky:** Vůbec teď, nebo až platforma žije (scénář A)? Jaká kosmetika je „fér" (odznak/barva), aby nerozdělila komunitu?
 
 ---
 
@@ -716,7 +758,8 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **Návrh přípravy:** rozhodnout 4. „globální/komunitní" scope vedle system/user/world; atribuce autora; verzování; snapshot při klonu (🔁 bestiář spawn semantics).
 **BE/FE:** rozšíření bestiáře + nové typy „global item/spell"; katalog + klonování; 🔁 upload pro obrázky.
 **✅ Rozhodnuto (2026-06-15) — kdo smí přidávat do globálu:** defaultně **Admin, Superadmin, vedoucí diskusí (SpravceDiskuzi)**. Navíc **grantovatelná pravomoc běžnému hráči**, který má nápady (per-user flag „smí přispívat do globální knihovny", uděluje admin/správce). 🔁 vzor granular permissions (D-031) + grant model jako AKJ clearance.
-**Otevřené otázky:** Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)? Jak grant hráči udělovat (na žádost, nebo proaktivně)? Jak řešit kvalitu (hodnocení, kurátor → 21.4)?
+> ⚠️ **Změna při implementaci (ověřeno kódem 2026-07-20):** **grant flag se nestavěl** — `canContributeGlobal` a spol. v kódu nejsou, `User` nese jen `isSupporter`. Reálný model = **otevřeno všem přihlášeným + post-moderace**: návrh vzniká jako draft (`scope: 'community'`), schvaluje kurátor přes frontu `pending-actions` a moderaci 20B (typy `plant`/`spell`/`potion`/`item`/`riddle`/`price_list`/`name_set`/`scene_template`). Anti-abuse řeší strop `MAX_BESTIAE_PER_USER` (community draft vždy klonuje i user-scope kopii autorovi). Kdyby se otevřený model neosvědčil, grant zůstává jako možné zpřísnění.
+**Otevřené otázky:** ~~Pre-moderace (schválit před zveřejněním) vs. post (nahlásit)?~~ (vyřešeno: **post-moderace** přes kurátorskou frontu) ~~Jak grant hráči udělovat?~~ (odpadá — grant se nestaví). Jak řešit kvalitu (hodnocení, kurátor → 21.4)?
 
 ### - [x] 21.2 Procedurální generátory postav & detailů (zdarma) — [dopad vysoký · náklad velký] ✅bez-AI
 **Cíl:** Generátory, které z **dat a náhodných tabulek** vytvoří cokoli, co postava má: **jména, výšku, věk, vzhled, povahu, životní příběh, rodinu/rodokmen, majetek…** Jednoduché, deterministické, **bez jakýchkoli nákladů**.
@@ -726,9 +769,11 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 **BE/FE:** generátor engine (weighted random + skládání) + editor tabulek + napojení na tvorbu postavy/NPC.
 **Vztah k AI (Fáze 18):** procedurální = **zdarma a výchozí**; AI (18.1) je volitelná *chytřejší* vrstva pro souvislý text (uhladit vygenerovaný příběh) — ne náhrada.
 **Otevřené otázky:** ~~Které generátory první~~ (vyřešeno: jména + rodina = 21.2a)? Formát tabulek pro komunitní příspěvky (jmenné sady = první formát)? Per-systém vs. globální sady?
-- **21.2a Jména + Potomci ✅ FE+BE (2026-07-13)** — **11. dlaždice Generátory** (`/ikaros/generatory`, taby Jména·Potomci·Sady) + BE modul `name-sets` (jmenné sady = komunitní knihovna: draft/approved, kurátor, moderace `name_set`, pending fronta). Jména: sady Morvol/státy/vlastní, Zipf „běžná častěji", **přechylování -ová**, přízviska, zámky per řádek, **deterministický seed**. Potomci: **demografický model porodní řady** (CAMPOP/OWID: intervaly ~30 měs., úmrtí matky 1 %/porod, dvojčata 1,5 %, presety úmrtnosti, příčiny smrti, tabulkové dožití) + **demografický profil sady** (elfí dožití/plodnost) + **mini-rodokmen 1–3 generace** (strop ~200 osob) + rok světa + „Pojmenuj". Enginy = čisté TS s vitest suitou (14 testů). **Seed ~76 sad** (22 Morvol z `Generátor jmen Morvol.xlsx` — reálné jazyky z Wikidata CC0, fantasy národy Markov syntézou; 54 států vč. izolátů Baskicko/Gruzie/Arménie) — 🚧 čeká dry-run + deploy (workflow `seed-name-sets.yml`). Spec: [arch/phase-21/spec-21.2a-generatory.md](arch/phase-21/spec-21.2a-generatory.md).
+- **21.2a Jména + Potomci ✅ FE+BE (2026-07-13)** — **11. dlaždice Generátory** (`/ikaros/generatory`, taby Jména·Potomci·Sady) + BE modul `name-sets` (jmenné sady = komunitní knihovna: draft/approved, kurátor, moderace `name_set`, pending fronta). Jména: sady Morvol/státy/vlastní, Zipf „běžná častěji", **přechylování -ová**, přízviska, zámky per řádek, **deterministický seed**. Potomci: **demografický model porodní řady** (CAMPOP/OWID: intervaly ~30 měs., úmrtí matky 1 %/porod, dvojčata 1,5 %, presety úmrtnosti, příčiny smrti, tabulkové dožití) + **demografický profil sady** (elfí dožití/plodnost) + **mini-rodokmen 1–3 generace** (strop ~200 osob) + rok světa + „Pojmenuj". Enginy = čisté TS s vitest suitou (14 testů). **Seed ~76 sad** (22 Morvol z `Generátor jmen Morvol.xlsx` — reálné jazyky z Wikidata CC0, fantasy národy Markov syntézou; 54 států vč. izolátů Baskicko/Gruzie/Arménie) — ✅ **nalito do produkce 2026-07-20** (workflow `seed-name-sets.yml`; viz R3 karta 24.4). Spec: [arch/phase-21/spec-21.2a-generatory.md](arch/phase-21/spec-21.2a-generatory.md).
 
-### - [ ] 21.3 Stavitel & generátor podzemí / map — [H4-01 · dopad střední · náklad velký] 🔁
+### - [x] 21.3 Stavitel & generátor podzemí / map — [H4-01 · dopad střední · náklad velký] 🔁 ✅ *(2026-07-14, a–g)*
+> ✅ **Master karta uzavřena 2026-07-20** (inventura R3 24.5) — všech **7 podkaret 21.3a–g ověřeno v kódu**: route `/svet/:slug/podzemi` + platformová `/ikaros/podzemi` (`router.tsx`), `src/features/world/dungeon-builder/` (editor, `engine/generate.ts` · `generateCity.ts` · `generateCaves.ts` · `generateWilderness.ts`, undo 50, 54 dekorací / 7 kategorií, témata, klíč mapy), BE `dungeon-maps` (`mapKind`, `GET /library`, `POST /:id/copy`, `POST /:id/export-scene` + `dungeon-walls.util.ts`), gating 19.4. Testy: **FE 39 vitest + BE 55 jest**. Admin stub zrušen.
+> **Jediné nesplněné z původního zadání:** „volitelně AI obrázek (18.3)" — **Fáze 18 neexistuje** (viz sekce Fáze 18), takže bod je bezpředmětný a odškrtnutí neblokuje. Kdyby AI někdy vznikla, doplní se jako samostatná podkarta.
 **Cíl:** Tvorba map + procedurální generátor podzemí s parametry (velikost, téma) a tlačítkem „Přegenerovat, dokud se nelíbí" → výsledek rovnou na taktickou mapu jako scéna. Volitelně AI obrázek (18.3). Inspirace: Azgaar na úrovni dungeonů.
 **Proč:** Tvůj původní oblíbený nápad; „nástroj pro líné vypravěče", skvělý na one-shoty (16.6), šetří PJ kreslení. Procedurální = zdarma; navazuje na import map (17.2).
 > ⚠️ **Oprava nesrovnalosti (ověřeno 2026-06-15):** Dungeon Builder **NENÍ hotový** — admin stub byl prázdná stránka. Dřívější formulace „reuse, už máme tile editor s exportem" byla **chybná**. ~~21.3 = postavit od nuly~~ → **vyřešeno 21.3a (2026-07-14)**: stub smazán, editor+generátor postaven ve `src/features/world/dungeon-builder/` nad existujícím BE `dungeon-maps`.
@@ -755,17 +800,17 @@ Bestiář ve **4 scope** (rozšíření dnešních 3 o komunitní). **Jedna best
 - **Bestiář** dlaždice → **komunitní scope bestiáře (16.2b-2)**, NE nová paralelní featura. Světový bestiář (`/svet/:slug/bestiar`) zůstává; hub je platformový katalog téhož modelu.
 - **Diskuze/Články/Galerie** → existující routy (`/ikaros/diskuze`, `/clanky`, `/galerie`).
 **Nové knihovny (pod-kroky — model jednou, obsah postupně):**
-- **21.5a Herbář** — katalog rostlin/bylin (lore + účinky/vlastnosti + per-systém staty dle vzoru bestie „systém → statblok"). **Etapa A ✅ (2026-07-10):** BE modul plants + FE list/detail/editor + migrace připravena (56 rostlin). **Etapa B ✅ (2026-07-10):** obrázek u ShopItem (+focal/zoom/fit) + bulk endpoint `POST /campaign/shopitems/bulk` (gate PomocnyPJ+, max 200) + vklad herbář→obchod (single z detailu + bulk z listu). Zbývá: ostrý seed, skiny, per-systém staty. Spec: [arch/phase-21/spec-21.5a-herbar.md](arch/phase-21/spec-21.5a-herbar.md).
-- **21.5b Lektvary** — alchymie / spotřební předměty (ingredience → uvařený, zpravidla jednorázový efekt). **✅ (2026-07-13):** BE modul potions (mirror kouzel + jádro: druh, **strukturované suroviny co+kolik** min. 1, suggestedPrice) + FE `/ikaros/lektvary` (2 knihovny + filtry systém/druh, detail s kartou surovin, editor, návrh statbloku) + **šablony výroby/mechaniky 14 systémů** (`potionTemplates.ts`, reuse infrastruktury kouzel) + **vklad do obchodu single/bulk** (zobecněný `InsertToShopModal` herbáře). Bez seedu z příruček. Zbývá: skiny, propojení surovin na herbář. Spec: [arch/phase-21/spec-21.5b-lektvary.md](arch/phase-21/spec-21.5b-lektvary.md).
+- **21.5a Herbář** — katalog rostlin/bylin (lore + účinky/vlastnosti + per-systém staty dle vzoru bestie „systém → statblok"). **Etapa A ✅ (2026-07-10):** BE modul plants + FE list/detail/editor + migrace připravena (56 rostlin). **Etapa B ✅ (2026-07-10):** obrázek u ShopItem (+focal/zoom/fit) + bulk endpoint `POST /campaign/shopitems/bulk` (gate PomocnyPJ+, max 200) + vklad herbář→obchod (single z detailu + bulk z listu). **Seed ✅ nalit do produkce 2026-07-20** (56 rostlin, ostrý běh; viz R3 karta 24.4). Zbývá: skiny, per-systém staty. Spec: [arch/phase-21/spec-21.5a-herbar.md](arch/phase-21/spec-21.5a-herbar.md).
+- **21.5b Lektvary** — alchymie / spotřební předměty (ingredience → uvařený, zpravidla jednorázový efekt). **✅ (2026-07-13):** BE modul potions (mirror kouzel + jádro: druh, **strukturované suroviny co+kolik** min. 1, suggestedPrice) + FE `/ikaros/lektvary` (2 knihovny + filtry systém/druh, detail s kartou surovin, editor, návrh statbloku) + **šablony výroby/mechaniky 14 systémů** (`potionTemplates.ts`, reuse infrastruktury kouzel) + **vklad do obchodu single/bulk** (zobecněný `InsertToShopModal` herbáře). Bez seedu z příruček. **Katalog zůstává vědomě prázdný** — seed data nikdy nevznikla (čekala na autorův vlastní dokument; příručky ne kvůli copyrightu); rozhodnutí uživatele: neblokovat (R3 24.4). Zbývá: skiny, propojení surovin na herbář. Spec: [arch/phase-21/spec-21.5b-lektvary.md](arch/phase-21/spec-21.5b-lektvary.md).
 - **21.5c Kouzla** — magické formule / spelly (efekt, náročnost/mana, dosah, per-systém staty). **= realizace „kouzla" typu už zmíněného v 21.1** (nezakládat druhou knihovnu kouzel). **✅ (2026-07-13):** BE modul spells (community scope, statblocky per systém + schvalování „balancnuté", dvouúrovňová diskuse, moderace 20B, pending fronta) + FE `/ikaros/kouzla` (2 knihovny + filtry systém/škola, detail karta, editor, návrh statbloku) + **šablony statbloků všech 14 systémů se školou magie** (`spellTemplates.ts`). Bez seedu z příruček (copyright) — jen vlastní tvorba hráčů. Zbývá: skiny. Spec: [arch/phase-21/spec-21.5c-kouzla.md](arch/phase-21/spec-21.5c-kouzla.md).
-- **21.5d Hádanky** — komunitní katalog hádanek/hlavolamů pro PJ (zadání + řešení + nápovědy). **✅ (2026-07-13):** BE modul riddles (bez statblocků/obchodu — nejjednodušší knihovna) + FE `/ikaros/hadanky` (**poslední stub Společné tvorby pryč — všech 9 dlaždic aktivních** vč. opravené dlaždice Bestiář) + **úrovně lehká/střední/těžká/ultratěžká** + odpověď a postupné nápovědy za spoiler klik (vyřešena otázka „reveal komu" — spoiler bez role-gate) + **seed 48 volných hádanek** (lidová slovesnost/antika/bible/logický folklór, copyright rešerše [arch/phase-21/hadanky-seed-21.5d.md](arch/phase-21/hadanky-seed-21.5d.md), skript `backend/scripts/seed-riddles`). Zbývá: spustit seed po deployi, skiny, U6 mini-einstein. Spec: [arch/phase-21/spec-21.5d-hadanky.md](arch/phase-21/spec-21.5d-hadanky.md).
+- **21.5d Hádanky** — komunitní katalog hádanek/hlavolamů pro PJ (zadání + řešení + nápovědy). **✅ (2026-07-13):** BE modul riddles (bez statblocků/obchodu — nejjednodušší knihovna) + FE `/ikaros/hadanky` (**poslední stub Společné tvorby pryč — všech 9 dlaždic aktivních** vč. opravené dlaždice Bestiář) + **úrovně lehká/střední/těžká/ultratěžká** + odpověď a postupné nápovědy za spoiler klik (vyřešena otázka „reveal komu" — spoiler bez role-gate) + **seed 48 volných hádanek** (lidová slovesnost/antika/bible/logický folklór, copyright rešerše [arch/phase-21/hadanky-seed-21.5d.md](arch/phase-21/hadanky-seed-21.5d.md), skript `backend/scripts/seed-riddles`). **Seed ✅ nalit do produkce 2026-07-20** (47 hádanek; viz R3 karta 24.4). Zbývá: skiny, U6 mini-einstein. Spec: [arch/phase-21/spec-21.5d-hadanky.md](arch/phase-21/spec-21.5d-hadanky.md).
 - **21.5e Předměty** — vlastní předměty (= realizace „items" z 21.1). **✅ (2026-07-13):** BE modul items (kolekce `community_items`, mirror lektvarů bez surovin) + FE `/ikaros/predmety` (**nová 9. dlaždice hubu**) + **druh předmětu řídí variantu polí statbloku** (zbraň/zbroj/obecné, `itemTemplates.ts`, 14 systémů, superset deníkových zbraní/zbrojí) + vklad do obchodu single/bulk. Bez seedu z příruček. Zbývá: skiny, import do výbavy postavy. Spec: [arch/phase-21/spec-21.5e-predmety.md](arch/phase-21/spec-21.5e-predmety.md).
-- **21.5f Ceníky** — sdílené ceníky zboží/služeb (ceník = dokument s max 200 vnořenými položkami: název · popis · obrázek s atribucí · **cena zlaté/stříbrné/měďáky 1:10:100** · sekce · link na Předměty). **✅ FE+BE (2026-07-13):** BE modul price-lists (kolekce `price_lists`, komentáře, moderace 20B, pending fronta) + FE `/ikaros/ceniky` (**nová 10. dlaždice hubu**, detail = tabulka položek po sekcích, editor s inline položkami) + **rozšíření `InsertToShopModal` o per-položkové ceny** (`priceGsc`, „měna pro zlaté", zpětně kompatibilní). **Seed z Ceník.xlsx (Morvol):** 20 ceníků / ~1011 položek + 103 zbraní/zbrojí do Předmětů (matrix statblok, provázané `linkedItemId`); obrázky Wikimedia Commons (PD/CC + `imageCredit`), workflow `seed-ceniky.yml` — 🚧 čeká na dry-run schválení + deploy. Zbývá: skiny. Spec: [arch/phase-21/spec-21.5f-ceniky.md](arch/phase-21/spec-21.5f-ceniky.md).
-- **21.5g Ceníky — éra Přítomnost (USD)** — tři éry ceníků: středověk/fantasy (21.5f) → **přítomnost** → budoucnost (kredity, později); follow-up nápad 1./2. světová válka (dobové USD). **✅ FE+BE měny (2026-07-13):** `PriceList.currency: 'gsc'|'usd'|'credits'` (default gsc, bez migrace; uložení VŽDY gold/silver/copper 1:10:100 — měna řídí jen zobrazení) — FE `formatPrice` (`$12.34`), editor jedno pole `$` (`decimalToGsc`, přepnutí bezeztrátové), badge „$ USD", `InsertToShopModal.priceCurrency` (jen popisky). **Seed z rešerše veřejných US dat** (BLS OES mzdy, BLS avg prices potraviny, MSRP/KBB/Zillow/UNODC): 22 ceníků / ~995 položek česky s cenami v USD + ~73 zbraní/ochrany do Předmětů **BEZ statbloků** (Matrix věci nemají kostky/bonusy); obrázky Wikimedia Commons, `ceniky-import.js` parametrizován (`SEED_TAG`/`ITEM_TAGS`, defaulty Morvol), workflow `seed-ceniky-pritomnost.yml` — 🚧 čeká na dry-run schválení + deploy. Spec: [arch/phase-21/spec-21.5g-ceniky-pritomnost.md](arch/phase-21/spec-21.5g-ceniky-pritomnost.md).
-- **21.5h Ceníky — éry 1. a 2. světová válka (dobové USD)** — čistě obsahové dávky (BE/FE beze změn, `currency:'usd'` z 21.5g). Rešerše z veřejných dat (žoldové tabulky 1917/1942, BLS 1918/1943, Sears katalogy, kontraktní ceny zbraní, OPA stropy + příděly). **WW1**: 15 ceníků / 454 položek + 38 předmětů (bez statbloků); **WW2**: 14 ceníků / 434 položek + 28 předmětů. Názvy nesou éru („Potraviny — 1. světová"), tagy `1. světová`/`2. světová`; obrázky Wikimedia 100 %. Workflows `seed-ceniky-ww1.yml`/`seed-ceniky-ww2.yml` — 🚧 čekají na dry-run schválení per éra (`c:\tmp\ceniky-ww1-dry-run.html`, `c:\tmp\ceniky-ww2-dry-run.html`). Sekvenční zpracování vln agentů (WW1 → WW2) dle zadání. Spec: [arch/phase-21/spec-21.5h-ceniky-valky.md](arch/phase-21/spec-21.5h-ceniky-valky.md).
-- **21.5i Ceníky — éra Divoký západ (dobové USD ~1865–1890)** — 13 ceníků / 391 položek + 31 předmětů (zbraně/nože bez statbloků); kotvy Colt SAA $17, Winchester 1873 $27, Stetson $5, Levi's $1.25, longhorn Texas→Kansas $4→$30, Homestead $18. Obrázky Wikimedia 100 % (dotazy bez éra-kvalifikátorů = 98 % napoprvé). Tag `divoký západ`, workflow `seed-ceniky-western.yml` — 🚧 čeká na dry-run schválení (`c:\tmp\ceniky-western-dry-run.html`). Spec: [arch/phase-21/spec-21.5i-ceniky-western.md](arch/phase-21/spec-21.5i-ceniky-western.md).
-- **21.5j Ceníky — éra Blízká budoucnost (kredity)** — osidlování sluneční soustavy ~2075; budoucnost rozdělena na 21.5j (blízká) a 21.5k (galaktické dobrodružství — samostatný příkaz, inspirace fan tvorbou povolena). První éra s fikčními cenami = **extrapolace reálné vesmírné ekonomiky** dle sdílené tabulky kotev ve spec (1 kr ≈ 1 USD 2025; Starship $/kg, MOXIE, ISS recyklace 98 %, asteroid-mining deflace). 13 ceníků / 380 položek + 27 předmětů (skafandry=zbroj, flechette=střelná; bez statbloků); obrázky 379/380 (NASA analogy). **+ R7: knihovna seskupená podle ér** (`PRICE_LIST_ERAS`+`eraOf` v types.ts, érové sekce v `KomunitniCenikyPage`; vitest 9 ✓) — reakce na 71 nasazených ceníků. Workflow `seed-ceniky-nearfuture.yml` — 🚧 čeká na dry-run schválení (`c:\tmp\ceniky-nearfuture-dry-run.html`). Spec: [arch/phase-21/spec-21.5j-ceniky-blizka-budoucnost.md](arch/phase-21/spec-21.5j-ceniky-blizka-budoucnost.md).
-- **21.5k Ceníky — éra Galaktické dobrodružství (kredity)** — space opera, setting-neutrální; kalibrace z fan ekonomik dle pokynu uživatele (Traveller mzdy ~1:1 na kotvy, SW blastery/droidi/lodě, Elite, Starfinder/CP RED kybernetika — jen hodnoty/poměry, žádná IP jména). 13 ceníků / 380 položek + 38 předmětů (energetické zbraně, zbroje+štíty; bez statbloků); hvězdné lodě, kybernetika, droidi, FTL doprava, xeno-kuchyně. Obrázky 380/380 (reálné analogy). Workflow `seed-ceniky-galaxy.yml` — 🚧 čeká na dry-run schválení (`c:\tmp\ceniky-galaxy-dry-run.html`). Spec: [arch/phase-21/spec-21.5k-ceniky-galaxie.md](arch/phase-21/spec-21.5k-ceniky-galaxie.md).
+- **21.5f Ceníky** — sdílené ceníky zboží/služeb (ceník = dokument s max 200 vnořenými položkami: název · popis · obrázek s atribucí · **cena zlaté/stříbrné/měďáky 1:10:100** · sekce · link na Předměty). **✅ FE+BE (2026-07-13):** BE modul price-lists (kolekce `price_lists`, komentáře, moderace 20B, pending fronta) + FE `/ikaros/ceniky` (**nová 10. dlaždice hubu**, detail = tabulka položek po sekcích, editor s inline položkami) + **rozšíření `InsertToShopModal` o per-položkové ceny** (`priceGsc`, „měna pro zlaté", zpětně kompatibilní). **Seed z Ceník.xlsx (Morvol):** 20 ceníků / ~1011 položek + 103 zbraní/zbrojí do Předmětů (matrix statblok, provázané `linkedItemId`); obrázky Wikimedia Commons (PD/CC + `imageCredit`), workflow `seed-ceniky.yml` — ✅ **nalito do produkce 2026-07-20** (viz R3 karta 24.4). Zbývá: skiny. Spec: [arch/phase-21/spec-21.5f-ceniky.md](arch/phase-21/spec-21.5f-ceniky.md).
+- **21.5g Ceníky — éra Přítomnost (USD)** — tři éry ceníků: středověk/fantasy (21.5f) → **přítomnost** → budoucnost (kredity, později); follow-up nápad 1./2. světová válka (dobové USD). **✅ FE+BE měny (2026-07-13):** `PriceList.currency: 'gsc'|'usd'|'credits'` (default gsc, bez migrace; uložení VŽDY gold/silver/copper 1:10:100 — měna řídí jen zobrazení) — FE `formatPrice` (`$12.34`), editor jedno pole `$` (`decimalToGsc`, přepnutí bezeztrátové), badge „$ USD", `InsertToShopModal.priceCurrency` (jen popisky). **Seed z rešerše veřejných US dat** (BLS OES mzdy, BLS avg prices potraviny, MSRP/KBB/Zillow/UNODC): 22 ceníků / ~995 položek česky s cenami v USD + ~73 zbraní/ochrany do Předmětů **BEZ statbloků** (Matrix věci nemají kostky/bonusy); obrázky Wikimedia Commons, `ceniky-import.js` parametrizován (`SEED_TAG`/`ITEM_TAGS`, defaulty Morvol), workflow `seed-ceniky-pritomnost.yml` — ✅ **nalito do produkce 2026-07-20** (viz R3 karta 24.4). Spec: [arch/phase-21/spec-21.5g-ceniky-pritomnost.md](arch/phase-21/spec-21.5g-ceniky-pritomnost.md).
+- **21.5h Ceníky — éry 1. a 2. světová válka (dobové USD)** — čistě obsahové dávky (BE/FE beze změn, `currency:'usd'` z 21.5g). Rešerše z veřejných dat (žoldové tabulky 1917/1942, BLS 1918/1943, Sears katalogy, kontraktní ceny zbraní, OPA stropy + příděly). **WW1**: 15 ceníků / 454 položek + 38 předmětů (bez statbloků); **WW2**: 14 ceníků / 434 položek + 28 předmětů. Názvy nesou éru („Potraviny — 1. světová"), tagy `1. světová`/`2. světová`; obrázky Wikimedia 100 %. Workflows `seed-ceniky-ww1.yml`/`seed-ceniky-ww2.yml` — ✅ **obě éry nality do produkce 2026-07-20** (viz R3 karta 24.4). Sekvenční zpracování vln agentů (WW1 → WW2) dle zadání. Spec: [arch/phase-21/spec-21.5h-ceniky-valky.md](arch/phase-21/spec-21.5h-ceniky-valky.md).
+- **21.5i Ceníky — éra Divoký západ (dobové USD ~1865–1890)** — 13 ceníků / 391 položek + 31 předmětů (zbraně/nože bez statbloků); kotvy Colt SAA $17, Winchester 1873 $27, Stetson $5, Levi's $1.25, longhorn Texas→Kansas $4→$30, Homestead $18. Obrázky Wikimedia 100 % (dotazy bez éra-kvalifikátorů = 98 % napoprvé). Tag `divoký západ`, workflow `seed-ceniky-western.yml` — ✅ **nalito do produkce 2026-07-20** (viz R3 karta 24.4). Spec: [arch/phase-21/spec-21.5i-ceniky-western.md](arch/phase-21/spec-21.5i-ceniky-western.md).
+- **21.5j Ceníky — éra Blízká budoucnost (kredity)** — osidlování sluneční soustavy ~2075; budoucnost rozdělena na 21.5j (blízká) a 21.5k (galaktické dobrodružství — samostatný příkaz, inspirace fan tvorbou povolena). První éra s fikčními cenami = **extrapolace reálné vesmírné ekonomiky** dle sdílené tabulky kotev ve spec (1 kr ≈ 1 USD 2025; Starship $/kg, MOXIE, ISS recyklace 98 %, asteroid-mining deflace). 13 ceníků / 380 položek + 27 předmětů (skafandry=zbroj, flechette=střelná; bez statbloků); obrázky 379/380 (NASA analogy). **+ R7: knihovna seskupená podle ér** (`PRICE_LIST_ERAS`+`eraOf` v types.ts, érové sekce v `KomunitniCenikyPage`; vitest 9 ✓) — reakce na 71 nasazených ceníků. Workflow `seed-ceniky-nearfuture.yml` — ✅ **nalito do produkce 2026-07-20** (viz R3 karta 24.4). Spec: [arch/phase-21/spec-21.5j-ceniky-blizka-budoucnost.md](arch/phase-21/spec-21.5j-ceniky-blizka-budoucnost.md).
+- **21.5k Ceníky — éra Galaktické dobrodružství (kredity)** — space opera, setting-neutrální; kalibrace z fan ekonomik dle pokynu uživatele (Traveller mzdy ~1:1 na kotvy, SW blastery/droidi/lodě, Elite, Starfinder/CP RED kybernetika — jen hodnoty/poměry, žádná IP jména). 13 ceníků / 380 položek + 38 předmětů (energetické zbraně, zbroje+štíty; bez statbloků); hvězdné lodě, kybernetika, droidi, FTL doprava, xeno-kuchyně. Obrázky 380/380 (reálné analogy). Workflow `seed-ceniky-galaxy.yml` — ✅ **nalito do produkce 2026-07-20** (viz R3 karta 24.4). Spec: [arch/phase-21/spec-21.5k-ceniky-galaxie.md](arch/phase-21/spec-21.5k-ceniky-galaxie.md).
 **Sdílí s:** 21.1 (knihovní model, grant „smí přispívat do globální knihovny"), 21.4 (kurátorství/moderace), 16.2b (scope + klon + povýšení).
 **Navigace (FE):** `PRIMARY_NAV` — nahradit body Diskuze/Články/Galerie jedním „Společná tvorba"; **RPG systémy zůstává samostatně** (veřejný SEO landing 15B.4a/22.1, ne komunitní tvorba).
 **Pořadí stavby:** hub + route + úprava nav + stuby „Připravujeme" (vše proklikatelné) → **Bestiář (16.2b-2) jako první plná featura = šablona** → Herbář → Lektvary → Kouzla → Hádanky.

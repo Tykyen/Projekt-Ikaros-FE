@@ -115,7 +115,7 @@ sesterský soubor (`drd16-skins/<id>.css` / `drdplus-skins/<id>.css` / matrix bl
 > ho neobnoví; pro živý update optimisticky propiš `token.characterData.customData` do scény cache
 > (`qc.setQueryData` + `applyOperationToScene`, guard = jen na mapě).
 > **Test MUSÍ používat klíče, co se REÁLNĚ ukládají** (grep `save({...})` + `set('hp…')`),
-> ne vymyšlené — jinak zelený test maskuje, že HP bar nejede (CH-2026-06-29).
+> ne vymyšlené — jinak zelený test maskuje, že HP bar nejede (viz ✅ ŘEŠENÍ „PC HP bar na mapě (JaD+dnd5e)" · 2026-06-29 v [`docs/chybovy-denik/fe.md`](../../chybovy-denik/fe.md)).
 
 ---
 

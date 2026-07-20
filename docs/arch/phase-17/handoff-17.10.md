@@ -1,12 +1,17 @@
 # Handoff — 17.10 Panelový workspace (taktická mapa)
 
+> ⚠️ **HISTORICKÝ DOKUMENT — 17.10 JE HOTOVÉ.** Handoff je z 2026-07-06, implementace proběhla **hned druhý den, 2026-07-07** (celý zátah A, fáze A1–A5). Text níže popisuje stav *před* implementací; **nečti ho jako aktuální stav**. Aktuální stav = kód `src/features/world/tactical-map/workspace/` + roadmap2.md karta 17.10 + deník `docs/chybovy-denik/fe.md` (3× ✅ ŘEŠENÍ). Neprovedený zůstal jen **zátah B** (server-side layout per uživatel). Dokument se drží kvůli architektuře a ověřeným nálezům.
+>
+> *(Poznámka 2026-07-20, inventura R3 24.5: věta „Nezačala implementace" níže byla zdrojem opakovaného omylu — 17.10 se kvůli ní vedlo jako nezahájené i měsíc po dokončení.)*
+
 > Předání do nové konverzace. Cíl: navázat bez ztráty kontextu a **rovnou jít k implementaci**, ne dál ladit HTML náhled.
 > Datum: 2026-07-06.
 
 ## TL;DR
 17.10 = sjednotit roztříštěné overlay panely taktické mapy pod **jednoho správce**: každý panel jde *zmenšit do spodní lišty a nahodit*, panely se *nepřetlačují*, karta postavy/nestvůry jde otevřít jako *plovoucí/ukotvené okno*, a je *pravý klik* menu. **Beze změny grafiky** (motiv/skin zůstává). Náklad velký → dělá se po fázích **A1–A5** (zátah A); server-side layout = pozdější zátah B.
 
-**Stav:** hotová analýza + adversariálně ověřená diagnóza + schválený směr + odladěný vizuální náhled. **Nezačala implementace.** Další krok = impl plán A1 → kód.
+**Stav (k datu handoffu 2026-07-06):** hotová analýza + adversariálně ověřená diagnóza + schválený směr + odladěný vizuální náhled. Další krok = impl plán A1 → kód.
+**Stav dnes:** ✅ **A1–A5 implementováno 2026-07-07** (viz varování v hlavičce). Zbývá jen zátah B.
 
 ## Kde co je (artefakty)
 - **Spec:** [`docs/arch/phase-17/spec-17.10.md`](spec-17.10.md) — zdroj pravdy, obsahuje architekturu + fáze + ověřené nálezy.

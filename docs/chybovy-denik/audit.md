@@ -30,7 +30,7 @@ vypadalo jako 73 regresí; nutno číst PŘÍČINU, ne počet. FIX-7 push hijack
 (500 místo 4xx) — funkční, ale ne elegantní. Necommitnutý FE balík (30 souborů) je velký na revizi —
 příště zvážit menší commity/dávky i u necommitovaného FE.
 
-## CH-058 — změna sdíleného guardu ověřena jen cíleným jest → regrese v neauditovaném konzumentovi — 2026-07-06
+## CH-127 — změna sdíleného guardu ověřena jen cíleným jest → regrese v neauditovaném konzumentovi — 2026-07-06
 
 **Co nefungovalo.** V opravné dávce 4c (FIX-46) jsem změnil `RolesGuard.canActivate` z bare
 `return false` na explicitní `throw new ForbiddenException({code:'INSUFFICIENT_ROLE'})`. Po dávce jsem

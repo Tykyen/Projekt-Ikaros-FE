@@ -50,7 +50,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Jitsi nedělá signaling na našem BE** — audio/WebRTC/TURN běží uvnitř iframe pod CSP Jitsi; náš BE drží jen textový pokec + roster metadat.
   - **CSP + Permissions-Policy** povolují `meet.jit.si` (script/frame/connect + delegace kamery/mikrofonu do iframe).
 - **Voice i ve světě (17.6 rozšíření):** hlas+video **i ve světovém chatu a na taktické mapě** — tlačítko 📞 v hlavičce světového chatu (`ChannelView`) a na mapě (`weatherSlot`). **Jeden hovor na svět** (`ikaros-world-{worldId}`), sdílený chatem i mapou; **přežije přechod mapa↔chat** (`WorldVoiceHost` v `WorldLayout` mimo `<Outlet/>` + `worldVoiceSessionAtom`, jotai). Bez BE změn — Jitsi ukazuje účastníky, náš roster jen v krčmě. Kód: `src/features/voice/{store.ts, components/WorldVoiceHost.tsx, WorldVoiceButton.tsx}`.
-- **Stav:** ✅ implementováno (BE jest 118/118; FE build/tsc/eslint/vitest ✓). ⚠️ **Čeká BE restart + CSP redeploy + živý test hlasu/videa na reálném zařízení** ([[feedback_be_restart_required]]). Room-name na veřejném `meet.jit.si` NENÍ bezpečnost (self-host Jitsi + JWT = follow-up).
+- **Stav:** ✅ (BE jest 118/118; FE build/tsc/eslint/vitest ✓; voice presence `global-chat.gateway.ts:376`, CSP `frame-src`/`connect-src` + Permissions-Policy pro `meet.jit.si` v `default.conf.template:143`/`:145`). ⚠️ Živý test hlasu/videa na reálném zařízení neproběhl (nasazení ověř přes /api/health → version.sha). Room-name na veřejném `meet.jit.si` NENÍ bezpečnost (self-host Jitsi + JWT = follow-up).
 - **Kód:** FE `src/features/voice/` (`components/VoiceKrcmaRoom.tsx`, `useVoice.ts`, `provider/{loadJitsiApi,JitsiVoiceProvider,types}.ts`, `api/useVoicePresence.ts`, `config.ts`), `pages/VoiceKrcmaPage.tsx`; route `app/router.tsx`, sidebar `IkarosLayout.tsx` `CHAT_ROOMS`, typy `features/chat/lib/types.ts`. BE `global-chat.service.ts` (`RoomKey`/`ROOM_DEFS`/`resolveSenderIdentity`), `global-chat.gateway.ts` (voice presence), `presence-messages.ts`; kontrakt `docs/websocket-api.md`. CSP `default.conf.template`. Spec `docs/arch/phase-17/spec-17.6.md`.
 
 ### Globální chat — Camp (Fantasy · Mystery · Sci-fi)
@@ -75,7 +75,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Sync názvů kanálů** při startu BE (`onModuleInit`) — přejmenuje i staré DB kanály „Camp I." → „Fantasy camp" (idempotentní), ať neprosakují do souhrnů chatů.
   - Přepnutí mezi Campy = čistý remount (`key`). Prostředí drží React Query cache (REST seed + WS + optimistická změna).
   - **15.9 — Camp negeneruje web push** (jen `room === 'hospoda'`).
-- **Stav:** ✅ (BE čeká restart — in-memory env/startHere + cron/DI + sync názvů; [[feedback_be_restart_required]])
+- **Stav:** ✅ (in-memory env/`startHere` `global-chat.gateway.ts:108`+`:294` `applyRotation`, cron `camp-rotation.job.ts:24` `@Cron('0 0,12 * * *', tz Europe/Prague)`, sync názvů `global-chat.service.ts:253` `onModuleInit`)
 - **Kód:** FE `src/features/chat/pages/CampPage.tsx`, `components/ChatRoom.tsx` (`scene.logTopNode`), `components/CampHeader.tsx`, `CampDescription.tsx`, `StartHereBlock.tsx`, `lib/campRooms.ts`, `lib/campPlaces.ts` (`CAMP_DEFAULT_GENRE`/`genreLabel`), `api/useSavedGame.ts`, `lib/roomAvatar.ts`. BE `global-chat.service.ts` (saveGame/loadGame/getSavedGame/deleteSavedGame/defaults, `CAMP_DEFAULT_GENRE`, `genreLabel`, `randomPlaceId`), `global-chat.gateway.ts` (`startHere`/`applyRotation`/per-room default env), `global-chat.controller.ts` (6 endpointů), `camp-rotation.job.ts`, `schemas/camp-saved-game.schema.ts`, `schemas/camp-room-config.schema.ts`. Spec `docs/arch/phase-16/spec-16.6.md` (+ 4.2a/4.2e základ).
 
 ---
@@ -162,7 +162,7 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **Dual-source defaulty** — kategorie/defaulty jsou na FE (`features/notifications/lib/notificationPreferences.ts`) i BE (`common/notifications/notification-preferences.ts`); při změně měň obě.
   - Defaulty se **neukládají do DB** — nenastavené pole zůstává `undefined`, default žije v kódu (`wantsPush`/`resolvePref`).
   - **Delta merge** na PATCH — pošle se jen měněné pole, ostatní zůstanou.
-- **Stav:** ✅ (BE filtr + endpoint + FE sekce hotové, ověřeno jest+build; čeká BE restart pro nasazení).
+- **Stav:** ✅ (BE filtr `push.service.ts:212` `filterByCategory` + endpoint `users.controller.ts:85` `PATCH me/notification-preferences` + FE sekce; ověřeno jest+build).
 - **Kód:** FE `src/features/profile/components/NotificationPreferencesSection.tsx`, `api/useNotificationPreferences.ts`, `features/notifications/lib/notificationPreferences.ts`. BE `common/notifications/notification-preferences.ts`, `modules/push/push.service.ts` (`filterByCategory`), `modules/users/users.service.ts` (`updateNotificationPreferences`), `users.controller.ts`, `dto/update-notification-preferences.dto.ts`.
 
 ---
@@ -202,9 +202,10 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **V globálním chatu/poště se custom OBRÁZKOVÉ emoty NEPOUŽÍVAJÍ** — `MessageItem` tam jede jen textovou konverzi (`emotes.ts`); modul `emotes` konzumuje výhradně `features/world/chat`.
   - **Pošta** nemá emote/emoji picker (čistý text/předmět).
   - Sada textových emotikonů je pevná (mapa v `chat/lib/emotes.ts`).
-  - **Plná paleta pickeru závisí na cizí CDN** — `frimousse` si `emojibase-data` `fetch`uje z `cdn.jsdelivr.net`. Lokální český quick-pick (`czechEmoji.ts`, ~120 emoji + český fulltext) funguje nezávisle, plná paleta ne. Výpadek jsdelivr = paleta visí na „Načítám…". Self-host dat → **D-075**.
+  - Plná paleta je **anglická** (`locale="en"`) — český je jen quick-pick (`czechEmoji.ts`, ~120 emoji + český fulltext). Další jazyk = přidat `public/emojibase/<locale>/`.
 - **Zvláštnosti:** rozlišuj „emoji reakce" (toggle na zprávě, WS `chat:message:reaction`) vs. „emoty v textu". Globální custom emoty mají vlastní `emotes/global` endpoint a admin správu.
-  - ⚠️ **Do 24.2 byla plná paleta v produkci rozbitá** — CSP `connect-src` neznala `cdn.jsdelivr.net`, takže fetch emoji dat enforce zablokovala. Nevšiml si toho nikdo, protože český quick-pick fungoval dál a picker vypadal funkčně; **částečně funkční UI nevyvolá hlášení**. Nalezeno až auditem nad buildem (`CH-125`) — v `src/` po té URL není stopa, skládá ji knihovna uvnitř `node_modules`.
+  - **Emoji data jsou self-hostovaná** (`public/emojibase/en/`, prop `emojibaseUrl="/emojibase"` — D-075). Picker tedy nezávisí na cizí CDN, funguje i při jejím výpadku a neposílá požadavek třetí straně. Data servíruje náš nginx gzipnutá (~150 kB); knihovna si je drží v `localStorage` dle ETagu.
+  - ⚠️ **Historie:** do 24.2 byla plná paleta v produkci **rozbitá** — `frimousse` si data tahal z `cdn.jsdelivr.net`, což enforce CSP blokovala. Nevšiml si toho nikdo, protože český quick-pick fungoval dál a picker vypadal funkčně; **částečně funkční UI nevyvolá hlášení**. Nalezeno až auditem nad buildem (`CH-125`) — v `src/` po té URL nebyla stopa, skládala ji knihovna uvnitř `node_modules`. Nejdřív obcházeno rozšířením `connect-src`, pak vyřešeno self-hostem (D-075) a whitelist zase zúžen.
 - **Stav:** ✅ (globální chat textové; world custom obrázkové)
 - **Správa emotů (admin):** vytváření/úprava/mazání custom emotů — **viz kapitola 08** (platformová správa). Globální: jen `Admin+` (`/emotes/global`, `assertGlobalCanManage`). Per-svět: `PJ`/`PomocnyPJ`+ (`/emotes/:worldId`, `assertWorldCanManage`).
 - **Kód:** FE globální `src/features/chat/lib/emotes.ts`, `components/MessageItem.tsx`, `EmojiPickerPopover.tsx`; world custom `src/features/world/chat/emotes/`, `lib/renderChatContent.tsx`. BE `backend/src/modules/emotes/emotes.controller.ts`, `emotes.service.ts`.

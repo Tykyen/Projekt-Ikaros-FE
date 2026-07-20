@@ -16,20 +16,20 @@
 |---|-------|--------|---------|
 | 0 | Základ a infrastruktura | — | ✅ |
 | 1 | Auth & Uživatelé | Ikaros | ✅ (1.0–1.8 hotovo) |
-| 2 | Ikaros jádro | Ikaros | ⬜ |
-| 3 | Ikaros komunita | Ikaros | ⬜ |
-| 4 | Globální chat (Hospoda + Camp) | Ikaros | ⬜ |
+| 2 | Ikaros jádro | Ikaros | ✅ (2.1–2.4 hotovo) |
+| 3 | Ikaros komunita | Ikaros | ✅ (3.1–3.8 hotovo) |
+| 4 | Globální chat (Hospoda + Camp) | Ikaros | ✅ (4.1–4.3b hotovo) |
 | — | **← Ikaros platforma hotová** | — | — |
-| 5 | Svět — základ | Svět | ⬜ |
-| 6 | Svět — chat | Svět | ⬜ |
-| 7 | Svět — wiki stránky | Svět | ⬜ |
-| 8 | Svět — postavy | Svět | ⬜ |
+| 5 | Svět — základ | Svět | ✅ (5.0–5.9b hotovo) |
+| 6 | Svět — chat | Svět | ✅ (6.1–6.7 hotovo) |
+| 7 | Svět — wiki stránky | Svět | ✅ (7.1–7.4 hotovo) |
+| 8 | Svět — postavy | Svět | ✅ (8.1–8.7 hotovo) |
 | — | **← MVP hranice** | — | — |
-| 9 | Svět — herní nástroje | Svět | ⬜ |
-| 10 | Svět — mapy | Svět | ⬜ |
-| 11 | Svět — kampaně | Svět | ⬜ |
-| 12 | Admin & nastavení | Ikaros + Svět | 🟡 (12.1 hotovo) |
-| 13 | Pokročilé funkce | Ikaros + Svět | ⬜ |
+| 9 | Svět — herní nástroje | Svět | ✅ (9.1–9.5 hotovo) |
+| 10 | Svět — mapy | Svět | ✅ (10.1 + 10.2; 10.3 → **21.3 Stavitel**) |
+| 11 | Svět — kampaně | Svět | ✅ (11.1–11.5 hotovo) |
+| 12 | Admin & nastavení | Ikaros + Svět | ✅ (12.1–12.3 hotovo) |
+| 13 | Pokročilé funkce | Ikaros + Svět | 🟡 (13.2 + 13.3 hotovo; zbývá globální search 13.1a) |
 
 > Legenda: ✅ Hotovo &nbsp;|&nbsp; 🟡 Rozpracováno &nbsp;|&nbsp; ⬜ Čeká
 
@@ -963,7 +963,7 @@ dle místnosti. Dřív globální zprávy ukazovaly vždy username + iniciálu.
 - [x] **5.7j Historický** ✅ (2026-05-19, slug `historie`) — barokní sál, zlato a vinná červeň
 - [x] **5.7k Současnost** ✅ (2026-05-19, slug `moderni`) — útulný večerní interiér, terakota
 - [x] **5.7l Western** ✅ (2026-05-19) — prašné pohraniční městečko za soumraku
-- [ ] každý skin = design spec (paleta + signature ornament) → `prompts-5.7X-<skin>-assets.md` → impl (`index.ts` + `decorations.css`) → `mobil-desktop` audit
+- [x] každý skin = design spec (paleta + signature ornament) → `prompts-5.7X-<skin>-assets.md` → impl (`index.ts` + `decorations.css`) → `mobil-desktop` audit — *doloženo: 11× `spec-5.7{b..l}-*.md` + 11× `prompts-5.7{b..l}-*-assets.md` v `arch/phase-5/`; 12 world skinů (`src/themes/themes/<skin>/index.ts` se `scope: 'world'` + `decorations.css`)*
 
 ### - [x] 5.8 Jednotná 3D vrstva UI světa ✅ (2026-05-19)
 
@@ -1526,7 +1526,7 @@ Uživatel zadal „všechny dluhy musíme zvládnout" → rozjet sweep zelených
 
 **Otevřené dluhy z 9.1-I:** pagination / year-grouping archivu (pokud per-svět překročí ~10 000 eventů — samostatný dluh, zatím limit 200).
 
-### - [ ] 9.2 Kalendář (`/svet/:worldId/kalendar`) — multi-config + fantasy datum všude
+### - [x] 9.2 Kalendář (`/svet/:worldId/kalendar`) — multi-config + fantasy datum všude ✅ (9.2a–e + 9.4 scalability)
 
 *BE `world-calendar-config` (singular) + `calendars` (agregace per-postava) + `character-calendar` subdoc existuje. **9.2 plán přepracován 2026-05-25** — multi-config per svět, společný `absDay` epoch napříč kalendáři, fantasy datum i na entitách / novinkách. Roadmapový mapping aktualizován níže.*
 
@@ -1540,7 +1540,7 @@ Uživatel zadal „všechny dluhy musíme zvládnout" → rozjet sweep zelených
 - [x] **Polish iterace (9.2-FIX + FIX2 + FIX3)** — modal flow místo inline listu, multi-day souvislé lišty (margin overlap přes cell padding/gap), restart názvu na pondělí (cross-row/cross-month), jump-to-date popover (klik na month label), Dnes tlačítko, today cell highlight, hover „+" hint na prázdné buňce. Commits `c73d686`, `3520287`, `e918ae4`.
 - [x] WorldLayout nav — položka „Kalendáře" v admin sekci (PJ+).
 - [x] `napoveda` aktualizace ✓ (commit `5f32ba4`).
-- [ ] `mobil-desktop` audit po dokončení polish iterací.
+- [x] `mobil-desktop` audit po dokončení polish iterací — *pokryto 9.4 „Mobile + a11y" (commit `d1c26e4`): `CalendarPage.module.css` `@media ≤900px` (layout 1 sloupec, `.cell` min-height 70px), media queries i v `DayDetailDrawer` / `EntityFilterTree` / `EventDensityToggle` / `CalendarTabGrid`.*
 
 **9.4 — Calendar scalability (2026-05-26)** ([spec](arch/phase-9/spec-9.4-calendar-scalability.md), [plán](arch/phase-9/plan-9.4-calendar-scalability.md)) — pro 100 → 1000+ entit:
 - [x] **Density toggle:** Detail / Kompakt (4px proužky) / Heat (gradient + count), auto-fallback při překročení 8 / 30 events/den, force-user-choice badge. `useDensity` hook s persistencí per `worldId` v localStorage. Commit `bfef737`.
@@ -1749,16 +1749,16 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 **Nové balíčky:** `pixi.js` + `@pixi/react` (taktická mapa — WebGL), `three` + `react-force-graph-3d` (universe 3D — taktéž WebGL), `konva` + `react-konva` (dungeon builder — editor, ne herní plocha, canvas 2D plně stačí). Vše lazy-loaded per-route, takže bundle hráče nezatěžují naráz. `socket.io-client` už je.
 
-**Routing Dungeon Builderu — oprava:** BE `dungeon-maps` je per-svět (`worldId` povinný), FE stub je ale chybně na platformové `/ikaros/admin/dungeon-builder` → **přesunout na `/svet/:worldId/admin/dungeon-builder`** (PJ+).
+**Routing Dungeon Builderu — ✅ vyřešeno v 21.3a (2026-07-14):** admin stub `/ikaros/admin/dungeon-builder` zrušen; tvorba je per-world route **`/svet/:worldSlug/podzemi`** (`Hrac+ ∧ Podporovatel/PJ+`) + platformová osobní knihovna `/ikaros/podzemi`. Viz `src/app/router.tsx:300, 378–379, 447–448`.
 
 **BE gap:** `dungeon-maps` nemá WS gateway — builder je single-PJ editor, real-time sync netřeba; ověřit ve spec.
 
 **Klíčové soubory:**
-- FE stuby: `src/features/world/pages/` — `MapPage`, `TacticalMapPage`; `src/features/admin/pages/DungeonBuilderPage`
+- FE stuby (výchozí stav fáze): `src/features/world/pages/` — `MapPage`, `TacticalMapPage`. *(`src/features/admin/pages/DungeonBuilderPage` už neexistuje — smazán v 21.3a; dnes `src/features/world/dungeon-builder/`.)*
 - Routy: `/svet/:worldSlug/mapa`, `/takticka-mapa`, `/admin/dungeon-builder`
 - Starý Matrix (funkční vzor — herní logika, ne renderer): `Matrix/frontend/src/pages/MapPage.tsx`, `UniverseMap.tsx`, `components/Map/` (`HexUtils`, `MapToken`, `FogOfWar`, `MapEffectOverlay`, `EffectsPalette`, `MapToolbar`, `InitiativeInput`, `Dice/`, `Builder/DungeonBuilder`)
 
-**Pořadí stavby:** 10.1 → 10.3 → 10.2 *(Dungeon Builder produkuje podklady taktické mapy; taktická mapa jako poslední — je nejnáročnější).*
+**Pořadí stavby (skutečné):** 10.2 *(2026-05-31)* → 10.1 *(2026-06-01)* → Stavitel **21.3** *(2026-07-14)*. *(Původní plán 10.1 → 10.3 → 10.2 se neuplatnil — taktická mapa nečekala na podklady z builderu.)*
 
 ### - [x] 10.1 Universe mapa 3D (`/svet/:worldSlug/mapa`) — 2026-06-01
 
@@ -1800,14 +1800,13 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 - [x] **10.2m — Nástroje + oprávnění** *(2026-05-31)* — **Ping:** double-tap (pointer-based, ne `onDoubleClick` — `touch-action: none` ho na dotyku znespolehlivuje) kohokoli na ploše → ephemeral prstenec se jménem všem na scéně, TTL 2 s, `PingsLayer` (PixiJS, `useTick`, reduced-motion). BE handler `map:ping`→`map:pinged` byl hotový z prep; FE doplnil `useMapSocket.emitPing/onPing`, `screenToMap`, `doubleTap` util. **Audit oprávnění:** `useTokenPermissions.canDrag` matice ověřena (PJ/Admin bypass, hráč jen vlastní token, respekt `scene.isLocked`, combat-turn gate); ping bez role gate (PJ i hráč). Fullscreen hotový z 10.2a. **Vyřazeno:** měření vzdálenosti (uživatel). **Dluh:** per-token `isLocked` (D-066). Testy: `useMapSocket` ping, `screenToMap`, `doubleTap`. `mobil-desktop` + `napoveda` hotové. Spec: `phase-10/spec-10.2m.md`. **→ 10.2 Taktická mapa kompletní.**
 - [x] **10.2n — Orchestrace: accordion palety + Přístup/viditelnost (per-scéna i per-hráč)** *(2026-05-31)* — UX redesign PJ orchestrátora pro reálné herní počty + převzetí role „kdo co vidí". **Accordion palety:** PC / NPC / Bestiář sbalitelné (`PaletteAccordion`, default sbalené, počet aktivních v hlavičce, LS persist `ikr-map-pal-*`, tělo se neodmountuje → query žije a hlásí count přes `onCountChange`) — zvládne 10+ bestií / 5 NPC / 10 PC bez nekonečného a vnořeného scrollu. **Přístup a viditelnost** (`AccessBoard`, nahradil `MemberAssignmentTable`): per aktivní scéna karta s přepínači 👁 skrýt / 🔒 zamknout — per-scéna „na všechny" (`scene.state`, navíc sweep vynuluje per-hráč overrides) i per-hráč override; „+ přiřadit hráče" / × přes `member.assignToScene`/`unassign`. **Per-hráč override (BE+FE):** `MapScene.playerStates[]` (`{userId, isHidden?, isLocked?}`) + nová PJ-only op `scene.playerState {userId, isHidden?:bool|null, isLocked?:bool|null}` (`null` = clear); efektivní stav = override ?? per-scéna default (`utils/sceneAccess`), respektováno v player overlay (`MapHiddenOverlay`) i gatingu (`useTokenPermissions`) a **autoritativně v BE** `OperationsAuthorizer.token.move`. Mechanika lock/hide jinak hotová z 10.2c (overlay, badge). **Mimochodem opraven** pre-existující mrtvý duplikát `case 'sound.playlist'` v patcheru. Testy: BE applyAtomic/inverse/authorizer (+8), FE patcher + `sceneAccess` (+8). `mobil-desktop` (touch toggly ≥30px, flex-wrap karty) + `napoveda` (PagesSection + FAQ) hotové. Spec: `phase-10/spec-10.2n.md`, plán: `plan-10.2n.md`. **Doplňky (user feedback při testu):** (a) sbalitelné je **vše** v orchestraci — i „Aktivní scény" a „Přístup a viditelnost" (sdílí `PaletteAccordion`, default zavřené); (b) **layout zvuku**: ambient ovládání PJ přesunuto pod dock „🖥️ Zobrazení" (pravý dolní stack), „co hraje" (`SceneSoundPlayer`) přesunut vpravo nahoru pod lištu počasí/deníku (in-flow ve `weatherSlot`); (c) **ambient škálování pro 200+ zvuků**: `AmbientSoundPanel` přepsán z inline výpisu na catalog-modal vzor palet — playlist (▲▼ pořadí, × odebrat) + „+ z katalogu" otevře sdílený `CharacterCatalogModal` se search a sekvenčním multi-add; tím **vyřešen dluh D-064** (bulk vkládání PC z katalogu — sdílený modal). Při tom opraveny 2 pre-existující lint chyby v sound komponentách.
 
-### - [ ] 10.3 Dungeon Builder (`/svet/:worldId/admin/dungeon-builder`)
+### - [x] 10.3 Dungeon Builder → **přesunuto do 21.3 „Stavitel"** (`/svet/:worldSlug/podzemi`) ✅ (2026-07-14)
 
-*Tile editor map. BE `dungeon-maps` kompletní. Konva canvas 2D (editor, ne herní plocha — výkon zde není kritický). PJ+.*
+*Karta zanikla — dodáno v širším rozsahu jako **21.3 Stavitel** (podzemí · město · krajina). Detail a commity: [roadmap2.md](roadmap2.md) §21.3, spec [arch/phase-21/spec-21.3-tvorba-podzemi.md](arch/phase-21/spec-21.3-tvorba-podzemi.md).*
 
-- [ ] **10.3a — Tile editor:** mřížka (square / hex), buňky (floor / wall / door / stairs / water / lava / pit), `wallEdges`, kreslení štětcem + guma
-- [ ] **10.3b — Dekorace:** props (dveře, truhly, schody, stoly…), umístění, rotace (Konva `Transformer`)
-- [ ] **10.3c — Téma:** `dyson` (pergamen, perokresba) / `modern`
-- [ ] **10.3d — Export:** `POST .../export-template` (→ `MapTemplate`) a `.../export-scene` (→ `MapScene`) — vznik podkladu pro taktickou mapu (10.2c); `mobil-desktop` audit
+- [x] **Realizace:** `src/features/world/dungeon-builder/` (editor, canvas 2D vlastní — **Konva zamítnuta**, nepoužita); routy `/svet/:worldSlug/podzemi` (+ `/:dungeonId`) `Hrac+ ∧ (Podporovatel ∨ PJ+)` a platformová osobní knihovna `/ikaros/podzemi` — `src/app/router.tsx:300, 447–448`. Původní admin stub `/ikaros/admin/dungeon-builder` zrušen (`router.tsx:378–379`).
+- [x] **10.3a–c — Editor + generátor + dekorace:** nástroje podlaha/guma/6 typů dveří/schody/terén/14 dekorací/popisky, undo-redo 50, zoom/pan+pinch; deterministický generátor rooms-and-mazes (seed); město = ulice/budovy/hradby/brány/mosty + generátor města; PNG export s pergamenovým rámem a legendou.
+- [x] **10.3d — Export na taktickou mapu:** FE `dungeon-builder/api/dungeonMapsApi.ts:33` → BE `dungeon-maps.controller.ts:123` `POST :id/export-template` a `:134` `POST :id/export-scene`; zdi + LoS, brány = dveře. `mobil-desktop` audit v rámci 21.3.
 
 ---
 
@@ -1817,10 +1816,10 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 - **Kostky (krok 6.3)** — hod kostkou na mapě sdílí dice engine s chatem.
 - **Zvuky (krok 13.3)** — ✅ hotovo v 10.2k: ambient playlist scény + sdílené přehrávací jádro.
 - **Počasí (krok 9.4)** — ✅ hotovo v 10.2i: PJ vysílá počasí generátoru na mapu (`World.activeMapWeather`), panel + vizuální atmosféra.
-- **Dungeon Builder (10.3)** — export produkuje `MapScene` / `MapTemplate` = podklad taktické mapy.
+- **Dungeon Builder (10.3)** — ✅ hotovo v **21.3**: `POST /dungeon-maps/:id/export-scene` (i `/export-template`) → `MapScene` / `MapTemplate` se zdmi + LoS = podklad taktické mapy.
 - **Wiki Lokace (krok 7) / Universe mapa (10.1)** — scéna může být vázaná na lokaci světa.
 
-**Závislosti:** 10.2 staví na krocích 6.3 (dice), 8 (postavy / NPC), 9.4 (počasí), 13.3 (zvuky) — část napojení (zvuky) lze dotáhnout až po fázi 13. 10.3 by mělo předcházet 10.2 (produkuje podklady).
+**Závislosti:** 10.2 staví na krocích 6.3 (dice), 8 (postavy / NPC), 9.4 (počasí), 13.3 (zvuky) — část napojení (zvuky) lze dotáhnout až po fázi 13.
 
 **Mimo rozsah / k ověření ve spec:**
 - Konečné potvrzení rendereru (PixiJS) — doporučeno výkonově, spec 10.2a potvrdí; fallback `Konva` pokud se WebGL ukáže jako neúměrná složitost.
@@ -1946,7 +1945,7 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 **FE — co už existuje:** komponenty správy uživatelů (`AdminUsersPage`, `UsersTab`, `RequestsTab`, `AuditLogTab`, `BanModal`, hooky `useAdminUsers*`) jsou **hotové, ale nezapojené v routeru**. „Zpracovat" tab (pending-actions, 8 typů) běží na `/ikaros/uzivatele`.
 
-⚠️ **Nesrovnalost k vyřešení ve spec:** správa uživatelů je dnes dvojkolejná — admin komponenty (`AdminUsersPage`) existují jako nezapojený sirotek, zároveň `/ikaros/uzivatele` má admin taby. `/admin` (`PlatformAdminPage`) je stub. **Návrh:** `/admin` = platformový admin hub (zapojit hotové `AdminUsersPage` komponenty), `/ikaros/uzivatele` ponechat pro „Zpracovat" + Přátelé + veřejné profily; hloubkové admin nástroje (ban, role, audit, bulk) konsolidovat pod `/admin`.
+✅ **Nesrovnalost vyřešena v 12.1 (2026-06-02):** dvojkolejnost správy uživatelů odstraněna — `/admin` (`src/features/admin/pages/PlatformAdminPage.tsx`) je plnohodnotný admin hub (3 taby Přehled/Uživatelé/Audit), sirotci `AdminUsersPage` / `RequestsTable` / `ViewToggle` smazáni (12.1f), `/ikaros/uzivatele` zúženo na komunitní taby („Zpracovat" + Přátelé + veřejné profily).
 
 **Pořadí stavby:** 12.1 → 12.2.
 
@@ -2039,7 +2038,7 @@ PWA push odsunut jako pozdější vrstva navrch (13.2c).*
 - [x] **13.3d — Nominační workflow:** nominace world zvuku → globální pending; admin tab Nominace (approve / reject), gate Admin+
 - [x] **13.3e — Integrace s taktickou mapou:** `sound.playlist` op — ambient playlist scény (viz **10.2k**)
 - [x] **13.3f — Broadcast do chatu (rozšíření):** PJ „pustí zvuk všem" v konverzaci (Discord-styl) — `SoundBroadcastButton` (🎵 v composeru) → ephemeral WS `sound:play` (PJ-gate `>=PomocnyPJ`) → `SoundNowPlayingBanner` všem účastníkům. Bez persistence/migrace.
-- [ ] `mobil-desktop` audit, `napoveda` *(zbývá)*
+- [x] `mobil-desktop` audit, `napoveda` — *doloženo: nápověda `HelpPage/sections/WorldSection.tsx:923` („Zvuková databáze světa") + `:676` (ambient na TM) + FAQ `FaqSection.tsx:488`; responsivita `SoundCard.module.css` `@media`, `SoundPreviewBar.module.css` 2× `@media`, `SoundFiltersBar.module.css` `auto-fill minmax(150px, 1fr)` + `flex-wrap`*
 
 > **Sdílené přehrávací jádro** (`features/world/sounds/player/`): `useYoutubePlayer` (skrytý 1×1 IFrame, playlist+loop+volume), `youtubeId` extrakce, autoplay gate (`SoundActivateButton` + jotai `soundActivatedAtom`, browser policy), per-user volume/mute v LS. Konzumují ho všechny 3 surfaces. **Token** `--sound-accent #22d3ee` (cyan).
 > ⚠️ **Limit:** YT iframe per-klient = „všem hraje stejný track", ne sample-přesná pozice.
@@ -2073,17 +2072,13 @@ PWA push odsunut jako pozdější vrstva navrch (13.2c).*
     "@tiptap/extension-table": "^2.x",
     "three": "^0.x",
     "react-force-graph-3d": "^1.x",
-    "react-force-graph": "^1.x",
     "pixi.js": "^8.x",
-    "@pixi/react": "^8.x",
-    "konva": "^9.x",
-    "react-konva": "^18.x",
-    "@cloudinary/react": "^1.x",
-    "react-datepicker": "^6.x",
-    "vite-plugin-pwa": "^1.x"
+    "@pixi/react": "^8.x"
   }
 }
 ```
+
+> **Nenainstalováno (plán se neuplatnil, ověřeno proti `package.json`):** `konva` + `react-konva` — Stavitel 21.3 má vlastní canvas 2D · `vite-plugin-pwa` — 13.2c použil vanilla service worker (`public/sw.js`) · `react-force-graph` — stačí `react-force-graph-3d` · `react-datepicker` — nahrazeno vlastním `<FantasyDatePicker>` (9.2c) · `@cloudinary/react` — upload jde přes BE, ne klientskou SDK.
 
 ---
 
