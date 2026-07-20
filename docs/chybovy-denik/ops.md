@@ -93,3 +93,19 @@ inflight++;                            // ← až tady
 **Zhodnocení:** dobře — ale poučení je o **zadání, ne o kódu**: dvě ze čtyř položek roadmapy neodpovídaly realitě a slepá implementace by u ① duplikovala hotové, u ② narazila na nespustitelný skript a u ③ „přepínala" už přepnuté, aniž by kdokoli našel rozbité náhledy. **Ops karty psané dopředu stárnou tiše** — mezi jejich napsáním a odbavením se stav změní a nikdo to nepozná. Vlastní chyba během práce: CH-124 (race v recyklaci). **Zbývá:** živý smoke stránek (nemůžu — zákaz prohlížeče) + BE/FE deploy, teprve pak se `report-uri` a `mem_limit` reálně projeví.
 
 ---
+
+### CH-125 — CSP audit jsem vedl nad `src/`, ne nad buildem → minul díru, kterou přinesla závislost · 2026-07-20
+
+**Kontext:** karta 24.2 bod ③ — místo živého smoke (zákaz prohlížeče) jsem dělal statický audit externích domén proti CSP whitelistu. Našel jsem tím nález 1 (`i.ytimg.com` vs `img.youtube.com`) a prohlásil zbytek za čistý.
+
+**Co jsem udělal špatně:** grepoval jsem **`src/`** — tedy jen náš vlastní kód. Prohlásil jsem „zbytek statického auditu čistý" na základě vzorku, který ze své podstaty nemohl vidět celý problém.
+
+**Proč to nefungovalo:** do bundlu přinášejí externí URL i **závislosti**. Emoji picker `frimousse` si `fetch`uje `emojibase-data` z `cdn.jsdelivr.net`, URL si skládá v template literálu uvnitř `node_modules` — v `src/` po ní není ani stopa. `connect-src` ji nepovoloval, takže plná paleta emoji v chatu visela na „Načítám…". Nikdo si toho nevšiml, protože lokální český quick-pick (`czechEmoji.ts`) fungoval dál a picker vypadal funkčně — **částečně funkční UI je horší detektor než rozbité**, protože nevyvolá hlášení.
+
+**Oprava:** audit zopakován nad `dist/` (skutečný build). Odhalil jsker nález 2 → `cdn.jsdelivr.net` do `connect-src` (JEN connect, ne script-src — jde o data, ne kód). Self-host dat → D-075.
+
+**Poučení:** **audit externích zdrojů se dělá nad buildem, ne nad zdrojáky.** `src/` odpovídá na otázku „co jsme napsali my", ale CSP se týká toho, „co se reálně načte" — a to je bundle včetně závislostí. Obecněji: když prohlašuju něco za „čisté", musí sedět rozsah vzorku s rozsahem tvrzení.
+
+**Příznak cyklení:** píšu „zbytek čistý / nic dalšího nenalezeno" po grepu — zkontrolovat, jestli vzorek (`src/` vs `dist/` vs runtime) pokrývá celý rozsah toho tvrzení. U CSP/závislostí vždy `dist/`.
+
+---

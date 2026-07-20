@@ -202,7 +202,9 @@ Kapitola pokrývá platformovou (mimo-světovou) komunikaci: **globální chat**
   - **V globálním chatu/poště se custom OBRÁZKOVÉ emoty NEPOUŽÍVAJÍ** — `MessageItem` tam jede jen textovou konverzi (`emotes.ts`); modul `emotes` konzumuje výhradně `features/world/chat`.
   - **Pošta** nemá emote/emoji picker (čistý text/předmět).
   - Sada textových emotikonů je pevná (mapa v `chat/lib/emotes.ts`).
+  - **Plná paleta pickeru závisí na cizí CDN** — `frimousse` si `emojibase-data` `fetch`uje z `cdn.jsdelivr.net`. Lokální český quick-pick (`czechEmoji.ts`, ~120 emoji + český fulltext) funguje nezávisle, plná paleta ne. Výpadek jsdelivr = paleta visí na „Načítám…". Self-host dat → **D-075**.
 - **Zvláštnosti:** rozlišuj „emoji reakce" (toggle na zprávě, WS `chat:message:reaction`) vs. „emoty v textu". Globální custom emoty mají vlastní `emotes/global` endpoint a admin správu.
+  - ⚠️ **Do 24.2 byla plná paleta v produkci rozbitá** — CSP `connect-src` neznala `cdn.jsdelivr.net`, takže fetch emoji dat enforce zablokovala. Nevšiml si toho nikdo, protože český quick-pick fungoval dál a picker vypadal funkčně; **částečně funkční UI nevyvolá hlášení**. Nalezeno až auditem nad buildem (`CH-125`) — v `src/` po té URL není stopa, skládá ji knihovna uvnitř `node_modules`.
 - **Stav:** ✅ (globální chat textové; world custom obrázkové)
 - **Správa emotů (admin):** vytváření/úprava/mazání custom emotů — **viz kapitola 08** (platformová správa). Globální: jen `Admin+` (`/emotes/global`, `assertGlobalCanManage`). Per-svět: `PJ`/`PomocnyPJ`+ (`/emotes/:worldId`, `assertWorldCanManage`).
 - **Kód:** FE globální `src/features/chat/lib/emotes.ts`, `components/MessageItem.tsx`, `EmojiPickerPopover.tsx`; world custom `src/features/world/chat/emotes/`, `lib/renderChatContent.tsx`. BE `backend/src/modules/emotes/emotes.controller.ts`, `emotes.service.ts`.

@@ -16,7 +16,15 @@
 
 ## Otevřené
 
-*(žádné — nové zapisuj sem)*
+### D-075 — Emoji picker tahá data z cizí CDN místo self-hostu
+
+**Soubor:** `src/features/chat/components/EmojiPickerPopover.tsx` (knihovna `frimousse`) + `default.conf.template` (CSP `connect-src`)
+**Problém:** `frimousse` si pro **plnou paletu** emoji `fetch`uje `emojibase-data` z `https://cdn.jsdelivr.net/npm/emojibase-data@…`; projekt nikde nepředává prop `emojibaseUrl`, takže jede default. Do 24.2 to CSP `connect-src` blokovala → paleta visela na „Načítám…". Nevšiml si toho nikdo, protože lokální český quick-pick (`czechEmoji.ts`, ~120 emoji) fungoval dál a picker se tvářil funkčně.
+**Dopad:** Nízký — funkčně opraveno (24.2 přidala doménu do `connect-src`, JEN connect, ne script-src). Zbývající dluh je **provozní a bezpečnostní**: závislost na dostupnosti cizí CDN (výpadek jsdelivr = rozbitá paleta), zbytečně rozšířený CSP whitelist a odchozí požadavek na třetí stranu z pohledu soukromí uživatele.
+**Řešení:** Stáhnout `emojibase-data` do `public/` (jen potřebné locale) a předat `EmojiPicker.Root` prop `emojibaseUrl` mířící na vlastní origin. Pak vrátit `cdn.jsdelivr.net` z `connect-src` pryč. Bonus: funguje offline a rychleji.
+**Kdy:** Až se bude sahat na chat nebo řešit soukromí/třetí strany (GDPR revize). Není urgentní — funkčnost je obnovená.
+
+---
 
 ---
 
