@@ -4,7 +4,7 @@
  */
 import type { ReactNode } from 'react';
 import type { DungeonMap } from '../types';
-import { MAP_KIND_LABELS } from '../types';
+import { MAP_KIND_LABELS, normalizeMapKind } from '../types';
 import { DungeonThumb } from './DungeonThumb';
 import styles from './DungeonGrid.module.css';
 
@@ -50,7 +50,10 @@ export function DungeonGrid({
               <div className={styles.cardText}>
                 <h3 className={styles.cardName}>{d.name || 'Bez názvu'}</h3>
                 <p className={styles.cardMeta}>
-                  {MAP_KIND_LABELS[d.mapKind === 'city' ? 'city' : 'dungeon']} ·{' '}
+                  {/* D-077 — `normalizeMapKind`, ne ternár: ten shazoval
+                      'wilderness' na 'dungeon', takže krajina se v seznamu
+                      vydávala za podzemí. */}
+                  {MAP_KIND_LABELS[normalizeMapKind(d.mapKind)]} ·{' '}
                   {d.gridWidth}×{d.gridHeight}
                   {extra ? ` · ${extra}` : ''}
                 </p>

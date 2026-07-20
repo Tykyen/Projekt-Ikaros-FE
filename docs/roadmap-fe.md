@@ -1804,9 +1804,13 @@ Taktická mapa stojí na **třech rovnocenných pilířích**. Každý podkrok 1
 
 *Karta zanikla — dodáno v širším rozsahu jako **21.3 Stavitel** (podzemí · město · krajina). Detail a commity: [roadmap2.md](roadmap2.md) §21.3, spec [arch/phase-21/spec-21.3-tvorba-podzemi.md](arch/phase-21/spec-21.3-tvorba-podzemi.md).*
 
+> ⚠️ **„V širším rozsahu" neznamená „ve všem" — 4 položky původního zadání 10.3 dodány nebyly** (ověřeno v kódu 2026-07-20):
+> **① hex mřížka** — `dungeon-builder/types.ts:240` je jediná zmínka; všude natvrdo `'square'` (`DungeonEditorPage.tsx:48,109`), renderer kreslí jen `fillRect`. **② `wallEdges`** (zdi na hranách buněk místo celých buněk) — `dungeon-map.interface.ts:47` je JEDINÝ výskyt v celém BE, schema `@Prop` chybí → neuloží se, mrtvé pole. **③ téma `modern`** — `DrawableDungeon`/`DrawOptions` pole `theme` vůbec nemají, existuje jen dysonův papír. **④ FE volání `export-template`** — v celém `src/` 0 výskytů; `dungeonMapsApi.ts` umí jen `exportScene`.
+> Rozhodnutí, jestli ① – ③ dodělat, nebo formálně odepsat jako zrušené, zatím **nepadlo**. ④ je nejblíž skutečnému dluhu: BE endpoint existuje a FE ho nevolá.
+
 - [x] **Realizace:** `src/features/world/dungeon-builder/` (editor, canvas 2D vlastní — **Konva zamítnuta**, nepoužita); routy `/svet/:worldSlug/podzemi` (+ `/:dungeonId`) `Hrac+ ∧ (Podporovatel ∨ PJ+)` a platformová osobní knihovna `/ikaros/podzemi` — `src/app/router.tsx:300, 447–448`. Původní admin stub `/ikaros/admin/dungeon-builder` zrušen (`router.tsx:378–379`).
 - [x] **10.3a–c — Editor + generátor + dekorace:** nástroje podlaha/guma/6 typů dveří/schody/terén/14 dekorací/popisky, undo-redo 50, zoom/pan+pinch; deterministický generátor rooms-and-mazes (seed); město = ulice/budovy/hradby/brány/mosty + generátor města; PNG export s pergamenovým rámem a legendou.
-- [x] **10.3d — Export na taktickou mapu:** FE `dungeon-builder/api/dungeonMapsApi.ts:33` → BE `dungeon-maps.controller.ts:123` `POST :id/export-template` a `:134` `POST :id/export-scene`; zdi + LoS, brány = dveře. `mobil-desktop` audit v rámci 21.3.
+- [x] **10.3d — Export na taktickou mapu:** FE `dungeon-builder/api/dungeonMapsApi.ts:33` volá `POST :id/export-scene` (BE `dungeon-maps.controller.ts:134`); zdi + LoS, brány = dveře. `mobil-desktop` audit v rámci 21.3. ⚠️ BE má i `POST :id/export-template` (`:123`), ale **FE ho nikde nevolá** — endpoint bez konzumenta.
 
 ---
 
