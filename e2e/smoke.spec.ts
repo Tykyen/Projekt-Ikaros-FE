@@ -41,7 +41,11 @@ test('login → seznam světů → vstup do světa → taktická mapa', async ({
   await expect(page).toHaveURL(/takticka-mapa/);
 
   const viewport = page.getByTestId('tactical-map-viewport');
-  await expect(viewport).toBeVisible();
+  // 26.x fix: default 5 s nestačí — TM čeká na schema bootstrap chunk
+  // (~14 modulů, vzor router-schema-gate.spec) + velký PIXI chunk; naměřeno
+  // ~7 s lokálně na studeném preview, CI bývá pomalejší. Smoke ověřuje
+  // „naběhne bez crashe", ne latenci → štědrý timeout jako u canvasu níže.
+  await expect(viewport).toBeVisible({ timeout: 30_000 });
   // PIXI <Application> mountuje <canvas> po načtení scény → nejsilnější důkaz,
   // že se mapa vyrenderovala a PixiJS init nespadl.
   //

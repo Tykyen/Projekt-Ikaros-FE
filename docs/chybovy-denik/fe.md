@@ -2411,3 +2411,11 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Zhodnocení:** **dobře** — akceptační test na primárních datech (arch) chytil problém, který „proběhlo bez chyby" zamaskovalo (první běh skriptu prošel ✓, ale výstup byl špatně — bbox přes neprůhledný celek nic neořízl). **Poučení:** u obrazové pipeline je „skript doběhl" nulový důkaz — vždy vizuální kontrola výstupu ve zmenšenině. Trvalá pojistka: skript loguje „(alfa beze změny!)" když nenajde ani green screen, ani šachovnici — nápadný příznak podezřelého vstupu.
 
 ---
+
+### ✅ ŘEŠENÍ — červené CI po pushi Vypravěče NEBYL Vypravěč: pre-existující 5s timeout smoke testu vs. ~7s render TM · 2026-07-21
+**Co nakonec zabralo:** místo hrabání ve vlastních změnách **bisekce** — smoke test spuštěn na HEAD (D5), HEAD~1 (tutorial) i HEAD~2 (poslední před vší prací): padal VŠUDE stejně → příčina je pre-existující, ne v nových commitech. Pak dočasný debug spec se zachytáváním console/pageerror/requestfailed + měřením: žádný crash, viewport TM se objeví po **7,2 s**, ale `expect(viewport).toBeVisible()` má default timeout 5 s. Fix: timeout 30 s s komentářem (vzor: druhý assert v témže testu i router-schema-gate.spec už 15–30 s měly — schema bootstrap ~14 modulů + velký PIXI chunk).
+**Proč to je správně:** smoke ověřuje „naběhne bez crashe", ne latenci; latence patří do perf brány plny-auditu, ne do happy-path smoke.
+**Jak ověřeno:** smoke lokálně zelený (viewport ~7 s, celkem 22,7 s); debug spec smazán.
+**Zhodnocení:** **dobře** — bisekce jako první krok ušetřila hodiny hledání neexistující chyby ve vlastním kódu; debug spec s console capture = rychlá cesta k příčině u E2E. **Poučení:** červené CI ihned po tvém pushi ≠ důkaz, že to způsobil tvůj push — deterministická reprodukce na starším commitu je otázka za 10 minut a rozhodne směr pátrání.
+
+---
