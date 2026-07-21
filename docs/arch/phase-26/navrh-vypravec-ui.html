@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vypravěč — návrh UI (D3–D4)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ── Tokeny (mimo svět = brand ikaros synthwave; ve světě je nahradí tokeny motivu) ── */
+  :root{
+    --noc:#0d0618;          /* pozadí jeviště */
+    --pulnoc:#1a1033;       /* surface panelu */
+    --plys:#241546;         /* zvednutá plocha (opona) */
+    --inkoust:#ece6f7;      /* text */
+    --sed:#9d92b8;          /* tlumený text */
+    --magenta:#ff3ea5;      /* akcent CTA */
+    --cyan:#22d3ee;         /* fokus, odkazy */
+    --mosaz:#c9963c;        /* Ishidův klíč, lemy, labely */
+    --mosaz-tm:#8a6526;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{
+    background:var(--noc);color:var(--inkoust);
+    font:15px/1.55 "Inter",system-ui,sans-serif;
+    padding:48px 24px 96px;
+  }
+  .stage{max-width:1060px;margin:0 auto}
+  h1{font:600 34px/1.2 "Cormorant Garamond",serif;letter-spacing:.01em}
+  h1 em{color:var(--mosaz);font-style:italic}
+  .lead{color:var(--sed);max-width:62ch;margin-top:8px}
+  section{margin-top:64px}
+  .eyebrow{
+    font:600 11px/1 "Inter",sans-serif;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--mosaz);display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--mosaz-tm),transparent)}
+  .note{color:var(--sed);font-size:13px;margin-top:12px;max-width:70ch}
+  .row{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-end}
+  .demo{display:flex;flex-direction:column;gap:10px;align-items:center}
+  .demo small{color:var(--sed);font-size:12px}
+
+  /* ── Ishidův klíč (podpisový ornament) ── */
+  .klic{display:inline-block;vertical-align:-2px}
+
+  /* ── FAB kotva ── */
+  .fab{
+    width:48px;height:48px;border-radius:50%;border:1.5px solid var(--mosaz);
+    background:radial-gradient(circle at 32% 28%, #2b1a52, var(--pulnoc) 70%);
+    color:var(--inkoust);display:grid;place-items:center;cursor:pointer;
+    position:relative;box-shadow:0 4px 18px rgba(0,0,0,.5), 0 0 0 3px rgba(201,150,60,.12);
+    transition:transform .15s ease, box-shadow .15s ease;padding:0;
+  }
+  .fab:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.55),0 0 14px rgba(255,62,165,.25)}
+  .fab:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+  .fab svg{width:30px;height:30px;color:var(--inkoust)}
+  .fab.mobil{width:44px;height:44px}
+  .fab .badge{
+    position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:8px;
+    background:var(--magenta);color:#fff;font:700 10px/16px "Inter";text-align:center;padding:0 4px;
+    box-shadow:0 0 0 2px var(--noc);
+  }
+  .fab.vede::after{
+    content:"";position:absolute;inset:-5px;border-radius:50%;
+    background:conic-gradient(var(--cyan) 0 216deg, rgba(157,146,184,.25) 216deg 360deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  }
+  .fab.spi{opacity:.45;filter:saturate(.5)}
+
+  /* ── Bublina ── */
+  .bublina{
+    max-width:300px;background:var(--pulnoc);border:1px solid var(--mosaz-tm);
+    border-radius:14px 14px 4px 14px;padding:12px 14px;position:relative;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+  }
+  .bublina .rec{font:italic 500 16px/1.45 "Cormorant Garamond",serif}
+  .bublina .akce{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .btn{
+    font:600 12.5px/1 "Inter";padding:8px 12px;border-radius:8px;border:1px solid transparent;
+    cursor:pointer;background:var(--magenta);color:#fff;
+  }
+  .btn.tiche{background:transparent;color:var(--sed);border-color:rgba(157,146,184,.35)}
+  .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .bublina .zavrit{
+    position:absolute;top:6px;right:8px;background:none;border:0;color:var(--sed);
+    font-size:14px;cursor:pointer;padding:2px 4px;
+  }
+  .kotvene{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+
+  /* ── Panel (desktop 380 px) ── */
+  .panel{
+    width:380px;background:var(--pulnoc);border:1px solid rgba(201,150,60,.35);
+    border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6);
+    display:flex;flex-direction:column;max-height:70vh;
+  }
+  /* vstupenka: perforovaná hlavička (podpisový tvar) */
+  .vstupenka{
+    background:linear-gradient(135deg,#2b1a52, var(--plys) 55%, #1f123f);
+    padding:16px 18px 14px;position:relative;
+    -webkit-mask:radial-gradient(circle 7px at 0 100%, transparent 97%, #000) top left,
+                 radial-gradient(circle 7px at 100% 100%, transparent 97%, #000) top right;
+    -webkit-mask-size:51% 100%;-webkit-mask-repeat:no-repeat;
+            mask:radial-gradient(circle 7px at 0 100%, transparent 97%, #000) top left,
+                 radial-gradient(circle 7px at 100% 100%, transparent 97%, #000) top right;
+            mask-size:51% 100%;mask-repeat:no-repeat;
+  }
+  .vstupenka::after{ /* perforace mezi hlavičkou a tělem */
+    content:"";position:absolute;left:14px;right:14px;bottom:0;height:0;
+    border-bottom:1.5px dashed rgba(201,150,60,.45);
+  }
+  .kdejsem{display:flex;gap:12px;align-items:flex-start}
+  .avatar{
+    width:40px;height:40px;border-radius:50%;flex:none;border:1.5px solid var(--mosaz);
+    background:radial-gradient(circle at 32% 28%, #2b1a52, var(--pulnoc) 72%);
+    display:grid;place-items:center;color:var(--inkoust);
+  }
+  .avatar svg{width:26px;height:26px}
+  .kdejsem .kde-label{font:600 10.5px/1 "Inter";letter-spacing:.2em;text-transform:uppercase;color:var(--mosaz)}
+  .kdejsem p{font:italic 500 15.5px/1.45 "Cormorant Garamond",serif;margin-top:4px}
+  .kdejsem strong{color:#fff;font-weight:600}
+
+  .panel-telo{padding:14px 14px 6px;overflow:auto}
+  .sekce-label{font:600 10.5px/1 "Inter";letter-spacing:.2em;text-transform:uppercase;color:var(--sed);margin:10px 4px 8px}
+  .karty{display:flex;flex-direction:column;gap:8px}
+  .karta{
+    text-align:left;background:var(--plys);border:1px solid rgba(157,146,184,.18);
+    border-radius:10px;padding:10px 12px;color:var(--inkoust);cursor:pointer;
+    font:500 13.5px/1.4 "Inter";display:flex;justify-content:space-between;align-items:center;gap:8px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .karta:hover{border-color:var(--cyan);transform:translateX(2px)}
+  .karta:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .karta .sipka{color:var(--cyan);flex:none}
+  .menu{list-style:none;padding:4px 0 8px}
+  .menu li{display:flex}
+  .menu a{
+    flex:1;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
+    color:var(--inkoust);text-decoration:none;font:500 13.5px/1 "Inter";
+  }
+  .menu a:hover{background:rgba(34,211,238,.08)}
+  .menu a:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
+  .menu .klic{color:var(--mosaz)}
+  .menu .meta{margin-left:auto;color:var(--sed);font-size:12px}
+  .panel-pata{
+    padding:10px 16px;border-top:1px solid rgba(157,146,184,.15);
+    display:flex;justify-content:space-between;align-items:center;color:var(--sed);font-size:12px;
+  }
+  .panel-pata button{background:none;border:0;color:var(--sed);cursor:pointer;font-size:12px;text-decoration:underline}
+
+  /* ── Lišta kroku ── */
+  .lista{
+    display:flex;align-items:center;gap:14px;background:var(--pulnoc);
+    border:1px solid rgba(201,150,60,.35);border-radius:999px;padding:8px 10px 8px 16px;
+    box-shadow:0 12px 34px rgba(0,0,0,.55);width:fit-content;
+  }
+  .kruh{
+    width:34px;height:34px;border-radius:50%;flex:none;position:relative;
+    background:conic-gradient(var(--cyan) 0 216deg, rgba(157,146,184,.25) 216deg 360deg);
+    display:grid;place-items:center;font:700 10px/1 "Inter";
+  }
+  .kruh::before{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--pulnoc)}
+  .kruh span{position:relative}
+  .lista .titul{font:600 14px/1.2 "Inter"}
+  .lista .odhad{color:var(--sed);font-size:12px}
+  .proužek{
+    display:flex;align-items:center;gap:10px;background:var(--pulnoc);
+    border:1px solid rgba(201,150,60,.3);border-radius:8px;padding:6px 12px;height:32px;
+    font:600 12.5px/1 "Inter";width:fit-content;color:var(--inkoust);cursor:pointer;
+  }
+  .proužek .mini{color:var(--cyan)}
+
+  /* ── Telefon (bottom-sheet) ── */
+  .telefon{
+    width:320px;height:560px;border:2px solid rgba(157,146,184,.3);border-radius:28px;
+    position:relative;overflow:hidden;background:linear-gradient(#160b2b,#0f0720);flex:none;
+  }
+  .telefon .obsah{padding:18px;color:var(--sed);font-size:13px}
+  .sheet{
+    position:absolute;left:0;right:0;bottom:0;background:var(--pulnoc);
+    border-radius:18px 18px 0 0;border-top:1.5px solid rgba(201,150,60,.4);
+    box-shadow:0 -14px 40px rgba(0,0,0,.6);padding:6px 14px 14px;height:38%;
+  }
+  .sheet .madlo{width:36px;height:4px;border-radius:2px;background:rgba(157,146,184,.4);margin:4px auto 10px}
+  .sheet .kdejsem p{font-size:15px}
+  .telefon .fab{position:absolute;right:14px;bottom:calc(38% + 14px)}
+
+  /* ── Ve světě (tokenizace) ── */
+  .svety{display:flex;gap:24px;flex-wrap:wrap}
+  .svet-chip{
+    border-radius:14px;padding:20px;width:300px;
+    display:flex;flex-direction:column;gap:14px;border:1px solid;
+  }
+  .svet-chip .mini-bublina{border-radius:12px 12px 4px 12px;padding:10px 12px;font:italic 500 14.5px/1.4 "Cormorant Garamond",serif;border:1px solid}
+  .svet-chip .fab-svet{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:1.5px solid}
+  .svet-chip .fab-svet svg{width:27px;height:27px}
+  .svet-chip small{font:600 10.5px/1 "Inter";letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+
+  /* ── Reveal opony (jen dekor návrhu; v appce drobná scale/fade animace panelu) ── */
+  @media (prefers-reduced-motion: no-preference){
+    .panel{animation:opona .45s ease-out}
+    @keyframes opona{from{clip-path:inset(0 0 100% 0);opacity:.4}to{clip-path:inset(0)}}
+  }
+  @media (max-width:768px){ body{padding:32px 14px 64px} .row{gap:24px} }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <h1>Vypravěč — <em>návrh UI</em> <span style="font-size:18px;color:var(--sed)">(D3–D4: kotva · bublina · panel · lišta · mobil · tokenizace)</span></h1>
+  <p class="lead">Mimo svět mluví plný brand (synthwave + mosaz Ishidova klíče). Uvnitř světa všechno přebarví tokeny motivu — tvar zůstává, barvy nikdy nejsou natvrdo. Podpis návrhu: <strong style="color:var(--mosaz)">mosazný klíč</strong> a hlavička panelu jako <strong style="color:var(--mosaz)">perforovaná vstupenka</strong>.</p>
+
+  <!-- ═══ 1 · Kotva ═══ -->
+  <section>
+    <div class="eyebrow">1 · Kotva (FAB) — stavový automat</div>
+    <div class="row">
+      <div class="demo">
+        <button class="fab" aria-label="Vypravěč — nápověda a průvodce">
+          <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+        </button>
+        <small>Klid (48 px)</small>
+      </div>
+      <div class="demo">
+        <button class="fab" aria-label="Vypravěč — 2 novinky">
+          <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+          <span class="badge">2</span>
+        </button>
+        <small>Badge</small>
+      </div>
+      <div class="demo">
+        <button class="fab vede" aria-label="Vypravěč — cesta, krok 3 z 5">
+          <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+        </button>
+        <small>Vede (3/5 — cyan kroužek)</small>
+      </div>
+      <div class="demo">
+        <button class="fab spi" aria-label="Vypravěč — jen na zavolání">
+          <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+        </button>
+        <small>Spí (jen na zavolání)</small>
+      </div>
+      <div class="demo">
+        <button class="fab mobil" aria-label="Vypravěč">
+          <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+        </button>
+        <small>Mobil (44 px)</small>
+      </div>
+    </div>
+    <p class="note">Silueta = <em>placeholder</em> (gentleman s cylindrem) — po dodání grafiky ji nahradí Ishidův avatar (mimo svět) / finální silueta (ve světě). Geometrie: right 16 px · bottom 16 px + <code>--fab-shift</code> (bottom-stack kontrakt s voice kartou a PWA bannerem) · z-index 190.</p>
+  </section>
+
+  <!-- ═══ 2 · Bublina ═══ -->
+  <section>
+    <div class="eyebrow">2 · Bublina — jediná proaktivní forma</div>
+    <div class="row">
+      <div class="kotvene">
+        <div class="bublina" role="status">
+          <button class="zavrit" aria-label="Zavřít">✕</button>
+          <p class="rec">Poprvé na taktické mapě? Provedu tě.</p>
+          <div class="akce"><button class="btn">Ukaž mi to</button><button class="btn tiche">Teď ne</button></div>
+        </div>
+        <button class="fab" aria-label="Vypravěč"><svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg></button>
+      </div>
+      <div class="demo" style="align-items:flex-start">
+        <div class="bublina" role="status" style="border-color:rgba(34,211,238,.5)">
+          <p class="rec">Nový svět stojí — a ne prázdný. Dovolil jsem si ti předchystat pravidla, měny i kalendář. Rozhlédni se.</p>
+        </div>
+        <small>Oslava — bez CTA, auto-zmizí po 8 s (tip s CTA nemizí sám)</small>
+      </div>
+    </div>
+    <p class="note">Ishidovy repliky vždy kurzívou (Cormorant) — hlas postavy je typograficky oddělený od UI textu. Zavření 1 tapem, zavřené se nikdy neopakuje.</p>
+  </section>
+
+  <!-- ═══ 3 · Panel (desktop) ═══ -->
+  <section>
+    <div class="eyebrow">3 · Panel — desktop 380 px, „vstupenka" hlavička</div>
+    <div class="row" style="align-items:flex-start">
+      <div class="panel" role="dialog" aria-labelledby="vt">
+        <div class="vstupenka">
+          <div class="kdejsem">
+            <span class="avatar"><svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg></span>
+            <div>
+              <div class="kde-label" id="vt">Kde jsem</div>
+              <p>Jsi v <strong>Encyklopedii světa Askalon</strong> jako <strong>Hráč</strong>. Tady najdeš wiki stránky světa; tvořit můžeš návrhem přes „+ Navrhnout".</p>
+            </div>
+          </div>
+        </div>
+        <div class="panel-telo">
+          <div class="sekce-label">K věci</div>
+          <div class="karty">
+            <button class="karta">Jak získám postavu? <span class="sipka">→</span></button>
+            <button class="karta">Doveď mě za PJ <span class="sipka">→</span></button>
+            <button class="karta">NPC vs. Bestie — co je co? <span class="sipka">→</span></button>
+          </div>
+          <div class="sekce-label">Vždy po ruce</div>
+          <ul class="menu">
+            <li><a href="#"><svg class="klic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg>Cesty <span class="meta">PJ Start · 3/5</span></a></li>
+            <li><a href="#"><svg class="klic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg>Zeptat se</a></li>
+            <li><a href="#"><svg class="klic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg>Co je nového <span class="meta">2 nové</span></a></li>
+            <li><a href="#"><svg class="klic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg>Plná nápověda</a></li>
+          </ul>
+        </div>
+        <div class="panel-pata">
+          <span>Ishida · Vypravěč</span>
+          <button>Nastavení</button>
+        </div>
+      </div>
+      <div style="max-width:360px">
+        <p class="note" style="margin-top:0"><strong style="color:var(--inkoust)">Anatomie:</strong> A) „Kde jsem" — kontextová hlavička (vstupenka, nulový klik) · B) „K věci" — max 4 kontextové karty · C) „Vždy po ruce" — trvalé menu s klíči.</p>
+        <p class="note">Perforace vstupenky + zoubky po stranách = jediné tvarové gesto panelu; zbytek je klidný, ať obsah dýchá. Otevření = krátké „zvednutí opony" (clip-path shora, 0,45 s; reduced-motion → bez animace).</p>
+        <p class="note">TopicView (po kliku na kartu) sdílí tělo panelu; dole vždy patička „Pomohlo ti to? [Ano] [Ne]".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 4 · Lišta kroku ═══ -->
+  <section>
+    <div class="eyebrow">4 · Lišta kroku (tutoriál) — plná a sbalená</div>
+    <div class="row">
+      <div class="demo" style="align-items:flex-start">
+        <div class="lista">
+          <div class="kruh" aria-hidden="true"><span>3/5</span></div>
+          <div>
+            <div class="titul">Otevři bránu a pozvi lidi</div>
+            <div class="odhad">~3 min</div>
+          </div>
+          <button class="btn">Vezmi mě tam</button>
+          <button class="btn tiche">Přeskočit</button>
+          <button class="btn tiche" aria-label="Pauza">⏸</button>
+        </div>
+        <small>Desktop — plovoucí dole, mimo obsah</small>
+      </div>
+      <div class="demo" style="align-items:flex-start">
+        <button class="proužek"><span class="mini">3/5</span> Otevři bránu a pozvi lidi</button>
+        <small>Sbalený proužek (32 px) — kolizní plochy, composer; tap = rozbalit</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 5 · Mobil ═══ -->
+  <section>
+    <div class="eyebrow">5 · Mobil — bottom-sheet (zarážka 1/3)</div>
+    <div class="row" style="align-items:flex-start">
+      <div class="telefon" aria-hidden="true">
+        <div class="obsah">Obsah stránky…</div>
+        <button class="fab mobil" aria-label="Vypravěč"><svg viewBox="0 0 100 100" fill="currentColor"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg></button>
+        <div class="sheet">
+          <div class="madlo"></div>
+          <div class="kdejsem">
+            <span class="avatar" style="width:34px;height:34px"><svg viewBox="0 0 100 100" fill="currentColor" style="width:22px;height:22px"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg></span>
+            <div>
+              <div class="kde-label">Kde jsem</div>
+              <p>Jsi v <strong>Putyce</strong> — společný chat celé platformy.</p>
+            </div>
+          </div>
+          <div class="karty" style="margin-top:10px">
+            <button class="karta">Jak fungují kostky v chatu? <span class="sipka">→</span></button>
+          </div>
+        </div>
+      </div>
+      <div style="max-width:340px">
+        <p class="note" style="margin-top:0">Zarážka 1/3 = rychlé menu (hlavička + první karta); tah nahoru → 3/4 plný obsah. Nikdy fullscreen. FAB 44 px sedí NAD sheetem; při highlight navigaci se sheet zavře a zůstane jen proužek s replikou.</p>
+        <p class="note">Otevřená klávesnice = kolizní plocha → FAB skrytý, vstup přes položku „Vypravěč" v draweru.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6 · Ve světě — tokenizace ═══ -->
+  <section>
+    <div class="eyebrow">6 · Uvnitř světa — silueta na tokenech motivu (žádné pevné barvy)</div>
+    <div class="svety">
+      <div class="svet-chip" style="background:#f3e9d4;border-color:#c9b48a;color:#3d2f1a">
+        <small>Motiv: fantasy pergamen</small>
+        <div style="display:flex;gap:14px;align-items:flex-end">
+          <span class="fab-svet" style="border-color:#8a6a3a;background:#eaddc2;color:#5a4425">
+            <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+          </span>
+          <div class="mini-bublina" style="background:#eee0c4;border-color:#c9b48a;color:#3d2f1a">Postavu ti tady zakládá tvůj PJ — napiš mu.</div>
+        </div>
+      </div>
+      <div class="svet-chip" style="background:#101418;border-color:#2c3844;color:#cfe3ef">
+        <small>Motiv: minimal dark</small>
+        <div style="display:flex;gap:14px;align-items:flex-end">
+          <span class="fab-svet" style="border-color:#3d5566;background:#18212a;color:#9fc0d4">
+            <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M28 34 L30 16 Q30 12 34 12 L62 10 Q66 10 66 14 L66 32 L78 34 Q82 35 81 38 Q80 41 76 41 L22 43 Q18 43 18 40 Q18 37 22 36 Z M36 48 Q47 44 56 48 Q64 52 63 62 Q62 70 54 73 L60 78 Q70 82 76 90 Q78 94 74 96 L26 98 Q22 98 23 93 Q27 84 38 79 L42 74 Q34 70 34 60 Q34 52 36 48 Z"/></svg>
+          </span>
+          <div class="mini-bublina" style="background:#18212a;border-color:#2c3844;color:#cfe3ef">Kalendář světa vidí až Pomocný PJ.</div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Ve světě: silueta přes <code>mask-image</code> + <code>currentColor</code>, plochy přes <code>var(--surface)</code>/<code>var(--accent)</code>, mosaz i magenta zmizí. Jeden tvar, 12 motivů, nula per-motiv assetů. Kurzíva replik zůstává i ve světě (hlas = typografie, ne barva).</p>
+  </section>
+
+  <!-- ═══ 7 · Pravidla ═══ -->
+  <section>
+    <div class="eyebrow">7 · Neporušitelná pravidla (z podkladu 03)</div>
+    <p class="note" style="max-width:none">
+      Nikdy fullscreen · nikdy nepřekrývá prvek, o kterém mluví · z-index 190 (pod voice 200 i toasty) · <code>--fab-shift</code> bottom-stack · na kolizních plochách FAB skrytý · Esc zavírá, focus trap, focus zpět · bubliny <code>role="status"</code> · reduced-motion: žádná opona, žádný pulz · všechny barvy v appce přes tokeny (tento náhled používá hex jen jako ukázku hodnot brand tokenů).
+    </p>
+  </section>
+
+</div>
+</body>
+</html>
