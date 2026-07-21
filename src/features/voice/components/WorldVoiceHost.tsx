@@ -6,7 +6,7 @@
  * svět. Jitsi iframe žije tady (odchod ze stránky ho neodmountuje); tlačítka
  * ve světovém chatu a na mapě jen togglují session atom.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import {
   Mic,
@@ -66,10 +66,33 @@ export function WorldVoiceHost() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
+  // Spec 26.1 — bottom-stack kontrakt: viditelná (nedokovaná) karta hlásí svou
+  // výšku + 16 px mezeru přes `--voice-host-h` na <html>; FAB Vypravěče si o ni
+  // zvedne bottom. ResizeObserver kryje minimalizaci i responsivní šířku.
+  const hostRef = useRef<HTMLDivElement>(null);
+  const hidden = !active || (minimized && docked);
+  useEffect(() => {
+    const root = document.documentElement;
+    if (hidden || !hostRef.current) {
+      root.style.removeProperty('--voice-host-h');
+      return;
+    }
+    const el = hostRef.current;
+    const ro = new ResizeObserver(() => {
+      root.style.setProperty('--voice-host-h', `${el.offsetHeight + 16}px`);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty('--voice-host-h');
+    };
+  }, [hidden]);
+
   if (!active) return null;
 
   return (
     <div
+      ref={hostRef}
       className={s.host}
       data-min={minimized || undefined}
       data-docked={(minimized && docked) || undefined}

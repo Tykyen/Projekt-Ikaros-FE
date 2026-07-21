@@ -100,7 +100,7 @@ Registr rozdělený per oblast; **metadata eager (malý chunk), body lazy**. Mar
 interface JourneyStep {
   id: string;                 // 'pj.create-world'
   title: string;              // „Založ svět"
-  narratorLine: string;       // Ishidova replika (flavor)
+  narratorLine: string;       // replika; mluvčí dle scope (Ishida/Joe/Měďák — 02 §1)
   cta: { label: string; to: string };   // deep-link; parametry světa doplní engine z contextWorldId
   anchor?: AnchorId;
   done: DoneCondition;        // §4

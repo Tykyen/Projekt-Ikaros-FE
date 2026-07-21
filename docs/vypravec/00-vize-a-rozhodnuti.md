@@ -21,7 +21,7 @@ Zásady (závazné, detail [03-interakcni-model.md](03-interakcni-model.md)):
 - **Jeden zdroj pravdy:** postupně pohlcuje 5 dnešních nezávislých zdrojů nápovědy (dle inventury 07 §2: data-driven kusy HelpPage · AnonStartPanel „Začni tady" · in-situ „?" vč. TM nápověd · empty-state CTA · HelpPage sections) — nesmí vzniknout šestý zdroj driftu. Řetěz: kód → `docs/funkce/` → registr → doručovací plochy.
 - **Retenční cíl:** první úspěch každé persony do minut, sociální akce do 24 h, důvod k návratu.
 
-Feature = **Vypravěč**; postava = **Ishida** (Tvůrce platformy, kloboučník × vůdce tajné organizace — zná každý kout, protože to místo stvořil; nikdy neřekne „jsem tvůj PJ": *„PJ je vypravěč TVÉHO světa, já jen spravuji dům, ve kterém všechny světy stojí."*). Persona, hlas a grafický brief: [02-persona-a-grafika.md](02-persona-a-grafika.md).
+Feature = **Vypravěč**; mluví v něm **tři postavy jedné tajné organizace tvůrců** (model potvrzen 2026-07-21): **Ishida** — šéf (platforma, Putyka/Camp/voice; „tohle místo jsem stvořil") · **Joe** — agentka v terénu (vše uvnitř světů vč. chatu světa; předání při prvním vstupu do světa) · **Měďák** — výcvikář POUZE pro taktickou mapu (hloubkový průvodce TM, v2). Nikdo z nich nikdy neřekne „jsem tvůj PJ"; Joe a Měďák neradí k příběhu — radí k nástrojům, hru vede PJ. Persona, hlasy a grafika: [02-persona-a-grafika.md](02-persona-a-grafika.md) + prompty [02a-prompty-grafika.md](02a-prompty-grafika.md).
 
 ---
 
@@ -48,8 +48,8 @@ Kompletní seznam (syntéza §10, **aktualizovaný o dopady kritiky** — změny
 
 | # | Rozhodnutí | Doporučení | Proč |
 |---|---|---|---|
-| 1 | **Persona lock:** Ishida + tykání + 8 few-shot replik | ✅ **schváleno 2026-07-20** („zatím" — ladění replik vyhrazeno, jen úpravou 02 §2.1) | Blokuje všechny texty; řeší kolizi „Vypravěč = PJ"; fikce kryje navigaci („tohle místo jsem stvořil"). |
-| 2 | **Grafika dle briefu** (master + 3 busty + avatar + 2 siluety) | Čeká na **finální upravenou referenci od vlastníka** (IP pravidla 02 §3.1a); do té doby placeholder silueta | Grafika nesmí blokovat architekturu; silueta stačí na theming test. |
+| 1 | **Persona lock** | ✅ **schváleno**: 2026-07-20 Ishida; **2026-07-21 rozšířeno na TŘI postavy — Ishida (platforma + Putyka/Camp) · Joe (světy vč. chatu světa) · Měďák (jen TM, v2)**; repliky „zatím", ladění jen úpravou 02 §2.1 | Blokuje všechny texty; řeší kolizi „Vypravěč = PJ"; TM dostane tematického výcvikáře (úsečné rozkazy = ideální formát kroků). |
+| 2 | **Grafika** (3 sady: Ishida 10 · Joe 10 · Měďák 4 assety) | Vlastník generuje z [02a-prompty-grafika.md](02a-prompty-grafika.md); pořadí masteři → kontrola (silueta/rozpoznatelnost) → busty; do dodání placeholder silueta | Grafika nesmí blokovat architekturu; Měďák bez siluety (TM nemá FAB). |
 | 3 | **26.2 v betě:** stretch lehký checklist vs. jen rozcestník | Stretch S1 — celý blok, když zbyde čas; ✎ krok 3 „Tvoje postava" jako čekací stav + „hotovo z tvé strany" po kroku 2, timeout 7 dní → tip na jiný svět | Hráči testerů-PJ dorazí během vlny 1 = nejcennější persona; progress 2/3 navždy u mrtvého světa demotivuje. |
 | 4 | **Uvítací/ukázkový svět (25.4)** s publicShowcase jako cíl „Najdi stůl" | Ano, 1 oficiální svět spravovaný vlastníkem; do té doby fallback Putyka/Camp | Sociální akce nesmí čekat na schválení PJ; Vypravěč nesmí slibovat, co katalog nedá. |
 | 5 | **Push v betě:** zákaz nových kategorií/připomínek; Ishidův hlas v textech existujících notifikací | Potvrdit zákaz; hlas ano, ale až stretch S4 | Špatně načasovaný personifikovaný push poškodí důvěru v postavu; textová úprava = nulové riziko. |
@@ -98,7 +98,7 @@ Wrap 4 in-situ „?" helpů + mapping test audience (PomocnýPJ nesmí tiše ztr
 
 ### 4.4 v2 (po vlně 1, ~2–3 týdny rozložené)
 
-Plné cesty 26.2 + 26.3 · 10 návodů 26.5 + slovníček · tenké topiky všech rout · Kronika UI + tři fáze vztahu + readiness odemykání · rozšířené milníky · push kategorie `vypravec` (rozhodnutí vlastníka) · admin dashboard trychtýře v /admin Přehledu · WS `onboarding:updated` · coverage hard-fail + allowlist · empty-states plošně · highlight polish · zbylé pózy grafiky · start rozřezu HelpPage (nejdřív data-driven sekce).
+Plné cesty 26.2 + 26.3 · **hloubkový průvodce taktické mapy s Měďákem** (cesta scéna→tokeny→mlha/LoS→iniciativa→orchestrace + série návodů; doručení přes „?" panel a proužek — TM je kolizní plocha) · 10 návodů 26.5 + slovníček · tenké topiky všech rout · Kronika UI + tři fáze vztahu + readiness odemykání · rozšířené milníky · push kategorie `vypravec` (rozhodnutí vlastníka) · admin dashboard trychtýře v /admin Přehledu · WS `onboarding:updated` · coverage hard-fail + allowlist · empty-states plošně · highlight polish · zbylé pózy grafiky · start rozřezu HelpPage (nejdřív data-driven sekce).
 
 ### 4.5 v3 (růst)
 
@@ -133,7 +133,7 @@ LlmBrain za flagem (RAG nad registrem, Haiku, cache, rate-limit, strop) · dokon
 |---|---|
 | 00-vize-a-rozhodnuti.md | (tento dokument) vize, vazba na roadmap3, rozhodnutí vlastníka, fázování, rizika |
 | [01-mapa-prostoru.md](01-mapa-prostoru.md) | mapa prostoru platformy: routy + tiery, top-10 zákysů, chybové kódy → topiky, kolizní plochy, 18 oblastí (zadání obsahové výroby) |
-| [02-persona-a-grafika.md](02-persona-a-grafika.md) | Ishida, terminologické pravidlo, style-guide hlasu, few-shot repliky, grafický brief |
+| [02-persona-a-grafika.md](02-persona-a-grafika.md) | tři postavy (Ishida · Joe · Měďák), terminologické pravidlo, style-guide tří hlasů, few-shot repliky vč. předávacích, grafický brief; prompty v [02a-prompty-grafika.md](02a-prompty-grafika.md) |
 | [03-interakcni-model.md](03-interakcni-model.md) | kotva/povrchy, inventura pravého dolního rohu + kolizní politika (`--fab-shift`), stavy, push/pull ústava, mobil/desktop, a11y |
 | [04-architektura.md](04-architektura.md) | registr, kontextový a checklist engine, persistence, vyhledávání, theming, výkon, brain šev; telemetrie §5.6 |
 | [05-retence-a-cesty.md](05-retence-a-cesty.md) | persona volba, cesty 26.1/26.2/26.3, milníky, graduace, push, anti-dark-patterns; metriky/vyhodnocení §9 |

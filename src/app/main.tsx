@@ -62,7 +62,14 @@ createRoot(document.getElementById("root")!).render(
           {/* 15B.1 — signál pro prerender (kdy je SPA domalovaná). No-op pro lidi. */}
           <PrerenderReady />
           <RouterProvider router={router} />
-          <Toaster position="bottom-right" theme="dark" richColors />
+          {/* Spec 26.1 — offset: toasty stackují NAD FAB Vypravěče (16+56+12). */}
+          <Toaster
+            position="bottom-right"
+            theme="dark"
+            richColors
+            offset={{ bottom: 84, right: 16 }}
+            mobileOffset={{ bottom: 76 }}
+          />
           {/* 15.1 — PWA install hint (sám se skryje ve standalone / po dismissu) */}
           <InstallBanner />
           {/* 15.1-followup — detekce nasazené nové verze → „Obnovit" (řeší

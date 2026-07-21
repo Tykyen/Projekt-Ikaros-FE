@@ -37,7 +37,9 @@ docs/funkce/ kapitola
         ↓
 AI draft dle šablon §4  (prompt ZAKAZUJE tvrzení mimo zdrojovou kapitolu)
         ↓
-voice pass  (style-guide + few-shot repliky; ZDE se ručně plní HelpTopic.status)
+voice pass  (style-guide + few-shot repliky; ZDE se ručně plní HelpTopic.status.
+  MLUVČÍHO určuje scope: platformní routy + Putyka/Camp = Ishida · in-world = Joe ·
+  TM = Měďák (v2) — tři hlasy dle 02 §2, mluvčí se v registru NEukládá, derivuje se ze scope)
         ↓
 dev review diffu (čtení, ne psaní) → commit (git = verzování obsahu, deploy = deploy obsahu)
 ```
@@ -86,7 +88,7 @@ NÁVOD 'navod.pozvi-hrace' — „Pozvi hráče do světa" (source: kap. 09)
 
 ### 4.3 KROK CESTY — návod s persistencí a progresem
 
-= `JourneyStep` ([04-architektura.md](04-architektura.md)): `narratorLine` (Ishidova replika, flavor limit 1/8) + `cta` deep-link + `done: DoneCondition` (probe = zdroj pravdy, event = jen trigger oslavy) + `topicId?` („chci vědět víc") + `skipAllowed: true` + `estMin`. Kroky 2+ cesty se scopují na `contextWorldId` cesty; deep-linky i probe z něj doplňují worldSlug. Krok cílící na kolizní plochu doručí repliku PŘED vstupem (viz interakční model), completion event ji jen potvrdí.
+= `JourneyStep` ([04-architektura.md](04-architektura.md)): `narratorLine` (replika; mluvčí dle scope — 02 §1; flavor limit 1/8) + `cta` deep-link + `done: DoneCondition` (probe = zdroj pravdy, event = jen trigger oslavy) + `topicId?` („chci vědět víc") + `skipAllowed: true` + `estMin`. Kroky 2+ cesty se scopují na `contextWorldId` cesty; deep-linky i probe z něj doplňují worldSlug. Krok cílící na kolizní plochu doručí repliku PŘED vstupem (viz interakční model), completion event ji jen potvrdí.
 
 Ukázka = doslovná citace kanonického kroku `pj.otevri-branu` z [05-retence-a-cesty.md](05-retence-a-cesty.md) §3 (kroky se definují JEN tam, tady se necitují ve třetí variantě):
 
@@ -226,7 +228,7 @@ Kandidáti hned za hranou (Tier 1): PIN_LIMIT/NOT_FAVORITE, 403 profil jen pro p
 
 ### 5.2 Tier 1 (v2)
 
-Tenké topiky všech zbylých rout (s voice passem, ne stroje) · slovníček ~15 hesel (sdílet s docs/glossary/) · 10 návodů 26.5: Založ a otevři svět · První postava · První hod · Pozvi hráče · Od prázdné mapy k boji · Mlha války/LoS · První wiki + [[wikilink]] · Kalendář a herní čas · Obchod a peníze · Najdi spoluhráče · prohloubení dle telemetrie děr (P1 oblasti: TM, wiki+AKJ, profil/soukromí, nábory, Putyka/Camp TTL).
+Tenké topiky všech zbylých rout (s voice passem, ne stroje) · slovníček ~15 hesel (sdílet s docs/glossary/) · 10 návodů 26.5: Založ a otevři svět · První postava · První hod · Pozvi hráče · První wiki + [[wikilink]] · Kalendář a herní čas · Obchod a peníze · Najdi spoluhráče · prohloubení dle telemetrie děr (P1 oblasti: wiki+AKJ, profil/soukromí, nábory, Putyka/Camp TTL). **TM povýšena z 2 návodů na hloubkový průvodce s Měďákem** (rozhodnutí vlastníka 2026-07-21): cesta `tm-vycvik` (scéna→tokeny→mlha/LoS→iniciativa→orchestrace) + návody efekty · per-player scény · knihovna map · export — detail [05-retence-a-cesty.md](05-retence-a-cesty.md) §5b.
 
 ### 5.3 Tier 2 (v3)
 

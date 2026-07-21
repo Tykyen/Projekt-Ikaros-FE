@@ -62,6 +62,7 @@ import { SYSTEM_LANDINGS_PUBLIC } from '@/features/ikaros/pages/SystemLanding/fl
 import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendshipsSocket';
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
 import { useWorldInviteSocket } from '@/features/world/hooks/useWorldInviteSocket';
+import { VypravecRoot } from '@/shared/vypravec/ui/VypravecRoot';
 import { useAdminChatLive } from '@/features/admin/chat/api/useAdminChatLive';
 import { useAdminChatUnreadTotal } from '@/features/admin/chat/api/useAdminChat';
 import {
@@ -1005,6 +1006,9 @@ export function IkarosLayout() {
               módu (stejný gate jako pravý panel). */}
           {showRightPanel && <SiteFooter />}
         </main>
+
+        {/* Spec 26.1 — Vypravěč (Ishida): kotva FAB, platformní scope. */}
+        <VypravecRoot scope="ikaros" />
 
         {showRightPanel && (
           <aside className={s.rightPanel} data-frame-panel="right">

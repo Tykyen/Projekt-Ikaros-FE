@@ -1,7 +1,7 @@
 # Vypravěč · 02a — Generační prompty grafiky (Ishida + Joe)
 
 Stav: podklad · 2026-07-21 · Příloha k [02-persona-a-grafika.md](02-persona-a-grafika.md) (persona, akceptační testy, pipeline po dodání)
-Model dvou průvodců (návrh, čeká potvrzení vlastníka): **Ishida = šéf, globální/platformní scope · Joe = agentka v terénu, scope světů.** Kompozičně proti sobě: Ishida doleva, Joe doprava.
+Model TŘÍ postav (✅ potvrzeno vlastníkem 2026-07-21): **Ishida = šéf, platforma + Putyka/Camp · Joe = agentka v terénu, světy vč. chatu světa · Měďák = výcvikář, POUZE taktická mapa (v2).** Kompozice: Ishida doleva, Joe doprava, Měďák mírné 3/4 doleva.
 
 ## Pravidla generace (platí pro všechny prompty)
 
@@ -11,11 +11,14 @@ Model dvou průvodců (návrh, čeká potvrzení vlastníka): **Ishida = šéf, 
 4. **IP / osobnostní práva:**
    - Ishida: odlišení od předlohy (Mefisto Feles) je zapracované v definici — viz 02 §3.1a; test rozpoznatelnosti blokuje schválení masteru.
    - Joe: referenční obrázek je **vlastní AI generát vlastníka (potvrzeno 2026-07-21)** → image-to-image povoleno; vlastník ji stejně generuje znovu z promptů níže. Kdyby se kdy měnila reference, pravidlo trvá: z fotky reálné osoby nikdy.
-5. Soubory: `ishida-*.png` / `joe-*.png`, 2048×2048, do `src/assets/vypravec/` (viz 02 §3.6). Reference-předlohy se NIKDY necommitují.
+5. Soubory: `ishida-*.png` / `joe-*.png` / `medak-*.png`, 2048×2048, do `src/assets/vypravec/` (viz 02 §3.6). Reference-předlohy se NIKDY necommitují.
+6. Měďák: reference = vlastní AI generát vlastníka (2026-07-21); z reference se VYPOUŠTÍ sklenička a kanadská vlajka (v promptech vynuceno „no flag, no glass").
 
 ---
 
 ## ISHIDA — šéf (globální)
+
+> ✅ **Master I-1 SCHVÁLEN (v2, 2026-07-21):** ~40 let, odstup od předlohy prošel, silueta silná. Odchylky masteru přijaté do kánonu: **tmavě fialové boty** (místo černých — sedí do palety) · **fialová podšívka kabátu** · cyan lampas na kalhotách. **Busty I-2 až I-8 generovat VÝHRADNĚ image-to-image z tohoto masteru / stejný seed**, v promptech používat „slender man in his early 40s, subtle expression lines"; pozadí držet green screen jako u masteru (konzistentní ořez).
 
 Společný popis (v každém promptu): štíhlý gentleman neurčitého věku · temně fialovočerné vlasy sčesané na stranu · jantarové oči · lidské uši · hladce oholený · vlídný úsměv se zavřenými rty · půlnočně indigový cylindr se zářícím pásem cyan→magenta a mosazným klíčkem za pásem · slonovinový dvouřadý kabát s vysokým límcem, mosazné knoflíky, cyan prošití · tmavě indigová vesta · sytě magentový askot · krémové rukavice · mosazný špendlík-klíč na hrudi.
 
@@ -63,6 +66,8 @@ Semi-realistic painterly character illustration, detailed stylized digital paint
 
 ## JOE — agentka v terénu (světy)
 
+> ✅ **Master J-1 SCHVÁLEN (2026-07-21).** Odchylky masteru přijaté do kánonu: **kožená brašna přes rameno** · opasky + stehenní řemínky · tmavé kožené kalhoty a boty · drobná náušnice. Master vyšel víc čelně — **u bust J-2 až J-8 v promptu ZDŮRAZNIT „three-quarter view facing right"** (párování s Ishidou na společných plochách). Busty výhradně image-to-image z masteru / stejný seed; průhledné pozadí držet.
+
 Společný popis: mladá žena · dlouhé tmavé zvlněné vlasy · výrazné modré oči · klidný sebejistý přátelský výraz · praktický elegantní tmavý cestovní kabát s vysokým límcem a drobnými mosaznými knoflíky · tmavě indigový šátek/šála · rukavice bez prstů · **mosazný klíček na šňůrce na krku** (znak Ishidovy organizace) · **malá mosazná ruční lucerna** s teplou cyan-magenta září (podpis siluety).
 
 ### J-1 · joe-master.png (full body)
@@ -107,7 +112,35 @@ Semi-realistic painterly character illustration, detailed stylized digital paint
 
 ---
 
-## Siluety (oba, nakonec)
+## MĚĎÁK — výcvikář taktické mapy (v2; redukovaná sada — TM nemá FAB, silueta se negeneruje)
+
+> ✅ **Avatar M-1 SCHVÁLEN (2026-07-21).** Generátor vypekl kruhový ořez přímo do obrázku — pro avatar OK (CSS kruh se vejde dovnitř), ale **u bust M-2 až M-4 do promptu přidat „full rectangular frame, no circular crop"** (busty jdou do bublin jako obdélníkové výřezy). Busty image-to-image z M-1 / stejný seed.
+
+Společný popis: ramenatý voják ~50 let · krátké měděně kaštanové vlasy a plnovous stejné barvy · zvětralá tvář s drobnou jizvou na lícní kosti · soustředěný přísný, ale ne nepřátelský výraz · zelená polní košile s digitálním kamufláž vzorem · **mosazná nášivka ve tvaru klíče na náprsní kapse** (znak organizace) · psí známky. **ZÁKAZ z reference: žádná sklenička, žádná kanadská vlajka.**
+
+### M-1 · medak-avatar.png (avatar „?" panelu TM)
+```text
+Semi-realistic painterly character illustration, detailed stylized digital painting, soft cinematic lighting, rich but limited palette, strong readable shapes. Medak, a rugged veteran drill instructor: broad-shouldered man around 40, short copper-auburn hair and full copper-auburn beard, weathered face with a small scar on the cheekbone, focused stern but not hostile expression; green digital-camo field shirt with a small brass key-shaped patch on the chest pocket; dog tags. POSE: head and shoulders portrait, composed for a circular avatar crop, bold simple shapes readable at very small size. Slight three-quarter view facing left. Transparent background, no text, no flag, no glass, not a photograph, not anime, no watermark. 2048x2048.
+```
+
+### M-2 · medak-bust-instruuje.png (kroky průvodce)
+```text
+Semi-realistic painterly character illustration, detailed stylized digital painting, soft cinematic lighting, rich but limited palette, strong readable shapes. Medak, a rugged veteran drill instructor: broad-shouldered man around 40, short copper-auburn hair and full copper-auburn beard, weathered face with a small scar on the cheekbone, focused instructive expression; green digital-camo field shirt with a small brass key-shaped patch on the chest pocket; dog tags. POSE: waist-up, pointing forward with two fingers in a tactical briefing gesture. Slight three-quarter view facing left. Strong readable silhouette. Transparent background, no text, no flag, no glass, not a photograph, not anime, no watermark, consistent character sheet style. 2048x2048.
+```
+
+### M-3 · medak-bust-schvaluje.png (splněný krok / pochvala)
+```text
+Semi-realistic painterly character illustration, detailed stylized digital painting, soft cinematic lighting, rich but limited palette, strong readable shapes. Medak, a rugged veteran drill instructor: broad-shouldered man around 40, short copper-auburn hair and full copper-auburn beard, weathered face with a small scar on the cheekbone, faint approving smile under the beard; green digital-camo field shirt with a small brass key-shaped patch on the chest pocket; dog tags. POSE: waist-up, arms crossed, short approving nod. Slight three-quarter view facing left. Strong readable silhouette. Transparent background, no text, no flag, no glass, not a photograph, not anime, no watermark, consistent character sheet style. 2048x2048.
+```
+
+### M-4 · medak-bust-varuje.png (destruktivní akce na TM)
+```text
+Semi-realistic painterly character illustration, detailed stylized digital painting, soft cinematic lighting, rich but limited palette, strong readable shapes. Medak, a rugged veteran drill instructor: broad-shouldered man around 40, short copper-auburn hair and full copper-auburn beard, weathered face with a small scar on the cheekbone, serious warning expression; green digital-camo field shirt with a small brass key-shaped patch on the chest pocket; dog tags. POSE: waist-up, one raised palm in a firm calm stop gesture, not threatening. Slight three-quarter view facing left. Strong readable silhouette. Transparent background, no text, no flag, no glass, not a photograph, not anime, no watermark, consistent character sheet style. 2048x2048.
+```
+
+---
+
+## Siluety (Ishida + Joe, nakonec)
 
 Image-to-image z hotového schváleného assetu (Ishida: I-1 a I-3 · Joe: J-1 a J-3), týž prompt:
 ```text

@@ -3,7 +3,9 @@
 Stav: podklad · 2026-07-20 · Vazby: roadmap3 fáze 26.1–26.4 (cesty + volba persony), 26.5 (návody, v2), 28.2 (vyhodnocení bety)
 Sousední podklady: [02-persona-a-grafika.md](02-persona-a-grafika.md) (style-guide replik) · [03-interakcni-model.md](03-interakcni-model.md) (bubliny, lišta kroku, kolizní plochy) · [04-architektura.md](04-architektura.md) (persistence, eventy, probe, telemetrie, backfill)
 
-Retenční princip: vztah s postavou, ne mechanika. Žádné body/streaky/badges — progres = done-log prezentovaný Ishidou. Cíl: první úspěch persony do minut, sociální akce ≤ 24 h, důvod k návratu.
+Retenční princip: vztah s postavami, ne mechanika. Žádné body/streaky/badges — progres = done-log prezentovaný průvodci. Cíl: první úspěch persony do minut, sociální akce ≤ 24 h, důvod k návratu.
+
+**Mluvčí (model tří postav, potvrzen 2026-07-21 — detail 02 §1):** kroky na platformních routách mluví **Ishida**, kroky uvnitř světa **Joe**; **předávací beat** = první vstup do světa (replika 9 v 02 §2.1: „Tady moje chodby končí. Tohle je Joe…"). U cesty 26.1 tedy krok 1 (wizard) = Ishida, kroky 2–5 = Joe. Taktická mapa (v2 hloubkový průvodce) = **Měďák**, předání replikou 10.
 
 ---
 
@@ -34,7 +36,7 @@ interface Journey { id: string; persona: 'pj'|'hrac'|'worldbuilder';
 interface JourneyStep {
   id: string;                  // 'pj.zaloz-svet'
   title: string;
-  narratorLine: string;        // Ishidova replika dle style-guide (02): ≤200 znaků, max 2 věty, tykání
+  narratorLine: string;        // replika dle style-guide (02); mluvčího určuje scope kroku (platforma=Ishida, svět=Joe, TM=Měďák)
   cta: { label: string; to: string };  // ':worldSlug' doplní engine z contextWorldId
   anchor?: AnchorId;
   done: DoneCondition;
@@ -174,6 +176,10 @@ interface WaitingState {
 ## 5. Cesta 26.3 — Worldbuilder (v2; MVP jen rozcestník)
 
 MVP: rozcestník topiků (svět jako ateliér · wiki + [[wikilink]] · Pavučina · výkladní skříň). Plná cesta v2 (~15 min), engine totožný — přidání je obsahová práce:
+
+### 5b. Hloubkový průvodce taktické mapy (v2; mluvčí Měďák) — rozhodnutí vlastníka 2026-07-21
+
+TM je nejnáročnější modul platformy → dostane vlastní hloubkovou cestu `tm-vycvik` (persona pj, worldBinding 'joins'): **scéna → tokeny → mlha/LoS → iniciativa → orchestrace** (+ Tier 1 návody: efekty, per-player scény, knihovna map, export). Specifika: TM = kolizní plocha (FAB skrytý) → doručení výhradně přes „?" panel a sbalený proužek; předání Joe→Měďák replikou 10 (02 §2.1); Měďákův úsečný rozkazový formát = přirozený tvar kroků. Engine totožný s ostatními cestami — jen obsah + mluvčí.
 
 ```ts
 const WORLDBUILDER: Journey = { id:'wb-start', persona:'worldbuilder', estimateMin:15, phases:[

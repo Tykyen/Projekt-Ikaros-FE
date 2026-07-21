@@ -39,6 +39,7 @@ import { WorldRequestsBell } from '@/features/world/components/WorldRequests';
 import { resolvePersona } from './resolvePersona';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
 import { WorldVoiceHost } from '@/features/voice/components/WorldVoiceHost';
+import { VypravecRoot } from '@/shared/vypravec/ui/VypravecRoot';
 
 /* ── Nav ── */
 // Systémová nav + filtrace + vlastní headline (12.2) žijí v `worldNavConfig.ts`
@@ -850,6 +851,9 @@ export function WorldLayout() {
         {/* 17.6 — hlasový hovor světa; hostuje se tu (mimo Outlet), aby přežil
             přechod mapa↔chat. Zobrazí se jen když je session aktivní. */}
         {realWorldId && <WorldVoiceHost />}
+
+        {/* Spec 26.1 — Vypravěč (Joe): kotva FAB, world scope. */}
+        <VypravecRoot scope="world" worldName={world?.name} />
       </div>
     </WorldContext.Provider>
   );

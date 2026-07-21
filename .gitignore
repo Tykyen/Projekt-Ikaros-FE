@@ -60,3 +60,4 @@ Thumbs.db
 
 # Claude Code runtime zámek scheduleru — regeneruje se, nepatří do gitu
 .claude/scheduled_tasks.lock
+src/assets/vypravec/raw/
