@@ -13,6 +13,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
+import { resolveRouteHeader, type VypravecWorldInfo } from '../engine/resolveHeader';
 import { VypravecFab } from './VypravecFab';
 
 const VypravecPanel = lazy(() => import('./VypravecPanel'));
@@ -36,10 +37,10 @@ function useKlavesniceOtevrena(): boolean {
 
 export function VypravecRoot({
   scope,
-  worldName,
+  world,
 }: {
   scope: 'ikaros' | 'world';
-  worldName?: string;
+  world?: VypravecWorldInfo;
 }) {
   const { pathname } = useLocation();
   const [otevreny, setOtevreny] = useState(false);
@@ -100,7 +101,12 @@ export function VypravecRoot({
       />
       {otevreny && (
         <Suspense fallback={null}>
-          <VypravecPanel scope={scope} worldName={worldName} onClose={zavrit} />
+          <VypravecPanel
+            scope={scope}
+            worldName={world?.name}
+            header={resolveRouteHeader(pathname, world)}
+            onClose={zavrit}
+          />
         </Suspense>
       )}
     </div>

@@ -3,7 +3,10 @@
  * Mimo svět mluví Ishida (silueta cylindr), ve světě Joe (silueta lucerna) —
  * placeholder siluety do dodání grafiky (02a). Stav „spí" = jen na zavolání.
  */
-import { SiluetaCylindr, SiluetaLucerna } from './siluety';
+import { SiluetaLucerna } from './siluety';
+import ishidaAvatarWebp96 from '@/assets/vypravec/ishida-avatar-96.webp';
+import ishidaAvatarWebp192 from '@/assets/vypravec/ishida-avatar-192.webp';
+import ishidaAvatarPng from '@/assets/vypravec/ishida-avatar.png';
 import s from './Vypravec.module.css';
 
 export function VypravecFab({
@@ -28,7 +31,19 @@ export function VypravecFab({
       aria-haspopup="dialog"
       onClick={onClick}
     >
-      {scope === 'world' ? <SiluetaLucerna /> : <SiluetaCylindr />}
+      {scope === 'world' ? (
+        /* ve světě tokenizovaná silueta Joe (currentColor — 12 motivů zdarma) */
+        <SiluetaLucerna />
+      ) : (
+        /* mimo svět brand avatar Ishidy (03 §1) */
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={`${ishidaAvatarWebp96} 1x, ${ishidaAvatarWebp192} 2x`}
+          />
+          <img src={ishidaAvatarPng} alt="" className={s.fabImg} />
+        </picture>
+      )}
     </button>
   );
 }

@@ -7,8 +7,19 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SiluetaCylindr, SiluetaLucerna } from './siluety';
+import type { ResolvedHeader } from '../engine/resolveHeader';
+import ishidaAvatarWebp96 from '@/assets/vypravec/ishida-avatar-96.webp';
+import ishidaAvatarWebp192 from '@/assets/vypravec/ishida-avatar-192.webp';
+import ishidaAvatarPng from '@/assets/vypravec/ishida-avatar.png';
+import joeAvatarWebp96 from '@/assets/vypravec/joe-avatar-96.webp';
+import joeAvatarWebp192 from '@/assets/vypravec/joe-avatar-192.webp';
+import joeAvatarPng from '@/assets/vypravec/joe-avatar.png';
 import s from './Vypravec.module.css';
+
+const AVATARY = {
+  ikaros: { webp96: ishidaAvatarWebp96, webp192: ishidaAvatarWebp192, png: ishidaAvatarPng },
+  world: { webp96: joeAvatarWebp96, webp192: joeAvatarWebp192, png: joeAvatarPng },
+} as const;
 
 /** Mosazný klíč — podpisová odrážka menu (znak Ishidovy organizace). */
 function Klic() {
@@ -33,10 +44,12 @@ function Klic() {
 export default function VypravecPanel({
   scope,
   worldName,
+  header,
   onClose,
 }: {
   scope: 'ikaros' | 'world';
   worldName?: string;
+  header: ResolvedHeader | null;
   onClose: () => void;
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
@@ -87,30 +100,44 @@ export default function VypravecPanel({
       />
       <header className={s.vstupenka}>
         <div className={s.kdeJsem}>
-          <span className={s.avatar} aria-hidden="true">
-            {scope === 'world' ? <SiluetaLucerna size={24} /> : <SiluetaCylindr size={24} />}
+          <span className={s.avatar}>
+            <picture>
+              <source
+                type="image/webp"
+                srcSet={`${AVATARY[scope].webp96} 1x, ${AVATARY[scope].webp192} 2x`}
+              />
+              <img
+                src={AVATARY[scope].png}
+                alt=""
+                loading="lazy"
+                className={s.avatarImg}
+              />
+            </picture>
           </span>
           <div>
             <div className={s.kdeLabel} id="vypravec-kde-jsem">
               Kde jsem
             </div>
             <p className={s.kdeText}>
-              {scope === 'world'
-                ? worldName
-                  ? `Jsi ve světě ${worldName}.`
-                  : 'Jsi uvnitř světa.'
-                : 'Jsi na platformě Ikaros.'}
+              {header ? (
+                <>
+                  <strong>{header.name}</strong> — {header.text}
+                </>
+              ) : scope === 'world' ? (
+                worldName ? (
+                  `Jsi ve světě ${worldName}. Tenhle kout nemám zmapovaný ani já — mrkni do plné nápovědy.`
+                ) : (
+                  'Jsi uvnitř světa. Tenhle kout nemám zmapovaný ani já — mrkni do plné nápovědy.'
+                )
+              ) : (
+                'Jsi na platformě Ikaros. Tenhle kout je neprobádaný i pro mě — nahlédni do plné nápovědy.'
+              )}
             </p>
           </div>
         </div>
       </header>
 
       <div className={s.telo}>
-        <p className={s.poznamka}>
-          {scope === 'world'
-            ? 'Jsem Joe — tvůj průvodce světy. Učím se mluvit; zatím ti posvítím aspoň na plnou nápovědu.'
-            : 'Jsem Ishida — tohle místo jsem stvořil. Učím se mluvit; zatím tě zavedu do plné nápovědy.'}
-        </p>
         <ul className={s.menu}>
           <li>
             <Link to="/ikaros/napoveda" onClick={onClose}>

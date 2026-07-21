@@ -852,8 +852,16 @@ export function WorldLayout() {
             přechod mapa↔chat. Zobrazí se jen když je session aktivní. */}
         {realWorldId && <WorldVoiceHost />}
 
-        {/* Spec 26.1 — Vypravěč (Joe): kotva FAB, world scope. */}
-        <VypravecRoot scope="world" worldName={world?.name} />
+        {/* Spec 26.1/26.2 — Vypravěč (Joe): kotva FAB, world scope + role pro
+            role-aware hlavičku „Kde jsem". */}
+        <VypravecRoot
+          scope="world"
+          world={{
+            name: world?.name,
+            userRole: (membership?.role ?? null) as WorldRole | null,
+            isPJ,
+          }}
+        />
       </div>
     </WorldContext.Provider>
   );

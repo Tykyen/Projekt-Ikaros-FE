@@ -41,6 +41,22 @@
   opacity: 0.45;
   filter: saturate(0.5);
 }
+.fabImg,
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+.fab picture,
+.avatar picture {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  display: block;
+}
 @media (max-width: 768px) {
   .fab {
     width: 44px;

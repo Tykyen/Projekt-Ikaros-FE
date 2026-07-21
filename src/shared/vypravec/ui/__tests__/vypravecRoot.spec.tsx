@@ -5,12 +5,20 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { WorldRole } from '@/shared/types';
 import { VypravecRoot } from '../VypravecRoot';
 
 function mountAt(path: string, scope: 'ikaros' | 'world' = 'ikaros') {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <VypravecRoot scope={scope} worldName="Askalon" />
+      <VypravecRoot
+        scope={scope}
+        world={
+          scope === 'world'
+            ? { name: 'Askalon', userRole: WorldRole.Hrac, isPJ: false }
+            : undefined
+        }
+      />
     </MemoryRouter>,
   );
 }
@@ -53,19 +61,30 @@ describe('VypravecRoot — panel: otevření, Esc, focus restore', () => {
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toBeInTheDocument();
     expect(screen.getByText('Kde jsem')).toBeInTheDocument();
-    // ikaros scope → mluví Ishida
-    expect(screen.getByText(/Jsi na platformě Ikaros/)).toBeInTheDocument();
+    // ikaros scope, routa '/' má RouteHeader (spec 26.2) → hlavička Úvodník
+    expect(screen.getByText('Úvodník')).toBeInTheDocument();
+    expect(screen.getByText(/Rozcestník celé platformy/)).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(document.activeElement).toBe(fab);
   });
 
-  it('world scope → hlavička nese název světa (mluví Joe)', async () => {
+  it('world scope → RouteHeader s role-aware dovětkem pro Hráče (mluví Joe)', async () => {
     mountAt('/svet/askalon/stranky', 'world');
     fireEvent.click(screen.getByRole('button', { name: FAB_LABEL }));
-    expect(await screen.findByText(/Jsi ve světě Askalon/)).toBeInTheDocument();
+    expect(await screen.findByText('Encyklopedie')).toBeInTheDocument();
+    // audience dovětek pro Hráče (spec 26.2 R3 — aditivní)
+    expect(screen.getByText(/Navrhnout/)).toBeInTheDocument();
     expect(screen.getByText(/Joe · Vypravěč/)).toBeInTheDocument();
+  });
+
+  it('nepokrytá routa → poctivý fallback, žádný stub', async () => {
+    mountAt('/ikaros/akce');
+    fireEvent.click(screen.getByRole('button', { name: FAB_LABEL }));
+    expect(
+      await screen.findByText(/Tenhle kout je neprobádaný i pro mě/),
+    ).toBeInTheDocument();
   });
 });
 
