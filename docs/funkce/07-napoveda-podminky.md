@@ -93,3 +93,24 @@ Krátká kapitola: vestavěná stránka Nápověda (6 tabů, statická), Podmín
 - ~~Podmínky jsou placeholder (verze 0.1)~~ — **vyřešeno.** Vydána verze 1.0 (11 sekcí, bez `[DOPLNIT]`), patička `TermsPage.tsx:170` hlásí `1.0` a **shoduje se** se server-side konstantou `AuthService.TERMS_VERSION = '1.0'` (`backend/src/modules/auth/auth.service.ts:109`) ukládanou při registraci (`auth.service.ts:206`). Zbývá jen finální právní revize advokátem po beta.
 - ~~Media sloty — k ověření, kolik je dodáno~~ — **ověřeno:** `media.ts:20–76` má 10 klíčů a u **všech** `src: undefined` → dodáno **0 z 10**. `ScreenshotSlot` renderuje prázdný stav, `IllustrationSlot` nic. Zbývá dodat obrázky (seznam v `docs/arch/phase-13/napoveda-screenshoty.md`).
 - ~~Nápověda popisuje úvodní stránku jinak, než ji renderuje kód~~ — **vyřešeno**, FAQ „Co najdu na úvodní stránce po přihlášení?" (`FaqSection.tsx:44`) je srovnané s realitou.
+
+---
+
+## Vypravěč (in-app průvodce) — spec 26.x, přidáno 2026-07-22
+
+**Co to je:** postava-průvodce (mimo svět **Ishida**, ve světech **Joe**) = nápověda + navigace + tutoriál. Kódem ověřeno k 2026-07-22.
+
+**FE (`src/shared/vypravec/`):**
+- **Kotva FAB** vpravo dole (`ui/VypravecFab.tsx`) — mimo svět Ishida avatar, ve světě Joe; skrytá na kolizních routách (`kolizniRouty.ts`: chat/TM/editory) a při otevřené mobilní klávesnici; z-index 190, bottom-stack `--voice-host-h`/`--pwa-banner-h`; zkratka Shift+V, Esc zavírá, focus trap (`ui/VypravecRoot.tsx`, `ui/VypravecPanel.tsx`).
+- **Panel** — blok A „Kde jsem" (`registry/routeHeaders.ts`, 25 rout Tier 0), blok B „K věci" (max 4 karty z `registry/topics.ts` — **21 hlubokých topiků** dle číselníku 06 §5.1b, per routa+publikum), blok C menu; TopicView s patičkou „Pomohlo ti to?" (telemetrie ±).
+- **Persona dialog (26.4)** — jediné auto-otevření: čerstvý účet po GET (`state:null, legacy:false`); volba pj/hrac/worldbuilder/rozhlédnu; zavření bez volby = dismiss navždy. Legacy účty (starší než `VYPRAVEC_RELEASE_DATE`) dialog nedostanou — FE backfill seedne `seenRoutes`.
+- **Cesta 26.1 „PJ Start"** (`registry/journeys/pjStart.ts`, 5 kroků) — engine `engine/journeyEngine.ts`: fixace `contextWorldId` (event `world.created` / probe návštěvy vlastního světa), event match s payloadem (zpráva v Putyce krok „Napiš do svého světa" NEsplní), lišta kroku + 32px proužek na kolizních plochách (`ui/JourneyBar.tsx`).
+- **Bubliny** (`ui/bublinaStore.ts`) — jediná proaktivní forma: „Poprvé tady?" (whitelist 12 rout `registry/netrivialniRouty.ts`), chybová mapa (2× táž chyba/session → vysvětlení; `registry/errorTopics.ts` 10 kódů + 403/404), empty-states 3× (`registry/emptyStates.ts`). Auto-tichý režim: 3 zavřené tipy → `onCall` + rozlučka.
+- **Persistence** (`state/onboardingStore.ts`) — localStorage-first, PATCH debounce 2 s, keepalive flush, anon→účet delta merge.
+- **Telemetrie** (`state/telemetry.ts`) — batch 5 s, 10 eventů, jen přihlášení.
+
+**BE (`backend/src/modules/user-onboarding/`):** `GET/PATCH /users/me/onboarding` (JwtAuthGuard; merge set-union/$min/LWW/first-write-wins, escapování teček v ID) · `POST /vypravec/telemetry` (batch ≤50, TTL 90 dní) · self-delete cleanup obojího · `npm run vypravec:funnel` (trychtýř + D2/D7 + obsahové díry).
+
+**CI pojistky:** `registry/__tests__/registrValidace.spec.ts` (unikátní ID, mrtvé routy/akce) · e2e `persona.spec.ts` (dialog→volba→lišta) · 50+ unit testů.
+
+**Vědomé mezery:** cesty 26.2/26.3 jen rozcestníky (plné v2) · fulltext „Zeptat se" = stretch S2 · in-situ „?" helpy zatím legacy obsah (parita MVP-B) · D-078 zúžen (NPC probe) · Měďák/TM průvodce = v2.

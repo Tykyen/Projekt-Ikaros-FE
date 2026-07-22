@@ -19,6 +19,34 @@ export type VypravecAudience =
   | 'pj'
   | 'admin';
 
+/**
+ * Hluboký topik Tier 0 (06 §5.1b — kanonický číselník ID; spec 26.6).
+ * Tělo = typované bloky, ne markdown (žádný parser v bundlu, žádné XSS).
+ * `source` kotví tvrzení do docs/funkce/ (řetěz pravdy 06 §2).
+ */
+export interface HelpTopic {
+  /** Stabilní ID z kanonického číselníku 06 §5.1b (deep-link, dismiss, telemetrie). */
+  id: string;
+  title: string;
+  /** Synonyma/žargon pro budoucí fulltext (S2). */
+  tags: string[];
+  /** Kde se topik nabízí v bloku „K věci" (typováno proti registru rout). */
+  routes: RoutePattern[];
+  /** undefined = všichni. Filtruje NABÍDKU karty, ne obsah (minAudienceNote). */
+  audience?: VypravecAudience[];
+  /** Vysvětlení pro publikum POD prahem („tohle dělá tvůj PJ"). */
+  minAudienceNote?: string;
+  /** Odstavce 1–3 věty; kroky = číslovaný postup (šablona TOPIK 06 §4.1). */
+  body: { odstavce: string[]; kroky?: string[] };
+  /** Max 2 navigační akce (deep-link v rámci platformy). */
+  akce?: { label: string; to: string }[];
+  /** Kotva do docs/funkce/ (kapitola NN) + datum posledního ověření. */
+  source: { kapitola: string };
+  verifiedAt: string;
+  /** Poctivost u 🚧 (06 §4.2): 'funkcni' | 'castecne' | 'stub'. */
+  status: 'funkcni' | 'castecne' | 'stub';
+}
+
 /** Kontextová hlavička „Kde jsem" (panel, blok A). */
 export interface RouteHeader {
   /** Typováno proti route registru (spec 26.0) — překlep spadne v tsc. */

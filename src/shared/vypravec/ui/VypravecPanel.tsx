@@ -1,16 +1,22 @@
 /**
- * Spec 26.1 — panel Vypravěče (desktop rohový panel / mobilní bottom-sheet).
- * Shell BEZ enginu (D5): poctivá hlavička „Kde jsem" per scope + odkaz na
- * plnou nápovědu. Žádné mrtvé položky menu — přibývají až s funkcí.
- * A11y: role dialog (nemodální), focus trap, Esc zavírá (řeší VypravecRoot),
- * po zavření focus zpět na FAB (řeší VypravecRoot).
+ * Spec 26.1/26.6 — panel Vypravěče (desktop rohový panel / mobilní bottom-sheet).
+ * Bloky (03 §8.1): A) „Kde jsem" hlavička · B) „K věci" kontextové karty
+ * (max 4 topiky pro routu+publikum) · C) trvalé menu. TopicView s povinnou
+ * patičkou zpětné vazby „Pomohlo ti to?" (telemetrie feedback ±).
+ * A11y: role dialog (nemodální), focus trap, Esc/focus řeší VypravecRoot.
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { ResolvedHeader } from '../engine/resolveHeader';
+import { topikyProRoutu, topikPodleId } from '../registry/topics';
+import type { HelpTopic } from '../registry/types';
+import { doplnSlug } from '../engine/journeyEngine';
+import { telemetrie } from '../state/telemetry';
 import ishidaAvatarWebp96 from '@/assets/vypravec/ishida-avatar-96.webp';
 import ishidaAvatarWebp192 from '@/assets/vypravec/ishida-avatar-192.webp';
 import ishidaAvatarPng from '@/assets/vypravec/ishida-avatar.png';
+import ishidaVitaWebp from '@/assets/vypravec/ishida-bust-vita-256.webp';
+import ishidaVitaPng from '@/assets/vypravec/ishida-bust-vita.png';
 import joeAvatarWebp96 from '@/assets/vypravec/joe-avatar-96.webp';
 import joeAvatarWebp192 from '@/assets/vypravec/joe-avatar-192.webp';
 import joeAvatarPng from '@/assets/vypravec/joe-avatar.png';
@@ -53,9 +59,96 @@ const PERSONA_VOLBY: Array<{
   { persona: null, titul: 'Jen se rozhlédnu', popis: 'Dobře. Kdybys mě potřeboval, víš, kde mě najdeš.' },
 ];
 
+function TopicView({
+  topik,
+  worldSlug,
+  onZpet,
+  onClose,
+}: {
+  topik: HelpTopic;
+  worldSlug?: string;
+  onZpet: () => void;
+  onClose: () => void;
+}) {
+  const [feedback, setFeedback] = useState<'ano' | 'ne' | null>(null);
+  return (
+    <div>
+      <button type="button" className={s.zpet} onClick={onZpet}>
+        ← Zpět
+      </button>
+      <h2 className={s.topikTitul}>{topik.title}</h2>
+      {topik.body.odstavce.map((o) => (
+        <p key={o.slice(0, 24)} className={s.topikOdstavec}>
+          {o}
+        </p>
+      ))}
+      {topik.body.kroky && (
+        <ol className={s.topikKroky}>
+          {topik.body.kroky.map((k) => (
+            <li key={k.slice(0, 24)}>{k}</li>
+          ))}
+        </ol>
+      )}
+      {topik.minAudienceNote && (
+        <p className={s.poznamka}>{topik.minAudienceNote}</p>
+      )}
+      {topik.akce?.map((a) => (
+        <Link
+          key={a.to}
+          to={doplnSlug(a.to, worldSlug)}
+          className={s.topikAkce}
+          onClick={onClose}
+        >
+          {a.label} →
+        </Link>
+      ))}
+      <div className={s.feedback}>
+        {feedback === null ? (
+          <>
+            <span>Pomohlo ti to?</span>
+            <button
+              type="button"
+              className={s.ctaTiche}
+              onClick={() => {
+                telemetrie('feedback_plus', { refId: topik.id });
+                setFeedback('ano');
+              }}
+            >
+              Ano
+            </button>
+            <button
+              type="button"
+              className={s.ctaTiche}
+              onClick={() => {
+                telemetrie('feedback_minus', { refId: topik.id });
+                setFeedback('ne');
+              }}
+            >
+              Ne
+            </button>
+          </>
+        ) : feedback === 'ano' ? (
+          <span>Dobře. Kdykoli znovu.</span>
+        ) : (
+          <span>
+            Rozumím.{' '}
+            <Link to="/ikaros/napoveda" onClick={onClose}>
+              Zkus plnou nápovědu
+            </Link>{' '}
+            — a já to předám dál.
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function VypravecPanel({
   scope,
   worldName,
+  worldSlug,
+  pattern,
+  audience,
   header,
   personaVolba,
   onPersona,
@@ -63,6 +156,11 @@ export default function VypravecPanel({
 }: {
   scope: 'ikaros' | 'world';
   worldName?: string;
+  worldSlug?: string;
+  /** Route pattern pro nabídku topiků (blok B). */
+  pattern: string | null;
+  /** Publikum (audienceZRole / anon / prihlaseny). */
+  audience: string;
   header: ResolvedHeader | null;
   /** true = obsah panelu je volba persony (auto-open po registraci). */
   personaVolba?: boolean;
@@ -70,6 +168,7 @@ export default function VypravecPanel({
   onClose: () => void;
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
+  const [topikId, setTopikId] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   // Focus trap: fokus dovnitř při otevření, Tab cykluje uvnitř panelu.
@@ -101,6 +200,14 @@ export default function VypravecPanel({
     return () => root.removeEventListener('keydown', onKey);
   }, []);
 
+  const topik = topikId ? topikPodleId(topikId) : undefined;
+  const karty = topikyProRoutu(pattern, audience).slice(0, 4);
+
+  function otevriTopik(id: string) {
+    setTopikId(id);
+    telemetrie('topic_open', { refId: id, route: pattern ?? undefined });
+  }
+
   return (
     <div
       ref={ref}
@@ -117,19 +224,27 @@ export default function VypravecPanel({
       />
       <header className={s.vstupenka}>
         <div className={s.kdeJsem}>
-          <span className={s.avatar}>
-            <picture>
-              <source
-                type="image/webp"
-                srcSet={`${AVATARY[scope].webp96} 1x, ${AVATARY[scope].webp192} 2x`}
-              />
-              <img
-                src={AVATARY[scope].png}
-                alt=""
-                loading="lazy"
-                className={s.avatarImg}
-              />
-            </picture>
+          <span className={s.avatar} data-vita={personaVolba || undefined}>
+            {personaVolba ? (
+              /* uvítání = vita busta (smeknutí) místo malého avataru */
+              <picture>
+                <source type="image/webp" srcSet={ishidaVitaWebp} />
+                <img src={ishidaVitaPng} alt="" loading="lazy" className={s.avatarImg} />
+              </picture>
+            ) : (
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet={`${AVATARY[scope].webp96} 1x, ${AVATARY[scope].webp192} 2x`}
+                />
+                <img
+                  src={AVATARY[scope].png}
+                  alt=""
+                  loading="lazy"
+                  className={s.avatarImg}
+                />
+              </picture>
+            )}
           </span>
           <div>
             <div className={s.kdeLabel} id="vypravec-kde-jsem">
@@ -171,15 +286,41 @@ export default function VypravecPanel({
               </button>
             ))}
           </div>
+        ) : topik ? (
+          <TopicView
+            topik={topik}
+            worldSlug={worldSlug}
+            onZpet={() => setTopikId(null)}
+            onClose={onClose}
+          />
         ) : (
-          <ul className={s.menu}>
-            <li>
-              <Link to="/ikaros/napoveda" onClick={onClose}>
-                <Klic />
-                Plná nápověda
-              </Link>
-            </li>
-          </ul>
+          <>
+            {karty.length > 0 && (
+              <>
+                <div className={s.sekceLabel}>K věci</div>
+                <div className={s.personaVolby}>
+                  {karty.map((k) => (
+                    <button
+                      key={k.id}
+                      type="button"
+                      className={s.personaVolba}
+                      onClick={() => otevriTopik(k.id)}
+                    >
+                      {k.title}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            <ul className={s.menu}>
+              <li>
+                <Link to="/ikaros/napoveda" onClick={onClose}>
+                  <Klic />
+                  Plná nápověda
+                </Link>
+              </li>
+            </ul>
+          </>
         )}
       </div>
 

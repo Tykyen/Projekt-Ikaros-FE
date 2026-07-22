@@ -9,6 +9,7 @@ import { ROUTE_HEADERS } from '../routeHeaders';
 import { CHYBOVE_TOPIKY, CHYBOVE_STATUSY } from '../errorTopics';
 import { CESTY } from '../journeys/pjStart';
 import { NETRIVIALNI_ROUTY } from '../netrivialniRouty';
+import { TOPIKY } from '../topics';
 
 const znameRouty = new Set<string>(ROUTES.map((r) => r.pattern));
 
@@ -46,6 +47,19 @@ describe('registr Vypravěče — validace (CI)', () => {
         if (k.done.kind === 'visit')
           expect(znameRouty.has(k.done.route), `visit ${k.done.route}`).toBe(true);
       }
+    }
+  });
+
+  it('topiky: unikátní ID + routy i akce existují v registru rout', () => {
+    const ids = TOPIKY.map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const topik of TOPIKY) {
+      for (const r of topik.routes)
+        expect(znameRouty.has(r), `topik ${topik.id} routa ${r}`).toBe(true);
+      for (const a of topik.akce ?? [])
+        expect(znameRouty.has(a.to), `topik ${topik.id} akce ${a.to}`).toBe(true);
+      expect(topik.body.odstavce.length, `topik ${topik.id} bez těla`).toBeGreaterThan(0);
+      expect(topik.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
   });
 

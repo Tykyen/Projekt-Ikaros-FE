@@ -164,7 +164,7 @@ Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 
 **FE:** tlačítko v patičce/hlavičce → modal/stránka; potvrzení „díky, sledujeme"; odkaz i z nápovědy a FAQ. Do ContactPage doplnit provozní e-mail (existuje — fallback kanál).
 **Otevřené otázky:** screenshot příloha ve V1, nebo jen text+kontext? Notifikace admina (Discord webhook při novém reportu)?
 
-### - [ ] 25.2 Post-registrační navedení — [dopad vysoký · náklad malý]
+### - [x] 25.2 Post-registrační navedení — [dopad vysoký · náklad malý] ✅ 2026-07-22 Vypravěčem (persona dialog 26.4 + rozcestníky + empty-states; spec-26.4/26.6)
 **Dnes paradox:** anon má panel „Začni tady" + uvítací kartu s CTA — **registrací obojí zmizí**; nový uživatel s 0 světy vidí generický pozdrav.
 **FE:** CTA řada („Prozkoumej světy / Najdi nábor / Vytvoř svět / Prohlédni ukázkový svět") i pro přihlášeného s 0 světy; checklist „Začni tady" ponechat členům bez světa. Váže na 26.4.
 
@@ -196,23 +196,23 @@ Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whi
 ## Fáze 26 — Segmentový onboarding 👑
 **Rešerše ROI #1 a #7: „Bez aktivace se žádná další funkce nepočítá."** Tři oddělené první cesty místo jednoho obřího průvodce (nahrazuje kartu 22.3 v beta podobě; plný wizard zůstává jako pozdější rozšíření).
 
-### - [ ] 26.1 PJ Start — [dopad vysoký · náklad střední] 👑
+### - [x] 26.1 PJ Start — [dopad vysoký · náklad střední] 👑 ✅ 2026-07-22 cesta „pj-start" ve Vypravěči (5 kroků, contextWorldId scope, probe rekonsiliace; spec-26.4) — čeká živé ověření na čerstvém účtu
 **Cíl:** nový PJ do ~15 minut: šablona světa → pozvánka hráčům → jednoduchá postava → první zpráva/scéna → ví o exportu. Cílová úspěšnost ~70 % bez pomoci (měříme v kohortě A ručně, later 19.1 funnel).
 **Návrh:** vedený tok „Založ svět" (výběr šablony/klonu z 25.5 → checklist prvních kroků v dashboardu světa → CTA pozvánky WorldInvite → CTA první scény). 🔁 reuse: šablony světů/stránek, WorldInvite (15.10), empty states 15.6, mapDefaults.
 **Otevřené otázky:** checklist persistentní per svět (dismiss), nebo jen do prvního splnění? Kolik šablon světa do startu?
 
-### - [ ] 26.2 Cesta hráče — [dopad vysoký · náklad malý]
+### - [ ] 26.2 Cesta hráče — [dopad vysoký · náklad malý] 🚧 částečně 2026-07-22: rozcestník ve volbě persony + topiky vstupu (svet.vstup, zadatel); plný checklist = stretch S1/v2
 **Cíl:** pozvaný hráč do ~7 minut: invite link → jasná role → postava/převzetí postavy → odpověď v chatu → notifikace zapnuté. Cílová úspěšnost ~80 %.
 **Návrh:** po přijetí pozvánky landing „Co teď" (postava → chat → deník); prázdné stavy vedou k akci. 🔁 reuse WorldInvite + přihláška s postavou (15.10).
 
-### - [ ] 26.3 Cesta worldbuildera — [dopad střední · náklad malý]
+### - [ ] 26.3 Cesta worldbuildera — [dopad střední · náklad malý] 🚧 částečně 2026-07-22: rozcestník (navigace na vytvořit-svět); plná cesta v2
 **Cíl:** do ~15 minut: první článek → vztah/pavučina → bod na mapě → veřejné/read-only sdílení (vitrína 22.4). Cílová úspěšnost ~70 %.
 **Návrh:** checklist v prázdném světě bez hráčů; provázat s osnovami stránek (15.5) a atlasem.
 
-### - [ ] 26.4 Kontextové tipy & checklist po registraci — [dopad střední · náklad malý]
+### - [x] 26.4 Kontextové tipy & checklist po registraci — [dopad střední · náklad malý] ✅ 2026-07-22 (persona dialog — jediné auto-otevření; volba se ukládá do UserOnboardingState.persona = odpověď na otevřenou otázku ANO; tipy „Poprvé tady?" + chybová mapa + auto-tichý režim)
 Lehká vrstva nad 25.2: po registraci volba „Chci vést hru / Hrát / Tvořit svět" → nasměrování do 26.1/26.2/26.3. Žádný intruzivní tour framework — checklist + empty-state CTA. **Otevřená otázka:** volbu ukládat (persona pro dashboard), nebo jen jednorázově navigovat?
 
-### - [ ] 26.5 Krátké návody v nápovědě — [dopad střední · náklad malý]
+### - [ ] 26.5 Krátké návody v nápovědě — [dopad střední · náklad malý] 🚧 základ 2026-07-22: 21 hlubokých Tier 0 topiků v panelu Vypravěče (registry/topics.ts); 10 samostatných návodů = v2
 10–15 návodů, **každý řeší jeden úkol do 5 minut** (založ svět, pozvi hráče, první scéna, hod v chatu, mapa+tokeny, deník, export…). 🔁 reuse HelpPage struktury; naplnit ScreenshotSloty reálnými snímky (spolupráce: uživatel dodá screenshoty).
 
 ---

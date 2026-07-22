@@ -74,6 +74,7 @@ export function StartSection() {
             { term: 'Hlavička', desc: 'Logo (na úvodník), přepínač motivů, zvonek (notifikace), Pošta, Profil, Odhlásit. U anonyma Přihlásit / Registrace.' },
             { term: 'Levý sidebar', desc: 'Navigace, seznam vesmírů a chat. Po přihlášení i Diskuze, Vytvořit svět a Camp; nepřihlášenému se tyhle skryjí (zůstává Úvodník, Nápověda, Články, Galerie, vesmíry a Putyka).' },
             { term: 'Hlavní panel', desc: 'Obsah aktuální stránky. Nepřihlášenému se na úvodníku navíc ukáže pás ukázek z aplikace.' },
+            { term: 'Vypravěč', desc: 'Kulaté tlačítko vpravo dole (zkratka Shift+V) — průvodce platformou. Mimo světy tě provází Ishida, uvnitř světů Joe: řekne, kde jsi, poradí k místu, kde stojíš, a nové Pány jeskyně provede založením světa krok za krokem. Po registraci se jednou zeptá, co tu chceš dělat — podle toho tě nasměruje.' },
             { term: 'Pravý panel', desc: 'Po přihlášení administrace, moje světy a oblíbené. Bez přihlášení tu najdeš „Začni tady" — tři kroky, jak se zapojit.' },
             { term: 'Zvonek', desc: 'Souhrn zpráv ze všech tvých světů + záložky Události a Ke zpracování.' },
             { term: 'Hledání', desc: 'Uvnitř světa pole „Hledat…" (Ctrl+K) prohledá stránky aktuálního světa.' },

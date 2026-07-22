@@ -23,7 +23,11 @@ import { useAtomValue } from 'jotai';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
-import { resolveRouteHeader, type VypravecWorldInfo } from '../engine/resolveHeader';
+import {
+  audienceZRole,
+  resolveRouteHeader,
+  type VypravecWorldInfo,
+} from '../engine/resolveHeader';
 import { onboardingStore, zapojFlush } from '../state/onboardingStore';
 import {
   aktivniCesta,
@@ -249,6 +253,15 @@ export function VypravecRoot({
           <VypravecPanel
             scope={scope}
             worldName={world?.name}
+            worldSlug={world?.worldSlug}
+            pattern={pattern}
+            audience={
+              scope === 'world'
+                ? audienceZRole(world?.userRole)
+                : userId
+                  ? 'prihlaseny'
+                  : 'anon'
+            }
             header={resolveRouteHeader(pathname, world)}
             personaVolba={personaVolba}
             onPersona={zvolPersonu}
