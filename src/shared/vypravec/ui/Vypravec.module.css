@@ -77,7 +77,8 @@
   z-index: 191;
   display: flex;
   flex-direction: column;
-  background: var(--surface-2);
+  /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
+  background: linear-gradient(var(--surface-2), var(--surface-2)), var(--bg);
   border: 1px solid color-mix(in srgb, var(--acc) 35%, var(--frame-border));
   box-shadow: 0 24px 60px color-mix(in srgb, var(--acc) 18%, transparent);
   overflow: hidden;
@@ -276,7 +277,8 @@
   gap: 12px;
   padding: 8px 10px 8px 14px;
   border-radius: var(--radius-full);
-  background: var(--surface-2);
+  /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
+  background: linear-gradient(var(--surface-2), var(--surface-2)), var(--bg);
   border: 1px solid color-mix(in srgb, var(--acc) 40%, var(--frame-border));
   box-shadow: 0 12px 34px color-mix(in srgb, var(--acc) 20%, transparent);
   max-width: min(92vw, 560px);
@@ -313,7 +315,8 @@
   position: absolute;
   inset: 3px;
   border-radius: var(--radius-full);
-  background: var(--surface-2);
+  /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
+  background: linear-gradient(var(--surface-2), var(--surface-2)), var(--bg);
 }
 .kruh span {
   position: relative;
@@ -381,7 +384,8 @@
   gap: 10px;
   padding: 0 12px;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--surface-2) 92%, transparent);
+  /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
+  background: linear-gradient(var(--surface-2), var(--surface-2)), var(--bg);
   border: 1px solid color-mix(in srgb, var(--acc) 30%, var(--frame-border));
   color: var(--text-strong);
   font-size: var(--text-xs);
@@ -391,6 +395,54 @@
 }
 .prouzek .mini {
   color: var(--acc);
+}
+
+/* ── Bublina (jediná proaktivní forma, 03 §3) ──────────────────────────── */
+.bublina {
+  position: fixed;
+  right: 16px;
+  bottom: calc(
+    16px + env(safe-area-inset-bottom, 0px) + var(--voice-host-h, 0px) +
+      var(--pwa-banner-h, 0px) + 60px
+  );
+  z-index: 190;
+  max-width: min(320px, calc(100vw - 32px));
+  /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
+  background: linear-gradient(var(--surface-2), var(--surface-2)), var(--bg);
+  border: 1px solid color-mix(in srgb, var(--acc) 40%, var(--frame-border));
+  border-radius: var(--radius-sm) var(--radius-sm) 4px var(--radius-sm);
+  padding: 12px 30px 12px 14px;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--acc) 20%, transparent);
+}
+.bublinaText {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-md);
+  line-height: 1.45;
+  color: var(--text-strong);
+}
+.bublinaZavrit {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  padding: 4px 6px;
+}
+.bublinaZavrit:hover {
+  color: var(--text-strong);
+}
+.bublinaZavrit:focus-visible {
+  outline: 2px solid var(--acc);
+}
+.bublinaAkce {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: center;
 }
 
 /* ── Persona volba (26.4 — obsah panelu, ne modal) ─────────────────────── */

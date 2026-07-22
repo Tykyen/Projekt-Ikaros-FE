@@ -1,0 +1,54 @@
+/**
+ * Spec 26.5 (D9) — vizuál bubliny u kotvy (03 §3): repliky kurzívou
+ * (hlas postavy), max 1 CTA + tiché zavření; role="status" (aria-live polite).
+ */
+import { useSyncExternalStore } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { bublinaStore } from './bublinaStore';
+import s from './Vypravec.module.css';
+
+export function VypravecBublina() {
+  const bublina = useSyncExternalStore(
+    bublinaStore.subscribe,
+    bublinaStore.getSnapshot,
+  );
+  const navigate = useNavigate();
+  if (!bublina) return null;
+
+  return (
+    <div className={s.bublina} role="status">
+      <button
+        type="button"
+        className={s.bublinaZavrit}
+        aria-label="Zavřít"
+        onClick={() => bublinaStore.zavrit()}
+      >
+        ✕
+      </button>
+      <p className={s.bublinaText}>{bublina.text}</p>
+      {bublina.akce && (
+        <div className={s.bublinaAkce}>
+          <button
+            type="button"
+            className={s.cta}
+            onClick={() => {
+              const { to, onClick } = bublina.akce!;
+              bublinaStore.interakce();
+              if (onClick) onClick();
+              else if (to) navigate(to);
+            }}
+          >
+            {bublina.akce.label}
+          </button>
+          <button
+            type="button"
+            className={s.ctaTiche}
+            onClick={() => bublinaStore.zavrit()}
+          >
+            Teď ne
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

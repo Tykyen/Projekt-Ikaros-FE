@@ -31,6 +31,10 @@ import {
   zpracujNavstevu,
 } from '../engine/journeyEngine';
 import { vypravecEmit } from '../engine/events';
+import { zapojChybovouMapu } from '../engine/chybovaMapa';
+import { NETRIVIALNI_ROUTY } from '../registry/netrivialniRouty';
+import { bublinaStore } from './bublinaStore';
+import { VypravecBublina } from './VypravecBublina';
 import { JourneyBar } from './JourneyBar';
 import { VypravecFab } from './VypravecFab';
 
@@ -77,6 +81,7 @@ export function VypravecRoot({
   useEffect(() => {
     zapojFlush();
     zapojJourneyEngine();
+    zapojChybovouMapu();
     let idleId: number | undefined;
     let timerId: number | undefined;
     if (typeof window.requestIdleCallback === 'function') {
@@ -91,12 +96,26 @@ export function VypravecRoot({
     };
   }, []);
 
-  // Moment 2 podklad (03 §4): záznam viděné routy (data pro „poprvé tady")
-  // + visit podmínky kroků cesty (D7).
+  // Moment 2 (03 §4): „Poprvé tady?" na whitelistu netriviálních rout —
+  // kontrola PŘED záznamem (jinak by routa byla „viděná" dřív, než promluvíme).
+  // Odchod z routy tip zavírá bez penalizace (03 §3). Pak záznam + visit kroky.
   useEffect(() => {
-    if (pattern) onboardingStore.zaznamenejRoutu(pattern);
+    bublinaStore.zmiz();
+    if (pattern) {
+      const uzVidel = onboardingStore
+        .getSnapshot()
+        .seenRoutes.includes(pattern);
+      if (!uzVidel && NETRIVIALNI_ROUTY.has(pattern) && !kolizni) {
+        bublinaStore.show({
+          dismissKey: `prvni:${pattern}`,
+          text: 'Poprvé tady? Provedu tě.',
+          akce: { label: 'Ukaž mi to', onClick: () => setOtevreny(true) },
+        });
+      }
+      onboardingStore.zaznamenejRoutu(pattern);
+    }
     zpracujNavstevu(pathname);
-  }, [pattern, pathname]);
+  }, [pattern, pathname, kolizni]);
 
   // D7 — probe rekonsiliace ve world scope (gateOpened z accessMode; slug
   // resync pro deep-linky). Probe = zdroj pravdy, auto-odškrtne i zpětně.
@@ -206,6 +225,7 @@ export function VypravecRoot({
         spi={onboarding.mode === 'onCall'}
         onClick={() => setOtevreny((o) => !o)}
       />
+      {!otevreny && <VypravecBublina />}
       {akt && !otevreny && (
         <JourneyBar akt={akt} kolizni={false} jinySvet={jinySvet} />
       )}

@@ -1,5 +1,6 @@
 ﻿import axios, { type AxiosError } from 'axios';
 import { toast } from 'sonner';
+import { ohlasApiChybu } from '@/shared/vypravec/engine/chybovyKanal';
 import { getDefaultStore } from 'jotai';
 import { router } from '@/app/router';
 import { saveLoginIntent } from '@/shared/lib/loginIntent';
@@ -169,6 +170,12 @@ apiClient.interceptors.response.use(
     } else {
       markBackendUp();
     }
+    // Vypravěč (spec 26.5): 2× táž chyba za session → vysvětlující bublina.
+    // Bezzávislostní kanál (žádný import vypravec enginu — kruh přes store).
+    ohlasApiChybu(
+      code != null ? String(code) : null,
+      error.response?.status ?? null,
+    );
     return Promise.reject(error);
   },
 );
