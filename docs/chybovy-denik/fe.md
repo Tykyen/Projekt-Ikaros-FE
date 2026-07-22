@@ -2419,3 +2419,12 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Zhodnocení:** **dobře** — bisekce jako první krok ušetřila hodiny hledání neexistující chyby ve vlastním kódu; debug spec s console capture = rychlá cesta k příčině u E2E. **Poučení:** červené CI ihned po tvém pushi ≠ důkaz, že to způsobil tvůj push — deterministická reprodukce na starším commitu je otázka za 10 minut a rozhodne směr pátrání.
 
 ---
+
+### CH-131 — Fixed prvek mountnutý jako přímé dítě grid kontejneru ukradl sloupec (ADMINISTRACE spadla doleva) · 2026-07-22
+**Kontext:** Vypravěč D3–D4, mount `<VypravecRoot/>` do IkarosLayoutu.
+**Co jsem udělal špatně:** mount jsem vložil mezi `<main>` a pravý `<aside>` UVNITŘ `.body`, což je grid `sidebar 1fr 280px`. FAB je `position:fixed`, tak jsem strukturu neřešil — jenže wrapper komponenty je pořád GRID ITEM: zabral třetí sloupec (slot pravého panelu) a skutečný pravý panel (ADMINISTRACE) auto-placement přetekl na další řádek pod levý sidebar. Lokálně jsem to neviděl (testy layout DOM nekontrolují gridové sloupce, vizuálně jsem netestoval — fb_tests_live), našel to až vlastník na produkci.
+**Proč to nefungovalo:** `position:fixed` vyjme prvek z FLOW, ale NE z grid placementu rodiče — dítě gridu dostane buňku vždy, i když je vizuálně jinde.
+**Poučení:** overlay/fixed komponenty mountovat MIMO layoutové grid/flex kontejnery (za jejich uzavírací tag, případně portál). Před mountem do cizího layoutu si přečíst jeho CSS — „je to fixed, nevadí kam to dám" je past. WorldLayout přežil jen náhodou (mount vedle VoiceHostu mimo grid).
+**Příznak cyklení:** po přidání „neviditelné" komponenty se přeskládal sousední sloupec/panel; hledám chybu v CSS komponenty místo v pozici mountu.
+
+---

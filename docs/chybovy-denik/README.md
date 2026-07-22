@@ -4,7 +4,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 
 **Hlavní účel: NECYKLIT SE + vědět, co už jsem zkusil a jak to dopadlo.** Než zkusím další variaci nějaké opravy, projdu **tenhle index** (je krátký — jen řádky). Když tu vidím podobný už neúspěšný pokus, **nezkouším ho znovu** — změním přístup od základu, nebo se zeptám. Záznam `✅ ŘEŠENÍ` naopak ukazuje, co u dané oblasti zabralo (a proč), ať na to navazuju, ne to bořím.
 
-> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-131.**
+> Pravidlo: tutéž chybu 2× = STOP. · **Příští ID: CH-132.**
 >
 > ℹ️ **Řada má díru `CH-083`–`CH-119`** — ta čísla nebyla NIKDY přidělena (ověřeno přes celou git historii), nic se neztratilo; nepřečíslovávej kvůli ní a neplň ji zpětně. Reálně použito: `CH-001`–`CH-082` + `CH-120`–`CH-129`.
 >
@@ -29,6 +29,7 @@ Záznam **vlastních chyb, omylů a slepých uliček** (`CH-xxx`) **i řešení 
 | [✅ ŘEŠENÍ](be.md#-řešení--bestiář-jako-jediný-komunitní-katalog-neuměl-mazat-návrhy--idor-díra--chybějící-ux--2026-07-19) | be | Bestiář (postaven před rodinou 7 katalogů) jediný neuměl mazat community návrhy — FE bez tlačítka, BE `assertCanWrite` bez community větve → generický `DELETE /bestiae/:id` = **IDOR** (kdokoli smaže i schválené). Fix: community authz (autor-draft \|\| kurátor) + FE tlačítko; audit potvrdil ostatních 7 OK | UX symptom může krýt IDOR — prošetři do kódu; odchylka od „vzoru rodiny" bývá i bezpečnostní → zkontroluj CELOU rodinu |
 | [✅ ŘEŠENÍ](ops.md#-řešení--236-ověřovací-brána-před-deployem-odhalila-mylnou-premisu-runbooku-žádný-caddy-server-za-nat--2026-07-19) | ops | 23.6: runbook lhal (žádný Caddy, server za NAT leafhostu) — ověřovací brána před deployem zachránila prod; loopback bind ZAKÁZÁN; opravy přes server-check/server-hardening workflowy (diagnose/apply + auto-rollback) | serverový zásah dle runbooku bez diagnostiky reality |
 | [✅ ŘEŠENÍ](fe.md#-řešení--feature-flag-skrytí-veřejných-rout-r3-258-landing-systémů-gate-loader-místo-podmíněné-registrace--2026-07-19) | fe | feature-flag routy = gate loader, NE podmíněná registrace (statický nav-audit vidí obě větve ternáru → ambiguita); testy psát flag-aware | audit:nav FAIL ambiguita po přidání flagu |
+| [CH-131](fe.md#ch-131--fixed-prvek-mountnutý-jako-přímé-dítě-grid-kontejneru-ukradl-sloupec-administrace-spadla-doleva--2026-07-22) | fe | `position:fixed` vyjme z flow, NE z grid placementu — wrapper VypravecRoot ukradl sloupec pravého panelu; overlay komponenty mountovat MIMO grid/flex kontejnery | po přidání „neviditelné" komponenty se přeskládal sousední panel; ladím CSS komponenty místo pozice mountu |
 | [CH-001](tisk.md#ch-001--izolace-přes-visibilityhidden--positionabsolute-inset0--2026-06-20) | tisk | `visibility:hidden`+`absolute;inset:0` → ořez na 1 stránku | ladím inset/position, obsah se ořezává |
 | [CH-002](tisk.md#ch-002--klon-do-body-byl-celý-neviditelný--2026-06-20) | tisk | klon do `<body>` měl obsah, ale celý neviditelný | „klon má obsah", ale tisk prázdný |
 | [CH-003](tisk.md#ch-003--barva-přes-rgbvar--black-rgb-se-v-klonu-nedědila--2026-06-20) | tisk | řešil jsem barvu, ač skryté bylo úplně vše | ladím barvy, ale nevidím vůbec nic |
