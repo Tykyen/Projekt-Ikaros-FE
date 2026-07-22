@@ -18,7 +18,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
 import { resolveRouteHeader, type VypravecWorldInfo } from '../engine/resolveHeader';
@@ -124,6 +124,7 @@ export function VypravecRoot({
     });
   }, []);
 
+  const navigate = useNavigate();
   const zvolPersonu = useCallback(
     (p: 'pj' | 'hrac' | 'worldbuilder' | null) => {
       onboardingStore.nastavPersonu(p);
@@ -131,9 +132,13 @@ export function VypravecRoot({
       vypravecEmit('persona.chosen');
       setPersonaVolba(false);
       setOtevreny(false);
+      // Volba naviguje na první krok (26.2/26.3 plné cesty = v2; rozcestník
+      // MVP): PJ startuje cestu 26.1, hráč jde hledat stůl, tvůrce zakládat.
       if (p === 'pj') startCesty('pj-start');
+      else if (p === 'hrac') navigate('/ikaros/vesmiry');
+      else if (p === 'worldbuilder') navigate('/ikaros/vytvorit-svet');
     },
-    [],
+    [navigate],
   );
 
   const zavrit = useCallback(() => {

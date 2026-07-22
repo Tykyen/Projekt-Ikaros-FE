@@ -16,7 +16,10 @@
 
 ## Otevřené
 
-*(žádné — nové zapisuj sem)*
+### D-078 — Vypravěč: probe `hasOwnWorld` a `pagesAboveSeed` neimplementovány (kroky cesty spoléhají na event)
+**Kde:** `src/shared/vypravec/engine/journeyEngine.ts` (probeResync umí jen `gateOpened`) · **Od:** 2026-07-22 (spec-26.4 odchylka 2)
+**Dopad:** pravidlo „probe = zdroj pravdy, event = trigger" platí jen pro krok 4; kroky 1 a 3 se při ušlém eventu (zavřený tab před flushí, druhé zařízení) neodškrtnou zpětně — checklist může „lhát", dokud uživatel akci nezopakuje.
+**Návrh:** při D9–D11 doplnit probe čtením react-query cache (`worlds.mine` → hasOwnWorld + výběr contextWorldId u existujícího světa; pages directory count → pagesAboveSeed) v `probeResync`; test „akce mimo tutoriál se odškrtne zpětně".
 
 ---
 
