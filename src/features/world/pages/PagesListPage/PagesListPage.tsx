@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { Link } from 'react-router-dom';
 import { FilePlus2, Star } from 'lucide-react';
 import {
@@ -57,6 +58,14 @@ export default function PagesListPage() {
   // Elevation — admin má world bypass jen když je v tomto světě „nahozený".
   const canCreate =
     world?.elevated === true || (userRole ?? -1) >= WorldRole.PomocnyPJ;
+
+  // Vypravěč (spec 26.6, moment 3a): prázdná wiki světa — až po načtení.
+  useEffect(() => {
+    if (!isLoading && !isError && directory.length === 0)
+      vypravecReportEmpty('stranky-prazdne', {
+        to: `/svet/${worldSlug}/nova-stranka`,
+      });
+  }, [isLoading, isError, directory.length, worldSlug]);
 
   // Osobní oblíbené v uživatelově pořadí (read-only; reorder je na dashboardu).
   const favoriteEntries = useMemo(() => {

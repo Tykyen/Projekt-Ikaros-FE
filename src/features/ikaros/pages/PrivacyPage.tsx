@@ -75,6 +75,8 @@ export default function PrivacyPage() {
             <tr><td>Newsletter a marketingová sdělení</td><td>Souhlas (čl. 6/1/a)</td></tr>
             <tr><td>Platby a dobrovolná podpora</td><td>Smlouva + právní povinnost (doklady)</td></tr>
             <tr><td>Nezbytná funkční analytika</td><td>Oprávněný zájem (agregovaně)</td></tr>
+            {/* Spec 26.6 — telemetrie Vypravěče (rozhodnutí 7): poctivě vč. userId */}
+            <tr><td>Průvodce Vypravěč — měření aktivace (události onboardingu vázané na účet, bez identifikátorů tvých světů či stránek; hledané dotazy zkrácené na 200 znaků; automatický výmaz po 90 dnech a při smazání účtu)</td><td>Oprávněný zájem (zlepšování prvních kroků)</td></tr>
             <tr><td>Marketingové cookies / cross-site analytika</td><td>Souhlas (cookie lišta)</td></tr>
           </tbody>
         </table>

@@ -9,6 +9,7 @@
  * oslavy a rozlučka se nepočítají.
  */
 import { onboardingStore } from '../state/onboardingStore';
+import { telemetrie } from '../state/telemetry';
 
 export interface Bublina {
   /** dismiss klíč (persistence „nikdy víc"); oslavy klíč nemají. */
@@ -73,6 +74,8 @@ class BublinaStore {
     const b = this.aktualni;
     if (!b) return;
     if (b.dismissKey) onboardingStore.zavritTip(b.dismissKey);
+    if (b.dismissKey && !b.oslava)
+      telemetrie('dismissed', { refId: b.dismissKey });
     this.zmiz();
     if (b.oslava) return;
     let n = 0;

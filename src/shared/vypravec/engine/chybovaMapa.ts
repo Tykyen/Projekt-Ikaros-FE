@@ -6,12 +6,13 @@
 import { odebirejApiChyby, type ApiChyba } from './chybovyKanal';
 import { najdiChybovyTopik } from '../registry/errorTopics';
 import { bublinaStore } from '../ui/bublinaStore';
+import { telemetrie } from '../state/telemetry';
 
 const PREFIX = 'vypravec:err:';
 
 function zapocitej(ch: ApiChyba): number {
   const klic = `${PREFIX}${ch.code ?? ch.status}:${ch.route}`;
-  let n = 0;
+  let n: number;
   try {
     n = Number(sessionStorage.getItem(klic) ?? '0') + 1;
     sessionStorage.setItem(klic, String(n));
@@ -32,6 +33,7 @@ function zpracuj(ch: ApiChyba): void {
     text: topik.text,
     akce: topik.akce,
   });
+  telemetrie('topic_open', { refId: topik.id, route: ch.route });
 }
 
 let zapojeno = false;

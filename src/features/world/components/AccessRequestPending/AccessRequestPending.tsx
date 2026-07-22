@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { toast } from 'sonner';
 import { Button, ConfirmDialog } from '@/shared/ui';
 import { useCancelAccessRequest } from '@/features/world/api/useWorldJoin';
@@ -16,6 +17,10 @@ interface Props {
  */
 export function AccessRequestPending({ worldId, requestedAt }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  // Vypravěč (spec 26.6): Žadatel — čekání není chyba (top zákys).
+  useEffect(() => {
+    vypravecReportEmpty('zadatel-ceka');
+  }, []);
   const cancel = useCancelAccessRequest();
 
   const formattedDate = new Date(requestedAt).toLocaleDateString('cs-CZ', {

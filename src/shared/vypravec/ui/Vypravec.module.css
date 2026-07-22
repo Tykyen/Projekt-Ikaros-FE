@@ -17,7 +17,13 @@
   height: 48px;
   border-radius: var(--radius-full);
   border: 1.5px solid color-mix(in srgb, var(--acc) 55%, var(--frame-border));
-  background: color-mix(in srgb, var(--surface-2) 88%, var(--acc) 12%);
+  /* neprůhledný i FAB — surface-2 mívá alfu (živý test 2026-07-22) */
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--surface-2) 88%, var(--acc) 12%),
+      color-mix(in srgb, var(--surface-2) 88%, var(--acc) 12%)
+    ),
+    var(--bg);
   color: var(--text-strong);
   display: grid;
   place-items: center;

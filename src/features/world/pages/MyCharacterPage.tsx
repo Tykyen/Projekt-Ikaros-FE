@@ -1,4 +1,5 @@
 import { Navigate, Link } from 'react-router-dom';
+import { ReportEmpty } from '@/shared/vypravec/ui/ReportEmpty';
 import { Plus, UserSquare, BookUser } from 'lucide-react';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { Spinner } from '@/shared/ui';
@@ -56,6 +57,8 @@ export default function MyCharacterPage() {
           </>
         ) : (
           <>
+            {/* Vypravěč (spec 26.6): hráč bez postavy = top zákys */}
+            <ReportEmpty klic="moje-postava" to={`/svet/${worldSlug}/chat`} />
             <h1 className={s.title}>Zatím nemáš postavu</h1>
             <p className={s.body}>
               V tomto světě ti ještě nikdo nepřidělil postavu. Prohlédni si

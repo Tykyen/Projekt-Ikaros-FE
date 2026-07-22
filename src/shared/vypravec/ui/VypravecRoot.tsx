@@ -31,6 +31,7 @@ import {
   zpracujNavstevu,
 } from '../engine/journeyEngine';
 import { vypravecEmit } from '../engine/events';
+import { telemetrie, zapojTelemetriiFlush } from '../state/telemetry';
 import { zapojChybovouMapu } from '../engine/chybovaMapa';
 import { NETRIVIALNI_ROUTY } from '../registry/netrivialniRouty';
 import { bublinaStore } from './bublinaStore';
@@ -82,6 +83,7 @@ export function VypravecRoot({
     zapojFlush();
     zapojJourneyEngine();
     zapojChybovouMapu();
+    zapojTelemetriiFlush();
     let idleId: number | undefined;
     let timerId: number | undefined;
     if (typeof window.requestIdleCallback === 'function') {
@@ -125,8 +127,9 @@ export function VypravecRoot({
       worldId: world.worldId,
       worldSlug: world.worldSlug,
       accessMode: world.accessMode,
+      isPJ: world.isPJ,
     });
-  }, [scope, world?.worldId, world?.worldSlug, world?.accessMode]);
+  }, [scope, world?.worldId, world?.worldSlug, world?.accessMode, world?.isPJ]);
 
   // 26.4 — volba persony: JEDINÉ auto-otevření panelu vůbec (05 §1).
   // Jen čerstvý účet (jeNovy z GET), bez persony, nezavřený dialog, mimo kolizi.
@@ -149,6 +152,7 @@ export function VypravecRoot({
       onboardingStore.nastavPersonu(p);
       onboardingStore.zavritTip('persona-dialog');
       vypravecEmit('persona.chosen');
+      telemetrie('persona_chosen', { refId: p ?? 'rozhlednu' });
       setPersonaVolba(false);
       setOtevreny(false);
       // Volba naviguje na první krok (26.2/26.3 plné cesty = v2; rozcestník

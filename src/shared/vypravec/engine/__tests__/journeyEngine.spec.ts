@@ -73,6 +73,25 @@ describe('journeyEngine — cesta 26.1', () => {
     expect(aktivniCesta()?.hotovo.has('pj.rozhledni-se')).toBe(true);
   });
 
+  it('D-078: PJ navštíví svůj svět bez fixace → probe zafixuje + odškrtne krok 1', () => {
+    // žádný world.created event (zavřený tab / jiné zařízení)
+    probeResync({
+      worldId: 'w-probe',
+      worldSlug: 'probe-svet',
+      accessMode: 'private',
+      isPJ: true,
+    });
+    const akt = aktivniCesta();
+    expect(akt?.contextWorldId).toBe('w-probe');
+    expect(akt?.hotovo.has('pj.zaloz-svet')).toBe(true);
+    // ne-PJ svět nefixuje
+  });
+
+  it('D-078: návštěva CIZÍHO světa (ne-PJ) nefixuje', () => {
+    probeResync({ worldId: 'w-cizi', worldSlug: 'cizi', isPJ: false });
+    expect(aktivniCesta()?.contextWorldId).toBeUndefined();
+  });
+
   it('probe gateOpened: accessMode ≠ private splní krok 4 (i zpětně/jinde)', () => {
     vypravecEmit('world.created', { worldId: 'w-1', worldSlug: 'muj-svet' });
     probeResync({ worldId: 'w-1', worldSlug: 'muj-svet', accessMode: 'private' });

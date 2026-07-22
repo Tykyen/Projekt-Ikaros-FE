@@ -15,6 +15,7 @@ import {
   type VypravecEventPayload,
 } from './events';
 import { CESTY, type Journey, type JourneyStep } from '../registry/journeys/pjStart';
+import { telemetrie } from '../state/telemetry';
 
 export interface AktivniCesta {
   cesta: Journey;
@@ -52,6 +53,7 @@ export function startCesty(jId: string): void {
   onboardingStore.aplikuj({
     journeys: { [jId]: { startedAt: new Date().toISOString(), dismissedAt: null, pausedAt: null } },
   });
+  telemetrie('journey_started', { refId: jId });
 }
 
 export function pauzaCesty(jId: string, pauza: boolean): void {
@@ -64,12 +66,15 @@ export function zrusitCestu(jId: string): void {
   onboardingStore.aplikuj({
     journeys: { [jId]: { dismissedAt: new Date().toISOString() } },
   });
+  telemetrie('journey_dismissed', { refId: jId });
 }
 
 export function krokSplnen(jId: string, stepId: string, at?: string): void {
+  const uz = onboardingStore.getSnapshot().journeys[jId]?.steps?.[stepId];
   onboardingStore.aplikuj({
     journeys: { [jId]: { steps: { [stepId]: at ?? new Date().toISOString() } } },
   });
+  if (!uz) telemetrie('step_done', { refId: stepId });
 }
 
 /** Přeskočit = odškrtnout teď (skipAllowed je u všech kroků MVP). */
@@ -175,9 +180,29 @@ export function probeResync(ctx: {
   worldId?: string;
   worldSlug?: string;
   accessMode?: string;
+  isPJ?: boolean;
 }): void {
-  const akt = aktivniCesta();
-  if (!akt || !ctx.worldId || ctx.worldId !== akt.contextWorldId) return;
+  let akt = aktivniCesta();
+  if (!akt || !ctx.worldId) return;
+
+  // D-078 (částečné uzavření): ušlý `world.created` (zavřený tab, jiné
+  // zařízení) — PJ navštíví SVŮJ svět bez fixace cesty → zafixuj a odškrtni
+  // krok 1 (probe = zdroj pravdy, checklist nesmí lhát).
+  if (
+    !akt.contextWorldId &&
+    akt.cesta.worldBinding === 'creates' &&
+    ctx.isPJ &&
+    akt.dalsiKrok?.id === 'pj.zaloz-svet'
+  ) {
+    onboardingStore.aplikuj({
+      journeys: { [akt.cesta.id]: { contextWorldId: ctx.worldId } },
+    });
+    krokSplnen(akt.cesta.id, 'pj.zaloz-svet');
+    akt = aktivniCesta();
+    if (!akt) return;
+  }
+
+  if (ctx.worldId !== akt.contextWorldId) return;
   ulozSlug(akt.cesta.id, ctx.worldSlug); // slug se mohl ztratit (jiné zařízení)
   for (const krok of akt.cesta.phases.flatMap((f) => f.steps)) {
     if (akt.hotovo.has(krok.id) || krok.done.kind !== 'probe') continue;
