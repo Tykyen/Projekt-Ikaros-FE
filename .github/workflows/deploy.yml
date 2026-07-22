@@ -102,6 +102,7 @@ jobs:
           EOF"
 
       - name: Build images
+        id: build_images
         run: |
           ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} bash -c '
             set -e
@@ -161,6 +162,9 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Cleanup old Docker images + build cache
-        if: always()
+        # `always()` dřív běžel i když gate zablokoval deploy (SSH known_hosts
+        # přeskočen → „Host key verification failed" — matoucí červený krok,
+        # který maskoval skutečnou příčinu). Teď: jen pokud proběhl build.
+        if: always() && steps.build_images.outcome != 'skipped'
         run: |
           ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_HOST }} -p ${{ vars.SERVER_PORT }} "docker image prune -f && docker builder prune -f"
