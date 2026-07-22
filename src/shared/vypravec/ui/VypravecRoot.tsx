@@ -9,11 +9,20 @@
  * Zkratka Shift+V (mimo input/textarea/contentEditable), Esc zavírá,
  * po zavření focus zpět na FAB. Panel je lazy — eager jen FAB + siluety.
  */
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
 import { resolveRouteHeader, type VypravecWorldInfo } from '../engine/resolveHeader';
+import { onboardingStore, zapojFlush } from '../state/onboardingStore';
 import { VypravecFab } from './VypravecFab';
 
 const VypravecPanel = lazy(() => import('./VypravecPanel'));
@@ -46,9 +55,36 @@ export function VypravecRoot({
   const [otevreny, setOtevreny] = useState(false);
   const fabRef = useRef<HTMLDivElement>(null);
   const klavesnice = useKlavesniceOtevrena();
+  const onboarding = useSyncExternalStore(
+    onboardingStore.subscribe,
+    onboardingStore.getSnapshot,
+  );
 
   const pattern = matchRoutePattern(pathname);
   const kolizni = pattern != null && KOLIZNI_ROUTY.has(pattern);
+
+  // D6 — init store po idle (GET + backfill + re-POST pending) a flush
+  // listenery; obojí idempotentní, dvojí mount (ikaros/world) nevadí.
+  useEffect(() => {
+    zapojFlush();
+    let idleId: number | undefined;
+    let timerId: number | undefined;
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(() => void onboardingStore.init());
+    } else {
+      // Safari — requestIdleCallback stále chybí
+      timerId = window.setTimeout(() => void onboardingStore.init(), 2000);
+    }
+    return () => {
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      if (timerId !== undefined) clearTimeout(timerId);
+    };
+  }, []);
+
+  // Moment 2 podklad (03 §4): záznam viděné routy (data pro „poprvé tady").
+  useEffect(() => {
+    if (pattern) onboardingStore.zaznamenejRoutu(pattern);
+  }, [pattern]);
 
   const zavrit = useCallback(() => {
     setOtevreny(false);
@@ -97,6 +133,7 @@ export function VypravecRoot({
       <VypravecFab
         scope={scope}
         otevreny={otevreny}
+        spi={onboarding.mode === 'onCall'}
         onClick={() => setOtevreny((o) => !o)}
       />
       {otevreny && (
