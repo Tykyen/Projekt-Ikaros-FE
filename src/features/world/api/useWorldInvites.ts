@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { api } from '@/shared/api/client';
 import type { WorldInviteListItem } from '@/shared/types';
 
@@ -24,6 +25,8 @@ export function useCreateInvite(worldId: string) {
     }) => api.post<WorldInviteListItem>(`/worlds/${worldId}/invites`, input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['worlds', worldId, 'invites'] });
+      // Vypravěč (spec 26.4): gateOpened alternativa — pozvánka otevírá bránu.
+      vypravecEmit('invite.created', { worldId });
     },
   });
 }

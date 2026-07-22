@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import type { World } from '@/shared/types';
 import type { CreateCalendarConfigDto } from '@/features/world/api/useCalendarConfigs';
 
@@ -47,9 +48,11 @@ export function useCreateWorld() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateWorldInput) => api.post<World>('/worlds', input),
-    onSuccess: () => {
+    onSuccess: (world) => {
       qc.invalidateQueries({ queryKey: ['worlds', 'public'] });
       qc.invalidateQueries({ queryKey: ['worlds', 'my'] });
+      // Vypravěč (spec 26.4): krok 1 cesty PJ + fixace contextWorldId.
+      vypravecEmit('world.created', { worldId: world.id, worldSlug: world.slug });
     },
   });
 }

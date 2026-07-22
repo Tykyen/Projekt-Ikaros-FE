@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { api } from '@/shared/api/client';
 import { pagesQueryKey } from './usePage';
 import type {
@@ -63,6 +64,9 @@ export function useCreatePage(worldId: string, worldSlug: string) {
       void qc.invalidateQueries({
         queryKey: pagesQueryKey.directory(worldId),
       });
+      // Vypravěč (spec 26.4): krok „První NPC" — jen schválené (ne pending návrh).
+      if (page.pageStatus !== 'pending')
+        vypravecEmit('page.created', { worldId, pageType: page.type });
       // C-15 — postava/NPC se zakládá přes Page; obnov i legacy character
       // directory (sidebar nav slot, MembersTab, mapa spawn, TransferModal).
       void qc.invalidateQueries({

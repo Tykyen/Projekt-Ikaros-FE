@@ -23,6 +23,15 @@ import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
 import { resolveRouteHeader, type VypravecWorldInfo } from '../engine/resolveHeader';
 import { onboardingStore, zapojFlush } from '../state/onboardingStore';
+import {
+  aktivniCesta,
+  probeResync,
+  startCesty,
+  zapojJourneyEngine,
+  zpracujNavstevu,
+} from '../engine/journeyEngine';
+import { vypravecEmit } from '../engine/events';
+import { JourneyBar } from './JourneyBar';
 import { VypravecFab } from './VypravecFab';
 
 const VypravecPanel = lazy(() => import('./VypravecPanel'));
@@ -67,6 +76,7 @@ export function VypravecRoot({
   // listenery; obojí idempotentní, dvojí mount (ikaros/world) nevadí.
   useEffect(() => {
     zapojFlush();
+    zapojJourneyEngine();
     let idleId: number | undefined;
     let timerId: number | undefined;
     if (typeof window.requestIdleCallback === 'function') {
@@ -81,10 +91,50 @@ export function VypravecRoot({
     };
   }, []);
 
-  // Moment 2 podklad (03 §4): záznam viděné routy (data pro „poprvé tady").
+  // Moment 2 podklad (03 §4): záznam viděné routy (data pro „poprvé tady")
+  // + visit podmínky kroků cesty (D7).
   useEffect(() => {
     if (pattern) onboardingStore.zaznamenejRoutu(pattern);
-  }, [pattern]);
+    zpracujNavstevu(pathname);
+  }, [pattern, pathname]);
+
+  // D7 — probe rekonsiliace ve world scope (gateOpened z accessMode; slug
+  // resync pro deep-linky). Probe = zdroj pravdy, auto-odškrtne i zpětně.
+  useEffect(() => {
+    if (scope !== 'world' || !world?.worldId) return;
+    probeResync({
+      worldId: world.worldId,
+      worldSlug: world.worldSlug,
+      accessMode: world.accessMode,
+    });
+  }, [scope, world?.worldId, world?.worldSlug, world?.accessMode]);
+
+  // 26.4 — volba persony: JEDINÉ auto-otevření panelu vůbec (05 §1).
+  // Jen čerstvý účet (jeNovy z GET), bez persony, nezavřený dialog, mimo kolizi.
+  const [personaVolba, setPersonaVolba] = useState(false);
+  const personaAutoOpenRef = useRef(false);
+  useEffect(() => {
+    return onboardingStore.subscribe(() => {
+      if (personaAutoOpenRef.current || !onboardingStore.jeNovy) return;
+      const s = onboardingStore.getSnapshot();
+      if (s.persona || s.dismissed.includes('persona-dialog')) return;
+      personaAutoOpenRef.current = true;
+      setPersonaVolba(true);
+      setOtevreny(true);
+    });
+  }, []);
+
+  const zvolPersonu = useCallback(
+    (p: 'pj' | 'hrac' | 'worldbuilder' | null) => {
+      onboardingStore.nastavPersonu(p);
+      onboardingStore.zavritTip('persona-dialog');
+      vypravecEmit('persona.chosen');
+      setPersonaVolba(false);
+      setOtevreny(false);
+      if (p === 'pj') startCesty('pj-start');
+    },
+    [],
+  );
 
   const zavrit = useCallback(() => {
     setOtevreny(false);
@@ -126,7 +176,22 @@ export function VypravecRoot({
     return () => document.removeEventListener('keydown', onKey);
   }, [kolizni]);
 
-  if (kolizni || klavesnice) return null;
+  // Aktivní cesta — derivace ze snapshotu (onboarding je dependency renderu).
+  void onboarding;
+  const akt = aktivniCesta();
+  const jinySvet = Boolean(
+    scope === 'world' &&
+      akt?.contextWorldId &&
+      world?.worldId &&
+      world.worldId !== akt.contextWorldId,
+  );
+
+  // Kolizní plocha / klávesnice: FAB+panel skryté, ale lišta cesty se SBALÍ
+  // do proužku, nikdy nezmizí (03 §8.3 — poslední instrukce nesmí zmizet
+  // v místě činu).
+  if (kolizni || klavesnice) {
+    return akt ? <JourneyBar akt={akt} kolizni jinySvet={jinySvet} /> : null;
+  }
 
   return (
     <div ref={fabRef}>
@@ -136,13 +201,25 @@ export function VypravecRoot({
         spi={onboarding.mode === 'onCall'}
         onClick={() => setOtevreny((o) => !o)}
       />
+      {akt && !otevreny && (
+        <JourneyBar akt={akt} kolizni={false} jinySvet={jinySvet} />
+      )}
       {otevreny && (
         <Suspense fallback={null}>
           <VypravecPanel
             scope={scope}
             worldName={world?.name}
             header={resolveRouteHeader(pathname, world)}
-            onClose={zavrit}
+            personaVolba={personaVolba}
+            onPersona={zvolPersonu}
+            onClose={() => {
+              if (personaVolba) {
+                // zavření bez volby = dismiss (nikdy víc auto-open; 04 §5.4)
+                onboardingStore.zavritTip('persona-dialog');
+                setPersonaVolba(false);
+              }
+              zavrit();
+            }}
           />
         </Suspense>
       )}

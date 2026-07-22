@@ -860,6 +860,9 @@ export function WorldLayout() {
             name: world?.name,
             userRole: (membership?.role ?? null) as WorldRole | null,
             isPJ,
+            worldId: realWorldId ?? undefined,
+            worldSlug: worldSlug ?? undefined,
+            accessMode: world?.accessMode,
           }}
         />
       </div>

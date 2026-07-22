@@ -41,15 +41,32 @@ function Klic() {
   );
 }
 
+/** 26.4 — volba persony: jediné auto-otevření panelu vůbec (05 §1). */
+const PERSONA_VOLBY: Array<{
+  persona: 'pj' | 'hrac' | 'worldbuilder' | null;
+  titul: string;
+  popis: string;
+}> = [
+  { persona: 'pj', titul: 'Chci vést hru', popis: 'Založíme ti svět a do 15 minut pozveš první hráče.' },
+  { persona: 'hrac', titul: 'Chci hrát', popis: 'Najdeme ti stůl — světy, nábory, nebo rovnou Putyka.' },
+  { persona: 'worldbuilder', titul: 'Chci tvořit svět', popis: 'Wiki, mapy a pavučina vztahů — svět i bez hráčů.' },
+  { persona: null, titul: 'Jen se rozhlédnu', popis: 'Dobře. Kdybys mě potřeboval, víš, kde mě najdeš.' },
+];
+
 export default function VypravecPanel({
   scope,
   worldName,
   header,
+  personaVolba,
+  onPersona,
   onClose,
 }: {
   scope: 'ikaros' | 'world';
   worldName?: string;
   header: ResolvedHeader | null;
+  /** true = obsah panelu je volba persony (auto-open po registraci). */
+  personaVolba?: boolean;
+  onPersona?: (p: 'pj' | 'hrac' | 'worldbuilder' | null) => void;
   onClose: () => void;
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
@@ -116,10 +133,12 @@ export default function VypravecPanel({
           </span>
           <div>
             <div className={s.kdeLabel} id="vypravec-kde-jsem">
-              Kde jsem
+              {personaVolba ? 'Vítej' : 'Kde jsem'}
             </div>
             <p className={s.kdeText}>
-              {header ? (
+              {personaVolba ? (
+                'Zdravím tě, příteli. Jsem Ishida — tohle místo jsem stvořil a znám každý jeho kout. Než vykročíš: chceš vést hru, hrát, nebo tvořit svět?'
+              ) : header ? (
                 <>
                   <strong>{header.name}</strong> — {header.text}
                 </>
@@ -138,14 +157,30 @@ export default function VypravecPanel({
       </header>
 
       <div className={s.telo}>
-        <ul className={s.menu}>
-          <li>
-            <Link to="/ikaros/napoveda" onClick={onClose}>
-              <Klic />
-              Plná nápověda
-            </Link>
-          </li>
-        </ul>
+        {personaVolba && onPersona ? (
+          <div className={s.personaVolby}>
+            {PERSONA_VOLBY.map((v) => (
+              <button
+                key={v.titul}
+                type="button"
+                className={s.personaVolba}
+                onClick={() => onPersona(v.persona)}
+              >
+                {v.titul}
+                <small>{v.popis}</small>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <ul className={s.menu}>
+            <li>
+              <Link to="/ikaros/napoveda" onClick={onClose}>
+                <Klic />
+                Plná nápověda
+              </Link>
+            </li>
+          </ul>
+        )}
       </div>
 
       <footer className={s.pata}>

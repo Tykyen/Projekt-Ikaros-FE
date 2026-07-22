@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
@@ -98,6 +99,13 @@ export function useSendMessage(room: RoomKey) {
         `/global-chat/messages?room=${room}`,
         dto,
       ),
+    onSuccess: () => {
+      // Vypravěč (spec 26.4): sociální akce; NIKDY nesplní krok „Napiš do svého
+      // světa" (channelKind ≠ 'world', worldId chybí).
+      vypravecEmit('message.sent', {
+        channelKind: room === 'hospoda' ? 'putyka' : 'camp',
+      });
+    },
     // FIX-4 — dřív tiché selhání (ChatInput smazal text i bez potvrzení odeslání).
     onError: (err) => {
       toast.error(`Zprávu se nepodařilo odeslat: ${parseApiError(err)}`);

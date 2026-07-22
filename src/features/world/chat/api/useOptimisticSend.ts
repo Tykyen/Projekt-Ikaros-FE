@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import type { ChatMessage } from '@/features/chat/lib/types';
@@ -90,6 +91,8 @@ export function useOptimisticSend({
           ...payload,
           clientNonce: nonce,
         });
+        // Vypravěč (spec 26.4): krok „Napiš do svého světa" — jen chat SVĚTA.
+        vypravecEmit('message.sent', { worldId, channelKind: 'world' });
         qc.setQueryData<ChatMessage[]>(messagesKey, (old) => {
           const list = old ?? [];
           // Pokud WS echo už dorazilo dříve než POST response, lokální zpráva
@@ -117,7 +120,7 @@ export function useOptimisticSend({
         );
       }
     },
-    [endpoint, messagesKey, qc],
+    [endpoint, messagesKey, qc, worldId],
   );
 
   const send = useCallback(

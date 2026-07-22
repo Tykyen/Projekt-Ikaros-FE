@@ -15,6 +15,10 @@ export interface VypravecWorldInfo {
   name?: string;
   userRole: WorldRole | null;
   isPJ: boolean;
+  /** D7–D8: scope cesty (contextWorldId) + probe gateOpened + deep-linky. */
+  worldId?: string;
+  worldSlug?: string;
+  accessMode?: string;
 }
 
 /** WorldRole → audience (04 §2; Žadatel není audience → čte jako host). */

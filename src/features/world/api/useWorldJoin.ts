@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { api } from '@/shared/api/client';
 import type { WorldMembership, WorldAccessRequest } from '@/shared/types';
 
@@ -11,10 +12,11 @@ export function useJoinWorld() {
   return useMutation({
     mutationFn: (worldId: string) =>
       api.post<WorldMembership>(`/worlds/${worldId}/join`),
-    onSuccess: () => {
+    onSuccess: (_membership, worldId) => {
       // C-01 — broad ['worlds'] prefixuje VŠECHNY world dotazy vč. detailu
       // ['worlds','id'|'slug',key]; ['worlds',worldId] detail netrefí (segment [1]).
       qc.invalidateQueries({ queryKey: ['worlds'] });
+      vypravecEmit('join.requested', { worldId }); // Vypravěč (spec 26.4)
     },
   });
 }
@@ -38,8 +40,9 @@ export function useRequestAccess() {
         `/worlds/${worldId}/access-request`,
         characterDraft ? { characterDraft } : {},
       ),
-    onSuccess: () => {
+    onSuccess: (_req, vars) => {
       qc.invalidateQueries({ queryKey: ['worlds', 'my-access-requests'] });
+      vypravecEmit('join.requested', { worldId: vars.worldId }); // Vypravěč (spec 26.4)
     },
   });
 }
