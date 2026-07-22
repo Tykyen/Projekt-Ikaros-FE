@@ -19,6 +19,8 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/shared/store/authStore';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
 import { resolveRouteHeader, type VypravecWorldInfo } from '../engine/resolveHeader';
@@ -78,16 +80,25 @@ export function VypravecRoot({
   const kolizni = pattern != null && KOLIZNI_ROUTY.has(pattern);
 
   // D6 — init store po idle (GET + backfill + re-POST pending) a flush
-  // listenery; obojí idempotentní, dvojí mount (ikaros/world) nevadí.
+  // listenery; idempotentní, dvojí mount (ikaros/world) nevadí.
+  // ZÁVISLOST na identitě: login přes modal layout NEremountuje — bez ní by
+  // idle callback proběhl ještě jako anonym a init po přihlášení už nikdy
+  // (persona dialog by se neukázal do reloadu).
+  const userId = useAtomValue(currentUserAtom)?.id ?? null;
   useEffect(() => {
     zapojFlush();
     zapojJourneyEngine();
     zapojChybovouMapu();
     zapojTelemetriiFlush();
+    if (!userId) return;
     let idleId: number | undefined;
     let timerId: number | undefined;
     if (typeof window.requestIdleCallback === 'function') {
-      idleId = window.requestIdleCallback(() => void onboardingStore.init());
+      // timeout: bez něj rIC hladoví, když stránka není nikdy idle
+      // (např. reconnect smyčka WS) — persona dialog by se neukázal.
+      idleId = window.requestIdleCallback(() => void onboardingStore.init(), {
+        timeout: 3000,
+      });
     } else {
       // Safari — requestIdleCallback stále chybí
       timerId = window.setTimeout(() => void onboardingStore.init(), 2000);
@@ -96,7 +107,7 @@ export function VypravecRoot({
       if (idleId !== undefined) window.cancelIdleCallback(idleId);
       if (timerId !== undefined) clearTimeout(timerId);
     };
-  }, []);
+  }, [userId]);
 
   // Moment 2 (03 §4): „Poprvé tady?" na whitelistu netriviálních rout —
   // kontrola PŘED záznamem (jinak by routa byla „viděná" dřív, než promluvíme).

@@ -37,6 +37,27 @@ export async function mockBackend(page: Page): Promise<void> {
     if (path === '/auth/login' && method === 'POST') {
       return json(route, LOGIN_RESPONSE);
     }
+    // Vypravěč (spec 26.6): default = ZAVEDENÝ účet s personou — persona
+    // dialog se v happy-path smoke NEotvírá (testuje ho persona.spec.ts,
+    // který tuhle routu přepíše). PATCH vrací tentýž stav, telemetrie 204.
+    if (path === '/users/me/onboarding') {
+      return json(route, {
+        state: {
+          persona: 'pj',
+          journeys: {},
+          seenRoutes: [],
+          dismissed: [],
+          milestones: {},
+          mode: 'active',
+          backfilled: false,
+          updatedAt: new Date().toISOString(),
+        },
+        legacy: false,
+      });
+    }
+    if (path === '/vypravec/telemetry' && method === 'POST') {
+      return route.fulfill({ status: 204, body: '' });
+    }
     if (path === '/users/me') {
       return json(route, TEST_USER);
     }
