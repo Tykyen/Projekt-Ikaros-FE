@@ -1,12 +1,16 @@
 /**
  * Spec 26.1 — kotva Vypravěče (FAB, pravý dolní roh).
- * Mimo svět mluví Ishida (silueta cylindr), ve světě Joe (silueta lucerna) —
- * placeholder siluety do dodání grafiky (02a). Stav „spí" = jen na zavolání.
+ * Mimo svět mluví Ishida, ve světě Joe — oba REÁLNÝM avatarem (rozhodnutí
+ * vlastníka 2026-07-22 z živého testu: tokenizovaná silueta ve světě
+ * nahrazena Joe avatarem; silueta zůstává jen jako koncept pro v2 theming).
+ * Stav „spí" = jen na zavolání.
  */
-import { SiluetaLucerna } from './siluety';
 import ishidaAvatarWebp96 from '@/assets/vypravec/ishida-avatar-96.webp';
 import ishidaAvatarWebp192 from '@/assets/vypravec/ishida-avatar-192.webp';
 import ishidaAvatarPng from '@/assets/vypravec/ishida-avatar.png';
+import joeAvatarWebp96 from '@/assets/vypravec/joe-avatar-96.webp';
+import joeAvatarWebp192 from '@/assets/vypravec/joe-avatar-192.webp';
+import joeAvatarPng from '@/assets/vypravec/joe-avatar.png';
 import s from './Vypravec.module.css';
 
 export function VypravecFab({
@@ -32,8 +36,14 @@ export function VypravecFab({
       onClick={onClick}
     >
       {scope === 'world' ? (
-        /* ve světě tokenizovaná silueta Joe (currentColor — 12 motivů zdarma) */
-        <SiluetaLucerna />
+        /* ve světě Joe (avatar; silueta odložena na v2 theming) */
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={`${joeAvatarWebp96} 1x, ${joeAvatarWebp192} 2x`}
+          />
+          <img src={joeAvatarPng} alt="" className={s.fabImg} />
+        </picture>
       ) : (
         /* mimo svět brand avatar Ishidy (03 §1) */
         <picture>

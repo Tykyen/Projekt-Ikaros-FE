@@ -8,7 +8,7 @@ Sousedé: architektura enginu, registru a persistence → [04-architektura.md](0
 ## 1. Kotva a povrchy
 
 - **Jedna stabilní kotva:** `<VypravecRoot/>` mountnutý v `router.tsx` vedle IkarosLayout a WorldLayout. **NE** v pop-outu `/svet/:slug/karta-tokenu` (druhý monitor = pracovní plocha). Čte `useLocation` + `WorldContext` (worldId, world, isPJ, userRole, character) → scope + publikum bez nového fetche.
-- **Vzhled kotvy:** fixed FAB pravý dolní roh; desktop 48 px avatar (mimo svět brand avatar **Ishidy**, ve světě tokenizovaná **silueta Joe s lucernou**), mobil 44 px. Přesná geometrie a z-index → §2 (závazná politika).
+- **Vzhled kotvy:** fixed FAB pravý dolní roh; desktop 48 px avatar (mimo svět brand avatar **Ishidy**, ve světě **reálný avatar Joe** — ✎ rozhodnutí vlastníka 2026-07-22 z živého testu; tokenizovaná silueta s lucernou odložena jako v2 theming koncept), mobil 44 px. Přesná geometrie a z-index → §2 (závazná politika).
 - **Kdo mluví kde (model tří postav, potvrzen 2026-07-21 — detail 02 §1):** platformní scope + Putyka/Camp/voice = **Ishida** · vše uvnitř světů vč. chatu světa = **Joe** · taktická mapa = **Měďák** (v2, jen „?" panel TM — FAB je na TM skrytý). Předávací beaty: první vstup do světa (Ishida→Joe, replika 9) · vstup do hloubkového průvodce TM (Joe→Měďák, replika 10).
 - **Povrch po kliknutí:** desktop rohový panel 380 px × min(70vh) kotvený vpravo dole (otevře se PŘED pravým panelem IkarosLayoutu, nepřekrývá ho trvale); mobil bottom-sheet se 2 zarážkami (1/3 rychlé menu, 3/4 plný obsah). **Nikdy fullscreen; nikdy nepřekrývá prvek, o kterém právě mluví** — míří-li highlight do pravého dolního kvadrantu, panel se dočasně přemístí doleva (v2 polish; MVP: panel se při highlightu sbalí).
 

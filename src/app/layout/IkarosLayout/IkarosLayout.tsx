@@ -1007,9 +1007,6 @@ export function IkarosLayout() {
           {showRightPanel && <SiteFooter />}
         </main>
 
-        {/* Spec 26.1 — Vypravěč (Ishida): kotva FAB, platformní scope. */}
-        <VypravecRoot scope="ikaros" />
-
         {showRightPanel && (
           <aside className={s.rightPanel} data-frame-panel="right">
             <PanelCorners />
@@ -1034,6 +1031,11 @@ export function IkarosLayout() {
           </aside>
         )}
       </div>
+
+      {/* Spec 26.1 — Vypravěč (Ishida): kotva FAB, platformní scope. MIMO
+          `.body` grid — jako přímé dítě gridu by zabral sloupec pravého
+          panelu a rozhodil layout (FAB je stejně position:fixed). */}
+      <VypravecRoot scope="ikaros" />
 
       {/* Theme decorations: gated displej via CSS — viditelné pouze pro temna-cerven */}
       <div data-theme-decoration="petals" aria-hidden="true">

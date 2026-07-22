@@ -51,7 +51,7 @@ Dvouvrstvý role model (globální vs. světová role — doložený top zdroj z
 ### 1.3 Kde se kdo projevuje
 
 - **Mimo svět (Ishida):** plná brand grafika — post-registrační dialog (26.4), panel Vypravěče (nahrazuje AnonStartPanel „Začni tady"), platformní empty-states, Putyka/Camp/voice.
-- **Uvnitř světa (Joe):** panel a bubliny s jejím hlasem; FAB = tlumená jednobarevná **silueta Joe s lucernou** obarvená tokenem motivu (detail theming + lazy rozpočet: [04-architektura.md](04-architektura.md)). Siluetový podpis Joe = **lucerna**; Ishidův (brand avatar mimo svět) = cylindr.
+- **Uvnitř světa (Joe):** panel a bubliny s jejím hlasem; FAB = **reálný Joe avatar** (✎ rozhodnutí vlastníka 2026-07-22 z živého testu — tlumená tokenizovaná silueta odložena jako v2 theming koncept; siluetové assety J-9/J-10 zůstávají v plánu pro v2). Siluetový podpis Joe = **lucerna**; Ishidův = cylindr.
 - **Taktická mapa (Měďák):** FAB skrytý (kolizní plocha) — nápovědu TM ponese hloubkový průvodce TM (v2) v „?" panelu; mluvčí = **Měďák** (§1.5), scope PŘÍSNĚ jen TM, redukovaná sada assetů (avatar + 2–3 busty, žádná silueta).
 - HelpPage zůstává „Ishidova knihovna" — dlouhé čtení, tisk, SEO; oba průvodci do ní deep-linkují.
 
