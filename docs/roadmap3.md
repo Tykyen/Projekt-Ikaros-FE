@@ -201,18 +201,18 @@ Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whi
 **Návrh:** vedený tok „Založ svět" (výběr šablony/klonu z 25.5 → checklist prvních kroků v dashboardu světa → CTA pozvánky WorldInvite → CTA první scény). 🔁 reuse: šablony světů/stránek, WorldInvite (15.10), empty states 15.6, mapDefaults.
 **Otevřené otázky:** checklist persistentní per svět (dismiss), nebo jen do prvního splnění? Kolik šablon světa do startu?
 
-### - [ ] 26.2 Cesta hráče — [dopad vysoký · náklad malý] 🚧 částečně 2026-07-22: rozcestník ve volbě persony + topiky vstupu (svet.vstup, zadatel); plný checklist = stretch S1/v2
+### - [x] 26.2 Cesta hráče — [dopad vysoký · náklad malý] ✅ 2026-07-22 naplno (spec-26.7): cesta hrac-start (2 kroky + čekací stav — postava→bublina, timeout 7 dní→nábory; Putyka počítá jako sociální akce)
 **Cíl:** pozvaný hráč do ~7 minut: invite link → jasná role → postava/převzetí postavy → odpověď v chatu → notifikace zapnuté. Cílová úspěšnost ~80 %.
 **Návrh:** po přijetí pozvánky landing „Co teď" (postava → chat → deník); prázdné stavy vedou k akci. 🔁 reuse WorldInvite + přihláška s postavou (15.10).
 
-### - [ ] 26.3 Cesta worldbuildera — [dopad střední · náklad malý] 🚧 částečně 2026-07-22: rozcestník (navigace na vytvořit-svět); plná cesta v2
+### - [x] 26.3 Cesta worldbuildera — [dopad střední · náklad malý] ✅ 2026-07-22 naplno (spec-26.7): cesta wb-start (ateliér → stránka+wikilink → Pavučina → výkladní skříň)
 **Cíl:** do ~15 minut: první článek → vztah/pavučina → bod na mapě → veřejné/read-only sdílení (vitrína 22.4). Cílová úspěšnost ~70 %.
 **Návrh:** checklist v prázdném světě bez hráčů; provázat s osnovami stránek (15.5) a atlasem.
 
 ### - [x] 26.4 Kontextové tipy & checklist po registraci — [dopad střední · náklad malý] ✅ 2026-07-22 (persona dialog — jediné auto-otevření; volba se ukládá do UserOnboardingState.persona = odpověď na otevřenou otázku ANO; tipy „Poprvé tady?" + chybová mapa + auto-tichý režim)
 Lehká vrstva nad 25.2: po registraci volba „Chci vést hru / Hrát / Tvořit svět" → nasměrování do 26.1/26.2/26.3. Žádný intruzivní tour framework — checklist + empty-state CTA. **Otevřená otázka:** volbu ukládat (persona pro dashboard), nebo jen jednorázově navigovat?
 
-### - [ ] 26.5 Krátké návody v nápovědě — [dopad střední · náklad malý] 🚧 základ 2026-07-22: 21 hlubokých Tier 0 topiků v panelu Vypravěče (registry/topics.ts); 10 samostatných návodů = v2
+### - [x] 26.5 Krátké návody v nápovědě — [dopad střední · náklad malý] ✅ 2026-07-22 (spec-26.7): 10 návodů (registry/navody.ts, menu Návody v panelu) + 24 hlubokých topiků; ScreenshotSloty zůstávají na dodání snímků (samostatná položka)
 10–15 návodů, **každý řeší jeden úkol do 5 minut** (založ svět, pozvi hráče, první scéna, hod v chatu, mapa+tokeny, deník, export…). 🔁 reuse HelpPage struktury; naplnit ScreenshotSloty reálnými snímky (spolupráce: uživatel dodá screenshoty).
 
 ---

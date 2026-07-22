@@ -14,8 +14,11 @@ import {
   probeResync,
   startCesty,
   zapojJourneyEngine,
+  zkontrolujCekaniHrace,
   zpracujNavstevu,
+  zrusitCestu,
 } from '../journeyEngine';
+import { bublinaStore } from '../../ui/bublinaStore';
 import { onboardingStore } from '../../state/onboardingStore';
 
 const jotai = getDefaultStore();
@@ -127,5 +130,89 @@ describe('journeyEngine — cesta 26.1', () => {
     vypravecEmit('invite.created', { worldId: 'w-1' });
     vypravecEmit('message.sent', { worldId: 'w-1', channelKind: 'world' });
     expect(aktivniCesta()).toBeNull();
+  });
+});
+
+describe('cesta 26.2 — Hráč (spec 26.7)', () => {
+  beforeEach(() => {
+    zrusitCestu('pj-start');
+    startCesty('hrac-start');
+  });
+
+  it('visit vesmiry NEBO nabory splní krok 1 (alt routy)', () => {
+    zpracujNavstevu('/ikaros/nabory');
+    expect(aktivniCesta()?.hotovo.has('hrac.najdi-stul')).toBe(true);
+  });
+
+  it('zpráva v Putyce SPLNÍ krok 2 (altEvents — sociální akce nesmí čekat na PJ)', () => {
+    vypravecEmit('message.sent', { channelKind: 'putyka' });
+    const s = onboardingStore.getSnapshot().journeys['hrac-start'];
+    expect(s?.steps?.['hrac.ozvi-se']).toBeDefined();
+    // bez žádosti není contextWorldId
+    expect(s?.contextWorldId).toBeUndefined();
+  });
+
+  it('join.requested splní krok 2 A zafixuje svět cesty', () => {
+    vypravecEmit('join.requested', { worldId: 'w-join' });
+    const s = onboardingStore.getSnapshot().journeys['hrac-start'];
+    expect(s?.steps?.['hrac.ozvi-se']).toBeDefined();
+    expect(s?.contextWorldId).toBe('w-join');
+  });
+
+  it('dokončení (2/2) → oslava bublinou; postava na světě → bublina s CTA', () => {
+    zpracujNavstevu('/ikaros/vesmiry');
+    vypravecEmit('join.requested', { worldId: 'w-join' });
+    expect(bublinaStore.getSnapshot()?.text).toContain('řada na PJ');
+    bublinaStore.zmiz();
+    // čekací stav: postava přidělena
+    zkontrolujCekaniHrace({ worldId: 'w-join', hasCharacter: true });
+    expect(bublinaStore.getSnapshot()?.text).toContain('Postava je na světě');
+  });
+
+  it('timeout 7 dní bez postavy → tip na nábory (1×)', () => {
+    zpracujNavstevu('/ikaros/vesmiry');
+    // ozvi-se před 8 dny
+    const pred8dny = new Date(Date.now() - 8 * 86_400_000).toISOString();
+    vypravecEmit('join.requested', { worldId: 'w-cekam' });
+    onboardingStore.aplikuj({
+      journeys: { 'hrac-start': { steps: { 'hrac.ozvi-se': pred8dny } } },
+    });
+    bublinaStore.zmiz();
+    zkontrolujCekaniHrace();
+    expect(bublinaStore.getSnapshot()?.text).toContain('nábory');
+    // dismiss → už nikdy
+    bublinaStore.zavrit();
+    zkontrolujCekaniHrace();
+    expect(bublinaStore.getSnapshot()).toBeNull();
+  });
+});
+
+describe('cesta 26.3 — Worldbuilder (spec 26.7)', () => {
+  beforeEach(() => {
+    zrusitCestu('pj-start');
+    startCesty('wb-start');
+  });
+
+  it('world.created fixuje; stránka + subjekt jen ve světě cesty', () => {
+    vypravecEmit('world.created', { worldId: 'w-at', worldSlug: 'atelier' });
+    expect(aktivniCesta()?.hotovo.has('wb.zaloz-atelier')).toBe(true);
+    vypravecEmit('page.created', { worldId: 'w-cizi', pageType: 'Lokace' });
+    expect(aktivniCesta()?.hotovo.has('wb.prvni-stranka')).toBe(false);
+    vypravecEmit('page.created', { worldId: 'w-at', pageType: 'Lokace' });
+    expect(aktivniCesta()?.hotovo.has('wb.prvni-stranka')).toBe(true);
+    vypravecEmit('subject.created', { worldId: 'w-at' });
+    expect(aktivniCesta()?.hotovo.has('wb.pavucina')).toBe(true);
+  });
+
+  it('probe publicShowcaseOn odškrtne „Ukaž to světu" (i zpětně)', () => {
+    vypravecEmit('world.created', { worldId: 'w-at', worldSlug: 'atelier' });
+    probeResync({ worldId: 'w-at', worldSlug: 'atelier', publicShowcase: false });
+    expect(
+      onboardingStore.getSnapshot().journeys['wb-start']?.steps?.['wb.ukaz-to'],
+    ).toBeUndefined();
+    probeResync({ worldId: 'w-at', worldSlug: 'atelier', publicShowcase: true });
+    expect(
+      onboardingStore.getSnapshot().journeys['wb-start']?.steps?.['wb.ukaz-to'],
+    ).toBeDefined();
   });
 });

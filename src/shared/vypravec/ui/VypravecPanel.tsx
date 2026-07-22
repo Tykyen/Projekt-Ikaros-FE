@@ -5,10 +5,18 @@
  * patičkou zpětné vazby „Pomohlo ti to?" (telemetrie feedback ±).
  * A11y: role dialog (nemodální), focus trap, Esc/focus řeší VypravecRoot.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import type { ResolvedHeader } from '../engine/resolveHeader';
 import { topikyProRoutu, topikPodleId } from '../registry/topics';
+import { NAVODY } from '../registry/navody';
+import { CESTY } from '../registry/journeys';
+import {
+  pauzaCesty,
+  startCesty,
+  zrusitCestu,
+} from '../engine/journeyEngine';
+import { onboardingStore } from '../state/onboardingStore';
 import type { HelpTopic } from '../registry/types';
 import { doplnSlug } from '../engine/journeyEngine';
 import { telemetrie } from '../state/telemetry';
@@ -92,7 +100,9 @@ function TopicView({
       {topik.minAudienceNote && (
         <p className={s.poznamka}>{topik.minAudienceNote}</p>
       )}
-      {topik.akce?.map((a) => (
+      {topik.akce
+        ?.filter((a) => worldSlug || !a.to.includes(':worldSlug'))
+        .map((a) => (
         <Link
           key={a.to}
           to={doplnSlug(a.to, worldSlug)}
@@ -143,6 +153,72 @@ function TopicView({
   );
 }
 
+/** Menu Cesty (05 §2): obnova/pauza/zrušení kdykoli; žádný guilt-trip. */
+function CestyView({ onZpet }: { onZpet: () => void }) {
+  const stav = useSyncExternalStore(
+    onboardingStore.subscribe,
+    onboardingStore.getSnapshot,
+  );
+  const POPISKY: Record<string, string> = {
+    'pj-start': 'PJ Start — od nuly k první zprávě ve vlastním světě',
+    'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
+    'wb-start': 'Cesta tvůrce — ateliér, wiki, Pavučina, výkladní skříň',
+  };
+  return (
+    <div>
+      <button type="button" className={s.zpet} onClick={onZpet}>
+        ← Zpět
+      </button>
+      <div className={s.personaVolby}>
+        {Object.values(CESTY).map((c) => {
+          const prog = stav.journeys[c.id];
+          const celkem = c.phases.flatMap((f) => f.steps).length;
+          const hotovo = prog ? Object.keys(prog.steps ?? {}).length : 0;
+          const bezi = prog && !prog.dismissedAt && hotovo < celkem;
+          const pauznuta = Boolean(bezi && prog?.pausedAt);
+          const dokoncena = prog && !prog.dismissedAt && hotovo >= celkem;
+          return (
+            <div key={c.id} className={s.personaVolba}>
+              {POPISKY[c.id] ?? c.id}
+              <small>
+                {dokoncena
+                  ? 'Dokončeno ✓'
+                  : bezi
+                    ? `Krok ${hotovo + 1} z ${celkem}${pauznuta ? ' · pozastaveno' : ''}`
+                    : `~${c.estimateMin} min`}
+              </small>
+              <div className={s.bublinaAkce}>
+                {!prog || prog.dismissedAt ? (
+                  <button type="button" className={s.cta} onClick={() => startCesty(c.id)}>
+                    Začít
+                  </button>
+                ) : dokoncena ? null : (
+                  <>
+                    <button
+                      type="button"
+                      className={s.cta}
+                      onClick={() => pauzaCesty(c.id, !pauznuta)}
+                    >
+                      {pauznuta ? 'Pokračovat' : 'Pozastavit'}
+                    </button>
+                    <button
+                      type="button"
+                      className={s.ctaTiche}
+                      onClick={() => zrusitCestu(c.id)}
+                    >
+                      Zrušit cestu
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function VypravecPanel({
   scope,
   worldName,
@@ -169,6 +245,7 @@ export default function VypravecPanel({
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
   const [topikId, setTopikId] = useState<string | null>(null);
+  const [pohled, setPohled] = useState<'domu' | 'navody' | 'cesty'>('domu');
   const ref = useRef<HTMLDivElement>(null);
 
   // Focus trap: fokus dovnitř při otevření, Tab cykluje uvnitř panelu.
@@ -200,7 +277,9 @@ export default function VypravecPanel({
     return () => root.removeEventListener('keydown', onKey);
   }, []);
 
-  const topik = topikId ? topikPodleId(topikId) : undefined;
+  const topik = topikId
+    ? (topikPodleId(topikId) ?? NAVODY.find((n) => n.id === topikId))
+    : undefined;
   const karty = topikyProRoutu(pattern, audience).slice(0, 4);
 
   function otevriTopik(id: string) {
@@ -293,6 +372,31 @@ export default function VypravecPanel({
             onZpet={() => setTopikId(null)}
             onClose={onClose}
           />
+        ) : pohled === 'cesty' ? (
+          <CestyView onZpet={() => setPohled('domu')} />
+        ) : pohled === 'navody' ? (
+          <div>
+            <button
+              type="button"
+              className={s.zpet}
+              onClick={() => setPohled('domu')}
+            >
+              ← Zpět
+            </button>
+            <div className={s.sekceLabel}>Návody — jeden úkol do 5 minut</div>
+            <div className={s.personaVolby}>
+              {NAVODY.map((n) => (
+                <button
+                  key={n.id}
+                  type="button"
+                  className={s.personaVolba}
+                  onClick={() => otevriTopik(n.id)}
+                >
+                  {n.title}
+                </button>
+              ))}
+            </div>
+          </div>
         ) : (
           <>
             {karty.length > 0 && (
@@ -313,6 +417,26 @@ export default function VypravecPanel({
               </>
             )}
             <ul className={s.menu}>
+              <li>
+                <button
+                  type="button"
+                  className={s.menuTlacitko}
+                  onClick={() => setPohled('cesty')}
+                >
+                  <Klic />
+                  Cesty
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={s.menuTlacitko}
+                  onClick={() => setPohled('navody')}
+                >
+                  <Klic />
+                  Návody
+                </button>
+              </li>
               <li>
                 <Link to="/ikaros/napoveda" onClick={onClose}>
                   <Klic />

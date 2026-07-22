@@ -572,3 +572,27 @@
   height: 56px;
   border-radius: var(--radius-sm);
 }
+
+/* menu položky-tlačítka (Cesty/Návody) — vizuálně shodné s odkazy */
+.menuTlacitko {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-strong);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  text-align: left;
+}
+.menuTlacitko:hover {
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+}
+.menuTlacitko:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}

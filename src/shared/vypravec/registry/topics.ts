@@ -369,6 +369,60 @@ export const TOPIKY: readonly HelpTopic[] = [
     status: 'funkcni',
   },
 
+  // ── Worldbuilding (kroky cesty 26.3) ───────────────────────────────────
+  {
+    id: 'svet.wiki.wikilinky',
+    title: 'Wikilinky: stránky se propojují samy',
+    tags: ['wikilink', 'odkaz', 'propojeni', 'wiki', '[['],
+    routes: ['/svet/:worldSlug/nova-stranka', '/svet/:worldSlug/stranky', '/svet/:worldSlug/:slug'],
+    body: {
+      odstavce: [
+        'Napiš v textu stránky [[Název stránky]] a vznikne odkaz. Když cílová stránka existuje, propojí se; když ne, odkaz ti ji nabídne založit.',
+        'Takhle svět roste přirozeně — píšeš příběh a struktura se plete sama. Encyklopedie pak drží všechno pohromadě.',
+      ],
+    },
+    akce: [{ label: 'Nová stránka', to: '/svet/:worldSlug/nova-stranka' }],
+    source: { kapitola: '11' },
+    verifiedAt: '2026-07-22',
+    status: 'funkcni',
+  },
+  {
+    id: 'svet.pavucina',
+    title: 'Pavučina: vztahy světa',
+    tags: ['pavucina', 'vztahy', 'subjekt', 'graf', 'kampan'],
+    routes: ['/svet/:worldSlug/pavucina', '/svet/:worldSlug'],
+    body: {
+      odstavce: [
+        'Pavučina je graf vztahů tvého světa: subjekty (postavy, frakce, místa) a vazby mezi nimi.',
+        'Subjekt můžeš materializovat na plnou stránku Encyklopedie — a naopak stránky zapojovat do grafu. Jedna síť, dva pohledy.',
+        'Začni prvním subjektem a propoj ho s tím, co už máš — od tří vazeb výš začne graf vyprávět sám.',
+      ],
+    },
+    akce: [{ label: 'Otevřít Pavučinu', to: '/svet/:worldSlug/pavucina' }],
+    source: { kapitola: '11' },
+    verifiedAt: '2026-07-22',
+    status: 'funkcni',
+  },
+  {
+    id: 'svet.vykladni-skrin',
+    title: 'Výkladní skříň: ukázat bez otevření',
+    tags: ['vykladni skrin', 'showcase', 'verejne', 'sdileni', 'ctenari'],
+    routes: ['/svet/:worldSlug/nastaveni', '/svet/:worldSlug'],
+    audience: ['pj', 'pomocnyPJ', 'admin'],
+    minAudienceNote: 'Výkladní skříň zapíná PJ v Nastavení přístupu.',
+    body: {
+      odstavce: [
+        'Výkladní skříň pustí návštěvníky k vybraným částem světa jen ke čtení — aniž bys otevíral vstup nebo rozdával role.',
+        'Zapíná se v Nastavení světa (záložka Přístup) a sám určuješ, které stránky jsou vystavené. Soukromé zůstává soukromé.',
+        'Hodí se jako vizitka: ukážeš, na čem stavíš, a zájemci si řeknou o vstup.',
+      ],
+    },
+    akce: [{ label: 'Nastavení přístupu', to: '/svet/:worldSlug/nastaveni' }],
+    source: { kapitola: '09' },
+    verifiedAt: '2026-07-22',
+    status: 'funkcni',
+  },
+
   // ── Globální chat ──────────────────────────────────────────────────────
   {
     id: 'chat.globalni',

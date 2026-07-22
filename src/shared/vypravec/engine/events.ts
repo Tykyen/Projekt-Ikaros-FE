@@ -16,6 +16,7 @@ export type VypravecEventName =
   | 'invite.created'
   | 'join.requested'
   | 'dice.rolled'
+  | 'subject.created'
   | 'rsvp.confirmed'
   | 'persona.chosen';
 

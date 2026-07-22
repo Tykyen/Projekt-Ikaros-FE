@@ -13,9 +13,21 @@ export interface EventMatch {
 }
 
 export type DoneCondition =
-  | { kind: 'fe-event'; event: VypravecEventName; match?: EventMatch }
-  | { kind: 'probe'; key: 'gateOpened' }
-  | { kind: 'visit'; route: RoutePattern; scoped?: boolean };
+  | {
+      kind: 'fe-event';
+      event: VypravecEventName;
+      match?: EventMatch;
+      /** Alternativní eventy (05 §4: „žádost NEBO zpráva v Putyce"). */
+      altEvents?: { event: VypravecEventName; match?: EventMatch }[];
+    }
+  | { kind: 'probe'; key: 'gateOpened' | 'publicShowcaseOn' }
+  | {
+      kind: 'visit';
+      route: RoutePattern;
+      /** Alternativní routy (05 §4: vesmiry ∨ nábory). */
+      alt?: RoutePattern[];
+      scoped?: boolean;
+    };
 
 export interface JourneyStep {
   id: string;
@@ -125,5 +137,3 @@ export const PJ_START: Journey = {
     },
   ],
 };
-
-export const CESTY: Record<string, Journey> = { 'pj-start': PJ_START };

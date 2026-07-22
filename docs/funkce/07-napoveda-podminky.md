@@ -113,4 +113,4 @@ Krátká kapitola: vestavěná stránka Nápověda (6 tabů, statická), Podmín
 
 **CI pojistky:** `registry/__tests__/registrValidace.spec.ts` (unikátní ID, mrtvé routy/akce) · e2e `persona.spec.ts` (dialog→volba→lišta) · 50+ unit testů.
 
-**Vědomé mezery:** cesty 26.2/26.3 jen rozcestníky (plné v2) · fulltext „Zeptat se" = stretch S2 · in-situ „?" helpy zatím legacy obsah (parita MVP-B) · D-078 zúžen (NPC probe) · Měďák/TM průvodce = v2.
+**Doplněno 2026-07-22 (spec-26.7):** cesty 26.2 (hrac-start: 2 kroky + čekací stav s timeoutem) a 26.3 (wb-start: 4 kroky) NAPLNO · 10 návodů 26.5 (`registry/navody.ts`, menu Návody) · menu Cesty (start/pauza/zrušení) · emit `subject.created` (Pavučina) · probe `publicShowcaseOn` · oslavy dokončení cest. **Vědomé mezery:** fulltext „Zeptat se" = stretch S2 · in-situ „?" helpy zatím legacy obsah (parita MVP-B) · D-078 zbytek (NPC/pavučina probe) · Měďák/TM průvodce = v2.

@@ -7,7 +7,8 @@ import { describe, it, expect } from 'vitest';
 import { ROUTES } from '@/app/routeRegistry';
 import { ROUTE_HEADERS } from '../routeHeaders';
 import { CHYBOVE_TOPIKY, CHYBOVE_STATUSY } from '../errorTopics';
-import { CESTY } from '../journeys/pjStart';
+import { CESTY } from '../journeys';
+import { NAVODY } from '../navody';
 import { NETRIVIALNI_ROUTY } from '../netrivialniRouty';
 import { TOPIKY } from '../topics';
 
@@ -61,6 +62,25 @@ describe('registr Vypravěče — validace (CI)', () => {
       expect(topik.body.odstavce.length, `topik ${topik.id} bez těla`).toBeGreaterThan(0);
       expect(topik.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
+  });
+
+  it('návody: unikátní ID + akce vedou na existující routy + mají kroky', () => {
+    const ids = NAVODY.map((n) => n.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const n of NAVODY) {
+      expect(n.body.kroky?.length ?? 0, n.id).toBeGreaterThanOrEqual(3);
+      expect(n.body.kroky?.length ?? 0, n.id).toBeLessThanOrEqual(7);
+      for (const a of n.akce ?? [])
+        expect(znameRouty.has(a.to), `návod ${n.id} akce ${a.to}`).toBe(true);
+    }
+  });
+
+  it('topicId kroků cest odkazují na existující topiky', () => {
+    const zname = new Set(TOPIKY.map((t) => t.id));
+    for (const cesta of Object.values(CESTY))
+      for (const k of cesta.phases.flatMap((f) => f.steps))
+        if (k.topicId)
+          expect(zname.has(k.topicId), `krok ${k.id} → ${k.topicId}`).toBe(true);
   });
 
   it('netriviální routy (moment 2) existují v registru', () => {

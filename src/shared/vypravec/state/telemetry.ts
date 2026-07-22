@@ -31,7 +31,7 @@ interface Zaznam {
 const DEBOUNCE_MS = 5000;
 const MAX_BATCH = 50;
 
-let fronta: Zaznam[] = [];
+const fronta: Zaznam[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 
 function prihlaseny(): boolean {
@@ -77,7 +77,7 @@ export function zapojTelemetriiFlush(): void {
   flushZapojen = true;
   const flush = () => {
     if (!fronta.length || !prihlaseny()) return;
-    let token: string | null = null;
+    let token: string | null;
     try {
       token = JSON.parse(localStorage.getItem('ikaros.jwt') ?? 'null');
     } catch {

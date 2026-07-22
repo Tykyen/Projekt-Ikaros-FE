@@ -4,6 +4,7 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/react-query';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { useAtomValue } from 'jotai';
 import { api } from '@/shared/api/client';
 import { accessTokenAtom } from '@/shared/store/authStore';
@@ -122,7 +123,11 @@ export function useCreateSubject(worldId: string) {
         `/campaign/subjects?worldId=${worldId}`,
         input,
       ),
-    onSuccess: () => invalidateCampaign(qc, worldId),
+    onSuccess: () => {
+      invalidateCampaign(qc, worldId);
+      // Vypravěč (spec 26.7): krok „První vztah v Pavučině" cesty tvůrce.
+      vypravecEmit('subject.created', { worldId });
+    },
   });
 }
 
