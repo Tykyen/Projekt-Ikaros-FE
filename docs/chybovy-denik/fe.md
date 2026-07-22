@@ -2428,3 +2428,12 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Příznak cyklení:** po přidání „neviditelné" komponenty se přeskládal sousední sloupec/panel; hledám chybu v CSS komponenty místo v pozici mountu.
 
 ---
+
+### CH-132 — Persona dialog se bez e2e nikdy neukázal: init jen jednou (před loginem) + requestIdleCallback bez timeoutu hladoví · 2026-07-22
+**Kontext:** Vypravěč D11, e2e test persona flow (čerstvý účet → dialog → cesta).
+**Co jsem udělal špatně:** dvě časovací chyby v initu store. ① Init běžel v effectu s `[]` deps na `requestIdleCallback` — idle callback proběhl ještě před přihlášením (anonym → skip) a po loginu přes modal se layout NEremountuje, takže init už nikdy neproběhl → persona dialog by se reálným uživatelům neukázal až do reloadu. ② `requestIdleCallback` bez `timeout` option čeká na idle donekonečna — stránka s WS reconnect smyčkou (nebo čímkoli aktivním) není idle nikdy.
+**Proč to unit testy nechytily:** jsdom `requestIdleCallback` nemá → testy jely přes setTimeout fallback; a v testech jsem identitu nastavoval PŘED mountem. Chybu odhalil až e2e nad reálným chromium + mock, který ubíjí socket.io (= věčný reconnect = nikdy idle).
+**Poučení:** (1) „spusť po přihlášení" NIKDY nevěšet na mount — login přes modal layouty neremountuje; věš na identitu (`useAtomValue(currentUserAtom)?.id` v deps). (2) `requestIdleCallback` VŽDY s `{ timeout }` — jinak je to „možná nikdy". (3) e2e s reálným prohlížečem chytá časování, které jsdom principiálně nevidí — unit zelené ≠ flow funguje.
+**Příznak cyklení:** „v testu to funguje, na živém ne" u věcí závislých na idle/mount pořadí; přidávám logy do buildu, který console.log stripuje (log-hygiene) — instrumentovat jde jen přes network/DOM efekty.
+
+---
