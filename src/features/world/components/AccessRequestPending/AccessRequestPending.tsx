@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { useEffect, useState } from 'react';
 import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { toast } from 'sonner';
@@ -16,6 +17,12 @@ interface Props {
  * na JoinCTA.
  */
 export function AccessRequestPending({ worldId, requestedAt }: Props) {
+  // Vypravěč (D-080/B3): viditelná čekající žádost = zdroj pravdy pro krok
+  // „Ozvi se" — re-emit je idempotentní ($min/FWW), odškrtne i zpětně.
+  useEffect(() => {
+    vypravecEmit('join.requested', { worldId });
+  }, [worldId]);
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   // Vypravěč (spec 26.6): Žadatel — čekání není chyba (top zákys).
   useEffect(() => {

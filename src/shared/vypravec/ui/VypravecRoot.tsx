@@ -155,6 +155,9 @@ export function VypravecRoot({
   useEffect(() => {
     bublinaStore.nastavKolizni(kolizni); // fronta oslav/tipů (03 §5)
     bublinaStore.nastavScope(scope); // mluvčí fronty (Joe ≠ Ishida)
+    bublinaStore.nastavMluvci(
+      pattern === '/svet/:worldSlug/takticka-mapa' ? 'tm' : scope,
+    ); // busta bubliny (TM = Měďák)
     bublinaStore.zavriPriOdchodu(pathname); // příchozí bublinu nezabíjet (C1)
     if (pattern) {
       const uzVidel = onboardingStore

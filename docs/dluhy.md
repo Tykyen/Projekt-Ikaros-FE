@@ -16,11 +16,7 @@
 
 ## Otevřené
 
-### D-080 — Vypravěč: dvojí údržba nápovědy + odložené kusy (dřívější D-048)
-**Kde:** HelpPage sekce/WorldToolboxPanel/AnonStartPanel (JSX mimo registr) · busty bublin (assety ladem, čeká frontend-design) · deaktivovaná scéna TM bez UI reaktivace (jen undo) · probe žádostí o vstup (checklist žadatele může lhát při eventu před startem cesty) · tm-vycvik lišta na platformě bez CTA · mobil: možný překryv bubliny a zalomené lišty cesty (živě ověřit) · **Od:** 2026-07-23 (finální audit)
-**Dopad:** obsah nápovědy se udržuje na 2 místech; drobné mrtvé konce v okrajových tocích.
-**Návrh:** registry-render HelpPage sekcí (M–L); frontend-design pass bust; „Aktivovat" na neaktivní scéně v orchestraci; probe z cache my-access-requests; CTA fallback výběru světa; bottom-stack proměnná pro bublinu.
-*(SKILL napoveda a PR šablona odkazují D-080 = tento záznam.)*
+*(žádné — D-080 uzavřen 2026-07-23 večer: registry-render FAQ/toolbox/AnonStart + busty bublin + reaktivace scén + probe žádostí + CTA fallback + mobilní stack. Plný registry-render OSTATNÍCH HelpPage sekcí (Start/World/…) zůstává v2 dle 07 §5 — sekce jsou JSX s deep-link ID, dvojí údržba už se netýká dat.)*
 
 ---
 

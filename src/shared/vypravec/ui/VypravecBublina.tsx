@@ -5,6 +5,7 @@
 import { useSyncExternalStore } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { bublinaStore } from './bublinaStore';
+import { bustaProBublinu } from './bublinaBusty';
 import s from './Vypravec.module.css';
 
 export function VypravecBublina() {
@@ -25,7 +26,16 @@ export function VypravecBublina() {
       >
         ✕
       </button>
-      <p className={s.bublinaText}>{bublina.text}</p>
+      <div className={s.bublinaTelo}>
+        {/* D-080c — busta mluvčího dle nálady (oslava/chyba/tip) */}
+        <img
+          src={bustaProBublinu(bublina.mluvci ?? 'ikaros', bublina)}
+          alt=""
+          aria-hidden="true"
+          className={s.bublinaBusta}
+        />
+        <p className={s.bublinaText}>{bublina.text}</p>
+      </div>
       {bublina.akce && (
         <div className={s.bublinaAkce}>
           <button

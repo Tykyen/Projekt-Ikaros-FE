@@ -11,7 +11,7 @@
  * Spec: docs/arch/phase-10/spec-10.2c.md §2 (PJ orchestrator), §5.
  */
 import { useCallback, useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
@@ -19,7 +19,11 @@ import { api, parseApiError } from '@/shared/api/client';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { ConfirmDialog } from '@/shared/ui';
 import { postWorldOperation } from '../../api/worldOpsApi';
-import { postMapOperation, activateMapScene } from '../../api/mapApi';
+import {
+  postMapOperation,
+  activateMapScene,
+  listMapScenes,
+} from '../../api/mapApi';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
 import { ActiveScenesList } from './ActiveScenesList';
 import { PaletteAccordion } from './PaletteAccordion';
@@ -178,6 +182,30 @@ export function MapPjPanel({
       },
     );
   };
+
+  // D-080 — deaktivovaná scéna neměla ŽÁDNOU cestu zpět (jen undo):
+  // seznam neaktivních + „Aktivovat" přes activateMapScene.
+  const { data: vsechnySceny = [] } = useQuery({
+    queryKey: ['map', 'all-scenes', worldId],
+    queryFn: () => listMapScenes(worldId),
+    enabled: expanded && isPjStrict,
+    staleTime: 15_000,
+  });
+  const neaktivni = vsechnySceny.filter((s) => !s.isActive);
+  const reactivateMutation = useMutation({
+    mutationFn: (sceneId: string) => activateMapScene(sceneId, worldId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: activeScenesQueryKey(worldId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ['map', 'all-scenes', worldId],
+      });
+    },
+    onError: (err) => {
+      toast.error(`Aktivace scény selhala: ${parseApiError(err)}`);
+    },
+  });
 
   // 10.2c-edit-1 — scene.deactivate (per-scene op). BE atomic CAS isActive=false +
   // cascade unassign affected hráčů (privát map:reassigned event → empty state).
@@ -380,6 +408,24 @@ export function MapPjPanel({
                   ? createSceneMutation.error.message
                   : 'Nepodařilo se vytvořit scénu'}
               </p>
+            )}
+            {isPjStrict && neaktivni.length > 0 && (
+              <div className={styles.neaktivniSekce}>
+                <div className={styles.neaktivniLabel}>Neaktivní scény</div>
+                {neaktivni.map((sc) => (
+                  <div key={sc.id} className={styles.neaktivniRadek}>
+                    <span className={styles.neaktivniNazev}>{sc.name}</span>
+                    <button
+                      type="button"
+                      className={styles.neaktivniAktivovat}
+                      disabled={reactivateMutation.isPending}
+                      onClick={() => reactivateMutation.mutate(sc.id)}
+                    >
+                      Aktivovat
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </PaletteAccordion>
 

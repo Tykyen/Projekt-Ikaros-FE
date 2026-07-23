@@ -62,6 +62,7 @@ import { useFriendshipsSocket } from '@/features/friendships/hooks/useFriendship
 import { useWorldAccessSocket } from '@/features/world/hooks/useWorldAccessSocket';
 import { useWorldInviteSocket } from '@/features/world/hooks/useWorldInviteSocket';
 import { VypravecRoot } from '@/shared/vypravec/ui/VypravecRoot';
+import { ANON_START_KROKY } from '@/shared/vypravec/registry/anonStart';
 import { useAdminChatLive } from '@/features/admin/chat/api/useAdminChatLive';
 import { useAdminChatUnreadTotal } from '@/features/admin/chat/api/useAdminChat';
 import {
@@ -625,6 +626,8 @@ function RightPanel({ onNav }: { onNav?: () => void } = {}) {
 /**
  * Spec 15.7 — pravý panel pro anonima (místo Administrace/Moje světy). Timeline
  * 3 kroků „Začni tady"; krok 1 je klikací → otevře registraci.
+ * D-080a (07 §4): texty kroků žijí v registru Vypravěče (ANON_START_KROKY),
+ * panel je render-slot — akce (modal · Link · event) zůstávají tady.
  */
 function AnonStartPanel({ onNav }: { onNav?: () => void } = {}) {
   const setRegisterOpen = useSetAtom(registerModalOpenAtom);
@@ -633,49 +636,40 @@ function AnonStartPanel({ onNav }: { onNav?: () => void } = {}) {
       <div className={s.section} data-section-key="zacni-tady">
         <SectionTitle>Začni tady</SectionTitle>
         <ol className={s.startSteps}>
-          <li className={s.startStep}>
-            <span className={s.startNum}>1</span>
-            <button
-              type="button"
-              className={s.startStepLink}
-              onClick={() => {
-                setRegisterOpen(true);
-                onNav?.();
-              }}
-            >
-              <span className={s.startStepTitle}>Zaregistruj se</span>
-              <span className={s.startStepDesc}>Zdarma, během chvilky</span>
-            </button>
-          </li>
-          <li className={s.startStep}>
-            <span className={s.startNum}>2</span>
-            <Link
-              to="/ikaros/vesmiry"
-              className={s.startStepLink}
-              onClick={() => onNav?.()}
-            >
-              <span className={s.startStepTitle}>Vytvoř svůj svět</span>
-              <span className={s.startStepDesc}>
-                Nebo se rozhlédni po vesmírech — jde to i bez účtu
-              </span>
-            </Link>
-          </li>
-          <li className={s.startStep}>
-            <span className={s.startNum}>3</span>
-            <button
-              type="button"
-              className={s.startStepLink}
-              onClick={() => {
-                window.dispatchEvent(new Event('vypravec:otevrit'));
-                onNav?.();
-              }}
-            >
-              <span className={s.startStepTitle}>Pozvi přátele</span>
-              <span className={s.startStepDesc}>
-                Nevíš kudy? Vypravěč tě provede — klepni sem
-              </span>
-            </button>
-          </li>
+          {ANON_START_KROKY.map((krok, i) => {
+            const texty = (
+              <>
+                <span className={s.startStepTitle}>{krok.titulek}</span>
+                <span className={s.startStepDesc}>{krok.popis}</span>
+              </>
+            );
+            return (
+              <li key={krok.id} className={s.startStep}>
+                <span className={s.startNum}>{i + 1}</span>
+                {krok.id === 'vesmiry' ? (
+                  <Link
+                    to="/ikaros/vesmiry"
+                    className={s.startStepLink}
+                    onClick={() => onNav?.()}
+                  >
+                    {texty}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className={s.startStepLink}
+                    onClick={() => {
+                      if (krok.id === 'registrace') setRegisterOpen(true);
+                      else window.dispatchEvent(new Event('vypravec:otevrit'));
+                      onNav?.();
+                    }}
+                  >
+                    {texty}
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ol>
       </div>
     </div>

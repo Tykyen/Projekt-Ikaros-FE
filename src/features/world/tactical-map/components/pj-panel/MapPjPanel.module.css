@@ -471,3 +471,44 @@
 [data-diary-system='shadowrun'] .sectionTitle {
   color: var(--sr-log-eq, #8893b0);
 }
+
+/* D-080 — reaktivace neaktivních scén (dřív šlo jen undo) */
+.neaktivniSekce {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--frame-border);
+}
+.neaktivniLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.neaktivniRadek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+}
+.neaktivniNazev {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.neaktivniAktivovat {
+  flex: none;
+  font-size: var(--text-xs);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--frame-border);
+  background: none;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+.neaktivniAktivovat:hover {
+  border-color: var(--theme-accent, var(--accent, #7c5cff));
+}

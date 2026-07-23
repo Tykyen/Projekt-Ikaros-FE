@@ -3,7 +3,7 @@ import { LayoutGrid } from 'lucide-react';
 import { WorldRole } from '@/shared/types';
 import { HelpAccordion, InfoCard, InfoGrid } from '@/shared/ui/help';
 import { useWorldContext } from '../context/WorldContext';
-import { toolboxItemsFor } from './toolboxItems';
+import { toolboxItemsFor } from '@/shared/vypravec/registry/toolbox';
 import s from './WorldHelp.module.css';
 
 /**

@@ -5,7 +5,7 @@
  * zmizení; instrukce kroku je doručená předem, completion event potvrdí).
  * V jiném světě než contextWorld cesty se lišta sbalí do badge s navigate CTA.
  */
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   bazoveId,
@@ -35,12 +35,24 @@ export function JourneyBar({
 }) {
   const navigate = useNavigate();
   const [rozbalenaVKolizi, setRozbalenaVKolizi] = useState(false);
+  // D-080: výška lišty do CSS proměnné — bublina se na mobilu zvedne nad ni
+  // (vzor --map-inset-top), místo aby ji překryla.
+  const listaRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = listaRef.current;
+    const root = document.documentElement;
+    root.style.setProperty('--journey-bar-h', `${el?.offsetHeight ?? 0}px`);
+    return () => root.style.setProperty('--journey-bar-h', '0px');
+  });
   const krok = akt.dalsiKrok;
   if (!krok) return null;
   // Bez slugu by CTA navigovalo na doslovné ':worldSlug' → „Svět nenalezen".
   const slug = akt.contextWorldSlug ?? aktualniSlug;
-  const ctaCil = doplnSlug(krok.cta.to, slug);
-  const ctaFunkcni = !ctaCil.includes(':worldSlug');
+  const bezSlugu = doplnSlug(krok.cta.to, slug).includes(':worldSlug');
+  // D-080: na platformě bez fixace vede CTA aspoň na výběr světa.
+  const ctaCil = bezSlugu ? '/ikaros/vesmiry' : doplnSlug(krok.cta.to, slug);
+  const ctaLabel = bezSlugu ? 'Vybrat svět' : krok.cta.label;
+  const ctaFunkcni = true;
   const pauznuta = Boolean(
     onboardingStore.getSnapshot().journeys[akt.klic]?.pausedAt,
   );
@@ -74,7 +86,7 @@ export function JourneyBar({
   }
 
   return (
-    <div className={s.lista} aria-label="Aktivní krok cesty">
+    <div ref={listaRef} className={s.lista} aria-label="Aktivní krok cesty">
       <div className={s.kruh} style={{ ['--prog' as string]: `${progresDeg}deg` }}>
         <span>
           {akt.poradi.hotovo}/{akt.poradi.celkem}
@@ -101,7 +113,7 @@ export function JourneyBar({
               if (krok.anchor) zvyrazni(krok.anchor); // čeká na mount cíle (retry)
             }}
           >
-            {krok.cta.label}
+            {ctaLabel}
           </button>
         )}
         <button

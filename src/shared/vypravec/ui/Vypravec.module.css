@@ -602,6 +602,36 @@
   border-radius: var(--radius-sm);
 }
 
+/* D-080c — busta mluvčího v bublině (kompakt, nikdy neroztahuje text) */
+.bublinaTelo {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.bublinaBusta {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  object-position: top;
+  border: 1.5px solid color-mix(in srgb, var(--acc) 55%, var(--frame-border));
+  background: color-mix(in srgb, var(--surface-2) 80%, var(--acc) 20%);
+}
+@media (max-width: 768px) {
+  .bublinaBusta {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* D-080: bublina nesmí překrýt zalomenou lištu cesty na mobilu */
+@media (max-width: 768px) {
+  .bublina {
+    bottom: calc(84px + var(--journey-bar-h, 0px));
+  }
+}
+
 /* Stav Badge (03 §3) — tečka na FAB při nepřečteném changelogu */
 .fabBadge {
   position: absolute;

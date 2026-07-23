@@ -33,6 +33,8 @@ export interface Bublina {
   jenTed?: boolean;
   /** Interní: scope vzniku — fronta nedoručí světový text na platformě. */
   vznikScope?: 'ikaros' | 'world';
+  /** Interní: mluvčí plochy ZOBRAZENÍ (busta) — razítkuje zobraz(). */
+  mluvci?: 'ikaros' | 'world' | 'tm';
   /**
    * Zavolá se v okamžiku SKUTEČNÉHO zobrazení (ne zařazení do fronty) —
    * sem patří konzumace „jednou za život" nároku (zavritTip, session flag).
@@ -54,6 +56,12 @@ class BublinaStore {
   private kolizni = false;
   /** Scope aktuální plochy — hlásí VypravecRoot (mluvčí ≠ jen kolize). */
   private scopeAktualni: 'ikaros' | 'world' = 'ikaros';
+  /** Mluvčí aktuální plochy (TM = Měďák) — pro bustu bubliny. */
+  private mluvciAktualni: 'ikaros' | 'world' | 'tm' = 'ikaros';
+
+  nastavMluvci(m: 'ikaros' | 'world' | 'tm'): void {
+    this.mluvciAktualni = m;
+  }
   /** Fronta doručení: kolize (03 §5) i obsazená klidná plocha (N1). */
   private fronta: Bublina[] = [];
 
@@ -122,7 +130,11 @@ class BublinaStore {
   /** Skutečné zobrazení — jediné místo, kde se volá priZobrazeni. */
   private zobraz(b: Bublina): void {
     if (this.hideTimer) clearTimeout(this.hideTimer);
-    this.aktualni = { ...b, route: window.location.pathname };
+    this.aktualni = {
+      ...b,
+      route: window.location.pathname,
+      mluvci: this.mluvciAktualni,
+    };
     if (b.oslava) this.hideTimer = setTimeout(() => this.zmiz(), 8000);
     this.notify();
     b.priZobrazeni?.();
