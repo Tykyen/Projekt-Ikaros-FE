@@ -1,116 +1,130 @@
 ---
 name: napoveda
-description: Aktualizuj stránku Nápověda (`/ikaros/napoveda`) když se v projektu změní funkčnost — nová stránka, přechod ze 🚧 na ✅, změna role/oprávnění, nová profilová sekce, nový workflow, který hráč musí znát. Spusť po dokončení implementace každé fáze/feature, před commitem.
+description: Udržuj obsah Vypravěče — registr src/shared/vypravec/registry/ (topiky, routeHeaders, errorTopics, changelog) a dočasně i HelpPage — v souladu se změnou funkčnosti. Spusť po dokončení implementace každé fáze/feature, VŽDY po skillu funkce, před commitem. Vstupem je seznam dotčených topiků od skillu funkce.
 ---
 
-# Skill: napoveda
+# Skill: napoveda (obsah Vypravěče + HelpPage)
 
-Drží stránku Nápověda v souladu s aktuálním stavem platformy. Bez ní obsah rychle zastará a uživatel dostává nepravdivé informace.
+Drží doručovanou nápovědu v souladu s realitou. Řetěz pravdy: kód → `docs/funkce/`
+→ **registr `src/shared/vypravec/registry/`** → plochy (Vypravěč panel, HelpPage,
+in-situ „?", empty-states). **Nové help texty vznikají VÝHRADNĚ v registru** — nikdy
+hardcoded bublina/tooltip/text v komponentě (jinak vzniká šestý zdroj driftu).
+
+## Režim skillu (zjisti PRVNÍ)
+
+| Režim | Poznávací znak | Co udržuješ |
+|---|---|---|
+| PŘECHODOVÝ | `src/shared/vypravec/registry/` neexistuje | jen HelpPage (tabulka §HelpPage níže) |
+| DVOJÍ | registr existuje, sekce HelpPage nemigrované | registr (primárně) + JSX nemigrovaných sekcí HelpPage |
+| CÍLOVÝ | dotčená sekce HelpPage renderuje z registru | jen registr |
+
+Režim se určuje **per dotčená sekce** — migrace jde kapitola po kapitole (nikdy big-bang).
+Stav migrace: tabulka v `src/shared/vypravec/registry/MIGRACE.md` (zakládá se s registrem).
 
 ## Kdy spustit
 
-- **Po implementaci nové stránky / route** (i když je zatím stub — patří do 🚧).
-- **Když stránka přechází ze stubu na funkční** (přesun z 🚧 na ✅).
-- **Při změně funkčnosti existující funkční stránky** (přidání sekce, nového flow, změny chování).
-- **Při změně rolí / oprávnění** (nová role, změna co kdo smí, nová granular permission).
-- **Při změně profilových sekcí** (nové pole, nová sekce, změna workflow).
-- **Při zavedení nového konceptu**, který hráč musí znát (tombstone, queue typu, theme, ...).
+Stejné spouštěče jako skill `funkce` (nová route · stub→funkční · změna chování ·
+změna rolí/oprávnění · nový koncept · nový workflow) + navíc:
+- **nový/změněný errorCode nebo friendly hláška** (403/404/409/429…),
+- **nová „soustředěná" plocha** (fullscreen editor, composer, mapový režim),
+- **změna kroků tutoriálové cesty** (journeys).
 
-Nespouštěj při:
-- Refaktoringu bez funkční změny.
-- Typo / drobné CSS / theme úpravě.
-- Změně, která je interní (BE-only, dev-only, lint config, ...).
+Nespouštěj při: refaktoring bez funkční změny · typo/CSS/theme · BE-only interní změna.
+Vstup: seznam dotčených topiků od skillu `funkce` (grep `source.kapitola`).
 
-## Struktura HelpPage — kam co patří
+## Tabulka změna → akce v registru
 
-> Redesign 13.5 (2026-06-06): nápověda má **6 tabů** a staví na **sadě
-> znovupoužitelných bloků** (`components/`). Stará `PagesSection.tsx` (ploché
-> `PageDoc` pole) **už neexistuje** — rozdělena na `PlatformSection` + `WorldSection`.
+| Změna | Akce v `src/shared/vypravec/registry/` |
+|---|---|
+| Nová route/stránka | `routeHeaders.ts` nový RouteHeader (name+blurb+audienceNotes) + aspoň tenký topik v `topics/<oblast>.ts`; route musí být v typovaném route registru |
+| Stub → funkční | topik: přepiš `body` na realitu, `status: 'stub'→'funkcni'` (nebo `'castecne'`), `verifiedAt` = dnes |
+| Změna chování existující funkce | update `body` dotčených topiků + `verifiedAt` = dnes |
+| Změna rolí/oprávnění | update `audience` (+ `minAudienceNote` pro role pod floorem); zkontroluj audience-sanity tabulku (parita s guardy) |
+| Nový pojem/žargon | přidej do `tags` dotčených topiků (synonymický můstek pro fulltext); heslo slovníčku = v2 (skill `slovnicek`) |
+| Nový errorCode / změna friendly hlášky | `errorTopics.ts`: mapování errorCode → topicId; topik = 2. linie „PROČ + co dál". Friendly hláška (rule friendly-messaging) = 1. linie a ZŮSTÁVÁ; obě znění nesmí protiřečit — zkontroluj proti FE/BE hlášce |
+| User-facing změna (cokoli, co uživatel uvidí) | záznam do `changelog.ts` `{version, date, title, body, topicId?}`; nový/výrazně změněný topik dostane `since` (štítek „nové") |
+| Rename/přesun route | update `routes`, `links.to`, `deepLink` všech dotčených topiků — CI test mrtvých odkazů to jinak shodí |
+| Nová „soustředěná" plocha | doplň kolizní whitelist (pravidlo skrytí kotvy) — POVINNÉ, default při neznámé ploše = skrýt |
+| Nový cíl navigace/kroku cesty | `anchors.ts` `{id, route, visibleFor?, mobileNote?, fallbackText}` + atribut `data-vypravec` v komponentě |
+| Změna tutoriálové cesty | `journeys/*.ts` (kroky, DoneCondition, narratorLine — voice pass) |
 
-```
-src/features/ikaros/pages/HelpPage/
-├── HelpPage.tsx                       # 6 tabů + datum „Aktualizováno k YYYY-MM-DD" (lead)
-├── helpers.ts                         # HELP_TABS (start/platforma/svet/role/ucet/faq) + TAB_LABELS
-├── media.ts                           # registr obrázků/screenshotů: klíč → {src?,alt,caption}
-├── components/                        # sada bloků (REUSE, nepiš nové ad-hoc):
-│   │                                  #   HelpAccordion (+Sub), InfoCard (+InfoGrid), TagChip,
-│   │                                  #   TermGrid, CalloutBox, StepList, PermissionTable,
-│   │                                  #   ScreenshotSlot, IllustrationSlot; accenty v accents.ts
-│   └── ...
-└── sections/
-    ├── StartSection.tsx               # onboarding: hero, první kroky, orientace, slovníček (TermGrid)
-    ├── PlatformSection.tsx            # ⬅ nástroje platformy (Ikaros-level), <Tool> ve skupinách
-    ├── WorldSection.tsx               # ⬅ nástroje světa, vč. taktické mapy (<MapFeature> pod-pod-sekce)
-    ├── RolesSection.tsx               # ⬅ collapsible globální + světové role + PermissionTable
-    ├── AccountSection.tsx             # ⬅ harmonika profilu (HelpAccordion bloky) + tombstone
-    └── FaqSection.tsx                 # ⬅ FAQ pole s `cat`, seskupené do kategorií (HelpAccordion)
-```
+## Pravidla psaní textů (voice pass)
 
-Stránky se v Platform/World sekcích reprezentují lokálním helperem `<Tool>`
-(= `HelpSubAccordion` s audience `TagChip` v hlavičce). Audience štítek nahrazuje
-staré `who`; bohatý popis jde do těla (odstavce + `CalloutBox`/`StepList`/`TermGrid`).
-Status stránky (✅/🚧) piš slovy v textu — ploché `PageDoc.status` pole už není.
+- Hlas Ishida dle style-guide: tykání · proaktivní replika ≤ 200 znaků · topik 3–6 vět
+  + akce · flavor max 1/8 · humor NIKDY v chybových stavech · žádné vykřičníky
+  v instrukcích, zdrobněliny, guilt-trip.
+- **Žádné tvrzení mimo zdrojovou kapitolu `docs/funkce/`** (pole `source` to kotví).
+- `status` topiku odpovídá stavu v `docs/funkce/` (✅→'funkcni', 🚧→'castecne'/'stub')
+  — Vypravěč u 🚧 říká pravdu, nepiš nedokončené jako funkční.
+- Anonymní pohled: „v profilu (po přihlášení)", ne „v tvém profilu".
+- Žádné interní termíny (D-NNN, spec §, BE error kódy) v textech pro hráče.
+- Odkazy na plnou nápovědu: do zavedení deep-link kontraktu (MVP-B) jen holé
+  `/ikaros/napoveda`, příp. `?sekce=X` (ta už dnes funguje); NIKDY `&topik=Y`
+  před schválením kontraktu (07 §7.2).
+- Barvy/UI netvoř — obsahový skill; UI změny řeší `frontend-design`/`mobil-desktop`.
 
-### Mapování změna → sekce
+## HelpPage — dočasná dvojí údržba (režim DVOJÍ)
 
-| Typ změny | Cíl |
-|-----------|-----|
-| Nová/změněná platformní stránka | `PlatformSection.tsx` → přidej/uprav `<Tool>` ve vhodné `HelpAccordion` skupině |
-| Nová/změněná světová stránka | `WorldSection.tsx` → `<Tool>` ve skupině |
-| Nová funkce taktické mapy | `WorldSection.tsx` → `<MapFeature>` uvnitř „Taktická mapa" |
-| Stub → funkční | uprav text `<Tool>` na reálný popis (štítky stavu jen ✅/🚧) |
-| Nová globální role | `RolesSection.tsx` → `GLOBAL_CARDS` + `GLOBAL_COLUMNS`/`GLOBAL_ROWS` |
-| Nová světová role | `RolesSection.tsx` → `WORLD_CARDS` + `WORLD_COLUMNS`/`WORLD_ROWS` |
-| Změna admin hierarchie | `RolesSection.tsx` → skupina „Globální role" → „Hierarchie a omezení adminů" |
-| Nová sekce profilu | `AccountSection.tsx` → přidej `HelpAccordion` blok |
-| Změna profilového flow (heslo, username, smazání) | `AccountSection.tsx` → relevantní blok (často `StepList`) |
-| Nový queue typ / koncept / pojem | `FaqSection.tsx` → přidej do `FAQ` s `cat`; pojem i do `StartSection` slovníčku (`TermGrid`) |
-| Nový screenshot k doplnění | `media.ts` (nový klíč) + `<ScreenshotSlot media="…">` v sekci + řádek v `docs/arch/phase-13/napoveda-screenshoty.md` |
+Dokud dotčená sekce HelpPage nerenderuje z registru, propiš user-facing změnu i do JSX:
+
+| Typ změny | Cíl v `src/features/ikaros/pages/HelpPage/` |
+|---|---|
+| Platformní stránka | `sections/PlatformSection.tsx` → `<Tool>` ve skupině |
+| Světová stránka / taktická mapa | `sections/WorldSection.tsx` → `<Tool>` / `<MapFeature>` |
+| Role/oprávnění | `sections/RolesSection.tsx` → `GLOBAL_/WORLD_CARDS` + tabulky (3 propojené — sync) |
+| Profil | `sections/AccountSection.tsx` → `HelpAccordion` blok |
+| Pojem/FAQ | `sections/FaqSection.tsx` (`FAQ` s `cat`) + slovníček v `StartSection` (`TermGrid`) |
+| Screenshot | `media.ts` + `<ScreenshotSlot>` |
+
+Vždy: reuse bloky z `components/` · štítky jen ✅/🚧 · aktualizuj „Aktualizováno k"
+v `HelpPage.tsx`. Jakmile je sekce migrovaná (zápis v `MIGRACE.md`), JSX edit ODPADÁ
+— edituje se jen registr. Nepřidávej tab bez souhlasu uživatele.
+
+## Definition of done fáze
+
+Fáze/feature NENÍ hotová bez: **kód + `funkce` + topik (registr) + changelog**.
+Chybí-li kterákoli část, fáze se nezaškrtává v roadmapě.
 
 ## Postup
 
-1. **Identifikuj změnu** z kontextu konverzace nebo z git diff. Pokud měla fázi v roadmapu (1.5, 2.3, ...), zjisti přesný stav z `docs/roadmap-fe.md`.
-
-2. **Klasifikuj** dle tabulky výše. Pokud změn je víc, projdi je jednu po druhé.
-
-3. **Otevři příslušnou sekci** v `src/features/ikaros/pages/HelpPage/sections/` a najdi relevantní místo:
-   - **`PlatformSection` / `WorldSection`** — `<Tool>` (= `HelpSubAccordion` + audience `TagChip`) uvnitř `HelpAccordion` skupiny; taktická mapa má `<MapFeature>`.
-   - **`RolesSection`** — data pole `GLOBAL_CARDS`/`WORLD_CARDS` + `*_COLUMNS`/`*_ROWS` pro `PermissionTable`; akční tabulka „Co kdo smí" je `<table>` v `tableWrap`.
-   - **`AccountSection`** — `HelpAccordion` bloky (akce přes `StepList`).
-   - **`FaqSection`** — pole `FAQ` (objekty `{ cat, q, a }`), `cat` ∈ ucet/komunita/svet/obecne.
-   - **`StartSection`** — slovníček je `TermGrid`.
-
-4. **Aplikuj edit** přesně dle stylu okolního obsahu:
-   - Píš česky, jednoduchými větami.
-   - **Reuse bloky z `components/`** — žádné nové ad-hoc komponenty.
-   - Status stránky vyjádři slovy / `TagChip` — štítky stavu jen ✅/🚧.
-   - Externí dokumentaci (specs, plans) neodkazuj — nápověda je pro hráče, ne pro AI agenta.
-
-5. **Aktualizuj datum** v `HelpPage.tsx` v lead odstavci („Aktualizováno k YYYY-MM-DD") — vždy dnešní datum.
-
+1. **Převezmi vstup** od skillu `funkce`: seznam dotčených topiků + typ změny.
+   Bez seznamu (skill spuštěn samostatně) proveď grep `source.kapitola` sám.
+2. **Klasifikuj** dle tabulky změna → akce; změn víc → jednu po druhé.
+3. **Edituj registr** dle tabulky + pravidel psaní. U KAŽDÉHO dotčeného topiku
+   nastav `verifiedAt` na dnešní datum (i když se text nemění a jen jsi ověřil platnost).
+4. **Changelog** při každé user-facing změně.
+5. **Režim DVOJÍ:** propiš do nemigrovaných sekcí HelpPage (tabulka výše).
 6. **Verifikace:**
    ```bash
-   npm run test:run -- src/features/ikaros/pages/HelpPage
+   npm run test:run -- src/shared/vypravec      # CI validace registru: unikátní ID, mrtvé odkazy, audience sanity, kotvy
+   npm run test:run -- src/features/ikaros/pages/HelpPage   # jen pokud editována HelpPage
    npm run lint:colors
    ```
-   (NE `npx vitest run` — flaky „failed to find current suite".) Pokud test krytí spadlo
-   (např. změna struktury sekce), uprav `__tests__/HelpPage.spec.tsx`.
-
-7. **Krátký report uživateli** — 1–2 věty: co jsi v nápovědě upravil a kde.
-
-## Pravidla
-
-- **Štítky pouze ✅ Funguje a 🚧 Připravujeme** — žádné jiné varianty (žádné „beta", „částečně", „experimental"...).
-- **Nepiš nedokončené featury jako funkční.** Stub stránka = 🚧 dokud nemá reálnou funkčnost (i kdyby existoval route).
-- **Anonymní pohled.** Stránka je dostupná i nepřihlášenému; nepiš věty „v tvém profilu...", piš „v profilu (po přihlášení)".
-- **Žádné interní termíny** (D-NNN dluhy, „spec 1.4 §4.2", BE error kódy). Ty patří do `docs/`, ne do nápovědy.
-- **Tabulky rolí** se mění opatrně — `RoleSection` mají 3 propojené tabulky (globální / akční matice / světové). Změna v jedné může vyžadovat sync v druhých.
-- **Nepřidávej tab** (přes `helpers.ts`) bez explicitního souhlasu uživatele — to je strukturální redesign.
-- **Nedokumentuj role, které nemají reálné chování** (Korektor / Čtenář / Žadatel / Ikarus). Zůstávají v poznámce „v přípravě".
-- **Když HelpPage potřebuje větší restruct** (nová tab, sjednocení sekcí, ...), zastav se a navrhni to uživateli — nedělej silent redesign.
+7. **Krátký report uživateli** — 1–2 věty: které topiky/sekce, jaká akce.
 
 ## Vazba na ostatní workflow
 
-- Tento skill **navazuje** na `spec-driven-development` — spusť `napoveda` v Fázi 3 (aktualizace specifikace) společně se zaškrtnutím roadmapu.
-- Souvisí s dluhem **D-048 (HelpPage content drift)** v `docs/dluhy.md` — tento skill je nástroj jak D-048 řešit kontinuálně.
-- Pokud změna byla čistě grafická (skin / theme), **NE**spouštěj `napoveda` — to řeší [[mobil-desktop]] a `frontend-design`.
+- **Vstup od `funkce`** (seznam dotčených topiků) — vždy až PO ní; `funkce` = pravda,
+  `napoveda` = doručení.
+- **Navazuje na `spec-driven-development`** Fázi 3 (po implementaci, se zaškrtnutím roadmapy).
+- **`chybovy-denik`**: oprava obsahu/CI nezabrala 2× nebo cyklíš v migraci → CH-xxx;
+  dokončená migrace sekce HelpPage → ✅ ŘEŠENÍ. Běžné obsahové edity NEzapisuj.
+- Řeší kontinuálně dluh **D-048** (HelpPage content drift) — nemigrovaná sekce
+  s driftem = záznam přes skill `dluh`.
+- Čistě grafická změna (skin/theme) → NEspouštěj (řeší `mobil-desktop`/`frontend-design`).
+
+## Dodatek spec-26.8: cesty a návody jsou taky obsah
+
+Registr od fáze 26 obsahuje i **cesty** (`registry/journeys/*.ts` — kroky s
+replikami a done podmínkami) a **návody** (`registry/navody.ts` — 3–7 kroků
+imperativem). Tabulka změna → akce pro ně platí stejně:
+
+- Nová stránka/tlačítko v toku cesty → zkontroluj `cta.to`, `narratorLine`
+  a done podmínku dotčených kroků (event payload/probe se mohly změnit).
+- Změna UI labelu, který návod cituje → oprav krok návodu (návod cituje
+  CÍLOVOU obrazovku doslovně).
+- Nový netriviální modul → zvaž zápis do `netrivialniRouty.ts` — ale JEN
+  pokud panel má pro routu header/topik („Provedu tě" nesmí vést do prázdna).
+- Po každé změně registru spusť `npx vitest run src/shared/vypravec/registry`
+  (CI validace: mrtvé routy, unikátní ID, topicId kroků) a u textů voice pass
+  proti few-shotům v `docs/vypravec/02-persona-a-grafika.md` §2.

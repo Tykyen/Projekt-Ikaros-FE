@@ -112,3 +112,15 @@ Mapa kapitol je i v `00-prehled.md`. Když si nejsi jistý kam funkce patří, o
 - **Páruje se s `napoveda`** — `funkce` = hluboký zdroj pravdy, `napoveda` = hráčský výtah z něj. Měň oba.
 - **Souvisí s `dluh`** — nově objevený dluh zapiš přes `dluh` do `docs/dluhy.md` A zrcadli do sekce „⚠️ Nesrovnalosti & dluhy" dotčené kapitoly.
 - Pokud byla změna čistě grafická (skin/theme) bez funkčního dopadu, `funkce` **NE**spouštěj.
+
+## Krok navíc: dotčené topiky Vypravěče (spec 26.8)
+
+Po aktualizaci kapitoly VŽDY vypiš seznam dotčených jednotek obsahu Vypravěče
+a předej ho skillu `napoveda`:
+
+1. `grep -rn "kapitola: '<NN>'" src/shared/vypravec/registry/` (NN = číslo
+   měněné kapitoly) → topiky/návody kotvené do této kapitoly.
+2. Změnila-li se routa/role/chybový kód, přidej i dotčené `routeHeaders.ts`,
+   `errorTopics.ts` a kroky cest (`registry/journeys/`).
+3. Výstup = odrážkový seznam ID; skill `napoveda` u každého rozhodne
+   update/nový/smazat a zvedne `verifiedAt`.
