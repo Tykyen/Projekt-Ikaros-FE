@@ -16,6 +16,11 @@
 
 ## Otevřené
 
+### D-079 — Vypravěč: restart zrušené cesty a výběr světa při startu
+**Kde:** journeyEngine (startCesty/FWW contextWorldId) · **Od:** 2026-07-23 (hloubková revize, engine nález 4+5)
+**Dopad:** restart zrušené cesty zdědí staré kroky i fixovaný svět (BE $min/FWW nejde vzít zpět) — cesta začne „rozehraná"; PJ s více světy nemá při startu výběr světa (D-078 probe fixne PRVNÍ navštívený vlastní svět). MVP zmírnění: „Začít" u zrušené cesty startuje se starým progresem (přiznaně).
+**Návrh:** generace progresu (klíč `jId~n` na BE) + dialog výběru světa při startu cesty, má-li uživatel vlastní světy.
+
 ### D-078 — Vypravěč: probe `hasOwnWorld` a `pagesAboveSeed` neimplementovány (kroky cesty spoléhají na event)
 **Kde:** `src/shared/vypravec/engine/journeyEngine.ts` (probeResync umí jen `gateOpened`) · **Od:** 2026-07-22 (spec-26.4 odchylka 2)
 **Dopad:** pravidlo „probe = zdroj pravdy, event = trigger" platí jen pro krok 4; kroky 1 a 3 se při ušlém eventu (zavřený tab před flushí, druhé zařízení) neodškrtnou zpětně — checklist může „lhát", dokud uživatel akci nezopakuje.

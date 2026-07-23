@@ -995,6 +995,17 @@ export function IkarosLayout() {
             isAuthenticated={isAuthenticated}
             onNav={() => setDrawerOpen(false)}
           />
+          {/* Vypravěč (03 §5) — mobilní vstup i na kolizních plochách (Putyka). */}
+          <button
+            type="button"
+            className={s.drawerVypravec}
+            onClick={() => {
+              setDrawerOpen(false);
+              window.dispatchEvent(new Event('vypravec:otevrit'));
+            }}
+          >
+            🗝️ Vypravěč — nápověda a průvodce
+          </button>
         </aside>
 
         <main

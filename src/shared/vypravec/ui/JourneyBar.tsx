@@ -5,6 +5,7 @@
  * zmizení; instrukce kroku je doručená předem, completion event potvrdí).
  * V jiném světě než contextWorld cesty se lišta sbalí do badge s navigate CTA.
  */
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   doplnSlug,
@@ -26,6 +27,7 @@ export function JourneyBar({
   jinySvet: boolean;
 }) {
   const navigate = useNavigate();
+  const [rozbalenaVKolizi, setRozbalenaVKolizi] = useState(false);
   const krok = akt.dalsiKrok;
   if (!krok) return null;
   const pauznuta = Boolean(
@@ -37,7 +39,7 @@ export function JourneyBar({
     (akt.poradi.hotovo / akt.poradi.celkem) * 360,
   );
 
-  if (kolizni || jinySvet) {
+  if ((kolizni && !rozbalenaVKolizi) || jinySvet) {
     const text = jinySvet
       ? 'Cesta pokračuje v jiném světě'
       : krok.title;
@@ -48,6 +50,7 @@ export function JourneyBar({
         onClick={() => {
           if (jinySvet && akt.contextWorldSlug)
             navigate(`/svet/${akt.contextWorldSlug}`);
+          else setRozbalenaVKolizi(true); // 03 §8.3: tap = rozbalení
         }}
         aria-label={`Cesta ${akt.cesta.id}: ${text} (${akt.poradi.hotovo}/${akt.poradi.celkem})`}
       >
@@ -60,13 +63,13 @@ export function JourneyBar({
   }
 
   return (
-    <div className={s.lista} role="status" aria-label="Aktivní krok cesty">
+    <div className={s.lista} aria-label="Aktivní krok cesty">
       <div className={s.kruh} style={{ ['--prog' as string]: `${progresDeg}deg` }}>
         <span>
           {akt.poradi.hotovo}/{akt.poradi.celkem}
         </span>
       </div>
-      <div className={s.listaTexty}>
+      <div className={s.listaTexty} role="status">
         <div className={s.listaTitul}>
           {krok.title} <span aria-hidden="true">· ~{krok.estMin} min</span>
         </div>

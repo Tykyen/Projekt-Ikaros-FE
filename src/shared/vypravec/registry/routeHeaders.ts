@@ -74,19 +74,19 @@ export const ROUTE_HEADERS: readonly RouteHeader[] = [
   },
   {
     route: '/chat/camp',
-    name: 'Camp',
+    name: 'Fantasy camp',
     blurb:
       'Atmosférická roleplay místnost mimo světy. Vstupuješ jako svá Camp postava.',
   },
   {
     route: '/chat/camp2',
-    name: 'Camp II',
+    name: 'Mystery camp',
     blurb:
       'Atmosférická roleplay místnost mimo světy. Vstupuješ jako svá Camp postava.',
   },
   {
     route: '/chat/camp3',
-    name: 'Camp III',
+    name: 'Sci-fi camp',
     blurb:
       'Atmosférická roleplay místnost mimo světy. Vstupuješ jako svá Camp postava.',
   },

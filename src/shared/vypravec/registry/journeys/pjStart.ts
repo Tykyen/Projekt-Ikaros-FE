@@ -89,7 +89,7 @@ export const PJ_START: Journey = {
           id: 'pj.prvni-npc',
           title: 'První NPC',
           narratorLine:
-            'Svět ožije postavami. Založ první NPC — nebo si ho vypůjč z bestiáře systému, ať nezačínáš od nuly.',
+            'Svět ožije postavami. Založ první NPC — stačí jméno a pár vět, zbytek dopíšeš, až bude potřeba.',
           cta: {
             label: 'Založit NPC',
             to: '/svet/:worldSlug/nova-stranka?typ=npc',

@@ -611,3 +611,23 @@
   .headerBtn { padding: 7px 7px; }
   .logoImg { width: 112px; }
 }
+
+/* Vypravěč v mobilním draweru (03 §5) — trvalý vstup, i na kolizních plochách */
+.drawerVypravec {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 8px 12px 12px;
+  padding: 10px 12px;
+  min-height: 44px;
+  background: none;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.drawerVypravec:hover {
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+}

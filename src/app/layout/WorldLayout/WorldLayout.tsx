@@ -781,6 +781,20 @@ export function WorldLayout() {
                   ⚙ Nastavení světa
                 </Link>
               </div>
+              {/* Vypravěč (03 §5) — trvalý mobilní vstup; jediná cesta k panelu
+                  na kolizních plochách (chat/TM/editor), kde je FAB skrytý. */}
+              <div className={s.drawerSection}>
+                <button
+                  type="button"
+                  className={s.drawerLink}
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    window.dispatchEvent(new Event('vypravec:otevrit'));
+                  }}
+                >
+                  🗝️ Vypravěč — nápověda a průvodce
+                </button>
+              </div>
               {isPJ && (
                 <button
                   type="button"
@@ -863,6 +877,8 @@ export function WorldLayout() {
             worldId: realWorldId ?? undefined,
             worldSlug: worldSlug ?? undefined,
             accessMode: world?.accessMode,
+            publicShowcase: world?.publicShowcase,
+            hasCharacter: characterSlot != null,
           }}
         />
       </div>

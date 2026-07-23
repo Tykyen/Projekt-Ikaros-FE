@@ -13,9 +13,12 @@ import { NAVODY } from '../registry/navody';
 import { CESTY } from '../registry/journeys';
 import {
   pauzaCesty,
+  postupCesty,
   startCesty,
   zrusitCestu,
 } from '../engine/journeyEngine';
+import { useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/shared/store/authStore';
 import { onboardingStore } from '../state/onboardingStore';
 import type { HelpTopic } from '../registry/types';
 import { doplnSlug } from '../engine/journeyEngine';
@@ -159,6 +162,8 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
     onboardingStore.subscribe,
     onboardingStore.getSnapshot,
   );
+  // Anonym cestu startovat nesmí — login by ji zahodil (journeys se nemergují).
+  const prihlasen = useAtomValue(currentUserAtom) != null;
   const POPISKY: Record<string, string> = {
     'pj-start': 'PJ Start — od nuly k první zprávě ve vlastním světě',
     'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
@@ -172,8 +177,7 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
       <div className={s.personaVolby}>
         {Object.values(CESTY).map((c) => {
           const prog = stav.journeys[c.id];
-          const celkem = c.phases.flatMap((f) => f.steps).length;
-          const hotovo = prog ? Object.keys(prog.steps ?? {}).length : 0;
+          const { hotovo, celkem } = postupCesty(c.id);
           const bezi = prog && !prog.dismissedAt && hotovo < celkem;
           const pauznuta = Boolean(bezi && prog?.pausedAt);
           const dokoncena = prog && !prog.dismissedAt && hotovo >= celkem;
@@ -189,9 +193,13 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
               </small>
               <div className={s.bublinaAkce}>
                 {!prog || prog.dismissedAt ? (
-                  <button type="button" className={s.cta} onClick={() => startCesty(c.id)}>
-                    Začít
-                  </button>
+                  prihlasen ? (
+                    <button type="button" className={s.cta} onClick={() => startCesty(c.id)}>
+                      Začít
+                    </button>
+                  ) : (
+                    <small>Cesty jsou pro přihlášené — vytvoř si účet.</small>
+                  )
                 ) : dokoncena ? null : (
                   <>
                     <button
@@ -257,7 +265,7 @@ export default function VypravecPanel({
         root.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         ),
-      );
+      ).filter((el) => el.offsetParent !== null); // skryté madlo na desktopu
     focusables()[0]?.focus();
     function onKey(e: KeyboardEvent) {
       if (e.key !== 'Tab') return;
@@ -280,7 +288,8 @@ export default function VypravecPanel({
   const topik = topikId
     ? (topikPodleId(topikId) ?? NAVODY.find((n) => n.id === topikId))
     : undefined;
-  const karty = topikyProRoutu(pattern, audience).slice(0, 4);
+  // Bez řezu — panel scrolluje; slice(0,4) zabíjel PJ topiky na dashboardu.
+  const karty = topikyProRoutu(pattern, audience);
 
   function otevriTopik(id: string) {
     setTopikId(id);
@@ -291,7 +300,7 @@ export default function VypravecPanel({
     <div
       ref={ref}
       className={s.panel}
-      data-rozbaleny={rozbaleny || undefined}
+      data-rozbaleny={rozbaleny || personaVolba || undefined}
       role="dialog"
       aria-labelledby="vypravec-kde-jsem"
     >

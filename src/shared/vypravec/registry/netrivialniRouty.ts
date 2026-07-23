@@ -7,16 +7,11 @@
 import type { RoutePattern } from '@/app/routeRegistry';
 
 export const NETRIVIALNI_ROUTY: ReadonlySet<RoutePattern> = new Set<RoutePattern>([
+  // JEN routy, kde panel má reálný obsah — „Provedu tě" nesmí vést do prázdna
+  // (revize pokrytí 2026-07-23). Zbytek se vrátí s obsahem Tier 1.
   '/svet/:worldSlug/pavucina',
   '/svet/:worldSlug/kalendar',
-  '/svet/:worldSlug/pocasi',
-  '/svet/:worldSlug/obchod',
-  '/svet/:worldSlug/prevodnik-men',
-  '/svet/:worldSlug/scenare',
   '/svet/:worldSlug/mapy',
   '/svet/:worldSlug/timeline',
-  '/ikaros/tvorba',
-  '/ikaros/generatory',
-  '/svet/:worldSlug/podzemi',
   '/svet/:worldSlug/bestiar',
 ]);

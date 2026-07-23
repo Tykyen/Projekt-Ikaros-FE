@@ -33,7 +33,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     routes: ['/svet/:worldSlug/hraci', '/svet/:worldSlug/nastaveni', '/svet/:worldSlug'],
     body: {
       odstavce: [
-        'Hierarchie světa odspodu: Čtenář (jen čte) → Hráč (postava, chat, hraní) → Korektor (opravuje texty) → Pomocný PJ (většina nástrojů PJ) → PJ (vládne světu).',
+        'Hierarchie světa odspodu: Čtenář (jen čte) → Hráč (postava, chat, hraní) → Korektor (pomáhá se správou části nastavení) → Pomocný PJ (většina nástrojů PJ) → PJ (vládne světu).',
         'Pozor na asymetrii: Pomocný PJ vede hru a spravuje obsah, ale žádosti o vstup schvaluje jen PJ. A předat svět umí výhradně jeho vlastník.',
       ],
       kroky: [
@@ -56,7 +56,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Jako platformní Admin nemáš ve světě automatickou moc — nejdřív musíš „nahodit práva" (elevaci) pro konkrétní svět.',
-        'Ani elevace ale neumí všechno: předání světa, členské rituály a governance zůstávají v rukou PJ. Elevace je nástroj pro moderaci, ne pro vládu.',
+        'Elevace dává plnou moc PJ — nastavení, členy i schvalování žádostí. Jediné, co neobejde, je předání světa (a obnovení smazaného): to zůstává vlastníkovi.',
       ],
     },
     source: { kapitola: '08' },
@@ -72,7 +72,8 @@ export const TOPIKY: readonly HelpTopic[] = [
     routes: ['/ikaros/vesmiry', '/svet/:worldSlug', '/invite/:token'],
     body: {
       odstavce: [
-        'Každý svět má jeden ze čtyř režimů přístupu: Veřejný (vstoupíš rovnou), Otevřený (klepeš — žádost schvaluje PJ), Soukromý (jen na pozvání) a k tomu může mít výkladní skříň pro čtení bez vstupu.',
+        'Každý svět má jeden ze čtyř režimů přístupu: Veřejný (vstoupíš rovnou), Veřejný se schválením (klepeš — žádost schvaluje PJ), Soukromý (jen na pozvání) a Uzavřený (nikdo nový nevstoupí).',
+        'K tomu může mít svět zapnutou výkladní skříň — ta není režim, ale samostatné okno pro čtení vybraných sekcí bez vstupu.',
         'Pozvánka nebo pozvací odkaz tě přivede jako Čtenáře — o vyšší roli pak rozhoduje PJ.',
         'Tlačítko na dashboardu světa vždy odpovídá jeho režimu: Vstoupit, Požádat o vstup, nebo nic (soukromý svět bez pozvánky neotevřeš).',
       ],
@@ -90,7 +91,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Dvě různé cesty dovnitř. „Chci hrát" podá žádost o vstup — po schválení ti PJ založí postavu a hraješ.',
-        '„Jen číst" tě udělá Čtenářem hned (kde to svět dovolí): vidíš obsah, ale nemáš postavu ani chat hráčů.',
+        '„Jen číst" podá žádost o čtení — Čtenářem se stáváš po schválení PJ (jen u Veřejného světa vstoupíš rovnou). Čtenář vidí obsah, ale nemá postavu ani chat hráčů.',
         'Čtenář se může na Hráče doptat kdykoli později — rozhodnutí je na PJ.',
       ],
     },
@@ -183,7 +184,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     routes: ['/svet/:worldSlug/nastaveni'],
     body: {
       odstavce: [
-        'Nastavení světa má přes dvacet záložek, ale nikdy je nevidíš všechny: část je vázaná na roli (většina patří PJ) a část na herní systém světa — třeba šablona deníku se ukazuje jen tam, kde dává smysl.',
+        'Nastavení světa má bezmála dvacet záložek, ale nikdy je nevidíš všechny: část je vázaná na roli (většina patří PJ) a část na herní systém světa — třeba šablona deníku se ukazuje jen tam, kde dává smysl.',
         'Chybějící záložka tedy není chyba. Pokud potřebuješ něco, co vidí jen PJ, požádej ho — role jsou popsané v topiku o světových rolích.',
       ],
     },
@@ -235,7 +236,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Hráč si postavu sám nezakládá — to je záměr, ne omezení. Postavu tvoří a přiděluje PJ, aby seděla do světa i pravidel.',
-        'Cesta vypadá takhle: vstoupíš do světa jako Hráč, domluvíš se s PJ (klidně v kanálu Postavy) a on ti postavu založí nebo předá existující.',
+        'Nejrychlejší cesta: v žádosti o vstup zvol „Chci hrát" a přilož návrh postavy — jedno schválení PJ ti dá roli Hráče i živou postavu najednou. Kdo vstoupil jako Čtenář, domluví se s PJ dodatečně (klidně v kanálu Postavy).',
         'Jakmile ji máš, najdeš ji pod Moje postava a v adresáři Postav.',
       ],
     },
@@ -287,7 +288,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Hráč tvoří stránky přes „+ Navrhnout" — návrh čeká na schválení PJ a do té doby ho ostatní nevidí. Tvůj text tedy nezmizel, jen stojí ve frontě.',
-        'PJ a Pomocný PJ tvoří rovnou, bez schvalování. Korektor smí opravovat existující texty.',
+        'PJ a Pomocný PJ tvoří i upravují rovnou, bez schvalování — editace stránek je od Pomocného PJ výš.',
         'Schválený návrh se objeví v Encyklopedii jako běžná stránka.',
       ],
     },
@@ -320,7 +321,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     id: 'rozcestnik.kalendare',
     title: 'Tři „kalendáře" — který kdy',
     tags: ['kalendar', 'akce', 'timeline', 'cas', 'udalosti'],
-    routes: ['/svet/:worldSlug/kalendar', '/svet/:worldSlug/timeline', '/ikaros/akce'],
+    routes: ['/svet/:worldSlug/kalendar', '/svet/:worldSlug/timeline', '/svet/:worldSlug/akce', '/ikaros/akce'],
     body: {
       odstavce: [
         'Kalendáře jsou tři a každý měří jiný čas.',
@@ -413,7 +414,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Výkladní skříň pustí návštěvníky k vybraným částem světa jen ke čtení — aniž bys otevíral vstup nebo rozdával role.',
-        'Zapíná se v Nastavení světa (záložka Přístup) a sám určuješ, které stránky jsou vystavené. Soukromé zůstává soukromé.',
+        'Zapíná se v Nastavení světa (záložka Přístup) a vystaví pevné sekce ke čtení: novinky, stránky, postavy, mapy a bestiář. Tajnosti dál chrání zámky AKJ.',
         'Hodí se jako vizitka: ukážeš, na čem stavíš, a zájemci si řeknou o vstup.',
       ],
     },
@@ -428,7 +429,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     id: 'chat.globalni',
     title: 'Putyka, Campy a Voice',
     tags: ['putyka', 'camp', 'voice', 'ttl', 'host', 'globalni chat'],
-    routes: ['/chat', '/chat/camp', '/'],
+    routes: ['/chat', '/chat/camp', '/chat/camp2', '/chat/camp3', '/'],
     body: {
       odstavce: [
         'Putyka je společná hospoda celé platformy — zprávy v ní žijí hodinu a pak mizí, je to místo na potkávání, ne archiv. Nakouknout smí i host bez účtu.',

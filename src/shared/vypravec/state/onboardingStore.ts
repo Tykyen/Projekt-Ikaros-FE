@@ -174,6 +174,10 @@ class OnboardingStore {
   private initDone = false;
   /** GET doběhl a uživatel je čerstvý (žádný state, ne legacy) — moment 1 (26.4). */
   jeNovy = false;
+  /** Init (GET) doběhl — moment 2 u přihlášeného čeká na tohle (C11). */
+  get initHotovo(): boolean {
+    return this.initDone;
+  }
 
   // ── čtení ──────────────────────────────────────────────────────────────
   getSnapshot = (): OnboardingStateFE => {
@@ -208,11 +212,13 @@ class OnboardingStore {
       if (anonState.seenRoutes.length) delta.seenRoutesAdd = anonState.seenRoutes;
       if (anonState.dismissed.length) delta.dismissedAdd = anonState.dismissed;
       const vse = [delta, ...anonPending].reduce(sloucitDelty, {});
-      if (Object.keys(vse).length) this.aplikuj(vse);
       localStorage.removeItem(stateKey('anon'));
       localStorage.removeItem(pendingKey('anon'));
+      // aplikuj (setState v cizích komponentách) NESMÍ běžet v render fázi —
+      // getSnapshot volá useSyncExternalStore při renderu (E14).
+      if (Object.keys(vse).length) queueMicrotask(() => this.aplikuj(vse));
     }
-    this.notify();
+    queueMicrotask(() => this.notify());
   }
 
   // ── zápis ──────────────────────────────────────────────────────────────

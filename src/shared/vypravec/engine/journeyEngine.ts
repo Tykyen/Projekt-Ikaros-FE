@@ -32,6 +32,31 @@ export interface AktivniCesta {
   poradi: { hotovo: number; celkem: number };
 }
 
+/** Explicitní aktivní cesta (rozhodnutí 14) — lokální; BE pořadí je $min. */
+const AKTIVNI_KEY = 'vypravec:aktivniCestaId';
+function ulozAktivniId(jId: string): void {
+  try {
+    localStorage.setItem(AKTIVNI_KEY, jId);
+  } catch {
+    /* fallback: nejnovější nepauznutá */
+  }
+}
+function ctiAktivniId(): string | null {
+  try {
+    return localStorage.getItem(AKTIVNI_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Dokončenost = PRŮNIK s definicí (steps na BE nikdy neubývají). */
+function hotoveKroky(cesta: Journey, steps: Record<string, string> | undefined): Set<string> {
+  const s = new Set<string>();
+  for (const k of cesta.phases.flatMap((f) => f.steps))
+    if (steps && k.id in steps) s.add(k.id);
+  return s;
+}
+
 /** contextWorldSlug žije jen lokálně (BE drží id; slug pro deep-linky). */
 const slugKey = (jId: string) => `vypravec:worldSlug:${jId}`;
 
@@ -59,6 +84,8 @@ export function startCesty(jId: string): void {
   onboardingStore.aplikuj({
     journeys: { [jId]: { startedAt: new Date().toISOString(), dismissedAt: null, pausedAt: null } },
   });
+  ulozAktivniId(jId);
+  pauzniOstatni(jId);
   telemetrie('journey_started', { refId: jId });
 }
 
@@ -66,6 +93,24 @@ export function pauzaCesty(jId: string, pauza: boolean): void {
   onboardingStore.aplikuj({
     journeys: { [jId]: { pausedAt: pauza ? new Date().toISOString() : null } },
   });
+  if (!pauza) {
+    // „Pokračovat" = převzetí aktivity (rozhodnutí 14: max 1 aktivní)
+    ulozAktivniId(jId);
+    pauzniOstatni(jId);
+  }
+}
+
+/** Max 1 aktivní: ostatním rozběhnutým nedokončeným zapiš pauzu. */
+function pauzniOstatni(krome: string): void {
+  const s = onboardingStore.getSnapshot();
+  for (const [jId, p] of Object.entries(s.journeys)) {
+    if (jId === krome || p.dismissedAt || p.pausedAt || !CESTY[jId]) continue;
+    const hotovo = hotoveKroky(CESTY[jId], p.steps);
+    if (hotovo.size >= CESTY[jId].phases.flatMap((f) => f.steps).length) continue;
+    onboardingStore.aplikuj({
+      journeys: { [jId]: { pausedAt: new Date().toISOString() } },
+    });
+  }
 }
 
 export function zrusitCestu(jId: string): void {
@@ -87,7 +132,7 @@ export function krokSplnen(jId: string, stepId: string, at?: string): void {
     const prog = onboardingStore.getSnapshot().journeys[jId];
     if (cesta && prog) {
       const celkem = cesta.phases.flatMap((f) => f.steps).length;
-      if (Object.keys(prog.steps ?? {}).length >= celkem) {
+      if (hotoveKroky(cesta, prog.steps).size >= celkem) {
         const o = OSLAVY_DOKONCENI[jId];
         if (o)
           bublinaStore.show({
@@ -137,26 +182,46 @@ function matchuje(
 /** Aktivní cesta = nejnovější nastartovaná, nezrušená, nedokončená. */
 export function aktivniCesta(): AktivniCesta | null {
   const s = onboardingStore.getSnapshot();
-  let nej: { jId: string; startedAt: string } | null = null;
-  for (const [jId, p] of Object.entries(s.journeys)) {
-    if (p.dismissedAt || !CESTY[jId]) continue;
-    if (!nej || p.startedAt > nej.startedAt) nej = { jId, startedAt: p.startedAt };
+  const kandidat = (jId: string): boolean => {
+    const p = s.journeys[jId];
+    if (!p || p.dismissedAt || p.pausedAt || !CESTY[jId]) return false;
+    return (
+      hotoveKroky(CESTY[jId], p.steps).size <
+      CESTY[jId].phases.flatMap((f) => f.steps).length
+    );
+  };
+  let vybrana = ctiAktivniId();
+  if (!vybrana || !kandidat(vybrana)) {
+    vybrana = null;
+    for (const jId of Object.keys(s.journeys)) {
+      if (!kandidat(jId)) continue;
+      if (!vybrana || s.journeys[jId].startedAt > s.journeys[vybrana].startedAt)
+        vybrana = jId;
+    }
   }
-  if (!nej) return null;
-  const cesta = CESTY[nej.jId];
-  const prog = s.journeys[nej.jId];
+  if (!vybrana) return null;
+  const cesta = CESTY[vybrana];
+  const prog = s.journeys[vybrana];
   const kroky = cesta.phases.flatMap((f) => f.steps);
-  const hotovo = new Set(Object.keys(prog.steps ?? {}));
-  if (hotovo.size >= kroky.length) return null; // dokončená → lišta pryč
+  const hotovo = hotoveKroky(cesta, prog.steps);
+  if (hotovo.size >= kroky.length) return null; // pojistka
   const dalsiKrok = kroky.find((k) => !hotovo.has(k.id)) ?? null;
   return {
     cesta,
     contextWorldId: prog.contextWorldId,
-    contextWorldSlug: ctiSlug(nej.jId),
+    contextWorldSlug: ctiSlug(vybrana),
     hotovo,
     dalsiKrok,
     poradi: { hotovo: hotovo.size, celkem: kroky.length },
   };
+}
+
+/** Postup cesty pro UI — průnik s definicí (E13). */
+export function postupCesty(jId: string): { hotovo: number; celkem: number } {
+  const cesta = CESTY[jId];
+  const prog = onboardingStore.getSnapshot().journeys[jId];
+  const celkem = cesta ? cesta.phases.flatMap((f) => f.steps).length : 0;
+  return { hotovo: cesta ? hotoveKroky(cesta, prog?.steps).size : 0, celkem };
 }
 
 /** Doplnění `:worldSlug` do CTA z contextu cesty. */
@@ -166,6 +231,18 @@ export function doplnSlug(to: string, slug?: string): string {
 
 /** Zpracování jednoho eventu proti aktivní cestě. */
 function zpracujEvent(e: VypravecEvent): void {
+  // Fixace světa i pro DOKONČENOU joins cestu (Putykou hotová, žádost až pak)
+  if (e.name === 'join.requested' && e.payload.worldId) {
+    const s = onboardingStore.getSnapshot();
+    for (const [jId, p] of Object.entries(s.journeys)) {
+      if (p.dismissedAt || p.contextWorldId || CESTY[jId]?.worldBinding !== 'joins')
+        continue;
+      onboardingStore.aplikuj({
+        journeys: { [jId]: { contextWorldId: e.payload.worldId } },
+      });
+      ulozSlug(jId, e.payload.worldSlug);
+    }
+  }
   const akt = aktivniCesta();
   if (!akt || onboardingStore.getSnapshot().journeys[akt.cesta.id]?.pausedAt)
     return;
@@ -206,7 +283,8 @@ function zpracujEvent(e: VypravecEvent): void {
  */
 export function zpracujNavstevu(pathname: string): void {
   const akt = aktivniCesta();
-  if (!akt) return;
+  if (!akt || onboardingStore.getSnapshot().journeys[akt.cesta.id]?.pausedAt)
+    return;
   for (const krok of akt.cesta.phases.flatMap((f) => f.steps)) {
     if (akt.hotovo.has(krok.id) || krok.done.kind !== 'visit') continue;
     if (krok.done.scoped && !akt.contextWorldSlug) continue; // bez fixace nevíme
@@ -247,6 +325,8 @@ export function probeResync(ctx: {
       journeys: { [akt.cesta.id]: { contextWorldId: ctx.worldId } },
     });
     krokSplnen(akt.cesta.id, prvniKrok.id);
+    ulozSlug(akt.cesta.id, ctx.worldSlug);
+    zpracujNavstevu(window.location.pathname);
     akt = aktivniCesta();
     if (!akt) return;
   }
@@ -304,9 +384,8 @@ export function zkontrolujCekaniHrace(ctx?: {
   const s = onboardingStore.getSnapshot();
   const prog = s.journeys['hrac-start'];
   if (!prog || prog.dismissedAt || !prog.contextWorldId) return;
-  const kroky = Object.keys(prog.steps ?? {});
   const celkem = CESTY['hrac-start'].phases.flatMap((f) => f.steps).length;
-  if (kroky.length < celkem) return; // cesta ještě běží
+  if (hotoveKroky(CESTY['hrac-start'], prog.steps).size < celkem) return; // běží
 
   // (a) postava je na světě — jen ve světě cesty
   if (ctx?.worldId === prog.contextWorldId && ctx.hasCharacter) {

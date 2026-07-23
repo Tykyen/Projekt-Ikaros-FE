@@ -38,7 +38,18 @@ function prihlaseny(): boolean {
   return getDefaultStore().get(currentUserAtom) != null;
 }
 
+let frontaUid: string | null = null;
+/** Fronta patří JEDNÉ identitě — logout/login ji vyprázdní (misattribution). */
+function zajistiIdentituFronty(): void {
+  const uid = getDefaultStore().get(currentUserAtom)?.id ?? null;
+  if (uid !== frontaUid) {
+    fronta.length = 0;
+    frontaUid = uid;
+  }
+}
+
 async function odeslat(): Promise<void> {
+  zajistiIdentituFronty();
   if (!fronta.length || !prihlaseny()) return;
   const davka = fronta.splice(0, MAX_BATCH);
   try {
@@ -53,6 +64,7 @@ export function telemetrie(
   event: TelemetrieEvent,
   meta: Omit<Zaznam, 'event'> = {},
 ): void {
+  zajistiIdentituFronty();
   if (!prihlaseny()) return;
   fronta.push({
     event,

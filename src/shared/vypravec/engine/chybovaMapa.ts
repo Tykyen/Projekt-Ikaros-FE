@@ -3,6 +3,7 @@
  * bublina s vysvětlením „proč + co dál" (2. linie; 1. linie friendly hláška
  * zůstává v místě chyby). Čítač v sessionStorage — nový tab = čistý stůl.
  */
+import { matchRoutePattern } from '@/app/routeRegistry';
 import { odebirejApiChyby, type ApiChyba } from './chybovyKanal';
 import { najdiChybovyTopik } from '../registry/errorTopics';
 import { bublinaStore } from '../ui/bublinaStore';
@@ -28,12 +29,17 @@ function zpracuj(ch: ApiChyba): void {
   const topik = najdiChybovyTopik(ch.code, ch.status);
   if (!topik) return;
   if (zapocitej(ch) < 2) return;
-  bublinaStore.show({
+  const zobrazeno = bublinaStore.show({
     dismissKey: topik.id,
+    sessionDismiss: true, // chyba se vrací — trvalé umlčení by ji pohřbilo
     text: topik.text,
     akce: topik.akce,
   });
-  telemetrie('topic_open', { refId: topik.id, route: ch.route });
+  if (zobrazeno)
+    telemetrie('topic_open', {
+      refId: topik.id,
+      route: matchRoutePattern(ch.route) ?? undefined, // žádná entity ID (04 §5.6)
+    });
 }
 
 let zapojeno = false;

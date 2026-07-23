@@ -125,12 +125,15 @@ describe('onboardingStore', () => {
     expect(pending).toHaveLength(1);
   });
 
-  it('anon → login: anon dismissed se přenese deltou a anon klíče se smažou', () => {
+  it('anon → login: anon dismissed se přenese deltou a anon klíče se smažou', async () => {
     jotai.set(currentUserAtom, null);
     void onboardingStore.getSnapshot(); // kontext anon
     onboardingStore.zavritTip('anon-tip');
     expect(onboardingStore.getSnapshot().dismissed).toContain('anon-tip');
     prihlasit('u4');
+    void onboardingStore.getSnapshot(); // spustí přepnutí kontextu
+    await Promise.resolve(); // anon-merge běží v microtasku (E14 — ne v render fázi)
+    await Promise.resolve();
     expect(onboardingStore.getSnapshot().dismissed).toContain('anon-tip');
     expect(localStorage.getItem('vypravec:anon')).toBeNull();
     const pending = JSON.parse(localStorage.getItem('vypravec:u4:pending') ?? '[]');

@@ -17,8 +17,13 @@ export interface ChybovyTopik {
 export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
   LIMIT_REACHED: {
     id: 'err.limit-reached',
-    text: 'Narazil jsi na strop tvorby — limity drží platformu zdravou (50 světů včetně smazaných, 2000 stránek na svět). Pokud je to omyl, ozvi se správcům.',
+    text: 'Narazil jsi na strop tvorby — přesné číslo říká hláška u akce. Limity drží platformu zdravou; pokud tě reálně blokují, ozvi se správcům.',
     akce: { label: 'Kontakt', to: '/kontakt' },
+  },
+  WORLD_MEMBERSHIP_QUOTA_REACHED: {
+    id: 'err.world-quota-free',
+    text: 'Bez Podporovatele můžeš být ve třech světech naráz. Uvolni místo odchodem z některého světa, nebo se mrkni, co dává podpora.',
+    akce: { label: 'Podporovatelé', to: '/ikaros/podporovatele' },
   },
   WORLD_QUOTA_REACHED: {
     id: 'err.world-quota',
@@ -27,11 +32,11 @@ export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
   },
   REJECTED_RECENTLY: {
     id: 'err.rejected-recently',
-    text: 'Po odmítnuté žádosti běží 7denní pauza — druhá strana ti ale může napsat hned.',
+    text: 'Po odmítnuté žádosti o přátelství běží 7denní pauza. Druhá strana ti ale může poslat žádost sama kdykoli. (Žádostí o vstup do světa se pauza netýká.)',
   },
   SOLE_PJ_BLOCK: {
     id: 'err.sole-pj',
-    text: 'Svět nesmí zůstat bez Pána jeskyně. Nejdřív jmenuj nástupce mezi hráči, pak můžeš odejít.',
+    text: 'Účet teď smazat nejde — jsi jediný PJ svého světa a svět nesmí osiřet. Jmenuj v něm Pomocného PJ (Nastavení → Členové), pak to půjde.',
   },
   WORLD_OWNER_CANNOT_LEAVE: {
     id: 'err.owner-leave',
@@ -65,7 +70,7 @@ export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
 export const CHYBOVE_STATUSY: Record<number, ChybovyTopik> = {
   403: {
     id: 'err.403',
-    text: 'Tahle sekce vyžaduje vyšší roli, než ve světě máš. Role uděluje PJ — napiš mu, pokud ji potřebuješ.',
+    text: 'Tahle sekce vyžaduje vyšší oprávnění — ve světě roli od PJ, na platformě třeba Podporovatele nebo správce. Pokud ji potřebuješ, ozvi se tomu, kdo ji uděluje.',
   },
   404: {
     id: 'err.404',

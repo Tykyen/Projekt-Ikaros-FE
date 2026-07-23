@@ -590,3 +590,13 @@
 [data-world-shell] .searchBar {
   box-shadow: var(--depth-inset);
 }
+
+/* Vypravěč v draweru je <button> — srovnat s Link vzhledem .drawerLink */
+button.drawerLink {
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}

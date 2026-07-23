@@ -19,6 +19,8 @@ export interface VypravecWorldInfo {
   worldId?: string;
   worldSlug?: string;
   accessMode?: string;
+  publicShowcase?: boolean;
+  hasCharacter?: boolean;
 }
 
 /** WorldRole → audience (04 §2; Žadatel není audience → čte jako host). */

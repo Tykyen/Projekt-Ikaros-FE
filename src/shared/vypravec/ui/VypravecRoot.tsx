@@ -21,6 +21,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { currentUserAtom } from '@/shared/store/authStore';
+import { UserRole } from '@/shared/types';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
 import {
@@ -34,6 +35,7 @@ import {
   probeResync,
   startCesty,
   zapojJourneyEngine,
+  zkontrolujCekaniHrace,
   zpracujNavstevu,
 } from '../engine/journeyEngine';
 import { vypravecEmit } from '../engine/events';
@@ -53,13 +55,28 @@ function useKlavesniceOtevrena(): boolean {
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const zaklad = vv.height;
+    let zaklad = vv.height;
     function onResize() {
       if (!vv) return;
+      // pinch-zoom není klávesnice; rotace resetuje baseline
+      if (vv.scale > 1.05) {
+        setOtevrena(false);
+        return;
+      }
       setOtevrena(zaklad - vv.height > 150);
     }
+    function onOrientace() {
+      window.setTimeout(() => {
+        if (vv) zaklad = vv.height;
+        onResize();
+      }, 300);
+    }
     vv.addEventListener('resize', onResize);
-    return () => vv.removeEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onOrientace);
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onOrientace);
+    };
   }, []);
   return otevrena;
 }
@@ -88,7 +105,11 @@ export function VypravecRoot({
   // ZÁVISLOST na identitě: login přes modal layout NEremountuje — bez ní by
   // idle callback proběhl ještě jako anonym a init po přihlášení už nikdy
   // (persona dialog by se neukázal do reloadu).
-  const userId = useAtomValue(currentUserAtom)?.id ?? null;
+  const uzivatel = useAtomValue(currentUserAtom);
+  const userId = uzivatel?.id ?? null;
+  // Platformní Admin/Superadmin → audience 'admin' (role.admin-elevace aj.)
+  const jePlatformniAdmin =
+    uzivatel != null && uzivatel.role <= UserRole.Admin;
   useEffect(() => {
     zapojFlush();
     zapojJourneyEngine();
@@ -117,12 +138,15 @@ export function VypravecRoot({
   // kontrola PŘED záznamem (jinak by routa byla „viděná" dřív, než promluvíme).
   // Odchod z routy tip zavírá bez penalizace (03 §3). Pak záznam + visit kroky.
   useEffect(() => {
-    bublinaStore.zmiz();
+    bublinaStore.zavriPriOdchodu(pathname); // příchozí bublinu nezabíjet (C1)
     if (pattern) {
       const uzVidel = onboardingStore
         .getSnapshot()
         .seenRoutes.includes(pattern);
-      if (!uzVidel && NETRIVIALNI_ROUTY.has(pattern) && !kolizni) {
+      // U přihlášeného čekej na init (server zná seen/dismissed z jiných
+      // zařízení) — jinak „Poprvé tady?" lže prvních pár sekund.
+      const initOk = !userId || onboardingStore.initHotovo;
+      if (initOk && !uzVidel && NETRIVIALNI_ROUTY.has(pattern) && !kolizni) {
         bublinaStore.show({
           dismissKey: `prvni:${pattern}`,
           text: 'Poprvé tady? Provedu tě.',
@@ -132,7 +156,7 @@ export function VypravecRoot({
       onboardingStore.zaznamenejRoutu(pattern);
     }
     zpracujNavstevu(pathname);
-  }, [pattern, pathname, kolizni]);
+  }, [pattern, pathname, kolizni, userId]);
 
   // D7 — probe rekonsiliace ve world scope (gateOpened z accessMode; slug
   // resync pro deep-linky). Probe = zdroj pravdy, auto-odškrtne i zpětně.
@@ -143,23 +167,48 @@ export function VypravecRoot({
       worldSlug: world.worldSlug,
       accessMode: world.accessMode,
       isPJ: world.isPJ,
+      publicShowcase: world.publicShowcase,
     });
-  }, [scope, world?.worldId, world?.worldSlug, world?.accessMode, world?.isPJ]);
+    zkontrolujCekaniHrace({
+      worldId: world.worldId,
+      hasCharacter: world.hasCharacter,
+    });
+  }, [
+    scope,
+    world?.worldId,
+    world?.worldSlug,
+    world?.accessMode,
+    world?.isPJ,
+    world?.publicShowcase,
+    world?.hasCharacter,
+  ]);
 
   // 26.4 — volba persony: JEDINÉ auto-otevření panelu vůbec (05 §1).
   // Jen čerstvý účet (jeNovy z GET), bez persony, nezavřený dialog, mimo kolizi.
   const [personaVolba, setPersonaVolba] = useState(false);
   const personaAutoOpenRef = useRef(false);
   useEffect(() => {
-    return onboardingStore.subscribe(() => {
+    const zkus = () => {
       if (personaAutoOpenRef.current || !onboardingStore.jeNovy) return;
       const s = onboardingStore.getSnapshot();
       if (s.persona || s.dismissed.includes('persona-dialog')) return;
+      // Nevnucovat: kolizní plocha / klávesnice / rozepsaný vstup (03 §4).
+      const el = document.activeElement as HTMLElement | null;
+      const pise =
+        el &&
+        (el.tagName === 'INPUT' ||
+          el.tagName === 'TEXTAREA' ||
+          el.isContentEditable);
+      const vzor = matchRoutePattern(window.location.pathname);
+      if ((vzor && KOLIZNI_ROUTY.has(vzor)) || pise) return; // zkusí se znovu
       personaAutoOpenRef.current = true;
       setPersonaVolba(true);
       setOtevreny(true);
-    });
-  }, []);
+    };
+    const odhlasit = onboardingStore.subscribe(zkus);
+    zkus();
+    return odhlasit;
+  }, [pathname]);
 
   const navigate = useNavigate();
   const zvolPersonu = useCallback(
@@ -173,8 +222,13 @@ export function VypravecRoot({
       // Volba naviguje na první krok (26.2/26.3 plné cesty = v2; rozcestník
       // MVP): PJ startuje cestu 26.1, hráč jde hledat stůl, tvůrce zakládat.
       if (p === 'pj') startCesty('pj-start');
-      else if (p === 'hrac') navigate('/ikaros/vesmiry');
-      else if (p === 'worldbuilder') navigate('/ikaros/vytvorit-svet');
+      else if (p === 'hrac') {
+        startCesty('hrac-start');
+        navigate('/ikaros/vesmiry');
+      } else if (p === 'worldbuilder') {
+        startCesty('wb-start');
+        navigate('/ikaros/vytvorit-svet');
+      }
     },
     [navigate],
   );
@@ -183,6 +237,15 @@ export function VypravecRoot({
     setOtevreny(false);
     // focus zpět na vyvolávač (03 §7)
     fabRef.current?.querySelector('button')?.focus();
+  }, []);
+
+  // Vstup z mobilního draweru / "?" (03 §5) — otevře panel i na kolizní ploše.
+  useEffect(() => {
+    function onOtevrit() {
+      setOtevreny(true);
+    }
+    window.addEventListener('vypravec:otevrit', onOtevrit);
+    return () => window.removeEventListener('vypravec:otevrit', onOtevrit);
   }, []);
 
   // Odchod z routy zavírá panel (kontext se změnil) — render-phase adjustment,
@@ -210,7 +273,7 @@ export function VypravecRoot({
           (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)
         )
           return;
-        if (kolizni) return; // na kolizní ploše se panel nevnucuje ani zkratkou přes skrytý FAB
+        // Shift+V je EXPLICITNÍ pull — funguje i na kolizní ploše (03 §5)
         e.preventDefault();
         setOtevreny((o) => !o);
       }
@@ -232,7 +295,7 @@ export function VypravecRoot({
   // Kolizní plocha / klávesnice: FAB+panel skryté, ale lišta cesty se SBALÍ
   // do proužku, nikdy nezmizí (03 §8.3 — poslední instrukce nesmí zmizet
   // v místě činu).
-  if (kolizni || klavesnice) {
+  if ((kolizni || klavesnice) && !otevreny) {
     return akt ? <JourneyBar akt={akt} kolizni jinySvet={jinySvet} /> : null;
   }
 
@@ -256,11 +319,13 @@ export function VypravecRoot({
             worldSlug={world?.worldSlug}
             pattern={pattern}
             audience={
-              scope === 'world'
-                ? audienceZRole(world?.userRole)
-                : userId
-                  ? 'prihlaseny'
-                  : 'anon'
+              jePlatformniAdmin
+                ? 'admin'
+                : scope === 'world'
+                  ? audienceZRole(world?.userRole)
+                  : userId
+                    ? 'prihlaseny'
+                    : 'anon'
             }
             header={resolveRouteHeader(pathname, world)}
             personaVolba={personaVolba}

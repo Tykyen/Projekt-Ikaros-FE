@@ -15,10 +15,10 @@ export const NAVODY: readonly HelpTopic[] = [
     body: {
       odstavce: ['Od prázdna k otevřené bráně za pár minut.'],
       kroky: [
-        'Otevři Vytvořit svět a vyplň název, žánr a systém — zbytek nech na defaultech.',
+        'Otevři Vytvořit svět a vyplň název, žánr a systém — zbytek nech na výchozích hodnotách.',
         'Rozmysli technologii, magii a náboženství — tohle se volí jen teď.',
         'Projdi seedované stránky v Encyklopedii a uprav, co nesedí.',
-        'V Nastavení → Přístup přepni svět ze Soukromého na Otevřený nebo Veřejný.',
+        'V Nastavení → Přístup přepni svět ze Soukromého na Veřejný, nebo Veřejný se schválením.',
         'Hotovo poznáš tak, že se svět objeví v katalogu Vesmírů.',
       ],
     },
@@ -38,7 +38,7 @@ export const NAVODY: readonly HelpTopic[] = [
         'Otevři Postavy svého světa a dej Nová postava.',
         'Vyber typ Postava hráče a vyplň základ dle systému.',
         'V detailu postavy ji přiřaď hráči (vlastníkovi).',
-        'Hráč ji od té chvíle vidí pod Moje postava — done.',
+        'Hotovo — hráč ji od té chvíle vidí pod Moje postava.',
       ],
     },
     akce: [{ label: 'Postavy', to: '/svet/:worldSlug/postavy' }],
@@ -195,7 +195,7 @@ export const NAVODY: readonly HelpTopic[] = [
       kroky: [
         'Otevři Nábory — nástěnku „hledám hru / hledám hráče".',
         'Filtruj podle systému a žánru, ať čteš jen relevantní inzeráty.',
-        'PJ: založ vlastní inzerát tlačítkem Nový nábor a popiš svůj stůl.',
+        'Vlastní inzerát založíš tlačítkem Přidat nábor — hledat můžeš hru i hráče, zakládá kdokoli přihlášený.',
         'Hráč: odpověz na inzerát, nebo se zatím ohlas v Putyce — první slovo je nejtěžší.',
       ],
     },

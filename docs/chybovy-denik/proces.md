@@ -522,3 +522,11 @@ Pokaždé jsem si myslel, že jsem u zdroje. **Ptej se rovnou: co je nejblíž r
 **Zhodnocení:** **dobře** — mapa před návrhem, soutěž před syntézou, verifikace proti kódu před předáním; workflow retry sám oživil 2 zaseklé agenty (stalled → attempt 2). **Špatně** — kolo 1 se zaseklo na finalizaci návratové hodnoty (výsledky jsem vytáhl ručně z journal.jsonl — funkční workaround, ne oprava); počáteční odhad „~20 min" byl 3× podstřelený, verifikátor kódu s 152 tool cally trval sám ~40 min. **Zbývá:** schválení 14 rozhodnutí vlastníkem (00 §3), generace grafiky dle briefu (02), commit ručně.
 
 ---
+
+### CH-133 — Patch skripty hlásily OK bez verifikace a CRLF tiše zabíjel replace: tři „zapojené" featury nikdy nebyly v kódu · 2026-07-23
+**Kontext:** Vypravěč spec-26.7; hloubková revize (4 nezávislí recenzenti) odhalila, že čekací stav hráče, probe výkladní skříně a start cest z persona volby NEJSOU zapojené — přestože jsem po „aplikaci" patchů hlásil hotovo a testy byly zelené (testovaly engine přímo, ne wiring).
+**Co jsem udělal špatně:** (1) node patch skripty tiskly „OK" bezpodmínečně — `String.replace` bez shody tiše vrátí původní text; (2) hlavní příčina neshod: soubory prošlé gitem/prettierem mají CRLF, můj vzor s `\n` nematchoval — takže SELEKTIVNĚ selhávaly patche starších souborů, zatímco čerstvě zapsané (LF) procházely → vzor selhání vypadal náhodně; (3) commit message pak tvrdila zapojení, které neexistovalo.
+**Poučení:** každý programový replace MUSÍ verifikovat shodu PŘED zápisem a hlásit MISS (patcher s `process.exitCode=1`); na Windows repu normalizovat CRLF ve vzorech; „testy zelené" nedokazuje wiring — na zapojení patří grep/test na místě použití. Rodina CH-130 (závěr bez otevření obsahu) — tentokrát „závěr z návratové hodnoty bez kontroly efektu".
+**Příznak cyklení:** hlásím „zapojeno/hotovo" na základě výstupu skriptu, který nemá failure větev; feature „záhadně nefunguje", ač commit tvrdí opak.
+
+---
