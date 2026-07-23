@@ -18,7 +18,14 @@ export type VypravecEventName =
   | 'dice.rolled'
   | 'subject.created'
   | 'rsvp.confirmed'
-  | 'persona.chosen';
+  | 'persona.chosen'
+  // v2 — cesta tm-vycvik (Měďák) + milník „první hráč" (05 §5b, §6):
+  | 'scene.created'
+  | 'scene.activated'
+  | 'token.spawned'
+  | 'fog.used'
+  | 'initiative.started'
+  | 'member.approved';
 
 export interface VypravecEventPayload {
   worldId?: string;

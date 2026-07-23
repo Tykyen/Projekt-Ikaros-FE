@@ -39,6 +39,7 @@ import {
   zpracujNavstevu,
 } from '../engine/journeyEngine';
 import { vypravecEmit } from '../engine/events';
+import { useSocketEvent } from '@/features/chat/api/useSocket';
 import { telemetrie, zapojTelemetriiFlush } from '../state/telemetry';
 import { zapojChybovouMapu } from '../engine/chybovaMapa';
 import { NETRIVIALNI_ROUTY } from '../registry/netrivialniRouty';
@@ -184,6 +185,9 @@ export function VypravecRoot({
     world?.hasCharacter,
     world?.hasNpcPage,
   ]);
+
+  // v2 — cross-device sync: jiné zařízení PATCHlo → signál bez dat → re-GET.
+  useSocketEvent('onboarding:updated', () => void onboardingStore.resync());
 
   // 26.4 — volba persony: JEDINÉ auto-otevření panelu vůbec (05 §1).
   // Jen čerstvý účet (jeNovy z GET), bez persony, nezavřený dialog, mimo kolizi.

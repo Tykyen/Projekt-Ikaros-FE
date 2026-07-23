@@ -243,6 +243,7 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
     'pj-start': 'PJ Start — od nuly k první zprávě ve vlastním světě',
     'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
     'wb-start': 'Cesta tvůrce — ateliér, wiki, Pavučina, výkladní skříň',
+    'tm-vycvik': 'Výcvik taktické mapy — Měďákův dril pro PJ',
   };
   return (
     <div>

@@ -12,6 +12,10 @@
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.7.
  */
 import { api } from '@/shared/api/client';
+import {
+  vypravecEmit,
+  type VypravecEventName,
+} from '@/shared/vypravec/engine/events';
 import type {
   MapScene,
   MapOperation,
@@ -45,14 +49,30 @@ export function listActiveMapScenes(worldId: string): Promise<MapScene[]> {
  *
  * Response obsahuje `inverse` pro klient-side undo stack (10.2m).
  */
+/**
+ * Vypravěč v2 (cesta tm-vycvik) — mapování op → event na JEDINÉM choke-pointu
+ * per-scene operací. Bez worldId: operace ho na FE nenese a práva na ni má
+ * stejně jen PJ/PomocnýPJ — kroky výcviku matchují bez worldId (viz cesta).
+ */
+const TM_VYPRAVEC_EVENTY: Partial<Record<string, VypravecEventName>> = {
+  'token.add': 'token.spawned',
+  'fog.brush': 'fog.used',
+  'fog.set': 'fog.used',
+  'scene.activate': 'scene.activated',
+  'combat.start': 'initiative.started',
+};
+
 export function postMapOperation(
   sceneId: string,
   op: MapOperation,
 ): Promise<ApplyMapOperationResponse> {
-  return api.post<ApplyMapOperationResponse>(
-    `/maps/${sceneId}/operations`,
-    op,
-  );
+  return api
+    .post<ApplyMapOperationResponse>(`/maps/${sceneId}/operations`, op)
+    .then((res) => {
+      const ev = TM_VYPRAVEC_EVENTY[op.type];
+      if (ev) vypravecEmit(ev);
+      return res;
+    });
 }
 
 /**

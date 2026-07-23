@@ -316,6 +316,28 @@ class OnboardingStore {
     }
   }
 
+  /**
+   * v2 — WS `onboarding:updated` (jiné zařízení PATCHlo): re-GET + merge.
+   * Vlastní echo je neškodné (server už náš zápis má; pending re-aplikace
+   * je idempotentní — set-union/$min/LWW).
+   */
+  async resync(): Promise<void> {
+    this.zajistiKontext();
+    if (this.ctxUid === 'anon' || this.ctxUid === 'nenacteno') return;
+    try {
+      const res = await api.get<{ state: OnboardingStateFE | null }>(
+        '/users/me/onboarding',
+      );
+      if (!res.state) return;
+      const pending = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
+      this.state = pending.reduce(aplikujDeltuLokalne, res.state);
+      writeJson(stateKey(this.ctxUid), this.state);
+      this.notify();
+    } catch {
+      /* offline — příští signál/WS reconnect to dorovná */
+    }
+  }
+
   /** Flush při zavírání tabu — fetch keepalive (PATCH s auth hlavičkou). */
   flushKeepalive(): void {
     if (this.ctxUid === 'anon' || this.ctxUid === 'nenacteno') return;

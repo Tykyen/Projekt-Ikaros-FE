@@ -78,6 +78,7 @@ export function useApproveAccessRequest() {
         `/worlds/${worldId}/access-requests/${requestId}/approve`,
       ),
     onSuccess: (_data, { worldId }) => {
+      vypravecEmit('member.approved', { worldId }); // milník „první hráč" (05 §6)
       qc.invalidateQueries({ queryKey: ['pending-actions'] });
       // 15.10 — world-scoped fronta (stránka Hráči, drawer, badge).
       qc.invalidateQueries({ queryKey: ['worlds', worldId, 'pending-actions'] });

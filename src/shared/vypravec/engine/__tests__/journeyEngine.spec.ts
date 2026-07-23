@@ -277,3 +277,31 @@ describe('D-078 — probe hasNpcPage', () => {
     expect(aktivniCesta()?.hotovo.has('pj.prvni-npc')).toBe(false);
   });
 });
+
+describe('v2 — tm-vycvik (Měďák) + milník první hráč', () => {
+  it('TM eventy odškrtávají kroky výcviku (worldBinding none, bez worldId)', () => {
+    zrusitCestu('pj-start');
+    startCesty('tm-vycvik');
+    vypravecEmit('scene.created', { worldId: 'w-1' });
+    vypravecEmit('token.spawned', {});
+    vypravecEmit('fog.used', {});
+    vypravecEmit('initiative.started', {});
+    const akt = aktivniCesta();
+    expect(akt?.hotovo.size).toBe(4);
+    expect(akt?.dalsiKrok?.id).toBe('tm.orchestrace');
+    vypravecEmit('scene.activated', {});
+    expect(aktivniCesta()).toBeNull(); // dokončeno
+    expect(bublinaStore.getSnapshot()?.text).toContain('Výcvik dokončen');
+  });
+
+  it('member.approved zapíše milník prvni.hrac a oslaví JEN poprvé', () => {
+    vypravecEmit('member.approved', { worldId: 'w-1' });
+    const prvni = onboardingStore.getSnapshot().milestones['prvni.hrac'];
+    expect(prvni).toBeDefined();
+    expect(bublinaStore.getSnapshot()?.text).toContain('První hráč');
+    bublinaStore.zmiz();
+    vypravecEmit('member.approved', { worldId: 'w-2' });
+    expect(onboardingStore.getSnapshot().milestones['prvni.hrac']).toBe(prvni);
+    expect(bublinaStore.getSnapshot()).toBeNull(); // žádná druhá oslava
+  });
+});

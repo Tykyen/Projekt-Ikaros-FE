@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
 import { api, apiClient, parseApiError } from '@/shared/api/client';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { ConfirmDialog } from '@/shared/ui';
 import { postWorldOperation } from '../../api/worldOpsApi';
 import { postMapOperation } from '../../api/mapApi';
@@ -219,6 +220,7 @@ export function MapPjPanel({
       return scene;
     },
     onSuccess: () => {
+      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
       void queryClient.invalidateQueries({
         queryKey: ['worlds', worldId, 'members'],

@@ -425,6 +425,22 @@ function zpracujGateEventy(e: VypravecEvent): void {
   if (krok && !akt.hotovo.has(krok.id)) krokSplnen(akt.klic, krok.id, e.at);
 }
 
+/**
+ * Milník „první hráč ve tvém světě" (05 §6) — nejsilnější retenční moment
+ * PJ. Oslavu spouští VÝHRADNĚ event (probe/backfill by slavil roky starý
+ * svět); $min na BE drží první datum, opakované schválení nic nepřepíše.
+ */
+function zpracujMilniky(e: VypravecEvent): void {
+  if (e.name !== 'member.approved') return;
+  const s = onboardingStore.getSnapshot();
+  if (s.milestones['prvni.hrac']) return;
+  onboardingStore.aplikuj({ milestones: { 'prvni.hrac': e.at } });
+  bublinaStore.show({
+    text: 'První hráč vešel do tvého světa. Od téhle chvíle to není kulisa — je to hra.',
+    oslava: true,
+  });
+}
+
 let zapojeno = false;
 /** Napojení na event bus (jednou; idempotentní pro dvojí mount). */
 export function zapojJourneyEngine(): void {
@@ -433,6 +449,7 @@ export function zapojJourneyEngine(): void {
   vypravecSubscribe((e) => {
     zpracujEvent(e);
     zpracujGateEventy(e);
+    zpracujMilniky(e);
   });
 }
 
