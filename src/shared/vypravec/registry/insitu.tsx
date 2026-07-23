@@ -36,6 +36,12 @@ export const INSITU_TOPIKY: readonly HelpTopic[] = [
         default: ({ audience }: { audience: VypravecAudience }) =>
           createElement(m.ChatHelp, { audience: naHelpAudience(audience) }),
       })),
+    akce: [
+      {
+        label: 'Celá kapitola v nápovědě',
+        to: '/ikaros/napoveda?sekce=svet&topik=komunikace-zvuk',
+      },
+    ],
     source: { kapitola: '13' },
     verifiedAt: '2026-07-23',
     status: 'funkcni',
@@ -57,6 +63,12 @@ export const INSITU_TOPIKY: readonly HelpTopic[] = [
             audience: naHelpAudience(audience),
           }),
       })),
+    akce: [
+      {
+        label: 'Celá kapitola v nápovědě',
+        to: '/ikaros/napoveda?sekce=svet&topik=takticka-mapa',
+      },
+    ],
     source: { kapitola: '14' },
     verifiedAt: '2026-07-23',
     status: 'funkcni',

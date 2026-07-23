@@ -60,7 +60,10 @@ describe('registr Vypravěče — validace (CI)', () => {
       for (const r of topik.routes)
         expect(znameRouty.has(r), `topik ${topik.id} routa ${r}`).toBe(true);
       for (const a of topik.akce ?? [])
-        expect(znameRouty.has(a.to), `topik ${topik.id} akce ${a.to}`).toBe(true);
+        expect(
+          znameRouty.has(a.to.split('?')[0].split('#')[0]),
+          `topik ${topik.id} akce ${a.to}`,
+        ).toBe(true);
       expect(topik.body.odstavce.length, `topik ${topik.id} bez těla`).toBeGreaterThan(0);
       expect(topik.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }

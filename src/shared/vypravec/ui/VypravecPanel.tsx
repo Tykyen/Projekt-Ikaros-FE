@@ -28,6 +28,7 @@ import {
 import { CESTY } from '../registry/journeys';
 import {
   aktualniKlic,
+  bazoveId,
   pauzaCesty,
   postupCesty,
   startCesty,
@@ -107,6 +108,48 @@ function tahakPro(topik: HelpTopic) {
     tahakCache.set(topik.id, c);
   }
   return c;
+}
+
+/** Kronika (05 §7 v2) — done-log lidskou řečí: milníky + dokončené kroky. */
+const MILNIK_LABELY: Record<string, string> = {
+  'prvni.hrac': 'První hráč vešel do tvého světa',
+  'prvni.hod': 'První hod kostkou',
+  'prvni.svet': 'První svět',
+};
+
+function kronikaZaznamy(): Array<{ at: string; text: string }> {
+  const s = onboardingStore.getSnapshot();
+  const zaznamy: Array<{ at: string; text: string }> = [];
+  for (const [k, at] of Object.entries(s.milestones))
+    zaznamy.push({ at, text: MILNIK_LABELY[k] ?? k });
+  for (const [jId, p] of Object.entries(s.journeys)) {
+    const cesta = CESTY[bazoveId(jId)];
+    if (!cesta) continue;
+    const kroky = cesta.phases.flatMap((f) => f.steps);
+    for (const [sid, at] of Object.entries(p.steps ?? {})) {
+      const krok = kroky.find((k) => k.id === sid);
+      if (krok) zaznamy.push({ at, text: krok.title });
+    }
+  }
+  return zaznamy.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 30);
+}
+
+function KronikaView({ onZpet }: { onZpet: () => void }) {
+  const zaznamy = kronikaZaznamy();
+  return (
+    <div>
+      <button type="button" className={s.zpet} onClick={onZpet}>
+        ← Zpět
+      </button>
+      <div className={s.sekceLabel}>Kronika — co už máš za sebou</div>
+      {zaznamy.map((z) => (
+        <div key={z.at + z.text} className={s.zmena}>
+          <div className={s.zmenaDatum}>{z.at.slice(0, 10)}</div>
+          <div className={s.zmenaTitul}>{z.text}</div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function TopicView({
@@ -268,6 +311,7 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
     'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
     'wb-start': 'Cesta tvůrce — ateliér, wiki, Pavučina, výkladní skříň',
     'tm-vycvik': 'Výcvik taktické mapy — Měďákův dril pro PJ',
+    'hrac-ve-svete': 'První dny ve světě — postava, stůl, encyklopedie',
   };
   return (
     <div>
@@ -282,6 +326,13 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
               c.id !== 'tm-vycvik' ||
               stav.persona === 'pj' ||
               Boolean(stav.journeys[aktualniKlic('pj-start')]),
+          )
+          // hrac-ve-svete startuje CTA z bubliny „Postava je na světě"
+          // (potřebuje fixaci světa) — v menu jen když už běží/běžela.
+          .filter(
+            (c) =>
+              c.id !== 'hrac-ve-svete' ||
+              Boolean(stav.journeys[aktualniKlic('hrac-ve-svete')]),
           )
           .map((c) => {
           const prog = stav.journeys[aktualniKlic(c.id)];
@@ -395,9 +446,9 @@ export default function VypravecPanel({
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
   const [topikId, setTopikId] = useState<string | null>(null);
-  const [pohled, setPohled] = useState<'domu' | 'navody' | 'cesty' | 'zmeny'>(
-    'domu',
-  );
+  const [pohled, setPohled] = useState<
+    'domu' | 'navody' | 'cesty' | 'zmeny' | 'kronika'
+  >('domu');
   // S2 „Zeptat se" — fulltext nad topiky+návody (engine/hledani).
   const [dotaz, setDotaz] = useState('');
   const nalezy = dotaz.trim().length >= 2 ? hledej(dotaz, audience) : [];
@@ -447,7 +498,19 @@ export default function VypravecPanel({
     ? (topikPodleId(topikId) ?? NAVODY.find((n) => n.id === topikId))
     : undefined;
   // Bez řezu — panel scrolluje; slice(0,4) zabíjel PJ topiky na dashboardu.
-  const karty = topikyProRoutu(pattern, audience);
+  // Persona boost (revize 07/23): volba persony se má vracet — PJ vidí
+  // PJ témata nahoře (řadíme, NEskrýváme; audience filtr zůstává).
+  const persona = onboardingStore.getSnapshot().persona;
+  const karty = [...topikyProRoutu(pattern, audience)].sort((a, b) => {
+    const boost = (t: HelpTopic): number =>
+      persona === 'pj' &&
+      t.audience?.some((x) => x === 'pj' || x === 'pomocnyPJ')
+        ? 1
+        : persona === 'hrac' && t.audience?.includes('hrac')
+          ? 1
+          : 0;
+    return boost(b) - boost(a);
+  });
 
   function otevriTopik(id: string) {
     setTopikId(id);
@@ -566,6 +629,8 @@ export default function VypravecPanel({
           />
         ) : pohled === 'cesty' ? (
           <CestyView onZpet={() => setPohled('domu')} />
+        ) : pohled === 'kronika' ? (
+          <KronikaView onZpet={() => setPohled('domu')} />
         ) : pohled === 'zmeny' ? (
           <div>
             <button
@@ -714,6 +779,18 @@ export default function VypravecPanel({
                   Návody
                 </button>
               </li>
+              {kronikaZaznamy().length >= 3 && (
+                <li>
+                  <button
+                    type="button"
+                    className={s.menuTlacitko}
+                    onClick={() => setPohled('kronika')}
+                  >
+                    <Klic />
+                    Kronika
+                  </button>
+                </li>
+              )}
               <li>
                 <button
                   type="button"

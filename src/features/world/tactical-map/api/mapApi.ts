@@ -55,6 +55,7 @@ export function listActiveMapScenes(worldId: string): Promise<MapScene[]> {
  * stejně jen PJ/PomocnýPJ — kroky výcviku matchují bez worldId (viz cesta).
  */
 const TM_VYPRAVEC_EVENTY: Partial<Record<string, VypravecEventName>> = {
+  'dice.roll': 'dice.rolled',
   'token.add': 'token.spawned',
   'fog.brush': 'fog.used',
   'fog.set': 'fog.used',

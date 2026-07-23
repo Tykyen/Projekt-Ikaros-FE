@@ -93,6 +93,8 @@ export function useOptimisticSend({
         });
         // Vypravěč (spec 26.4): krok „Napiš do svého světa" — jen chat SVĚTA.
         vypravecEmit('message.sent', { worldId, channelKind: 'world' });
+        if (payload.dicePayload)
+          vypravecEmit('dice.rolled', { worldId }); // milník „první hod"
         qc.setQueryData<ChatMessage[]>(messagesKey, (old) => {
           const list = old ?? [];
           // Pokud WS echo už dorazilo dříve než POST response, lokální zpráva

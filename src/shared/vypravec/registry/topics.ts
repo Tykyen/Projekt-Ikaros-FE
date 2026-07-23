@@ -44,7 +44,13 @@ export const TOPIKY: readonly HelpTopic[] = [
         'Stránka Hráči slouží k žádostem a pozvánkám — role se mění jinde.',
       ],
     },
-    akce: [{ label: 'Otevřít Hráče', to: '/svet/:worldSlug/hraci' }],
+    akce: [
+      { label: 'Otevřít Hráče', to: '/svet/:worldSlug/hraci' },
+      {
+        label: 'Role v plné nápovědě',
+        to: '/ikaros/napoveda?sekce=role&topik=role-svetove',
+      },
+    ],
     minAudienceNote: 'Role přiděluje PJ — pokud potřebuješ vyšší, napiš mu.',
     source: { kapitola: '09' },
     verifiedAt: '2026-07-22',

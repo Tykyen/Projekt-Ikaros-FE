@@ -361,3 +361,31 @@ describe('revize 07/23 — nábory + fronta bublin', () => {
     bublinaStore.nastavKolizni(false);
   });
 });
+
+describe('F5 rozšíření — hrac-ve-svete + milník první hod', () => {
+  it('start hrac-ve-svete se světem fixuje kontext BEZ odškrtnutí kroku 1', () => {
+    zrusitCestu('pj-start');
+    startCesty('hrac-ve-svete', { id: 'w-h', slug: 'muj-stul' });
+    const akt = aktivniCesta();
+    expect(akt?.cesta.id).toBe('hrac-ve-svete');
+    expect(akt?.contextWorldId).toBe('w-h');
+    expect(akt?.hotovo.size).toBe(0); // 'none' binding nic neodškrtává
+    // scoped visit + zpráva ve světě cesty
+    zpracujNavstevu('/svet/muj-stul/moje-postava');
+    vypravecEmit('message.sent', { worldId: 'w-h', channelKind: 'world' });
+    zpracujNavstevu('/svet/muj-stul/stranky');
+    expect(aktivniCesta()).toBeNull(); // 3/3 hotovo
+  });
+
+  it('dice.rolled zapíše milník prvni.hod a oslaví jen poprvé', () => {
+    bublinaStore.zmiz();
+    vypravecEmit('dice.rolled', { worldId: 'w-1' });
+    expect(
+      onboardingStore.getSnapshot().milestones['prvni.hod'],
+    ).toBeDefined();
+    expect(bublinaStore.getSnapshot()?.text).toContain('kostka');
+    bublinaStore.zmiz();
+    vypravecEmit('dice.rolled', { worldId: 'w-1' });
+    expect(bublinaStore.getSnapshot()).toBeNull();
+  });
+});

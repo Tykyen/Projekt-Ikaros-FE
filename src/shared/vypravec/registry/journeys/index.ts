@@ -6,6 +6,7 @@ import { PJ_START, type Journey } from './pjStart';
 import { HRAC_START } from './hracStart';
 import { WB_START } from './wbStart';
 import { TM_VYCVIK } from './tmVycvik';
+import { HRAC_VE_SVETE } from './hracVeSvete';
 
 export type { Journey, JourneyStep, DoneCondition, EventMatch } from './pjStart';
 
@@ -14,6 +15,7 @@ export const CESTY: Record<string, Journey> = {
   'hrac-start': HRAC_START,
   'wb-start': WB_START,
   'tm-vycvik': TM_VYCVIK,
+  'hrac-ve-svete': HRAC_VE_SVETE,
 };
 
 /** Oslavy dokončení cest (bublina; 05 §6 — oslava jen z eventu, ne backfillu). */
@@ -36,5 +38,9 @@ export const OSLAVY_DOKONCENI: Record<string, { sKontextem: string; bezKontextu?
       'Výcvik dokončen. Mapa je tvoje bojiště — velení předávám tobě.',
     bezKontextu:
       'Výcvik dokončen. Mapa je tvoje bojiště — velení předávám tobě.',
+  },
+  'hrac-ve-svete': {
+    sKontextem:
+      'Postava, slovo u stolu, mapa světa v hlavě. Teď už jen hrát — a to je na vás dvou s PJ.',
   },
 };

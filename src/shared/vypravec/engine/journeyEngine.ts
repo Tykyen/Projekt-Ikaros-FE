@@ -123,13 +123,16 @@ export function startCesty(
   onboardingStore.aplikuj({
     journeys: { [klic]: { startedAt: new Date().toISOString(), dismissedAt: null, pausedAt: null } },
   });
-  if (svet && cesta.worldBinding === 'creates') {
+  if (svet) {
     onboardingStore.aplikuj({
       journeys: { [klic]: { contextWorldId: svet.id } },
     });
     ulozSlug(klic, svet.slug);
-    const prvni = cesta.phases[0]?.steps[0];
-    if (prvni) krokSplnen(klic, prvni.id);
+    // Jen u 'creates': vybraný existující svět = krok „Založ svět" splněn.
+    if (cesta.worldBinding === 'creates') {
+      const prvni = cesta.phases[0]?.steps[0];
+      if (prvni) krokSplnen(klic, prvni.id);
+    }
   }
   ulozAktivniId(klic);
   pauzniOstatni(klic);
@@ -433,16 +436,25 @@ function zpracujGateEventy(e: VypravecEvent): void {
  * svět); $min na BE drží první datum, opakované schválení nic nepřepíše.
  */
 function zpracujMilniky(e: VypravecEvent): void {
-  if (e.name !== 'member.approved') return;
   const s = onboardingStore.getSnapshot();
-  if (s.milestones['prvni.hrac']) return;
-  onboardingStore.aplikuj({ milestones: { 'prvni.hrac': e.at } });
-  // Veterán (backfill) — hráče má roky; milník zapiš tiše, oslava by lhala.
-  if (s.backfilled) return;
-  bublinaStore.show({
-    text: 'První hráč vešel do tvého světa. Od téhle chvíle to není kulisa — je to hra.',
-    oslava: true,
-  });
+  if (e.name === 'member.approved' && !s.milestones['prvni.hrac']) {
+    onboardingStore.aplikuj({ milestones: { 'prvni.hrac': e.at } });
+    // Veterán (backfill) — hráče má roky; milník zapiš tiše, oslava by lhala.
+    if (s.backfilled) return;
+    bublinaStore.show({
+      text: 'První hráč vešel do tvého světa. Od téhle chvíle to není kulisa — je to hra.',
+      oslava: true,
+    });
+  }
+  // 05 §6 — první HERNÍ akce (ne administrativní): první hod kostkou.
+  if (e.name === 'dice.rolled' && !s.milestones['prvni.hod']) {
+    onboardingStore.aplikuj({ milestones: { 'prvni.hod': e.at } });
+    if (s.backfilled) return;
+    bublinaStore.show({
+      text: 'První kostka je vržena. Ať padá ve tvůj prospěch.',
+      oslava: true,
+    });
+  }
 }
 
 let zapojeno = false;
@@ -476,14 +488,19 @@ export function zkontrolujCekaniHrace(ctx?: {
   const celkem = CESTY['hrac-start'].phases.flatMap((f) => f.steps).length;
   if (hotoveKroky(CESTY['hrac-start'], prog.steps).size < celkem) return; // běží
 
-  // (a) postava je na světě — jen ve světě cesty
+  // (a) postava je na světě — jen ve světě cesty; CTA startuje pokračování
+  // „První dny ve světě" (pull-first: bez kliku se nic nespustí).
   if (ctx?.worldId === prog.contextWorldId && ctx.hasCharacter) {
+    const svetId = prog.contextWorldId;
+    const slug = ctiSlug(hsKlic);
     bublinaStore.show({
       dismissKey: 'hrac.postava-na-svete',
-      text: 'Postava je na světě. Najdeš ji pod Moje postava — pojď se na ni podívat.',
+      text: 'Postava je na světě. Pojď — provedu tě prvními dny: postava, stůl, svět.',
       akce: {
-        label: 'Moje postava',
-        to: doplnSlug('/svet/:worldSlug/moje-postava', ctiSlug(hsKlic)),
+        label: 'Jdeme na to',
+        onClick: () => {
+          startCesty('hrac-ve-svete', { id: svetId, slug });
+        },
       },
     });
     return;

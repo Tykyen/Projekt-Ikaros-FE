@@ -32,6 +32,8 @@ import {
 import { onboardingStore, zapojFlush } from '../state/onboardingStore';
 import {
   aktivniCesta,
+  aktualniKlic,
+  postupCesty,
   probeResync,
   startCesty,
   zapojJourneyEngine,
@@ -225,6 +227,49 @@ export function VypravecRoot({
       akce: { label: 'Chci provést', onClick: () => setOtevreny(true) },
     });
   }, [userId, onboarding]);
+
+  // Řetězení cest (revize 07/23): dokončený pj-start → tip na Měďákův
+  // výcvik při návštěvě dashboardu vlastního světa. Jednorázový dismiss.
+  useEffect(() => {
+    if (scope !== 'world' || !userId || !world?.isOwner) return;
+    if (pattern !== '/svet/:worldSlug') return;
+    if (onboarding.dismissed.includes('tip-medak')) return;
+    const pj = postupCesty('pj-start');
+    if (pj.celkem === 0 || pj.hotovo < pj.celkem) return;
+    if (onboarding.journeys[aktualniKlic('tm-vycvik')]) return; // už zná
+    bublinaStore.show({
+      dismissKey: 'tip-medak',
+      text: 'Svět stojí. Na cvičišti čeká Měďák — výcvik taktické mapy, pět rozkazů.',
+      akce: {
+        label: 'Nastoupit',
+        onClick: () => {
+          startCesty('tm-vycvik');
+          setOtevreny(false);
+        },
+      },
+    });
+  }, [scope, userId, world?.isOwner, pattern, onboarding]);
+
+  // „Vítej zpět" (revize 07/23, jen in-app — žádný push): ≥7 dní ticha →
+  // 1× bublina s novinkami. lastActive se razítkuje lokálně při navigaci.
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      const klic = `vypravec:lastActive:${userId}`;
+      const minule = Number(localStorage.getItem(klic) ?? '0');
+      const ted = Date.now();
+      localStorage.setItem(klic, String(ted));
+      if (!minule || ted - minule < 7 * 24 * 3600 * 1000) return;
+      if (sessionStorage.getItem('vypravec:vitej-zpet')) return;
+      sessionStorage.setItem('vypravec:vitej-zpet', '1');
+      bublinaStore.show({
+        text: 'Vítej zpět. Zatímco jsi byl pryč, pár věcí se pohnulo — mrknem na ně?',
+        akce: { label: 'Co je nového', onClick: () => setOtevreny(true) },
+      });
+    } catch {
+      /* private mode — bez uvítání */
+    }
+  }, [userId]);
 
   // 05 §2 — „Pokračujeme?": pauznutá nedokončená cesta nemá lištu; 1× za
   // session ji připomeneme (aktivní cesty lišta pokrývá sama).
