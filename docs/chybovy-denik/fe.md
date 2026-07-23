@@ -2447,3 +2447,10 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Příznak cyklení:** druhá iterace téže vizuální opravy „silnějším" prostředkem bez diagnózy, proč selhala první.
 
 ---
+
+### ✅ ŘEŠENÍ — 26 „dotáhni vše": 5 odložených bloků Vypravěče v jednom tahu (highlight+kotvy · MVP-B · fulltext+changelog · D-078/079 · v2 Měďák) — 2026-07-23
+
+**Co zabralo:** rozklad na 5 samostatně commitnutých bloků (b68dc51f → 14a8407c → 13755874 → d8aed35a → a1311a3f; BE 974785a + d89a488), každý s plnou bránou (tsc · vitest · eslint · build) PŘED commitem. Klíčová rozhodnutí: (1) fulltext bez MiniSearch — ~60 dokumentů nese vlastní skórovaný fold-substring index, žádná závislost; (2) in-situ „?" taháky NEpřepsány, jen zabaleny lazy adaptérem (`bodyComponent`) — jediný zdroj obsahu, „?" modal zůstal aliasem; (3) TM eventy přes JEDEN choke-point (`postMapOperation` op→event mapa) místo 5 roztroušených emitů; (4) D-079 generace `jId~n` čistě na FE klíčích — BE stačilo povolit `~` v `SAFE_KEY_RE`.
+**Proč správně:** BE set-union/$min nejde vzít zpět → restart cesty MUSÍ dostat nový klíč; probe = zdroj pravdy i pro fe-event kroky (NPC z directory cache); oslavu smí spustit jen event (backfill by slavil roky starý svět).
+**Jak ověřeno:** 90 vitest (journey generace, probe NPC, tm-vycvik 5 kroků, milník dedup, fulltext diakritika/AND/audience) + 9 BE jest (roundtrip `pj-start~1`) + build budget 92 %.
+**Zhodnocení:** dobře — žádný blok nezůstal v půlce; špatně — 2× jsem šlápl vedle u závislostí UI vrstvy (useMyWorlds vyžadoval QueryClientProvider → padl personaDialog test timeoutem; chybějící EventEmitter2 provider v BE spec module se maskoval jako „Unable to connect to database" retry smyčka — DI chyba uvnitř Nest testing modulu umí vypadat jako infra problém). Poučení: shared shell (Vypravěč) nesmí staticky záviset na provider-vázaných hoocích — lazy `api.get` v handleru je bezpečnější; „DB nejede" v jest po změně DI ověř nejdřív jako DI.
