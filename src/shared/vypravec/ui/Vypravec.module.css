@@ -602,6 +602,24 @@
   border-radius: var(--radius-sm);
 }
 
+/* Stav Badge (03 §3) — tečka na FAB při nepřečteném changelogu */
+.fabBadge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--acc);
+  border: 2px solid var(--surface-opaque);
+}
+
+/* Podpis mluvčího v liště cesty (Měďák na tm-vycviku) */
+.mluvciLabel {
+  color: var(--acc);
+  font-weight: var(--weight-semi);
+}
+
 /* D-079 — výběr světa před startem cesty (CestyView) */
 .vyberSveta {
   display: flex;

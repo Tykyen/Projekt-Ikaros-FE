@@ -17,11 +17,14 @@ export function VypravecFab({
   scope,
   otevreny,
   spi,
+  badge,
   onClick,
 }: {
   scope: 'ikaros' | 'world';
   otevreny: boolean;
   spi?: boolean;
+  /** Počet nepřečtených změn (03 §3 stav Badge) — 0/undefined = bez tečky. */
+  badge?: number;
   onClick: () => void;
 }) {
   return (
@@ -30,11 +33,16 @@ export function VypravecFab({
       className={s.fab}
       data-spi={spi || undefined}
       data-vypravec-fab=""
-      aria-label="Vypravěč — nápověda a průvodce"
+      aria-label={
+        badge
+          ? `Vypravěč — nápověda a průvodce (${badge} novinek)`
+          : 'Vypravěč — nápověda a průvodce'
+      }
       aria-expanded={otevreny}
       aria-haspopup="dialog"
       onClick={onClick}
     >
+      {badge ? <span className={s.fabBadge} aria-hidden="true" /> : null}
       {scope === 'world' ? (
         /* ve světě Joe (avatar; silueta odložena na v2 theming) */
         <picture>

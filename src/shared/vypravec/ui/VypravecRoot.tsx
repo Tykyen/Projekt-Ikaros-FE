@@ -43,6 +43,7 @@ import { useSocketEvent } from '@/features/chat/api/useSocket';
 import { telemetrie, zapojTelemetriiFlush } from '../state/telemetry';
 import { zapojChybovouMapu } from '../engine/chybovaMapa';
 import { NETRIVIALNI_ROUTY } from '../registry/netrivialniRouty';
+import { pocetNovychZmen } from '../registry/changelog';
 import { bublinaStore } from './bublinaStore';
 import { VypravecBublina } from './VypravecBublina';
 import { JourneyBar } from './JourneyBar';
@@ -201,6 +202,52 @@ export function VypravecRoot({
     zkontrolujCekaniHrace();
   }, [scope, onboarding]);
 
+  // Replika 9 (02 §2.1) — předávací beat Ishida→Joe při PRVNÍM vstupu do
+  // světa. Jednorázový: zapisuje se hned po show (bez dismissKey na bublině,
+  // ať projde i frontou z kolizní plochy).
+  useEffect(() => {
+    if (scope !== 'world' || !userId || !onboardingStore.initHotovo) return;
+    if (onboarding.dismissed.includes('predani-joe')) return;
+    const ok = bublinaStore.show({
+      text: '„Tady moje chodby končí. Tohle je Joe — uvnitř tě povede ona." A Joe? „Vítej. Posvítíme na to spolu."',
+    });
+    if (ok) onboardingStore.zavritTip('predani-joe');
+  }, [scope, userId, onboarding]);
+
+  // Rozhodnutí 13 (00 §3) — veterán (backfill) nedostane persona dialog;
+  // místo něj jednorázová nabídka provedení novinkami.
+  useEffect(() => {
+    if (!userId || !onboarding.backfilled) return;
+    if (onboarding.dismissed.includes('veteran-intro')) return;
+    bublinaStore.show({
+      dismissKey: 'veteran-intro',
+      text: 'Vidím, že to tu znáš, příteli. Přesto je tu pár novinek — kdybys chtěl, provedu tě.',
+      akce: { label: 'Chci provést', onClick: () => setOtevreny(true) },
+    });
+  }, [userId, onboarding]);
+
+  // 05 §2 — „Pokračujeme?": pauznutá nedokončená cesta nemá lištu; 1× za
+  // session ji připomeneme (aktivní cesty lišta pokrývá sama).
+  useEffect(() => {
+    if (!userId || !onboardingStore.initHotovo) return;
+    if (aktivniCesta()) return; // běžící cesta má JourneyBar
+    const s = onboardingStore.getSnapshot();
+    const pauznuta = Object.entries(s.journeys).find(
+      ([, p]) => p.pausedAt && !p.dismissedAt,
+    );
+    if (!pauznuta) return;
+    try {
+      if (sessionStorage.getItem('vypravec:navrat-nabidnut')) return;
+      sessionStorage.setItem('vypravec:navrat-nabidnut', '1');
+    } catch {
+      return;
+    }
+    bublinaStore.show({
+      text: 'Máš rozdělanou cestu. Pokračujeme, kde jsme skončili?',
+      akce: { label: 'Pokračovat', onClick: () => setOtevreny(true) },
+    });
+  }, [userId, onboarding]);
+
   // v2 — cross-device sync: jiné zařízení PATCHlo → signál bez dat → re-GET.
   useSocketEvent('onboarding:updated', () => void onboardingStore.resync());
 
@@ -333,6 +380,7 @@ export function VypravecRoot({
         scope={scope}
         otevreny={otevreny}
         spi={onboarding.mode === 'onCall'}
+        badge={userId ? pocetNovychZmen() : 0}
         onClick={() => setOtevreny((o) => !o)}
       />
       {!otevreny && <VypravecBublina />}

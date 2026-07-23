@@ -48,9 +48,10 @@ export function MaintenanceOverlay(): React.ReactElement | null {
       <div className={s.card}>
         <Spinner />
         <h2 className={s.title}>Probíhá údržba</h2>
+        {/* Hlas Ishidy — replika 7 (Vypravěč 02 §2.1, moment 3c). */}
         <p className={s.text}>
-          Systém se právě aktualizuje a za malou chvíli bude zpátky.
-          Připojujeme tě automaticky — nemusíš nic dělat.
+          Za oponou se právě přestavuje scéna. Malý moment — stránka se sama
+          obnoví, nemusíš nic dělat.
         </p>
         <Button
           type="button"

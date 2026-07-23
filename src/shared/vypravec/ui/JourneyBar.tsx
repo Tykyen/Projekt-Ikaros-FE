@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  bazoveId,
   doplnSlug,
   pauzaCesty,
   preskocitKrok,
@@ -82,7 +83,12 @@ export function JourneyBar({
         <div className={s.listaTitul}>
           {krok.title} <span aria-hidden="true">· ~{krok.estMin} min</span>
         </div>
-        <div className={s.listaReplika}>{krok.narratorLine}</div>
+        <div className={s.listaReplika}>
+          {bazoveId(akt.klic) === 'tm-vycvik' && (
+            <strong className={s.mluvciLabel}>Měďák · </strong>
+          )}
+          {krok.narratorLine}
+        </div>
       </div>
       <div className={s.listaAkce}>
         {ctaFunkcni && (

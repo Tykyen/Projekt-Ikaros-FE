@@ -49,11 +49,16 @@ import ishidaVitaPng from '@/assets/vypravec/ishida-bust-vita.png';
 import joeAvatarWebp96 from '@/assets/vypravec/joe-avatar-96.webp';
 import joeAvatarWebp192 from '@/assets/vypravec/joe-avatar-192.webp';
 import joeAvatarPng from '@/assets/vypravec/joe-avatar.png';
+import medakAvatarWebp96 from '@/assets/vypravec/medak-avatar-96.webp';
+import medakAvatarWebp192 from '@/assets/vypravec/medak-avatar-192.webp';
+import medakAvatarPng from '@/assets/vypravec/medak-avatar.png';
 import s from './Vypravec.module.css';
 
 const AVATARY = {
   ikaros: { webp96: ishidaAvatarWebp96, webp192: ishidaAvatarWebp192, png: ishidaAvatarPng },
   world: { webp96: joeAvatarWebp96, webp192: joeAvatarWebp192, png: joeAvatarPng },
+  // Taktická mapa = Měďákovo cvičiště (02 §1.5) — mluví a podepisuje se on.
+  tm: { webp96: medakAvatarWebp96, webp192: medakAvatarWebp192, png: medakAvatarPng },
 } as const;
 
 /** Mosazný klíč — podpisová odrážka menu (znak Ishidovy organizace). */
@@ -449,6 +454,16 @@ export default function VypravecPanel({
     telemetrie('topic_open', { refId: id, route: pattern ?? undefined });
   }
 
+  // 05 §7 — režim pro patičku (subscription: přepnutí se hned propíše).
+  const rezim = useSyncExternalStore(
+    onboardingStore.subscribe,
+    () => onboardingStore.getSnapshot().mode,
+  );
+
+  // Mluvčí dle plochy: TM = Měďák, jinak scope (svět Joe / platforma Ishida).
+  const naTM = pattern === '/svet/:worldSlug/takticka-mapa';
+  const mluvci = naTM ? 'tm' : scope;
+
   return (
     <div
       ref={ref}
@@ -476,10 +491,10 @@ export default function VypravecPanel({
               <picture>
                 <source
                   type="image/webp"
-                  srcSet={`${AVATARY[scope].webp96} 1x, ${AVATARY[scope].webp192} 2x`}
+                  srcSet={`${AVATARY[mluvci].webp96} 1x, ${AVATARY[mluvci].webp192} 2x`}
                 />
                 <img
-                  src={AVATARY[scope].png}
+                  src={AVATARY[mluvci].png}
                   alt=""
                   loading="lazy"
                   className={s.avatarImg}
@@ -694,7 +709,25 @@ export default function VypravecPanel({
       </div>
 
       <footer className={s.pata}>
-        <span>{scope === 'world' ? 'Joe · Vypravěč' : 'Ishida · Vypravěč'}</span>
+        <span>
+          {naTM
+            ? 'Měďák · Vypravěč'
+            : scope === 'world'
+              ? 'Joe · Vypravěč'
+              : 'Ishida · Vypravěč'}
+        </span>
+        {/* 05 §7 — přepínač režimu: z auto-tichého MUSÍ vést cesta zpět. */}
+        <button
+          type="button"
+          className={s.zavrit}
+          onClick={() =>
+            onboardingStore.nastavRezim(
+              rezim === 'onCall' ? 'active' : 'onCall',
+            )
+          }
+        >
+          {rezim === 'onCall' ? 'Probudit rady' : 'Jen na zavolání'}
+        </button>
         <button type="button" className={s.zavrit} onClick={onClose}>
           Zavřít (Esc)
         </button>
