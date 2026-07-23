@@ -1,6 +1,14 @@
-import * as Sentry from '@sentry/react';
+/**
+ * SLO S5 — @sentry/react se importuje DYNAMICKY: ~28 kB gzip nesmí ležet
+ * v eager grafu (budget 350 kB byl v CI překročen; lokálně bez DSN se
+ * Sentry tree-shakne, takže to lokální build neviděl). Chyby vzniklé před
+ * doběhnutím chunku se frontují a flushnou po init.
+ */
+type SentryModul = typeof import('@sentry/react');
 
-let initialized = false;
+let sentry: SentryModul | null = null;
+const fronta: Array<{ err: unknown; context?: string }> = [];
+const FRONTA_MAX = 50;
 
 // LH-13 — scrubber: axios error nese config.headers.Authorization (JWT),
 // config.data (na loginu heslo) a response.data; Sentry serializuje enumerable
@@ -36,7 +44,8 @@ export function initMonitoring(): void {
     const apiBase =
       (import.meta.env.VITE_API_URL as string | undefined) ??
       'http://localhost:3000';
-    Sentry.init({
+    void import('@sentry/react').then((Sentry) => {
+      Sentry.init({
       dsn,
       tunnel: `${apiBase}/api/monitoring/tunnel`,
       environment: import.meta.env.PROD ? 'production' : 'development',
@@ -52,8 +61,15 @@ export function initMonitoring(): void {
         if (event.contexts) event.contexts = scrubValue(event.contexts) as typeof event.contexts;
         return event;
       },
+      });
+      sentry = Sentry;
+      for (const z of fronta.splice(0)) {
+        Sentry.captureException(
+          z.err,
+          z.context ? { tags: { context: z.context } } : undefined,
+        );
+      }
     });
-    initialized = true;
   }
 
   // Globální handlery i bez DSN — aspoň se chyba zaloguje, ne aby zmizela beze stopy.
@@ -66,9 +82,13 @@ export function initMonitoring(): void {
 }
 
 export function captureError(err: unknown, context?: string): void {
-  if (initialized) {
-    Sentry.captureException(err, context ? { tags: { context } } : undefined);
-  } else {
-    console.error(`[monitoring${context ? ':' + context : ''}]`, err);
+  if (sentry) {
+    sentry.captureException(err, context ? { tags: { context } } : undefined);
+    return;
   }
+  // DSN je, ale chunk ještě letí sítí → zafrontuj (flush po init).
+  if (import.meta.env.VITE_SENTRY_DSN) {
+    if (fronta.length < FRONTA_MAX) fronta.push({ err, context });
+  }
+  console.error(`[monitoring${context ? ':' + context : ''}]`, err);
 }
