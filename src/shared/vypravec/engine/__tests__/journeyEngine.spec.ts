@@ -216,3 +216,64 @@ describe('cesta 26.3 — Worldbuilder (spec 26.7)', () => {
     ).toBeDefined();
   });
 });
+
+describe('D-079 — generace progresu + start s vybraným světem', () => {
+  it('restart zrušené cesty startuje ČISTÝ progres (nová generace)', () => {
+    vypravecEmit('world.created', { worldId: 'w-1', worldSlug: 'muj-svet' });
+    expect(aktivniCesta()?.hotovo.size).toBe(1);
+    zrusitCestu('pj-start');
+    expect(aktivniCesta()).toBeNull();
+    startCesty('pj-start');
+    const akt = aktivniCesta();
+    expect(akt?.klic).toBe('pj-start~1');
+    expect(akt?.hotovo.size).toBe(0); // NE zděděný krok 1
+    expect(akt?.contextWorldId).toBeUndefined(); // NE zděděná fixace
+    // starý progres zůstává archivem pod původním klíčem
+    expect(
+      onboardingStore.getSnapshot().journeys['pj-start']?.steps?.['pj.zaloz-svet'],
+    ).toBeDefined();
+  });
+
+  it('další zrušení a restart zvyšuje generaci (~2)', () => {
+    zrusitCestu('pj-start');
+    startCesty('pj-start');
+    zrusitCestu('pj-start');
+    startCesty('pj-start');
+    expect(aktivniCesta()?.klic).toBe('pj-start~2');
+  });
+
+  it('start s vybraným světem zafixuje kontext a odškrtne krok 1', () => {
+    zrusitCestu('pj-start');
+    startCesty('pj-start', { id: 'w-42', slug: 'existujici' });
+    const akt = aktivniCesta();
+    expect(akt?.contextWorldId).toBe('w-42');
+    expect(akt?.contextWorldSlug).toBe('existujici');
+    expect(akt?.hotovo.has('pj.zaloz-svet')).toBe(true);
+    expect(akt?.dalsiKrok?.id).toBe('pj.rozhledni-se');
+  });
+
+  it('eventy i probe zapisují do generačního klíče, ne do base', () => {
+    zrusitCestu('pj-start');
+    startCesty('pj-start');
+    vypravecEmit('world.created', { worldId: 'w-2', worldSlug: 'druhy' });
+    const s = onboardingStore.getSnapshot();
+    expect(s.journeys['pj-start~1']?.steps?.['pj.zaloz-svet']).toBeDefined();
+    expect(s.journeys['pj-start~1']?.contextWorldId).toBe('w-2');
+  });
+});
+
+describe('D-078 — probe hasNpcPage', () => {
+  it('directory s NPC odškrtne „První NPC" i bez eventu', () => {
+    vypravecEmit('world.created', { worldId: 'w-1', worldSlug: 'muj-svet' });
+    probeResync({ worldId: 'w-1', worldSlug: 'muj-svet', hasNpcPage: false });
+    expect(aktivniCesta()?.hotovo.has('pj.prvni-npc')).toBe(false);
+    probeResync({ worldId: 'w-1', worldSlug: 'muj-svet', hasNpcPage: true });
+    expect(aktivniCesta()?.hotovo.has('pj.prvni-npc')).toBe(true);
+  });
+
+  it('cizí svět NPC krok neodškrtne', () => {
+    vypravecEmit('world.created', { worldId: 'w-1', worldSlug: 'muj-svet' });
+    probeResync({ worldId: 'w-cizi', worldSlug: 'cizi', hasNpcPage: true });
+    expect(aktivniCesta()?.hotovo.has('pj.prvni-npc')).toBe(false);
+  });
+});

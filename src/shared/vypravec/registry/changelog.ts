@@ -2,8 +2,10 @@
  * S3 (07 §7) — „Co je nového": ručně kurátorovaný seznam změn PRO HRÁČE
  * (ne git log — jen věci, které uživatel pozná v UI). Údržba: skill
  * `napoveda` přidává záznam při každé změně funkčnosti. Nejnovější první.
- * Badge: počet záznamů novějších než `vypravec:zmenyVideny` (localStorage).
+ * Badge: počet záznamů novějších než `lastSeenChangelog` (onboardingStore).
  */
+import { onboardingStore } from '../state/onboardingStore';
+
 export interface Zmena {
   /** Stabilní ID (zm-RRRR-MM-DD-slug) — kotva pro „viděno". */
   id: string;
@@ -59,25 +61,21 @@ export const ZMENY: readonly Zmena[] = [
   },
 ];
 
-const KLIC_VIDENO = 'vypravec:zmenyVideny';
+/**
+ * „Viděno" žije v onboardingStore (`lastSeenChangelog`, LWW) — BE pole
+ * existuje od spec 26.3, takže badge drží krok i napříč zařízeními.
+ */
 
 /** Kolik změn uživatel ještě neviděl (badge na menu). */
 export function pocetNovychZmen(): number {
-  try {
-    const videno = localStorage.getItem(KLIC_VIDENO);
-    if (!videno) return ZMENY.length;
-    const i = ZMENY.findIndex((z) => z.id === videno);
-    return i < 0 ? ZMENY.length : i;
-  } catch {
-    return 0;
-  }
+  const videno = onboardingStore.getSnapshot().lastSeenChangelog;
+  if (!videno) return ZMENY.length;
+  const i = ZMENY.findIndex((z) => z.id === videno);
+  return i < 0 ? ZMENY.length : i;
 }
 
 /** Označ vše jako viděné (volat při otevření pohledu Změny). */
 export function oznacZmenyVidene(): void {
-  try {
-    if (ZMENY.length) localStorage.setItem(KLIC_VIDENO, ZMENY[0].id);
-  } catch {
-    /* privátní režim — badge prostě zůstane */
-  }
+  if (ZMENY.length)
+    onboardingStore.aplikuj({ lastSeenChangelog: ZMENY[0].id });
 }

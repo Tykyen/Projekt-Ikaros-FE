@@ -26,11 +26,14 @@ import {
 } from '../registry/changelog';
 import { CESTY } from '../registry/journeys';
 import {
+  aktualniKlic,
   pauzaCesty,
   postupCesty,
   startCesty,
   zrusitCestu,
 } from '../engine/journeyEngine';
+import { api } from '@/shared/api';
+import { WorldRole, type MyWorldEntry } from '@/shared/types';
 import { useAtomValue } from 'jotai';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { onboardingStore } from '../state/onboardingStore';
@@ -207,6 +210,35 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
   );
   // Anonym cestu startovat nesmí — login by ji zahodil (journeys se nemergují).
   const prihlasen = useAtomValue(currentUserAtom) != null;
+  // D-079: PJ/WB s vlastními světy si při startu 'creates' cesty vybere svět
+  // (probe by jinak zafixoval PRVNÍ navštívený). Lazy api.get až při kliku —
+  // shell nesmí záviset na QueryClientProvideru.
+  const [vyberSvetaPro, setVyberSvetaPro] = useState<string | null>(null);
+  const [vlastniSvety, setVlastniSvety] = useState<
+    { id: string; slug?: string; name: string }[]
+  >([]);
+  async function klikZacit(cestaId: string, binding?: string): Promise<void> {
+    if (binding === 'creates') {
+      try {
+        const data = await api.get<MyWorldEntry[]>('/worlds/my');
+        const vlastni = (Array.isArray(data) ? data : [])
+          .filter((e) => e.membership?.role === WorldRole.PJ)
+          .map((e) => ({
+            id: e.world.id,
+            slug: e.world.slug,
+            name: e.world.name,
+          }));
+        if (vlastni.length > 0) {
+          setVlastniSvety(vlastni);
+          setVyberSvetaPro(cestaId);
+          return;
+        }
+      } catch {
+        /* nedostupné → start bez výběru (probe doladí později) */
+      }
+    }
+    startCesty(cestaId);
+  }
   const POPISKY: Record<string, string> = {
     'pj-start': 'PJ Start — od nuly k první zprávě ve vlastním světě',
     'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
@@ -219,7 +251,7 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
       </button>
       <div className={s.personaVolby}>
         {Object.values(CESTY).map((c) => {
-          const prog = stav.journeys[c.id];
+          const prog = stav.journeys[aktualniKlic(c.id)];
           const { hotovo, celkem } = postupCesty(c.id);
           const bezi = prog && !prog.dismissedAt && hotovo < celkem;
           const pauznuta = Boolean(bezi && prog?.pausedAt);
@@ -237,9 +269,43 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
               <div className={s.bublinaAkce}>
                 {!prog || prog.dismissedAt ? (
                   prihlasen ? (
-                    <button type="button" className={s.cta} onClick={() => startCesty(c.id)}>
-                      Začít
-                    </button>
+                    vyberSvetaPro === c.id ? (
+                      // D-079: výběr světa před startem 'creates' cesty
+                      <div className={s.vyberSveta}>
+                        <small>Ke kterému světu cestu připnout?</small>
+                        {vlastniSvety.map((w) => (
+                          <button
+                            key={w.id}
+                            type="button"
+                            className={s.ctaTiche}
+                            onClick={() => {
+                              startCesty(c.id, { id: w.id, slug: w.slug });
+                              setVyberSvetaPro(null);
+                            }}
+                          >
+                            {w.name}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          className={s.cta}
+                          onClick={() => {
+                            startCesty(c.id);
+                            setVyberSvetaPro(null);
+                          }}
+                        >
+                          Založím nový svět
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className={s.cta}
+                        onClick={() => void klikZacit(c.id, c.worldBinding)}
+                      >
+                        Začít
+                      </button>
+                    )
                   ) : (
                     <small>Cesty jsou pro přihlášené — vytvoř si účet.</small>
                   )

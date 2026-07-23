@@ -602,6 +602,14 @@
   border-radius: var(--radius-sm);
 }
 
+/* D-079 — výběr světa před startem cesty (CestyView) */
+.vyberSveta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
 /* S2 „Zeptat se" — hledací pole nahoře v pohledu domů */
 .hledani {
   width: 100%;

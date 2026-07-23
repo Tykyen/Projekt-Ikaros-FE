@@ -32,7 +32,7 @@ export function JourneyBar({
   const krok = akt.dalsiKrok;
   if (!krok) return null;
   const pauznuta = Boolean(
-    onboardingStore.getSnapshot().journeys[akt.cesta.id]?.pausedAt,
+    onboardingStore.getSnapshot().journeys[akt.klic]?.pausedAt,
   );
   if (pauznuta) return null;
 
@@ -90,7 +90,7 @@ export function JourneyBar({
         <button
           type="button"
           className={s.ctaTiche}
-          onClick={() => preskocitKrok(akt.cesta.id, krok.id)}
+          onClick={() => preskocitKrok(akt.klic, krok.id)}
         >
           Přeskočit
         </button>
@@ -99,7 +99,7 @@ export function JourneyBar({
           className={s.ctaTiche}
           aria-label="Pozastavit cestu"
           title="Pozastavit cestu"
-          onClick={() => pauzaCesty(akt.cesta.id, true)}
+          onClick={() => pauzaCesty(akt.klic, true)}
         >
           ⏸
         </button>

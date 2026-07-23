@@ -21,6 +21,8 @@ export interface VypravecWorldInfo {
   accessMode?: string;
   publicShowcase?: boolean;
   hasCharacter?: boolean;
+  /** D-078: svět už má NPC stránku (probe „První NPC"). */
+  hasNpcPage?: boolean;
 }
 
 /** WorldRole → audience (04 §2; Žadatel není audience → čte jako host). */

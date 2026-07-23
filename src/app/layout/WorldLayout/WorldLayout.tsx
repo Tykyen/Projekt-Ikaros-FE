@@ -880,6 +880,10 @@ export function WorldLayout() {
             accessMode: world?.accessMode,
             publicShowcase: world?.publicShowcase,
             hasCharacter: characterSlot != null,
+            // D-078: probe „První NPC" — placeholder ≠ „nemá NPC", proto undefined.
+            hasNpcPage: pagesDirPlaceholder
+              ? undefined
+              : pagesDir.some((p) => p.type === 'NPC'),
           }}
         />
       </div>

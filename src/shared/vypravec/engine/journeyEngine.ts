@@ -24,6 +24,8 @@ import { bublinaStore } from '../ui/bublinaStore';
 import { telemetrie } from '../state/telemetry';
 
 export interface AktivniCesta {
+  /** D-079: klíč progresu v store (`baseId` či `baseId~n`) — pro zápisy. */
+  klic: string;
   cesta: Journey;
   contextWorldId?: string;
   contextWorldSlug?: string;
@@ -76,27 +78,73 @@ function ctiSlug(jId: string): string | undefined {
   }
 }
 
-export function startCesty(jId: string): void {
+/**
+ * D-079: klíč progresu = `baseId` nebo `baseId~n`. Restart zrušené cesty
+ * dostane NOVOU generaci (čistý progres) — BE set-union/$min nejde vzít
+ * zpět, takže starý klíč zůstává archivem a nová generace startuje od nuly.
+ */
+export function bazoveId(klic: string): string {
+  return klic.split('~')[0];
+}
+function dejCestu(klic: string): Journey | undefined {
+  return CESTY[bazoveId(klic)];
+}
+/** Nejvyšší existující generace progresu cesty (bez progresu → baseId). */
+export function aktualniKlic(baseId: string): string {
+  const s = onboardingStore.getSnapshot();
+  let nej = baseId;
+  let nejN = -1;
+  for (const k of Object.keys(s.journeys)) {
+    if (bazoveId(k) !== baseId) continue;
+    const n = k.includes('~') ? Number(k.split('~')[1]) || 0 : 0;
+    if (n > nejN) {
+      nejN = n;
+      nej = k;
+    }
+  }
+  return nej;
+}
+
+export function startCesty(
+  jId: string,
+  /** D-079: předvolený svět (PJ/WB s existujícími světy) — zafixuje kontext
+   *  a odškrtne krok „Založ svět". */
+  svet?: { id: string; slug?: string },
+): void {
   const cesta = CESTY[jId];
   if (!cesta) return;
-  const uz = onboardingStore.getSnapshot().journeys[jId];
-  if (uz && !uz.dismissedAt) return; // idempotentní
+  let klic = aktualniKlic(jId);
+  const uz = onboardingStore.getSnapshot().journeys[klic];
+  if (uz && !uz.dismissedAt) return; // idempotentní (běžící/dokončená)
+  if (uz?.dismissedAt) {
+    const n = klic.includes('~') ? (Number(klic.split('~')[1]) || 0) + 1 : 1;
+    klic = `${jId}~${n}`;
+  }
   onboardingStore.aplikuj({
-    journeys: { [jId]: { startedAt: new Date().toISOString(), dismissedAt: null, pausedAt: null } },
+    journeys: { [klic]: { startedAt: new Date().toISOString(), dismissedAt: null, pausedAt: null } },
   });
-  ulozAktivniId(jId);
-  pauzniOstatni(jId);
-  telemetrie('journey_started', { refId: jId });
+  if (svet && cesta.worldBinding === 'creates') {
+    onboardingStore.aplikuj({
+      journeys: { [klic]: { contextWorldId: svet.id } },
+    });
+    ulozSlug(klic, svet.slug);
+    const prvni = cesta.phases[0]?.steps[0];
+    if (prvni) krokSplnen(klic, prvni.id);
+  }
+  ulozAktivniId(klic);
+  pauzniOstatni(klic);
+  telemetrie('journey_started', { refId: klic });
 }
 
 export function pauzaCesty(jId: string, pauza: boolean): void {
+  const klic = aktualniKlic(bazoveId(jId)); // UI smí poslat base id i klíč
   onboardingStore.aplikuj({
-    journeys: { [jId]: { pausedAt: pauza ? new Date().toISOString() : null } },
+    journeys: { [klic]: { pausedAt: pauza ? new Date().toISOString() : null } },
   });
   if (!pauza) {
     // „Pokračovat" = převzetí aktivity (rozhodnutí 14: max 1 aktivní)
-    ulozAktivniId(jId);
-    pauzniOstatni(jId);
+    ulozAktivniId(klic);
+    pauzniOstatni(klic);
   }
 }
 
@@ -104,9 +152,10 @@ export function pauzaCesty(jId: string, pauza: boolean): void {
 function pauzniOstatni(krome: string): void {
   const s = onboardingStore.getSnapshot();
   for (const [jId, p] of Object.entries(s.journeys)) {
-    if (jId === krome || p.dismissedAt || p.pausedAt || !CESTY[jId]) continue;
-    const hotovo = hotoveKroky(CESTY[jId], p.steps);
-    if (hotovo.size >= CESTY[jId].phases.flatMap((f) => f.steps).length) continue;
+    const cesta = dejCestu(jId);
+    if (jId === krome || p.dismissedAt || p.pausedAt || !cesta) continue;
+    const hotovo = hotoveKroky(cesta, p.steps);
+    if (hotovo.size >= cesta.phases.flatMap((f) => f.steps).length) continue;
     onboardingStore.aplikuj({
       journeys: { [jId]: { pausedAt: new Date().toISOString() } },
     });
@@ -114,10 +163,11 @@ function pauzniOstatni(krome: string): void {
 }
 
 export function zrusitCestu(jId: string): void {
+  const klic = aktualniKlic(bazoveId(jId));
   onboardingStore.aplikuj({
-    journeys: { [jId]: { dismissedAt: new Date().toISOString() } },
+    journeys: { [klic]: { dismissedAt: new Date().toISOString() } },
   });
-  telemetrie('journey_dismissed', { refId: jId });
+  telemetrie('journey_dismissed', { refId: klic });
 }
 
 export function krokSplnen(jId: string, stepId: string, at?: string): void {
@@ -128,12 +178,12 @@ export function krokSplnen(jId: string, stepId: string, at?: string): void {
   if (!uz) {
     telemetrie('step_done', { refId: stepId });
     // Oslava dokončení celé cesty (05 §6 — jen z eventu/akce, ne backfillu).
-    const cesta = CESTY[jId];
+    const cesta = dejCestu(jId);
     const prog = onboardingStore.getSnapshot().journeys[jId];
     if (cesta && prog) {
       const celkem = cesta.phases.flatMap((f) => f.steps).length;
       if (hotoveKroky(cesta, prog.steps).size >= celkem) {
-        const o = OSLAVY_DOKONCENI[jId];
+        const o = OSLAVY_DOKONCENI[bazoveId(jId)];
         if (o)
           bublinaStore.show({
             text:
@@ -184,10 +234,10 @@ export function aktivniCesta(): AktivniCesta | null {
   const s = onboardingStore.getSnapshot();
   const kandidat = (jId: string): boolean => {
     const p = s.journeys[jId];
-    if (!p || p.dismissedAt || p.pausedAt || !CESTY[jId]) return false;
+    const c = dejCestu(jId);
+    if (!p || p.dismissedAt || p.pausedAt || !c) return false;
     return (
-      hotoveKroky(CESTY[jId], p.steps).size <
-      CESTY[jId].phases.flatMap((f) => f.steps).length
+      hotoveKroky(c, p.steps).size < c.phases.flatMap((f) => f.steps).length
     );
   };
   let vybrana = ctiAktivniId();
@@ -200,13 +250,14 @@ export function aktivniCesta(): AktivniCesta | null {
     }
   }
   if (!vybrana) return null;
-  const cesta = CESTY[vybrana];
+  const cesta = dejCestu(vybrana)!;
   const prog = s.journeys[vybrana];
   const kroky = cesta.phases.flatMap((f) => f.steps);
   const hotovo = hotoveKroky(cesta, prog.steps);
   if (hotovo.size >= kroky.length) return null; // pojistka
   const dalsiKrok = kroky.find((k) => !hotovo.has(k.id)) ?? null;
   return {
+    klic: vybrana,
     cesta,
     contextWorldId: prog.contextWorldId,
     contextWorldSlug: ctiSlug(vybrana),
@@ -216,10 +267,10 @@ export function aktivniCesta(): AktivniCesta | null {
   };
 }
 
-/** Postup cesty pro UI — průnik s definicí (E13). */
+/** Postup cesty pro UI — průnik s definicí (E13); čte aktuální generaci. */
 export function postupCesty(jId: string): { hotovo: number; celkem: number } {
-  const cesta = CESTY[jId];
-  const prog = onboardingStore.getSnapshot().journeys[jId];
+  const cesta = dejCestu(jId);
+  const prog = onboardingStore.getSnapshot().journeys[aktualniKlic(bazoveId(jId))];
   const celkem = cesta ? cesta.phases.flatMap((f) => f.steps).length : 0;
   return { hotovo: cesta ? hotoveKroky(cesta, prog?.steps).size : 0, celkem };
 }
@@ -235,7 +286,7 @@ function zpracujEvent(e: VypravecEvent): void {
   if (e.name === 'join.requested' && e.payload.worldId) {
     const s = onboardingStore.getSnapshot();
     for (const [jId, p] of Object.entries(s.journeys)) {
-      if (p.dismissedAt || p.contextWorldId || CESTY[jId]?.worldBinding !== 'joins')
+      if (p.dismissedAt || p.contextWorldId || dejCestu(jId)?.worldBinding !== 'joins')
         continue;
       onboardingStore.aplikuj({
         journeys: { [jId]: { contextWorldId: e.payload.worldId } },
@@ -244,9 +295,9 @@ function zpracujEvent(e: VypravecEvent): void {
     }
   }
   const akt = aktivniCesta();
-  if (!akt || onboardingStore.getSnapshot().journeys[akt.cesta.id]?.pausedAt)
+  if (!akt || onboardingStore.getSnapshot().journeys[akt.klic]?.pausedAt)
     return;
-  const jId = akt.cesta.id;
+  const jId = akt.klic;
 
   // fixace světa cesty dle worldBinding: 'creates' → world.created,
   // 'joins' → join.requested (05 §4: payload.worldId → contextWorldId).
@@ -283,7 +334,7 @@ function zpracujEvent(e: VypravecEvent): void {
  */
 export function zpracujNavstevu(pathname: string): void {
   const akt = aktivniCesta();
-  if (!akt || onboardingStore.getSnapshot().journeys[akt.cesta.id]?.pausedAt)
+  if (!akt || onboardingStore.getSnapshot().journeys[akt.klic]?.pausedAt)
     return;
   for (const krok of akt.cesta.phases.flatMap((f) => f.steps)) {
     if (akt.hotovo.has(krok.id) || krok.done.kind !== 'visit') continue;
@@ -291,7 +342,7 @@ export function zpracujNavstevu(pathname: string): void {
     const cile = [krok.done.route, ...(krok.done.alt ?? [])].map((r) =>
       doplnSlug(r, akt.contextWorldSlug),
     );
-    if (cile.includes(pathname)) krokSplnen(akt.cesta.id, krok.id);
+    if (cile.includes(pathname)) krokSplnen(akt.klic, krok.id);
   }
 }
 
@@ -306,6 +357,8 @@ export function probeResync(ctx: {
   accessMode?: string;
   isPJ?: boolean;
   publicShowcase?: boolean;
+  /** D-078: svět už má NPC stránku (z pages directory cache). */
+  hasNpcPage?: boolean;
 }): void {
   let akt = aktivniCesta();
   if (!akt || !ctx.worldId) return;
@@ -322,17 +375,17 @@ export function probeResync(ctx: {
     akt.dalsiKrok?.id === prvniKrok.id
   ) {
     onboardingStore.aplikuj({
-      journeys: { [akt.cesta.id]: { contextWorldId: ctx.worldId } },
+      journeys: { [akt.klic]: { contextWorldId: ctx.worldId } },
     });
-    krokSplnen(akt.cesta.id, prvniKrok.id);
-    ulozSlug(akt.cesta.id, ctx.worldSlug);
+    krokSplnen(akt.klic, prvniKrok.id);
+    ulozSlug(akt.klic, ctx.worldSlug);
     zpracujNavstevu(window.location.pathname);
     akt = aktivniCesta();
     if (!akt) return;
   }
 
   if (ctx.worldId !== akt.contextWorldId) return;
-  ulozSlug(akt.cesta.id, ctx.worldSlug); // slug se mohl ztratit (jiné zařízení)
+  ulozSlug(akt.klic, ctx.worldSlug); // slug se mohl ztratit (jiné zařízení)
   for (const krok of akt.cesta.phases.flatMap((f) => f.steps)) {
     if (akt.hotovo.has(krok.id) || krok.done.kind !== 'probe') continue;
     if (
@@ -340,9 +393,23 @@ export function probeResync(ctx: {
       ctx.accessMode &&
       ctx.accessMode !== 'private'
     )
-      krokSplnen(akt.cesta.id, krok.id);
+      krokSplnen(akt.klic, krok.id);
     if (krok.done.key === 'publicShowcaseOn' && ctx.publicShowcase)
-      krokSplnen(akt.cesta.id, krok.id);
+      krokSplnen(akt.klic, krok.id);
+  }
+
+  // D-078 dokončení: krok „První NPC" je fe-event, ale při ušlém eventu
+  // (zavřený tab před flushí, druhé zařízení) ho zpětně odškrtne directory
+  // cache — probe = zdroj pravdy i tady.
+  if (ctx.hasNpcPage) {
+    for (const krok of akt.cesta.phases.flatMap((f) => f.steps)) {
+      if (akt.hotovo.has(krok.id) || krok.done.kind !== 'fe-event') continue;
+      if (
+        krok.done.event === 'page.created' &&
+        krok.done.match?.pageType === 'NPC'
+      )
+        krokSplnen(akt.klic, krok.id);
+    }
   }
 }
 
@@ -355,7 +422,7 @@ function zpracujGateEventy(e: VypravecEvent): void {
   const krok = akt.cesta.phases
     .flatMap((f) => f.steps)
     .find((k) => k.done.kind === 'probe' && k.done.key === 'gateOpened');
-  if (krok && !akt.hotovo.has(krok.id)) krokSplnen(akt.cesta.id, krok.id, e.at);
+  if (krok && !akt.hotovo.has(krok.id)) krokSplnen(akt.klic, krok.id, e.at);
 }
 
 let zapojeno = false;
@@ -382,7 +449,8 @@ export function zkontrolujCekaniHrace(ctx?: {
   hasCharacter?: boolean;
 }): void {
   const s = onboardingStore.getSnapshot();
-  const prog = s.journeys['hrac-start'];
+  const hsKlic = aktualniKlic('hrac-start');
+  const prog = s.journeys[hsKlic];
   if (!prog || prog.dismissedAt || !prog.contextWorldId) return;
   const celkem = CESTY['hrac-start'].phases.flatMap((f) => f.steps).length;
   if (hotoveKroky(CESTY['hrac-start'], prog.steps).size < celkem) return; // běží
@@ -394,7 +462,7 @@ export function zkontrolujCekaniHrace(ctx?: {
       text: 'Postava je na světě. Najdeš ji pod Moje postava — pojď se na ni podívat.',
       akce: {
         label: 'Moje postava',
-        to: doplnSlug('/svet/:worldSlug/moje-postava', ctiSlug('hrac-start')),
+        to: doplnSlug('/svet/:worldSlug/moje-postava', ctiSlug(hsKlic)),
       },
     });
     return;

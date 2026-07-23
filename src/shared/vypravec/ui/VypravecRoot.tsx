@@ -168,6 +168,7 @@ export function VypravecRoot({
       accessMode: world.accessMode,
       isPJ: world.isPJ,
       publicShowcase: world.publicShowcase,
+      hasNpcPage: world.hasNpcPage,
     });
     zkontrolujCekaniHrace({
       worldId: world.worldId,
@@ -181,6 +182,7 @@ export function VypravecRoot({
     world?.isPJ,
     world?.publicShowcase,
     world?.hasCharacter,
+    world?.hasNpcPage,
   ]);
 
   // 26.4 — volba persony: JEDINÉ auto-otevření panelu vůbec (05 §1).
