@@ -13,7 +13,6 @@ import {
   Home,
   PlusCircle,
   Palette,
-  HelpCircle,
   HandHeart,
   Beer,
   Signpost,
@@ -115,7 +114,9 @@ type NavItemDef = {
 
 const PRIMARY_NAV: NavItemDef[] = [
   { navKey: 'uvodnik',       label: 'Úvodník',       to: '/',                      end: true, icon: <Home size={18} /> },
-  { navKey: 'napoveda',      label: 'Nápověda',      to: '/ikaros/napoveda',                  icon: <HelpCircle size={18} /> },
+  // 26.8 — „Nápověda" z nav odebrána (rozhodnutí vlastníka 2026-07-23):
+  // nápovědu doručuje Vypravěč (FAB/Shift+V/drawer), plná verze žije
+  // v jeho menu „Plná nápověda" + SEO. Routa /ikaros/napoveda zůstává.
   { navKey: 'podporovatele', label: 'Podporovatelé', to: '/ikaros/podporovatele',             icon: <HandHeart size={18} /> },
   // 15B.4a — veřejný rozcestník landing stránek RPG systémů (anon i člen)
   // R3 25.8 — skryto za flag do rozhodnutí licencí (spec-25.8)
