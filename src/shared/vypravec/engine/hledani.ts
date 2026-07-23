@@ -6,13 +6,16 @@
  */
 import { TOPIKY } from '../registry/topics';
 import { NAVODY } from '../registry/navody';
+import { ROUTE_HEADERS } from '../registry/routeHeaders';
 import type { HelpTopic } from '../registry/types';
 
 export interface Nalez {
-  typ: 'topik' | 'navod';
+  typ: 'topik' | 'navod' | 'misto';
   id: string;
   title: string;
   skore: number;
+  /** typ 'misto': routa hlavičky — CTA „vezmi mě tam". */
+  route?: string;
 }
 
 /** Fold: lowercase + odstranění diakritiky (NFD + combining marks pryč). */
@@ -24,13 +27,14 @@ export function fold(s: string): string {
 }
 
 interface Dokument {
-  typ: 'topik' | 'navod';
+  typ: 'topik' | 'navod' | 'misto';
   id: string;
   title: string;
   fTitle: string;
   fTags: string;
   fText: string;
   audience?: readonly string[];
+  route?: string;
 }
 
 let index: Dokument[] | null = null;
@@ -55,6 +59,16 @@ function dejIndex(): Dokument[] {
     index = [
       ...TOPIKY.map((t) => naDokument(t, 'topik')),
       ...NAVODY.map((n) => naDokument(n, 'navod')),
+      // „Kde jsou nábory?" má být navigace, ne search_miss (revize 07/23).
+      ...ROUTE_HEADERS.map((h) => ({
+        typ: 'misto' as const,
+        id: `misto:${h.route}`,
+        title: h.name,
+        fTitle: fold(h.name),
+        fTags: '',
+        fText: fold(h.blurb),
+        route: h.route,
+      })),
     ];
   }
   return index;
@@ -89,7 +103,14 @@ export function hledej(dotaz: string, audience: string): Nalez[] {
       }
       skore += s;
     }
-    if (vsechny) vysledky.push({ typ: d.typ, id: d.id, title: d.title, skore });
+    if (vsechny)
+      vysledky.push({
+        typ: d.typ,
+        id: d.id,
+        title: d.title,
+        skore,
+        ...(d.route ? { route: d.route } : {}),
+      });
   }
   return vysledky.sort((a, b) => b.skore - a.skore).slice(0, 8);
 }

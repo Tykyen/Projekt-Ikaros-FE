@@ -19,7 +19,7 @@ hardcoded bublina/tooltip/text v komponentě (jinak vzniká šestý zdroj driftu
 | CÍLOVÝ | dotčená sekce HelpPage renderuje z registru | jen registr |
 
 Režim se určuje **per dotčená sekce** — migrace jde kapitola po kapitole (nikdy big-bang).
-Stav migrace: tabulka v `src/shared/vypravec/registry/MIGRACE.md` (zakládá se s registrem).
+Stav migrace: režim DVOJÍ platí pro in-situ „?" (obsah žije ve feature, panel ho balí přes `insitu.tsx` bodyComponent) a pro HelpPage sekce (JSX zůstává, deep-link `?sekce&topik` na ně míří). Samostatný MIGRACE.md se nevede — stav popisuje tenhle odstavec + docs/funkce/07.
 
 ## Kdy spustit
 
@@ -36,16 +36,16 @@ Vstup: seznam dotčených topiků od skillu `funkce` (grep `source.kapitola`).
 
 | Změna | Akce v `src/shared/vypravec/registry/` |
 |---|---|
-| Nová route/stránka | `routeHeaders.ts` nový RouteHeader (name+blurb+audienceNotes) + aspoň tenký topik v `topics/<oblast>.ts`; route musí být v typovaném route registru |
+| Nová route/stránka | `routeHeaders.ts` nový RouteHeader (name+blurb+audienceNotes) + aspoň tenký topik v `topics.ts` (jediný soubor; in-situ taháky v `insitu.tsx`); route musí být v typovaném route registru |
 | Stub → funkční | topik: přepiš `body` na realitu, `status: 'stub'→'funkcni'` (nebo `'castecne'`), `verifiedAt` = dnes |
 | Změna chování existující funkce | update `body` dotčených topiků + `verifiedAt` = dnes |
 | Změna rolí/oprávnění | update `audience` (+ `minAudienceNote` pro role pod floorem); zkontroluj audience-sanity tabulku (parita s guardy) |
 | Nový pojem/žargon | přidej do `tags` dotčených topiků (synonymický můstek pro fulltext); heslo slovníčku = v2 (skill `slovnicek`) |
 | Nový errorCode / změna friendly hlášky | `errorTopics.ts`: mapování errorCode → topicId; topik = 2. linie „PROČ + co dál". Friendly hláška (rule friendly-messaging) = 1. linie a ZŮSTÁVÁ; obě znění nesmí protiřečit — zkontroluj proti FE/BE hlášce |
-| User-facing změna (cokoli, co uživatel uvidí) | záznam do `changelog.ts` `{version, date, title, body, topicId?}`; nový/výrazně změněný topik dostane `since` (štítek „nové") |
+| User-facing změna (cokoli, co uživatel uvidí) | záznam do `changelog.ts` `{id: 'zm-RRRR-MM-DD-slug', datum, titul, popis, to?}` — ID nese datum (CI to hlídá); badge řídí `lastSeenChangelog` |
 | Rename/přesun route | update `routes`, `links.to`, `deepLink` všech dotčených topiků — CI test mrtvých odkazů to jinak shodí |
 | Nová „soustředěná" plocha | doplň kolizní whitelist (pravidlo skrytí kotvy) — POVINNÉ, default při neznámé ploše = skrýt |
-| Nový cíl navigace/kroku cesty | `anchors.ts` `{id, route, visibleFor?, mobileNote?, fallbackText}` + atribut `data-vypravec` v komponentě |
+| Nový cíl navigace/kroku cesty | `anchors.ts` `{route, fallbackText}` pod klíčem kotvy + atribut `data-vypravec` v komponentě (fallbackText = povinná slovní navigace pro mobil/roli) |
 | Změna tutoriálové cesty | `journeys/*.ts` (kroky, DoneCondition, narratorLine — voice pass) |
 
 ## Pravidla psaní textů (voice pass)
@@ -59,7 +59,8 @@ Vstup: seznam dotčených topiků od skillu `funkce` (grep `source.kapitola`).
 - Anonymní pohled: „v profilu (po přihlášení)", ne „v tvém profilu".
 - Žádné interní termíny (D-NNN, spec §, BE error kódy) v textech pro hráče.
 - Odkazy na plnou nápovědu: do zavedení deep-link kontraktu (MVP-B) jen holé
-  `/ikaros/napoveda`, příp. `?sekce=X` (ta už dnes funguje); NIKDY `&topik=Y`
+  `/ikaros/napoveda`, `?sekce=X` i `?sekce=X&topik=Y` — topik = `id` akordeonu
+  (HelpAccordion `id=`; kontrakt otevře, doscrolluje a zvýrazní cíl)
   před schválením kontraktu (07 §7.2).
 - Barvy/UI netvoř — obsahový skill; UI změny řeší `frontend-design`/`mobil-desktop`.
 
@@ -77,7 +78,7 @@ Dokud dotčená sekce HelpPage nerenderuje z registru, propiš user-facing změn
 | Screenshot | `media.ts` + `<ScreenshotSlot>` |
 
 Vždy: reuse bloky z `components/` · štítky jen ✅/🚧 · aktualizuj „Aktualizováno k"
-v `HelpPage.tsx`. Jakmile je sekce migrovaná (zápis v `MIGRACE.md`), JSX edit ODPADÁ
+v `HelpPage.tsx`. Jakmile bude sekce jednou renderovaná z registru, JSX edit ODPADÁ
 — edituje se jen registr. Nepřidávej tab bez souhlasu uživatele.
 
 ## Definition of done fáze
@@ -128,3 +129,11 @@ imperativem). Tabulka změna → akce pro ně platí stejně:
 - Po každé změně registru spusť `npx vitest run src/shared/vypravec/registry`
   (CI validace: mrtvé routy, unikátní ID, topicId kroků) a u textů voice pass
   proti few-shotům v `docs/vypravec/02-persona-a-grafika.md` §2.
+
+## Dodatek revize 2026-07-23 — nové kusy registru
+
+- `engine/hledani.ts` — fulltext „Zeptat se" čte `tags` topiků/návodů + RouteHeaders (name+blurb). Nový obsah = zkontroluj, že má rozumné tagy; chybějící témata hlásí telemetrie `search_miss`/`no_topic` (BE `npm run vypravec:funnel`).
+- `registry/emptyStates.ts` — moment 3a bubliny (klíč → text+CTA); nové prázdné místo = záznam + `vypravecReportEmpty(klic)` v komponentě.
+- `registry/insitu.tsx` — „?" taháky jako topiky (lazy bodyComponent); obsah NEpřepisovat, žije ve feature.
+- `kolizniRouty.ts` — plochy bez FAB; oslavy/tipy tam bublinaStore frontuje, chybová vysvětlení projdou hned.
+- Mluvčí: platforma Ishida · svět Joe (ženský rod!) · taktická mapa Měďák (úsečné rozkazy). Předávací beaty: replika 9 (VypravecRoot), replika 10 (tmVycvik krok 1).

@@ -23,6 +23,12 @@ const FAQ: FaqItem[] = [
         </p>
         <ul>
           <li>
+            <strong>Vypravěč</strong> — avatar průvodce vpravo dole (nebo
+            Shift+V). Ví, kde stojíš, nabízí témata k místu, hledání, cesty
+            pro nováčky i novinky. Ve světech tě vede Joe, na taktické mapě
+            velí Měďák.
+          </li>
+          <li>
             Na <strong>úvodní straně světa</strong> je panel{' '}
             <strong>„Co máš po ruce"</strong> — rozcestník nástrojů; klik na dlaždici
             tě vezme rovnou tam.

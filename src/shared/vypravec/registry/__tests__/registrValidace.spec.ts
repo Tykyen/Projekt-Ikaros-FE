@@ -11,6 +11,7 @@ import { CESTY } from '../journeys';
 import { NAVODY } from '../navody';
 import { NETRIVIALNI_ROUTY } from '../netrivialniRouty';
 import { TOPIKY } from '../topics';
+import { ZMENY } from '../changelog';
 import { KOTVY } from '../anchors';
 
 const znameRouty = new Set<string>(ROUTES.map((r) => r.pattern));
@@ -96,5 +97,36 @@ describe('registr Vypravěče — validace (CI)', () => {
   it('netriviální routy (moment 2) existují v registru', () => {
     for (const r of NETRIVIALNI_ROUTY)
       expect(znameRouty.has(r), `netriviální ${r}`).toBe(true);
+  });
+});
+
+describe('revize 07/23 — sanity pojistky (06 §7)', () => {
+  const PLATNE_AUDIENCE = new Set([
+    'anon',
+    'prihlaseny',
+    'ctenar',
+    'hrac',
+    'korektor',
+    'pomocnyPJ',
+    'pj',
+    'admin',
+  ]);
+
+  it('audience hodnoty jsou z výčtu VypravecAudience', () => {
+    for (const t of [...TOPIKY, ...NAVODY])
+      for (const a of t.audience ?? [])
+        expect(PLATNE_AUDIENCE.has(a), `${t.id}: audience '${a}'`).toBe(true);
+  });
+
+  it('verifiedAt je ISO datum (RRRR-MM-DD)', () => {
+    for (const t of [...TOPIKY, ...NAVODY])
+      expect(t.verifiedAt, t.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('changelog: ID formát zm-RRRR-MM-DD-slug a shoda s datem', () => {
+    for (const z of ZMENY) {
+      expect(z.id).toMatch(/^zm-\d{4}-\d{2}-\d{2}-[a-z0-9-]+$/);
+      expect(z.id.slice(3, 13), z.id).toBe(z.datum);
+    }
   });
 });

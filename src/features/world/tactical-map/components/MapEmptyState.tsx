@@ -1,3 +1,4 @@
+import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
  * 10.2a — empty state pro taktickou mapu.
@@ -21,7 +22,7 @@ import { vypravecEmit } from '@/shared/vypravec/engine/events';
  * Spec: docs/arch/phase-10/spec-10.2a.md §3.7,
  *       docs/arch/maps/scene-assignment-ux/purpose.md §1.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiClient } from '@/shared/api/client';
 import { stateIllustrationSrc } from '@/shared/ui';
@@ -67,6 +68,11 @@ export function MapEmptyState({
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const isEmptyVariant = variant === 'empty';
+
+  // Vypravěč (moment 3a): hráč bez scény — vysvětlit, že mapa není rozbitá.
+  useEffect(() => {
+    if (isEmptyVariant && !isPJ) vypravecReportEmpty('tm-hrac-bez-sceny');
+  }, [isEmptyVariant, isPJ]);
 
   // 10.2c-edit-1 — pro hráče načti postavy ve světě, filtruj na své PC.
   // Skip pro PJ (jiný workflow), pro chybové varianty i pokud chybí worldId/userId.

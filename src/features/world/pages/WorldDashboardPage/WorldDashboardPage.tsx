@@ -1,3 +1,9 @@
+import { useEffect } from 'react';
+import { useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { onboardingStore } from '@/shared/vypravec/state/onboardingStore';
+import { aktivniCesta } from '@/shared/vypravec/engine/journeyEngine';
+import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { useParams } from 'react-router-dom';
 import { Spinner, Breadcrumbs } from '@/shared/ui';
 import { Seo, metaDescription, JsonLd, worldJsonLd, breadcrumbJsonLd } from '@/shared/seo';
@@ -27,6 +33,19 @@ export default function WorldDashboardPage() {
   const { data: world, isLoading, isError } = useWorld(worldSlug);
   const { status, pendingAccessRequest, isLoading: statusLoading } =
     useWorldStatus(world?.id ?? '');
+  const currentUser = useAtomValue(currentUserAtom);
+
+  // Vypravěč (07 §6): čerstvý svět vlastníka BEZ rozjeté cesty (dialog
+  // přeskočil) → jednorázová rada prvního tahu. Veterán (backfill) ne.
+  useEffect(() => {
+    if (status !== 'member' || !world) return;
+    if (world.ownerId !== currentUser?.id) return;
+    const s = onboardingStore.getSnapshot();
+    if (s.backfilled || aktivniCesta()) return;
+    vypravecReportEmpty('svet-dashboard-cerstvy', {
+      to: `/svet/${worldSlug}/stranky`,
+    });
+  }, [status, world, currentUser?.id, worldSlug]);
 
   if (isLoading || statusLoading) {
     return (

@@ -405,7 +405,7 @@ export default function VypravecPanel({
   useEffect(() => {
     if (dotaz.trim().length < 3 || nalezy.length > 0) return;
     const t = setTimeout(
-      () => telemetrie('search_miss', { query: dotaz.trim().slice(0, 100) }),
+      () => telemetrie('search_miss', { query: dotaz.trim().slice(0, 200) }),
       1200,
     );
     return () => clearTimeout(t);
@@ -453,6 +453,20 @@ export default function VypravecPanel({
     setTopikId(id);
     telemetrie('topic_open', { refId: id, route: pattern ?? undefined });
   }
+
+  // Telemetrie no_topic (05 §9) — nezmapovaná routa = zadání pro obsahovou
+  // směnu; 1× za session a routu (fronta batchuje, ale nespamovat).
+  useEffect(() => {
+    if (header || !pattern) return;
+    try {
+      const klic = `vypravec:no-topic:${pattern}`;
+      if (sessionStorage.getItem(klic)) return;
+      sessionStorage.setItem(klic, '1');
+    } catch {
+      /* private mode — pošli bez dedupu */
+    }
+    telemetrie('no_topic', { route: pattern });
+  }, [header, pattern]);
 
   // 05 §7 — režim pro patičku (subscription: přepnutí se hned propíše).
   const rezim = useSyncExternalStore(
@@ -626,17 +640,39 @@ export default function VypravecPanel({
                   </p>
                 )}
                 <div className={s.personaVolby}>
-                  {nalezy.map((n) => (
-                    <button
-                      key={n.id}
-                      type="button"
-                      className={s.personaVolba}
-                      onClick={() => otevriTopik(n.id)}
-                    >
-                      {n.title}
-                      <small>{n.typ === 'navod' ? 'Návod' : 'Nápověda'}</small>
-                    </button>
-                  ))}
+                  {nalezy
+                    .filter(
+                      (n) =>
+                        n.typ !== 'misto' ||
+                        (n.route != null &&
+                          (worldSlug != null ||
+                            !n.route.includes(':worldSlug'))),
+                    )
+                    .map((n) =>
+                      n.typ === 'misto' && n.route ? (
+                        <Link
+                          key={n.id}
+                          to={doplnSlug(n.route, worldSlug)}
+                          className={s.personaVolba}
+                          onClick={onClose}
+                        >
+                          {n.title}
+                          <small>Vezmi mě tam →</small>
+                        </Link>
+                      ) : (
+                        <button
+                          key={n.id}
+                          type="button"
+                          className={s.personaVolba}
+                          onClick={() => otevriTopik(n.id)}
+                        >
+                          {n.title}
+                          <small>
+                            {n.typ === 'navod' ? 'Návod' : 'Nápověda'}
+                          </small>
+                        </button>
+                      ),
+                    )}
                 </div>
               </>
             )}

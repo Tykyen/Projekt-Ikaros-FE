@@ -21,6 +21,15 @@ const EMPTY_STATES: Record<string, { text: string; ctaLabel?: string }> = {
   'zadatel-ceka': {
     text: 'Tvá žádost leží u PJ. Dokud ji neschválí, brána zůstává zavřená — čekání není chyba.',
   },
+  // Měďák — hráč na TM bez přiřazené scény (07 §6, doložený top zákys)
+  'tm-hrac-bez-sceny': {
+    text: 'Klid, vojáku. Mapa není rozbitá — PJ tě zatím nepřiřadil na žádnou scénu. Až tě povolá, uvidíš ji tady.',
+  },
+  // Joe — čerstvý svět: prázdný dashboard PJ (07 §6)
+  'svet-dashboard-cerstvy': {
+    text: 'Svět stojí a čeká na první tah. Doporučuji začít Encyklopedií — pravidla a měny už jsou předchystané.',
+    ctaLabel: 'Otevřít Encyklopedii',
+  },
 };
 
 export function vypravecReportEmpty(
