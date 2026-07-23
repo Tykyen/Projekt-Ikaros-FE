@@ -2437,3 +2437,13 @@ Navazuje na předchozí analýzu (viz výše). Uživatel: „je to implementová
 **Příznak cyklení:** „v testu to funguje, na živém ne" u věcí závislých na idle/mount pořadí; přidávám logy do buildu, který console.log stripuje (log-hygiene) — instrumentovat jde jen přes network/DOM efekty.
 
 ---
+
+### CH-134 — Průhledný panel jsem 2× „opravoval" vrstvením, přitom var(--bg) vůbec neexistoval · 2026-07-23
+**Kontext:** Vypravěč — panel průhledný napříč motivy (živý test vlastníka: měsíc, zlatý standard).
+**Co jsem udělal špatně:** dvakrát jsem přidal vrstvy (`linear-gradient(surface-2) přes var(--bg)`, pak 6 vrstev + blur) bez ověření, že `--bg` v token vrstvě existuje. Nedefinovaná CSS proměnná v `background` shorthandu činí CELOU deklaraci nevalidní — prohlížeč ji zahodil a panel zůstal průhledný všude, bez ohledu na počet vrstev.
+**Proč to nefungovalo:** tokens.css mapuje jen `--surface-1/2/3` (všechny s alfou 0.35–0.85); `--bg` není definován nikde. Skutečné neprůhledné hodnoty žijí v `--bg-primary`/`--bg-secondary` motivů (solidní hexy).
+**Fix:** kanonický token `--surface-opaque: var(--bg-primary, var(--bg-secondary, var(--bg-card, #14141c)))` v tokens.css; plovoucí prvky = surface tint přes něj + backdrop blur.
+**Poučení:** když CSS oprava „nezabírá", NEJDŘÍV ověř, že použité tokeny EXISTUJÍ (grep token vrstvy / computed styles) — nevalidní vrstva tiše zabije celý shorthand. Vrstvení navíc = léčba symptomu. Rodina CH-133 (efekt neověřen po zásahu).
+**Příznak cyklení:** druhá iterace téže vizuální opravy „silnějším" prostředkem bez diagnózy, proč selhala první.
+
+---
