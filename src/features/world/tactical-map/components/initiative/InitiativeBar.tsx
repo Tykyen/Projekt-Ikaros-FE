@@ -21,7 +21,9 @@ import { effectivelyRevealed, isTokenHiddenByFog } from '../fog/fogUtils';
 import { InitiativeBarItem } from './InitiativeBarItem';
 import { InitiativeControls } from './InitiativeControls';
 import type { MapScene, MapToken } from '../../types';
-import { WorldHelpButton } from '@/features/world/help';
+import medakAvatarWebp96 from '@/assets/vypravec/medak-avatar-96.webp';
+import medakAvatarWebp192 from '@/assets/vypravec/medak-avatar-192.webp';
+import medakAvatarPng from '@/assets/vypravec/medak-avatar.png';
 import styles from './InitiativeBar.module.css';
 
 interface Props {
@@ -199,7 +201,23 @@ export function InitiativeBar({
       </div>
 
       {onHelp && (
-        <WorldHelpButton label="Nápověda k mapě" onClick={onHelp} />
+        /* Varianta A (07/23): tvář nápovědy mapy je Měďák — otevírá panel
+           Vypravěče (legacy tahák je v něm jako topik). */
+        <button
+          type="button"
+          className={styles.medakBtn}
+          onClick={onHelp}
+          aria-label="Vypravěč — Měďákova nápověda k mapě"
+          title="Vypravěč — Měďákova nápověda k mapě"
+        >
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={`${medakAvatarWebp96} 1x, ${medakAvatarWebp192} 2x`}
+            />
+            <img src={medakAvatarPng} alt="" className={styles.medakImg} />
+          </picture>
+        </button>
       )}
       <button
         type="button"

@@ -119,7 +119,7 @@ import { useResolvedSystemId } from "@/features/world/useResolvedSystemId";
 import { useMyCharacterSlugs } from "./hooks/useMyCharacterSlugs";
 import { MapNotebookButton } from "./components/notebook/MapNotebookButton";
 import { MapNotebookOverlay } from "./components/notebook/MapNotebookOverlay";
-import { WorldHelpModal, TacticalMapHelp } from "@/features/world/help";
+import { WorldHelpModal } from "@/features/world/help";
 import { EfektyKresleniHelp } from "./components/effects/EfektyKresleniHelp";
 import { useGmNotes, useUpdateGmNotes } from "./api/useGmNotes";
 import { useCharacterNotes } from "@/features/world/pages/api/useCharacterSubdocs";
@@ -657,7 +657,6 @@ export function TacticalMapView(): React.ReactElement {
   // (per-PJ), hráč → notes jeho jediné postavy (propisuje se do tabu Poznámky
   // na stránce postavy). Oba hooky volány vždy, gated přes `enabled`/slug.
   const [notebookOpen, setNotebookOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
   // 17.13 — nápověda panelu „Efekty & kreslení" (samostatný modal).
   const [effectsHelpOpen, setEffectsHelpOpen] = useState(false);
   const playerSlug = mySlugs[0] ?? "";
@@ -2305,7 +2304,7 @@ export function TacticalMapView(): React.ReactElement {
           myCharacterSlugs={mySlugs}
           resolveTokenImage={resolveTokenImage}
           onOpenInfo={openTokenCard}
-          onHelp={() => setHelpOpen(true)}
+          onHelp={() => window.dispatchEvent(new Event('vypravec:otevrit'))}
           onItemClick={(token) => {
             const p = getGridAdapter(scene.config.gridType).toPixel(
               token.q,
@@ -2470,16 +2469,6 @@ export function TacticalMapView(): React.ReactElement {
           <StoryMapPill worldId={worldId} sceneId={scene?.id ?? null} />
         </div>
       </div>
-
-      {/* 13.6 — modal s nápovědou k taktické mapě. */}
-      <WorldHelpModal topik="takticka-mapa"
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        title="Nápověda — Taktická mapa"
-        size="lg"
-      >
-        <TacticalMapHelp audience={isPJ ? "pj" : "hrac"} />
-      </WorldHelpModal>
 
       {/* 17.13 — modal s nápovědou k panelu „Efekty & kreslení". */}
       <WorldHelpModal topik="takticka-mapa"

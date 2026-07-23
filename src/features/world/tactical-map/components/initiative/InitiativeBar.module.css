@@ -107,3 +107,37 @@
     flex: 1 1 100%;
   }
 }
+
+/* Varianta A (07/23) — Měďákův avatar jako vstup do nápovědy mapy.
+   Stejná hit-area jako ostatní ikonová tlačítka lišty (44 px na dotyku). */
+.medakBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--acc) 40%, transparent);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+.medakBtn:hover {
+  border-color: var(--acc);
+}
+.medakBtn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+.medakImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+@media (pointer: coarse) {
+  .medakBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
