@@ -440,7 +440,11 @@ function Header({
     <div className={s.pageHead}>
       <h1 className={s.title}>Postavy světa</h1>
       {canManage && (
-        <Button variant="primary" onClick={onCreate}>
+        <Button
+          variant="primary"
+          onClick={onCreate}
+          data-vypravec="postavy-nova"
+        >
           <Plus size={16} aria-hidden /> Nová postava
         </Button>
       )}

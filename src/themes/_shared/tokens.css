@@ -235,3 +235,26 @@
   --news-warning:            #dc2626;  /* Upozornění — červená */
   --news-system:             #16a34a;  /* Systémová — zelená */
 }
+
+/* Spec 26.9 — highlight cílového prvku Vypravěčem (globální třída: kotvy
+   `data-vypravec` žijí napříč featurami). Jen tokeny; reduced-motion bez pulzu. */
+.vypravec-highlight {
+  outline: 2px solid var(--acc);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+  animation: vypravecPulz 1.2s ease-in-out infinite;
+}
+@keyframes vypravecPulz {
+  0%,
+  100% {
+    outline-offset: 3px;
+  }
+  50% {
+    outline-offset: 6px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vypravec-highlight {
+    animation: none;
+  }
+}

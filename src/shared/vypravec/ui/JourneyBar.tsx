@@ -14,6 +14,7 @@ import {
   type AktivniCesta,
 } from '../engine/journeyEngine';
 import { onboardingStore } from '../state/onboardingStore';
+import { zvyrazni } from '../engine/highlight';
 import s from './Vypravec.module.css';
 
 export function JourneyBar({
@@ -79,7 +80,10 @@ export function JourneyBar({
         <button
           type="button"
           className={s.cta}
-          onClick={() => navigate(doplnSlug(krok.cta.to, akt.contextWorldSlug))}
+          onClick={() => {
+            navigate(doplnSlug(krok.cta.to, akt.contextWorldSlug));
+            if (krok.anchor) zvyrazni(krok.anchor); // čeká na mount cíle (retry)
+          }}
         >
           {krok.cta.label}
         </button>

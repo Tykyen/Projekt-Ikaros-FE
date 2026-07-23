@@ -6,6 +6,8 @@ export interface TabItem {
   id: string;
   label: string;
   icon?: ReactNode;
+  /** Kotva Vypravěče (spec 26.9) — highlight cílového tabu. */
+  vypravecKotva?: string;
 }
 
 interface TabsProps {
@@ -67,6 +69,7 @@ export function Tabs({
               id={`tab-${item.id}`}
               aria-selected={active}
               aria-controls={`panel-${item.id}`}
+              data-vypravec={item.vypravecKotva}
               tabIndex={active ? 0 : -1}
               className={clsx(s.tab, active && s.active)}
               onClick={() => onChange(item.id)}

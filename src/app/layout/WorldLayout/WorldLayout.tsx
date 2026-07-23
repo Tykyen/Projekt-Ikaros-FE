@@ -662,6 +662,7 @@ export function WorldLayout() {
                     to={`/svet/${worldSlug}/nastaveni`}
                     className={clsx(s.actionBtn, s.settingsBtn)}
                     title="Nastavení světa"
+                    data-vypravec="svet-nastaveni-ozubene"
                   >
                     ⚙
                   </Link>

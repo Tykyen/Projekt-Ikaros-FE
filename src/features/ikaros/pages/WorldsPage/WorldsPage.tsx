@@ -171,7 +171,7 @@ export default function WorldsPage() {
         ))}
 
       {!isLoading && visibleWorlds.length > 0 && (
-        <div className={s.grid}>
+        <div className={s.grid} data-vypravec="vesmiry-katalog">
           {visibleWorlds.map((world) => (
             <WorldCard
               key={world.id}

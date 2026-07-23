@@ -11,6 +11,7 @@ import { CESTY } from '../journeys';
 import { NAVODY } from '../navody';
 import { NETRIVIALNI_ROUTY } from '../netrivialniRouty';
 import { TOPIKY } from '../topics';
+import { KOTVY } from '../anchors';
 
 const znameRouty = new Set<string>(ROUTES.map((r) => r.pattern));
 
@@ -81,6 +82,15 @@ describe('registr Vypravěče — validace (CI)', () => {
       for (const k of cesta.phases.flatMap((f) => f.steps))
         if (k.topicId)
           expect(zname.has(k.topicId), `krok ${k.id} → ${k.topicId}`).toBe(true);
+  });
+
+  it('kotvy: routy existují + kroky cest odkazují na existující kotvy', () => {
+    for (const [id, k] of Object.entries(KOTVY))
+      expect(znameRouty.has(k.route), `kotva ${id}`).toBe(true);
+    for (const cesta of Object.values(CESTY))
+      for (const krok of cesta.phases.flatMap((f) => f.steps))
+        if (krok.anchor)
+          expect(krok.anchor in KOTVY, `krok ${krok.id} kotva`).toBe(true);
   });
 
   it('netriviální routy (moment 2) existují v registru', () => {

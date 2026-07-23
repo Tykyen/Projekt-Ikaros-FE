@@ -115,7 +115,7 @@ export function JoinCTA({ world }: Props) {
   };
 
   return (
-    <div className={s.card} data-elev="panel">
+    <div className={s.card} data-elev="panel" data-vypravec="dashboard-join">
       <h3 className={s.title}>{accessLabel}</h3>
       <p className={s.description}>{description}</p>
 

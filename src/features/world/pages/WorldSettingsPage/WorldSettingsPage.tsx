@@ -89,6 +89,7 @@ const TABS: SettingsTab[] = [
     id: 'pristup',
     label: 'Přístup',
     icon: <ShieldHalf size={18} />,
+    vypravecKotva: 'nastaveni-tab-pristup',
     minRole: WorldRole.Korektor,
     render: () => <AccessModeTab />,
   },

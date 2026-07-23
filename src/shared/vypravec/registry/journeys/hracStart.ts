@@ -21,6 +21,7 @@ export const HRAC_START: Journey = {
           narratorLine:
             'Světy mají čtyři režimy přístupu — někam vejdeš rovnou, jinde se klepe. Vyber si, kde chceš hrát.',
           cta: { label: 'Procházet světy', to: '/ikaros/vesmiry' },
+          anchor: 'vesmiry-katalog',
           done: {
             kind: 'visit',
             route: '/ikaros/vesmiry',

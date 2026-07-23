@@ -132,6 +132,7 @@ export default function PagesListPage() {
           <Link
             to={`/svet/${worldSlug}/nova-stranka`}
             className={s.newBtn}
+            data-vypravec="stranky-nova"
           >
             <FilePlus2 size={15} aria-hidden /> Nová stránka
           </Link>

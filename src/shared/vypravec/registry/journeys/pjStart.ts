@@ -34,6 +34,8 @@ export interface JourneyStep {
   title: string;
   narratorLine: string;
   cta: { label: string; to: string };
+  /** Kotva data-vypravec — po navigaci se prvek zvýrazní (03 §8.2). */
+  anchor?: import('../anchors').AnchorId;
   done: DoneCondition;
   topicId?: string;
   skipAllowed: true;
@@ -113,6 +115,7 @@ export const PJ_START: Journey = {
             label: 'Nastavení přístupu',
             to: '/svet/:worldSlug/nastaveni#pristup',
           },
+          anchor: 'nastaveni-tab-pristup',
           done: { kind: 'probe', key: 'gateOpened' },
           topicId: 'svet.vstup',
           skipAllowed: true,

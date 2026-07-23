@@ -51,6 +51,7 @@ export const WB_START: Journey = {
           narratorLine:
             'Pavučina drží vztahy tvého světa pohromadě. Přidej první subjekt a propoj ho s tím, co už máš.',
           cta: { label: 'Otevřít Pavučinu', to: '/svet/:worldSlug/pavucina' },
+          anchor: 'pavucina-novy-subjekt',
           done: {
             kind: 'fe-event',
             event: 'subject.created',
@@ -69,6 +70,7 @@ export const WB_START: Journey = {
             label: 'Nastavení přístupu',
             to: '/svet/:worldSlug/nastaveni#pristup',
           },
+          anchor: 'nastaveni-tab-pristup',
           done: { kind: 'probe', key: 'publicShowcaseOn' },
           topicId: 'svet.vykladni-skrin',
           skipAllowed: true,

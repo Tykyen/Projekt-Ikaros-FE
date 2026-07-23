@@ -43,7 +43,12 @@ export function SubjectRail({
       <div className={s.railHead}>
         <span className={s.railTitle}>Subjekty</span>
         {canAdd && (
-          <Button size="sm" onClick={onAdd} aria-label="Přidat subjekt">
+          <Button
+            size="sm"
+            onClick={onAdd}
+            aria-label="Přidat subjekt"
+            data-vypravec="pavucina-novy-subjekt"
+          >
             +
           </Button>
         )}

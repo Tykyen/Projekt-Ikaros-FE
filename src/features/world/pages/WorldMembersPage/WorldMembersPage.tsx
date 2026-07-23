@@ -152,6 +152,7 @@ export default function WorldMembersPage() {
             variant="primary"
             size="sm"
             onClick={() => setInviteOpen(true)}
+            data-vypravec="hraci-pozvanka"
           >
             <UserPlus size={16} aria-hidden="true" /> Přidat hráče
           </Button>
