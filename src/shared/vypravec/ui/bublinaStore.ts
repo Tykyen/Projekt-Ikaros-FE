@@ -138,9 +138,10 @@ class BublinaStore {
     this.aktualni = {
       ...b,
       route: window.location.pathname,
-      // Bublina z fronty si nese mluvčího vzniku (V-A) — jinak Měďákova
-      // oslava dorazí s bustou Joe; nová bublina bere mluvčího plochy.
-      mluvci: b.mluvci ?? this.mluvciAktualni,
+      // Jen OSLAVA si nese mluvčího vzniku (Měďákovo „velení předávám" i po
+      // doručení jinde); ne-oslava (tip/chyba) bere mluvčího plochy doručení,
+      // ať Měďák-varuje nezazní mimo mapu (adverz. verifikace kolo 5).
+      mluvci: b.oslava ? (b.mluvci ?? this.mluvciAktualni) : this.mluvciAktualni,
     };
     if (b.oslava) this.hideTimer = setTimeout(() => this.zmiz(), 8000);
     this.notify();

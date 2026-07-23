@@ -298,7 +298,10 @@ class OnboardingStore {
       // jinak otráví celou budoucí synchronizaci (retry na každý zápis).
       // 5xx/offline/síť = přechodné → nechat na re-POST.
       const status = axios.isAxiosError(e) ? (e.response?.status ?? 0) : 0;
-      if (status >= 400 && status < 500) {
+      // 408/425/429 jsou PŘECHODNÉ 4xx (timeout/too-early/rate-limit) —
+      // retry projde, zahodit = ztráta dat (adverz. verifikace kolo 5).
+      const prechodne = status === 408 || status === 425 || status === 429;
+      if (status >= 400 && status < 500 && !prechodne) {
         const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
         writeJson(pendingKey(this.ctxUid), ted.slice(odesilane));
       }

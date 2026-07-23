@@ -428,6 +428,12 @@
 }
 
 /* ── Bublina (jediná proaktivní forma, 03 §3) ──────────────────────────── */
+/* Trvale namontovaný live-region (a11y) — prázdný nemá rozměr,
+   .bublina uvnitř je position:fixed, takže region nikdy neblokuje klik. */
+.bublinaRegion {
+  display: block;
+}
+
 .bublina {
   position: fixed;
   right: 16px;

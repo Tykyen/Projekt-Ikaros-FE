@@ -72,6 +72,10 @@ export function pocetNovychZmen(): number {
   if (!videno) return ZMENY.length;
   // Nález 6: srovnávej DATEM (ne indexem) — smazání viděného záznamu jinak
   // rozsvítí badge na plný počet. ID má tvar zm-RRRR-MM-DD-slug.
+  // Pořadí v poli řeší i více změn TÉHOŽ dne (index = počet novějších).
+  const i = ZMENY.findIndex((z) => z.id === videno);
+  if (i >= 0) return i;
+  // Viděný záznam byl smazán → fallback na datum (nález 6).
   const videnoDatum = videno.slice(3, 13);
   return ZMENY.filter((z) => z.datum > videnoDatum).length;
 }

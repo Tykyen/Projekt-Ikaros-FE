@@ -225,11 +225,11 @@ function TopicView({
           </Suspense>
         </VypravecChyba>
       )}
-      {topik.minAudienceNote &&
-        (!topik.audience ||
-          !topik.audience.includes(
-            audience as import('../registry/types').VypravecAudience,
-          )) && <p className={s.poznamka}>{topik.minAudienceNote}</p>}
+      {/* minAudienceNote je vysvětlení pro publikum POD prahem karty
+         (types.ts:36 — filtruje NABÍDKU, ne obsah); zobrazuje se vždy. */}
+      {topik.minAudienceNote && (
+        <p className={s.poznamka}>{topik.minAudienceNote}</p>
+      )}
       {topik.akce
         ?.filter((a) => worldSlug || !a.to.includes(':worldSlug'))
         .map((a) => (

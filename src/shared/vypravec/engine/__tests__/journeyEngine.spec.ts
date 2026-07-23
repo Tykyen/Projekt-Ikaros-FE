@@ -20,6 +20,7 @@ import {
 } from '../journeyEngine';
 import { bublinaStore } from '../../ui/bublinaStore';
 import { onboardingStore } from '../../state/onboardingStore';
+import { ZMENY, pocetNovychZmen } from '../../registry/changelog';
 
 const jotai = getDefaultStore();
 let uidCounter = 0;
@@ -475,5 +476,20 @@ describe('audit kolo 5 — per-uid klíče + čítač + badge', () => {
     expect(onboardingStore.getSnapshot().mode).toBe('onCall');
     onboardingStore.nastavRezim('active');
     bublinaStore.vycistiProUzivatele();
+  });
+});
+
+describe('audit kolo 5 verifikace — changelog badge hybrid', () => {
+  it('index řeší i více změn TÉHOŽ dne (viděný uprostřed → počet novějších)', () => {
+    onboardingStore.aplikuj({ lastSeenChangelog: ZMENY[2].id });
+    expect(pocetNovychZmen()).toBe(2);
+  });
+  it('smazaný viděný záznam → fallback na datum (nález 6)', () => {
+    onboardingStore.aplikuj({ lastSeenChangelog: 'zm-2000-01-01-pryc' });
+    expect(pocetNovychZmen()).toBe(ZMENY.length);
+  });
+  it('viděná nejnovější → badge 0', () => {
+    onboardingStore.aplikuj({ lastSeenChangelog: ZMENY[0].id });
+    expect(pocetNovychZmen()).toBe(0);
   });
 });

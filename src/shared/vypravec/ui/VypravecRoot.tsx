@@ -384,11 +384,16 @@ export function VypravecRoot({
   // Nález 8: fokus po zavření zpět na vyvolávač; na kolizní ploše FAB
   // v DOM není → padal na <body>. Fallback FAB → body (vždy fokusovatelné).
   const vratFocus = useCallback(() => {
+    const v = vyvolavacRef.current;
+    // isConnected: odmountovaný vyvolávač (WS re-render seznamu) → .focus()
+    // je no-op a fokus spadne na body; míříme přímo na FAB (data-atribut,
+    // ne první button v obalu — ten obsahuje i panel). (adverz. verifikace)
     const cil =
-      vyvolavacRef.current ??
-      fabRef.current?.querySelector<HTMLElement>('button') ??
-      document.body;
-    cil?.focus?.();
+      v && v.isConnected
+        ? v
+        : (document.querySelector<HTMLElement>('[data-vypravec-fab]') ??
+          document.body);
+    cil.focus?.();
   }, []);
   const zavrit = useCallback(() => {
     setOtevreny(false);
@@ -438,7 +443,7 @@ export function VypravecRoot({
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [kolizni, vratFocus]);
+  }, [vratFocus]);
 
   // Aktivní cesta — derivace ze snapshotu (onboarding je dependency renderu).
   void onboarding;
