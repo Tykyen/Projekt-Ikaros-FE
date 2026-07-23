@@ -1,4 +1,4 @@
-import { type ComponentType } from "react";
+import { useEffect, type ComponentType } from "react";
 import { useSearchParams } from "react-router-dom";
 import clsx from "clsx";
 import { HELP_TABS, TAB_LABELS, parseTab, type HelpTab } from "./helpers";
@@ -23,7 +23,29 @@ const SECTIONS: Record<HelpTab, ComponentType> = {
 export default function HelpPage() {
   const [params, setParams] = useSearchParams();
   const tab = parseTab(params.get("sekce"));
+  const topik = params.get("topik");
   const Section = SECTIONS[tab];
+
+  // Deep-link Vypravěče (07 §5.2): ?sekce=X&topik=Y otevře akordeon (i řetěz
+  // rodičů), doscrolluje a krátce zvýrazní. `<details>` je uncontrolled →
+  // přímé nastavení .open React nepřepíše.
+  useEffect(() => {
+    if (!topik) return;
+    const el = document.getElementById(topik);
+    if (!el) return;
+    for (let p: HTMLElement | null = el; p; p = p.parentElement)
+      if (p instanceof HTMLDetailsElement) p.open = true;
+    el.scrollIntoView({ block: "start", behavior: "smooth" });
+    el.classList.add("vypravec-highlight");
+    const timer = setTimeout(
+      () => el.classList.remove("vypravec-highlight"),
+      8000,
+    );
+    return () => {
+      clearTimeout(timer);
+      el.classList.remove("vypravec-highlight");
+    };
+  }, [tab, topik]);
 
   function changeTab(next: HelpTab) {
     setParams(

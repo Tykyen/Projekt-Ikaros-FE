@@ -97,7 +97,7 @@ export function WorldSection() {
       </p>
 
       {/* ── Základy světa ──────────────────────────────────────────────── */}
-      <HelpAccordion icon={<LayoutDashboard size={20} />} title="Základy světa" accent="accent" defaultOpen>
+      <HelpAccordion icon={<LayoutDashboard size={20} />} title="Základy světa" id="zaklady-sveta" accent="accent" defaultOpen>
         <Tool icon={<LayoutDashboard size={16} />} title="Přehled světa" audience={{ kind: 'vse', label: 'Členové' }}>
           <p>
             Vstupní strana světa ve 3 sloupcích: vlevo nadcházející herní{' '}
@@ -242,7 +242,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Informace & lidé ───────────────────────────────────────────── */}
-      <HelpAccordion icon={<Users size={20} />} title="Informace & lidé" accent="player">
+      <HelpAccordion icon={<Users size={20} />} title="Informace & lidé" id="informace-lide" accent="player">
         <Tool icon={<BookOpen size={16} />} title="Pravidla, Magický systém, Technologie, Náboženství" audience={{ kind: 'vse', label: 'Členové (úpravy PJ)' }}>
           <p>
             Čtyři referenční wiki stránky každého světa (menu Informace). Píše a
@@ -375,7 +375,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Mapy & vizuál ──────────────────────────────────────────────── */}
-      <HelpAccordion icon={<MapIcon size={20} />} title="Mapy & vizuál" accent="info">
+      <HelpAccordion icon={<MapIcon size={20} />} title="Mapy & vizuál" id="mapy-vizual" accent="info">
         <Tool icon={<MapIcon size={16} />} title="Mapa vesmíru" audience={{ kind: 'vse', label: 'Členové (editace PJ)' }} accent="info">
           <p>
             3D graf lokací světa — tělesa (planeta, hvězda, mlhovina…) propojená
@@ -468,6 +468,7 @@ export function WorldSection() {
       <HelpAccordion
         icon={<Swords size={20} />}
         title="Taktická mapa"
+        id="takticka-mapa"
         accent="pj"
         tag={<TagChip kind="hrac" label="Hráč + PJ" />}
       >
@@ -700,7 +701,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Příběhové nástroje (PJ) ────────────────────────────────────── */}
-      <HelpAccordion icon={<ScrollText size={20} />} title="Příběhové nástroje (PJ)" accent="pj">
+      <HelpAccordion icon={<ScrollText size={20} />} title="Příběhové nástroje (PJ)" id="pribehove-nastroje" accent="pj">
         <Tool icon={<Skull size={16} />} title="Bestiář" audience={{ kind: 'pj', label: 'Členové (tvorba PJ)' }} accent="pj">
           <p>
             Knihovna statbloků (bestií) pro taktickou mapu. Bestie drží jméno, avatar,
@@ -768,7 +769,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Svět v čase ────────────────────────────────────────────────── */}
-      <HelpAccordion icon={<CalendarDays size={20} />} title="Svět v čase" accent="warning">
+      <HelpAccordion icon={<CalendarDays size={20} />} title="Svět v čase" id="svet-v-case" accent="warning">
         <Tool icon={<CloudSun size={16} />} title="Generátor počasí" audience={{ kind: 'vse', label: 'Členové (generuje PJ)' }} accent="warning">
           <p>
             Generuje počasí pro regiony světa z bohaté databáze presetů (reálná města,
@@ -824,7 +825,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Ekonomika ──────────────────────────────────────────────────── */}
-      <HelpAccordion icon={<Coins size={20} />} title="Ekonomika" accent="success">
+      <HelpAccordion icon={<Coins size={20} />} title="Ekonomika" id="ekonomika" accent="success">
         <Tool icon={<Coins size={16} />} title="Převodník měn" audience={{ kind: 'vse', label: 'Členové (správa PJ)' }} accent="success">
           <p>
             Nahoře převodník (zadáš částku a měnu, dopočítá se druhá; ⇅ prohodí), dole
@@ -846,7 +847,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Komunikace & zvuk ──────────────────────────────────────────── */}
-      <HelpAccordion icon={<MessageSquare size={20} />} title="Komunikace & zvuk" accent="info">
+      <HelpAccordion icon={<MessageSquare size={20} />} title="Komunikace & zvuk" id="komunikace-zvuk" accent="info">
         <Tool icon={<MessageSquare size={16} />} title="Chat světa" audience={{ kind: 'vse', label: 'Členové' }} accent="info">
           <p>
             Chat uvnitř světa — vlevo kanály a v nich konverzace, uprostřed zprávy,
@@ -929,7 +930,7 @@ export function WorldSection() {
       </HelpAccordion>
 
       {/* ── Nastavení & správa (PJ) ────────────────────────────────────── */}
-      <HelpAccordion icon={<Settings size={20} />} title="Nastavení & správa" accent="pjasst">
+      <HelpAccordion icon={<Settings size={20} />} title="Nastavení & správa" id="nastaveni-sprava" accent="pjasst">
         <Tool icon={<Settings size={16} />} title="Nastavení světa" audience={{ kind: 'pjasst', label: 'PJ / Pomocný PJ' }} accent="pjasst">
           <p>
             Konfigurace světa v tabech: Základní info (název, systém, viditelnost hodů),

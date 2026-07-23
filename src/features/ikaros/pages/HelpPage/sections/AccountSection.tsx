@@ -25,7 +25,7 @@ export function AccountSection() {
         (po přihlášení). Rozbal si oblast, kterou řešíš.
       </p>
 
-      <HelpAccordion icon={<UserCircle size={20} />} title="Hlavička & něco o mně" accent="accent" defaultOpen>
+      <HelpAccordion icon={<UserCircle size={20} />} title="Hlavička & něco o mně" id="hlavicka" accent="accent" defaultOpen>
         <p>
           V hlavičce karty je avatar, přezdívka, město, datum založení, poslední
           přihlášení, barva chatu a motiv. Většinu polí (město, zobrazované jméno)
@@ -37,7 +37,7 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Drama size={20} />} title="Postava v Campu" accent="player">
+      <HelpAccordion icon={<Drama size={20} />} title="Postava v Campu" id="postava-camp" accent="player">
         <p>
           Jméno, krátké bio a <strong>samostatný avatar</strong> pro tvoji
           platformovou „postavu" — personu, pod kterou se objevíš v chatech a
@@ -47,7 +47,7 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Palette size={20} />} title="Vzhled a čitelnost" accent="accent">
+      <HelpAccordion icon={<Palette size={20} />} title="Vzhled a čitelnost" id="vzhled-citelnost" accent="accent">
         <p>
           V sekci <strong>Vzhled</strong> si zvolíš <strong>motiv</strong> platformy
           a v <strong>Doladění vzhledu</strong> si vše přizpůsobíš jen pro sebe.
@@ -73,7 +73,7 @@ export function AccountSection() {
         </CalloutBox>
       </HelpAccordion>
 
-      <HelpAccordion icon={<AtSign size={20} />} title="Přezdívka & e-mail" accent="info">
+      <HelpAccordion icon={<AtSign size={20} />} title="Přezdívka & e-mail" id="prezdivka-email" accent="info">
         <p>
           Vedle e-mailu vidíš odznak <strong>✓ Ověřeno</strong> nebo{' '}
           <strong>⚠ Neověřeno</strong>. Pokud e-mail nedorazil, klikni „Poslat znovu"
@@ -97,7 +97,7 @@ export function AccountSection() {
         />
       </HelpAccordion>
 
-      <HelpAccordion icon={<KeyRound size={20} />} title="Heslo & reset" accent="warning">
+      <HelpAccordion icon={<KeyRound size={20} />} title="Heslo & reset" id="heslo-reset" accent="warning">
         <p>
           <strong>Změna hesla</strong> vyžaduje staré heslo. Po úspěšné změně se
           odhlásí všechna ostatní zařízení.
@@ -122,7 +122,7 @@ export function AccountSection() {
         </CalloutBox>
       </HelpAccordion>
 
-      <HelpAccordion icon={<ShieldCheck size={20} />} title="Dvoufaktorové ověření (2FA)" accent="success">
+      <HelpAccordion icon={<ShieldCheck size={20} />} title="Dvoufaktorové ověření (2FA)" id="dvoufaktor" accent="success">
         <p>
           Druhý zámek u přihlášení — <strong>dobrovolný</strong>. K heslu přidáš
           jednorázový kód z aplikace v mobilu (Google Authenticator, Authy…). I
@@ -155,14 +155,14 @@ export function AccountSection() {
         </CalloutBox>
       </HelpAccordion>
 
-      <HelpAccordion icon={<ImagePlus size={20} />} title="Avatar" accent="corrector">
+      <HelpAccordion icon={<ImagePlus size={20} />} title="Avatar" id="avatar" accent="corrector">
         <p>
           Pokud nenahraješ vlastní avatar, použije se <strong>default</strong> —
           muž, žena nebo „bytost"; typ si vybíráš v profilu.
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<EyeOff size={20} />} title="Soukromí" accent="info">
+      <HelpAccordion icon={<EyeOff size={20} />} title="Soukromí" id="soukromi" accent="info">
         <TermGrid
           items={[
             { term: 'Neviditelný mód', desc: 'Skryje tvůj online stav — zelená/žlutá tečka u jména zmizí ostatním. Ty vidíš ostatní beze změny.' },
@@ -171,7 +171,7 @@ export function AccountSection() {
         />
       </HelpAccordion>
 
-      <HelpAccordion icon={<Bell size={20} />} title="Notifikace (upozornění)" accent="accent">
+      <HelpAccordion icon={<Bell size={20} />} title="Notifikace (upozornění)" id="notifikace" accent="accent">
         <p>
           Sám/sama si vybíráš, na co ti přijde <strong>push upozornění</strong> —
           bublina na telefon nebo do prohlížeče, i když appku nemáš otevřenou.
@@ -197,7 +197,7 @@ export function AccountSection() {
         </CalloutBox>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Globe2 size={20} />} title="Moje světy & komunitní stopa" accent="success">
+      <HelpAccordion icon={<Globe2 size={20} />} title="Moje světy & komunitní stopa" id="moje-svety" accent="success">
         <p>
           <strong>Moje světy</strong> = seznam světů, kterých jsi členem (klik tě
           přenese do světa). <strong>Moje akce ve světech</strong> agregují blížící
@@ -207,7 +207,7 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Flag size={20} />} title="Moderace (moje hlášení a rozhodnutí)" accent="info">
+      <HelpAccordion icon={<Flag size={20} />} title="Moderace (moje hlášení a rozhodnutí)" id="moderace" accent="info">
         <p>
           Sekce <strong>Moderace</strong> v profilu shrnuje tvoji stranu
           nahlašování — na jednom místě vidíš:
@@ -226,7 +226,7 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Download size={20} />} title="Stáhnout moje data" accent="success">
+      <HelpAccordion icon={<Download size={20} />} title="Stáhnout moje data" id="stahnout-data" accent="success">
         <p>
           V sekci <strong>Účet</strong> je tlačítko{' '}
           <strong>„Stáhnout moje data (JSON)"</strong>. Vytvoří a stáhne soubor s
@@ -236,7 +236,7 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Baby size={20} />} title="Věková hranice 15+" accent="warning">
+      <HelpAccordion icon={<Baby size={20} />} title="Věková hranice 15+" id="vek-15" accent="warning">
         <p>
           Při registraci se ptáme jen na to, jestli ti je{' '}
           <strong>15 a víc, nebo méně</strong> — přesné datum narození nechceme.
@@ -251,7 +251,7 @@ export function AccountSection() {
         </p>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Trash2 size={20} />} title="Smazání účtu (tombstone)" accent="warning">
+      <HelpAccordion icon={<Trash2 size={20} />} title="Smazání účtu (tombstone)" id="smazani-uctu" accent="warning">
         <p>Smazání účtu funguje v <strong>30denním hold režimu</strong>:</p>
         <StepList
           steps={[

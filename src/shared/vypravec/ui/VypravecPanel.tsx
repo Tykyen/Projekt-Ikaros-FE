@@ -5,7 +5,15 @@
  * patičkou zpětné vazby „Pomohlo ti to?" (telemetrie feedback ±).
  * A11y: role dialog (nemodální), focus trap, Esc/focus řeší VypravecRoot.
  */
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import {
+  Suspense,
+  lazy,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ComponentType,
+} from 'react';
 import { Link } from 'react-router-dom';
 import type { ResolvedHeader } from '../engine/resolveHeader';
 import { topikyProRoutu, topikPodleId } from '../registry/topics';
@@ -70,18 +78,37 @@ const PERSONA_VOLBY: Array<{
   { persona: null, titul: 'Jen se rozhlédnu', popis: 'Dobře. Kdybys mě potřeboval, víš, kde mě najdeš.' },
 ];
 
+// MVP-B: lazy taháky per topik — cache na úrovni modulu, ať má komponenta
+// stabilní identitu napříč rendery (jinak Suspense bliká a hooks warning).
+const tahakCache = new Map<
+  string,
+  ComponentType<{ audience: import('../registry/types').VypravecAudience }>
+>();
+function tahakPro(topik: HelpTopic) {
+  if (!topik.bodyComponent) return null;
+  let c = tahakCache.get(topik.id);
+  if (!c) {
+    c = lazy(topik.bodyComponent);
+    tahakCache.set(topik.id, c);
+  }
+  return c;
+}
+
 function TopicView({
   topik,
   worldSlug,
+  audience,
   onZpet,
   onClose,
 }: {
   topik: HelpTopic;
   worldSlug?: string;
+  audience: string;
   onZpet: () => void;
   onClose: () => void;
 }) {
   const [feedback, setFeedback] = useState<'ano' | 'ne' | null>(null);
+  const Tahak = tahakPro(topik);
   return (
     <div>
       <button type="button" className={s.zpet} onClick={onZpet}>
@@ -99,6 +126,16 @@ function TopicView({
             <li key={k.slice(0, 24)}>{k}</li>
           ))}
         </ol>
+      )}
+      {Tahak && (
+        <Suspense
+          fallback={<p className={s.topikOdstavec}>Načítám tahák…</p>}
+        >
+          {/* eslint-disable-next-line react-hooks/static-components -- identita je stabilní: tahakPro čte modulovou cache per topik.id */}
+          <Tahak
+            audience={audience as import('../registry/types').VypravecAudience}
+          />
+        </Suspense>
       )}
       {topik.minAudienceNote && (
         <p className={s.poznamka}>{topik.minAudienceNote}</p>
@@ -378,6 +415,7 @@ export default function VypravecPanel({
           <TopicView
             topik={topik}
             worldSlug={worldSlug}
+            audience={audience}
             onZpet={() => setTopikId(null)}
             onClose={onClose}
           />

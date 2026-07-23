@@ -649,17 +649,32 @@ function AnonStartPanel({ onNav }: { onNav?: () => void } = {}) {
           </li>
           <li className={s.startStep}>
             <span className={s.startNum}>2</span>
-            <div className={s.startStepText}>
+            <Link
+              to="/ikaros/vesmiry"
+              className={s.startStepLink}
+              onClick={() => onNav?.()}
+            >
               <span className={s.startStepTitle}>Vytvoř svůj svět</span>
-              <span className={s.startStepDesc}>Nebo se přidej k existujícímu</span>
-            </div>
+              <span className={s.startStepDesc}>
+                Nebo se rozhlédni po vesmírech — jde to i bez účtu
+              </span>
+            </Link>
           </li>
           <li className={s.startStep}>
             <span className={s.startNum}>3</span>
-            <div className={s.startStepText}>
+            <button
+              type="button"
+              className={s.startStepLink}
+              onClick={() => {
+                window.dispatchEvent(new Event('vypravec:otevrit'));
+                onNav?.();
+              }}
+            >
               <span className={s.startStepTitle}>Pozvi přátele</span>
-              <span className={s.startStepDesc}>A hrajte společně</span>
-            </div>
+              <span className={s.startStepDesc}>
+                Nevíš kudy? Vypravěč tě provede — klepni sem
+              </span>
+            </button>
           </li>
         </ol>
       </div>

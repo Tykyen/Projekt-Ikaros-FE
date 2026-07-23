@@ -23,7 +23,7 @@ export function StartSection() {
         zatím nefunguje, je označené štítkem <strong>🚧 Připravujeme</strong>.
       </p>
 
-      <HelpAccordion icon={<Rocket size={20} />} title="První kroky" accent="success" defaultOpen>
+      <HelpAccordion icon={<Rocket size={20} />} title="První kroky" id="prvni-kroky" accent="success" defaultOpen>
         <p>Než se vrhneš do hry, projdi si tyhle tři kroky:</p>
         <StepList
           steps={[
@@ -52,7 +52,7 @@ export function StartSection() {
         </CalloutBox>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Eye size={20} />} title="Co uvidíš a co odemkne registrace" accent="info">
+      <HelpAccordion icon={<Eye size={20} />} title="Co uvidíš a co odemkne registrace" id="co-uvidis" accent="info">
         <InfoGrid>
           <InfoCard icon={<Eye size={22} />} title="Bez přihlášení" accent="reader">
             Úvodník platformy, veřejné vesmíry, tahle nápověda a podmínky, články a
@@ -68,7 +68,7 @@ export function StartSection() {
         </InfoGrid>
       </HelpAccordion>
 
-      <HelpAccordion icon={<Layout size={20} />} title="Orientace v rozhraní" accent="accent">
+      <HelpAccordion icon={<Layout size={20} />} title="Orientace v rozhraní" id="orientace" accent="accent">
         <TermGrid
           items={[
             { term: 'Hlavička', desc: 'Logo (na úvodník), přepínač motivů, zvonek (notifikace), Pošta, Profil, Odhlásit. U anonyma Přihlásit / Registrace.' },
@@ -84,7 +84,7 @@ export function StartSection() {
         <ScreenshotSlot media="start.orientace" />
       </HelpAccordion>
 
-      <HelpAccordion icon={<BookOpen size={20} />} title="Slovníček pojmů" accent="corrector">
+      <HelpAccordion icon={<BookOpen size={20} />} title="Slovníček pojmů" id="slovnicek" accent="corrector">
         <p>Pár slov, na která narazíš všude:</p>
         <TermGrid
           items={[
@@ -104,7 +104,7 @@ export function StartSection() {
         />
       </HelpAccordion>
 
-      <HelpAccordion icon={<Palette size={20} />} title="Vzhled (motivy)" accent="warning">
+      <HelpAccordion icon={<Palette size={20} />} title="Vzhled (motivy)" id="vzhled-motivy" accent="warning">
         <p>
           Platforma má desítky vizuálních motivů — od neutrální „Modré nebe" přes
           Kyberpunk, Pergamen, Nemrtví až po Arabský svět. Přepneš je v přepínači

@@ -580,7 +580,7 @@ export function MapPjPanel({
         />
       )}
       {/* 17.13 — dedikovaná nápověda orchestrace (role-aware dle isPjStrict). */}
-      <WorldHelpModal
+      <WorldHelpModal topik="takticka-mapa"
         open={helpOpen}
         onClose={() => setHelpOpen(false)}
         title="Orchestrace — nápověda"

@@ -2472,7 +2472,7 @@ export function TacticalMapView(): React.ReactElement {
       </div>
 
       {/* 13.6 — modal s nápovědou k taktické mapě. */}
-      <WorldHelpModal
+      <WorldHelpModal topik="takticka-mapa"
         open={helpOpen}
         onClose={() => setHelpOpen(false)}
         title="Nápověda — Taktická mapa"
@@ -2482,7 +2482,7 @@ export function TacticalMapView(): React.ReactElement {
       </WorldHelpModal>
 
       {/* 17.13 — modal s nápovědou k panelu „Efekty & kreslení". */}
-      <WorldHelpModal
+      <WorldHelpModal topik="takticka-mapa"
         open={effectsHelpOpen}
         onClose={() => setEffectsHelpOpen(false)}
         title="Efekty & kreslení — nápověda"

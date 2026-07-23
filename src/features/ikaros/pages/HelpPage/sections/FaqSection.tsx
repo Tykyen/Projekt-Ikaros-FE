@@ -766,6 +766,7 @@ export function FaqSection() {
             key={cat.key}
             icon={cat.icon}
             title={cat.label}
+            id={`faq-${cat.key}`}
             accent={cat.accent}
             defaultOpen={i === 0}
           >

@@ -7,8 +7,11 @@
  * je FAB skrytý (03 §5) a karta by tam nebyla k mání.
  */
 import type { HelpTopic } from './types';
+import { INSITU_TOPIKY } from './insitu';
 
 export const TOPIKY: readonly HelpTopic[] = [
+  // MVP-B: in-situ taháky („?" chat/TM) jako topiky — adaptéry viz insitu.tsx.
+  ...INSITU_TOPIKY,
   // ── Role (příčná vrstva — zákys č. 1) ──────────────────────────────────
   {
     id: 'role.dve-patra',

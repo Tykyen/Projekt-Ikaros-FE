@@ -3,6 +3,7 @@
  * Plný registr (HelpTopic, Anchor, Journey…) přibude s dalšími dny MVP-A —
  * definice viz docs/vypravec/04-architektura.md §2.
  */
+import type { ComponentType } from 'react';
 import type { RoutePattern } from '@/app/routeRegistry';
 
 /**
@@ -38,6 +39,14 @@ export interface HelpTopic {
   minAudienceNote?: string;
   /** Odstavce 1–3 věty; kroky = číslovaný postup (šablona TOPIK 06 §4.1). */
   body: { odstavce: string[]; kroky?: string[] };
+  /**
+   * MVP-B (07 §5.1): bohatý in-situ tahák („?" v chatu/TM) jako lazy
+   * komponenta POD odstavci. Obsah žije dál ve feature — „?" modal je alias,
+   * panel jen druhý povrch. Lazy import → eager graf Vypravěče neroste.
+   */
+  bodyComponent?: () => Promise<{
+    default: ComponentType<{ audience: VypravecAudience }>;
+  }>;
   /** Max 2 navigační akce (deep-link v rámci platformy). */
   akce?: { label: string; to: string }[];
   /** Kotva do docs/funkce/ (kapitola NN) + datum posledního ověření. */

@@ -13,12 +13,15 @@ export function WorldHelpModal({
   onClose,
   title,
   size = 'md',
+  topik,
   children,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** Deep-link na akordeon plné nápovědy (?topik=…, MVP-B 07 §5.2). */
+  topik?: string;
   children: ReactNode;
 }) {
   return (
@@ -29,7 +32,7 @@ export function WorldHelpModal({
       size={size}
       footer={
         <Link
-          to="/ikaros/napoveda?sekce=svet"
+          to={`/ikaros/napoveda?sekce=svet${topik ? `&topik=${topik}` : ''}`}
           className={s.fullLink}
           target="_blank"
           rel="noreferrer"

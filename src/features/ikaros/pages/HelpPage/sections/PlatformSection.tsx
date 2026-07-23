@@ -71,7 +71,7 @@ export function PlatformSection() {
       </p>
 
       {/* ── Úvod & orientace ───────────────────────────────────────────── */}
-      <HelpAccordion icon={<Home size={20} />} title="Úvod & vesmíry" accent="accent" defaultOpen>
+      <HelpAccordion icon={<Home size={20} />} title="Úvod & vesmíry" id="uvod-vesmiry" accent="accent" defaultOpen>
         <Tool icon={<Home size={16} />} title="Úvodník" audience={{ kind: 'vse', label: 'Všichni' }}>
           <p>
             Vstupní stránka platformy: uvítací karta + dvě sekce vedle sebe — vlevo
@@ -130,7 +130,7 @@ export function PlatformSection() {
       </HelpAccordion>
 
       {/* ── Komunikace ─────────────────────────────────────────────────── */}
-      <HelpAccordion icon={<MessageSquare size={20} />} title="Komunikace" accent="info">
+      <HelpAccordion icon={<MessageSquare size={20} />} title="Komunikace" id="komunikace" accent="info">
         <Tool icon={<Beer size={16} />} title="Putyka (globální chat)" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             Jedna sdílená místnost pro celou platformu napříč světy. Píšeš v reálném
@@ -235,7 +235,7 @@ export function PlatformSection() {
       </HelpAccordion>
 
       {/* ── Obsah komunity ─────────────────────────────────────────────── */}
-      <HelpAccordion icon={<BookOpen size={20} />} title="Obsah komunity" accent="corrector">
+      <HelpAccordion icon={<BookOpen size={20} />} title="Obsah komunity" id="obsah-komunity" accent="corrector">
         <Tool icon={<Palette size={16} />} title="Společná tvorba (rozcestník)" audience={{ kind: 'vse', label: 'Všichni' }} accent="corrector">
           <p>
             Jedno tlačítko v hlavním menu, které otevře rozcestník veškeré
@@ -483,7 +483,7 @@ export function PlatformSection() {
       </HelpAccordion>
 
       {/* ── Lidé & profil ──────────────────────────────────────────────── */}
-      <HelpAccordion icon={<Users size={20} />} title="Lidé & profil" accent="player">
+      <HelpAccordion icon={<Users size={20} />} title="Lidé & profil" id="lide-profil" accent="player">
         <Tool icon={<User size={16} />} title="Profil" audience={{ kind: 'vse', label: 'Vlastník účtu' }} accent="player">
           <p>
             Tvoje nastavení účtu (po přihlášení): hlavička, něco o mně, postava v
@@ -526,7 +526,7 @@ export function PlatformSection() {
       </HelpAccordion>
 
       {/* ── Pravidla, soukromí & nahlašování ───────────────────────────── */}
-      <HelpAccordion icon={<Gavel size={20} />} title="Pravidla, soukromí & nahlašování" accent="info">
+      <HelpAccordion icon={<Gavel size={20} />} title="Pravidla, soukromí & nahlašování" id="pravidla-soukromi" accent="info">
         <Tool icon={<Flag size={16} />} title="Nahlásit obsah" audience={{ kind: 'vse', label: 'Přihlášení' }} accent="info">
           <p>
             U cizího obsahu — <strong>článku, obrázku v galerii, profilu, náboru,
@@ -575,7 +575,7 @@ export function PlatformSection() {
       </HelpAccordion>
 
       {/* ── Správa platformy (admini) ──────────────────────────────────── */}
-      <HelpAccordion icon={<Shield size={20} />} title="Správa platformy" accent="warning">
+      <HelpAccordion icon={<Shield size={20} />} title="Správa platformy" id="sprava-platformy" accent="warning">
         <Tool icon={<Shield size={16} />} title="Správa platformy (/admin)" audience={{ kind: 'admin', label: 'Jen admini' }} accent="warning">
           <p>
             Admin hub se třemi taby. <strong>Přehled</strong>: dashboard se

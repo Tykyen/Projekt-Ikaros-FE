@@ -577,7 +577,7 @@ export function ChannelView({
       </header>
 
       {/* 13.6 — modal s nápovědou k chatu. */}
-      <WorldHelpModal
+      <WorldHelpModal topik="komunikace-zvuk"
         open={helpOpen}
         onClose={() => setHelpOpen(false)}
         title="Nápověda — Chat světa"
