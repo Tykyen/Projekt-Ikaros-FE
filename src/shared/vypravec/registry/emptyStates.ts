@@ -14,7 +14,7 @@ const EMPTY_STATES: Record<string, { text: string; ctaLabel?: string }> = {
   },
   // Joe — prázdné wiki stránky světa
   'stranky-prazdne': {
-    text: 'Wiki tvého světa je zatím prázdná. První stránka je nejtěžší — začni klidně jednou lokací nebo pravidly.',
+    text: 'Vlastní stránky tu zatím nejsou. První je nejtěžší — začni klidně jednou lokací nebo pravidly.',
     ctaLabel: 'Založit stránku',
   },
   // Joe — Žadatel čeká na schválení (replika 3, zkrácená pro bublinu)

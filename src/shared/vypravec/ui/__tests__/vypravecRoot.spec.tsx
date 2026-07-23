@@ -80,7 +80,7 @@ describe('VypravecRoot — panel: otevření, Esc, focus restore', () => {
   });
 
   it('nepokrytá routa → poctivý fallback, žádný stub', async () => {
-    mountAt('/ikaros/akce');
+    mountAt('/ikaros/clanky');
     fireEvent.click(screen.getByRole('button', { name: FAB_LABEL }));
     expect(
       await screen.findByText(/Tenhle kout je neprobádaný i pro mě/),

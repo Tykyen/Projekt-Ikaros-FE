@@ -19,7 +19,7 @@ export const NAVODY: readonly HelpTopic[] = [
         'Rozmysli technologii, magii a náboženství — tohle se volí jen teď.',
         'Projdi seedované stránky v Encyklopedii a uprav, co nesedí.',
         'V Nastavení → Přístup přepni svět ze Soukromého na Veřejný, nebo Veřejný se schválením.',
-        'Hotovo poznáš tak, že se svět objeví v katalogu Vesmírů.',
+        'Hotovo poznáš tak, že karta tvého světa v katalogu už není zamčená a nabízí vstup.',
       ],
     },
     akce: [{ label: 'Vytvořit svět', to: '/ikaros/vytvorit-svet' }],
@@ -37,7 +37,7 @@ export const NAVODY: readonly HelpTopic[] = [
       kroky: [
         'Otevři Postavy svého světa a dej Nová postava.',
         'Vyber typ Postava hráče a vyplň základ dle systému.',
-        'V detailu postavy ji přiřaď hráči (vlastníkovi).',
+        'V Nastavení → Členové postavu přiřaď členovi (nebo vyber vlastníka rovnou v editoru).',
         'Hotovo — hráč ji od té chvíle vidí pod Moje postava.',
       ],
     },
@@ -57,7 +57,7 @@ export const NAVODY: readonly HelpTopic[] = [
         'PJ: v Nastavení světa povol kostky (whitelist) — bez toho ikona nic nenabídne.',
         'Otevři chat světa a klikni na 🎲 v poli zprávy.',
         'Vyber kostku a hoď — výsledek padne do konverzace všem.',
-        'Na taktické mapě najdeš tentýž 🎲 u výřezu scény.',
+        'Na taktické mapě najdeš tentýž 🎲 v pravém docku nástrojů.',
       ],
     },
     akce: [{ label: 'Chat světa', to: '/svet/:worldSlug/chat' }],
@@ -115,10 +115,10 @@ export const NAVODY: readonly HelpTopic[] = [
     body: {
       odstavce: ['Hráči mají vidět jen to, co jejich postavy.'],
       kroky: [
-        'Na Taktické mapě zapni mlhu války v nastavení scény.',
+        'Na Taktické mapě otevři dock Mlha a mlhu zapni.',
         'Odkrývej ručně štětcem, NEBO zapni LoS — výhled se počítá od tokenů podle zdí.',
         'Zdi a překážky má scéna z exportu Stavitele, nebo je dokreslíš.',
-        'Zkontroluj si náhled pohledu hráče, ať nevidí za roh.',
+        'Zahalené oblasti vidíš jako PJ poloprůsvitně — co je plně šedé, hráč nevidí.',
       ],
     },
     akce: [{ label: 'Taktická mapa', to: '/svet/:worldSlug/takticka-mapa' }],
@@ -157,7 +157,7 @@ export const NAVODY: readonly HelpTopic[] = [
       kroky: [
         'Otevři Kalendář světa (vidí Pomocný PJ a výš).',
         'Zvol preset kalendáře, nebo si nastav vlastní měsíce a svátky v Nastavení → Kalendáře.',
-        'Posouvej aktuální datum podle děje — události se k němu vážou.',
+        'In-game datum posouvej v Generátoru počasí (Posunout den) — kalendář ho jen čte.',
         'Časovou osu příběhu vedle toho kreslí Timeline.',
       ],
     },
@@ -174,8 +174,8 @@ export const NAVODY: readonly HelpTopic[] = [
     body: {
       odstavce: ['Ekonomika světa od měn po první nákup.'],
       kroky: [
-        'PJ: zkontroluj měny světa v Převodníku měn (seedují se se světem).',
-        'PJ: naskladni Obchod — položky ber z katalogů Společné tvorby, nebo vlastní.',
+        'PJ (či Pomocný PJ): zkontroluj měny světa v Převodníku měn (seedují se se světem).',
+        'PJ (či Pomocný PJ): naskladni Obchod — položky ber z katalogů Společné tvorby, nebo vlastní.',
         'Hráč: nakupuje v Obchodě za peníze SVÉ postavy (stav vidíš ve Financích postavy).',
         'Nestačí-li zůstatek, obchod nákup odmítne — doplnění je na PJ.',
       ],

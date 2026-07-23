@@ -36,7 +36,7 @@ describe('resolveRouteHeader', () => {
   });
 
   it('nepokrytá / neznámá routa → null (poctivý fallback)', () => {
-    expect(resolveRouteHeader('/ikaros/akce')).toBeNull();
+    expect(resolveRouteHeader('/ikaros/clanky')).toBeNull();
     expect(resolveRouteHeader('/uplne/mimo')).toBeNull();
   });
 

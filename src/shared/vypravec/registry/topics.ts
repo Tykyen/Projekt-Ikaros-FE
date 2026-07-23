@@ -40,7 +40,7 @@ export const TOPIKY: readonly HelpTopic[] = [
         'Pozor na asymetrii: Pomocný PJ vede hru a spravuje obsah, ale žádosti o vstup schvaluje jen PJ. A předat svět umí výhradně jeho vlastník.',
       ],
       kroky: [
-        'Roli člena mění PJ v Nastavení světa, záložka Členové.',
+        'Roli člena mění PJ nebo Pomocný PJ v Nastavení světa, záložka Členové.',
         'Stránka Hráči slouží k žádostem a pozvánkám — role se mění jinde.',
       ],
     },
@@ -59,7 +59,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Jako platformní Admin nemáš ve světě automatickou moc — nejdřív musíš „nahodit práva" (elevaci) pro konkrétní svět.',
-        'Elevace dává plnou moc PJ — nastavení, členy i schvalování žádostí. Jediné, co neobejde, je předání světa (a obnovení smazaného): to zůstává vlastníkovi.',
+        'Elevace dává plnou moc PJ — nastavení, členy i schvalování žádostí. Jediné, co neobejde, je předání světa: to zůstává vlastníkovi. Obnova smazaného světa je naopak čistě platformní akce Admina — jde i bez elevace.',
       ],
     },
     source: { kapitola: '08' },
@@ -78,7 +78,7 @@ export const TOPIKY: readonly HelpTopic[] = [
         'Každý svět má jeden ze čtyř režimů přístupu: Veřejný (vstoupíš rovnou), Veřejný se schválením (klepeš — žádost schvaluje PJ), Soukromý (jen na pozvání) a Uzavřený (nikdo nový nevstoupí).',
         'K tomu může mít svět zapnutou výkladní skříň — ta není režim, ale samostatné okno pro čtení vybraných sekcí bez vstupu.',
         'Pozvánka nebo pozvací odkaz tě přivede jako Čtenáře — o vyšší roli pak rozhoduje PJ.',
-        'Tlačítko na dashboardu světa vždy odpovídá jeho režimu: Vstoupit, Požádat o vstup, nebo nic (soukromý svět bez pozvánky neotevřeš).',
+        'Tlačítko na úvodní stránce světa odpovídá jeho režimu: „Vstoupit do světa", dvojice „Chci hrát" / „Jen číst", nebo nic (uzavřený svět nikoho nového nepustí).',
       ],
     },
     akce: [{ label: 'Katalog světů', to: '/ikaros/vesmiry' }],
@@ -206,7 +206,7 @@ export const TOPIKY: readonly HelpTopic[] = [
       odstavce: [
         'Chat světa má dvě úrovně: kanál je tematická skupina (například Globální, Postavy) a uvnitř kanálu žijí jednotlivé konverzace.',
         'Kanál Postavy je zvláštní — konverzace v něm bývají soukromé mezi hráčem a PJ, proto nevidíš cizí vlákna.',
-        'Když nevíš kam psát, Globální konverzace je společný stůl celého světa.',
+        'Když nevíš kam psát, Globální konverzace je společný stůl hráčů světa (Čtenář ji nevidí — chat se otevírá s rolí Hráč).',
       ],
     },
     source: { kapitola: '13' },
@@ -220,7 +220,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     routes: ['/svet/:worldSlug/chat', '/svet/:worldSlug'],
     body: {
       odstavce: [
-        'Hází se ikonou 🎲 v chatu světa a na taktické mapě — deník postavy kostky nemá, ten je na čtení a správu postavy.',
+        'Hází se ikonou 🎲 v chatu světa a na taktické mapě; klikací hody má i deník v chatu a bojové panely. Samostatná stránka postavy je na čtení a správu.',
         'Které kostky jsou k dispozici, určuje PJ whitelistem v Nastavení světa. Prázdný whitelist znamená, že se zatím neháže — připomeň to PJ.',
       ],
     },
@@ -239,11 +239,11 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Hráč si postavu sám nezakládá — to je záměr, ne omezení. Postavu tvoří a přiděluje PJ, aby seděla do světa i pravidel.',
-        'Nejrychlejší cesta: v žádosti o vstup zvol „Chci hrát" a přilož návrh postavy — jedno schválení PJ ti dá roli Hráče i živou postavu najednou. Kdo vstoupil jako Čtenář, domluví se s PJ dodatečně (klidně v kanálu Postavy).',
+        'Nejrychlejší cesta: v žádosti o vstup zvol „Chci hrát" a přilož návrh postavy — jedno schválení PJ ti dá roli Hráče i živou postavu najednou. Kdo vstoupil jako Čtenář, domluví se s PJ dodatečně — nejlíp Poštou nebo osobně; konverzace v kanálu Postavy vzniká až s přidělenou postavou.',
         'Jakmile ji máš, najdeš ji pod Moje postava a v adresáři Postav.',
       ],
     },
-    akce: [{ label: 'Otevřít chat světa', to: '/svet/:worldSlug/chat' }],
+    akce: [{ label: 'Otevřít Poštu', to: '/ikaros/posta' }],
     source: { kapitola: '12' },
     verifiedAt: '2026-07-22',
     status: 'funkcni',
@@ -274,11 +274,11 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Záložka se zámkem 🔒 znamená obsah za prověrkou (AKJ) — vidíš, ŽE tajemství existuje, ale ne co v něm je.',
-        'Úrovně prověrek definuje PJ v Nastavení (záložka AKJ) a lidem je přiděluje v Členech. Ani Pomocný PJ nemá zámky automaticky — i on potřebuje prověrku.',
+        'Úrovně prověrek definuje vedení světa (PJ i Pomocný PJ) v Nastavení, záložka AKJ, a lidem je přiděluje v Členech. PJ a Pomocný PJ vidí za zámky automaticky.',
         'Chceš-li dovnitř, je to herní záležitost: získej prověrku od PJ, ne technickou fintu.',
       ],
     },
-    minAudienceNote: 'Prověrky uděluje PJ v Nastavení → Členové.',
+    minAudienceNote: 'Prověrky uděluje vedení světa v Nastavení → Členové.',
     source: { kapitola: '11' },
     verifiedAt: '2026-07-22',
     status: 'funkcni',
@@ -311,9 +311,9 @@ export const TOPIKY: readonly HelpTopic[] = [
         'Slovo „mapa" tu nese tři různé nástroje.',
       ],
       kroky: [
-        'Mapa a Mapy (atlas) — příběhové mapy světa na koukání a piny.',
+        'Mapa (vesmír) — graf lokací a vazeb; Atlas map — obrázkové mapy s piny.',
         'Taktická mapa — živé hraní: tokeny, iniciativa, mlha války.',
-        'Stavitel podzemí — kreslení podkladů, které pak exportuješ na taktickou mapu.',
+        'Stavitel — generátor podzemí, města i krajiny; výsledek exportuješ na taktickou mapu.',
       ],
     },
     source: { kapitola: '14' },
@@ -331,8 +331,8 @@ export const TOPIKY: readonly HelpTopic[] = [
       ],
       kroky: [
         'Platformní akce (/ikaros/akce) — reálné termíny hráčů a komunity.',
-        'Kalendář světa — herní čas světa; pohled PJ (vidí ho Pomocný PJ a výš).',
-        'Timeline — časová osa příběhu a událostí postav.',
+        'Kalendář světa — přehled akcí a událostí postav pro vedení světa (Pomocný PJ a výš). In-game datum posouvá modul Počasí.',
+        'Timeline — historická osa světa; na herní akce ani postavy se neváže.',
       ],
     },
     minAudienceNote: 'Kalendář světa vidí až Pomocný PJ — hráčům čas oznamuje PJ.',
@@ -364,7 +364,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Vzhled se skládá ze tří vrstev. Globální motiv si volíš v profilu a platí na platformě.',
-        'Vzhled světa nastavuje PJ pro všechny členy; a Můj vzhled je tvoje osobní odchylka uvnitř světa — dokud ji nezapneš, sleduješ vzhled od PJ.',
+        'Vzhled světa nastavuje PJ nebo Pomocný PJ pro všechny členy; a Můj vzhled je tvoje osobní odchylka uvnitř světa — dokud ji nezapneš, sleduješ vzhled od PJ.',
         'Když se ti tedy svět „přebarvil sám", nejspíš PJ změnil sdílený vzhled.',
       ],
     },
@@ -439,11 +439,27 @@ export const TOPIKY: readonly HelpTopic[] = [
         'Campy jsou tři roleplay místnosti se sdílenou scénou, která rotuje v poledne a o půlnoci; rozehranou scénu si můžeš uložit do jednoho slotu.',
         'Voice krčma je hlasová místnost pro registrované. Emoty světů fungují jen uvnitř světů.',
       ],
-      kroky: undefined,
     },
     akce: [{ label: 'Do Putyky', to: '/chat' }],
     source: { kapitola: '05' },
     verifiedAt: '2026-07-22',
+    status: 'funkcni',
+  },
+  // ── Podporovatel (revize 07/23 — cíl dvou chybových topiků byl bez obsahu) ──
+  {
+    id: 'platforma.podporovatel',
+    title: 'Co dává podpora platformy',
+    tags: ['podporovatel', 'supporter', 'kvota', 'limit svetu', 'skiny', 'stavitel'],
+    routes: ['/ikaros/podporovatele'],
+    body: {
+      odstavce: [
+        'Platforma běží z podpory hráčů — bez reklam a bez prodeje dat. Podporovatel je poděkování s výhodami, ne brána k obsahu.',
+        'Co podpora otevírá: až 30 světů místo 3, Stavitele map (podzemí, město, krajina) a sadu skinů navíc. Ke hře samotné ale podporu nepotřebuješ.',
+        'Podporovatele poznáš podle odznaku Ikara u jména.',
+      ],
+    },
+    source: { kapitola: '02' },
+    verifiedAt: '2026-07-23',
     status: 'funkcni',
   },
 ] as const;

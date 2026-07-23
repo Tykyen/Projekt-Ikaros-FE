@@ -51,9 +51,13 @@ export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
     text: 'Přezdívka se mění žádostí (Profil → Bezpečnost), kterou schvaluje správa — a pak 30 dní cooldown.',
     akce: { label: 'Otevřít profil', to: '/ikaros/profil' },
   },
-  NOT_APPLICABLE: {
+  FINANCE_NOT_APPLICABLE: {
     id: 'err.npc-finance',
-    text: 'NPC nemá Finance ani Výbavu — to není chyba. Plný inventář mají jen postavy hráčů; NPC je kulisa vyprávění.',
+    text: 'NPC nemá Finance — to není chyba. Plný inventář mají jen postavy hráčů; NPC je kulisa vyprávění.',
+  },
+  INVENTORY_NOT_APPLICABLE: {
+    id: 'err.npc-vybava',
+    text: 'NPC nemá Výbavu — to není chyba. Plný inventář mají jen postavy hráčů; NPC je kulisa vyprávění.',
   },
   NOT_SUPPORTER: {
     id: 'err.supporter',

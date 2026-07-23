@@ -596,7 +596,13 @@ export default function VypravecPanel({
             {dotaz.trim().length >= 2 && (
               <>
                 <div className={s.sekceLabel}>
-                  {nalezy.length ? 'Našel jsem' : 'Nic jsem nenašel'}
+                  {nalezy.length
+                    ? scope === 'world'
+                      ? 'Našla jsem'
+                      : 'Našel jsem'
+                    : scope === 'world'
+                      ? 'Nic jsem nenašla'
+                      : 'Nic jsem nenašel'}
                 </div>
                 {nalezy.length === 0 && (
                   <p className={s.topikOdstavec}>

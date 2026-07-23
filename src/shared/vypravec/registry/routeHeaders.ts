@@ -99,7 +99,7 @@ export const ROUTE_HEADERS: readonly RouteHeader[] = [
   // ── Svět (Joe) ──────────────────────────────────────────────────────────
   {
     route: '/svet/:worldSlug',
-    name: 'Dashboard světa',
+    name: 'Přehled světa',
     blurb: 'Vstupní síň světa — novinky, rychlé akce a lidé, co jsou zrovna tady.',
     audienceNotes: {
       anon: 'Jako host vidíš jen průčelí; o vstup požádáš tlačítkem u názvu světa.',
@@ -182,5 +182,61 @@ export const ROUTE_HEADERS: readonly RouteHeader[] = [
     name: 'Taktická mapa',
     blurb:
       'Bojiště světa — scény, tokeny, mlha války. Velí PJ; vidíš, co ti scéna dovolí.',
+  },
+  // Revize 07/23 — netriviální routy (moment 2) MUSÍ mít hlavičku:
+  {
+    route: '/svet/:worldSlug/pavucina',
+    name: 'Pavučina',
+    blurb:
+      'Vztahy světa jako graf — subjekty a vazby mezi nimi. Přidávej, propojuj, materializuj do stránek.',
+  },
+  {
+    route: '/svet/:worldSlug/kalendar',
+    name: 'Kalendář světa',
+    blurb:
+      'Přehled akcí a událostí postav pro vedení světa. In-game datum posouvá Generátor počasí.',
+  },
+  {
+    route: '/svet/:worldSlug/mapy',
+    name: 'Atlas map',
+    blurb:
+      'Obrázkové mapy světa s piny. Viditelnost jednotlivých map řídí PJ.',
+  },
+  {
+    route: '/svet/:worldSlug/timeline',
+    name: 'Timeline',
+    blurb:
+      'Historická osa světa — éry a události příběhu. Na herní akce se neváže.',
+  },
+  // Revize 07/23 — cíle akcí topiků/changelogu bez hlavičky:
+  {
+    route: '/ikaros/podporovatele',
+    name: 'Podporovatelé',
+    blurb:
+      'Díky nim platforma běží. Podpora otevírá 30 světů místo 3, Stavitele a skiny navíc.',
+  },
+  {
+    route: '/ikaros/akce',
+    name: 'Akce',
+    blurb:
+      'Kalendář platformních i světových akcí — co se kde chystá a kam se přihlásit.',
+  },
+  {
+    route: '/ikaros/oblibene',
+    name: 'Oblíbené',
+    blurb:
+      'Tvoje záložky napříč platformou — světy i stránky, které sis připnul.',
+  },
+  {
+    route: '/ikaros/sceny',
+    name: 'Katalog scén',
+    blurb:
+      'Sdílené scény taktické mapy — naklonuj si cizí bojiště do svého světa i s terénem.',
+  },
+  {
+    route: '/chat/voice',
+    name: 'Voice krčma',
+    blurb:
+      'Hlasová místnost pro registrované — mluvené slovo místo psaní. Vstup je volný, mikrofon dobrovolný.',
   },
 ];

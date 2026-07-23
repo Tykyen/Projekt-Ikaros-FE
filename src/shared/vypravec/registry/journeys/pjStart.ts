@@ -75,7 +75,7 @@ export const PJ_START: Journey = {
           id: 'pj.rozhledni-se',
           title: 'Rozhlédni se',
           narratorLine:
-            'Svět není prázdný. Předchystal jsem ti pravidla, měny i kalendář — projdi si, co už stojí.',
+            'Svět není prázdný. Ishida ti předchystal pravidla, měny i kalendář — projdi si, co už stojí.',
           cta: { label: 'Ukaž mi můj svět', to: '/svet/:worldSlug' },
           done: { kind: 'visit', route: '/svet/:worldSlug', scoped: true },
           topicId: 'svet.neni-prazdny',

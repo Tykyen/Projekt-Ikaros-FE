@@ -22,7 +22,7 @@ export const TM_VYCVIK: Journey = {
           id: 'tm.scena',
           title: 'Založ scénu',
           narratorLine:
-            'Tady přebírám já. Měďák. První rozkaz: založ scénu — bez bojiště není výcvik.',
+            '„Tady velí Měďák," řekla Joe. Správně. Přebírám. První rozkaz: založ scénu — bez bojiště není výcvik.',
           cta: { label: 'Otevřít mapu', to: '/svet/:worldSlug/takticka-mapa' },
           done: { kind: 'fe-event', event: 'scene.created' },
           topicId: 'insitu.tm',

@@ -20,13 +20,13 @@ export const ZMENY: readonly Zmena[] = [
   {
     id: 'zm-2026-07-23-vypravec',
     datum: '2026-07-23',
-    titul: 'Vypravěč: Ishida a Joe tě provedou',
+    titul: 'Vypravěč: Ishida, Joe a Měďák tě provedou',
     popis:
-      'Nová postava-průvodce (klávesa Shift+V nebo tlačítko s klíčem). Cesty pro nové PJ, hráče i tvůrce světů, kontextová nápověda ke každé stránce a krátké návody.',
+      'Nová postava-průvodce — avatar vpravo dole (nebo Shift+V). Cesty pro PJ, hráče a tvůrce světů, výcvik taktické mapy s Měďákem, kontextová nápověda a krátké návody.',
   },
   {
-    id: 'zm-2026-07-21-sdileni-scen',
-    datum: '2026-07-21',
+    id: 'zm-2026-07-15-sdileni-scen',
+    datum: '2026-07-15',
     titul: 'Katalog sdílených scén',
     popis:
       'PJ může publikovat scénu taktické mapy do katalogu — ostatní si ji naklonují do svého světa i s terénem a zdmi.',
