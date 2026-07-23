@@ -459,7 +459,7 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
               položka je mobil-only; bez tohohle je desktop jen Shift+V. */}
           <button
             type="button"
-            className={s.count}
+            className={`${s.count} ${s.vypravecVstup}`}
             onClick={() => window.dispatchEvent(new Event('vypravec:otevrit'))}
             aria-label="Vypravěč — nápověda a průvodce"
             title="Vypravěč (Shift+V)"

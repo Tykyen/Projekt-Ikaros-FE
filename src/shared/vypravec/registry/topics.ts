@@ -1,5 +1,5 @@
 /**
- * Spec 26.6 — 21 hlubokých Tier 0 topiků (kanonický číselník 06 §5.1b).
+ * Spec 26.6 — hluboké Tier 0 topiky (počet hlídá CI, ne komentář) (kanonický číselník 06 §5.1b).
  * Hlas: platformní routy = Ishida, world routy = Joe (02 §2 — věcně,
  * bez vykřičníků v instrukcích, humor nikdy u chyb). Každé tvrzení kryje
  * kapitola docs/funkce/ (source) — topik NIKDY netvrdí, co tam není.

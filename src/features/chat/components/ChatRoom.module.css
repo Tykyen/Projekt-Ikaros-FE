@@ -281,3 +281,11 @@
     display: inline-flex;
   }
 }
+
+/* Vstup k Vypravěči — na rozdíl od čítače je klikací i na desktopu */
+.vypravecVstup {
+  cursor: pointer;
+}
+.vypravecVstup:hover {
+  filter: brightness(1.2);
+}

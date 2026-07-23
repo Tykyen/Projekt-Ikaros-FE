@@ -111,6 +111,7 @@
 /* Varianta A (07/23) — Měďákův avatar jako vstup do nápovědy mapy.
    Stejná hit-area jako ostatní ikonová tlačítka lišty (44 px na dotyku). */
 .medakBtn {
+  --acc: var(--theme-accent, var(--accent, #7c5cff));
   display: grid;
   place-items: center;
   width: 32px;

@@ -36,13 +36,14 @@ export function postWorldOperation(
       // skutečná orchestrace; self-assign při zakládání scény se nepočítá.
       const ja = getDefaultStore().get(currentUserAtom)?.id;
       const cil = (op as { userId?: string }).userId;
-      if (
-        (op.type === 'member.assignToScene' ||
-          op.type === 'member.bulkAssignToScene') &&
-        cil !== undefined &&
-        cil !== ja
-      )
-        vypravecEmit('scene.assigned', { worldId });
+      const cile = (op as { userIds?: string[] }).userIds;
+      const priraditJineho =
+        (op.type === 'member.assignToScene' &&
+          cil !== undefined &&
+          cil !== ja) ||
+        (op.type === 'member.bulkAssignToScene' &&
+          (cile ?? []).some((id) => id !== ja));
+      if (priraditJineho) vypravecEmit('scene.assigned', { worldId });
       return res;
     });
 }

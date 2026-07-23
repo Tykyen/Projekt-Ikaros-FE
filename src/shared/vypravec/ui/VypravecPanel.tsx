@@ -14,7 +14,7 @@ import {
   useSyncExternalStore,
   type ComponentType,
 } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { ResolvedHeader } from '../engine/resolveHeader';
 import { topikyProRoutu, topikPodleId } from '../registry/topics';
 import { NAVODY } from '../registry/navody';
@@ -25,7 +25,7 @@ import {
   oznacZmenyVidene,
   pocetNovychZmen,
 } from '../registry/changelog';
-import { CESTY } from '../registry/journeys';
+import { CESTY, POPISKY_CEST } from '../registry/journeys';
 import {
   aktualniKlic,
   bazoveId,
@@ -37,8 +37,8 @@ import {
 } from '../engine/journeyEngine';
 import { api } from '@/shared/api';
 import { WorldRole, type MyWorldEntry } from '@/shared/types';
-import { useAtomValue } from 'jotai';
-import { currentUserAtom } from '@/shared/store/authStore';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { currentUserAtom, registerModalOpenAtom } from '@/shared/store/authStore';
 import { onboardingStore } from '../state/onboardingStore';
 import type { HelpTopic } from '../registry/types';
 import { doplnSlug } from '../engine/journeyEngine';
@@ -278,6 +278,8 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
   );
   // Anonym cestu startovat nesmí — login by ji zahodil (journeys se nemergují).
   const prihlasen = useAtomValue(currentUserAtom) != null;
+  const naviguj = useNavigate();
+  const setRegisterOpen = useSetAtom(registerModalOpenAtom);
   // D-079: PJ/WB s vlastními světy si při startu 'creates' cesty vybere svět
   // (probe by jinak zafixoval PRVNÍ navštívený). Lazy api.get až při kliku —
   // shell nesmí záviset na QueryClientProvideru.
@@ -288,6 +290,12 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
   async function klikZacit(cestaId: string, binding?: string): Promise<void> {
     if (cestaId === 'hrac-ve-svete') {
       startHracVeSvete(); // fixace z dokončené hrac-start (N3)
+      return;
+    }
+    if (cestaId === 'hrac-start') {
+      // Krok 1 je visit katalogu — bez navigace by checklist stál (B4).
+      startCesty(cestaId);
+      naviguj('/ikaros/vesmiry');
       return;
     }
     if (binding === 'creates') {
@@ -311,13 +319,7 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
     }
     startCesty(cestaId);
   }
-  const POPISKY: Record<string, string> = {
-    'pj-start': 'PJ Start — od nuly k první zprávě ve vlastním světě',
-    'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
-    'wb-start': 'Cesta tvůrce — ateliér, wiki, Pavučina, výkladní skříň',
-    'tm-vycvik': 'Výcvik taktické mapy — Měďákův dril pro PJ',
-    'hrac-ve-svete': 'První dny ve světě — postava, stůl, encyklopedie',
-  };
+  const POPISKY = POPISKY_CEST;
   return (
     <div>
       <button type="button" className={s.zpet} onClick={onZpet}>
@@ -403,7 +405,13 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
                       </button>
                     )
                   ) : (
-                    <small>Cesty jsou pro přihlášené — vytvoř si účet.</small>
+                    <button
+                      type="button"
+                      className={s.cta}
+                      onClick={() => setRegisterOpen(true)}
+                    >
+                      Vytvořit účet
+                    </button>
                   )
                 ) : dokoncena ? null : (
                   <>

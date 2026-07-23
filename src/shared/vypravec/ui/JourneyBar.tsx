@@ -14,6 +14,7 @@ import {
   preskocitKrok,
   type AktivniCesta,
 } from '../engine/journeyEngine';
+import { POPISKY_CEST } from '../registry/journeys';
 import { onboardingStore } from '../state/onboardingStore';
 import { zvyrazni } from '../engine/highlight';
 import s from './Vypravec.module.css';
@@ -62,7 +63,7 @@ export function JourneyBar({
             navigate(`/svet/${akt.contextWorldSlug}`);
           else setRozbalenaVKolizi(true); // 03 §8.3: tap = rozbalení
         }}
-        aria-label={`Cesta ${akt.cesta.id}: ${text} (${akt.poradi.hotovo}/${akt.poradi.celkem})`}
+        aria-label={`${POPISKY_CEST[akt.cesta.id] ?? akt.cesta.id}: ${text} (${akt.poradi.hotovo}/${akt.poradi.celkem})`}
       >
         <span className={s.mini}>
           {akt.poradi.hotovo}/{akt.poradi.celkem}

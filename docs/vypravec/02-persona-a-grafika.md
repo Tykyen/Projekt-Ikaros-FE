@@ -125,7 +125,7 @@ Vlastní postava vlastníka (reference = vlastní AI generát; z reference se vy
 - Replika 2: „…najdeš ji pod Moje postava." — bez deixe „tady" (bublina umí čekat ve frontě).
 - Replika 4: transformována — milník „první svět" je tichý zápis do Kroniky; obsah nese Joe v kroku pj.rozhledni-se („Ishida ti předchystal…") + topik svet.neni-prazdny (dvojitá oslava = inflace).
 - Replika 7: + dovětek „…nemusíš nic dělat." (MaintenanceOverlay).
-- Replika 9: serializovaná do jedné bubliny: ‚Ishida: „Tady moje chodby končí…" Joe: „Vítej. Posvítíme na to spolu."'; dostane ji i veterán (záměr — představení nové postavy).
+- Replika 9: serializovaná do jedné bubliny: ‚Ishida: „Tady moje chodby končí…" Joe: „Vítej. Posvítíme na to spolu."'; veterán ji NEdostane (má veteránskou bublinu; finální audit 2026-07-23).
 - Replika 10: serializovaná do narratorLine kroku tm.scena: ‚„Tady velí Měďák," řekla Joe. Správně. Přebírám…'.
 - Veteránská (backfill): „Vidím, že to tu znáš, příteli. Přesto je tu pár novinek — kdybys chtěl, provedu tě." (jen platforma).
 - Výjimka k zákazu emoji: odkaz na KONKRÉTNÍ ikonu UI (🎲, 🔒, 🗝️) se nepočítá — zrcadlí rozhraní, není dekorace.

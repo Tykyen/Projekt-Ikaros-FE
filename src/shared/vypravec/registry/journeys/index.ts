@@ -18,6 +18,15 @@ export const CESTY: Record<string, Journey> = {
   'hrac-ve-svete': HRAC_VE_SVETE,
 };
 
+/** Lidské názvy cest — menu Cesty i aria popisky lišty. */
+export const POPISKY_CEST: Record<string, string> = {
+  'pj-start': 'PJ Start — od nuly k první zprávě ve vlastním světě',
+  'hrac-start': 'Cesta hráče — najdi stůl a ozvi se',
+  'wb-start': 'Cesta tvůrce — ateliér, wiki, Pavučina, výkladní skříň',
+  'tm-vycvik': 'Výcvik taktické mapy — Měďákův dril pro PJ',
+  'hrac-ve-svete': 'První dny ve světě — postava, stůl, encyklopedie',
+};
+
 /** Oslavy dokončení cest (bublina; 05 §6 — oslava jen z eventu, ne backfillu). */
 export const OSLAVY_DOKONCENI: Record<string, { sKontextem: string; bezKontextu?: string }> = {
   'pj-start': {

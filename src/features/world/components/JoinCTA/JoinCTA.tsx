@@ -155,6 +155,7 @@ export function JoinCTA({ world }: Props) {
             requestAccess.mutate(
               {
                 worldId: world.id,
+                worldSlug: world.slug,
                 characterDraft: { name, note: charNote.trim() || undefined },
               },
               {

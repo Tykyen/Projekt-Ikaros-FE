@@ -215,6 +215,10 @@
 
 /* Měďákův vstup do nápovědy na prázdné mapě (vpravo nahoře, mimo obsah) */
 .medakBtn {
+  /* kontejner má pointer-events:none — bez tohohle je tlačítko mrtvé */
+  pointer-events: auto;
+  /* --acc není globální token — lokální fallback (vzor Help.module.css) */
+  --acc: var(--theme-accent, var(--accent, #7c5cff));
   position: absolute;
   top: 12px;
   right: 12px;

@@ -21,6 +21,8 @@ export interface Bublina {
   dismissKey?: string;
   /** Zavření platí jen pro session (chybová vysvětlení — chyba se vrací). */
   sessionDismiss?: boolean;
+  /** Smí se zobrazit i na kolizní ploše (kontext chyby/prázdna na místě). */
+  kolizniOk?: boolean;
   /** Interní: routa vzniku (zavírání při odchodu z routy, ne při příchodu). */
   route?: string;
   text: string;
@@ -95,8 +97,9 @@ class BublinaStore {
    */
   show(b: Bublina): boolean {
     const s = onboardingStore.getSnapshot();
-    if (b.dismissKey && !b.sessionDismiss && s.dismissed.includes(b.dismissKey))
-      return false;
+    // Trvalý dismissed platí VŽDY — interakce() ho zapisuje i sessionDismiss
+    // bublinám (klik na CTA = vyřízeno navždy, B2).
+    if (b.dismissKey && s.dismissed.includes(b.dismissKey)) return false;
     if (b.dismissKey && b.sessionDismiss && this.sessionDismissed().has(b.dismissKey))
       return false;
     if (s.mode === 'onCall' && !b.oslava) return false;
@@ -105,7 +108,7 @@ class BublinaStore {
     // vysvětlení (to má kontext na místě chyby), (b) něco už visí — přepis
     // by tiše zahodil zobrazený obsah (N1) i oslavu blokovanou radou (N6).
     const doFronty =
-      (this.kolizni && !b.sessionDismiss) || this.aktualni != null;
+      (this.kolizni && !b.kolizniOk) || this.aktualni != null;
     if (doFronty) {
       if (b.jenTed) return false; // deixe: jinde/jindy by text lhal
       if (this.fronta.length >= FRONTA_MAX) return false; // drop = přiznat (N2)

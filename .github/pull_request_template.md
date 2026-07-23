@@ -18,7 +18,7 @@
       - novou stránku v aplikaci → sekce **Stránky** (✅/🚧 značky)
       - novou roli nebo oprávnění → sekce **Role**
       - funkčnost popsanou v FAQ → sekce **FAQ**
-      <br>(tracking D-048 — viz `docs/dluhy.md`; pomocí skillu `napoveda`)
+      <br>(tracking D-080 — viz `docs/dluhy.md`; pomocí skillu `napoveda`)
 - [ ] `docs/roadmap-fe.md` reflektuje stav (✅/⬜/🟡 + datum dokončení)
 - [ ] `docs/dluhy.md` — uzavřené dluhy přesunuté, nové zapsané (skill `dluh`)
 

@@ -164,11 +164,19 @@ export function MapPjPanel({
   });
 
   const handleSwitchSelf = (sceneId: string): void => {
-    mutation.mutate({
-      type: 'member.assignToScene',
-      userId: currentUserId,
-      sceneId,
-    });
+    mutation.mutate(
+      {
+        type: 'member.assignToScene',
+        userId: currentUserId,
+        sceneId,
+      },
+      {
+        // Vypravěč (tm-vycvik „Rozděl jednotky"): PŘEPNUTÍ scény z panelu
+        // orchestrace je orchestrální tah — sólo PJ jinak krok nesplní
+        // (self-assign při zakládání scény se nepočítá — jde jinou cestou).
+        onSuccess: () => vypravecEmit('scene.assigned', { worldId }),
+      },
+    );
   };
 
   // 10.2c-edit-1 — scene.deactivate (per-scene op). BE atomic CAS isActive=false +

@@ -212,7 +212,7 @@ Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whi
 ### - [x] 26.4 Kontextové tipy & checklist po registraci — [dopad střední · náklad malý] ✅ 2026-07-22 (persona dialog — jediné auto-otevření; volba se ukládá do UserOnboardingState.persona = odpověď na otevřenou otázku ANO; tipy „Poprvé tady?" + chybová mapa + auto-tichý režim)
 Lehká vrstva nad 25.2: po registraci volba „Chci vést hru / Hrát / Tvořit svět" → nasměrování do 26.1/26.2/26.3. Žádný intruzivní tour framework — checklist + empty-state CTA. **Otevřená otázka:** volbu ukládat (persona pro dashboard), nebo jen jednorázově navigovat?
 
-### - [x] 26.5 Krátké návody v nápovědě — [dopad střední · náklad malý] ✅ 2026-07-22 (spec-26.7): 10 návodů (registry/navody.ts, menu Návody v panelu) + 24 hlubokých topiků; ScreenshotSloty zůstávají na dodání snímků (samostatná položka)
+### - [x] 26.5 Krátké návody v nápovědě — [dopad střední · náklad malý] ✅ 2026-07-22 (spec-26.7): 10 návodů (registry/navody.ts, menu Návody v panelu) + 25 hlubokých topiků; ScreenshotSloty zůstávají na dodání snímků (samostatná položka)
 10–15 návodů, **každý řeší jeden úkol do 5 minut** (založ svět, pozvi hráče, první scéna, hod v chatu, mapa+tokeny, deník, export…). 🔁 reuse HelpPage struktury; naplnit ScreenshotSloty reálnými snímky (spolupráce: uživatel dodá screenshoty).
 
 ---

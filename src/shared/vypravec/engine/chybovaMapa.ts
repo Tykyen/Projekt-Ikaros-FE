@@ -32,6 +32,7 @@ function zpracuj(ch: ApiChyba): void {
   const zobrazeno = bublinaStore.show({
     dismissKey: topik.id,
     sessionDismiss: true, // chyba se vrací — trvalé umlčení by ji pohřbilo
+    kolizniOk: true, // vysvětlení chyby patří na místo chyby
     text: topik.text,
     akce: topik.akce,
   });

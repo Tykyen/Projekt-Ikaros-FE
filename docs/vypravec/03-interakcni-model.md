@@ -178,3 +178,10 @@ Audience `anon` existuje (AnonStartPanel se nahrazuje rozcestníkem Vypravěče)
 | Poslední krok cesty zmizí v composeru | Definované sbalení + replika před vstupem (§8.3) |
 | Auto-tichý režim umlčí aktivní cestu | Explicitně vyloučeno (§4.1) — tlumí jen momenty 2 a 3 |
 | Highlight se rozbije refaktorem | Kotvy = kontrakt + CI guard + slovní fallback (§8.2) |
+
+## Dodatek — implementační stav 2026-07-23 (přebíjí starší body výše)
+
+- **Čtvrtý vstup na kolizních plochách: klíček 🗝️ / Měďákův avatar.** Putyka+Campy+Voice krčma mají v hlavičce chatu tlačítko 🗝️ (ChatRoom), taktická mapa Měďákův avatar (bojová lišta ve všech stavech + MapEmptyState) — oba dispatchují `vypravec:otevrit`. §5 výčet „?"/Shift+V/drawer je tím rozšířen; „čip na TM = v2" z §2.1 je PŘEKONANÝ (nasazeno).
+- **Bottom-stack kontrakt:** žádný `--fab-shift` neexistuje — FAB čte přímo `--voice-host-h` a `--pwa-banner-h` (Vypravec.module.css). Nový plovoucí prvek = přidat vlastní proměnnou tamtéž.
+- **Moment 2 whitelist:** zúžen na 5 netriviálních rout (netrivialniRouty.ts; revize 2026-07-23), ne ~12.
+- **Bubliny:** `jenTed` (deixe — zobraz teď nebo vůbec), `kolizniOk` (smí na kolizní plochu — chybová vysvětlení, empty-state na místě), `priZobrazeni` (konzumace „jednou za život" až při zobrazení), scope fronty (světový text se nedoručí na platformě; oslavy ano).

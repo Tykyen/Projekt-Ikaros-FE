@@ -391,8 +391,9 @@ export function probeResync(ctx: {
     !akt.contextWorldId &&
     akt.cesta.worldBinding === 'creates' &&
     ctx.isOwner &&
-    prvniKrok &&
-    akt.dalsiKrok?.id === prvniKrok.id
+    // A2: fixuj i při hotovém/přeskočeném kroku 1 — jinak cesta bez
+    // kontextu navždy (odškrtnutí níže je idempotentní).
+    prvniKrok
   ) {
     onboardingStore.aplikuj({
       journeys: { [akt.klic]: { contextWorldId: ctx.worldId } },
@@ -509,6 +510,9 @@ export function zkontrolujCekaniHrace(ctx?: {
 
   // (a) postava je na světě — jen ve světě cesty; CTA startuje pokračování
   // „První dny ve světě" (pull-first: bez kliku se nic nespustí).
+  // Guard B2: jakmile hrac-ve-svete existuje, nabídka se už NIKDY nevrací.
+  if (onboardingStore.getSnapshot().journeys[aktualniKlic('hrac-ve-svete')])
+    return;
   if (ctx?.worldId === prog.contextWorldId && ctx.hasCharacter) {
     const svetId = prog.contextWorldId;
     const slug = ctiSlug(hsKlic);

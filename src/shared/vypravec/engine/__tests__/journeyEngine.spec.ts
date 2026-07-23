@@ -363,6 +363,7 @@ describe('revize 07/23 — nábory + fronta bublin', () => {
     bublinaStore.show({
       dismissKey: 'err-x',
       sessionDismiss: true,
+      kolizniOk: true, // vysvětlení chyby patří na místo chyby
       text: 'Vysvětlení chyby',
     });
     expect(bublinaStore.getSnapshot()?.text).toBe('Vysvětlení chyby');

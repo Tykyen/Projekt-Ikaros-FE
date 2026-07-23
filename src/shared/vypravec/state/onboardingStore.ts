@@ -312,6 +312,15 @@ class OnboardingStore {
         const pending = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
         this.state = pending.reduce(aplikujDeltuLokalne, res.state);
         writeJson(stateKey(this.ctxUid), this.state);
+        // E2/E3: stav může existovat jen díky anon-merge/zaznamenané routě —
+        // bez persony, cest a bez zavření dialogu je účet pořád „nový".
+        if (
+          !this.state.persona &&
+          Object.keys(this.state.journeys).length === 0 &&
+          !this.state.dismissed.includes('persona-dialog') &&
+          !this.state.backfilled
+        )
+          this.jeNovy = true;
         this.notify();
       } else if (res.legacy) {
         // Backfill 04 §5.4 — veterán: seed všech rout, žádné retro-oslavy.

@@ -71,7 +71,7 @@ export const TM_VYCVIK: Journey = {
           id: 'tm.orchestrace',
           title: 'Rozděl jednotky',
           narratorLine:
-            'Velitel určuje, kdo kde bojuje. V orchestraci přiřaď hráče na scénu — nebo scénu odstav, když dohrála.',
+            'Velitel určuje, kdo kde bojuje. V orchestraci přiřaď hráče na scénu, přepni se na jinou, nebo scénu odstav.',
           cta: { label: 'Otevřít mapu', to: '/svet/:worldSlug/takticka-mapa' },
           // Přiřazení JINÉHO člena (scene.assigned) ∨ deaktivace scény —
           // obojí je skutečný orchestrální tah; aktivace vzniká už založením

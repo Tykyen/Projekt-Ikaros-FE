@@ -221,6 +221,7 @@ export function VypravecRoot({
   // ať projde i frontou z kolizní plochy).
   useEffect(() => {
     if (scope !== 'world' || !userId || !onboardingStore.initHotovo) return;
+    if (onboarding.backfilled) return; // veterán světy zná — beat je pro nováčky
     if (onboarding.dismissed.includes('predani-joe')) return;
     bublinaStore.show({
       text: 'Ishida: „Tady moje chodby končí. Tohle je Joe — uvnitř tě povede ona." Joe: „Vítej. Posvítíme na to spolu."',

@@ -42,7 +42,7 @@ Vstup: seznam dotčených topiků od skillu `funkce` (grep `source.kapitola`).
 | Změna rolí/oprávnění | update `audience` (+ `minAudienceNote` pro role pod floorem); zkontroluj audience-sanity tabulku (parita s guardy) |
 | Nový pojem/žargon | přidej do `tags` dotčených topiků (synonymický můstek pro fulltext); heslo slovníčku = v2 (skill `slovnicek`) |
 | Nový errorCode / změna friendly hlášky | `errorTopics.ts`: mapování errorCode → topicId; topik = 2. linie „PROČ + co dál". Friendly hláška (rule friendly-messaging) = 1. linie a ZŮSTÁVÁ; obě znění nesmí protiřečit — zkontroluj proti FE/BE hlášce |
-| User-facing změna (cokoli, co uživatel uvidí) | záznam do `changelog.ts` `{id: 'zm-RRRR-MM-DD-slug', datum, titul, popis, to?}` — ID nese datum (CI to hlídá); badge řídí `lastSeenChangelog` |
+| User-facing změna (cokoli, co uživatel uvidí) | záznam do `changelog.ts` `{id: 'zm-RRRR-MM-DD-slug', datum, titul, popis, to?}` — ID nese datum a NOVÝ záznam patří NA ZAČÁTEK pole — CI hlídá formát, shodu id↔datum, sestupné pořadí i existenci `to` routy; badge řídí `lastSeenChangelog` |
 | Rename/přesun route | update `routes`, `links.to`, `deepLink` všech dotčených topiků — CI test mrtvých odkazů to jinak shodí |
 | Nová „soustředěná" plocha | doplň kolizní whitelist (pravidlo skrytí kotvy) — POVINNÉ, default při neznámé ploše = skrýt |
 | Nový cíl navigace/kroku cesty | `anchors.ts` `{route, fallbackText}` pod klíčem kotvy + atribut `data-vypravec` v komponentě (fallbackText = povinná slovní navigace pro mobil/roli) |
@@ -110,7 +110,7 @@ Chybí-li kterákoli část, fáze se nezaškrtává v roadmapě.
 - **Navazuje na `spec-driven-development`** Fázi 3 (po implementaci, se zaškrtnutím roadmapy).
 - **`chybovy-denik`**: oprava obsahu/CI nezabrala 2× nebo cyklíš v migraci → CH-xxx;
   dokončená migrace sekce HelpPage → ✅ ŘEŠENÍ. Běžné obsahové edity NEzapisuj.
-- Řeší kontinuálně dluh **D-048** (HelpPage content drift) — nemigrovaná sekce
+- Řeší kontinuálně dluh **D-080** (HelpPage content drift) — nemigrovaná sekce
   s driftem = záznam přes skill `dluh`.
 - Čistě grafická změna (skin/theme) → NEspouštěj (řeší `mobil-desktop`/`frontend-design`).
 
@@ -137,3 +137,12 @@ imperativem). Tabulka změna → akce pro ně platí stejně:
 - `registry/insitu.tsx` — „?" taháky jako topiky (lazy bodyComponent); obsah NEpřepisovat, žije ve feature.
 - `kolizniRouty.ts` — plochy bez FAB; oslavy/tipy tam bublinaStore frontuje, chybová vysvětlení projdou hned.
 - Mluvčí: platforma Ishida · svět Joe (ženský rod!) · taktická mapa Měďák (úsečné rozkazy). Předávací beaty: replika 9 (VypravecRoot), replika 10 (tmVycvik krok 1).
+
+## Checklist „nová cesta" (finální audit 2026-07-23)
+
+Nová cesta = 5 zápisů, jinak se rozbije UI/metriky (CI hlídá první tři):
+1. `registry/journeys/<nazev>.ts` + registrace v `CESTY` (index.ts),
+2. `OSLAVY_DOKONCENI` (index.ts) — bez záznamu se dokončení neoslaví,
+3. `POPISKY_CEST` (index.ts) — bez záznamu menu i čtečka ukážou syrové id,
+4. BE `scripts/vypravec-funnel.mjs` — mapa počtů kroků (jinak funnel cestu neměří),
+5. rozhodni doručení: menu Cesty (filtr ve VypravecPanel CestyView) vs. trigger bublinou.

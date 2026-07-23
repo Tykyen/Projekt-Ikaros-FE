@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { ROUTES } from '@/app/routeRegistry';
 import { ROUTE_HEADERS } from '../routeHeaders';
 import { CHYBOVE_TOPIKY, CHYBOVE_STATUSY } from '../errorTopics';
-import { CESTY } from '../journeys';
+import { CESTY, OSLAVY_DOKONCENI, POPISKY_CEST } from '../journeys';
 import { NAVODY } from '../navody';
 import { NETRIVIALNI_ROUTY } from '../netrivialniRouty';
 import { TOPIKY } from '../topics';
@@ -130,6 +130,28 @@ describe('revize 07/23 — sanity pojistky (06 §7)', () => {
     for (const z of ZMENY) {
       expect(z.id).toMatch(/^zm-\d{4}-\d{2}-\d{2}-[a-z0-9-]+$/);
       expect(z.id.slice(3, 13), z.id).toBe(z.datum);
+    }
+  });
+});
+
+describe('finální audit 07/23 — pojistky changelogu a cest', () => {
+  it('ZMENY jsou sestupně dle data (badge = findIndex na pořadí stojí)', () => {
+    for (let i = 1; i < ZMENY.length; i++)
+      expect(ZMENY[i - 1].datum >= ZMENY[i].datum, ZMENY[i].id).toBe(true);
+  });
+
+  it('Zmena.to vede na existující routu', () => {
+    for (const z of ZMENY)
+      if (z.to)
+        expect(znameRouty.has(z.to.split('?')[0]), `${z.id} → ${z.to}`).toBe(
+          true,
+        );
+  });
+
+  it('každá cesta má popisek i oslavu dokončení', () => {
+    for (const id of Object.keys(CESTY)) {
+      expect(POPISKY_CEST[id], `POPISKY_CEST['${id}']`).toBeTruthy();
+      expect(OSLAVY_DOKONCENI[id], `OSLAVY_DOKONCENI['${id}']`).toBeTruthy();
     }
   });
 });

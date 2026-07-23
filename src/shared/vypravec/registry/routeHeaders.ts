@@ -1,5 +1,5 @@
 /**
- * Spec 26.2 — RouteHeaders Tier 0 (25 rout + varianty; 01-mapa-prostoru §1).
+ * Spec 26.2 — RouteHeaders Tier 0 (počet hlídá CI; 01-mapa-prostoru §1).
  * Hlas: platformní routy mluví Ishida, world routy Joe (02 §2) — texty prošly
  * draft voice passem, ladění vyhrazeno vlastníkovi (režim „zatím").
  * Zdroj pravdy obsahu: docs/funkce/ (kapitoly dle mapy prostoru).
