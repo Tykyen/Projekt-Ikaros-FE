@@ -18,7 +18,7 @@ export const WB_START: Journey = {
           id: 'wb.zaloz-atelier',
           title: 'Založ svět',
           narratorLine:
-            'Tvůj ateliér. Doporučuji ho zatím nechat soukromý — ukázat ho světu můžeš, až bude na co koukat.',
+            'Tvůj ateliér. Doporučuji ho zatím nechat soukromý — ukázat ho světu můžeš, až bude co ukazovat.',
           cta: { label: 'Založit svět', to: '/ikaros/vytvorit-svet' },
           done: { kind: 'fe-event', event: 'world.created' },
           topicId: 'svet.zalozeni',

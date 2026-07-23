@@ -26,7 +26,7 @@ export const OSLAVY_DOKONCENI: Record<string, { sKontextem: string; bezKontextu?
   },
   'hrac-start': {
     sKontextem:
-      'Z tvé strany hotovo. Teď je řada na PJ — dám ti vědět, až se brána otevře.',
+      'Z tvé strany hotovo. Teď je řada na PJ — až bude postava na světě, provedu tě prvními dny.',
     bezKontextu:
       'První slovo padlo. Až si vybereš svět, víš, kde mě najdeš.',
   },

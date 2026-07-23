@@ -154,6 +154,7 @@ export function VypravecRoot({
   // Odchod z routy tip zavírá bez penalizace (03 §3). Pak záznam + visit kroky.
   useEffect(() => {
     bublinaStore.nastavKolizni(kolizni); // fronta oslav/tipů (03 §5)
+    bublinaStore.nastavScope(scope); // mluvčí fronty (Joe ≠ Ishida)
     bublinaStore.zavriPriOdchodu(pathname); // příchozí bublinu nezabíjet (C1)
     if (pattern) {
       const uzVidel = onboardingStore
@@ -165,6 +166,7 @@ export function VypravecRoot({
       if (initOk && !uzVidel && NETRIVIALNI_ROUTY.has(pattern) && !kolizni) {
         bublinaStore.show({
           dismissKey: `prvni:${pattern}`,
+          jenTed: true, // deixe „tady" — jinde by lhala
           text: 'Poprvé tady? Provedu tě.',
           akce: { label: 'Ukaž mi to', onClick: () => setOtevreny(true) },
         });
@@ -174,7 +176,7 @@ export function VypravecRoot({
       if (initOk) onboardingStore.zaznamenejRoutu(pattern);
     }
     zpracujNavstevu(pathname);
-  }, [pattern, pathname, kolizni, userId, onboarding]);
+  }, [pattern, pathname, kolizni, userId, onboarding, scope]);
 
   // D7 — probe rekonsiliace ve world scope (gateOpened z accessMode; slug
   // resync pro deep-linky). Probe = zdroj pravdy, auto-odškrtne i zpětně.
@@ -221,7 +223,7 @@ export function VypravecRoot({
     if (scope !== 'world' || !userId || !onboardingStore.initHotovo) return;
     if (onboarding.dismissed.includes('predani-joe')) return;
     bublinaStore.show({
-      text: '„Tady moje chodby končí. Tohle je Joe — uvnitř tě povede ona." A Joe? „Vítej. Posvítíme na to spolu."',
+      text: 'Ishida: „Tady moje chodby končí. Tohle je Joe — uvnitř tě povede ona." Joe: „Vítej. Posvítíme na to spolu."',
       // Konzumace až při SKUTEČNÉM zobrazení — fronta/přepis beat nespálí (N1/N2).
       priZobrazeni: () => onboardingStore.zavritTip('predani-joe'),
     });
@@ -230,14 +232,15 @@ export function VypravecRoot({
   // Rozhodnutí 13 (00 §3) — veterán (backfill) nedostane persona dialog;
   // místo něj jednorázová nabídka provedení novinkami.
   useEffect(() => {
-    if (!userId || !onboarding.backfilled) return;
+    // Jen platforma — mluví Ishida („příteli"); ve světě by beat kolidoval s Joe.
+    if (scope !== 'ikaros' || !userId || !onboarding.backfilled) return;
     if (onboarding.dismissed.includes('veteran-intro')) return;
     bublinaStore.show({
       dismissKey: 'veteran-intro',
       text: 'Vidím, že to tu znáš, příteli. Přesto je tu pár novinek — kdybys chtěl, provedu tě.',
       akce: { label: 'Chci provést', onClick: () => setOtevreny(true) },
     });
-  }, [userId, onboarding]);
+  }, [scope, userId, onboarding]);
 
   // Řetězení cest (revize 07/23): dokončený pj-start → tip na Měďákův
   // výcvik při návštěvě dashboardu vlastního světa. Jednorázový dismiss.
@@ -273,7 +276,7 @@ export function VypravecRoot({
       if (!minule || ted - minule < 7 * 24 * 3600 * 1000) return;
       if (sessionStorage.getItem('vypravec:vitej-zpet')) return;
       bublinaStore.show({
-        text: 'Vítej zpět. Zatímco jsi byl pryč, pár věcí se pohnulo — mrknem na ně?',
+        text: 'Vítej zpět. Zatímco jsi byl pryč, pár věcí se pohnulo — provedu tě?',
         akce: { label: 'Co je nového', onClick: () => setOtevreny(true) },
         priZobrazeni: () => {
           try {
@@ -447,13 +450,17 @@ export function VypravecRoot({
 
   return (
     <div ref={fabRef}>
-      <VypravecFab
-        scope={scope}
-        otevreny={otevreny}
-        spi={onboarding.mode === 'onCall'}
-        badge={userId ? pocetNovychZmen() : 0}
-        onClick={() => setOtevreny((o) => !o)}
-      />
+      {/* Na kolizní ploše (TM/chat) FAB nikdy — ani s otevřeným panelem
+          (kánon 02 §1.3; Joe avatar nemá co dělat na Měďákově cvičišti). */}
+      {!kolizni && !klavesnice && (
+        <VypravecFab
+          scope={scope}
+          otevreny={otevreny}
+          spi={onboarding.mode === 'onCall'}
+          badge={userId ? pocetNovychZmen() : 0}
+          onClick={() => setOtevreny((o) => !o)}
+        />
+      )}
       {!otevreny && <VypravecBublina />}
       {akt && !otevreny && (
         <JourneyBar akt={akt} kolizni={false} jinySvet={jinySvet} aktualniSlug={world?.worldSlug} />

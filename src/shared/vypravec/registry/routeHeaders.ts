@@ -164,13 +164,13 @@ export const ROUTE_HEADERS: readonly RouteHeader[] = [
   {
     route: '/svet/:worldSlug/bestiar',
     name: 'Bestiář',
-    blurb: 'Bestie tohoto světa. Prohlíží každý člen, chov spravuje PJ.',
+    blurb: 'Bestie tohoto světa. Prohlížet je smí každý člen, chov spravuje PJ.',
   },
   {
     route: '/svet/:worldSlug/chat',
     name: 'Chat světa',
     blurb:
-      'Kanály a konverzace — tady se hraje. Kostky hází 🎲 v composeru, povolené drží PJ.',
+      'Kanály a konverzace — tady se hraje. Kostky se hází ikonou 🎲 v poli zprávy; povolené určuje PJ.',
   },
   {
     route: '/svet/:worldSlug/novinky',

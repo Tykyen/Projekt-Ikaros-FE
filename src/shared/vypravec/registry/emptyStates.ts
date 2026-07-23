@@ -12,7 +12,7 @@ const EMPTY_STATES: Record<
 > = {
   // Joe — hráč bez postavy (top zákys „postavu zakládá PJ")
   'moje-postava': {
-    text: 'Postavu ti tady zakládá tvůj PJ — napiš mu. Až bude na světě, najdeš ji tady.',
+    text: 'Postavu ti zakládá tvůj PJ — napiš mu. Až bude na světě, najdeš ji pod Moje postava.',
     ctaLabel: 'Otevřít chat světa',
   },
   // Joe — prázdné wiki stránky světa
@@ -37,6 +37,7 @@ const EMPTY_STATES: Record<
   },
 };
 
+// Empty-state má smysl jen NA MÍSTĚ — z fronty jinde by deixe lhala.
 export function vypravecReportEmpty(
   klic: keyof typeof EMPTY_STATES & string,
   opts: { to?: string } = {},
@@ -45,6 +46,7 @@ export function vypravecReportEmpty(
   if (!def) return;
   bublinaStore.show({
     dismissKey: `empty:${klic}`,
+    jenTed: true,
     ...(def.sessionDismiss ? { sessionDismiss: true } : {}),
     text: def.text,
     ...(def.ctaLabel && opts.to

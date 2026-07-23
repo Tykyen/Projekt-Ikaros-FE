@@ -391,7 +391,7 @@ export const TOPIKY: readonly HelpTopic[] = [
     body: {
       odstavce: [
         'Napiš v textu stránky [[Název stránky]] a vznikne odkaz. Když cílová stránka existuje, propojí se; když ne, odkaz ti ji nabídne založit.',
-        'Takhle svět roste přirozeně — píšeš příběh a struktura se plete sama. Encyklopedie pak drží všechno pohromadě.',
+        'Takhle svět roste přirozeně — píšeš příběh a struktura se splétá sama. Encyklopedie pak drží všechno pohromadě.',
       ],
     },
     akce: [{ label: 'Nová stránka', to: '/svet/:worldSlug/nova-stranka' }],

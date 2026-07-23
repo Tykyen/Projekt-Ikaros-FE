@@ -22,7 +22,7 @@ export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
   },
   WORLD_MEMBERSHIP_QUOTA_REACHED: {
     id: 'err.world-quota-free',
-    text: 'Bez Podporovatele můžeš být ve třech světech naráz. Uvolni místo odchodem z některého světa, nebo se mrkni, co dává podpora.',
+    text: 'Bez Podporovatele můžeš být ve třech světech naráz. Uvolni místo odchodem z některého světa, nebo se podívej, co dává podpora.',
     akce: { label: 'Podporovatelé', to: '/ikaros/podporovatele' },
   },
   WORLD_QUOTA_REACHED: {
@@ -48,7 +48,7 @@ export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
   },
   USERNAME_CHANGE_VIA_REQUEST: {
     id: 'err.username-request',
-    text: 'Přezdívka se mění žádostí (Profil → Bezpečnost), kterou schvaluje správa — a pak 30 dní cooldown.',
+    text: 'Přezdívka se mění žádostí (Profil → Bezpečnost), kterou schvaluje správa; poté běží 30denní pauza.',
     akce: { label: 'Otevřít profil', to: '/ikaros/profil' },
   },
   FINANCE_NOT_APPLICABLE: {
@@ -61,7 +61,7 @@ export const CHYBOVE_TOPIKY: Record<string, ChybovyTopik> = {
   },
   NOT_SUPPORTER: {
     id: 'err.supporter',
-    text: 'Tahle funkce patří Podporovatelům — díky nim platforma běží. Co všechno dává a jak se přidat najdeš na stránce Podporovatelé.',
+    text: 'Tahle funkce patří Podporovatelům — díky nim platforma běží. Co všechno dává a jak se přidat, najdeš na stránce Podporovatelé.',
     akce: { label: 'Podporovatelé', to: '/ikaros/podporovatele' },
   },
   SESSION_REVOKED: {

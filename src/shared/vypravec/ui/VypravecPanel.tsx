@@ -90,7 +90,7 @@ const PERSONA_VOLBY: Array<{
   popis: string;
 }> = [
   { persona: 'pj', titul: 'Chci vést hru', popis: 'Založíme ti svět a do 15 minut pozveš první hráče.' },
-  { persona: 'hrac', titul: 'Chci hrát', popis: 'Najdeme ti stůl — světy, nábory, nebo rovnou Putyka.' },
+  { persona: 'hrac', titul: 'Chci hrát', popis: 'Najdeme ti stůl — světy, nábory nebo rovnou Putyka.' },
   { persona: 'worldbuilder', titul: 'Chci tvořit svět', popis: 'Wiki, mapy a pavučina vztahů — svět i bez hráčů.' },
   { persona: null, titul: 'Jen se rozhlédnu', popis: 'Dobře. Kdybys mě potřeboval, víš, kde mě najdeš.' },
 ];
@@ -694,7 +694,7 @@ export default function VypravecPanel({
             <input
               type="search"
               className={s.hledani}
-              placeholder="Zeptat se — např. „jak pozvat hráče“"
+              placeholder='Zeptat se — např. „jak pozvat hráče"'
               aria-label="Zeptat se Vypravěče"
               value={dotaz}
               onChange={(e) => setDotaz(e.target.value)}
@@ -703,17 +703,17 @@ export default function VypravecPanel({
               <>
                 <div className={s.sekceLabel}>
                   {nalezy.length
-                    ? scope === 'world'
-                      ? 'Našla jsem'
-                      : 'Našel jsem'
-                    : scope === 'world'
+                    ? mluvci === 'world'
+                      ? 'Našla jsem' // Joe
+                      : 'Našel jsem' // Ishida i Měďák (TM)
+                    : mluvci === 'world'
                       ? 'Nic jsem nenašla'
                       : 'Nic jsem nenašel'}
                 </div>
                 {nalezy.length === 0 && (
                   <p className={s.topikOdstavec}>
                     Zkus to jinými slovy, nebo otevři Plnou nápovědu níže —
-                    tvůj dotaz si zapisuju, ať příště odpovím líp.
+                    tvůj dotaz si zapisuji a příště odpovím lépe.
                   </p>
                 )}
                 <div className={s.personaVolby}>
@@ -816,7 +816,7 @@ export default function VypravecPanel({
                   <Klic />
                   Co je nového
                   {zmenBadge > 0 && (
-                    <span className={s.zmenBadge} aria-label={`${zmenBadge} nových`}>
+                    <span className={s.zmenBadge} aria-label={`nové změny: ${zmenBadge}`}>
                       {zmenBadge}
                     </span>
                   )}

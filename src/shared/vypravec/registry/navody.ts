@@ -35,7 +35,7 @@ export const NAVODY: readonly HelpTopic[] = [
     body: {
       odstavce: ['Postavy hráčů zakládá PJ — takhle na to.'],
       kroky: [
-        'Otevři Postavy svého světa a dej Nová postava.',
+        'Otevři Postavy svého světa a klikni na Nová postava.',
         'Vyber typ Postava hráče a vyplň základ dle systému.',
         'V Nastavení → Členové postavu přiřaď členovi (nebo vyber vlastníka rovnou v editoru).',
         'Hotovo — hráč ji od té chvíle vidí pod Moje postava.',
@@ -151,7 +151,7 @@ export const NAVODY: readonly HelpTopic[] = [
     tags: ['navod', 'kalendar', 'cas', 'udalosti'],
     routes: [],
     audience: ['pomocnyPJ', 'pj', 'admin'],
-    minAudienceNote: 'Kalendář světa je pohled PJ — hráčům čas oznamuje vypravěč hry.',
+    minAudienceNote: 'Kalendář světa je pohled vedení světa — hráčům čas oznamuje PJ.',
     body: {
       odstavce: ['Herní čas drží kalendář světa.'],
       kroky: [
@@ -176,7 +176,7 @@ export const NAVODY: readonly HelpTopic[] = [
       kroky: [
         'PJ (či Pomocný PJ): zkontroluj měny světa v Převodníku měn (seedují se se světem).',
         'PJ (či Pomocný PJ): naskladni Obchod — položky ber z katalogů Společné tvorby, nebo vlastní.',
-        'Hráč: nakupuje v Obchodě za peníze SVÉ postavy (stav vidíš ve Financích postavy).',
+        'Hráč: nakupuj v Obchodě za peníze SVÉ postavy (stav vidíš ve Financích postavy).',
         'Nestačí-li zůstatek, obchod nákup odmítne — doplnění je na PJ.',
       ],
     },

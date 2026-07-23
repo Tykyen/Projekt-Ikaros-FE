@@ -22,15 +22,7 @@ export const ZMENY: readonly Zmena[] = [
     datum: '2026-07-23',
     titul: 'Vypravěč: Ishida, Joe a Měďák tě provedou',
     popis:
-      'Nová postava-průvodce — avatar vpravo dole (nebo Shift+V). Cesty pro PJ, hráče a tvůrce světů, výcvik taktické mapy s Měďákem, kontextová nápověda a krátké návody.',
-  },
-  {
-    id: 'zm-2026-07-15-sdileni-scen',
-    datum: '2026-07-15',
-    titul: 'Katalog sdílených scén',
-    popis:
-      'PJ může publikovat scénu taktické mapy do katalogu — ostatní si ji naklonují do svého světa i s terénem a zdmi.',
-    to: '/ikaros/sceny',
+      'Noví průvodci — avatar vpravo dole (nebo Shift+V). Cesty pro PJ, hráče a tvůrce světů, výcvik taktické mapy s Měďákem, kontextová nápověda a krátké návody.',
   },
   {
     id: 'zm-2026-07-20-vykladni-skrin',
@@ -52,6 +44,14 @@ export const ZMENY: readonly Zmena[] = [
     titul: 'Nábory: filtr podle systému a žánru',
     popis: 'Nástěnka náborů umí filtrovat inzeráty podle herního systému a žánru.',
     to: '/ikaros/nabory',
+  },
+  {
+    id: 'zm-2026-07-15-sdileni-scen',
+    datum: '2026-07-15',
+    titul: 'Katalog sdílených scén',
+    popis:
+      'PJ může publikovat scénu taktické mapy do katalogu — ostatní si ji naklonují do svého světa i s terénem a zdmi.',
+    to: '/ikaros/sceny',
   },
   {
     id: 'zm-2026-07-15-generatory',

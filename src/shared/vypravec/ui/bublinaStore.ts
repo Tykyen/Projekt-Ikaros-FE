@@ -27,6 +27,10 @@ export interface Bublina {
   akce?: { label: string; to?: string; onClick?: () => void };
   /** oslava = auto-hide 8 s, nepočítá se do auto-tichého čítače. */
   oslava?: boolean;
+  /** Text s deixí („tady") — zobraz TEĎ, nebo vůbec (nikdy z fronty jinde). */
+  jenTed?: boolean;
+  /** Interní: scope vzniku — fronta nedoručí světový text na platformě. */
+  vznikScope?: 'ikaros' | 'world';
   /**
    * Zavolá se v okamžiku SKUTEČNÉHO zobrazení (ne zařazení do fronty) —
    * sem patří konzumace „jednou za život" nároku (zavritTip, session flag).
@@ -46,11 +50,17 @@ class BublinaStore {
   private hideTimer: ReturnType<typeof setTimeout> | null = null;
   /** Kolizní plocha (chat/TM/editory) — hlásí VypravecRoot při navigaci. */
   private kolizni = false;
+  /** Scope aktuální plochy — hlásí VypravecRoot (mluvčí ≠ jen kolize). */
+  private scopeAktualni: 'ikaros' | 'world' = 'ikaros';
   /** Fronta doručení: kolize (03 §5) i obsazená klidná plocha (N1). */
   private fronta: Bublina[] = [];
 
   nastavKolizni(kolizni: boolean): void {
     this.kolizni = kolizni;
+  }
+
+  nastavScope(scope: 'ikaros' | 'world'): void {
+    this.scopeAktualni = scope;
   }
 
   /** Změna identity (logout/login bez reloadu) — fronta nesmí přetéct k jinému účtu. */
@@ -97,8 +107,9 @@ class BublinaStore {
     const doFronty =
       (this.kolizni && !b.sessionDismiss) || this.aktualni != null;
     if (doFronty) {
+      if (b.jenTed) return false; // deixe: jinde/jindy by text lhal
       if (this.fronta.length >= FRONTA_MAX) return false; // drop = přiznat (N2)
-      this.fronta.push(b);
+      this.fronta.push({ ...b, vznikScope: this.scopeAktualni });
       return true;
     }
     this.zobraz(b);
@@ -117,7 +128,13 @@ class BublinaStore {
   /** Další z fronty, pokud je klidno a nic nevisí (re-check dismissed/spí). */
   private dorucFrontu(): void {
     if (this.kolizni || this.aktualni || this.fronta.length === 0) return;
-    const dalsi = this.fronta.shift();
+    // Scope filtr: světový mluvčí nesmí promluvit na platformě (a naopak);
+    // oslavy jsou bezrodé a krátké — doručí se kdekoli, ať se neztratí.
+    const i = this.fronta.findIndex(
+      (b) => b.oslava || !b.vznikScope || b.vznikScope === this.scopeAktualni,
+    );
+    if (i < 0) return;
+    const [dalsi] = this.fronta.splice(i, 1);
     if (dalsi) this.show(dalsi);
   }
 

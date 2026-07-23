@@ -1,3 +1,6 @@
+import medakAvatarWebp96 from '@/assets/vypravec/medak-avatar-96.webp';
+import medakAvatarWebp192 from '@/assets/vypravec/medak-avatar-192.webp';
+import medakAvatarPng from '@/assets/vypravec/medak-avatar.png';
 import { activateMapScene } from '../api/mapApi';
 import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
@@ -185,6 +188,22 @@ export function MapEmptyState({
 
   return (
     <div className={styles.container} role="status" aria-live="polite">
+      {/* Měďákův vstup i bez scény — jinak je krok 1 výcviku bez průvodce. */}
+      <button
+        type="button"
+        className={styles.medakBtn}
+        onClick={() => window.dispatchEvent(new Event('vypravec:otevrit'))}
+        aria-label="Vypravěč — Měďákova nápověda k mapě"
+        title="Vypravěč — Měďákova nápověda k mapě"
+      >
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={`${medakAvatarWebp96} 1x, ${medakAvatarWebp192} 2x`}
+          />
+          <img src={medakAvatarPng} alt="" className={styles.medakImg} />
+        </picture>
+      </button>
       <img
         src={stateIllustrationSrc('worlds')}
         alt=""

@@ -455,6 +455,17 @@ export function ChatRoom({ room, roomName, icon, scene }: ChatRoomProps) {
           {icon} {roomName}
         </h1>
         <div className={s.headerActions}>
+          {/* Vstup k Vypravěči — FAB je na kolizní ploše skrytý a drawer
+              položka je mobil-only; bez tohohle je desktop jen Shift+V. */}
+          <button
+            type="button"
+            className={s.count}
+            onClick={() => window.dispatchEvent(new Event('vypravec:otevrit'))}
+            aria-label="Vypravěč — nápověda a průvodce"
+            title="Vypravěč (Shift+V)"
+          >
+            🗝️
+          </button>
           <button
             type="button"
             className={s.count}

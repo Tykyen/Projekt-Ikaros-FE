@@ -35,7 +35,7 @@ export function VypravecFab({
       data-vypravec-fab=""
       aria-label={
         badge
-          ? `Vypravěč — nápověda a průvodce (${badge} novinek)`
+          ? `Vypravěč — nápověda a průvodce (novinky: ${badge})`
           : 'Vypravěč — nápověda a průvodce'
       }
       aria-expanded={otevreny}

@@ -33,7 +33,7 @@ export const TM_VYCVIK: Journey = {
           id: 'tm.tokeny',
           title: 'Nasaď jednotky',
           narratorLine:
-            'Prázdná mapa nikoho nezastaví. Přetáhni z palety postavu nebo bestii na hex.',
+            'Prázdná mapa nikoho nezastaví. Přetáhni z palety postavu nebo bestii na pole.',
           cta: { label: 'Otevřít mapu', to: '/svet/:worldSlug/takticka-mapa' },
           done: { kind: 'fe-event', event: 'token.spawned' },
           topicId: 'insitu.tm',
