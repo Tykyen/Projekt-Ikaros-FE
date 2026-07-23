@@ -60,7 +60,7 @@ export const TM_VYCVIK: Journey = {
           id: 'tm.iniciativa',
           title: 'Zaveď pořádek boje',
           narratorLine:
-            'Boj bez pořadí je vřava. Spusť iniciativu — lišta nahoře ti seřadí tahy.',
+            'Boj bez pořadí je vřava. Označ jednotky „V boji" (karta tokenu), pak spusť iniciativu — lišta nahoře ti seřadí tahy.',
           cta: { label: 'Otevřít mapu', to: '/svet/:worldSlug/takticka-mapa' },
           done: { kind: 'fe-event', event: 'initiative.started' },
           topicId: 'insitu.tm',

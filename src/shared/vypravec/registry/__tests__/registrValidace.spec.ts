@@ -11,6 +11,7 @@ import { CESTY, OSLAVY_DOKONCENI, POPISKY_CEST } from '../journeys';
 import { NAVODY } from '../navody';
 import { NETRIVIALNI_ROUTY } from '../netrivialniRouty';
 import { TOPIKY } from '../topics';
+import { TOOLBOX_ITEMS } from '../toolbox';
 import { ZMENY } from '../changelog';
 import { KOTVY } from '../anchors';
 
@@ -153,5 +154,35 @@ describe('finální audit 07/23 — pojistky changelogu a cest', () => {
       expect(POPISKY_CEST[id], `POPISKY_CEST['${id}']`).toBeTruthy();
       expect(OSLAVY_DOKONCENI[id], `OSLAVY_DOKONCENI['${id}']`).toBeTruthy();
     }
+  });
+});
+
+describe('závěrečný podpis — CI pojistky (kritik úplnosti)', () => {
+  it('toolbox `to` míří na existující world routu', () => {
+    for (const it of TOOLBOX_ITEMS)
+      expect(
+        znameRouty.has(`/svet/:worldSlug/${it.to}`),
+        `toolbox ${it.key} → /svet/:worldSlug/${it.to}`,
+      ).toBe(true);
+  });
+
+  it('deep-linky ?topik=Y jsou dobře tvarované a v whitelistu kotev HelpPage', () => {
+    // Whitelist musí zůstat v souladu s id akordeonů HelpPage sekcí.
+    // Rozbití = přejmenování akordeonu → přidat sem i do HelpPage sekce.
+    const KOTVY_HELPPAGE = new Set([
+      'role-svetove',
+      'role-globalni',
+      'komunikace-zvuk',
+      'takticka-mapa',
+    ]);
+    const deepLinky: string[] = [];
+    for (const t of TOPIKY)
+      for (const a of t.akce ?? []) {
+        const m = a.to.match(/[?&]topik=([a-z0-9-]+)/);
+        if (m) deepLinky.push(m[1]);
+      }
+    expect(deepLinky.length).toBeGreaterThan(0);
+    for (const k of deepLinky)
+      expect(KOTVY_HELPPAGE.has(k), `deep-link kotva ${k}`).toBe(true);
   });
 });

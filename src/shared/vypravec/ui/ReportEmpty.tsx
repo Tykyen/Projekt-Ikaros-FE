@@ -5,7 +5,15 @@
 import { useEffect } from 'react';
 import { vypravecReportEmpty } from '../registry/emptyStates';
 
-export function ReportEmpty({ klic, to }: { klic: string; to?: string }) {
+import type { EmptyStateKlic } from '../registry/emptyStates';
+
+export function ReportEmpty({
+  klic,
+  to,
+}: {
+  klic: EmptyStateKlic;
+  to?: string;
+}) {
   useEffect(() => {
     vypravecReportEmpty(klic, { to });
   }, [klic, to]);

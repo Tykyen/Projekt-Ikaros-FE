@@ -94,7 +94,7 @@ export const PJ_START: Journey = {
             'Svět ožije postavami. Založ první NPC — stačí jméno a pár vět, zbytek dopíšeš, až bude potřeba.',
           cta: {
             label: 'Založit NPC',
-            to: '/svet/:worldSlug/nova-stranka?typ=npc',
+            to: '/svet/:worldSlug/nova-stranka?type=NPC',
           },
           done: {
             kind: 'fe-event',

@@ -37,6 +37,11 @@ export function InitiativeControls({
           className={`${styles.btn} ${styles.primary}`}
           disabled={!hasCombatants || isPending}
           onClick={onStart}
+          title={
+            !hasCombatants
+              ? 'Nejdřív označ aspoň jednu jednotku „V boji" v její kartě'
+              : undefined
+          }
         >
           ▶ Zahájit boj
         </button>

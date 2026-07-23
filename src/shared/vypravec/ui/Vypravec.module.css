@@ -2,6 +2,9 @@
  * Výhradně tokeny motivu (lint:colors) — brand vzhled mimo svět dodá motiv
  * ikaros, ve světě motiv světa. Nikdy nesahat na :root (theme_root_ownership). */
 
+/* --acc je globální alias v tokens.css :root (audit-podpis) — var(--acc)
+   zde tedy resolvuje a :focus-visible outline je viditelný (WCAG 2.4.7). */
+
 /* ── FAB kotva ─────────────────────────────────────────────────────────── */
 .fab {
   position: fixed;
@@ -748,7 +751,12 @@
   .cta,
   .ctaTiche,
   .zavrit,
-  .zpet {
+  .zpet,
+  /* audit-podpis: menu/karty/odkaz/hledání pod 44 px (03 §6) */
+  .menuTlacitko,
+  .menu a,
+  .personaVolba,
+  .hledani {
     min-height: 44px;
   }
   .bublinaZavrit {

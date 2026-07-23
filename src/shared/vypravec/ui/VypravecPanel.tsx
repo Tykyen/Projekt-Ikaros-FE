@@ -533,6 +533,20 @@ export default function VypravecPanel({
     return () => root.removeEventListener('keydown', onKey);
   }, []);
 
+  // Nález 12: přepnutí na pod-pohled odmontuje aktivační tlačítko → fokus by
+  // spadl na <body>; přesunout ho na první prvek pod-pohledu („← Zpět").
+  const jePodpohled = Boolean(topikId) || pohled !== 'domu' || personaVolba;
+  useEffect(() => {
+    if (!jePodpohled) return;
+    const root = ref.current;
+    const prvni = root
+      ? Array.from(
+          root.querySelectorAll<HTMLElement>('button, [href], input'),
+        ).filter((el) => el.offsetParent !== null)[0]
+      : null;
+    prvni?.focus();
+  }, [topikId, pohled, personaVolba, jePodpohled]);
+
   const topik = topikId
     ? (topikPodleId(topikId) ?? NAVODY.find((n) => n.id === topikId))
     : undefined;
@@ -753,7 +767,7 @@ export default function VypravecPanel({
                             !n.route.includes(':worldSlug'))),
                     )
                     .map((n) =>
-                      n.typ === 'misto' && n.route ? (
+                      (n.typ === 'misto' || n.typ === 'faq') && n.route ? (
                         <Link
                           key={n.id}
                           to={doplnSlug(n.route, worldSlug)}
@@ -761,7 +775,11 @@ export default function VypravecPanel({
                           onClick={onClose}
                         >
                           {n.title}
-                          <small>Vezmi mě tam →</small>
+                          <small>
+                            {n.typ === 'faq'
+                              ? 'Odpověď v nápovědě →'
+                              : 'Vezmi mě tam →'}
+                          </small>
                         </Link>
                       ) : (
                         <button

@@ -1,8 +1,10 @@
 /**
  * Spec 26.5 (D9) — vizuál bubliny u kotvy (03 §3): repliky kurzívou
  * (hlas postavy), max 1 CTA + tiché zavření.
- * A11y: live region (role=status + aria-live) je TRVALE namontovaný i prázdný
- * — čtečka jinak nově vzniklý region často přeskočí (adverz. verifikace kolo 5).
+ * A11y: obálka je live region (role=status + aria-live) i když je bublina
+ * prázdná — čtečka pak spolehlivě ohlásí obsah vložený do už existujícího
+ * regionu. (Pozn.: VypravecRoot komponentu montuje jen mimo otevřený panel,
+ * takže napříč otevřením/zavřením panelu se region přesto remountuje.)
  */
 import { useSyncExternalStore } from 'react';
 import { useNavigate } from 'react-router-dom';

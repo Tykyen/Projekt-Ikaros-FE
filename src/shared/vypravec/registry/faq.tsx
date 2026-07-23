@@ -204,7 +204,7 @@ export const FAQ_POLOZKY: FaqPolozka[] = [
           na hráče na stránce Hráči světa) a stiskni <strong>„Přidat do přátel"</strong>.
           Druhá strana žádost najde v tabu <strong>Zpracovat</strong>.
         </p>
-        <p>Při odmítnutí pošleš novou žádost až za 24 hodin (anti-spam).</p>
+        <p>Při odmítnutí pošleš novou žádost až za 7 dní (anti-spam).</p>
       </>
     ),
   },

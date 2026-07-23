@@ -152,16 +152,45 @@ export function sloucitDelty(a: OnboardingDelta, b: OnboardingDelta): Onboarding
     out.dismissedAdd = [
       ...new Set([...(a.dismissedAdd ?? []), ...(b.dismissedAdd ?? [])]),
     ];
+  // Audit-podpis (nález 9): steps/milestones/startedAt slévej MIN (parita
+  // s aplikujDeltuLokalne i BE $min) — spread by byl LWW a pozdější čas by
+  // přebil pravé nejstarší dokončení.
+  const minMerge = (
+    x: Record<string, string> = {},
+    y: Record<string, string> = {},
+  ): Record<string, string> => {
+    const o: Record<string, string> = { ...x };
+    for (const [k, v] of Object.entries(y)) {
+      const c = o[k];
+      o[k] = !c || v < c ? v : c;
+    }
+    return o;
+  };
   if (a.milestones || b.milestones)
-    out.milestones = { ...(a.milestones ?? {}), ...(b.milestones ?? {}) };
+    out.milestones = minMerge(a.milestones, b.milestones);
   if (a.journeys || b.journeys) {
     const merged: NonNullable<OnboardingDelta['journeys']> = {
       ...(a.journeys ?? {}),
     };
     for (const [jId, j] of Object.entries(b.journeys ?? {})) {
       const prev = merged[jId];
+      const startedAt =
+        prev?.startedAt && j.startedAt
+          ? j.startedAt < prev.startedAt
+            ? j.startedAt
+            : prev.startedAt
+          : (prev?.startedAt ?? j.startedAt);
       merged[jId] = prev
-        ? { ...prev, ...j, steps: { ...(prev.steps ?? {}), ...(j.steps ?? {}) } }
+        ? {
+            ...prev,
+            ...j,
+            // FWW pro contextWorldId (parita s aplikujDeltuLokalne)
+            ...(prev.contextWorldId
+              ? { contextWorldId: prev.contextWorldId }
+              : {}),
+            ...(startedAt ? { startedAt } : {}),
+            steps: minMerge(prev.steps, j.steps),
+          }
         : j;
     }
     out.journeys = merged;
@@ -223,6 +252,8 @@ class OnboardingStore {
       const delta: OnboardingDelta = {};
       if (anonState.seenRoutes.length) delta.seenRoutesAdd = anonState.seenRoutes;
       if (anonState.dismissed.length) delta.dismissedAdd = anonState.dismissed;
+      // Nález 11: přenes i ztišení průvodce (anon si mohl dát „jen na zavolání").
+      if (anonState.mode === 'onCall') delta.mode = 'onCall';
       const vse = [delta, ...anonPending].reduce(sloucitDelty, {});
       localStorage.removeItem(stateKey('anon'));
       localStorage.removeItem(pendingKey('anon'));
@@ -283,7 +314,11 @@ class OnboardingStore {
   async sync(): Promise<void> {
     if (this.syncBezi || this.ctxUid === 'anon' || this.ctxUid === 'nenacteno')
       return;
-    const fronta = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
+    // Audit-podpis (nález 8): zachyť identitu — po awaitu se ctxUid může
+    // přepnout (logout/login během in-flight PATCHe) a ořez fronty by pak
+    // zahodil delty JINÉHO uživatele.
+    const uidPri = this.ctxUid;
+    const fronta = readJson<OnboardingDelta[]>(pendingKey(uidPri), []);
     if (!fronta.length) return;
     this.syncBezi = true;
     const odesilane = fronta.length;
@@ -291,8 +326,8 @@ class OnboardingStore {
       await api.patch('/users/me/onboarding', fronta.reduce(sloucitDelty, {}));
       this.syncGen += 1; // zneplatní resync GET rozběhnutý před tímto PATCHem
       this.posledniPatch = Date.now();
-      const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
-      writeJson(pendingKey(this.ctxUid), ted.slice(odesilane));
+      const ted = readJson<OnboardingDelta[]>(pendingKey(uidPri), []);
+      writeJson(pendingKey(uidPri), ted.slice(odesilane));
     } catch (e) {
       // Nález 2: 4xx = delta je vadná a NIKDY neprojde → zahodit odeslané,
       // jinak otráví celou budoucí synchronizaci (retry na každý zápis).
@@ -302,14 +337,17 @@ class OnboardingStore {
       // retry projde, zahodit = ztráta dat (adverz. verifikace kolo 5).
       const prechodne = status === 408 || status === 425 || status === 429;
       if (status >= 400 && status < 500 && !prechodne) {
-        const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
-        writeJson(pendingKey(this.ctxUid), ted.slice(odesilane));
+        const ted = readJson<OnboardingDelta[]>(pendingKey(uidPri), []);
+        writeJson(pendingKey(uidPri), ted.slice(odesilane));
       }
     } finally {
       this.syncBezi = false;
       // Delta přišlá BĚHEM PATCHe by jinak čekala na další aktivitu.
-      const zbyva = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
-      if (zbyva.length > 0) this.naplanujSync();
+      // Jen když se identita nepřepnula (nález 8) — jinak řeší nový uživatel sám.
+      if (this.ctxUid === uidPri) {
+        const zbyva = readJson<OnboardingDelta[]>(pendingKey(uidPri), []);
+        if (zbyva.length > 0) this.naplanujSync();
+      }
     }
   }
 
@@ -404,7 +442,8 @@ class OnboardingStore {
   /** Flush při zavírání tabu — fetch keepalive (PATCH s auth hlavičkou). */
   flushKeepalive(): void {
     if (this.ctxUid === 'anon' || this.ctxUid === 'nenacteno') return;
-    const fronta = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
+    const uidPri = this.ctxUid; // nález 8 — identita pro .then callback
+    const fronta = readJson<OnboardingDelta[]>(pendingKey(uidPri), []);
     if (!fronta.length) return;
     let token: string | null = null;
     try {
@@ -426,8 +465,8 @@ class OnboardingStore {
     })
       .then((r) => {
         if (r.ok) {
-          const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
-          writeJson(pendingKey(this.ctxUid), ted.slice(fronta.length));
+          const ted = readJson<OnboardingDelta[]>(pendingKey(uidPri), []);
+          writeJson(pendingKey(uidPri), ted.slice(fronta.length));
         }
       })
       .catch(() => {

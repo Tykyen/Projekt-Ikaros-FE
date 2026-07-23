@@ -17,8 +17,7 @@ export type VypravecEventName =
   | 'join.requested'
   | 'dice.rolled'
   | 'subject.created'
-  | 'rsvp.confirmed'
-  | 'persona.chosen'
+  | 'persona.chosen' // bez konzumenta — telemetrie ho pokrývá (audit-podpis)
   // v2 — cesta tm-vycvik (Měďák) + milník „první hráč" (05 §5b, §6):
   | 'scene.created'
   | 'scene.activated'

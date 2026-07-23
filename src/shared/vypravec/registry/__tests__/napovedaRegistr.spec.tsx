@@ -43,12 +43,12 @@ describe('registr — FAQ_POLOZKY (D-080a §3)', () => {
 });
 
 describe('registr — TOOLBOX_ITEMS (D-080a §3)', () => {
-  it('parita po přesunu: 14 dlaždic (8 sdílených + 6 PJ-only), unikátní klíče', () => {
+  it('parita po přesunu: 14 dlaždic (7 sdílených + 7 PJ-only), unikátní klíče', () => {
     expect(TOOLBOX_ITEMS.length).toBe(14);
     const keys = TOOLBOX_ITEMS.map((i) => i.key);
     expect(new Set(keys).size).toBe(keys.length);
     expect(toolboxItemsFor(true).length).toBe(14);
-    expect(toolboxItemsFor(false).length).toBe(8);
+    expect(toolboxItemsFor(false).length).toBe(7); // Kalendář přesunut na PJ (audit-podpis)
   });
 
   it('toolboxItemsFor: hráč vidí jen položky s audience hrac', () => {

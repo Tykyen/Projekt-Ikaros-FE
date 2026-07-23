@@ -629,5 +629,6 @@
   cursor: pointer;
 }
 .drawerVypravec:hover {
+  /* --acc je globální alias (tokens.css :root) — audit-podpis */
   background: color-mix(in srgb, var(--acc) 10%, transparent);
 }

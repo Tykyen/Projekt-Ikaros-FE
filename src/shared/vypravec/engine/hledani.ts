@@ -7,14 +7,15 @@
 import { TOPIKY } from '../registry/topics';
 import { NAVODY } from '../registry/navody';
 import { ROUTE_HEADERS } from '../registry/routeHeaders';
+import { FAQ_POLOZKY } from '../registry/faq';
 import type { HelpTopic } from '../registry/types';
 
 export interface Nalez {
-  typ: 'topik' | 'navod' | 'misto';
+  typ: 'topik' | 'navod' | 'misto' | 'faq';
   id: string;
   title: string;
   skore: number;
-  /** typ 'misto': routa hlavičky — CTA „vezmi mě tam". */
+  /** typ 'misto'/'faq': routa/deep-link — CTA „vezmi mě tam"/„odpověď v nápovědě". */
   route?: string;
 }
 
@@ -27,7 +28,7 @@ export function fold(s: string): string {
 }
 
 interface Dokument {
-  typ: 'topik' | 'navod' | 'misto';
+  typ: 'topik' | 'navod' | 'misto' | 'faq';
   id: string;
   title: string;
   fTitle: string;
@@ -68,6 +69,18 @@ function dejIndex(): Dokument[] {
         fTags: '',
         fText: fold(h.blurb),
         route: h.route,
+      })),
+      // Kritik úplnosti: FAQ je nejbohatší Q&A korpus — bez něj „zeptej se
+      // na cokoli" tiše míjí FAQ-only dotazy. Indexuje se otázka (odpověď
+      // je JSX); deep-link do plné nápovědy na příslušnou kategorii.
+      ...FAQ_POLOZKY.map((f, i) => ({
+        typ: 'faq' as const,
+        id: `faq:${f.cat}:${i}`,
+        title: f.q,
+        fTitle: fold(f.q),
+        fTags: '',
+        fText: fold(f.q),
+        route: `/ikaros/napoveda?sekce=faq&topik=faq-${f.cat}`,
       })),
     ];
   }

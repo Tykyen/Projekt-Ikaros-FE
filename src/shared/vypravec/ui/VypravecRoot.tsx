@@ -20,7 +20,11 @@ import {
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { currentUserAtom } from '@/shared/store/authStore';
+import {
+  currentUserAtom,
+  loginModalOpenAtom,
+  registerModalOpenAtom,
+} from '@/shared/store/authStore';
 import { UserRole } from '@/shared/types';
 import { matchRoutePattern } from '@/app/routeRegistry';
 import { KOLIZNI_ROUTY } from '../kolizniRouty';
@@ -41,7 +45,6 @@ import {
   zkontrolujCekaniHrace,
   zpracujNavstevu,
 } from '../engine/journeyEngine';
-import { vypravecEmit } from '../engine/events';
 import { useSocketEvent } from '@/features/chat/api/useSocket';
 import { telemetrie, zapojTelemetriiFlush } from '../state/telemetry';
 import { zapojChybovouMapu } from '../engine/chybovaMapa';
@@ -115,6 +118,11 @@ export function VypravecRoot({
   // (persona dialog by se neukázal do reloadu).
   const uzivatel = useAtomValue(currentUserAtom);
   const userId = uzivatel?.id ?? null;
+  // Esc nesmí zavřít panel, když je NAD ním modal (registrace/login) — nález 13.
+  // Oba hooky bezpodmínečně (rules-of-hooks), pak zkombinovat.
+  const loginModalOtevren = useAtomValue(loginModalOpenAtom);
+  const registerModalOtevren = useAtomValue(registerModalOpenAtom);
+  const modalNad = loginModalOtevren || registerModalOtevren;
   // Platformní Admin/Superadmin → audience 'admin' (role.admin-elevace aj.)
   const jePlatformniAdmin =
     uzivatel != null && uzivatel.role <= UserRole.Admin;
@@ -126,6 +134,16 @@ export function VypravecRoot({
       bublinaStore.vycistiProUzivatele();
     }
   }, [userId]);
+
+  // Kritik úplnosti: fronta bublin je singleton bez worldId — přechod mezi
+  // světy ji nesmí přenést (světová bublina z A by promluvila v B).
+  const minulyWorldId = useRef(world?.worldId);
+  useEffect(() => {
+    if (minulyWorldId.current !== world?.worldId) {
+      minulyWorldId.current = world?.worldId;
+      bublinaStore.vycistiFrontu();
+    }
+  }, [world?.worldId]);
 
   useEffect(() => {
     zapojFlush();
@@ -363,7 +381,8 @@ export function VypravecRoot({
     (p: 'pj' | 'hrac' | 'worldbuilder' | null) => {
       onboardingStore.nastavPersonu(p);
       onboardingStore.zavritTip('persona-dialog');
-      vypravecEmit('persona.chosen');
+      // (persona.chosen event nemá konzumenta — cestu startuje startCesty,
+      //  událost pokrývá telemetrie; audit-podpis nález 16)
       telemetrie('persona_chosen', { refId: p ?? 'rozhlednu' });
       setPersonaVolba(false);
       setOtevreny(false);
@@ -422,6 +441,7 @@ export function VypravecRoot({
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
+        if (modalNad) return; // modal nad panelem si Esc zpracuje sám
         setOtevreny((o) => {
           if (o) vratFocus();
           return false;
@@ -443,7 +463,7 @@ export function VypravecRoot({
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [vratFocus]);
+  }, [vratFocus, modalNad]);
 
   // Aktivní cesta — derivace ze snapshotu (onboarding je dependency renderu).
   void onboarding;

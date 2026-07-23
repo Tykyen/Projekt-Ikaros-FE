@@ -30,7 +30,7 @@ export const WB_START: Journey = {
           title: 'První vlastní stránka',
           narratorLine:
             'Založ lokaci a zkus v textu [[wikilink]] — stránky se ti začnou samy propojovat.',
-          cta: { label: 'Nová stránka', to: '/svet/:worldSlug/nova-stranka?typ=lokace' },
+          cta: { label: 'Nová stránka', to: '/svet/:worldSlug/nova-stranka?type=Lokace' },
           done: {
             kind: 'fe-event',
             event: 'page.created',

@@ -70,7 +70,7 @@ export const TOOLBOX_ITEMS: ToolboxItem[] = [
   },
   {
     key: 'stranky',
-    title: 'Wiki stránky',
+    title: 'Encyklopedie',
     desc: 'Encyklopedie světa — lokace, lore, postavy.',
     icon: <FileText size={22} />,
     to: 'stranky',
@@ -93,7 +93,7 @@ export const TOOLBOX_ITEMS: ToolboxItem[] = [
     icon: <CalendarDays size={22} />,
     to: 'kalendar',
     accent: 'warning',
-    audience: ['hrac', 'pj'],
+    audience: ['pj'],
   },
   {
     key: 'obchod',

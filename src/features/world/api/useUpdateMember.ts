@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
-import type { WorldMembership, WorldRole } from '@/shared/types';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
+import { WorldRole } from '@/shared/types';
+import type { WorldMembership } from '@/shared/types';
 
 /**
  * 5.3c — změna role / skupiny / AKJ úrovně člena světa. Každé pole má
@@ -32,7 +34,11 @@ export function useUpdateMember(worldId: string) {
           });
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, payload) => {
+      // Milník „první hráč" (05 §6) — i povýšení Čtenář->Hráč přes Nastavení->Členové
+      // (nejen schválení žádosti). Milník+oslava jsou idempotentní. (audit-podpis 14)
+      if (payload.field === 'role' && payload.value >= WorldRole.Hrac)
+        vypravecEmit('member.approved', { worldId });
       qc.invalidateQueries({ queryKey: ['worlds', worldId, 'members'] });
       // C-03 — změna vlastní role se promítá do useMyWorlds (WorldContext role/slot).
       qc.invalidateQueries({ queryKey: ['worlds', 'my'] });

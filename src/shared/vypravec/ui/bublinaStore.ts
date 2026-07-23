@@ -74,10 +74,28 @@ class BublinaStore {
     this.scopeAktualni = scope;
   }
 
-  /** Změna identity (logout/login bez reloadu) — fronta nesmí přetéct k jinému účtu. */
-  vycistiProUzivatele(): void {
+  /** Jen fronta + zobrazená bublina (přechod mezi světy — nepřetéct cross-world). */
+  vycistiFrontu(): void {
     this.fronta = [];
     this.zmiz();
+  }
+
+  /** Změna identity (logout/login bez reloadu) — fronta nesmí přetéct k jinému účtu. */
+  vycistiProUzivatele(): void {
+    this.vycistiFrontu();
+    // Audit-podpis (nález 17): sessionStorage klíče Vypravěče (sess-dismiss,
+    // vitej-zpet, navrat-nabidnut, err:*, no-topic:*) NEjsou per-uid → na
+    // sdíleném tabu by je uživatel B zdědil po A. Vymést při změně identity.
+    try {
+      const smazat: string[] = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith('vypravec:')) smazat.push(k);
+      }
+      smazat.forEach((k) => sessionStorage.removeItem(k));
+    } catch {
+      /* privátní režim — nevadí */
+    }
   }
 
   getSnapshot = (): Bublina | null => this.aktualni;

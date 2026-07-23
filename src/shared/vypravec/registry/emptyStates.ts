@@ -6,10 +6,16 @@
  */
 import { bublinaStore } from '../ui/bublinaStore';
 
-const EMPTY_STATES: Record<
-  string,
-  { text: string; ctaLabel?: string; sessionDismiss?: boolean }
-> = {
+interface EmptyDef {
+  text: string;
+  ctaLabel?: string;
+  sessionDismiss?: boolean;
+}
+/** Zúží klíč na literál (překlep spadne v tsc) a drží jednotný typ hodnoty. */
+const mkEmpty = <K extends string>(m: Record<K, EmptyDef>): Record<K, EmptyDef> =>
+  m;
+
+const EMPTY_STATES = mkEmpty({
   // Joe — hráč bez postavy (top zákys „postavu zakládá PJ")
   'moje-postava': {
     text: 'Postavu ti zakládá tvůj PJ — napiš mu. Až bude na světě, najdeš ji pod Moje postava.',
@@ -35,11 +41,13 @@ const EMPTY_STATES: Record<
     text: 'Svět stojí a čeká na první tah. Doporučuji začít Encyklopedií — pravidla a měny už jsou předchystané.',
     ctaLabel: 'Otevřít Encyklopedii',
   },
-};
+});
+/** Klíče empty-states — překlep v ReportEmpty spadne v tsc (kritik úplnosti). */
+export type EmptyStateKlic = keyof typeof EMPTY_STATES;
 
 // Empty-state má smysl jen NA MÍSTĚ — z fronty jinde by deixe lhala.
 export function vypravecReportEmpty(
-  klic: keyof typeof EMPTY_STATES & string,
+  klic: EmptyStateKlic,
   opts: { to?: string } = {},
 ): void {
   const def = EMPTY_STATES[klic];
