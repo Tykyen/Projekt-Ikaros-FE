@@ -18,6 +18,12 @@ import { Link } from 'react-router-dom';
 import type { ResolvedHeader } from '../engine/resolveHeader';
 import { topikyProRoutu, topikPodleId } from '../registry/topics';
 import { NAVODY } from '../registry/navody';
+import { hledej } from '../engine/hledani';
+import {
+  ZMENY,
+  oznacZmenyVidene,
+  pocetNovychZmen,
+} from '../registry/changelog';
 import { CESTY } from '../registry/journeys';
 import {
   pauzaCesty,
@@ -290,7 +296,23 @@ export default function VypravecPanel({
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
   const [topikId, setTopikId] = useState<string | null>(null);
-  const [pohled, setPohled] = useState<'domu' | 'navody' | 'cesty'>('domu');
+  const [pohled, setPohled] = useState<'domu' | 'navody' | 'cesty' | 'zmeny'>(
+    'domu',
+  );
+  // S2 „Zeptat se" — fulltext nad topiky+návody (engine/hledani).
+  const [dotaz, setDotaz] = useState('');
+  const nalezy = dotaz.trim().length >= 2 ? hledej(dotaz, audience) : [];
+  // Neúspěšné hledání hlásíme s prodlevou (až když uživatel dopsal).
+  useEffect(() => {
+    if (dotaz.trim().length < 3 || nalezy.length > 0) return;
+    const t = setTimeout(
+      () => telemetrie('search_miss', { query: dotaz.trim().slice(0, 100) }),
+      1200,
+    );
+    return () => clearTimeout(t);
+  }, [dotaz, nalezy.length]);
+  // S3 badge „Co je nového" — po otevření pohledu se přepočítá na 0.
+  const [zmenBadge, setZmenBadge] = useState(pocetNovychZmen);
   const ref = useRef<HTMLDivElement>(null);
 
   // Focus trap: fokus dovnitř při otevření, Tab cykluje uvnitř panelu.
@@ -421,6 +443,29 @@ export default function VypravecPanel({
           />
         ) : pohled === 'cesty' ? (
           <CestyView onZpet={() => setPohled('domu')} />
+        ) : pohled === 'zmeny' ? (
+          <div>
+            <button
+              type="button"
+              className={s.zpet}
+              onClick={() => setPohled('domu')}
+            >
+              ← Zpět
+            </button>
+            <div className={s.sekceLabel}>Co je nového</div>
+            {ZMENY.map((z) => (
+              <div key={z.id} className={s.zmena}>
+                <div className={s.zmenaDatum}>{z.datum}</div>
+                <div className={s.zmenaTitul}>{z.titul}</div>
+                <p className={s.topikOdstavec}>{z.popis}</p>
+                {z.to && (
+                  <Link to={z.to} className={s.topikAkce} onClick={onClose}>
+                    Vyzkoušet →
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
         ) : pohled === 'navody' ? (
           <div>
             <button
@@ -446,7 +491,41 @@ export default function VypravecPanel({
           </div>
         ) : (
           <>
-            {karty.length > 0 && (
+            <input
+              type="search"
+              className={s.hledani}
+              placeholder="Zeptat se — např. „jak pozvat hráče“"
+              aria-label="Zeptat se Vypravěče"
+              value={dotaz}
+              onChange={(e) => setDotaz(e.target.value)}
+            />
+            {dotaz.trim().length >= 2 && (
+              <>
+                <div className={s.sekceLabel}>
+                  {nalezy.length ? 'Našel jsem' : 'Nic jsem nenašel'}
+                </div>
+                {nalezy.length === 0 && (
+                  <p className={s.topikOdstavec}>
+                    Zkus to jinými slovy, nebo otevři Plnou nápovědu níže —
+                    tvůj dotaz si zapisuju, ať příště odpovím líp.
+                  </p>
+                )}
+                <div className={s.personaVolby}>
+                  {nalezy.map((n) => (
+                    <button
+                      key={n.id}
+                      type="button"
+                      className={s.personaVolba}
+                      onClick={() => otevriTopik(n.id)}
+                    >
+                      {n.title}
+                      <small>{n.typ === 'navod' ? 'Návod' : 'Nápověda'}</small>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {karty.length > 0 && dotaz.trim().length < 2 && (
               <>
                 <div className={s.sekceLabel}>K věci</div>
                 <div className={s.personaVolby}>
@@ -482,6 +561,25 @@ export default function VypravecPanel({
                 >
                   <Klic />
                   Návody
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={s.menuTlacitko}
+                  onClick={() => {
+                    oznacZmenyVidene();
+                    setZmenBadge(0);
+                    setPohled('zmeny');
+                  }}
+                >
+                  <Klic />
+                  Co je nového
+                  {zmenBadge > 0 && (
+                    <span className={s.zmenBadge} aria-label={`${zmenBadge} nových`}>
+                      {zmenBadge}
+                    </span>
+                  )}
                 </button>
               </li>
               <li>
