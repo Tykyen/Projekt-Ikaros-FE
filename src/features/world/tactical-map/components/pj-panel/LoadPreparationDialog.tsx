@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -115,6 +116,7 @@ export function LoadPreparationDialog({
         name: plan.title || 'Nová scéna',
         config: { size: 40, originX: 0, originY: 0, showGrid: true },
       });
+      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
 
       // 2) Podklad mapy ze scénáře (základní imageUrl, pokud je).
       if (plan.mapImageUrl) {

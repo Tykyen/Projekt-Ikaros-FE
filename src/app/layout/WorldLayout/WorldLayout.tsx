@@ -879,6 +879,9 @@ export function WorldLayout() {
             worldSlug: worldSlug ?? undefined,
             accessMode: world?.accessMode,
             publicShowcase: world?.publicShowcase,
+            // Fixace cesty smí jen na VLASTNÍ svět — isPJ zahrnuje i PomocnýPJ
+            // a elevovaného admina v cizím světě (revize 07/23, engine nález 2).
+            isOwner: world?.ownerId === currentUser?.id,
             hasCharacter: characterSlot != null,
             // D-078: probe „První NPC" — placeholder ≠ „nemá NPC", proto undefined.
             hasNpcPage: pagesDirPlaceholder

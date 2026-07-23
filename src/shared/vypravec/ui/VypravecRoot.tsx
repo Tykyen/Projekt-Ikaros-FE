@@ -47,6 +47,7 @@ import { bublinaStore } from './bublinaStore';
 import { VypravecBublina } from './VypravecBublina';
 import { JourneyBar } from './JourneyBar';
 import { VypravecFab } from './VypravecFab';
+import { VypravecChyba } from './VypravecChyba';
 
 const VypravecPanel = lazy(() => import('./VypravecPanel'));
 
@@ -139,6 +140,7 @@ export function VypravecRoot({
   // kontrola PŘED záznamem (jinak by routa byla „viděná" dřív, než promluvíme).
   // Odchod z routy tip zavírá bez penalizace (03 §3). Pak záznam + visit kroky.
   useEffect(() => {
+    bublinaStore.nastavKolizni(kolizni); // fronta oslav/tipů (03 §5)
     bublinaStore.zavriPriOdchodu(pathname); // příchozí bublinu nezabíjet (C1)
     if (pattern) {
       const uzVidel = onboardingStore
@@ -154,10 +156,12 @@ export function VypravecRoot({
           akce: { label: 'Ukaž mi to', onClick: () => setOtevreny(true) },
         });
       }
-      onboardingStore.zaznamenejRoutu(pattern);
+      // Záznam až po initu — jinak deep-link během čekání na server routu
+      // „spálí" a jediná šance na tip navždy propadne (revize 07/23).
+      if (initOk) onboardingStore.zaznamenejRoutu(pattern);
     }
     zpracujNavstevu(pathname);
-  }, [pattern, pathname, kolizni, userId]);
+  }, [pattern, pathname, kolizni, userId, onboarding]);
 
   // D7 — probe rekonsiliace ve world scope (gateOpened z accessMode; slug
   // resync pro deep-linky). Probe = zdroj pravdy, auto-odškrtne i zpětně.
@@ -168,6 +172,7 @@ export function VypravecRoot({
       worldSlug: world.worldSlug,
       accessMode: world.accessMode,
       isPJ: world.isPJ,
+      isOwner: world.isOwner,
       publicShowcase: world.publicShowcase,
       hasNpcPage: world.hasNpcPage,
     });
@@ -181,10 +186,20 @@ export function VypravecRoot({
     world?.worldSlug,
     world?.accessMode,
     world?.isPJ,
+    world?.isOwner,
     world?.publicShowcase,
     world?.hasCharacter,
     world?.hasNpcPage,
+    // Probe znovu i po doběhnutí initu (2. zařízení — stav dorazí až PO mountu).
+    onboarding,
   ]);
+
+  // Čekací stav hráče i NA PLATFORMĚ (bez ctx = jen timeout 7 dní) — hráč
+  // v soukromém světě se do world scope nedostane (revize 07/23, nález 11).
+  useEffect(() => {
+    if (scope === 'world') return;
+    zkontrolujCekaniHrace();
+  }, [scope, onboarding]);
 
   // v2 — cross-device sync: jiné zařízení PATCHlo → signál bez dat → re-GET.
   useSocketEvent('onboarding:updated', () => void onboardingStore.resync());
@@ -302,7 +317,14 @@ export function VypravecRoot({
   // do proužku, nikdy nezmizí (03 §8.3 — poslední instrukce nesmí zmizet
   // v místě činu).
   if ((kolizni || klavesnice) && !otevreny) {
-    return akt ? <JourneyBar akt={akt} kolizni jinySvet={jinySvet} /> : null;
+    // Chybová vysvětlení se ukazují i tady (kontext chyby) — oslavy/tipy
+    // drží bublinaStore ve frontě na klidnou plochu (03 §5).
+    return (
+      <>
+        <VypravecBublina />
+        {akt && <JourneyBar akt={akt} kolizni jinySvet={jinySvet} aktualniSlug={world?.worldSlug} />}
+      </>
+    );
   }
 
   return (
@@ -315,9 +337,16 @@ export function VypravecRoot({
       />
       {!otevreny && <VypravecBublina />}
       {akt && !otevreny && (
-        <JourneyBar akt={akt} kolizni={false} jinySvet={jinySvet} />
+        <JourneyBar akt={akt} kolizni={false} jinySvet={jinySvet} aktualniSlug={world?.worldSlug} />
       )}
       {otevreny && (
+        <VypravecChyba
+          naChybu={() => (
+            <div role="alert" className="vypravec-highlight">
+              Vypravěče se nepodařilo načíst — zkus obnovit stránku.
+            </div>
+          )}
+        >
         <Suspense fallback={null}>
           <VypravecPanel
             scope={scope}
@@ -346,6 +375,7 @@ export function VypravecRoot({
             }}
           />
         </Suspense>
+        </VypravecChyba>
       )}
     </div>
   );

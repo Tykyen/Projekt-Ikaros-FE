@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import type {
@@ -65,7 +66,11 @@ export function useCreateNabor() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateNaborDto) => api.post<Nabor>(PREFIX, dto),
-    onSuccess: () => invalidate(qc),
+    onSuccess: (data) => {
+      // Vypravěč: nábor = alternativa otevření brány (05 §3 krok 4)
+      vypravecEmit('nabor.created', { worldId: data.worldId });
+      invalidate(qc);
+    },
   });
 }
 
@@ -111,6 +116,7 @@ export function useOzvatSe() {
   return useMutation({
     mutationFn: ({ id, message }: { id: string; message: string }) =>
       api.post<{ ok: true }>(`${PREFIX}/${id}/ozvat-se`, { message }),
+    onSuccess: () => vypravecEmit('nabor.responded', {}), // hrac.ozvi-se alt
   });
 }
 

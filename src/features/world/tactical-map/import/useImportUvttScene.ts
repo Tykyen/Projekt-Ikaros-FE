@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
  * 17.2 — import UVTT scény.
  *
@@ -49,6 +50,7 @@ export function useImportUvttScene(worldId: string, currentUserId: string) {
         name,
         imageUrl: uploaded.url,
       });
+      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
 
       // Kalibrovaný config (celý objekt přes scene.config op)
       await postMapOperation(scene.id, {

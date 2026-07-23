@@ -356,6 +356,8 @@ export function probeResync(ctx: {
   worldSlug?: string;
   accessMode?: string;
   isPJ?: boolean;
+  /** Vlastník světa — fixace cesty jen podle něj (isPJ zahrnuje cizí světy). */
+  isOwner?: boolean;
   publicShowcase?: boolean;
   /** D-078: svět už má NPC stránku (z pages directory cache). */
   hasNpcPage?: boolean;
@@ -370,7 +372,7 @@ export function probeResync(ctx: {
   if (
     !akt.contextWorldId &&
     akt.cesta.worldBinding === 'creates' &&
-    ctx.isPJ &&
+    ctx.isOwner &&
     prvniKrok &&
     akt.dalsiKrok?.id === prvniKrok.id
   ) {
@@ -415,7 +417,7 @@ export function probeResync(ctx: {
 
 /** gateOpened alternativy: pozvánka/nábor pro svět cesty (05 §3 krok 4). */
 function zpracujGateEventy(e: VypravecEvent): void {
-  if (e.name !== 'invite.created') return;
+  if (e.name !== 'invite.created' && e.name !== 'nabor.created') return;
   const akt = aktivniCesta();
   if (!akt || !akt.contextWorldId || e.payload.worldId !== akt.contextWorldId)
     return;
@@ -435,6 +437,8 @@ function zpracujMilniky(e: VypravecEvent): void {
   const s = onboardingStore.getSnapshot();
   if (s.milestones['prvni.hrac']) return;
   onboardingStore.aplikuj({ milestones: { 'prvni.hrac': e.at } });
+  // Veterán (backfill) — hráče má roky; milník zapiš tiše, oslava by lhala.
+  if (s.backfilled) return;
   bublinaStore.show({
     text: 'První hráč vešel do tvého světa. Od téhle chvíle to není kulisa — je to hra.',
     oslava: true,

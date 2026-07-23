@@ -25,7 +25,10 @@ export type VypravecEventName =
   | 'token.spawned'
   | 'fog.used'
   | 'initiative.started'
-  | 'member.approved';
+  | 'member.approved'
+  // Nábory (LFG) — gateOpened alternativa PJ + „ozvi se" hráče (05 §3–4):
+  | 'nabor.created'
+  | 'nabor.responded';
 
 export interface VypravecEventPayload {
   worldId?: string;

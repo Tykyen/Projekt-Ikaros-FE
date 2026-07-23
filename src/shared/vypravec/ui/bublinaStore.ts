@@ -33,6 +33,14 @@ class BublinaStore {
   private aktualni: Bublina | null = null;
   private listeners = new Set<Listener>();
   private hideTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Kolizní plocha (chat/TM/editory) — hlásí VypravecRoot při navigaci. */
+  private kolizni = false;
+  /** Fronta doručení (03 §5: oslava/tip se doručí až MIMO kolizní plochu). */
+  private fronta: Bublina[] = [];
+
+  nastavKolizni(kolizni: boolean): void {
+    this.kolizni = kolizni;
+  }
 
   getSnapshot = (): Bublina | null => this.aktualni;
   subscribe = (fn: Listener): (() => void) => {
@@ -56,6 +64,16 @@ class BublinaStore {
       return false;
     if (s.mode === 'onCall' && !b.oslava) return false;
     if (b.oslava && this.aktualni?.akce) return false; // priorita rady nad oslavou
+    // Kolizní plocha: chybová vysvětlení (sessionDismiss) se ukážou hned
+    // (kontext chyby), oslavy/tipy počkají ve frontě na klidnou plochu.
+    if (this.kolizni && !b.sessionDismiss) {
+      if (
+        this.fronta.length < 3 &&
+        !this.fronta.some((f) => f.text === b.text)
+      )
+        this.fronta.push(b);
+      return true; // doručí se — jen později
+    }
     if (this.hideTimer) clearTimeout(this.hideTimer);
     this.aktualni = { ...b, route: window.location.pathname };
     if (b.oslava) this.hideTimer = setTimeout(() => this.zmiz(), 8000);
@@ -76,6 +94,11 @@ class BublinaStore {
   /** Zavření při ODCHODU z routy (03 §3) — příchozí bublinu nezabíjí. */
   zavriPriOdchodu(pathname: string): void {
     if (this.aktualni && this.aktualni.route !== pathname) this.zmiz();
+    // Klidná plocha a nic nevisí → doruč frontu (show znovu ověří dismissed).
+    if (!this.kolizni && !this.aktualni && this.fronta.length > 0) {
+      const dalsi = this.fronta.shift();
+      if (dalsi) this.show(dalsi);
+    }
   }
 
   /** Odchod z routy — tip zmizí bez penalizace čítače (03 §3). */

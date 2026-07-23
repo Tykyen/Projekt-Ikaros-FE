@@ -19,6 +19,7 @@ import type { ResolvedHeader } from '../engine/resolveHeader';
 import { topikyProRoutu, topikPodleId } from '../registry/topics';
 import { NAVODY } from '../registry/navody';
 import { hledej } from '../engine/hledani';
+import { VypravecChyba } from './VypravecChyba';
 import {
   ZMENY,
   oznacZmenyVidene,
@@ -137,14 +138,32 @@ function TopicView({
         </ol>
       )}
       {Tahak && (
-        <Suspense
-          fallback={<p className={s.topikOdstavec}>Načítám tahák…</p>}
+        <VypravecChyba
+          naChybu={(zkusZnovu) => (
+            <p className={s.topikOdstavec} role="alert">
+              Tahák se nepodařilo načíst — zkontroluj připojení.{' '}
+              <button
+                type="button"
+                className={s.ctaTiche}
+                onClick={() => {
+                  tahakCache.delete(topik.id); // rejected import necachovat
+                  zkusZnovu();
+                }}
+              >
+                Zkusit znovu
+              </button>
+            </p>
+          )}
         >
-          {/* eslint-disable-next-line react-hooks/static-components -- identita je stabilní: tahakPro čte modulovou cache per topik.id */}
-          <Tahak
-            audience={audience as import('../registry/types').VypravecAudience}
-          />
-        </Suspense>
+          <Suspense
+            fallback={<p className={s.topikOdstavec}>Načítám tahák…</p>}
+          >
+            {/* eslint-disable-next-line react-hooks/static-components -- identita je stabilní: tahakPro čte modulovou cache per topik.id */}
+            <Tahak
+              audience={audience as import('../registry/types').VypravecAudience}
+            />
+          </Suspense>
+        </VypravecChyba>
       )}
       {topik.minAudienceNote && (
         <p className={s.poznamka}>{topik.minAudienceNote}</p>
@@ -251,7 +270,15 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
         ← Zpět
       </button>
       <div className={s.personaVolby}>
-        {Object.values(CESTY).map((c) => {
+        {Object.values(CESTY)
+          // tm-vycvik je PJ dril (BE ops PJ-only) — hráči by měl věčných 0/5.
+          .filter(
+            (c) =>
+              c.id !== 'tm-vycvik' ||
+              stav.persona === 'pj' ||
+              Boolean(stav.journeys[aktualniKlic('pj-start')]),
+          )
+          .map((c) => {
           const prog = stav.journeys[aktualniKlic(c.id)];
           const { hotovo, celkem } = postupCesty(c.id);
           const bezi = prog && !prog.dismissedAt && hotovo < celkem;

@@ -171,6 +171,8 @@ class OnboardingStore {
   private listeners = new Set<Listener>();
   private timer: ReturnType<typeof setTimeout> | null = null;
   private syncBezi = false;
+  /** Roste s každým úspěšným PATCHem — resync s ním hlídá stale GET. */
+  private syncGen = 0;
   private initDone = false;
   /** GET doběhl a uživatel je čerstvý (žádný state, ne legacy) — moment 1 (26.4). */
   jeNovy = false;
@@ -271,12 +273,16 @@ class OnboardingStore {
     const odesilane = fronta.length;
     try {
       await api.patch('/users/me/onboarding', fronta.reduce(sloucitDelty, {}));
+      this.syncGen += 1; // zneplatní resync GET rozběhnutý před tímto PATCHem
       const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
       writeJson(pendingKey(this.ctxUid), ted.slice(odesilane));
     } catch {
       /* offline/chyba — fronta zůstává, re-POST příště (BE merge idempotentní) */
     } finally {
       this.syncBezi = false;
+      // Delta přišlá BĚHEM PATCHe by jinak čekala na další aktivitu.
+      const zbyva = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
+      if (zbyva.length > 0) this.naplanujSync();
     }
   }
 
@@ -324,11 +330,16 @@ class OnboardingStore {
   async resync(): Promise<void> {
     this.zajistiKontext();
     if (this.ctxUid === 'anon' || this.ctxUid === 'nenacteno') return;
+    const genPred = this.syncGen;
     try {
       const res = await api.get<{ state: OnboardingStateFE | null }>(
         '/users/me/onboarding',
       );
       if (!res.state) return;
+      // Race (revize 07/23, nález 8): pokud BĚHEM GETu doběhl náš PATCH,
+      // odpověď je stale — replace by smazal čerstvě odškrtnuté. Zahodit;
+      // WS echo vlastního PATCHe stejně přijde a resync poběží znovu.
+      if (this.syncGen !== genPred || this.syncBezi) return;
       const pending = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
       this.state = pending.reduce(aplikujDeltuLokalne, res.state);
       writeJson(stateKey(this.ctxUid), this.state);
@@ -351,7 +362,8 @@ class OnboardingStore {
     }
     if (!token) return;
     const base = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-    void fetch(`${base}/users/me/onboarding`, {
+    // POZOR: BE má setGlobalPrefix('api') — bez /api je to 404 (revize 07/23).
+    void fetch(`${base}/api/users/me/onboarding`, {
       method: 'PATCH',
       keepalive: true,
       headers: {

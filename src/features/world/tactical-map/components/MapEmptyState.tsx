@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
  * 10.2a — empty state pro taktickou mapu.
  *
@@ -115,6 +116,7 @@ export function MapEmptyState({
         name: 'Nová scéna',
         config: { size: 40, originX: 0, originY: 0, showGrid: true },
       });
+      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
       // 2) Aktivovat scénu (POST /maps/:id/active s worldId v query) —
       // bez tohoto by `useActiveScenes` (PJ panel) ukazovala prázdný seznam
       // a `useMapScene` by stále vracelo 404 (membership.currentSceneId

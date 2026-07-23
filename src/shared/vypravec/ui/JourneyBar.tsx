@@ -21,16 +21,24 @@ export function JourneyBar({
   akt,
   kolizni,
   jinySvet,
+  aktualniSlug,
 }: {
   akt: AktivniCesta;
   kolizni: boolean;
   /** Uživatel je ve světě ≠ contextWorld cesty (05 §2). */
   jinySvet: boolean;
+  /** Slug světa, ve kterém uživatel PRÁVĚ je — fallback pro cesty bez
+   *  fixace (worldBinding 'none', např. tm-vycvik). */
+  aktualniSlug?: string;
 }) {
   const navigate = useNavigate();
   const [rozbalenaVKolizi, setRozbalenaVKolizi] = useState(false);
   const krok = akt.dalsiKrok;
   if (!krok) return null;
+  // Bez slugu by CTA navigovalo na doslovné ':worldSlug' → „Svět nenalezen".
+  const slug = akt.contextWorldSlug ?? aktualniSlug;
+  const ctaCil = doplnSlug(krok.cta.to, slug);
+  const ctaFunkcni = !ctaCil.includes(':worldSlug');
   const pauznuta = Boolean(
     onboardingStore.getSnapshot().journeys[akt.klic]?.pausedAt,
   );
@@ -77,16 +85,18 @@ export function JourneyBar({
         <div className={s.listaReplika}>{krok.narratorLine}</div>
       </div>
       <div className={s.listaAkce}>
-        <button
-          type="button"
-          className={s.cta}
-          onClick={() => {
-            navigate(doplnSlug(krok.cta.to, akt.contextWorldSlug));
-            if (krok.anchor) zvyrazni(krok.anchor); // čeká na mount cíle (retry)
-          }}
-        >
-          {krok.cta.label}
-        </button>
+        {ctaFunkcni && (
+          <button
+            type="button"
+            className={s.cta}
+            onClick={() => {
+              navigate(ctaCil);
+              if (krok.anchor) zvyrazni(krok.anchor); // čeká na mount cíle (retry)
+            }}
+          >
+            {krok.cta.label}
+          </button>
+        )}
         <button
           type="button"
           className={s.ctaTiche}

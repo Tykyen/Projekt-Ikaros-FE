@@ -98,7 +98,8 @@ export function zapojTelemetriiFlush(): void {
     if (!token) return;
     const base = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
     const davka = fronta.splice(0, MAX_BATCH);
-    void fetch(`${base}/vypravec/telemetry`, {
+    // POZOR: BE má setGlobalPrefix('api') — bez /api je to 404 (revize 07/23).
+    void fetch(`${base}/api/vypravec/telemetry`, {
       method: 'POST',
       keepalive: true,
       headers: {

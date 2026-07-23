@@ -76,23 +76,36 @@ describe('journeyEngine — cesta 26.1', () => {
     expect(aktivniCesta()?.hotovo.has('pj.rozhledni-se')).toBe(true);
   });
 
-  it('D-078: PJ navštíví svůj svět bez fixace → probe zafixuje + odškrtne krok 1', () => {
+  it('D-078: VLASTNÍK navštíví svůj svět bez fixace → probe zafixuje + odškrtne krok 1', () => {
     // žádný world.created event (zavřený tab / jiné zařízení)
     probeResync({
       worldId: 'w-probe',
       worldSlug: 'probe-svet',
       accessMode: 'private',
       isPJ: true,
+      isOwner: true,
     });
     const akt = aktivniCesta();
     expect(akt?.contextWorldId).toBe('w-probe');
     expect(akt?.hotovo.has('pj.zaloz-svet')).toBe(true);
-    // ne-PJ svět nefixuje
   });
 
   it('D-078: návštěva CIZÍHO světa (ne-PJ) nefixuje', () => {
     probeResync({ worldId: 'w-cizi', worldSlug: 'cizi', isPJ: false });
     expect(aktivniCesta()?.contextWorldId).toBeUndefined();
+  });
+
+  it('D-078: PomocnýPJ v CIZÍM světě (isPJ, ne owner) NEfixuje — checklist nesmí lhát', () => {
+    probeResync({
+      worldId: 'w-cizi',
+      worldSlug: 'cizi',
+      isPJ: true,
+      isOwner: false,
+      hasNpcPage: true,
+    });
+    const akt = aktivniCesta();
+    expect(akt?.contextWorldId).toBeUndefined();
+    expect(akt?.hotovo.size).toBe(0);
   });
 
   it('probe gateOpened: accessMode ≠ private splní krok 4 (i zpětně/jinde)', () => {
@@ -303,5 +316,48 @@ describe('v2 — tm-vycvik (Měďák) + milník první hráč', () => {
     vypravecEmit('member.approved', { worldId: 'w-2' });
     expect(onboardingStore.getSnapshot().milestones['prvni.hrac']).toBe(prvni);
     expect(bublinaStore.getSnapshot()).toBeNull(); // žádná druhá oslava
+  });
+});
+
+describe('revize 07/23 — nábory + fronta bublin', () => {
+  it('nabor.created splní gateOpened krok (alternativa pozvánky)', () => {
+    vypravecEmit('world.created', { worldId: 'w-1', worldSlug: 'muj-svet' });
+    vypravecEmit('nabor.created', { worldId: 'w-1' });
+    expect(aktivniCesta()?.hotovo.has('pj.otevri-branu')).toBe(true);
+  });
+
+  it('nabor.responded splní hrac.ozvi-se', () => {
+    zrusitCestu('pj-start');
+    startCesty('hrac-start');
+    zpracujNavstevu('/ikaros/vesmiry');
+    vypravecEmit('nabor.responded', {});
+    expect(
+      onboardingStore.getSnapshot().journeys['hrac-start']?.steps?.[
+        'hrac.ozvi-se'
+      ],
+    ).toBeDefined();
+  });
+
+  it('oslava na kolizní ploše čeká ve frontě a doručí se na klidné', () => {
+    bublinaStore.zmiz(); // úklid oslavy z předchozího testu
+    bublinaStore.nastavKolizni(true);
+    bublinaStore.show({ text: 'Oslava z chatu', oslava: true });
+    expect(bublinaStore.getSnapshot()).toBeNull(); // nedoručeno hned
+    bublinaStore.nastavKolizni(false);
+    bublinaStore.zavriPriOdchodu('/jinam');
+    expect(bublinaStore.getSnapshot()?.text).toBe('Oslava z chatu');
+    bublinaStore.zmiz();
+  });
+
+  it('chybové vysvětlení (sessionDismiss) se ukáže i na kolizní ploše', () => {
+    bublinaStore.nastavKolizni(true);
+    bublinaStore.show({
+      dismissKey: 'err-x',
+      sessionDismiss: true,
+      text: 'Vysvětlení chyby',
+    });
+    expect(bublinaStore.getSnapshot()?.text).toBe('Vysvětlení chyby');
+    bublinaStore.zmiz();
+    bublinaStore.nastavKolizni(false);
   });
 });

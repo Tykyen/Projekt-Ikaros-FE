@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
  * 10.2c-edit — MapLibraryModal (knihovna map / templates).
  *
@@ -115,6 +116,7 @@ export function MapLibraryModal({
         revealedHexes: template.revealedHexes ?? [],
         activeSoundIds: template.activeSoundIds ?? [],
       });
+      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
 
       // 2. Aktivovat scénu (paralelně, nemizí ostatní díky setActive fixu)
       await apiClient.post(`/maps/${newScene.id}/active`, undefined, {

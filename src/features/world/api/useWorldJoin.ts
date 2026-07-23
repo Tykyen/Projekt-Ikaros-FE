@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { api } from '@/shared/api/client';
+import { WorldRole } from '@/shared/types';
 import type { WorldMembership, WorldAccessRequest } from '@/shared/types';
 
 /**
@@ -77,8 +78,10 @@ export function useApproveAccessRequest() {
       api.post<{ ok: true; membership: WorldMembership }>(
         `/worlds/${worldId}/access-requests/${requestId}/approve`,
       ),
-    onSuccess: (_data, { worldId }) => {
-      vypravecEmit('member.approved', { worldId }); // milník „první hráč" (05 §6)
+    onSuccess: (data, { worldId }) => {
+      // Milník „první hráč" (05 §6) — jen skutečný Hráč, ne čtenářská žádost.
+      if ((data.membership?.role ?? WorldRole.Ctenar) >= WorldRole.Hrac)
+        vypravecEmit('member.approved', { worldId });
       qc.invalidateQueries({ queryKey: ['pending-actions'] });
       // 15.10 — world-scoped fronta (stránka Hráči, drawer, badge).
       qc.invalidateQueries({ queryKey: ['worlds', worldId, 'pending-actions'] });

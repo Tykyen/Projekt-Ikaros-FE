@@ -43,6 +43,7 @@ export const HRAC_START: Journey = {
             altEvents: [
               { event: 'message.sent', match: { channelKind: 'putyka' } },
               { event: 'message.sent', match: { channelKind: 'camp' } },
+              { event: 'nabor.responded' }, // odpověď na nábor = ozvání (05 §4)
             ],
           },
           topicId: 'svet.zadatel',

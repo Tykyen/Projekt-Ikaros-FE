@@ -35,7 +35,11 @@ function scrubValue(value: unknown, depth = 0): unknown {
  * do bundlu) — to je u Sentry/GlitchTip designově OK; odchozí data kryje
  * beforeSend scrubber.
  */
+let initVolano = false;
+
 export function initMonitoring(): void {
+  if (initVolano) return; // guard proti dvojímu initu (duplicitní listenery)
+  initVolano = true;
   const dsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
   if (dsn) {
     // Tunnel: adblockery blokují přímé requesty na *.ingest.sentry.io
@@ -44,7 +48,8 @@ export function initMonitoring(): void {
     const apiBase =
       (import.meta.env.VITE_API_URL as string | undefined) ??
       'http://localhost:3000';
-    void import('@sentry/react').then((Sentry) => {
+    import('@sentry/react')
+      .then((Sentry) => {
       Sentry.init({
       dsn,
       tunnel: `${apiBase}/api/monitoring/tunnel`,
@@ -69,7 +74,12 @@ export function initMonitoring(): void {
           z.context ? { tags: { context: z.context } } : undefined,
         );
       }
-    });
+      })
+      .catch((err: unknown) => {
+        // Chunk nedorazil (offline/adblock) — bez šumu unhandledrejection;
+        // chyby zůstávají v console.error fallbacku captureError.
+        console.error('[monitoring] Sentry se nepodařilo načíst', err);
+      });
   }
 
   // Globální handlery i bez DSN — aspoň se chyba zaloguje, ne aby zmizela beze stopy.
