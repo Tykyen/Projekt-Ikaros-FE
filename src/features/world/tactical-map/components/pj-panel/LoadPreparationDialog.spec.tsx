@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoadPreparationDialog } from './LoadPreparationDialog';
 
-const { postOp, postWorldOp, apiPost, apiPut, apiClientPost } = vi.hoisted(
+const { postOp, postWorldOp, apiPost, apiPut, apiClientPost, aktivace } = vi.hoisted(
   () => ({
     postOp: vi.fn<
       (
@@ -18,13 +18,17 @@ const { postOp, postWorldOp, apiPost, apiPut, apiClientPost } = vi.hoisted(
     apiPut: vi.fn<(url: string, body?: unknown) => Promise<unknown>>(() =>
       Promise.resolve({}),
     ),
+    aktivace: vi.fn(() => Promise.resolve({})),
     apiClientPost: vi.fn<(url: string, body?: unknown) => Promise<unknown>>(
       () => Promise.resolve({}),
     ),
   }),
 );
 
-vi.mock('../../api/mapApi', () => ({ postMapOperation: postOp }));
+vi.mock('../../api/mapApi', () => ({
+  postMapOperation: postOp,
+  activateMapScene: aktivace,
+}));
 vi.mock('../../api/worldOpsApi', () => ({ postWorldOperation: postWorldOp }));
 vi.mock('@/shared/api/client', () => ({
   api: {
@@ -93,6 +97,7 @@ describe('LoadPreparationDialog', () => {
     apiPost.mockClear();
     apiPut.mockClear();
     apiClientPost.mockClear();
+    aktivace.mockClear();
     renderDialog();
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 's1' } });
@@ -125,8 +130,8 @@ describe('LoadPreparationDialog', () => {
     expect(postOp.mock.calls.every((c) => c[0] === 'newscene')).toBe(true);
 
     // Aktivace + přepnutí PJ na novou scénu.
-    await waitFor(() => expect(apiClientPost).toHaveBeenCalled());
-    expect(apiClientPost.mock.calls[0][0]).toBe('/maps/newscene/active');
+    await waitFor(() => expect(aktivace).toHaveBeenCalled());
+    expect(aktivace).toHaveBeenCalledWith('newscene', 'w');
     expect(postWorldOp).toHaveBeenCalledWith('w', {
       type: 'member.assignToScene',
       userId: 'me',

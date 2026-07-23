@@ -4,6 +4,11 @@
  * oslava auto-zmizí po 8 s. Zavřené se nikdy neopakuje (dismissKey →
  * onboardingStore.dismissed, BE set-union).
  *
+ * Serializace (verifikace 07/23, nálezy N1/N2/N5/N6): show NIKDY nepřepíše
+ * zobrazenou bublinu — čeká ve frontě (i na klidné ploše). `show` vrací
+ * false, když se bublina nikam nedostala (plno/duplicita) — „jednou za
+ * život" obsah se proto konzumuje přes `priZobrazeni`, ne návratovkou.
+ *
  * Auto-tichý režim (03 §4.1): 3 po sobě zavřené TIPY bez interakce →
  * mode 'onCall' + rozlučková replika. Čítač resetuje klik na CTA;
  * oslavy a rozlučka se nepočítají.
@@ -22,10 +27,16 @@ export interface Bublina {
   akce?: { label: string; to?: string; onClick?: () => void };
   /** oslava = auto-hide 8 s, nepočítá se do auto-tichého čítače. */
   oslava?: boolean;
+  /**
+   * Zavolá se v okamžiku SKUTEČNÉHO zobrazení (ne zařazení do fronty) —
+   * sem patří konzumace „jednou za život" nároku (zavritTip, session flag).
+   */
+  priZobrazeni?: () => void;
 }
 
 const CITAC_KEY = 'vypravec:zavrene-tipy';
 const ROZLUCKA = 'Nebudu rušit. Kdybys mě potřeboval, víš, kde mě najdeš.';
+const FRONTA_MAX = 5;
 
 type Listener = () => void;
 
@@ -35,11 +46,17 @@ class BublinaStore {
   private hideTimer: ReturnType<typeof setTimeout> | null = null;
   /** Kolizní plocha (chat/TM/editory) — hlásí VypravecRoot při navigaci. */
   private kolizni = false;
-  /** Fronta doručení (03 §5: oslava/tip se doručí až MIMO kolizní plochu). */
+  /** Fronta doručení: kolize (03 §5) i obsazená klidná plocha (N1). */
   private fronta: Bublina[] = [];
 
   nastavKolizni(kolizni: boolean): void {
     this.kolizni = kolizni;
+  }
+
+  /** Změna identity (logout/login bez reloadu) — fronta nesmí přetéct k jinému účtu. */
+  vycistiProUzivatele(): void {
+    this.fronta = [];
+    this.zmiz();
   }
 
   getSnapshot = (): Bublina | null => this.aktualni;
@@ -51,10 +68,20 @@ class BublinaStore {
     for (const fn of this.listeners) fn();
   }
 
+  /** Bublina je zobrazená, nebo už čeká ve frontě (dedup dle klíče/textu). */
+  private jeEvidovana(b: Bublina): boolean {
+    const stejna = (x: Bublina): boolean =>
+      b.dismissKey ? x.dismissKey === b.dismissKey : x.text === b.text;
+    return (
+      (this.aktualni != null && stejna(this.aktualni)) ||
+      this.fronta.some(stejna)
+    );
+  }
+
   /**
-   * Zobraz bublinu — respektuje dismissed + režim spí (mimo rozlučku).
-   * Vrací true jen při skutečném zobrazení (telemetrie nesmí lhát).
-   * Priorita: oslava NIKDY nepřepíše zobrazený tip/chybu s CTA.
+   * Zobraz (nebo zařaď) bublinu — respektuje dismissed + režim spí (mimo
+   * rozlučku). Vrací false, když se bublina NIKAM nedostala (dismissed,
+   * spí, plná fronta) — true znamená „zobrazena teď, nebo čeká ve frontě".
    */
   show(b: Bublina): boolean {
     const s = onboardingStore.getSnapshot();
@@ -63,22 +90,35 @@ class BublinaStore {
     if (b.dismissKey && b.sessionDismiss && this.sessionDismissed().has(b.dismissKey))
       return false;
     if (s.mode === 'onCall' && !b.oslava) return false;
-    if (b.oslava && this.aktualni?.akce) return false; // priorita rady nad oslavou
-    // Kolizní plocha: chybová vysvětlení (sessionDismiss) se ukážou hned
-    // (kontext chyby), oslavy/tipy počkají ve frontě na klidnou plochu.
-    if (this.kolizni && !b.sessionDismiss) {
-      if (
-        this.fronta.length < 3 &&
-        !this.fronta.some((f) => f.text === b.text)
-      )
-        this.fronta.push(b);
-      return true; // doručí se — jen později
+    if (this.jeEvidovana(b)) return true; // už visí/čeká — nespamovat frontu
+    // Do fronty místo zobrazení: (a) kolizní plocha a není to chybové
+    // vysvětlení (to má kontext na místě chyby), (b) něco už visí — přepis
+    // by tiše zahodil zobrazený obsah (N1) i oslavu blokovanou radou (N6).
+    const doFronty =
+      (this.kolizni && !b.sessionDismiss) || this.aktualni != null;
+    if (doFronty) {
+      if (this.fronta.length >= FRONTA_MAX) return false; // drop = přiznat (N2)
+      this.fronta.push(b);
+      return true;
     }
+    this.zobraz(b);
+    return true;
+  }
+
+  /** Skutečné zobrazení — jediné místo, kde se volá priZobrazeni. */
+  private zobraz(b: Bublina): void {
     if (this.hideTimer) clearTimeout(this.hideTimer);
     this.aktualni = { ...b, route: window.location.pathname };
     if (b.oslava) this.hideTimer = setTimeout(() => this.zmiz(), 8000);
     this.notify();
-    return true;
+    b.priZobrazeni?.();
+  }
+
+  /** Další z fronty, pokud je klidno a nic nevisí (re-check dismissed/spí). */
+  private dorucFrontu(): void {
+    if (this.kolizni || this.aktualni || this.fronta.length === 0) return;
+    const dalsi = this.fronta.shift();
+    if (dalsi) this.show(dalsi);
   }
 
   private sessionDismissed(): Set<string> {
@@ -94,11 +134,7 @@ class BublinaStore {
   /** Zavření při ODCHODU z routy (03 §3) — příchozí bublinu nezabíjí. */
   zavriPriOdchodu(pathname: string): void {
     if (this.aktualni && this.aktualni.route !== pathname) this.zmiz();
-    // Klidná plocha a nic nevisí → doruč frontu (show znovu ověří dismissed).
-    if (!this.kolizni && !this.aktualni && this.fronta.length > 0) {
-      const dalsi = this.fronta.shift();
-      if (dalsi) this.show(dalsi);
-    }
+    this.dorucFrontu();
   }
 
   /** Odchod z routy — tip zmizí bez penalizace čítače (03 §3). */
@@ -106,6 +142,7 @@ class BublinaStore {
     if (this.hideTimer) clearTimeout(this.hideTimer);
     this.aktualni = null;
     this.notify();
+    this.dorucFrontu();
   }
 
   /** Uživatel klikl na CTA — interakce resetuje auto-tichý čítač. */

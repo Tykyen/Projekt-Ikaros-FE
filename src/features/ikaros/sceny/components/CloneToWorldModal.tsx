@@ -1,3 +1,4 @@
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
  * 22.5 — výběr cílového světa pro naklonování scény z katalogu. Nabízí jen
  * světy, kde je uživatel PJ+ (BE `POST /maps` vyžaduje `assertCanManage` = PJ;
@@ -37,12 +38,15 @@ export function CloneToWorldModal({
   );
 
   const clone = useMutation({
-    mutationFn: (worldId: string) =>
-      api.post<{ id: string }>('/maps', {
+    mutationFn: async (worldId: string) => {
+      const scene = await api.post<{ id: string }>('/maps', {
         worldId,
         templateId,
         name: sceneName,
-      }),
+      });
+      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
+      return scene;
+    },
     onSuccess: (_scene, worldId) => {
       const entry = eligible.find((e) => e.world.id === worldId);
       const slug = entry?.world.slug;

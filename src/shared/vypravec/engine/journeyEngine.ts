@@ -200,6 +200,21 @@ export function krokSplnen(jId: string, stepId: string, at?: string): void {
   }
 }
 
+/**
+ * N3 — start „Prvních dnů ve světě" i z menu Cesty (ne jen z bubliny):
+ * fixaci světa převezme z dokončené hrac-start.
+ */
+export function startHracVeSvete(): void {
+  const klic = aktualniKlic('hrac-start');
+  const prog = onboardingStore.getSnapshot().journeys[klic];
+  startCesty(
+    'hrac-ve-svete',
+    prog?.contextWorldId
+      ? { id: prog.contextWorldId, slug: ctiSlug(klic) }
+      : undefined,
+  );
+}
+
 /** Přeskočit = odškrtnout teď (skipAllowed je u všech kroků MVP). */
 export const preskocitKrok = (jId: string, stepId: string): void =>
   krokSplnen(jId, stepId);
@@ -446,6 +461,10 @@ function zpracujMilniky(e: VypravecEvent): void {
       oslava: true,
     });
   }
+  // 05 §6 — „První svět": tichý zápis (oslavu nese dokončení cesty/krok 1;
+  // dvojitá oslava by byla inflace). Kronika záznam ukáže.
+  if (e.name === 'world.created' && !s.milestones['prvni.svet'])
+    onboardingStore.aplikuj({ milestones: { 'prvni.svet': e.at } });
   // 05 §6 — první HERNÍ akce (ne administrativní): první hod kostkou.
   if (e.name === 'dice.rolled' && !s.milestones['prvni.hod']) {
     onboardingStore.aplikuj({ milestones: { 'prvni.hod': e.at } });
@@ -495,6 +514,7 @@ export function zkontrolujCekaniHrace(ctx?: {
     const slug = ctiSlug(hsKlic);
     bublinaStore.show({
       dismissKey: 'hrac.postava-na-svete',
+      sessionDismiss: true, // „Teď ne" = odklad, ne odmítnutí navždy (N3)
       text: 'Postava je na světě. Pojď — provedu tě prvními dny: postava, stůl, svět.',
       akce: {
         label: 'Jdeme na to',

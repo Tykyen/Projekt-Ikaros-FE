@@ -69,11 +69,18 @@ export const TM_VYCVIK: Journey = {
         },
         {
           id: 'tm.orchestrace',
-          title: 'Řiď scény',
+          title: 'Rozděl jednotky',
           narratorLine:
-            'Velitel řídí víc front najednou. Aktivuj scénu v orchestraci — hráče na ni přiřadíš tamtéž.',
+            'Velitel určuje, kdo kde bojuje. V orchestraci přiřaď hráče na scénu — nebo scénu odstav, když dohrála.',
           cta: { label: 'Otevřít mapu', to: '/svet/:worldSlug/takticka-mapa' },
-          done: { kind: 'fe-event', event: 'scene.activated' },
+          // Přiřazení JINÉHO člena (scene.assigned) ∨ deaktivace scény —
+          // obojí je skutečný orchestrální tah; aktivace vzniká už založením
+          // scény (krok 1), tou se velet nedá (verifikace 07/23).
+          done: {
+            kind: 'fe-event',
+            event: 'scene.assigned',
+            altEvents: [{ event: 'scene.deactivated' }],
+          },
           topicId: 'insitu.orchestrace',
           skipAllowed: true,
           estMin: 3,

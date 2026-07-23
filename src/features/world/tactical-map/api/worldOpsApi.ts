@@ -7,7 +7,10 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.7.
  */
+import { getDefaultStore } from 'jotai';
 import { api } from '@/shared/api/client';
+import { currentUserAtom } from '@/shared/store/authStore';
+import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import type {
   WorldOperation,
   ApplyWorldOperationResponse,
@@ -26,10 +29,22 @@ export function postWorldOperation(
   worldId: string,
   op: WorldOperation,
 ): Promise<ApplyWorldOperationResponse> {
-  return api.post<ApplyWorldOperationResponse>(
-    `/worlds/${worldId}/operations`,
-    op,
-  );
+  return api
+    .post<ApplyWorldOperationResponse>(`/worlds/${worldId}/operations`, op)
+    .then((res) => {
+      // Vypravěč (tm-vycvik „Rozděl jednotky"): přiřazení JINÉHO člena =
+      // skutečná orchestrace; self-assign při zakládání scény se nepočítá.
+      const ja = getDefaultStore().get(currentUserAtom)?.id;
+      const cil = (op as { userId?: string }).userId;
+      if (
+        (op.type === 'member.assignToScene' ||
+          op.type === 'member.bulkAssignToScene') &&
+        cil !== undefined &&
+        cil !== ja
+      )
+        vypravecEmit('scene.assigned', { worldId });
+      return res;
+    });
 }
 
 /** Catch-up cross-scene log (PJ-only — server enforce). */

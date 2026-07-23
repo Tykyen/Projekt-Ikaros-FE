@@ -33,6 +33,11 @@ function cerstvyUzivatel(): void {
 
 beforeEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
+  // Fronta bublin je modulový singleton — bez resetu prosakuje mezi testy
+  // (serializační sémantika 07/23: show nepřepisuje, řadí do fronty).
+  bublinaStore.vycistiProUzivatele();
+  bublinaStore.nastavKolizni(false);
   zapojJourneyEngine();
   cerstvyUzivatel();
   startCesty('pj-start');
@@ -302,7 +307,11 @@ describe('v2 — tm-vycvik (Měďák) + milník první hráč', () => {
     const akt = aktivniCesta();
     expect(akt?.hotovo.size).toBe(4);
     expect(akt?.dalsiKrok?.id).toBe('tm.orchestrace');
+    // krok 5 = skutečná orchestrace: přiřazení hráče ∨ deaktivace scény
+    // (scene.activated NENÍ done — vystřelí už při založení scény v kroku 1)
     vypravecEmit('scene.activated', {});
+    expect(aktivniCesta()).not.toBeNull();
+    vypravecEmit('scene.assigned', {});
     expect(aktivniCesta()).toBeNull(); // dokončeno
     expect(bublinaStore.getSnapshot()?.text).toContain('Výcvik dokončen');
   });
@@ -387,5 +396,58 @@ describe('F5 rozšíření — hrac-ve-svete + milník první hod', () => {
     bublinaStore.zmiz();
     vypravecEmit('dice.rolled', { worldId: 'w-1' });
     expect(bublinaStore.getSnapshot()).toBeNull();
+  });
+});
+
+describe('verifikace 07/23 — serializace bublin', () => {
+  it('show na obsazené klidné ploše NEpřepisuje — řadí do fronty', () => {
+    bublinaStore.zmiz();
+    bublinaStore.show({ text: 'První' });
+    bublinaStore.show({ text: 'Druhá' });
+    expect(bublinaStore.getSnapshot()?.text).toBe('První'); // žádný přepis
+    bublinaStore.zmiz(); // zavření doručí frontu
+    expect(bublinaStore.getSnapshot()?.text).toBe('Druhá');
+    bublinaStore.zmiz();
+  });
+
+  it('priZobrazeni se volá až při SKUTEČNÉM zobrazení, ne při zařazení', () => {
+    bublinaStore.zmiz();
+    let zobrazeno = 0;
+    bublinaStore.show({ text: 'Visící' });
+    bublinaStore.show({ text: 'Čekající', priZobrazeni: () => zobrazeno++ });
+    expect(zobrazeno).toBe(0); // jen ve frontě
+    bublinaStore.zmiz();
+    expect(zobrazeno).toBe(1); // doručeno z fronty
+    bublinaStore.zmiz();
+  });
+
+  it('plná fronta → show vrací false (drop se přiznává)', () => {
+    bublinaStore.zmiz();
+    bublinaStore.show({ text: 'A' }); // zobrazena
+    for (let i = 0; i < 5; i++)
+      expect(bublinaStore.show({ text: `F${i}` })).toBe(true);
+    expect(bublinaStore.show({ text: 'přeteklá' })).toBe(false);
+    bublinaStore.vycistiProUzivatele();
+  });
+
+  it('oslava blokovaná zobrazenou radou se zařadí, neztratí (N6)', () => {
+    bublinaStore.zmiz();
+    bublinaStore.show({ text: 'Rada', akce: { label: 'CTA', to: '/x' } });
+    expect(bublinaStore.show({ text: 'Oslava', oslava: true })).toBe(true);
+    bublinaStore.zmiz(); // rada pryč → oslava z fronty
+    expect(bublinaStore.getSnapshot()?.text).toBe('Oslava');
+    bublinaStore.vycistiProUzivatele();
+  });
+
+  it('dedup: týž dismissKey se do fronty nezařadí dvakrát', () => {
+    bublinaStore.zmiz();
+    bublinaStore.show({ text: 'Visící' });
+    bublinaStore.show({ dismissKey: 'k1', text: 'tip verze 1' });
+    bublinaStore.show({ dismissKey: 'k1', text: 'tip verze 2' });
+    bublinaStore.zmiz();
+    expect(bublinaStore.getSnapshot()?.text).toBe('tip verze 1');
+    bublinaStore.zmiz();
+    expect(bublinaStore.getSnapshot()).toBeNull(); // druhá se nezařadila
+    bublinaStore.vycistiProUzivatele();
   });
 });

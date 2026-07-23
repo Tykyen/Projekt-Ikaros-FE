@@ -14,9 +14,9 @@ import { vypravecEmit } from '@/shared/vypravec/engine/events';
  * Spec: docs/arch/phase-17/spec-17.2.md §4.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, apiClient } from '@/shared/api/client';
+import { api } from '@/shared/api/client';
 import { useUploadImage } from '@/shared/api/useUploadImage';
-import { postMapOperation } from '../api/mapApi';
+import { postMapOperation, activateMapScene } from '../api/mapApi';
 import { postWorldOperation } from '../api/worldOpsApi';
 import { mapSceneQueryKey } from '../hooks/useMapScene';
 import { activeScenesQueryKey } from '../hooks/useActiveScenes';
@@ -73,9 +73,7 @@ export function useImportUvttScene(worldId: string, currentUserId: string) {
       }
 
       // Aktivovat + přepnout PJ na novou scénu
-      await apiClient.post(`/maps/${scene.id}/active`, undefined, {
-        params: { worldId },
-      });
+      await activateMapScene(scene.id, worldId);
       await postWorldOperation(worldId, {
         type: 'member.assignToScene',
         userId: currentUserId,

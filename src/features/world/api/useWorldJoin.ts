@@ -11,13 +11,13 @@ import type { WorldMembership, WorldAccessRequest } from '@/shared/types';
 export function useJoinWorld() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (worldId: string) =>
+    mutationFn: ({ worldId }: { worldId: string; worldSlug?: string }) =>
       api.post<WorldMembership>(`/worlds/${worldId}/join`),
-    onSuccess: (_membership, worldId) => {
+    onSuccess: (_membership, { worldId, worldSlug }) => {
       // C-01 — broad ['worlds'] prefixuje VŠECHNY world dotazy vč. detailu
       // ['worlds','id'|'slug',key]; ['worlds',worldId] detail netrefí (segment [1]).
       qc.invalidateQueries({ queryKey: ['worlds'] });
-      vypravecEmit('join.requested', { worldId }); // Vypravěč (spec 26.4)
+      vypravecEmit('join.requested', { worldId, worldSlug }); // Vypravěč (spec 26.4)
     },
   });
 }
@@ -35,6 +35,7 @@ export function useRequestAccess() {
       characterDraft,
     }: {
       worldId: string;
+      worldSlug?: string;
       characterDraft?: { name: string; note?: string };
     }) =>
       api.post<WorldAccessRequest>(
@@ -43,7 +44,10 @@ export function useRequestAccess() {
       ),
     onSuccess: (_req, vars) => {
       qc.invalidateQueries({ queryKey: ['worlds', 'my-access-requests'] });
-      vypravecEmit('join.requested', { worldId: vars.worldId }); // Vypravěč (spec 26.4)
+      vypravecEmit('join.requested', {
+        worldId: vars.worldId,
+        worldSlug: vars.worldSlug,
+      }); // Vypravěč (spec 26.4)
     },
   });
 }

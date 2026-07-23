@@ -29,7 +29,7 @@ describe('useJoinWorld', () => {
     const spy = vi.spyOn(qc, 'invalidateQueries');
     const { result } = renderHook(() => useJoinWorld(), { wrapper });
     await act(async () => {
-      await result.current.mutateAsync('w1');
+      await result.current.mutateAsync({ worldId: 'w1' });
     });
     const keys = spy.mock.calls.map((c) => c[0]?.queryKey);
     expect(keys).toContainEqual(['worlds']);

@@ -174,6 +174,8 @@ class OnboardingStore {
   /** Roste s každým úspěšným PATCHem — resync s ním hlídá stale GET. */
   private syncGen = 0;
   private initDone = false;
+  /** N4: init BĚŽÍ ≠ init HOTOVÝ — brány (C11) čekají na doběhnutí GETu. */
+  private initLetJiz = false;
   /** GET doběhl a uživatel je čerstvý (žádný state, ne legacy) — moment 1 (26.4). */
   jeNovy = false;
   /** Init (GET) doběhl — moment 2 u přihlášeného čeká na tohle (C11). */
@@ -292,9 +294,14 @@ class OnboardingStore {
    */
   async init(): Promise<void> {
     this.zajistiKontext();
-    if (this.initDone || this.ctxUid === 'anon' || this.ctxUid === 'nenacteno')
+    if (
+      this.initDone ||
+      this.initLetJiz ||
+      this.ctxUid === 'anon' ||
+      this.ctxUid === 'nenacteno'
+    )
       return;
-    this.initDone = true;
+    this.initLetJiz = true;
     try {
       const res = await api.get<{
         state: OnboardingStateFE | null;
@@ -316,9 +323,15 @@ class OnboardingStore {
         this.jeNovy = true; // moment 1 (persona dialog) — spotřebuje D7
         this.notify();
       }
+      // Hotovo až PO zpracování odpovědi — během letícího GETu se brány
+      // (replika 9, „Poprvé tady?") nesmí rozhodovat nad stale lokálem (N4).
+      this.initDone = true;
+      this.notify();
       await this.sync();
     } catch {
-      this.initDone = false; // příští pokus (offline start)
+      /* offline start — příští pokus */
+    } finally {
+      this.initLetJiz = false;
     }
   }
 

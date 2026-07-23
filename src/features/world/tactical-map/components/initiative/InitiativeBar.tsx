@@ -107,8 +107,31 @@ export function InitiativeBar({
     return () => root.style.setProperty('--map-inset-top', '0px');
   });
 
-  // Empty = lišta skrytá (pro danou roli není co zobrazit).
-  if (visibleCombatants.length === 0 && visibleBench.length === 0) return null;
+  // Měďákův vstup do nápovědy — musí existovat i bez lišty (verifikace
+  // 07/23: prázdná scéna = přesně fáze prvních kroků výcviku).
+  const medakBtn = onHelp ? (
+    <button
+      type="button"
+      className={styles.medakBtn}
+      onClick={onHelp}
+      aria-label="Vypravěč — Měďákova nápověda k mapě"
+      title="Vypravěč — Měďákova nápověda k mapě"
+    >
+      <picture>
+        <source
+          type="image/webp"
+          srcSet={`${medakAvatarWebp96} 1x, ${medakAvatarWebp192} 2x`}
+        />
+        <img src={medakAvatarPng} alt="" className={styles.medakImg} />
+      </picture>
+    </button>
+  ) : null;
+
+  // Empty = lišta skrytá (pro danou roli není co zobrazit) — Měďák zůstává.
+  if (visibleCombatants.length === 0 && visibleBench.length === 0)
+    return medakBtn ? (
+      <div className={styles.soloMedak}>{medakBtn}</div>
+    ) : null;
 
   const canEditInit = (token: MapToken): boolean =>
     isPj || myCharacterSlugs.includes(token.characterSlug);
@@ -128,6 +151,7 @@ export function InitiativeBar({
         >
           ⚔ Zobrazit bojovou lištu ▾
         </button>
+        {medakBtn}
       </div>
     );
   }
@@ -200,25 +224,7 @@ export function InitiativeBar({
         ))}
       </div>
 
-      {onHelp && (
-        /* Varianta A (07/23): tvář nápovědy mapy je Měďák — otevírá panel
-           Vypravěče (legacy tahák je v něm jako topik). */
-        <button
-          type="button"
-          className={styles.medakBtn}
-          onClick={onHelp}
-          aria-label="Vypravěč — Měďákova nápověda k mapě"
-          title="Vypravěč — Měďákova nápověda k mapě"
-        >
-          <picture>
-            <source
-              type="image/webp"
-              srcSet={`${medakAvatarWebp96} 1x, ${medakAvatarWebp192} 2x`}
-            />
-            <img src={medakAvatarPng} alt="" className={styles.medakImg} />
-          </picture>
-        </button>
-      )}
+      {medakBtn}
       <button
         type="button"
         className={styles.collapseBtn}

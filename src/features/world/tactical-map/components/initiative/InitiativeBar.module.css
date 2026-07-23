@@ -141,3 +141,11 @@
     height: 44px;
   }
 }
+
+/* Měďák bez lišty (prázdná scéna) — stejná pozice jako lišta vpravo nahoře */
+.soloMedak {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+}

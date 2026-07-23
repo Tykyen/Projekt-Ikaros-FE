@@ -7,7 +7,7 @@
  * Skrytí (03 §5): kolizní routy (typované proti registru spec 26.0) +
  * otevřená mobilní klávesnice (visualViewport heuristika).
  * Zkratka Shift+V (mimo input/textarea/contentEditable), Esc zavírá,
- * po zavření focus zpět na FAB. Panel je lazy — eager jen FAB + siluety.
+ * po zavření focus zpět na FAB. Panel je lazy — eager jen FAB (siluety = odložený v2 koncept, viz siluety.tsx).
  */
 import {
   lazy,
@@ -33,6 +33,7 @@ import { onboardingStore, zapojFlush } from '../state/onboardingStore';
 import {
   aktivniCesta,
   aktualniKlic,
+  bazoveId,
   postupCesty,
   probeResync,
   startCesty,
@@ -115,6 +116,15 @@ export function VypravecRoot({
   // Platformní Admin/Superadmin → audience 'admin' (role.admin-elevace aj.)
   const jePlatformniAdmin =
     uzivatel != null && uzivatel.role <= UserRole.Admin;
+  // N8 — fronta bublin nesmí přetéct k jinému účtu (logout/login bez reloadu).
+  const minulyUserId = useRef<string | null>(userId);
+  useEffect(() => {
+    if (minulyUserId.current !== userId) {
+      minulyUserId.current = userId;
+      bublinaStore.vycistiProUzivatele();
+    }
+  }, [userId]);
+
   useEffect(() => {
     zapojFlush();
     zapojJourneyEngine();
@@ -210,10 +220,11 @@ export function VypravecRoot({
   useEffect(() => {
     if (scope !== 'world' || !userId || !onboardingStore.initHotovo) return;
     if (onboarding.dismissed.includes('predani-joe')) return;
-    const ok = bublinaStore.show({
+    bublinaStore.show({
       text: '„Tady moje chodby končí. Tohle je Joe — uvnitř tě povede ona." A Joe? „Vítej. Posvítíme na to spolu."',
+      // Konzumace až při SKUTEČNÉM zobrazení — fronta/přepis beat nespálí (N1/N2).
+      priZobrazeni: () => onboardingStore.zavritTip('predani-joe'),
     });
-    if (ok) onboardingStore.zavritTip('predani-joe');
   }, [scope, userId, onboarding]);
 
   // Rozhodnutí 13 (00 §3) — veterán (backfill) nedostane persona dialog;
@@ -261,10 +272,16 @@ export function VypravecRoot({
       localStorage.setItem(klic, String(ted));
       if (!minule || ted - minule < 7 * 24 * 3600 * 1000) return;
       if (sessionStorage.getItem('vypravec:vitej-zpet')) return;
-      sessionStorage.setItem('vypravec:vitej-zpet', '1');
       bublinaStore.show({
         text: 'Vítej zpět. Zatímco jsi byl pryč, pár věcí se pohnulo — mrknem na ně?',
         akce: { label: 'Co je nového', onClick: () => setOtevreny(true) },
+        priZobrazeni: () => {
+          try {
+            sessionStorage.setItem('vypravec:vitej-zpet', '1');
+          } catch {
+            /* noop */
+          }
+        },
       });
     } catch {
       /* private mode — bez uvítání */
@@ -277,19 +294,28 @@ export function VypravecRoot({
     if (!userId || !onboardingStore.initHotovo) return;
     if (aktivniCesta()) return; // běžící cesta má JourneyBar
     const s = onboardingStore.getSnapshot();
-    const pauznuta = Object.entries(s.journeys).find(
-      ([, p]) => p.pausedAt && !p.dismissedAt,
-    );
+    const pauznuta = Object.entries(s.journeys).find(([jId, p]) => {
+      if (!p.pausedAt || p.dismissedAt) return false;
+      // Cross-device merge umí pauznutou cestu dokončit — tu nenabízet (N11).
+      const postup = postupCesty(bazoveId(jId));
+      return postup.celkem > 0 && postup.hotovo < postup.celkem;
+    });
     if (!pauznuta) return;
     try {
       if (sessionStorage.getItem('vypravec:navrat-nabidnut')) return;
-      sessionStorage.setItem('vypravec:navrat-nabidnut', '1');
     } catch {
       return;
     }
     bublinaStore.show({
       text: 'Máš rozdělanou cestu. Pokračujeme, kde jsme skončili?',
       akce: { label: 'Pokračovat', onClick: () => setOtevreny(true) },
+      priZobrazeni: () => {
+        try {
+          sessionStorage.setItem('vypravec:navrat-nabidnut', '1');
+        } catch {
+          /* noop */
+        }
+      },
     });
   }, [userId, onboarding]);
 

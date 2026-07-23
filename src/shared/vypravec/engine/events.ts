@@ -25,6 +25,8 @@ export type VypravecEventName =
   | 'token.spawned'
   | 'fog.used'
   | 'initiative.started'
+  | 'scene.assigned'
+  | 'scene.deactivated'
   | 'member.approved'
   // Nábory (LFG) — gateOpened alternativa PJ + „ozvi se" hráče (05 §3–4):
   | 'nabor.created'

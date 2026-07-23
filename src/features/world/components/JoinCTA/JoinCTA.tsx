@@ -76,7 +76,7 @@ export function JoinCTA({ world }: Props) {
               promptLogin();
               return;
             }
-            join.mutate(world.id, {
+            join.mutate({ worldId: world.id, worldSlug: world.slug }, {
               onSuccess: () => {
                 toast.success(`Vstoupil jsi do světa ${world.name}.`);
               },
@@ -106,7 +106,7 @@ export function JoinCTA({ world }: Props) {
       return;
     }
     requestAccess.mutate(
-      { worldId: world.id },
+      { worldId: world.id, worldSlug: world.slug },
       {
         onSuccess: () => toast.success('Žádost o vstup byla odeslána.'),
         onError: () => toast.error('Žádost se nezdařila. Zkus to znovu.'),

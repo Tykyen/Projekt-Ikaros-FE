@@ -11,7 +11,7 @@
  *
  * Spec: docs/arch/phase-10/spec-10.2c.md §3.7.
  */
-import { api } from '@/shared/api/client';
+import { api, apiClient } from '@/shared/api/client';
 import {
   vypravecEmit,
   type VypravecEventName,
@@ -59,9 +59,26 @@ const TM_VYPRAVEC_EVENTY: Partial<Record<string, VypravecEventName>> = {
   'token.add': 'token.spawned',
   'fog.brush': 'fog.used',
   'fog.set': 'fog.used',
-  'scene.activate': 'scene.activated',
+  'scene.activate': 'scene.activated', // jen BE inverse/undo replay
+  'scene.deactivate': 'scene.deactivated',
   'combat.start': 'initiative.started',
 };
+
+/**
+ * Aktivace scény jde REST endpointem MIMO ops pipeline — bez tohohle
+ * helperu by 'scene.activated' nikdy nevystřelil (verifikace 07/23).
+ */
+export function activateMapScene(
+  sceneId: string,
+  worldId: string,
+): Promise<unknown> {
+  return apiClient
+    .post(`/maps/${sceneId}/active`, undefined, { params: { worldId } })
+    .then((res) => {
+      vypravecEmit('scene.activated', { worldId });
+      return res;
+    });
+}
 
 export function postMapOperation(
   sceneId: string,

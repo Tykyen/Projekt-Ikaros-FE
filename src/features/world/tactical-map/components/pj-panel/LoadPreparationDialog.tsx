@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Modal, Button } from '@/shared/ui';
-import { api, apiClient, parseApiError } from '@/shared/api/client';
+import { api, parseApiError } from '@/shared/api/client';
 import {
   useCampaignScenarios,
   useCampaignSubjects,
@@ -11,7 +11,7 @@ import {
 import { getMeta, mergeMeta } from '@/features/world/campaign/scenarioMeta';
 import { campaignKeys } from '@/features/world/campaign/api';
 import { postWorldOperation } from '../../api/worldOpsApi';
-import { postMapOperation } from '../../api/mapApi';
+import { postMapOperation, activateMapScene } from '../../api/mapApi';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
 import s from './LoadPreparationDialog.module.css';
@@ -141,9 +141,7 @@ export function LoadPreparationDialog({
       }
 
       // 4) Aktivuj scénu a přepni na ni PJ.
-      await apiClient.post(`/maps/${created.id}/active`, undefined, {
-        params: { worldId },
-      });
+      await activateMapScene(created.id, worldId);
       await postWorldOperation(worldId, {
         type: 'member.assignToScene',
         userId: currentUserId,

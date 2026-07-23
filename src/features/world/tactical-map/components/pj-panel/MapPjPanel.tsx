@@ -15,11 +15,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useActiveScenes } from '../../hooks/useActiveScenes';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
-import { api, apiClient, parseApiError } from '@/shared/api/client';
+import { api, parseApiError } from '@/shared/api/client';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
 import { ConfirmDialog } from '@/shared/ui';
 import { postWorldOperation } from '../../api/worldOpsApi';
-import { postMapOperation } from '../../api/mapApi';
+import { postMapOperation, activateMapScene } from '../../api/mapApi';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
 import { ActiveScenesList } from './ActiveScenesList';
 import { PaletteAccordion } from './PaletteAccordion';
@@ -209,9 +209,8 @@ export function MapPjPanel({
           config: { size: 40, originX: 0, originY: 0, showGrid: true },
         },
       );
-      await apiClient.post(`/maps/${scene.id}/active`, undefined, {
-        params: { worldId },
-      });
+      vypravecEmit('scene.created', { worldId }); // hned po POST — activate/assign může spadnout
+      await activateMapScene(scene.id, worldId);
       await postWorldOperation(worldId, {
         type: 'member.assignToScene',
         userId: currentUserId,
@@ -220,7 +219,6 @@ export function MapPjPanel({
       return scene;
     },
     onSuccess: () => {
-      vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
       void queryClient.invalidateQueries({
         queryKey: ['worlds', worldId, 'members'],

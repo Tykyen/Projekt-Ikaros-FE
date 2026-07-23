@@ -1,3 +1,4 @@
+import { activateMapScene } from '../../api/mapApi';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
  * 10.2c-edit — MapLibraryModal (knihovna map / templates).
@@ -16,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 import { Modal, Button, ConfirmDialog } from '@/shared/ui';
-import { api, apiClient } from '@/shared/api/client';
+import { api } from '@/shared/api/client';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { mapSceneQueryKey } from '../../hooks/useMapScene';
 import { activeScenesQueryKey } from '../../hooks/useActiveScenes';
@@ -119,9 +120,7 @@ export function MapLibraryModal({
       vypravecEmit('scene.created', { worldId }); // Vypravěč (tm-vycvik)
 
       // 2. Aktivovat scénu (paralelně, nemizí ostatní díky setActive fixu)
-      await apiClient.post(`/maps/${newScene.id}/active`, undefined, {
-        params: { worldId },
-      });
+      await activateMapScene(newScene.id, worldId);
 
       // 3. Přepnout PJ self na novou scénu
       await postWorldOperation(worldId, {

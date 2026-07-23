@@ -32,6 +32,7 @@ import {
   pauzaCesty,
   postupCesty,
   startCesty,
+  startHracVeSvete,
   zrusitCestu,
 } from '../engine/journeyEngine';
 import { api } from '@/shared/api';
@@ -285,6 +286,10 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
     { id: string; slug?: string; name: string }[]
   >([]);
   async function klikZacit(cestaId: string, binding?: string): Promise<void> {
+    if (cestaId === 'hrac-ve-svete') {
+      startHracVeSvete(); // fixace z dokončené hrac-start (N3)
+      return;
+    }
     if (binding === 'creates') {
       try {
         const data = await api.get<MyWorldEntry[]>('/worlds/my');
@@ -327,13 +332,20 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
               stav.persona === 'pj' ||
               Boolean(stav.journeys[aktualniKlic('pj-start')]),
           )
-          // hrac-ve-svete startuje CTA z bubliny „Postava je na světě"
-          // (potřebuje fixaci světa) — v menu jen když už běží/běžela.
-          .filter(
-            (c) =>
-              c.id !== 'hrac-ve-svete' ||
-              Boolean(stav.journeys[aktualniKlic('hrac-ve-svete')]),
-          )
+          // hrac-ve-svete: v menu když už běží/běžela, NEBO když je
+          // hrac-start dokončená s fixací (start si ji převezme — N3).
+          .filter((c) => {
+            if (c.id !== 'hrac-ve-svete') return true;
+            if (stav.journeys[aktualniKlic('hrac-ve-svete')]) return true;
+            const hs = postupCesty('hrac-start');
+            return (
+              hs.celkem > 0 &&
+              hs.hotovo >= hs.celkem &&
+              Boolean(
+                stav.journeys[aktualniKlic('hrac-start')]?.contextWorldId,
+              )
+            );
+          })
           .map((c) => {
           const prog = stav.journeys[aktualniKlic(c.id)];
           const { hotovo, celkem } = postupCesty(c.id);

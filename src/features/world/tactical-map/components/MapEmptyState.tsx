@@ -1,3 +1,4 @@
+import { activateMapScene } from '../api/mapApi';
 import { vypravecReportEmpty } from '@/shared/vypravec/registry/emptyStates';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
 /**
@@ -24,7 +25,7 @@ import { vypravecEmit } from '@/shared/vypravec/engine/events';
  */
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, apiClient } from '@/shared/api/client';
+import { api } from '@/shared/api/client';
 import { stateIllustrationSrc } from '@/shared/ui';
 import { postWorldOperation } from '../api/worldOpsApi';
 import { mapSceneQueryKey } from '../hooks/useMapScene';
@@ -128,9 +129,7 @@ export function MapEmptyState({
       // a `useMapScene` by stále vracelo 404 (membership.currentSceneId
       // sice nastavený krokem 3, ale UX nekonzistence: scene visible v
       // mapě, ale PJ panel říká "Žádná aktivní scéna").
-      await apiClient.post(`/maps/${scene.id}/active`, undefined, {
-        params: { worldId },
-      });
+      if (worldId) await activateMapScene(scene.id, worldId);
       // 3) Auto-assign self (přes Operations API z 10.2-prep-1)
       if (worldId && currentUserId) {
         await postWorldOperation(worldId, {

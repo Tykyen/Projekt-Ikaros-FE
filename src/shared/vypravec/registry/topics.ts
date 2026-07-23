@@ -120,7 +120,10 @@ export const TOPIKY: readonly HelpTopic[] = [
         'Mezitím se můžeš rozhlédnout jinde: Putyka je otevřená všem a katalog světů má i veřejné světy bez čekání.',
       ],
     },
-    akce: [{ label: 'Katalog světů', to: '/ikaros/vesmiry' }],
+    akce: [
+      { label: 'Katalog světů', to: '/ikaros/vesmiry' },
+      { label: 'Napsat PJ (Pošta)', to: '/ikaros/posta' },
+    ],
     source: { kapitola: '09' },
     verifiedAt: '2026-07-22',
     status: 'funkcni',

@@ -6,7 +6,10 @@
  */
 import { bublinaStore } from '../ui/bublinaStore';
 
-const EMPTY_STATES: Record<string, { text: string; ctaLabel?: string }> = {
+const EMPTY_STATES: Record<
+  string,
+  { text: string; ctaLabel?: string; sessionDismiss?: boolean }
+> = {
   // Joe — hráč bez postavy (top zákys „postavu zakládá PJ")
   'moje-postava': {
     text: 'Postavu ti tady zakládá tvůj PJ — napiš mu. Až bude na světě, najdeš ji tady.',
@@ -21,9 +24,11 @@ const EMPTY_STATES: Record<string, { text: string; ctaLabel?: string }> = {
   'zadatel-ceka': {
     text: 'Tvá žádost leží u PJ. Dokud ji neschválí, brána zůstává zavřená — čekání není chyba.',
   },
-  // Měďák — hráč na TM bez přiřazené scény (07 §6, doložený top zákys)
+  // Měďák — hráč na TM bez přiřazené scény (07 §6, doložený top zákys).
+  // sessionDismiss → doručí se HNED na mapě (kontext), ne frontou až jinde.
   'tm-hrac-bez-sceny': {
     text: 'Klid, vojáku. Mapa není rozbitá — PJ tě zatím nepřiřadil na žádnou scénu. Až tě povolá, uvidíš ji tady.',
+    sessionDismiss: true,
   },
   // Joe — čerstvý svět: prázdný dashboard PJ (07 §6)
   'svet-dashboard-cerstvy': {
@@ -40,6 +45,7 @@ export function vypravecReportEmpty(
   if (!def) return;
   bublinaStore.show({
     dismissKey: `empty:${klic}`,
+    ...(def.sessionDismiss ? { sessionDismiss: true } : {}),
     text: def.text,
     ...(def.ctaLabel && opts.to
       ? { akce: { label: def.ctaLabel, to: opts.to } }
