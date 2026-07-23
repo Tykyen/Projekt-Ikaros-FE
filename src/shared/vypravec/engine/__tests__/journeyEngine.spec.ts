@@ -452,3 +452,28 @@ describe('verifikace 07/23 — serializace bublin', () => {
     bublinaStore.vycistiProUzivatele();
   });
 });
+
+describe('audit kolo 5 — per-uid klíče + čítač + badge', () => {
+  it('auto-tichý čítač NEpočítá chybová vysvětlení (nález 5)', () => {
+    bublinaStore.vycistiProUzivatele();
+    // 3× zavřená chybová bublina (kolizniOk/sessionDismiss) nesmí umlčet
+    for (let i = 0; i < 3; i++) {
+      bublinaStore.show({
+        dismissKey: `err.x${i}`,
+        sessionDismiss: true,
+        kolizniOk: true,
+        text: `chyba ${i}`,
+      });
+      bublinaStore.zavrit();
+    }
+    expect(onboardingStore.getSnapshot().mode).toBe('active');
+    // ale 3 zavřené TIPY umlčí
+    for (let i = 0; i < 3; i++) {
+      bublinaStore.show({ text: `tip ${i}`, akce: { label: 'x', to: '/y' } });
+      bublinaStore.zavrit();
+    }
+    expect(onboardingStore.getSnapshot().mode).toBe('onCall');
+    onboardingStore.nastavRezim('active');
+    bublinaStore.vycistiProUzivatele();
+  });
+});

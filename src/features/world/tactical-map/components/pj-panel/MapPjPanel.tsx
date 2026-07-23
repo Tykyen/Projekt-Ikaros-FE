@@ -225,6 +225,10 @@ export function MapPjPanel({
       // useReassignmentListener invaliduje sám. Tady defenzivně invalidujeme
       // i mapSceneQueryKey pokud current PJ na scéně byl.
       void queryClient.invalidateQueries({ queryKey: mapSceneQueryKey(worldId) });
+      // D-080/V-3: deaktivovaná scéna se hned objeví v „Neaktivní scény".
+      void queryClient.invalidateQueries({
+        queryKey: ['map', 'all-scenes', worldId],
+      });
       setPendingDeactivateId(null);
     },
     onError: (err) => {

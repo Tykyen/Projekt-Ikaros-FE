@@ -118,25 +118,35 @@ const MILNIK_LABELY: Record<string, string> = {
   'prvni.svet': 'První svět',
 };
 
-function kronikaZaznamy(): Array<{ at: string; text: string }> {
+function kronikaZaznamy(): {
+  zaznamy: Array<{ at: string; text: string }>;
+  viceNez: boolean;
+} {
   const s = onboardingStore.getSnapshot();
   const zaznamy: Array<{ at: string; text: string }> = [];
   for (const [k, at] of Object.entries(s.milestones))
     zaznamy.push({ at, text: MILNIK_LABELY[k] ?? k });
-  for (const [jId, p] of Object.entries(s.journeys)) {
-    const cesta = CESTY[bazoveId(jId)];
-    if (!cesta) continue;
+  // Jen AKTUÁLNÍ generace cesty (nález 9) — archivní ~n by kroky duplikovaly.
+  const hotove = new Set<string>();
+  for (const jId of Object.keys(s.journeys)) {
+    const base = bazoveId(jId);
+    if (hotove.has(base)) continue;
+    hotove.add(base);
+    const cesta = CESTY[base];
+    const p = s.journeys[aktualniKlic(base)];
+    if (!cesta || !p) continue;
     const kroky = cesta.phases.flatMap((f) => f.steps);
     for (const [sid, at] of Object.entries(p.steps ?? {})) {
       const krok = kroky.find((k) => k.id === sid);
       if (krok) zaznamy.push({ at, text: krok.title });
     }
   }
-  return zaznamy.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 30);
+  const serazene = zaznamy.sort((a, b) => b.at.localeCompare(a.at));
+  return { zaznamy: serazene.slice(0, 30), viceNez: serazene.length > 30 };
 }
 
 function KronikaView({ onZpet }: { onZpet: () => void }) {
-  const zaznamy = kronikaZaznamy();
+  const { zaznamy, viceNez } = kronikaZaznamy();
   return (
     <div>
       <button type="button" className={s.zpet} onClick={onZpet}>
@@ -149,6 +159,7 @@ function KronikaView({ onZpet }: { onZpet: () => void }) {
           <div className={s.zmenaTitul}>{z.text}</div>
         </div>
       ))}
+      {viceNez && <p className={s.poznamka}>… a starší.</p>}
     </div>
   );
 }
@@ -214,9 +225,11 @@ function TopicView({
           </Suspense>
         </VypravecChyba>
       )}
-      {topik.minAudienceNote && (
-        <p className={s.poznamka}>{topik.minAudienceNote}</p>
-      )}
+      {topik.minAudienceNote &&
+        (!topik.audience ||
+          !topik.audience.includes(
+            audience as import('../registry/types').VypravecAudience,
+          )) && <p className={s.poznamka}>{topik.minAudienceNote}</p>}
       {topik.akce
         ?.filter((a) => worldSlug || !a.to.includes(':worldSlug'))
         .map((a) => (
@@ -472,13 +485,19 @@ export default function VypravecPanel({
   // S2 „Zeptat se" — fulltext nad topiky+návody (engine/hledani).
   const [dotaz, setDotaz] = useState('');
   const nalezy = dotaz.trim().length >= 2 ? hledej(dotaz, audience) : [];
-  // Neúspěšné hledání hlásíme s prodlevou (až když uživatel dopsal).
+  // Neúspěšné hledání hlásíme s prodlevou (až když uživatel dopsal) a jen
+  // JEDNOU pro rostoucí dotaz (nález 10 — jinak série prefixů s userId).
+  const poslMiss = useRef('');
   useEffect(() => {
     if (dotaz.trim().length < 3 || nalezy.length > 0) return;
-    const t = setTimeout(
-      () => telemetrie('search_miss', { query: dotaz.trim().slice(0, 200) }),
-      1200,
-    );
+    const t = setTimeout(() => {
+      const q = dotaz.trim().slice(0, 200);
+      const p = poslMiss.current;
+      // prefix vztah (uživatel dopisuje totéž) → nepřidávat další záznam
+      if (p && (q.startsWith(p) || p.startsWith(q))) return;
+      poslMiss.current = q;
+      telemetrie('search_miss', { query: q });
+    }, 1200);
     return () => clearTimeout(t);
   }, [dotaz, nalezy.length]);
   // S3 badge „Co je nového" — po otevření pohledu se přepočítá na 0.
@@ -661,7 +680,7 @@ export default function VypravecPanel({
               ← Zpět
             </button>
             <div className={s.sekceLabel}>Co je nového</div>
-            {ZMENY.map((z) => (
+            {ZMENY.slice(0, 15).map((z) => (
               <div key={z.id} className={s.zmena}>
                 <div className={s.zmenaDatum}>{z.datum}</div>
                 <div className={s.zmenaTitul}>{z.titul}</div>
@@ -799,7 +818,7 @@ export default function VypravecPanel({
                   Návody
                 </button>
               </li>
-              {kronikaZaznamy().length >= 3 && (
+              {kronikaZaznamy().zaznamy.length >= 3 && (
                 <li>
                   <button
                     type="button"

@@ -628,7 +628,11 @@
 /* D-080: bublina nesmí překrýt zalomenou lištu cesty na mobilu */
 @media (max-width: 768px) {
   .bublina {
-    bottom: calc(84px + var(--journey-bar-h, 0px));
+    /* V-B: základní pravidlo přebíjí env()+voice+pwa — obnovit celý stack */
+    bottom: calc(
+      16px + env(safe-area-inset-bottom, 0px) + var(--voice-host-h, 0px) +
+        var(--pwa-banner-h, 0px) + 68px + var(--journey-bar-h, 0px)
+    );
   }
 }
 

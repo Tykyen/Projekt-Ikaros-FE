@@ -15,8 +15,10 @@
  *   ze VŠECH rout registru + `backfilled:true` (žádné „poprvé tady" pro
  *   veterány; seed dělá FE — BE nezná FE routy).
  */
+import axios from 'axios';
 import { getDefaultStore } from 'jotai';
 import { api } from '@/shared/api';
+import { ZMENY } from '../registry/changelog';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { ROUTES } from '@/app/routeRegistry';
 
@@ -77,6 +79,10 @@ const DEBOUNCE_MS = 2000;
 
 function uid(): string {
   return getDefaultStore().get(currentUserAtom)?.id ?? 'anon';
+}
+/** Aktuální identita — sdílí ji journeyEngine/bublinaStore pro per-uid klíče. */
+export function vypravecUid(): string {
+  return uid();
 }
 const stateKey = (u: string) => `vypravec:${u}`;
 const pendingKey = (u: string) => `vypravec:${u}:pending`;
@@ -173,6 +179,8 @@ class OnboardingStore {
   private syncBezi = false;
   /** Roste s každým úspěšným PATCHem — resync s ním hlídá stale GET. */
   private syncGen = 0;
+  /** Čas posledního úspěšného PATCHe — resync do 2 s ho bere jako vlastní echo (nález 12). */
+  private posledniPatch = 0;
   private initDone = false;
   /** N4: init BĚŽÍ ≠ init HOTOVÝ — brány (C11) čekají na doběhnutí GETu. */
   private initLetJiz = false;
@@ -259,6 +267,12 @@ class OnboardingStore {
     this.aplikuj({ persona });
   }
 
+  /** Nový účet nezná staré změny jako „nové" (nález 11). */
+  private seedChangelog(): void {
+    if (!this.state.lastSeenChangelog && ZMENY.length)
+      this.aplikuj({ lastSeenChangelog: ZMENY[0].id });
+  }
+
   // ── BE sync ────────────────────────────────────────────────────────────
   private naplanujSync(): void {
     if (this.timer) clearTimeout(this.timer);
@@ -276,10 +290,18 @@ class OnboardingStore {
     try {
       await api.patch('/users/me/onboarding', fronta.reduce(sloucitDelty, {}));
       this.syncGen += 1; // zneplatní resync GET rozběhnutý před tímto PATCHem
+      this.posledniPatch = Date.now();
       const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
       writeJson(pendingKey(this.ctxUid), ted.slice(odesilane));
-    } catch {
-      /* offline/chyba — fronta zůstává, re-POST příště (BE merge idempotentní) */
+    } catch (e) {
+      // Nález 2: 4xx = delta je vadná a NIKDY neprojde → zahodit odeslané,
+      // jinak otráví celou budoucí synchronizaci (retry na každý zápis).
+      // 5xx/offline/síť = přechodné → nechat na re-POST.
+      const status = axios.isAxiosError(e) ? (e.response?.status ?? 0) : 0;
+      if (status >= 400 && status < 500) {
+        const ted = readJson<OnboardingDelta[]>(pendingKey(this.ctxUid), []);
+        writeJson(pendingKey(this.ctxUid), ted.slice(odesilane));
+      }
     } finally {
       this.syncBezi = false;
       // Delta přišlá BĚHEM PATCHe by jinak čekala na další aktivitu.
@@ -319,8 +341,10 @@ class OnboardingStore {
           Object.keys(this.state.journeys).length === 0 &&
           !this.state.dismissed.includes('persona-dialog') &&
           !this.state.backfilled
-        )
+        ) {
           this.jeNovy = true;
+          this.seedChangelog(); // nový účet: changelog není „nový"
+        }
         this.notify();
       } else if (res.legacy) {
         // Backfill 04 §5.4 — veterán: seed všech rout, žádné retro-oslavy.
@@ -330,6 +354,7 @@ class OnboardingStore {
         });
       } else {
         this.jeNovy = true; // moment 1 (persona dialog) — spotřebuje D7
+        this.seedChangelog(); // nový účet: changelog není „nový"
         this.notify();
       }
       // Hotovo až PO zpracování odpovědi — během letícího GETu se brány
@@ -353,6 +378,8 @@ class OnboardingStore {
     this.zajistiKontext();
     if (this.ctxUid === 'anon' || this.ctxUid === 'nenacteno') return;
     const genPred = this.syncGen;
+    // Vlastní PATCH echo (BE posílá i odesílateli) — do 2 s přeskoč re-GET.
+    if (Date.now() - this.posledniPatch < 2000) return;
     try {
       const res = await api.get<{ state: OnboardingStateFE | null }>(
         '/users/me/onboarding',

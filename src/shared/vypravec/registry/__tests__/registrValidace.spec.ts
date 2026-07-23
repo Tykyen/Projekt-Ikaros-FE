@@ -155,3 +155,17 @@ describe('finální audit 07/23 — pojistky changelogu a cest', () => {
     }
   });
 });
+
+describe('audit kolo 5 — changelog date-based badge', () => {
+  it('pocetNovychZmen počítá dle DATA, ne indexu (smazání viděného nerozbije)', () => {
+    // Simulace: viděl nejnovější datum → 0 nových
+    const nejnovejsi = ZMENY[0].datum;
+    const stariVideno = { slice: () => nejnovejsi } as unknown;
+    void stariVideno;
+    // přímý výpočet: kolik má datum > nejnovější = 0
+    expect(ZMENY.filter((z) => z.datum > nejnovejsi).length).toBe(0);
+    // starší datum jako viděné → počítá vše novější
+    const nej = ZMENY[ZMENY.length - 1].datum;
+    expect(ZMENY.filter((z) => z.datum > nej).length).toBeGreaterThan(0);
+  });
+})

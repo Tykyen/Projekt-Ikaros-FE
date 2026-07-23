@@ -52,7 +52,6 @@ export function JourneyBar({
   // D-080: na platformě bez fixace vede CTA aspoň na výběr světa.
   const ctaCil = bezSlugu ? '/ikaros/vesmiry' : doplnSlug(krok.cta.to, slug);
   const ctaLabel = bezSlugu ? 'Vybrat svět' : krok.cta.label;
-  const ctaFunkcni = true;
   const pauznuta = Boolean(
     onboardingStore.getSnapshot().journeys[akt.klic]?.pausedAt,
   );
@@ -104,18 +103,17 @@ export function JourneyBar({
         </div>
       </div>
       <div className={s.listaAkce}>
-        {ctaFunkcni && (
-          <button
-            type="button"
-            className={s.cta}
-            onClick={() => {
-              navigate(ctaCil);
-              if (krok.anchor) zvyrazni(krok.anchor); // čeká na mount cíle (retry)
-            }}
-          >
-            {ctaLabel}
-          </button>
-        )}
+        <button
+          type="button"
+          className={s.cta}
+          onClick={() => {
+            navigate(ctaCil);
+            // Kotvu zvýrazni jen když jdeme na cílovou routu (ne fallback výběr).
+            if (!bezSlugu && krok.anchor) zvyrazni(krok.anchor);
+          }}
+        >
+          {ctaLabel}
+        </button>
         <button
           type="button"
           className={s.ctaTiche}

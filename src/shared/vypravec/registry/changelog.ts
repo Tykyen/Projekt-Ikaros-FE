@@ -70,8 +70,10 @@ export const ZMENY: readonly Zmena[] = [
 export function pocetNovychZmen(): number {
   const videno = onboardingStore.getSnapshot().lastSeenChangelog;
   if (!videno) return ZMENY.length;
-  const i = ZMENY.findIndex((z) => z.id === videno);
-  return i < 0 ? ZMENY.length : i;
+  // Nález 6: srovnávej DATEM (ne indexem) — smazání viděného záznamu jinak
+  // rozsvítí badge na plný počet. ID má tvar zm-RRRR-MM-DD-slug.
+  const videnoDatum = videno.slice(3, 13);
+  return ZMENY.filter((z) => z.datum > videnoDatum).length;
 }
 
 /** Označ vše jako viděné (volat při otevření pohledu Změny). */

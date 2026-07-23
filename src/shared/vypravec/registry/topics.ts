@@ -173,7 +173,6 @@ export const TOPIKY: readonly HelpTopic[] = [
     tags: ['hraci', 'clenove', 'clenstvi', 'zadosti', 'pozvanky', 'skupiny'],
     routes: ['/svet/:worldSlug/hraci', '/svet/:worldSlug/nastaveni'],
     audience: ['pomocnyPJ', 'pj', 'admin'],
-    minAudienceNote: 'Tohle je kuchyně PJ — tebe se týká jen výsledek (tvoje role).',
     body: {
       odstavce: [
         'Lidi světa spravuješ na třech místech a každé dělá něco jiného.',
@@ -340,7 +339,7 @@ export const TOPIKY: readonly HelpTopic[] = [
       ],
       kroky: [
         'Platformní akce (/ikaros/akce) — reálné termíny hráčů a komunity.',
-        'Kalendář světa — přehled akcí a událostí postav pro vedení světa (Pomocný PJ a výš). In-game datum posouvá modul Počasí.',
+        'Kalendář světa — přehled akcí a událostí postav pro vedení světa (Pomocný PJ a výš). In-game datum posouvá Generátor počasí.',
         'Timeline — historická osa světa; na herní akce ani postavy se neváže.',
       ],
     },

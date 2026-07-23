@@ -97,6 +97,8 @@ export function VypravecRoot({
   const { pathname } = useLocation();
   const [otevreny, setOtevreny] = useState(false);
   const fabRef = useRef<HTMLDivElement>(null);
+  /** Prvek s fokusem v okamžiku otevření — sem ho po zavření vracíme (nález 8). */
+  const vyvolavacRef = useRef<HTMLElement | null>(null);
   const klavesnice = useKlavesniceOtevrena();
   const onboarding = useSyncExternalStore(
     onboardingStore.subscribe,
@@ -379,15 +381,24 @@ export function VypravecRoot({
     [navigate],
   );
 
+  // Nález 8: fokus po zavření zpět na vyvolávač; na kolizní ploše FAB
+  // v DOM není → padal na <body>. Fallback FAB → body (vždy fokusovatelné).
+  const vratFocus = useCallback(() => {
+    const cil =
+      vyvolavacRef.current ??
+      fabRef.current?.querySelector<HTMLElement>('button') ??
+      document.body;
+    cil?.focus?.();
+  }, []);
   const zavrit = useCallback(() => {
     setOtevreny(false);
-    // focus zpět na vyvolávač (03 §7)
-    fabRef.current?.querySelector('button')?.focus();
-  }, []);
+    vratFocus();
+  }, [vratFocus]);
 
   // Vstup z mobilního draweru / "?" (03 §5) — otevře panel i na kolizní ploše.
   useEffect(() => {
     function onOtevrit() {
+      vyvolavacRef.current = document.activeElement as HTMLElement | null;
       setOtevreny(true);
     }
     window.addEventListener('vypravec:otevrit', onOtevrit);
@@ -407,7 +418,7 @@ export function VypravecRoot({
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         setOtevreny((o) => {
-          if (o) fabRef.current?.querySelector('button')?.focus();
+          if (o) vratFocus();
           return false;
         });
         return;
@@ -421,12 +432,13 @@ export function VypravecRoot({
           return;
         // Shift+V je EXPLICITNÍ pull — funguje i na kolizní ploše (03 §5)
         e.preventDefault();
+        vyvolavacRef.current = document.activeElement as HTMLElement | null;
         setOtevreny((o) => !o);
       }
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [kolizni]);
+  }, [kolizni, vratFocus]);
 
   // Aktivní cesta — derivace ze snapshotu (onboarding je dependency renderu).
   void onboarding;
@@ -462,7 +474,11 @@ export function VypravecRoot({
           otevreny={otevreny}
           spi={onboarding.mode === 'onCall'}
           badge={userId ? pocetNovychZmen() : 0}
-          onClick={() => setOtevreny((o) => !o)}
+          onClick={() => {
+            vyvolavacRef.current =
+              fabRef.current?.querySelector<HTMLElement>('button') ?? null;
+            setOtevreny((o) => !o);
+          }}
         />
       )}
       {!otevreny && <VypravecBublina />}

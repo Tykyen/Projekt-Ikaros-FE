@@ -16,8 +16,17 @@ export function VypravecBublina() {
   const navigate = useNavigate();
   if (!bublina) return null;
 
+  // A11y (nález 7): bublina s akcí = interaktivní skupina (role=group +
+  // aria-live, ať čtečka ohlásí text i to, že nabízí akci); čistá oslava/info
+  // zůstává status (jen oznámení, auto-hide).
+  const maAkci = Boolean(bublina.akce);
   return (
-    <div className={s.bublina} role="status">
+    <div
+      className={s.bublina}
+      role={maAkci ? 'group' : 'status'}
+      aria-live="polite"
+      aria-label={maAkci ? 'Vypravěč nabízí akci' : 'Vypravěč'}
+    >
       <button
         type="button"
         className={s.bublinaZavrit}

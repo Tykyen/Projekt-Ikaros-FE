@@ -109,7 +109,7 @@ export const ROUTE_HEADERS: readonly RouteHeader[] = [
   {
     route: '/svet/:worldSlug/hraci',
     name: 'Hráči',
-    blurb: 'Členové světa a pozvánky. Kdo co smí, řídí role — povyšuje PJ.',
+    blurb: 'Členové světa a pozvánky. Kdo co smí, řídí role — mění ji PJ nebo Pomocný PJ.',
     audienceNotes: {
       pj: 'Pozvi lidi odkazem, nebo vyvěs nábor na platformě.',
     },
@@ -225,7 +225,7 @@ export const ROUTE_HEADERS: readonly RouteHeader[] = [
     route: '/ikaros/oblibene',
     name: 'Oblíbené',
     blurb:
-      'Tvoje záložky napříč platformou — světy i stránky, které sis připnul.',
+      'Tvoje platformní záložky — diskuze, články a obrázky z komunity. Hvězdička uvnitř světa je jiný, oddělený seznam.',
   },
   {
     route: '/ikaros/sceny',

@@ -13,7 +13,7 @@
  * mode 'onCall' + rozlučková replika. Čítač resetuje klik na CTA;
  * oslavy a rozlučka se nepočítají.
  */
-import { onboardingStore } from '../state/onboardingStore';
+import { onboardingStore, vypravecUid } from '../state/onboardingStore';
 import { telemetrie } from '../state/telemetry';
 
 export interface Bublina {
@@ -42,7 +42,8 @@ export interface Bublina {
   priZobrazeni?: () => void;
 }
 
-const CITAC_KEY = 'vypravec:zavrene-tipy';
+/** Per-uid (nález 1) — auto-tichý čítač nesmí přetékat mezi účty. */
+const citacKey = () => `vypravec:zavrene-tipy:${vypravecUid()}`;
 const ROZLUCKA = 'Nebudu rušit. Kdybys mě potřeboval, víš, kde mě najdeš.';
 const FRONTA_MAX = 5;
 
@@ -120,7 +121,11 @@ class BublinaStore {
     if (doFronty) {
       if (b.jenTed) return false; // deixe: jinde/jindy by text lhal
       if (this.fronta.length >= FRONTA_MAX) return false; // drop = přiznat (N2)
-      this.fronta.push({ ...b, vznikScope: this.scopeAktualni });
+      this.fronta.push({
+        ...b,
+        vznikScope: this.scopeAktualni,
+        mluvci: this.mluvciAktualni,
+      });
       return true;
     }
     this.zobraz(b);
@@ -133,7 +138,9 @@ class BublinaStore {
     this.aktualni = {
       ...b,
       route: window.location.pathname,
-      mluvci: this.mluvciAktualni,
+      // Bublina z fronty si nese mluvčího vzniku (V-A) — jinak Měďákova
+      // oslava dorazí s bustou Joe; nová bublina bere mluvčího plochy.
+      mluvci: b.mluvci ?? this.mluvciAktualni,
     };
     if (b.oslava) this.hideTimer = setTimeout(() => this.zmiz(), 8000);
     this.notify();
@@ -182,7 +189,7 @@ class BublinaStore {
     const b = this.aktualni;
     if (b?.dismissKey) onboardingStore.zavritTip(b.dismissKey);
     try {
-      localStorage.setItem(CITAC_KEY, '0');
+      localStorage.setItem(citacKey(), '0');
     } catch {
       /* noop */
     }
@@ -204,17 +211,20 @@ class BublinaStore {
     if (b.dismissKey && !b.oslava)
       telemetrie('dismissed', { refId: b.dismissKey });
     this.zmiz();
-    if (b.oslava) return;
+    // Nález 5: do auto-ticha se počítají jen zavřené TIPY (03 §4.1). Chybová
+    // vysvětlení (kolizniOk/sessionDismiss) ani oslavy NE — jinak si uživatel
+    // po 3 zavřených chybách omylem vypne celého Vypravěče.
+    if (b.oslava || b.kolizniOk || b.sessionDismiss) return;
     let n = 0;
     try {
-      n = Number(localStorage.getItem(CITAC_KEY) ?? '0') + 1;
-      localStorage.setItem(CITAC_KEY, String(n));
+      n = Number(localStorage.getItem(citacKey()) ?? '0') + 1;
+      localStorage.setItem(citacKey(), String(n));
     } catch {
       /* noop */
     }
     if (n >= 3) {
       try {
-        localStorage.setItem(CITAC_KEY, '0'); // reset — po znovuzapnutí zase 3
+        localStorage.setItem(citacKey(), '0'); // reset — po znovuzapnutí zase 3
       } catch {
         /* noop */
       }

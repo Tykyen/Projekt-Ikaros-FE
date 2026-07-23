@@ -8,7 +8,7 @@
  * - visit scoped: pathname musí odpovídat route se slugem contextWorld
  * - probe gateOpened: derivace z WorldContext (accessMode) + eventy invite/nábor
  */
-import { onboardingStore } from '../state/onboardingStore';
+import { onboardingStore, vypravecUid } from '../state/onboardingStore';
 import {
   vypravecSubscribe,
   type VypravecEvent,
@@ -34,18 +34,19 @@ export interface AktivniCesta {
   poradi: { hotovo: number; celkem: number };
 }
 
-/** Explicitní aktivní cesta (rozhodnutí 14) — lokální; BE pořadí je $min. */
-const AKTIVNI_KEY = 'vypravec:aktivniCestaId';
+/** Explicitní aktivní cesta (rozhodnutí 14) — per-uid (nález 1: sdílený
+ *  počítač jinak zdědil cizí aktivní cestu/slug). */
+const aktivniKey = () => `vypravec:aktivniCestaId:${vypravecUid()}`;
 function ulozAktivniId(jId: string): void {
   try {
-    localStorage.setItem(AKTIVNI_KEY, jId);
+    localStorage.setItem(aktivniKey(), jId);
   } catch {
     /* fallback: nejnovější nepauznutá */
   }
 }
 function ctiAktivniId(): string | null {
   try {
-    return localStorage.getItem(AKTIVNI_KEY);
+    return localStorage.getItem(aktivniKey());
   } catch {
     return null;
   }
@@ -59,8 +60,9 @@ function hotoveKroky(cesta: Journey, steps: Record<string, string> | undefined):
   return s;
 }
 
-/** contextWorldSlug žije jen lokálně (BE drží id; slug pro deep-linky). */
-const slugKey = (jId: string) => `vypravec:worldSlug:${jId}`;
+/** contextWorldSlug žije jen lokálně (BE drží id; slug pro deep-linky).
+ *  Per-uid (nález 1) — jinak CTA lišty poslala uživatele B do světa A. */
+const slugKey = (jId: string) => `vypravec:worldSlug:${vypravecUid()}:${jId}`;
 
 function ulozSlug(jId: string, slug?: string): void {
   if (!slug) return;
