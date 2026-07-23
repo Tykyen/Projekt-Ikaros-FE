@@ -136,6 +136,10 @@
   --surface-1:    var(--theme-surface,        var(--bg-card,         rgba(0, 0, 0, 0.72)));
   --surface-2:    var(--theme-surface-soft,   var(--bg-card-hover,   rgba(0, 0, 0, 0.45)));
   --surface-3:    var(--theme-surface-strong, var(--bg-secondary,    rgba(0, 0, 0, 0.85)));
+  /* Spec 26.8 — jediný GARANTOVANĚ neprůhledný podklad (plovoucí panely:
+     Vypravěč aj.). --theme-surface* mají alfu; --bg-primary je v motivech
+     solidní hex. Řetěz fallbacků končí neutrální tmavou. */
+  --surface-opaque: var(--bg-primary, var(--bg-secondary, var(--bg-card, #14141c)));
   --frame-border: var(--theme-border-soft,    var(--border,          rgba(255, 255, 255, 0.18)));
   --text:         var(--theme-text,           var(--text-primary,    #e8e8e8));
   --text-strong:  var(--theme-heading,        var(--theme-text,      var(--text-primary, #ffffff)));

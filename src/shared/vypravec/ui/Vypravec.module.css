@@ -23,7 +23,7 @@
       color-mix(in srgb, var(--surface-2) 88%, var(--acc) 12%),
       color-mix(in srgb, var(--surface-2) 88%, var(--acc) 12%)
     ),
-    var(--bg);
+    var(--surface-opaque);
   color: var(--text-strong);
   display: grid;
   place-items: center;
@@ -86,12 +86,8 @@
   /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
   background:
     linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--bg), var(--bg)),
-    linear-gradient(var(--bg), var(--bg)),
-    var(--bg);
-  /* motivy mají průhledný i --bg (podkladový obrázek) — blur dorazí zbytek */
+    var(--surface-opaque);
+  /* --surface-opaque = garantovaně solidní podklad (tokens.css, spec 26.8) */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid color-mix(in srgb, var(--acc) 35%, var(--frame-border));
@@ -295,12 +291,8 @@
   /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
   background:
     linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--bg), var(--bg)),
-    linear-gradient(var(--bg), var(--bg)),
-    var(--bg);
-  /* motivy mají průhledný i --bg (podkladový obrázek) — blur dorazí zbytek */
+    var(--surface-opaque);
+  /* --surface-opaque = garantovaně solidní podklad (tokens.css, spec 26.8) */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid color-mix(in srgb, var(--acc) 40%, var(--frame-border));
@@ -344,12 +336,8 @@
   /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
   background:
     linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--bg), var(--bg)),
-    linear-gradient(var(--bg), var(--bg)),
-    var(--bg);
-  /* motivy mají průhledný i --bg (podkladový obrázek) — blur dorazí zbytek */
+    var(--surface-opaque);
+  /* --surface-opaque = garantovaně solidní podklad (tokens.css, spec 26.8) */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -424,12 +412,8 @@
   /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
   background:
     linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--bg), var(--bg)),
-    linear-gradient(var(--bg), var(--bg)),
-    var(--bg);
-  /* motivy mají průhledný i --bg (podkladový obrázek) — blur dorazí zbytek */
+    var(--surface-opaque);
+  /* --surface-opaque = garantovaně solidní podklad (tokens.css, spec 26.8) */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid color-mix(in srgb, var(--acc) 30%, var(--frame-border));
@@ -456,12 +440,8 @@
   /* neprůhledné (živý test 2026-07-22): surface-2 mívá alfu — vrstvení přes opaque --bg drží motiv */
   background:
     linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--surface-2), var(--surface-2)),
-    linear-gradient(var(--bg), var(--bg)),
-    linear-gradient(var(--bg), var(--bg)),
-    var(--bg);
-  /* motivy mají průhledný i --bg (podkladový obrázek) — blur dorazí zbytek */
+    var(--surface-opaque);
+  /* --surface-opaque = garantovaně solidní podklad (tokens.css, spec 26.8) */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid color-mix(in srgb, var(--acc) 40%, var(--frame-border));
