@@ -38,6 +38,11 @@ vi.mock('@/features/world/api/useGameEvents', () => ({
     isPending: false,
   }),
 }));
+// 27.1b — GameEventCard nově čte scénáře (vazba ④); bez mocku by hook volal
+// reálný useQuery → „No QueryClient set" (test nemá QueryClientProvider).
+vi.mock('@/features/world/campaign/api', () => ({
+  useCampaignScenarios: () => ({ data: [], isLoading: false }),
+}));
 vi.mock('@/features/world/api/useWorldSettings', () => ({
   useWorldSettings: () => ({
     data: { customGroups: [], groupColors: {} },
