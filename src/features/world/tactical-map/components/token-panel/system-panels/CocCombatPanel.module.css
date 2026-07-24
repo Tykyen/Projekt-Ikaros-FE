@@ -441,3 +441,15 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .vitalPm button { min-width: 40px; min-height: 40px; }
+  .vitalInput { min-height: 40px; }
+  .minInput { min-height: 40px; }
+  .seal { min-height: 40px; }
+  .initBtn { min-height: 40px; }
+  .charChip { min-height: 40px; }
+  .skill { min-height: 40px; }
+  .weaponSkill { min-height: 40px; }
+}

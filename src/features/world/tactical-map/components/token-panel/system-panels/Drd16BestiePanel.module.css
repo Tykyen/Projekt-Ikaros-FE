@@ -303,3 +303,11 @@
   border-style: solid;
   background: rgba(221, 202, 159, 0.5);
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .initBtn { min-height: 40px; }
+  .steps button { min-width: 40px; min-height: 40px; }
+  .atk { min-height: 40px; }
+  .editBtn { min-height: 40px; }
+}

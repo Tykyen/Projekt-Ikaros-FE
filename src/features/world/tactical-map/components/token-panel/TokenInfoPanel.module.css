@@ -220,6 +220,12 @@
   .popoutBtn {
     display: none;
   }
+  /* 27.2 — zavření ✕ a přepínač režimu 📌/🪟 dotykový terč ≥ 40px. */
+  .closeBtn,
+  .modeBtn {
+    min-width: 40px;
+    min-height: 40px;
+  }
 }
 
 /* ── IDENTITY ROW (avatar + jméno) ─────────────────────────────── */
@@ -274,6 +280,11 @@
   /* 10.2c-edit-9g fix — no horizontal overflow (MatrixSheet 2-col layout
      se musí zúžit místo přetékat). */
   overflow-x: hidden;
+  /* 27.2 — plátno mapy má touch-action:none, které se dědí i sem → prst by tělo
+     karty neposunul a místo scrollu by jezdila mapa. pan-y vrací nativní svislý
+     scroll; overscroll-behavior brání propsání gesta na plátno pod kartou. */
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   padding: 16px;
   scrollbar-width: thin;
   scrollbar-color: rgb(var(--map-ui-accent-rgb) / 0.3) transparent;

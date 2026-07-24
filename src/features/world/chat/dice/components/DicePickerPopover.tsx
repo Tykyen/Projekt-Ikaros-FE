@@ -7,6 +7,7 @@ import {
   Skull,
   Sliders,
   Settings,
+  X,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -226,6 +227,17 @@ export const DicePickerPopover: React.FC<DicePickerPopoverProps> = ({
             }}
           >
             <Settings size={15} aria-hidden="true" />
+          </button>
+          {/* 27.2 — na mobilu je picker spodní sheet; viditelné ✕ pro zavření
+              (tap-mimo/Esc funguje dál, ale na dotyku je méně objevný). */}
+          <button
+            type="button"
+            className={styles.closeSheet}
+            title="Zavřít"
+            aria-label="Zavřít"
+            onClick={onClose}
+          >
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
       </div>

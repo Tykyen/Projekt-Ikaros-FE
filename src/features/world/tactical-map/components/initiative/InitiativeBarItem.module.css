@@ -154,4 +154,18 @@
   .name {
     font-size: 0.62rem;
   }
+  /* 27.2 — „i" (otevře detail tokenu = vstup do karty na cestě ③) a „skok na
+     tah" mají větší hit-area na dotyk; ikona zůstává malá, klikací plocha roste
+     přes padding a záporný offset. */
+  .infoBtn {
+    width: 28px;
+    height: 28px;
+    top: -6px;
+    left: -6px;
+    font-size: 0.72rem;
+  }
+  .jumpBtn {
+    min-width: 34px;
+    height: 34px;
+  }
 }

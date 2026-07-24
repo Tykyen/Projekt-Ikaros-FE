@@ -489,6 +489,14 @@
   .send {
     font-size: 15px;
     padding: 8px 16px;
+    /* 27.2 — dotykový terč Odeslat ≥ 44px. */
+    min-height: 44px;
+  }
+  /* 27.2 — razítka toolbaru (🎲 😊 příloha RP…) z 32px na 40px pro dotyk;
+     flex-wrap už zabraňuje overflow. */
+  .stamp {
+    width: 40px;
+    height: 40px;
   }
 }
 

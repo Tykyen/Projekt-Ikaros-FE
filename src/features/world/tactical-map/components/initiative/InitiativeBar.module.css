@@ -31,6 +31,11 @@
   overflow-y: hidden;
   padding: 2px 2px 4px;
   scrollbar-width: thin;
+  /* 27.2 — plátno mapy má touch-action:none (dědí se sem) → vodorovný seznam
+     bojovníků by se prstem neposunul a jezdila by mapa. pan-x vrací nativní
+     horizontální scroll lišty. */
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
 }
 
 /* 17.10 — sbalená lišta (roleta): jen tenký pruh s „Zobrazit". */

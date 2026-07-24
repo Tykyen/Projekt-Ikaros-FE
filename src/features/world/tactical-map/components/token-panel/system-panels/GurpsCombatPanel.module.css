@@ -484,3 +484,16 @@
   max-height: 72vh;
   overflow: auto;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .steppers button { min-height: 40px; }
+  .initBtn { min-height: 40px; }
+  .mod button { min-width: 40px; min-height: 40px; }
+  .chip { min-height: 40px; }
+  .tgt { min-height: 40px; }
+  .def { min-height: 40px; }
+  .qa { min-height: 40px; }
+  .skl { min-height: 40px; }
+  .detailsBtn { min-height: 40px; }
+}

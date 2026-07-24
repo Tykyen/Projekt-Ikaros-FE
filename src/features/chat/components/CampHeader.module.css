@@ -260,8 +260,10 @@
     display: none;
   }
 
+  /* 27.2 — akce hry (Uložit/Načíst) dotykový terč ≥ 44px. */
   .seal {
-    width: 34px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     justify-content: center;
   }

@@ -20,6 +20,9 @@
 .dialog {
   width: 100%;
   max-width: 520px;
+  /* 27.2 — na krátkém telefonu (PJ = 7 karet ≈ 670px) se dialog musí vejít do
+     viewportu a nechat karty odscrollovat; jinak spodní karty + CTA odříznuté. */
+  max-height: calc(100dvh - 2rem);
   background: var(--bg-secondary, rgba(16, 20, 34, 0.98));
   border: 1px solid var(--border, rgba(120, 140, 180, 0.3));
   border-radius: 12px;
@@ -74,6 +77,10 @@
   grid-template-columns: 1fr;
   gap: 0.65rem;
   padding: 1.25rem;
+  /* 27.2 — karty scrollují uvnitř dialogu (header zůstává nahoře); min-height:0
+     povolí flex-child scroll. */
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .card {
@@ -147,6 +154,11 @@
     padding: 0.85rem 0.9rem;
   }
   .cardIcon {
+    width: 40px;
+    height: 40px;
+  }
+  /* 27.2 — zavírací ✕ dotykový terč ≥ 40px. */
+  .closeBtn {
     width: 40px;
     height: 40px;
   }

@@ -64,7 +64,10 @@
 
 @media (max-width: 768px) {
   .btn {
-    padding: 5px 7px;
-    font-size: 0.72rem;
+    /* 27.2 — klíčová bojová tlačítka (Zahájit boj / Další tah / Ukončit)
+       dotykový terč ≥ 40px. */
+    min-height: 40px;
+    padding: 7px 9px;
+    font-size: 0.74rem;
   }
 }

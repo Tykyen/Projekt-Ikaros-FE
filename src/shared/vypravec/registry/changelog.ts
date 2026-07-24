@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-mapa-na-mobilu',
+    datum: '2026-07-24',
+    titul: 'Taktická mapa pod palcem',
+    popis:
+      'Na telefonu teď kartu tokenu i lištu iniciativy odscrolluješ prstem, aniž by ti pod tím ujížděla mapa. Tlačítka na mapě, v chatu i v deníku jsou na dotyku větší, ať se trefíš palcem.',
+  },
+  {
     id: 'zm-2026-07-24-scenar-session-kronika',
     datum: '2026-07-24',
     titul: 'Propoj scénář, session a kroniku',

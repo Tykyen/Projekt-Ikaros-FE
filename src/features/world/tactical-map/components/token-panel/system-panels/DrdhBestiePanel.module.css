@@ -637,3 +637,22 @@
 .root :disabled {
   cursor: default;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .nameEdit { min-height: 40px; }
+  .initBtn { min-height: 40px; }
+  .editFull { min-height: 40px; }
+  .hpEdit { min-height: 40px; }
+  .steps button { min-width: 40px; min-height: 40px; }
+  .metaEdit { min-height: 40px; }
+  .statBtn { min-height: 40px; }
+  .defEdit { min-height: 40px; }
+  .atkBtn { min-height: 40px; }
+  .resSelect { min-height: 40px; }
+  .winBtn { min-height: 40px; }
+  .ed { min-height: 40px; }
+  .edNum { min-height: 40px; }
+  .del { min-width: 40px; min-height: 40px; }
+  .miniAdd { min-height: 40px; }
+}

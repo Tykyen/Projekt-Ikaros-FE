@@ -375,3 +375,16 @@
 .root :disabled {
   cursor: default;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .initBtn { min-height: 40px; }
+  .editFull { min-height: 40px; }
+  .sudbaEdit { min-height: 40px; }
+  .steps button { min-width: 40px; min-height: 40px; }
+  .hin { min-height: 40px; }
+  .ed { min-height: 40px; }
+  .edNum { min-height: 40px; }
+  .del { min-width: 40px; min-height: 40px; }
+  .miniAdd { min-height: 40px; }
+}

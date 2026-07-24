@@ -206,6 +206,13 @@
 .vsteps button:hover {
   background: var(--dd-gold-hi, #f4dd92);
 }
+/* 27.2 — HP +/- kroky (výsledek cesty ③) dotykový terč ≥ 40px na mobilu. */
+@media (max-width: 768px) {
+  .vsteps button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
 
 /* ── Hranice smrti ── */
 .hpDeath {

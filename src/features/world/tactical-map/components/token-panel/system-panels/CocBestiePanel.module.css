@@ -550,3 +550,22 @@
   color: rgba(220, 201, 164, 0.75);
   line-height: 1.45;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .initBtn { min-height: 40px; }
+  .editFull { min-height: 40px; }
+  .hpEdit { min-height: 40px; }
+  .steps button { min-height: 40px; }
+  .statBtn { min-height: 40px; }
+  .edNum { min-height: 40px; }
+  .sanEdit { min-height: 40px; }
+  .atkBtn { min-height: 40px; }
+  .dmgBtn { min-height: 40px; }
+  .ed { min-height: 40px; }
+  .del { min-width: 40px; min-height: 40px; }
+  .miniAdd { min-height: 40px; }
+  .defBtn { min-height: 40px; }
+  .defEdit { min-height: 40px; }
+  .winBtn { min-height: 40px; }
+}

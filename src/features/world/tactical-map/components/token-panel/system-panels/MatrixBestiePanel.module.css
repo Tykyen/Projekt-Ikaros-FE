@@ -475,3 +475,13 @@ button.pip:hover { border-color: color-mix(in srgb, var(--mx-accent, #38e0ff) 60
   background: linear-gradient(90deg, #ff5d6c, #ff9a4d, #ffe14d, #5bd47e, #3ac0ff, #7a6bff, #ff6ad5);
   box-shadow: 0 0 0 2px #16162e;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px, pipy ≥24px. */
+@media (max-width: 768px) {
+  .init { min-height: 40px; }
+  .num { min-height: 40px; }
+  .roll { min-width: 40px; min-height: 40px; }
+  .del { min-width: 40px; min-height: 40px; }
+  .add { min-height: 40px; }
+  button.pip { min-width: 24px; min-height: 24px; }
+}

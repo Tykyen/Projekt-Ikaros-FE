@@ -378,3 +378,17 @@
   color: var(--jc-ink-soft);
   white-space: pre-wrap;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .initBtn { min-height: 40px; }
+  .hpStep { min-width: 40px; min-height: 40px; }
+  .hpInput { min-height: 40px; }
+  .abilMain { min-height: 40px; }
+  .zhBtn { min-height: 40px; }
+  .skillRow { min-height: 40px; }
+  .weaponRow { min-height: 40px; }
+  .weaponAtk { min-height: 40px; }
+  .weaponDmg { min-height: 40px; }
+  .collapse > summary { min-height: 40px; }
+}

@@ -22,3 +22,11 @@
   opacity: 0.7;
   cursor: default;
 }
+
+/* 27.2 — pole iniciativy dotykový terč na mobilu (edituje se prstem). */
+@media (max-width: 768px) {
+  .input {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}

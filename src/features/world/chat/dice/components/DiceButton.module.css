@@ -37,3 +37,12 @@
 .active:hover {
   background: color-mix(in srgb, var(--ch-accent, #a78bfa) 18%, transparent);
 }
+
+/* 27.2 — na mobilu je 🎲 vstupem do celé cesty „hod kostkou"; zvětši dotykový
+   terč z 32px na 44px (Apple HIG / WCAG 2.5.5). */
+@media (max-width: 768px) {
+  .btn {
+    width: 44px;
+    height: 44px;
+  }
+}

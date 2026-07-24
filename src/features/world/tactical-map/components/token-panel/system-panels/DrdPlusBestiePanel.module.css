@@ -540,3 +540,16 @@
 .del:hover {
   opacity: 1;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .nameEdit { min-height: 40px; }
+  .editFull { min-height: 40px; }
+  .rollRow { min-height: 40px; }
+  .chip { min-height: 40px; }
+  .wsteps button { min-width: 40px; min-height: 40px; }
+  .postihField input { min-height: 40px; }
+  .ed { min-height: 40px; }
+  .miniAdd { min-height: 40px; }
+  .del { min-width: 40px; min-height: 40px; }
+}

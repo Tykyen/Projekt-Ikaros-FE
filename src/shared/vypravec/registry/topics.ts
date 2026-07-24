@@ -356,7 +356,7 @@ export const TOPIKY: readonly HelpTopic[] = [
       ],
     },
     source: { kapitola: '14' },
-    verifiedAt: '2026-07-22',
+    verifiedAt: '2026-07-24',
     status: 'funkcni',
   },
   {

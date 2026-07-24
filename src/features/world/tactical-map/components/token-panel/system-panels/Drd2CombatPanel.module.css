@@ -535,3 +535,16 @@
   cursor: default;
   opacity: 0.9;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px, husté toggle/pipy ≥24px. */
+@media (max-width: 768px) {
+  .initBtn { min-height: 40px; }
+  .scar { min-height: 40px; }
+  .prof { min-height: 40px; }
+  .collH { min-height: 40px; }
+  .add { min-height: 40px; }
+  .seg { min-height: 24px; }
+  .rung { min-height: 24px; }
+  .dot { min-width: 24px; min-height: 24px; }
+  .pipSq { min-width: 24px; min-height: 24px; }
+}

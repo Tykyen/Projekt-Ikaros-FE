@@ -10,8 +10,9 @@
   min-width: 0;
 }
 
-/* Mobil — rail se přesune pod editor (stack). */
-@media (max-width: 720px) {
+/* Mobil — rail se přesune pod editor (stack). 27.2 — sjednoceno na 768px
+   (shodně s IdentityPanel), ať v pásmu 721–768px není půl editoru 2-sloupcová. */
+@media (max-width: 768px) {
   .split {
     grid-template-columns: 1fr;
   }
@@ -22,6 +23,8 @@
   border-radius: 6px;
   background: var(--bg-input, rgb(var(--black-rgb) / 0.2));
   min-height: 320px;
+  /* 27.2 — široká vložená .rte-table nepřeteče rám editoru na úzkém telefonu. */
+  overflow-x: auto;
 }
 
 .editor {

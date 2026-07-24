@@ -550,3 +550,13 @@
   text-shadow: 0 0 7px var(--mx-violet, rgba(255, 106, 213, 0.7));
   pointer-events: none;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px, kondiční mřížka ≥24px. */
+@media (max-width: 768px) {
+  .initBtn { min-height: 40px; }
+  .chip input { min-height: 40px; }
+  .attr.click { min-height: 40px; }
+  .rowbtn { min-height: 40px; }
+  .openbtn { min-height: 40px; }
+  .box.click { min-width: 24px; min-height: 24px; }
+}

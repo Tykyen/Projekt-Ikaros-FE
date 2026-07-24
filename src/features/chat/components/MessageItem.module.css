@@ -309,7 +309,13 @@
     /* Pohodlný dotykový terč; šířka se vejde do gutteru (.body padding 64px),
        výška držena nízko, ať absolutní tlačítko nezasahuje do další zprávy. */
     min-width: 44px;
-    min-height: 36px;
+    min-height: 40px;
+  }
+
+  /* 27.2 — bez hover lišty (skrytá výše) rezervovaný pravý gutter ~128px jen
+     mačká text na úzkém telefonu; stačí místo pro samotný kebab. */
+  .body {
+    padding-right: 48px;
   }
 }
 

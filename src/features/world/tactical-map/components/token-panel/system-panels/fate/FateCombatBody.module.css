@@ -716,3 +716,11 @@
   background: var(--dd-sapphire, #5b4a7a);
   color: #fff;
 }
+
+/* 27.2 — dotykové terče na mobilu: akční ≥40px. */
+@media (max-width: 768px) {
+  .init { min-height: 40px; }
+  .roll { min-width: 40px; min-height: 40px; }
+  .step { min-width: 40px; min-height: 40px; }
+  .cinput { min-height: 40px; }
+}

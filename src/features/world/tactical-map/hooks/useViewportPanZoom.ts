@@ -230,6 +230,14 @@ export function useViewportPanZoom(
   }, [viewportRef]);
 
   const onPointerDown = useCallback((e: PointerEvent) => {
+    // 27.2 — gesto začínající na UI chrome mapy (token karta [role=dialog],
+    // iniciativa [role=region], docky [data-map-chrome], tlačítka/inputy) NEsmí
+    // armovat pan/pinch mapy — patří scrollu/kliku toho prvku. Plátno (PIXI
+    // canvas) tyto DOM uzly neobsahuje, takže pan na prázdnu funguje dál.
+    const chrome = (e.target as HTMLElement | null)?.closest(
+      '[data-map-chrome],[role="dialog"],[role="region"],[role="toolbar"],button,input,textarea,select,a',
+    );
+    if (chrome) return;
     // Touch — sleduj pointers, detekuj 2-finger pinch + 1-finger pan
     if (e.pointerType === 'touch' || e.pointerType === 'pen') {
       activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
