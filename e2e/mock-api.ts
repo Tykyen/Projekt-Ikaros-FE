@@ -12,6 +12,11 @@ import {
   TEST_WORLD,
   TEST_MY_WORLD_ENTRY,
   TEST_SCENE,
+  TEST_CHARACTER,
+  TEST_DIARY,
+  TEST_CHAT_GROUP,
+  TEST_CHAT_APPEARANCE,
+  TEST_INVITE_ACCEPT,
 } from './fixtures';
 
 function json(route: Route, body: unknown, status = 200): Promise<void> {
@@ -70,8 +75,88 @@ export async function mockBackend(page: Page): Promise<void> {
     if (path.startsWith('/worlds/slug/')) {
       return json(route, TEST_WORLD);
     }
+    // Svět dle ID (useWorld) — ChannelView čte `world.dice` odsud; bez toho
+    // je dice picker prázdný. PŘESNÉ ID (ne `[^/]+`, jinak by chytlo i jiné
+    // 1-segmentové /worlds/* endpointy vracející pole → .find/.map crash).
+    if (path === `/worlds/${TEST_WORLD.id}` && method === 'GET') {
+      return json(route, TEST_WORLD);
+    }
     if (path === '/maps/active') {
       return json(route, TEST_SCENE);
+    }
+
+    // ── 27.1 golden ① — přijetí pozvánky (link i cílená) → redirect do světa ──
+    if (/\/worlds\/invite-token\/[^/]+\/accept$/.test(path) && method === 'POST') {
+      return json(route, TEST_INVITE_ACCEPT, 201);
+    }
+    if (/\/worlds\/[^/]+\/invites\/[^/]+\/accept$/.test(path) && method === 'POST') {
+      return json(route, TEST_INVITE_ACCEPT, 201);
+    }
+
+    // ── 27.1 golden ② — postava + deník ──
+    // POZOR: `/pages/directory` (adresář postav) musí být PŘED obecným
+    // `/pages/:slug`, jinak by directory dostal objekt místo pole → `.map` crash.
+    if (/\/pages\/directory$/.test(path) && method === 'GET') {
+      return json(route, []);
+    }
+    if (/\/characters\/[^/]+\/diary$/.test(path)) {
+      return json(route, TEST_DIARY);
+    }
+    if (/\/characters\/[^/]+$/.test(path) && method === 'GET') {
+      return json(route, TEST_CHARACTER);
+    }
+    // Page load pro PostavaLayout (PageViewer čte stránku dle slug). Kompletní
+    // Page dle pages.types.ts — povinná pole (sections/galleryImages/videos/
+    // menu/accessRequirements) MUSÍ být pole (ne null → .filter/.map crash).
+    if (/\/pages\/[^/]+$/.test(path) && method === 'GET') {
+      return json(route, {
+        ...TEST_CHARACTER,
+        title: TEST_CHARACTER.name,
+        content: '<p>Statečný hrdina.</p>',
+        plainText: 'Statečný hrdina.',
+        sections: [],
+        galleryImages: [],
+        videos: [],
+        menu: [],
+        isWoodWide: false,
+        accessRequirements: [],
+        order: 0,
+        pageStatus: 'approved',
+        // Link na character entity — subdoc taby (Deník/Finance/…) se odemknou.
+        characterRef: { characterId: TEST_CHARACTER.id },
+      });
+    }
+
+    // ── 27.1 golden ② — chat (groups s kanálem → composer se vykreslí) ──
+    if (/\/chat\/groups$/.test(path)) {
+      return json(route, [TEST_CHAT_GROUP]);
+    }
+    if (/\/chat\/appearance$/.test(path) && method === 'GET') {
+      return json(route, TEST_CHAT_APPEARANCE);
+    }
+    if (/\/chat\/unread$/.test(path)) {
+      return json(route, []);
+    }
+    if (/\/chat\/(channels\/[^/]+\/)?messages/.test(path) && method === 'GET') {
+      return json(route, []);
+    }
+    // Odeslání zprávy (běžná i hod) → echo, ať optimistic insert má co potvrdit.
+    if (/\/chat\/channels\/[^/]+\/messages$/.test(path) && method === 'POST') {
+      const body = (req.postDataJSON() ?? {}) as Record<string, unknown>;
+      return json(
+        route,
+        {
+          id: `msg-${Date.now()}`,
+          worldId: TEST_WORLD.id,
+          senderId: TEST_USER.id,
+          senderName: TEST_USER.displayName,
+          content: body.content ?? '',
+          isDiceRoll: !!body.dicePayload,
+          dicePayload: body.dicePayload ?? null,
+          createdAt: new Date().toISOString(),
+        },
+        201,
+      );
     }
 
     // Default — neblokující prázdná kolekce (settings/directory/access-requests/…).

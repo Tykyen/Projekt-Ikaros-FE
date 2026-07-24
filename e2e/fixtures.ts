@@ -71,9 +71,85 @@ export const TEST_WORLD = {
   accessMode: 'public' as const,
   playerCount: 1,
   maxPlayers: null,
+  // 27.1 golden ② — dice picker v chatu vykreslí dlaždice jen když je `dice`
+  // neprázdné. Kanonické klíče (worldDiceCatalog) — alias k6/k20 catalog
+  // neresolvne → lookup undefined → `.color` crash při renderu DiceButton.
+  dice: ['d6', 'd20', 'fate'],
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-06-19T00:00:00.000Z',
   owner: { id: 'owner-1', username: 'pj' },
+};
+
+/** 27.1 golden ① — cílová postava (PostavaHrace) pro cestu postava→deník. */
+export const TEST_CHARACTER = {
+  id: '6650000000000000000000e1',
+  worldId: TEST_WORLD.id,
+  slug: 'test-postava',
+  name: 'Vlkodav z Černého lesa',
+  // Page.type nese DISPLAY hodnotu (PAGE_TYPES.PostavaHrace = 'Postava hráče'),
+  // ne URL klíč 'PostavaHrace' — jinak PostavaLayout nedetekuje postavu.
+  type: 'Postava hráče' as const,
+  ownerUserId: TEST_USER.id,
+  isNpc: false,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-06-19T00:00:00.000Z',
+};
+
+/** 27.1 golden ② — deníkový subdoc postavy (jinak DiaryTab hlásí chybu načtení). */
+export const TEST_DIARY = {
+  characterId: TEST_CHARACTER.id,
+  personalDiarySchema: null,
+  customData: {},
+  sections: [],
+};
+
+/**
+ * 27.1 golden ② — chat skupina s jednou konverzací. POZOR na tvar: FE čeká
+ * `GroupWithChannels[]` = zabalené `{ group, channels }` (ne ploché) — jinak
+ * `ChannelSidebar` volá `groupColorVarFor(undefined)` → `.color` crash.
+ */
+export const TEST_CHAT_CHANNEL = {
+  id: '6650000000000000000000f1',
+  groupId: '665000000000000000000f01',
+  worldId: TEST_WORLD.id,
+  name: 'Táborák',
+  isGlobal: false,
+  accessMode: 'all' as const,
+  allowedRoles: [],
+  allowedMemberIds: [],
+  order: 0,
+  type: 'text' as const,
+};
+
+export const TEST_CHAT_GROUP = {
+  group: {
+    id: '665000000000000000000f01',
+    worldId: TEST_WORLD.id,
+    name: 'Obecné',
+    order: 0,
+  },
+  channels: [TEST_CHAT_CHANNEL],
+};
+
+/** Per-svět vzhled zprávy (`GET /chat/appearance` — objekt, ne pole). */
+export const TEST_CHAT_APPEARANCE = {
+  chatColor: '#a78bfa',
+  chatFont: null,
+  chatFontSize: null,
+  chatSkin: null,
+  readerFontOverride: false,
+  readerFont: null,
+  readerFontSize: null,
+  diceSkinMapping: null,
+  jailedDiceSkins: [],
+};
+
+/** Invite accept odpověď (link i cílená → redirect do světa). */
+export const TEST_INVITE_ACCEPT = {
+  ok: true,
+  worldId: TEST_WORLD.id,
+  worldSlug: TEST_WORLD.slug,
+  membership: null as unknown,
 };
 
 export const TEST_MEMBERSHIP = {

@@ -217,11 +217,17 @@ Lehká vrstva nad 25.2: po registraci volba „Chci vést hru / Hrát / Tvořit 
 ## Fáze 27 — Zlaté cesty & certifikace jádra
 **Rešerše ROI #3: chránit kritické propojení produktu — to je hlavní diferenciátor (síla propojení 84 %).**
 
-### - [ ] 27.1 Pět zlatých cest FE↔BE e2e — [dopad vysoký · náklad střední] 👑
+### - [x] 27.1 Pět zlatých cest FE↔BE e2e — [dopad vysoký · náklad střední] 👑 ✅ 2026-07-24
 **Cíl:** certifikované e2e průchody (BE e2e harness + FE Playwright rozšíření smoke):
 ① pozvánka → členství → postava · ② postava → deník → chat → hod · ③ mapa → token → iniciativa → výsledek · ④ wiki → scénář → událost → kronika · ⑤ komunitní položka → schválení → klon do světa.
 **Proč:** dnes 1 FE smoke happy-path + BE e2e po modulech; zlaté cesty svazují moduly dohromady — přesně tam vznikají cross-repo regrese (rešerše: pravděpodobnost 50 %, dopad 90 %).
-**Návrh:** BE e2e per cesta (rozšíření seed-scenario páteře 16/16); FE Playwright: cesty ①② nad mock-API rozšířit o reálnější fixtures. Napojit na CI z 23.7.
+**Návrh:** BE e2e per cesta (rozšíření seed-scenario páteře — `buildCanonicalWorld`, 7 kroků); FE Playwright: cesty ①② nad mock-API rozšířit o reálnější fixtures. Napojit na CI z 23.7. **Spec:** `docs/arch/phase-27/spec-27.1.md`.
+**Pozn. k ④:** produkt nemá datové vazby scénář→událost→kronika → 27.1 certifikuje ④ jako „4 uzly v jednom světě"; reálný referenční řetěz dodá 27.1b.
+**Hotovo (2026-07-24):** BE 5 golden-path e2e (`backend/test/golden/` + ⑤ tag na `scene-template-share`), 21/21 zelené, 3× deterministicky; FE 2 Playwright cesty ①② (`e2e/golden-path-{1,2}.spec.ts` nad rozšířeným mock-API), 3× zelené; registr `docs/golden-paths.md`. Oba CI joby (23.7) chytnou globem → deploy gate je brání. Šev-asserty: role po pozvánce · anti-forge dopočet total · posun tahu+HP clamp · worldId+tenant izolace ④.
+
+### - [ ] 27.1b Vazba ④ scénář→událost→kronika — [dopad střední · náklad střední]
+**Cíl:** založit datovou vazbu, aby zlatá cesta ④ byla reálný řetěz (ne 4 nezávislé moduly). Dvě úzká pole dle konvence kódu: `GameEvent.scenarioId` („session hraje scénář") + `TimelineEvent.sourceGameEventId` („kronika vzešla ze session"); wiki→scénář (`linkedPageSlug`) už existuje. + FE UI (2 selecty) + povýšení golden-path-4 e2e na assert řetězu.
+**Proč:** vyčleněno z 27.1 (produkční featura ≠ certifikační infra). **Spec:** `docs/arch/phase-27/spec-27.1b.md`.
 
 ### - [ ] 27.2 Mobilní core cesty — [dopad střední · náklad střední]
 **Cíl:** zlaté cesty ①–③ projít na telefonu (hráči u stolu drží mobil). Statická CSS review + živý průchod uživatelem (fb_tests_live); opravit, co drhne. 🔁 reuse 17.4 dotyk mapy. **Ne** nový mobilní layout — jen průchodnost core cest.
