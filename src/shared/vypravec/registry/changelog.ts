@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-nahlasit-chybu',
+    datum: '2026-07-24',
+    titul: 'Nahlásit chybu přímo v aplikaci',
+    popis:
+      'Když něco nefunguje, otevři mě a zvol „Nahlásit chybu". Pár vět stačí — kde jsi, verzi appky i prohlížeč přiložím sám. Funguje odkudkoli, i bez přihlášení.',
+  },
+  {
     id: 'zm-2026-07-23-vypravec',
     datum: '2026-07-23',
     titul: 'Vypravěč: Ishida, Joe a Měďák tě provedou',

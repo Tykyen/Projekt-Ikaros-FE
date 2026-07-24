@@ -749,10 +749,13 @@ export const FAQ_POLOZKY: FaqPolozka[] = [
     q: 'Kde nahlásit chybu nebo navrhnout vylepšení?',
     a: (
       <p>
-        E-mailem na adresu uvedenou v <Link to="/podminky">podmínkách použití</Link>{' '}
-        nebo na <Link to="/kontakt">kontaktní stránce</Link>. Stručný popis + jak
-        chybu vyvolat + screenshot urychlí opravu. <em>(Nevhodný obsah nehlas
-        e-mailem — na to je tlačítko „Nahlásit" přímo u obsahu.)</em>
+        Nejrychleji přes <strong>Vypravěče</strong>: klikni na jeho ikonu
+        (vpravo dole, nebo zkratkou <strong>Shift+V</strong>) a zvol{' '}
+        <strong>„Nahlásit chybu"</strong>. Stačí pár vět — kde jsi, verzi appky
+        i prohlížeč přiložím sám. Funguje odkudkoli, i bez přihlášení. Kdykoli i
+        e-mailem přes <Link to="/kontakt">kontaktní stránku</Link>.{' '}
+        <em>(Nevhodný obsah takhle nehlas — na to je tlačítko „Nahlásit" přímo
+        u obsahu.)</em>
       </p>
     ),
   },

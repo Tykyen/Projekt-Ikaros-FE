@@ -99,6 +99,8 @@ export function VypravecRoot({
 }) {
   const { pathname } = useLocation();
   const [otevreny, setOtevreny] = useState(false);
+  // 25.1 — počáteční pohled panelu (např. 'chyba' z odkazu „Nahlásit chybu").
+  const [initialView, setInitialView] = useState<'chyba' | undefined>(undefined);
   const fabRef = useRef<HTMLDivElement>(null);
   /** Prvek s fokusem v okamžiku otevření — sem ho po zavření vracíme (nález 8). */
   const vyvolavacRef = useRef<HTMLElement | null>(null);
@@ -416,17 +418,29 @@ export function VypravecRoot({
   }, []);
   const zavrit = useCallback(() => {
     setOtevreny(false);
+    setInitialView(undefined); // příští otevření začne na domovském pohledu
     vratFocus();
   }, [vratFocus]);
 
   // Vstup z mobilního draweru / "?" (03 §5) — otevře panel i na kolizní ploše.
+  // 25.1 — `vypravec:nahlasit-chybu` otevře rovnou formulář hlášení (z FAQ/nápovědy).
   useEffect(() => {
     function onOtevrit() {
       vyvolavacRef.current = document.activeElement as HTMLElement | null;
+      setInitialView(undefined);
+      setOtevreny(true);
+    }
+    function onNahlasit() {
+      vyvolavacRef.current = document.activeElement as HTMLElement | null;
+      setInitialView('chyba');
       setOtevreny(true);
     }
     window.addEventListener('vypravec:otevrit', onOtevrit);
-    return () => window.removeEventListener('vypravec:otevrit', onOtevrit);
+    window.addEventListener('vypravec:nahlasit-chybu', onNahlasit);
+    return () => {
+      window.removeEventListener('vypravec:otevrit', onOtevrit);
+      window.removeEventListener('vypravec:nahlasit-chybu', onNahlasit);
+    };
   }, []);
 
   // Odchod z routy zavírá panel (kontext se změnil) — render-phase adjustment,
@@ -458,6 +472,7 @@ export function VypravecRoot({
         // Shift+V je EXPLICITNÍ pull — funguje i na kolizní ploše (03 §5)
         e.preventDefault();
         vyvolavacRef.current = document.activeElement as HTMLElement | null;
+        setInitialView(undefined);
         setOtevreny((o) => !o);
       }
     }
@@ -502,6 +517,7 @@ export function VypravecRoot({
           onClick={() => {
             vyvolavacRef.current =
               fabRef.current?.querySelector<HTMLElement>('button') ?? null;
+            setInitialView(undefined);
             setOtevreny((o) => !o);
           }}
         />
@@ -523,6 +539,8 @@ export function VypravecRoot({
             scope={scope}
             worldName={world?.name}
             worldSlug={world?.worldSlug}
+            worldId={world?.worldId}
+            initialView={initialView}
             pattern={pattern}
             audience={
               jePlatformniAdmin

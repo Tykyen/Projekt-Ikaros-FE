@@ -453,20 +453,166 @@ function CestyView({ onZpet }: { onZpet: () => void }) {
   );
 }
 
+/** 25.1 — hlas persony ve formuláři hlášení: kdo je na řadě, ten mluví. */
+const CHYBA_PERSONA: Record<
+  'ikaros' | 'world' | 'tm',
+  { uvod: string; potvrzeni: string }
+> = {
+  ikaros: {
+    uvod: 'Něco skřípe? Popiš mi, co se stalo — projdu to.', // Ishida
+    potvrzeni: 'Mám to. Podívám se na to.',
+  },
+  world: {
+    uvod: 'Narazil jsi na chybu? Napiš mi, co zlobí — předám to dál.', // Joe
+    potvrzeni: 'Díky. Zapsala jsem to — sledujeme.',
+  },
+  tm: {
+    uvod: 'Hlášení závady. Stručně — co selhalo?', // Měďák
+    potvrzeni: 'Zaznamenáno. Předávám výš.',
+  },
+};
+
+/**
+ * 25.1 — formulář „Nahlásit chybu". Mluví aktuální persona (`mluvci`). Text +
+ * nepovinný e-mail + auto-kontext (route/url bez query/verze/UA/scope/speaker).
+ * Odesílá anon i přihlášený (BE doplní reporterId z tokenu).
+ */
+function ChybaView({
+  mluvci,
+  scope,
+  pattern,
+  worldId,
+  onZpet,
+}: {
+  mluvci: 'ikaros' | 'world' | 'tm';
+  scope: 'ikaros' | 'world';
+  pattern: string | null;
+  worldId?: string;
+  onZpet: () => void;
+}) {
+  const [text, setText] = useState('');
+  const [email, setEmail] = useState('');
+  const [stav, setStav] = useState<'form' | 'odesilam' | 'hotovo' | 'chyba'>(
+    'form',
+  );
+  const persona = CHYBA_PERSONA[mluvci];
+
+  async function odeslat() {
+    if (text.trim().length < 3 || stav === 'odesilam') return;
+    setStav('odesilam');
+    // __APP_VERSION__ = vite define (existuje jen v buildu; v testu/SSR ne) →
+    // typeof stráž proti ReferenceError.
+    const buildVersion =
+      typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : undefined;
+    try {
+      await api.post('/bug-reports', {
+        text: text.trim().slice(0, 4000),
+        ...(email.trim() ? { email: email.trim() } : {}),
+        context: {
+          // url BEZ query stringu (PII/GDPR — spec §8).
+          url: window.location.origin + window.location.pathname,
+          scope,
+          speaker: mluvci,
+          ...(pattern ? { route: pattern } : {}),
+          ...(worldId ? { worldId } : {}),
+          ...(buildVersion ? { buildVersion } : {}),
+          userAgent: navigator.userAgent,
+        },
+      });
+      setStav('hotovo');
+    } catch {
+      setStav('chyba');
+    }
+  }
+
+  return (
+    <div>
+      <button type="button" className={s.zpet} onClick={onZpet}>
+        ← Zpět
+      </button>
+      <div className={s.kdeJsem}>
+        <span className={s.avatar}>
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={`${AVATARY[mluvci].webp96} 1x, ${AVATARY[mluvci].webp192} 2x`}
+            />
+            <img
+              src={AVATARY[mluvci].png}
+              alt=""
+              loading="lazy"
+              className={s.avatarImg}
+            />
+          </picture>
+        </span>
+        <div>
+          <div className={s.kdeLabel}>Nahlásit chybu</div>
+          <p className={s.kdeText}>{persona.uvod}</p>
+        </div>
+      </div>
+
+      {stav === 'hotovo' ? (
+        <p className={s.topikOdstavec} role="status">
+          {persona.potvrzeni}
+        </p>
+      ) : (
+        <>
+          <textarea
+            className={s.chybaTextarea}
+            placeholder="Co se stalo? Klidně i „kliknul jsem sem a nic se nestalo“."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={4000}
+            aria-label="Popis chyby"
+          />
+          <input
+            type="email"
+            className={s.hledani}
+            placeholder="E-mail, když chceš vědět, jak to dopadlo (nepovinné)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            aria-label="E-mail pro odpověď (nepovinné)"
+          />
+          <p className={s.poznamka}>
+            Přiložím kontext: kde jsi, verzi appky a prohlížeč. Osobní údaje sem
+            prosím nepiš.
+          </p>
+          {stav === 'chyba' && (
+            <p className={s.topikOdstavec} role="alert">
+              Nepodařilo se odeslat — zkus to prosím znovu.
+            </p>
+          )}
+          <button
+            type="button"
+            className={s.cta}
+            disabled={stav === 'odesilam' || text.trim().length < 3}
+            onClick={() => void odeslat()}
+          >
+            {stav === 'odesilam' ? 'Odesílám…' : 'Odeslat hlášení'}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function VypravecPanel({
   scope,
   worldName,
   worldSlug,
+  worldId,
   pattern,
   audience,
   header,
   personaVolba,
+  initialView,
   onPersona,
   onClose,
 }: {
   scope: 'ikaros' | 'world';
   worldName?: string;
   worldSlug?: string;
+  worldId?: string;
   /** Route pattern pro nabídku topiků (blok B). */
   pattern: string | null;
   /** Publikum (audienceZRole / anon / prihlaseny). */
@@ -474,14 +620,16 @@ export default function VypravecPanel({
   header: ResolvedHeader | null;
   /** true = obsah panelu je volba persony (auto-open po registraci). */
   personaVolba?: boolean;
+  /** 25.1 — počáteční pohled (např. 'chyba' z odkazu „Nahlásit chybu"). */
+  initialView?: 'chyba';
   onPersona?: (p: 'pj' | 'hrac' | 'worldbuilder' | null) => void;
   onClose: () => void;
 }) {
   const [rozbaleny, setRozbaleny] = useState(false);
   const [topikId, setTopikId] = useState<string | null>(null);
   const [pohled, setPohled] = useState<
-    'domu' | 'navody' | 'cesty' | 'zmeny' | 'kronika'
-  >('domu');
+    'domu' | 'navody' | 'cesty' | 'zmeny' | 'kronika' | 'chyba'
+  >(initialView === 'chyba' ? 'chyba' : 'domu');
   // S2 „Zeptat se" — fulltext nad topiky+návody (engine/hledani).
   const [dotaz, setDotaz] = useState('');
   const nalezy = dotaz.trim().length >= 2 ? hledej(dotaz, audience) : [];
@@ -682,6 +830,14 @@ export default function VypravecPanel({
           />
         ) : pohled === 'cesty' ? (
           <CestyView onZpet={() => setPohled('domu')} />
+        ) : pohled === 'chyba' ? (
+          <ChybaView
+            mluvci={mluvci}
+            scope={scope}
+            pattern={pattern}
+            worldId={worldId}
+            onZpet={() => setPohled('domu')}
+          />
         ) : pohled === 'kronika' ? (
           <KronikaView onZpet={() => setPohled('domu')} />
         ) : pohled === 'zmeny' ? (
@@ -865,6 +1021,16 @@ export default function VypravecPanel({
                       {zmenBadge}
                     </span>
                   )}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={s.menuTlacitko}
+                  onClick={() => setPohled('chyba')}
+                >
+                  <Klic />
+                  Nahlásit chybu
                 </button>
               </li>
               <li>

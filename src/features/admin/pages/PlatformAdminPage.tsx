@@ -14,6 +14,7 @@ import { UsersAdminTab } from '../components/UsersAdminTab/UsersAdminTab';
 import { AuditLogTab } from '../users/components/AuditLogTab/AuditLogTab';
 import { SearchIndexTab } from '../components/SearchIndexTab/SearchIndexTab';
 import { DeletedWorldsTab } from '../components/DeletedWorldsTab/DeletedWorldsTab';
+import { ChybyTab } from '../components/ChybyTab/ChybyTab';
 import { FriendshipDebugTab } from '@/features/users/components/tabs/FriendshipDebugTab/FriendshipDebugTab';
 import s from './PlatformAdminPage.module.css';
 
@@ -21,6 +22,7 @@ type AdminTab =
   | 'prehled'
   | 'uzivatele'
   | 'smazane-svety'
+  | 'chyby'
   | 'audit'
   | 'search-index'
   | 'friendship-debug';
@@ -35,6 +37,7 @@ const TABS: TabItem[] = [
     label: 'Smazané světy',
     icon: <Trash2 size={18} />,
   },
+  { id: 'chyby', label: 'Chyby', icon: <Bug size={18} /> },
   { id: 'audit', label: 'Audit log', icon: <ClipboardList size={18} /> },
   { id: 'search-index', label: 'Search index', icon: <Search size={18} /> },
   // 20.5 — „Chat" není obsahový tab: navádí na samostatnou route /admin/chat.
@@ -55,6 +58,7 @@ const VALID = new Set<AdminTab>([
   'prehled',
   'uzivatele',
   'smazane-svety',
+  'chyby',
   'audit',
   'search-index',
   ...(IS_DEV ? (['friendship-debug'] as AdminTab[]) : []),
@@ -103,6 +107,7 @@ export default function PlatformAdminPage() {
         {tab === 'prehled' && <OverviewTab />}
         {tab === 'uzivatele' && <UsersAdminTab />}
         {tab === 'smazane-svety' && <DeletedWorldsTab />}
+        {tab === 'chyby' && <ChybyTab />}
         {tab === 'audit' && <AuditLogTab />}
         {tab === 'search-index' && <SearchIndexTab />}
         {tab === 'friendship-debug' && IS_DEV && <FriendshipDebugTab />}

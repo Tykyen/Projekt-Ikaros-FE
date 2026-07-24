@@ -12,6 +12,37 @@ import { INSITU_TOPIKY } from './insitu';
 export const TOPIKY: readonly HelpTopic[] = [
   // MVP-B: in-situ taháky („?" chat/TM) jako topiky — adaptéry viz insitu.tsx.
   ...INSITU_TOPIKY,
+  // ── Podpora (25.1) ─────────────────────────────────────────────────────
+  {
+    id: 'podpora.nahlasit-chybu',
+    title: 'Jak nahlásit chybu',
+    tags: [
+      'chyba',
+      'bug',
+      'nahlásit',
+      'hlášení',
+      'vada',
+      'rozbité',
+      'nefunguje',
+      'problém',
+    ],
+    routes: [],
+    body: {
+      odstavce: [
+        'Když něco nefunguje, jak má, nahlas to přímo tady — otevři mě a zvol „Nahlásit chybu". Funguje z každé stránky, i bez přihlášení.',
+        'Stačí pár vět o tom, co se stalo. Kde právě jsi, verzi aplikace i prohlížeč přiložím sám — nemusíš nic opisovat.',
+        'Když necháš e-mail, ozvu se, až to bude vyřešené. Není povinný.',
+      ],
+      kroky: [
+        'Otevři Vypravěče — ikona vpravo dole, nebo zkratka Shift+V.',
+        'V nabídce zvol „Nahlásit chybu".',
+        'Popiš, co se stalo, a odešli.',
+      ],
+    },
+    source: { kapitola: '07' },
+    verifiedAt: '2026-07-24',
+    status: 'funkcni',
+  },
   // ── Role (příčná vrstva — zákys č. 1) ──────────────────────────────────
   {
     id: 'role.dve-patra',

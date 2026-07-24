@@ -690,6 +690,29 @@
   color: var(--text-muted);
 }
 
+/* 25.1 — formulář hlášení chyby (mluvčí = aktuální persona) */
+.chybaTextarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+  background: color-mix(in srgb, var(--acc) 6%, transparent);
+  color: var(--text-strong);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.chybaTextarea:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -1px;
+}
+.chybaTextarea::placeholder {
+  color: var(--text-muted);
+}
+
 /* S3 „Co je nového" — záznam changelogu + badge v menu */
 .zmena {
   padding: 10px 0;

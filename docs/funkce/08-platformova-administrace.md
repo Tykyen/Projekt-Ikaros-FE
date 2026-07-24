@@ -59,7 +59,7 @@ Definice `AdminPermissions` (`Projekt-ikaros-FE/src/shared/types/index.ts:24`, B
 ## Platform Admin panel (`/admin`)
 
 ### Co to je
-Centrální platformový admin hub s 6 obsahovými taby (z toho 1 dev-only) + 7. položkou v liště „Chat", která není tab, ale rozcestník na samostatnou route `/admin/chat` (`PlatformAdminPage.tsx:41`).
+Centrální platformový admin hub se 7 obsahovými taby (z toho 1 dev-only) + 8. položkou v liště „Chat", která není tab, ale rozcestník na samostatnou route `/admin/chat` (`PlatformAdminPage.tsx:41`).
 - **Kde:** route `/admin`, `Projekt-ikaros-FE/src/features/admin/pages/PlatformAdminPage.tsx`. Tab se drží v URL `?tab=` (whitelist `VALID`, `PlatformAdminPage.tsx:54`; neznámá hodnota → `prehled`).
 - **Kdo:** FE `RoleGuard roles={[Superadmin, Admin]}` (`router.tsx:360-366`). BE jednotlivé endpointy `AdminGuard` (role ≤ Admin, `admin.guard.ts:17`).
 - **Stav:** ✅
@@ -68,9 +68,10 @@ Centrální platformový admin hub s 6 obsahovými taby (z toho 1 dev-only) + 7.
 1. **Přehled** (`?tab=prehled`) — dashboard se stat-kartami.
 2. **Uživatelé** (`?tab=uzivatele`) — správa uživatelů.
 3. **Smazané světy** (`?tab=smazane-svety`) — recovery soft-smazaných světů.
-4. **Audit log** (`?tab=audit`) — moderátorský audit.
-5. **Search index** (`?tab=search-index`) — monitoring + rebuild vyhledávání.
-6. **Friendship debug** (`?tab=friendship-debug`) — **jen v DEV buildu** (`import.meta.env.DEV`), na produkci se tab vůbec nevykreslí.
+4. **Chyby** (`?tab=chyby`) — inbox in-app hlášení chyb (25.1).
+5. **Audit log** (`?tab=audit`) — moderátorský audit.
+6. **Search index** (`?tab=search-index`) — monitoring + rebuild vyhledávání.
+7. **Friendship debug** (`?tab=friendship-debug`) — **jen v DEV buildu** (`import.meta.env.DEV`), na produkci se tab vůbec nevykreslí.
 
 > Pozn.: „Zpracovat" frontu (schvalování username/obsahu) panel ZÁMĚRNĚ neobsahuje — je to osobní fronta na `/ikaros/uzivatele?tab=zpracovat`, ne admin nástroj.
 
@@ -218,6 +219,16 @@ Centrální platformový admin hub s 6 obsahovými taby (z toho 1 dev-only) + 7.
 - **Kód:** FE `components/DeletedWorldsTab/DeletedWorldsTab.tsx`.
 
 ---
+
+### Tab Chyby (in-app hlášení chyb) — 25.1
+- **Co to je:** Admin inbox hlášení chyb od uživatelů. Kanál sběru = **Vypravěč** (menu „Nahlásit chybu", persona-aware — viz kap. 07). Bug ≠ obsahová moderace → **oddělená entita** `bug_reports`, ne modul `moderation`.
+- **Kde:** tab `?tab=chyby` v `/admin` (`PlatformAdminPage.tsx`, `ChybyTab.tsx`). Filtr Nové / Vyřešené.
+- **Kdo:** FE `RoleGuard [Superadmin, Admin]` (tab v panelu). BE `GET /bug-reports` + `POST /bug-reports/:id/resolve` = `JwtAuthGuard + RolesGuard @Roles(Superadmin, Admin)` (`bug-reports.controller.ts`). Non-admin → 403, anon → 401.
+- **Co jde dělat:** filtrovat nové/vyřešené · přečíst text + auto-kontext (čas, přihlášený/anonym, persona-mluvčí, route, verze buildu, userAgent, nepovinný e-mail reportera) · označit „Vyřešeno" (`markResolved`).
+- **Hranice / co neumí:** bez detailu/threadu, bez odpovědi reporterovi (V1 e-mail se jen uloží), bez kategorií, bez screenshotu (→ V2). Reporty se **nemažou** (audit).
+- **Zvláštnosti:** intake `POST /bug-reports` je **veřejný** (anon i přihlášený, `OptionalJwtAuthGuard`), rate-limit `@Throttle(5/min/IP)`; `reporterId` se bere z tokenu, ne z body. Discord notifikace nového reportu přes globální `AlertService` (webhook `DISCORD_ALERT_WEBHOOK`, fire-and-forget — selhání report neshodí; unikátní dedupeKey per report). `url` v kontextu je bez query stringu (PII/GDPR).
+- **Stav:** ✅ (BE modul + testy 8/8; FE tab + persona formulář)
+- **Kód:** FE `src/features/admin/components/ChybyTab/ChybyTab.tsx` + `src/features/admin/api/useBugReports.ts`; formulář `src/shared/vypravec/ui/VypravecPanel.tsx` (ChybaView). BE `backend/src/modules/bug-reports/` (controller/service/repository/schema/dto), registrace `app.module.ts`. Testy `backend/test/bug-reports.e2e-spec.ts` + `bug-reports-throttle.e2e-spec.ts`.
 
 ### Tab Audit log
 - **Co to je:** log moderátorských akcí s filtrací.

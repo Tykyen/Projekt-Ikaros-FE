@@ -156,7 +156,7 @@ Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 
 ## Fáze 25 — Testerská výbava & první dojem
 **Z auditu cesty testera + rešerše prvního dojmu.** Bez 25.1 se zpětná vazba rozteče mimo platformu; bez zbytku kouká nováček na prázdno a odchází.
 
-### - [ ] 25.1 In-app hlášení chyb — [dopad vysoký · náklad střední] 👑
+### - [x] 25.1 In-app hlášení chyb — [dopad vysoký · náklad střední] 👑 ✅ 2026-07-24 (BE modul `bug-reports` + FE Vypravěč „Nahlásit chybu" persona-aware + admin tab Chyby + `/kontakt` e-maily; screenshot/kategorie/Discord-detaily → V2; čeká BE deploy+restart + živé screenshoty)
 **Cíl:** Stránka/tlačítko „Nahlásit chybu" dostupné odkudkoli; hlášení pod minutu.
 **Dnes slepá smyčka:** FAQ → „napiš e-mailem dle kontaktu" → ContactPage má `[DOPLNIT: e-mail]`. Tlačítko „Nahlásit" je jen DSA obsahová moderace. Discord v UI není.
 **Rozhodnuto (uživatel):** primární kanál = **in-app stránka**, ne Discord (existuje, ale nebude se extrémně využívat).
@@ -180,14 +180,10 @@ Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 
 ### - [ ] 25.5 Úklid prvního dojmu — [dopad střední · náklad malý]
 Z rešerše živého webu: ① skrýt/přejmenovat veřejně viditelný svět s `/test/` v názvu · ② skrýt nulové indikátory (Putyka „0 online" apod. — prázdnota nesmí být první signál) · ③ **PWA install prompt odložit**, dokud uživatel nezažil hodnotu (dnes hned; odhad −5–15 % první konverze) · ④ prověřit ~3s spinner nápovědy (první dojem) · ⑤ patička/beta štítek viditelný i v layoutech, kde se dnes nerenderuje.
 
-### - [ ] 25.6 Kurátorský první výběr motivů — [dopad střední · náklad malý]
-**Rešerše:** 33 motivů = rozhodovací zátěž + vizuální QA plocha; kyberpunk default polarizuje.
-**Návrh:** v prvním výběru 4–6 „podpisových" motivů (zbytek za „Další motivy…"), žádné mazání. **Otevřené otázky:** neutrálnější default, nebo rychlá volba dle žánru při registraci/založení světa? Kterých 4–6? *(Kvalita skinů zůstává princip — tady jde o kurátorství nabídky, ne o šetření na grafice.)*
-
-### - [ ] 25.7 Registrační brzda (volitelné) — [dopad nízký · náklad malý]
+### - [ ] 25.6 Registrační brzda (volitelné) — [dopad nízký · náklad malý]
 Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whitelist neexistuje. Pro kohorty A/B stačí nešířit URL. Env-flag invite kód / kapacitní cap připravit, jen kdyby se to zvrhlo. **Otevřená otázka:** chceme pro kohortu C pozvánkové kódy (měřitelné „přišel doporučením"), nebo volný vstup s capem?
 
-### - [x] 25.8 Ohraničení systémových slibů ⚠️ — [dopad vysoký · náklad malý] ✅ 2026-07-19
+### - [x] 25.7 Ohraničení systémových slibů ⚠️ — [dopad vysoký · náklad malý] ✅ 2026-07-19
 **Kolize (rešerše):** veřejná stránka „RPG systémy" slibovala hraní DrD 1.6, DrD II a JaD vč. deníku a taktické mapy — mantinel projektu ale říká „licence čekají, systémy neřešíme".
 **✅ Implementováno (spec [spec-25.8](arch/phase-25/spec-25.8.md)):** rozhodnuto uživatelem „skryj" (generická stránka zamítnuta). Vše za flagem `SystemLanding/flag.ts` (`SYSTEM_LANDINGS_PUBLIC=false`): routy `/ikaros/systemy*` → gate loader redirect na `/` (stránky byly indexované, ne 404) · nav položka + sekce nápovědy skryty · BE sitemap bez 4 záznamů · prerender řádek zakomentován · dashboard meta bez názvů systémů. In-app funkčnost (výběr systému, deníky) beze změny — není to veřejný claim. Vědomě neskryto: TermsPage „např." výčet (právní popisný text → advokát, 31.1) a zmínky v nápovědě světa (dokumentace reálné funkce). Zpětné zapnutí po licencích = 3 kroky (návod ve flag.ts). Ověřeno: FE build+budget+CSP ✓, audit:nav ✓, vitest 120 ✓, BE typecheck + seo 7/7 ✓. **Čeká FE+BE deploy.**
 

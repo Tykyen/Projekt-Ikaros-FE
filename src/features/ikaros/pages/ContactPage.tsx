@@ -32,16 +32,21 @@ export default function ContactPage() {
       </p>
       <p>
         Provozní e-mail:{' '}
-        <mark className={s.dopisat}>[DOPLNIT: e-mail]</mark>.
+        <a href="mailto:tyky.projekt.ikaros@gmail.com">
+          tyky.projekt.ikaros@gmail.com
+        </a>
+        .
       </p>
 
       <h2>Kontaktní místo pro uživatele</h2>
       <p>
         Pro dotazy, žádosti k osobním údajům i obecná hlášení nás kontaktuj
         elektronicky na{' '}
-        <mark className={s.dopisat}>[DOPLNIT: e-mail / formulář]</mark>. Za
-        kontaktním místem stojí člověk — nespoléháme výhradně na automat. Sem
-        směřuje i případné <strong>odvolání</strong> proti moderačnímu
+        <a href="mailto:tyky.projekt.ikaros@gmail.com">
+          tyky.projekt.ikaros@gmail.com
+        </a>
+        . Za kontaktním místem stojí člověk — nespoléháme výhradně na automat.
+        Sem směřuje i případné <strong>odvolání</strong> proti moderačnímu
         rozhodnutí.
       </p>
 
@@ -49,7 +54,10 @@ export default function ContactPage() {
       <p>
         Jednotné kontaktní místo pro orgány členských států, Evropskou komisi
         a sbor (DSA čl. 11):{' '}
-        <mark className={s.dopisat}>[DOPLNIT: e-mail pro orgány]</mark>.
+        <a href="mailto:tyky.projekt.ikaros@gmail.com">
+          tyky.projekt.ikaros@gmail.com
+        </a>
+        .
       </p>
 
       <h2>Jazyk komunikace</h2>
