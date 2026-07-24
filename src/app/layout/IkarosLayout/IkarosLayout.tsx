@@ -54,7 +54,8 @@ import { ForgotPasswordModal } from '@/features/auth/components/ForgotPasswordMo
 import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { SiteFooter } from '@/shared/ui/SiteFooter/SiteFooter';
 import { BetaBanner } from '@/features/beta';
-import { UserAvatar, useFocusTrap } from '@/shared/ui';
+import { UserAvatar, useFocusTrap, PreviewBadge } from '@/shared/ui';
+import { isPreview } from '@/shared/scope/scope';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
@@ -196,6 +197,8 @@ export function NavItem({
     >
       <span className={s.navItemIcon}>{icon}</span>
       <span className={s.navItemLabel}>{label}</span>
+      {/* 27.3 — plocha třídy B nese „Preview" štítek (scope registr, SSOT scope.ts). */}
+      {isPreview(navKey) && <PreviewBadge />}
       {pendingCount > 0 && (
         <span className={s.navItemBadge} aria-label={tooltip}>
           {pendingCount}
@@ -292,9 +295,10 @@ export function SidebarContent({
               Prozkoumat světy →
             </Link>
           )}
-          {/* 19.3 — vstup na nástěnku náborů (LFG). */}
+          {/* 19.3 — vstup na nástěnku náborů (LFG). 27.3 — B plocha → Preview. */}
           <Link to="/ikaros/nabory" className={s.showAllLink} onClick={onNav}>
             Hledá se →
+            {isPreview('nabory') && <PreviewBadge />}
           </Link>
         </div>
       </div>
@@ -338,6 +342,8 @@ export function SidebarContent({
                   )}
                 </span>
                 <span className={s.navItemLabel}>{room.label}</span>
+                {/* 27.3 — B plocha (voice/campy) → „Preview" štítek (scope.ts). */}
+                {isPreview(room.key) && <PreviewBadge />}
                 {/* 25.5 ② — prázdnou místnost (0) neukazujeme jako „0"; badge
                     jen když někdo je (sjednoceno se vzorem pendingCount výše). */}
                 {count > 0 && (

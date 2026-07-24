@@ -4,6 +4,15 @@ Detailní záznamy pro frontend (komponenty, hooky, timing, render). Index v [`R
 
 ---
 
+### ✅ ŘEŠENÍ — 27.3 scope registr A/B/C: metadata vrstva (preview/hidden) přes centrální registr, který render JEN ČTE — ne prop-drilling ani úprava definic položek · 2026-07-24
+**Kontext:** 27.3 měl označit ~13 „preview" nav položek (třída B) štítkem a připravit skrytí (třída C) napříč platform nav (`IkarosLayout` `PRIMARY_NAV`/`CHAT_ROOMS`) i world nav (`buildFullWorldNav` → 6 render míst desktop dropdown/top-level + mobil drawer). Naivní cesta = přidat `preview?: boolean` do každé definice položky a protáhnout ho rendery (prop-drilling přes NavItemDef, NavNode, chat rooms, nábory…).
+**Co zabralo:** jeden SSOT modul `src/shared/scope/scope.ts` (`PREVIEW_FEATURES`/`HIDDEN_FEATURES` = `Set<string>` klíčů + `isPreview`/`isHidden`/`scopeTier`). Klíč = **stabilní identifikátor, který už v nav existuje** — world nav `id` (z `HIDEABLE_NAV_ITEMS`), platform `navKey`/room `key`. Render místa jen volají `isPreview(id)` → `<PreviewBadge>`; **definice položek se NEMĚNÍ**. Badge = tenká vrstva nad existující `Badge` (variant warning, ⚗ ikona). C = existující `flagGate` guard (vzor 25.8), aktivní jen pro už-blokované „systemy".
+**Proč správně:** SSOT drží klasifikaci na jednom místě → přesun tieru = 1 řádek, žádné rozházené flagy po 6 souborech. Odvození z existujícího `id` znamená nula změn ve strukturách položek a nula rizika drift mezi definicí a badge. Reuse `Badge`+`flagGate`+hideable `id` = minimum nového kódu (náklad malý dle karty).
+**Jak ověřeno:** unit `scope.spec.ts` (4 — A/B/C tiery + disjunktnost setů), IkarosLayout gating + route-registry parita zelené, build 94 % (badge do barrelu nezvedla entry graf — 1 lucide ikona), registr Vypravěče 123/123.
+**Zhodnocení (dobře/špatně):** **dobře** — čistý průchod napoprvé bez cyklení; klíčové rozhodnutí *render čte registr, ne mění data* ušetřilo prop-drilling a udrželo definice položek nedotčené; **scoped** volba (nic hotového neschováno, C jen už-blokované) předešla regresi pro zavedené PJ. **Pozor dál:** klíče v `PREVIEW_FEATURES` musí přesně sedět na nav `id`/`navKey` — překlep = tichý no-op (badge se prostě neukáže, tsc to nechytí); proto disjunktnost/existenci hlídá test a živé ověření badge zbývá (fb_tests_live). Reflexe: metoda „SSOT set + render čte přes stabilní klíč" je přenositelná na další cross-cutting metadata vrstvy (např. budoucí `NEW`/`beta` štítky).
+
+---
+
 ### CH-061 — A1 rezervace okrajů (--map-inset-*) nefungovala: default v `.viewport` STÍNIL dynamickou hodnotu z `<html>` · 2026-07-07
 **Kontext:** 17.10 A1/reorganizace — panely u okrajů (weatherSlot řádek pod lištou, dokovaná karta odsun) čtou CSS var `--map-inset-top/-right`; zapisují je `InitiativeBar` (top) a `TokenInfoPanel` (right) na `document.documentElement` (`<html>`).
 **Co jsem udělal špatně:** v A1 jsem přidal `--map-inset-right/-top/-bottom-left: 0px` jako DEFAULT přímo do `.viewport` (aby var „měl hodnotu"). Ale `.viewport` je předek konzumentů (`weatherSlot`, `.stack`) → CSS custom property se resolvuje z NEJBLIŽŠÍHO předka = `.viewport` (0px), NE z `<html>` (kam se zapisuje skutečná hodnota).

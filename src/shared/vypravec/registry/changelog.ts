@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-preview-stitky',
+    datum: '2026-07-24',
+    titul: 'Poznáš, co je ještě v přípravě',
+    popis:
+      'U některých funkcí teď uvidíš malý štítek ⚗ Preview. Znamená to, že funkce funguje, ale je hlouběji v betě — může se ještě měnit a nemá nejvyšší prioritu podpory. Jádro (postavy, chat, mapa, deník) běží bez štítku naplno.',
+  },
+  {
     id: 'zm-2026-07-24-mapa-na-mobilu',
     datum: '2026-07-24',
     titul: 'Taktická mapa pod palcem',

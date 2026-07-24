@@ -15,6 +15,7 @@ export { Breadcrumbs } from './Breadcrumbs';
 export type { Crumb } from './Breadcrumbs';
 export { RoleStar, roleHasStar } from './RoleStar/RoleStar';
 export { SupporterBadge } from './SupporterBadge/SupporterBadge';
+export { PreviewBadge } from './PreviewBadge/PreviewBadge';
 export { IdentityBadge } from './IdentityBadge/IdentityBadge';
 export { WorldRoleIcon } from './WorldRoleIcon';
 export type { WorldRoleKey } from './WorldRoleIcon';

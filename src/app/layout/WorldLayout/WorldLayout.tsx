@@ -17,7 +17,8 @@ import { useWorldStatus } from '@/features/world/api/useWorldStatus';
 import { useCharacterDirectory } from '@/features/world/pages/api/useCharacterDirectory';
 import { currentUserAtom } from '@/shared/store/authStore';
 import { UserRole, WorldRole } from '@/shared/types';
-import { UserAvatar, useFocusTrap } from '@/shared/ui';
+import { UserAvatar, useFocusTrap, PreviewBadge } from '@/shared/ui';
+import { isPreview } from '@/shared/scope/scope';
 import {
   themeAtom,
   worldThemePreviewAtom,
@@ -118,6 +119,8 @@ function DrawerSection({
               onClick={onNavigate}
             >
               {item.label}
+              {/* 27.3 — leaf třídy B → Preview štítek (scope.ts). */}
+              {isPreview(item.id) && <PreviewBadge />}
               {item.external && (
                 <span className={s.externalIcon} aria-label="otevře mimo svět">↗</span>
               )}
@@ -197,6 +200,8 @@ function NavDropdown({ group, onClose }: { group: NavNode; onClose: () => void }
         onClick={onClose}
       >
         {group.label}
+        {/* 27.3 — top-level leaf třídy B (např. Kalendář) → Preview (scope.ts). */}
+        {isPreview(group.id) && <PreviewBadge />}
       </NavLink>
     );
   }
@@ -230,6 +235,8 @@ function NavDropdown({ group, onClose }: { group: NavNode; onClose: () => void }
                 onClick={() => { setOpen(false); onClose(); }}
               >
                 {item.label}
+                {/* 27.3 — leaf třídy B → Preview štítek (scope.ts). */}
+                {isPreview(item.id) && <PreviewBadge />}
                 {item.external && (
                   <span className={s.externalIcon} aria-label="otevře mimo svět">↗</span>
                 )}
@@ -833,6 +840,8 @@ export function WorldLayout() {
                       onClick={() => setDrawerOpen(false)}
                     >
                       {group.label}
+                      {/* 27.3 — top-level leaf třídy B (Kalendář) → Preview. */}
+                      {isPreview(group.id) && <PreviewBadge />}
                     </NavLink>
                   </div>
                 ),
