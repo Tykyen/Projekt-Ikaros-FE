@@ -38,9 +38,11 @@ jobs:
       - name: Nav audit (FE-only scanner)
         run: npm run audit:nav
 
-      # 14.6 SCA: blokuje na prod high+critical. Dev/build toolchain řeší Dependabot.
+      # 14.6 SCA: blokuje na prod high+critical (npm audit) s DOKUMENTOVANÝM
+      # allowlistem s expirací (scripts/check-sca.mjs) — propustí jen advisory,
+      # co se naší architektury netýká a nemá vydaný fix. Dev/build → Dependabot.
       - name: SCA — npm audit (prod závislosti)
-        run: npm audit --omit=dev --audit-level=high
+        run: SCA_TODAY=$(date -u +%F) npm run audit:sca
 
   frontend-test:
     name: Frontend tests (vitest)

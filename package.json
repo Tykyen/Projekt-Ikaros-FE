@@ -22,6 +22,7 @@
     "audit:config": "node scripts/prod-config-scan.mjs",
     "audit:csp": "node scripts/check-csp-hash.mjs",
     "audit:bundle": "node scripts/check-bundle-budget.mjs",
+    "audit:sca": "node scripts/check-sca.mjs",
     "audit:errors": "node scripts/error-contract-scan.mjs --contract",
     "audit:logs": "node scripts/log-hygiene-scan.mjs --docker",
     "lint:colors": "node scripts/lint-no-hardcoded-colors.mjs",
