@@ -338,16 +338,17 @@ export function SidebarContent({
                   )}
                 </span>
                 <span className={s.navItemLabel}>{room.label}</span>
-                <span
-                  className={clsx(
-                    s.roomCount,
-                    count > 0 && s.roomCountActive,
-                  )}
-                  aria-label={`${count} dalších přítomných`}
-                  title={`Další přítomní: ${count}`}
-                >
-                  {count}
-                </span>
+                {/* 25.5 ② — prázdnou místnost (0) neukazujeme jako „0"; badge
+                    jen když někdo je (sjednoceno se vzorem pendingCount výše). */}
+                {count > 0 && (
+                  <span
+                    className={clsx(s.roomCount, s.roomCountActive)}
+                    aria-label={`${count} dalších přítomných`}
+                    title={`Další přítomní: ${count}`}
+                  >
+                    {count}
+                  </span>
+                )}
               </NavLink>
             );
           })}

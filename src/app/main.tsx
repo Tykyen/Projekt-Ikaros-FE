@@ -8,7 +8,8 @@ import { GlobalErrorBoundary } from "@/shared/ui/GlobalErrorBoundary";
 import { MaintenanceOverlay } from "@/shared/ui/MaintenanceOverlay";
 import { AuthBootstrap } from '@/features/auth/components';
 import { ThemeProvider } from "@/themes/ThemeProvider";
-import { InstallBanner, UpdateBanner } from "@/features/pwa";
+import { InstallBanner, UpdateBanner, bumpVisitCount } from "@/features/pwa";
+import { BetaMarker } from "@/features/beta";
 import { PrerenderReady } from "./PrerenderReady";
 import { initMonitoring } from "@/shared/lib/monitoring";
 import "./index.css";
@@ -16,6 +17,23 @@ import "./index.css";
 // Monitoring (3. noha) — error tracking + globální záchyt async/promise chyb.
 // Co nejdřív, ať pokryje i chyby při startu.
 initMonitoring();
+
+// 25.5 ③ — čítač návštěv. 2.+ návštěva odemkne PWA install prompt i pasivnímu
+// uživateli (ten, kdo nesplní žádný „hodnotový" milník). Viz features/pwa/valueGate.
+bumpVisitCount();
+
+// 25.5 ④ — přednačti chunk NÁPOVĚDY na pozadí (nízká priorita). Otevření
+// /ikaros/napoveda dnes ukáže ~3s Suspense spinner (těžký lazy chunk).
+// Vite dedupuje `import()` podle specifikátoru → skutečné kliknutí dostane už
+// hotový modul. Specifikátor MUSÍ sedět s lazy importem v router.tsx.
+const prefetchHelp = () => {
+  void import("@/features/ikaros/pages/HelpPage/HelpPage");
+};
+if (typeof window.requestIdleCallback === "function") {
+  window.requestIdleCallback(prefetchHelp);
+} else {
+  window.setTimeout(prefetchHelp, 2000);
+}
 
 // STAB (styl 29) — po deployi má starý tab stale hash lazy chunků → dynamic
 // import route selže (`vite:preloadError`) = bílá stránka. Jednorázový reload
@@ -78,6 +96,10 @@ createRoot(document.getElementById("root")!).render(
           {/* Globální údržbový overlay — při výpadku BE (deploy/restart) ukáže
               „Probíhá údržba" místo matoucího „svět nenalezen"; sám se schová. */}
           <MaintenanceOverlay />
+          {/* 25.5 ⑤ — trvalý minimální beta štítek tam, kde BetaBanner není
+              (anon / po zavření banneru / fullscreen mapa). Gate zrcadlí banner
+              → žádné zdvojení. Mimo router = nezávislý na layoutu. */}
+          <BetaMarker />
         </GlobalErrorBoundary>
       </ThemeProvider>
     </QueryClientProvider>

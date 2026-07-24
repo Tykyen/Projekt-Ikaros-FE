@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { hasExperiencedValue, getVisitCount, VALUE_EVENT } from './valueGate';
 
 /**
  * Spec 15.1 — logika install hintu PWA.
@@ -55,7 +56,19 @@ export function useInstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(isDismissed);
   const [standalone, setStandalone] = useState(detectStandalone);
+  // 25.5 ③ — brána „prožitá hodnota": prompt až po milníku (vstup do světa /
+  // zpráva) nebo na 2.+ návštěvě, ne hned po prvním načtení.
+  const [experienced, setExperienced] = useState(
+    () => hasExperiencedValue() || getVisitCount() >= 2,
+  );
   const isIos = detectIos();
+
+  useEffect(() => {
+    if (experienced) return; // už odemčeno → listener netřeba
+    const onValue = () => setExperienced(true);
+    window.addEventListener(VALUE_EVENT, onValue);
+    return () => window.removeEventListener(VALUE_EVENT, onValue);
+  }, [experienced]);
 
   useEffect(() => {
     const onPrompt = (e: Event) => {
@@ -93,7 +106,8 @@ export function useInstallPrompt() {
 
   // Android/desktop: nativní prompt je k dispozici. iOS: nabízíme jen návod.
   const canPrompt = !!deferred;
-  const shouldShow = !standalone && !dismissed && (canPrompt || isIos);
+  const shouldShow =
+    experienced && !standalone && !dismissed && (canPrompt || isIos);
 
   return { shouldShow, canPrompt, isIos, install, dismiss };
 }

@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { vypravecEmit } from '@/shared/vypravec/engine/events';
+import { markValueExperienced } from '@/features/pwa/valueGate';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
@@ -100,6 +101,8 @@ export function useSendMessage(room: RoomKey) {
         dto,
       ),
     onSuccess: () => {
+      // 25.5 ③ — odeslání zprávy = prožitá hodnota (odemkne PWA install prompt).
+      markValueExperienced();
       // Vypravěč (spec 26.4): sociální akce; NIKDY nesplní krok „Napiš do svého
       // světa" (channelKind ≠ 'world', worldId chybí).
       vypravecEmit('message.sent', {

@@ -119,4 +119,15 @@ describe('WorldCard', () => {
     renderCard(makeWorld({ playerCount: 3, maxPlayers: 6 }));
     expect(screen.getByText('3 / 6 hráčů')).toBeInTheDocument();
   });
+
+  it('0 hráčů bez limitu → "zatím bez hráčů" (25.5 ② — prázdnota nekazí první dojem)', () => {
+    renderCard(makeWorld({ playerCount: 0 }));
+    expect(screen.getByText('zatím bez hráčů')).toBeInTheDocument();
+    expect(screen.queryByText(/0 hráčů/)).toBeNull();
+  });
+
+  it('0 hráčů s limitem → stále "0 / Y hráčů" (kapacita nese info)', () => {
+    renderCard(makeWorld({ playerCount: 0, maxPlayers: 6 }));
+    expect(screen.getByText('0 / 6 hráčů')).toBeInTheDocument();
+  });
 });

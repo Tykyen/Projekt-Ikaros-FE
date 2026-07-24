@@ -180,13 +180,11 @@ Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 
 **Mechanika hotová:** `publicShowcase` (anon = Čtenář), sdílení scén 22.5, šablony stránek 15.5, generátory a knihovny 21.x. Zbývá **obsah** + odkazy z dashboardu/nápovědy.
 **Otevřené otázky:** které žánry (fantasy + sci-fi/Matrix + …)? kdo plní — autor, admin síť („správce ukázkového světa" role, 28.3)?
 
-### - [ ] 25.5 Úklid prvního dojmu — [dopad střední · náklad malý]
-Z rešerše živého webu: ① skrýt/přejmenovat veřejně viditelný svět s `/test/` v názvu · ② skrýt nulové indikátory (Putyka „0 online" apod. — prázdnota nesmí být první signál) · ③ **PWA install prompt odložit**, dokud uživatel nezažil hodnotu (dnes hned; odhad −5–15 % první konverze) · ④ prověřit ~3s spinner nápovědy (první dojem) · ⑤ patička/beta štítek viditelný i v layoutech, kde se dnes nerenderuje.
+### - [x] 25.5 Úklid prvního dojmu — [dopad střední · náklad malý] ✅ 2026-07-24 (spec-25.5)
+Z rešerše živého webu: ~~① skrýt/přejmenovat veřejně viditelný svět s `/test/` v názvu~~ (**vypuštěno** — legitimní svět tvůrce, ne náš test; do cizího obsahu nezasahujeme) · ② skrýt nulové indikátory (Putyka „0 online" apod. — prázdnota nesmí být první signál) · ③ **PWA install prompt odložit**, dokud uživatel nezažil hodnotu (dnes hned; odhad −5–15 % první konverze) · ④ prověřit ~3s spinner nápovědy (první dojem) · ⑤ patička/beta štítek viditelný i v layoutech, kde se dnes nerenderuje.
+**Hotovo (FE):** ② chat badge/„Putyka 0" skryto + katalog „zatím bez hráčů"; ③ PWA gate „prožitá hodnota" (milník vstup do světa/zpráva NEBO 2. návštěva); ④ idle prefetch chunku HelpPage; ⑤ globální **BetaMarker** (svislý ribbon vlevo, mount mimo router → i fullscreen mapa i anon). Čeká FE deploy + živé ověření (screenshoty pozice markeru + mobil).
 
-### - [ ] 25.6 Registrační brzda (volitelné) — [dopad nízký · náklad malý]
-Registrace je dnes otevřená komukoli (Turnstile + 15+); platformní invite/whitelist neexistuje. Pro kohorty A/B stačí nešířit URL. Env-flag invite kód / kapacitní cap připravit, jen kdyby se to zvrhlo. **Otevřená otázka:** chceme pro kohortu C pozvánkové kódy (měřitelné „přišel doporučením"), nebo volný vstup s capem?
-
-### - [x] 25.7 Ohraničení systémových slibů ⚠️ — [dopad vysoký · náklad malý] ✅ 2026-07-19
+### - [x] 25.6 Ohraničení systémových slibů ⚠️ — [dopad vysoký · náklad malý] ✅ 2026-07-19
 **Kolize (rešerše):** veřejná stránka „RPG systémy" slibovala hraní DrD 1.6, DrD II a JaD vč. deníku a taktické mapy — mantinel projektu ale říká „licence čekají, systémy neřešíme".
 **✅ Implementováno (spec [spec-25.8](arch/phase-25/spec-25.8.md)):** rozhodnuto uživatelem „skryj" (generická stránka zamítnuta). Vše za flagem `SystemLanding/flag.ts` (`SYSTEM_LANDINGS_PUBLIC=false`): routy `/ikaros/systemy*` → gate loader redirect na `/` (stránky byly indexované, ne 404) · nav položka + sekce nápovědy skryty · BE sitemap bez 4 záznamů · prerender řádek zakomentován · dashboard meta bez názvů systémů. In-app funkčnost (výběr systému, deníky) beze změny — není to veřejný claim. Vědomě neskryto: TermsPage „např." výčet (právní popisný text → advokát, 31.1) a zmínky v nápovědě světa (dokumentace reálné funkce). Zpětné zapnutí po licencích = 3 kroky (návod ve flag.ts). Ověřeno: FE build+budget+CSP ✓, audit:nav ✓, vitest 120 ✓, BE typecheck + seo 7/7 ✓. **Čeká FE+BE deploy.**
 

@@ -36,6 +36,7 @@ import { AdminElevationToggle } from '@/features/world/components/AdminElevation
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 import { ShowcaseBar } from '@/features/world/components/ShowcaseBar/ShowcaseBar';
 import { BetaBanner } from '@/features/beta';
+import { markValueExperienced } from '@/features/pwa/valueGate';
 import { WorldRequestsBell } from '@/features/world/components/WorldRequests';
 import { resolvePersona } from './resolvePersona';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
@@ -254,6 +255,10 @@ export function WorldLayout() {
   const headerRef = useRef<HTMLElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   useFocusTrap({ active: drawerOpen, containerRef: worldDrawerRef });
+  // 25.5 ③ — vstup do světa = prožitá hodnota (odemkne PWA install prompt).
+  useEffect(() => {
+    markValueExperienced();
+  }, []);
   useEffect(() => {
     if (!drawerOpen) return;
     const onKey = (e: KeyboardEvent) => {

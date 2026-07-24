@@ -13,6 +13,8 @@ function formatPlayers(playerCount: number, maxPlayers?: number | null): string 
   if (maxPlayers != null) {
     return `${playerCount} / ${maxPlayers} hráčů`;
   }
+  // 25.5 ② — prázdný svět v katalogu: „0 hráčů" kazí první dojem.
+  if (playerCount === 0) return 'zatím bez hráčů';
   if (playerCount === 1) return '1 hráč';
   if (playerCount >= 2 && playerCount <= 4) return `${playerCount} hráči`;
   return `${playerCount} hráčů`;

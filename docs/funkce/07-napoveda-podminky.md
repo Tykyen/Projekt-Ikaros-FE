@@ -69,8 +69,9 @@ Krátká kapitola: vestavěná stránka Nápověda (6 tabů, statická), Podmín
 
 ### Sdílená patička (SiteFooter) — 20A
 - **Co to je:** Legal patička s odkazy Podmínky použití / Ochrana údajů / Pravidla komunity / Kontakt / Nápověda + řádek `© {rok} Projekt Ikaros — komunitní RPG platforma ({štítek})`. Štítek už NENÍ hardcoded „(beta)" — bere se z konstanty `BETA_STAGE_SHORT` (`src/shared/config/betaStage.ts`, spec 25.3) → jeden zdroj pravdy sdílený s beta bannerem.
-- **Kde:** renderuje se uvnitř `<main>` za `<Outlet/>` v `IkarosLayout`, gate `showRightPanel` = `!isChat && !isAdmin && !isBestiar` → skryje se v chat focus módu (`/chat*`), v administraci (`/admin*`) **a v globálním bestiáři** (`/ikaros/bestiar*`, imerzivní full-width plocha). Rok z runtime `new Date().getFullYear()`.
+- **Kde:** renderuje se uvnitř `<main>` za `<Outlet/>` v `IkarosLayout`, gate `showRightPanel` = `!isChat && !isAdmin && !isBestiar` → skryje se v chat focus módu (`/chat*`), v administraci (`/admin*`) **a v globálním bestiáři** (`/ikaros/bestiar*`, imerzivní full-width plocha). **Ve `WorldLayout` (celý svět) se patička nerenderuje vůbec.** Rok z runtime `new Date().getFullYear()`.
 - **Kdo:** viditelná všem (i anonymům) na content stránkách.
+- **Hranice:** mezeru v pokrytí beta štítku (chat/admin/bestiar + celý WorldLayout + fullscreen mapa) doplňuje od 25.5 ⑤ globální **beta marker** (viz níže) — beta signál tak nechybí nikde.
 - **Stav:** ✅
 - **Kód:** FE `src/shared/ui/SiteFooter/SiteFooter.tsx` (+ css), konstanta `src/shared/config/betaStage.ts`, mount v `src/app/layout/IkarosLayout/IkarosLayout.tsx`.
 
@@ -85,6 +86,25 @@ Krátká kapitola: vestavěná stránka Nápověda (6 tabů, statická), Podmín
 - **Zvláštnosti:** dismiss v `onboardingStore.dismissed` pod verzovaným klíčem `beta-banner:v1` · barvy z theme tokenů (funguje ve všech skinech) · signature = razítko `BETA` v monospace.
 - **Stav:** ✅ (kód hotový; čeká FE deploy + živé ověření)
 - **Kód:** FE `src/features/beta/BetaBanner.tsx` (+ css), konstanty `src/shared/config/betaStage.ts`, mount `src/app/layout/IkarosLayout/IkarosLayout.tsx` + `src/app/layout/WorldLayout/WorldLayout.tsx`.
+
+---
+
+### Beta marker (trvalý štítek) — 25.5 ⑤
+- **Co to je:** Minimální svislý „beta" ribbon přišpendlený k LEVÉ hraně obrazovky — trvalý beta signál tam, kde patička ani beta banner nejsou.
+- **Kde:** mountnutý globálně v `src/app/main.tsx` (mimo router) → nezávislý na layoutu; vidět ve WorldLayout, chat/admin/bestiar, **fullscreen taktické mapě** i na anonymních plochách. `pointer-events:none` → neblokuje ovládání pod sebou.
+- **Kdo:** **anonym vždy**; přihlášený jen když je beta banner **zavřený** (gate zrcadlí `BetaBanner` — `initHotovo` + dismiss `beta-banner:v1`) → žádné zdvojení, dokud nahoře svítí proužek.
+- **Hranice / co neumí:** neinteraktivní (jen signál, ne odkaz) · gate nezná routu (mount mimo router) ⇒ přihlášený s NEzavřeným bannerem marker nevidí ani ve fullscreen mapě, kde banner reálně chybí (marginální okno; po zavření banneru marker naskočí všude).
+- **Zvláštnosti:** tečka bere akcent aktivního motivu (`--acc`) + jemný pulz (off při `prefers-reduced-motion`) · z-index 180 (pod FAB Vypravěče 190 i toasty) · termín z `BETA_STAGE_SHORT` (sdílený s patičkou i bannerem).
+- **Stav:** ✅ (kód hotový; čeká FE deploy + živé ověření pozice)
+- **Kód:** FE `src/features/beta/BetaMarker.tsx` (+ css), mount `src/app/main.tsx`, konstanty `src/shared/config/betaStage.ts`.
+
+---
+
+### Úklid prvního dojmu — 25.5 (ostatní body)
+- **② Nulové indikátory:** prázdný počet se neukazuje jako „0" tam, kde kazí první dojem — chat room badge (Putyka/campy) se při 0 **nevykreslí** (`IkarosLayout.tsx`), katalog světů ukáže **„zatím bez hráčů"** místo „0 hráčů" (`WorldCard.tsx`; s limitem zůstává „0 / N hráčů", kapacita nese info). Veřejný profil „0 světů", diskuze `postCount`/`likeCount` a admin overview **záměrně beze změny** (tam 0 nese informaci).
+- **③ PWA install prompt — brána „prožitá hodnota":** výzva k instalaci se už neukáže hned po prvním načtení; čeká na **milník** (vstup do světa / odeslání zprávy) NEBO na **2. návštěvu** (čítač `pwa:visits`). Odemčení v session je reaktivní (window event). Dismiss/re-offer 14 dní beze změny. Kód: `src/features/pwa/valueGate.ts` + `useInstallPrompt.ts`; milníky `WorldLayout.tsx` (mount) a `useGlobalChat.ts` (onSuccess).
+- **④ Spinner nápovědy:** chunk `HelpPage` se přednačítá po idle v `main.tsx` (`requestIdleCallback` + Safari fallback) → otevření `/ikaros/napoveda` už neukáže ~3s Suspense spinner (kromě úplně první návštěvy před doběhnutím prefetche).
+- **Stav:** ✅ (kód hotový; tsc/eslint/vitest zelené; čeká FE deploy + živé ověření).
 
 ---
 

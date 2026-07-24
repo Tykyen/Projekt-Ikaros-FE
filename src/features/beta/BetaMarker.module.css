@@ -1,0 +1,82 @@
+/*
+ * Spec 25.5 ⑤ — svislý mini-ribbon přišpendlený k LEVÉ hraně (~2/3 výšky).
+ * Mimo rohy → nekoliduje s headerem (nahoře) ani FAB Vypravěče (vpravo dole).
+ * Barvy z motivových tokenů (fallbacky jako .roomCount / --acc alias), tečka
+ * nese akcent aktivního motivu. pointer-events:none = neblokuje UI pod sebou.
+ */
+.marker {
+  position: fixed;
+  left: 0;
+  top: 66%;
+  transform: translateY(-50%);
+  z-index: 180; /* pod FAB Vypravěče (190) i toasty (500), nad obsahem */
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 5px 10px;
+
+  border: 1px solid var(--frame-border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  background: var(--surface-1);
+  color: var(--theme-text-muted, var(--text-muted));
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-lg);
+  user-select: none;
+  pointer-events: none;
+}
+
+.label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 10px;
+  font-weight: var(--weight-semi, 600);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--acc);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc) 55%, transparent);
+  animation: beta-marker-pulse 2.4s ease-out infinite;
+}
+
+@keyframes beta-marker-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--acc) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}
+
+/* Mobil: drž se u hrany se safe-area, o kousek menší. */
+@media (max-width: 768px) {
+  .marker {
+    top: auto;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    transform: none;
+    padding: 9px 4px 8px;
+  }
+  .label {
+    font-size: 9.5px;
+  }
+}

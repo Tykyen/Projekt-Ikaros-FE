@@ -351,8 +351,8 @@
   line-height: 1;
 }
 
-/* 4.2c §4 — počet přítomných u chat místností. Zobrazuje se vždy (i „0");
-   prázdná místnost = decentní obrys, obsazená = plný badge. */
+/* 4.2c §4 / 25.5 ② — počet přítomných u chat místností. Badge JEN když > 0
+   (prázdnota nesmí být první signál — „0 online" se nerenderuje). */
 .roomCount {
   display: inline-flex;
   align-items: center;

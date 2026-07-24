@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-prvni-dojem',
+    datum: '2026-07-24',
+    titul: 'Uhlazenější první dojem',
+    popis:
+      'Nápověda se teď otevře hned, bez čekání. Prázdné počty už neukazujeme jako „0" a pozvánku k instalaci na plochu ti nabídnu až ve chvíli, kdy ti dá smysl — ne hned na uvítanou.',
+  },
+  {
     id: 'zm-2026-07-24-beta-rezim',
     datum: '2026-07-24',
     titul: 'Beta režim: víš, na čem jsi',
