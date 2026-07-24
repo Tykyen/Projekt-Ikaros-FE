@@ -66,6 +66,8 @@ export const timelineEventSchema = z.object({
     .nullable()
     .optional()
     .or(z.literal('')),
+  // 27.1b — vazba na herní událost (zlatá cesta ④). null = žádná.
+  sourceGameEventId: z.string().max(64).nullable().optional(),
   celestialOverrides: z.array(
     z.object({
       bodyId: z.string(),

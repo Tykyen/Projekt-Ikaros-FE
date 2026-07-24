@@ -10,6 +10,7 @@ import {
   useCreateGameEvent,
   useUpdateGameEvent,
 } from '@/features/world/api/useGameEvents';
+import { useCampaignScenarios } from '@/features/world/campaign/api';
 // Světový obsah → content-image upload (PomocnyPJ+ není globální Admin, takže
 // admin-gated /upload/image vracel 403). Modal je gated na world roli.
 import { useUploadImage } from '@/shared/api/useUploadImage';
@@ -59,6 +60,8 @@ export function GameEventModal({
   const create = useCreateGameEvent();
   const update = useUpdateGameEvent();
   const upload = useUploadImage();
+  // 27.1b — scénáře světa pro dropdown „Hraný scénář" (zlatá cesta ④).
+  const { data: scenarios } = useCampaignScenarios(worldId);
 
   const [imageUrl, setImageUrl] = useState<string | null>(
     event?.imageUrl ?? null,
@@ -83,6 +86,7 @@ export function GameEventModal({
         targetGroup: event.targetGroup,
         groupOnly: event.groupOnly,
         confirmable: event.confirmable,
+        scenarioId: event.scenarioId ?? null,
       }
     : {
         title: '',
@@ -91,6 +95,7 @@ export function GameEventModal({
         targetGroup: null,
         groupOnly: false,
         confirmable: true,
+        scenarioId: null,
       };
 
   const {
@@ -119,6 +124,7 @@ export function GameEventModal({
       targetGroup: null,
       groupOnly: false,
       confirmable: true,
+      scenarioId: null,
     });
     setImageUrl(null);
     setImageError(null);
@@ -168,6 +174,7 @@ export function GameEventModal({
             targetGroup: normalizedGroup,
             groupOnly: values.groupOnly,
             confirmable: values.confirmable,
+            scenarioId: values.scenarioId ?? null,
           },
         });
         toast.success('Akce upravena.');
@@ -185,6 +192,7 @@ export function GameEventModal({
           targetGroup: normalizedGroup,
           groupOnly: values.groupOnly,
           confirmable: values.confirmable,
+          scenarioId: values.scenarioId ?? null,
         });
         toast.success('Akce vytvořena.');
       }
@@ -381,6 +389,36 @@ export function GameEventModal({
           {errors.targetGroup?.message && (
             <span className={s.errorMsg}>{errors.targetGroup.message}</span>
           )}
+        </div>
+
+        {/* 27.1b — vazba na scénář (zlatá cesta ④): „tato session hraje…". */}
+        <div className={s.fieldWrap}>
+          <label htmlFor="ge-scenario" className={s.label}>
+            Hraný scénář (volitelně)
+          </label>
+          <Controller
+            control={control}
+            name="scenarioId"
+            render={({ field }) => (
+              <select
+                id="ge-scenario"
+                className={s.input}
+                value={field.value ?? ''}
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value === '' ? null : e.target.value,
+                  )
+                }
+              >
+                <option value="">— Žádný —</option>
+                {(scenarios ?? []).map((sc) => (
+                  <option key={sc.id} value={sc.id}>
+                    {sc.title}
+                  </option>
+                ))}
+              </select>
+            )}
+          />
         </div>
 
         <Controller

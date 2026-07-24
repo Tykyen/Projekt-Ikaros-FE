@@ -20,6 +20,7 @@ import {
   useCreateTimelineEvent,
   useUpdateTimelineEvent,
 } from '../api/useTimelineEvents';
+import { useAllWorldGameEvents } from '@/features/world/api/useGameEvents';
 import {
   timelineEventSchema,
   type TimelineEventFormValues,
@@ -60,6 +61,8 @@ export function TimelineEventModal({
   const create = useCreateTimelineEvent(worldId);
   const update = useUpdateTimelineEvent(worldId);
   const upload = useUploadImage();
+  // 27.1b — herní události světa pro dropdown „Vzešlo z události" (zlatá cesta ④).
+  const { data: gameEvents } = useAllWorldGameEvents(worldId);
 
   const [imageUrl, setImageUrl] = useState<string | null>(
     event?.imageUrl ?? null,
@@ -95,6 +98,7 @@ export function TimelineEventModal({
         text: event.text,
         link: event.link ?? '',
         pageSlug: event.pageSlug ?? '',
+        sourceGameEventId: event.sourceGameEventId ?? null,
         celestialOverrides: event.celestialOverrides,
       }
     : {
@@ -106,6 +110,7 @@ export function TimelineEventModal({
         text: '',
         link: '',
         pageSlug: '',
+        sourceGameEventId: null,
         celestialOverrides: [],
       };
 
@@ -200,6 +205,7 @@ export function TimelineEventModal({
             imageFocalY: imageUrl ? focal.y : null,
             link: cleanLink,
             pageSlug: cleanPageSlug,
+            sourceGameEventId: values.sourceGameEventId ?? null,
             celestialOverrides: values.celestialOverrides,
           },
         });
@@ -218,6 +224,7 @@ export function TimelineEventModal({
           imageFocalY: imageUrl ? focal.y : undefined,
           link: cleanLink ?? undefined,
           pageSlug: cleanPageSlug ?? undefined,
+          sourceGameEventId: values.sourceGameEventId ?? undefined,
           celestialOverrides: values.celestialOverrides,
         });
         toast.success('Událost vytvořena.');
@@ -410,6 +417,36 @@ export function TimelineEventModal({
           {errors.pageSlug?.message && (
             <span className={s.errorMsg}>{errors.pageSlug.message}</span>
           )}
+        </div>
+
+        {/* 27.1b — vazba na herní událost (zlatá cesta ④): „vzešlo ze session". */}
+        <div className={s.fieldWrap}>
+          <label htmlFor="tl-source-event" className={s.label}>
+            Vzešlo z herní události (volitelně)
+          </label>
+          <Controller
+            control={control}
+            name="sourceGameEventId"
+            render={({ field }) => (
+              <select
+                id="tl-source-event"
+                className={s.select}
+                value={field.value ?? ''}
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value === '' ? null : e.target.value,
+                  )
+                }
+              >
+                <option value="">— Žádná —</option>
+                {(gameEvents ?? []).map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title}
+                  </option>
+                ))}
+              </select>
+            )}
+          />
         </div>
 
         <Controller

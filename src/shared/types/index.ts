@@ -1129,6 +1129,8 @@ export interface GameEvent {
    */
   comments?: EventComment[];
   reminderSent: boolean;
+  /** 27.1b — zlatá cesta ④: ID scénáře (CampaignScenario), který session hraje. */
+  scenarioId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

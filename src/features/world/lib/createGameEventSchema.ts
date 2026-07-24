@@ -32,6 +32,8 @@ export const createGameEventSchema = z
       .optional(),
     groupOnly: z.boolean().default(false),
     confirmable: z.boolean().default(true),
+    // 27.1b — vazba na scénář (zlatá cesta ④). null = žádný.
+    scenarioId: z.string().max(64).nullable().optional(),
   })
   .refine(
     (v) =>

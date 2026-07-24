@@ -225,9 +225,10 @@ Lehká vrstva nad 25.2: po registraci volba „Chci vést hru / Hrát / Tvořit 
 **Pozn. k ④:** produkt nemá datové vazby scénář→událost→kronika → 27.1 certifikuje ④ jako „4 uzly v jednom světě"; reálný referenční řetěz dodá 27.1b.
 **Hotovo (2026-07-24):** BE 5 golden-path e2e (`backend/test/golden/` + ⑤ tag na `scene-template-share`), 21/21 zelené, 3× deterministicky; FE 2 Playwright cesty ①② (`e2e/golden-path-{1,2}.spec.ts` nad rozšířeným mock-API), 3× zelené; registr `docs/golden-paths.md`. Oba CI joby (23.7) chytnou globem → deploy gate je brání. Šev-asserty: role po pozvánce · anti-forge dopočet total · posun tahu+HP clamp · worldId+tenant izolace ④.
 
-### - [ ] 27.1b Vazba ④ scénář→událost→kronika — [dopad střední · náklad střední]
+### - [x] 27.1b Vazba ④ scénář→událost→kronika — [dopad střední · náklad střední] ✅ 2026-07-24
 **Cíl:** založit datovou vazbu, aby zlatá cesta ④ byla reálný řetěz (ne 4 nezávislé moduly). Dvě úzká pole dle konvence kódu: `GameEvent.scenarioId` („session hraje scénář") + `TimelineEvent.sourceGameEventId` („kronika vzešla ze session"); wiki→scénář (`linkedPageSlug`) už existuje. + FE UI (2 selecty) + povýšení golden-path-4 e2e na assert řetězu.
 **Proč:** vyčleněno z 27.1 (produkční featura ≠ certifikační infra). **Spec:** `docs/arch/phase-27/spec-27.1b.md`.
+**Hotovo (2026-07-24):** BE vazba (schema→DTO→service→toEntity oba směry, 12 souborů + unit fixture); golden-path-4 povýšen na assert řetězu odspoda nahoru (BE e2e zelené). FE: GameEventModal select „Hraný scénář" (`useCampaignScenarios`) + TimelineEventModal select „Vzešlo z události" (`useAllWorldGameEvents`) + zobrazení na kartách (degradace „odstraněn"); typ/DTO/schema oba. tsc+eslint+vitest 45/45+build 93 % zelené. MVP = holý string ID (bez tvrdé validace „patří do světa", konzistentní s `pageSlug`).
 
 ### - [ ] 27.2 Mobilní core cesty — [dopad střední · náklad střední]
 **Cíl:** zlaté cesty ①–③ projít na telefonu (hráči u stolu drží mobil). Statická CSS review + živý průchod uživatelem (fb_tests_live); opravit, co drhne. 🔁 reuse 17.4 dotyk mapy. **Ne** nový mobilní layout — jen průchodnost core cest.

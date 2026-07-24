@@ -362,7 +362,7 @@ export const TOPIKY: readonly HelpTopic[] = [
   {
     id: 'rozcestnik.kalendare',
     title: 'Tři „kalendáře" — který kdy',
-    tags: ['kalendar', 'akce', 'timeline', 'cas', 'udalosti'],
+    tags: ['kalendar', 'akce', 'timeline', 'cas', 'udalosti', 'scenar', 'kronika'],
     routes: ['/svet/:worldSlug/kalendar', '/svet/:worldSlug/timeline', '/svet/:worldSlug/akce', '/ikaros/akce'],
     body: {
       odstavce: [
@@ -371,12 +371,13 @@ export const TOPIKY: readonly HelpTopic[] = [
       kroky: [
         'Platformní akce (/ikaros/akce) — reálné termíny hráčů a komunity.',
         'Kalendář světa — přehled akcí a událostí postav pro vedení světa (Pomocný PJ a výš). In-game datum posouvá Generátor počasí.',
-        'Timeline — historická osa světa; na herní akce ani postavy se neváže.',
+        'Timeline — historická osa světa; kronikový zápis volitelně propojíš s herní session, ze které vzešel.',
+        'Provázání příběhu (Pomocný PJ a výš): herní akci navážeš na hraný scénář a kronikový zápis na session — vznikne linie scénář → session → kronika.',
       ],
     },
     minAudienceNote: 'Kalendář světa vidí až Pomocný PJ — hráčům čas oznamuje PJ.',
     source: { kapitola: '15' },
-    verifiedAt: '2026-07-22',
+    verifiedAt: '2026-07-24',
     status: 'funkcni',
   },
   {

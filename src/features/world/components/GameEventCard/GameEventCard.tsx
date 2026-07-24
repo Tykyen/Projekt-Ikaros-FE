@@ -4,6 +4,7 @@ import {
   Check,
   Users,
   CalendarDays,
+  Clapperboard,
   MoreVertical,
   Pencil,
   Trash2,
@@ -20,6 +21,7 @@ import {
   useToggleRsvp,
   useDeleteGameEvent,
 } from '@/features/world/api/useGameEvents';
+import { useCampaignScenarios } from '@/features/world/campaign/api';
 import { relativeEventDate } from '@/features/world/utils/relativeEventDate';
 import { getImageStyle } from '@/shared/lib/imageStyle';
 import {
@@ -68,6 +70,11 @@ export function GameEventCard({
   const toggle = useToggleRsvp();
   const deleteEvent = useDeleteGameEvent();
   const currentUser = useAtomValue(currentUserAtom);
+  // 27.1b — zlatá cesta ④: název hraného scénáře (resolve dle ID; smazaný → „—").
+  const { data: scenarios } = useCampaignScenarios(worldId);
+  const scenario = event.scenarioId
+    ? scenarios?.find((sc) => sc.id === event.scenarioId)
+    : undefined;
 
   const isConfirmed = currentUser
     ? event.confirmedBy.some((c) => c.userId === currentUser.id)
@@ -201,6 +208,15 @@ export function GameEventCard({
             />
           )}
           <span className={s.dateChip}>{relativeEventDate(event.date)}</span>
+          {event.scenarioId && (
+            <span
+              className={s.dateChip}
+              title={`Hraný scénář: ${scenario?.title ?? 'odstraněn'}`}
+            >
+              <Clapperboard size={12} aria-hidden="true" />{' '}
+              {scenario?.title ?? 'scénář odstraněn'}
+            </span>
+          )}
           {isRunning && (
             <span className={s.running} aria-label="Probíhá">
               {countdown}

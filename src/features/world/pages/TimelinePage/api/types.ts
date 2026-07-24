@@ -31,6 +31,8 @@ export interface TimelineEvent {
   imageFocalY: number | null;
   link: string | null;
   pageSlug: string | null;
+  /** 27.1b — zlatá cesta ④: ID herní události (GameEvent), z níž zápis vzešel. */
+  sourceGameEventId: string | null;
   celestialOverrides: CelestialOverride[];
   createdAt: string;
   updatedAt: string;
@@ -68,6 +70,8 @@ export interface CreateTimelineEventDto {
   imageFocalY?: number | null;
   link?: string | null;
   pageSlug?: string | null;
+  // 27.1b — vazba na herní událost (zlatá cesta ④).
+  sourceGameEventId?: string | null;
   celestialOverrides?: CelestialOverride[];
 }
 
@@ -84,6 +88,8 @@ export interface UpdateTimelineEventDto {
   imageFocalY?: number | null;
   link?: string | null;
   pageSlug?: string | null;
+  // 27.1b — vazba na herní událost (zlatá cesta ④).
+  sourceGameEventId?: string | null;
   celestialOverrides?: CelestialOverride[];
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  CalendarClock,
   ExternalLink,
   FileText,
   MoreVertical,
@@ -11,6 +12,7 @@ import {
 import { KebabMenu } from '@/shared/ui';
 import type { KebabMenuItem } from '@/shared/ui';
 import { usePagesDirectory } from '@/features/world/pages/api/usePagesDirectory';
+import { useAllWorldGameEvents } from '@/features/world/api/useGameEvents';
 import type { CalendarConfig } from '@/shared/lib/calendarEngine';
 import { formatFantasyDate } from '../lib/formatFantasyDate';
 import { CelestialChip } from './CelestialChip';
@@ -47,6 +49,11 @@ export function TimelineEventCard({
   onLightbox,
 }: Props) {
   const { data: pages } = usePagesDirectory(worldId);
+  // 27.1b — zlatá cesta ④: herní událost, z níž zápis vzešel (resolve dle ID).
+  const { data: gameEvents } = useAllWorldGameEvents(worldId);
+  const sourceEvent = event.sourceGameEventId
+    ? gameEvents?.find((ev) => ev.id === event.sourceGameEventId)
+    : undefined;
   const [imgError, setImgError] = useState(false);
   const [kebabOpen, setKebabOpen] = useState(false);
   const [kebabAnchor, setKebabAnchor] = useState<HTMLElement | null>(null);
@@ -186,7 +193,7 @@ export function TimelineEventCard({
         />
       )}
 
-      {(event.link || event.pageSlug) && (
+      {(event.link || event.pageSlug || event.sourceGameEventId) && (
         <footer className={s.links}>
           {event.link && (
             <a
@@ -197,6 +204,15 @@ export function TimelineEventCard({
             >
               <ExternalLink size={14} aria-hidden /> Externí odkaz
             </a>
+          )}
+          {event.sourceGameEventId && (
+            <span
+              className={s.linkChip}
+              title={`Vzešlo z herní události: ${sourceEvent?.title ?? 'odstraněna'}`}
+            >
+              <CalendarClock size={14} aria-hidden />{' '}
+              {sourceEvent?.title ?? 'událost odstraněna'}
+            </span>
           )}
           {event.pageSlug && linkedPage && (
             <Link

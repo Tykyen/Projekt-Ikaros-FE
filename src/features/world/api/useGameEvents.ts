@@ -19,6 +19,8 @@ export interface CreateGameEventDto {
   targetGroup?: string | null;
   groupOnly?: boolean;
   confirmable?: boolean;
+  // 27.1b — vazba na scénář (zlatá cesta ④).
+  scenarioId?: string | null;
 }
 
 export interface UpdateGameEventDto {
@@ -33,6 +35,8 @@ export interface UpdateGameEventDto {
   targetGroup?: string | null;
   groupOnly?: boolean;
   confirmable?: boolean;
+  // 27.1b — vazba na scénář (zlatá cesta ④).
+  scenarioId?: string | null;
 }
 
 export function useUpcomingEventsMine(opts: { limit?: number } = {}) {

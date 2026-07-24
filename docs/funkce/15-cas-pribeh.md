@@ -64,14 +64,14 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
 - **Co jde dělat:**
   - **Cursor pagination** (infinite scroll, `useInfiniteTimelineEvents`, default sort `desc` = nejnovější rok nahoře, v rámci roku ASC). Filtry v URL: `fromYear`, `toYear`, `q` (fulltext title+text), `sort`.
   - **Year scrubber** (sidebar / drawer) z agregátu `{year, count}` (`year-counts`).
-  - **Přidat/upravit/smazat událost** (PomocnyPJ+) přes `TimelineEventModal` + `ConfirmDialog`. Pole: rok/měsíc/den/hodina, název, rich-text text, obrázek (focal point), odkaz, `pageSlug` (vazba na stránku), **celestial overrides** (ruční přepis fáze nebeského tělesa pro daný den).
+  - **Přidat/upravit/smazat událost** (PomocnyPJ+) přes `TimelineEventModal` + `ConfirmDialog`. Pole: rok/měsíc/den/hodina, název, rich-text text, obrázek (focal point), odkaz, `pageSlug` (vazba na stránku), **`sourceGameEventId`** (27.1b — select „Vzešlo z herní události", vazba na game-event z `useAllWorldGameEvents`), **celestial overrides** (ruční přepis fáze nebeského tělesa pro daný den).
   - **✅ OPRAVENO 2026-07-05 (FUNC-02, RUN-2026-07-05) — „odstranit obrázek".** Nastavení `imageUrl` na prázdno v editoru se dřív na BE neprojevilo (update ho tiše ignoroval) — obrázek zůstal viset i po „smazání". Teď `imageUrl: null` v těle requestu obrázek reálně smaže a uklidí storage (event `media.orphaned`), stejně jako u ostatních modulů s obrázkem (game-events/world-news). Doloženo `timeline.service.ts:234–243` (v kódu nese marker **CD-RUN-1 / FIX-11b**) + úklid při smazání události `:264–267`.
   - **Nebeské stavy** se počítají read-time z aktivního configu (`calculateCelestialStates`) — lunární fáze u událostí.
   - **Konverze data** mezi kalendáři světa (`DateConversionPopup`).
 - **Hranice / co neumí:**
   - Vyžaduje **alespoň 1 kalendář** — bez configu varovný box „svět nemá kalendář" a nelze přidávat (FE blok + BE `getTimelineConfig` → null).
   - `worldId` je **immutable** — událost nelze přesunout mezi světy (PUT s `worldId` → 400 `EVENT_WORLD_IMMUTABLE`); přesun = smaž+vytvoř.
-  - **Žádná vazba na herní akce ani na character-kalendář** — timeline je samostatná kolekce (historie), nemíchá se se sjednoceným kalendářem.
+  - **Volitelná vazba na herní akci** (`sourceGameEventId`, 27.1b — zlatá cesta ④: „tento kronikový zápis vzešel z této session"; jednosměrný string ID, resolve na FE, degradace „událost odstraněna" na kartě u smazaného rodiče). **Character-kalendář** zůstává oddělený — timeline je samostatná kolekce (historie), nemíchá se se sjednoceným kalendářem. Pozn.: `GameEvent.date` = reálný svět (RSVP), `TimelineEvent.rok/měsíc/den` = in-game kalendář — vazba je **narativní**, ne převod data.
   - Rich-text se **sanitizuje** na write i read (allowlist); `data:` base64 obrázky se v listu strhávají (`stripBase64`), v detailu se ponechávají.
 - **Zvláštnosti:** Timeline má **vlastní getter** `getTimelineConfig` (priorita: `timelineCalendarSlug` → `defaultCalendarConfigSlug` → `configs[0]`), záměrně oddělený od `getConfigInternal`. Route `year-counts` musí být před `:id`.
 - **Stav:** ✅
@@ -112,7 +112,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - BE — read = **kterýkoli člen kromě Zadatele** (`canView:122` → `if (!m || m.role === WorldRole.Zadatel) return false`, list `:186` stejně), tj. **Ctenar+** — parita s FE gate. **Archiv** (date < cutoff 24 h) = jen **PomocnyPJ+** (jinak 403 `ARCHIVE_PJ_ONLY`); hráč bez `fromDate` dostane auto-clamp na cutoff (vidí jen nadcházející). Mutace eventu = **PomocnyPJ+** (`assertManage`). Komentář/RSVP/reakce = každý, kdo event vidí (`canView`, respektuje groupOnly). Editace komentáře = jen autor; mazání = autor nebo PJ-mod.
 - **Co jde dělat:**
   - **Upcoming / Archiv** taby (URL `?view=`), **filtr podle skupiny** (`?group=`, klient-side dle `targetGroup` + barvy skupin z worldSettings).
-  - **Vytvořit/upravit/smazat akci** (`GameEventModal`): název, datum+čas, popis, obrázek (focal/zoom/fit), cílová skupina + `groupOnly`, `confirmable` (RSVP). `groupOnly` vyžaduje `targetGroup` (jinak 400).
+  - **Vytvořit/upravit/smazat akci** (`GameEventModal`): název, datum+čas, popis, obrázek (focal/zoom/fit), cílová skupina + `groupOnly`, `confirmable` (RSVP), **`scenarioId`** (27.1b — select „Hraný scénář" z `useCampaignScenarios`; zobrazení chip s názvem na kartě, degradace „scénář odstraněn"). `groupOnly` vyžaduje `targetGroup` (jinak 400).
   - **RSVP** (`/:id/confirm` toggle), **komentáře** root + reply na root, **editace/soft-delete** komentáře, **emoji reakce** toggle na komentář.
   - **Push notifikace** při vytvoření akce (respektuje groupOnly příjemce) + **cron připomínky 24 h a 1 h předem** (15.9; `GameEventReminderJob` à 15 min, okna 23–25 h / 0.75–1.25 h, nezávislé flagy `reminderSent` + `reminder1hSent`). Vše kategorie push `worldEvent` (respektuje `notificationPreferences`).
   - Dashboard widget „blížící se akce" napříč světy uživatele (`upcoming/mine`, limit 5, max 20).
@@ -178,7 +178,7 @@ Role-zkratky (světové, vzestupně): Zadatel(0) < Ctenar(1) < Hrac(2) < Korekto
   - Hráč/Čtenář **nevidí** Storyboard vůbec (PomocnyPJ floor na FE guardu).
   - Reorder/move je dávkový PUT přes `reorder` — při velkém stromu řeší pořadí celý sourozenecký seznam.
   - „Síť" zobrazení scénářů neexistuje — graf je jen pro vztahy (Pavučina); scénáře jsou strom.
-- **Zvláštnosti:** `isShared` opět jen PomocnyPJ+ (resolveIsShared). Tajná pole (gmNotes/cíl/výsledek) edituje `isGm` (PomocnyPJ+), ne pouhý PJ.
+- **Zvláštnosti:** `isShared` opět jen PomocnyPJ+ (resolveIsShared). Tajná pole (gmNotes/cíl/výsledek) edituje `isGm` (PomocnyPJ+), ne pouhý PJ. **27.1b (zlatá cesta ④):** herní akce na scénář odkazuje přes `GameEvent.scenarioId` (nastavuje se v `GameEventModal`); scénář sám vazbu nedrží — je jednosměrná (potomek→rodič), scénář o svých sessionách neví.
 - **Stav:** ✅
 - **Kód:** FE `src/features/world/pages/StorylinesPage.tsx`, `campaign/components/StoryboardView.tsx:55`, strom `ScenarioTree.tsx`, editor `ScenarioEditor.tsx`, provázání `ScenarioLinksPanel.tsx`, meta `campaign/scenarioMeta.ts`, šablony `scenarioTemplates.ts`. BE controller `backend/src/modules/campaign/campaign.controller.ts` (sekce Scenarios `:407` GET list, `:418` GET detail, `:432` POST + role-floor `< PomocnyPJ → 403 INSUFFICIENT_WORLD_ROLE` `:446`, `:459` PUT, `:483` DELETE), service `campaign.service.ts` (`findScenarios`/`createScenario`), schéma `schemas/campaign-scenario.schema.ts`.
 

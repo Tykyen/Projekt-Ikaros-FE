@@ -163,7 +163,7 @@ export const NAVODY: readonly HelpTopic[] = [
     },
     akce: [{ label: 'Kalendář', to: '/svet/:worldSlug/kalendar' }],
     source: { kapitola: '15' },
-    verifiedAt: '2026-07-22',
+    verifiedAt: '2026-07-24',
     status: 'funkcni',
   },
   {

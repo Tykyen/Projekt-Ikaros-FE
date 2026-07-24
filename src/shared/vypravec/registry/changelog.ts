@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-scenar-session-kronika',
+    datum: '2026-07-24',
+    titul: 'Propoj scénář, session a kroniku',
+    popis:
+      'Když vedeš hru: u herní akce vybereš, který scénář se hraje, a u zápisu v kronice, ze které session vzešel. Vznikne dohledatelná linie od scénáře přes odehranou session až po záznam v historii světa.',
+  },
+  {
     id: 'zm-2026-07-24-prvni-dojem',
     datum: '2026-07-24',
     titul: 'Uhlazenější první dojem',
