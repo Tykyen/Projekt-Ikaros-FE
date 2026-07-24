@@ -5,8 +5,13 @@
  * zrcadlo `docs/scope-registr.md`). Každá plocha s vstupním bodem v UI je:
  *
  *  A = beta core     — certifikováno (zlaté cesty 27.1), default viditelné.
- *  B = preview       — funguje, ale okrajové/hloubkové → `<PreviewBadge>`.
+ *  B = preview       — funguje, ale okrajové/hloubkové (klasifikace, viz níže).
  *  C = skryté (flag) — experimentální/blokované → nav hide + route `flagGate`.
+ *
+ * POZN. (2026-07-24): vizuální „Preview" štítek v nav byl SUNDÁN (vzhled
+ * zamítnut vlastníkem). Registr zůstává jako zdroj pravdy klasifikace
+ * (docs/scope-registr.md) + freeze pravidlo; `isPreview` je připravené API
+ * pro budoucí redesign štítku, dnes bez vizuálního konzumenta.
  *
  * PRAVIDLO SCOPE-FREEZE (Etapa III): žádná nová velká doména, dokud A-scope
  * není certifikovaný. Výjimky jen po diskuzi.
@@ -29,8 +34,9 @@
 export type ScopeTier = 'A' | 'B' | 'C';
 
 /**
- * Třída B — viditelné s „Preview" štítkem. Klíč = nav `id` (svět) /
- * `navKey`|room `key` (platforma). Řazeno dle `docs/scope-registr.md`.
+ * Třída B — okrajové/hloubkové plochy (klasifikace „preview"; vizuální štítek
+ * dnes nenasazen). Klíč = nav `id` (svět) / `navKey`|room `key` (platforma).
+ * Řazeno dle `docs/scope-registr.md`.
  */
 export const PREVIEW_FEATURES: ReadonlySet<string> = new Set([
   // Platforma (first-contact okrajová šíře)

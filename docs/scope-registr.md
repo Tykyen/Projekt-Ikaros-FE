@@ -13,8 +13,10 @@
 | Třída | Význam | Mechanismus | Support |
 |---|---|---|---|
 | **A** | Beta core — certifikováno (zlaté cesty 27.1), jádro produktu | default viditelné | plný |
-| **B** | Funguje, ale okrajové / hloubkové / méně vyzrálé | `<PreviewBadge>` (⚗ „Preview") | best-effort |
+| **B** | Funguje, ale okrajové / hloubkové / méně vyzrálé | klasifikace (vizuální štítek dnes nenasazen — viz níže) | best-effort |
 | **C** | Experimentální / blokované / niche | skryté za feature flagem (nav hide + route `flagGate`) | žádný (default off) |
+
+> ⚠️ **Vizuální „Preview" štítek SUNDÁN (2026-07-24)** — vzhled zamítnut vlastníkem. Registr A/B/C zůstává jako **klasifikace + freeze pravidlo** (zdroj pravdy `src/shared/scope/scope.ts`); `isPreview` je připravené API pro budoucí redesign štítku. Třída B se dnes v UI nijak vizuálně neodlišuje.
 
 **Scoped, ne destruktivní:** in-world nástroje zavedených PJ se neschovávají flagem. C se používá jen pro už-blokované plochy. Přesun tieru = 1 řádek v `scope.ts`.
 

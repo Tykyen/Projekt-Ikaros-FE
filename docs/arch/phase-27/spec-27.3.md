@@ -1,6 +1,6 @@
 # Spec 27.3 — Scope registr A/B/C + scope freeze
 
-**Status:** Návrh → implementace (2026-07-24)
+**Status:** Implementováno 2026-07-24 — klasifikace/registr/freeze pravidlo ✅. ⚠️ **Vizuální „preview" štítek (B) po nasazení SUNDÁN** (vlastník: vzhledově nevyhovující); `<PreviewBadge>` smazána, badge odstraněn ze 7 render míst, changelog zrušen. Registr (`scope.ts`) + docs zůstávají jako klasifikace; `isPreview` = připravené API pro budoucí redesign štítku (`frontend-design`).
 **Rozsah:** klasifikace viditelné šíře platformy do tříd A/B/C + FE „preview" badge (B) + flag mechanismus skrytí (C) + pravidlo scope-freeze do docs
 **Repo:** `Projekt-ikaros-FE` (FE only)
 **Náklad:** malý (dle roadmap3 karty 27.3)
