@@ -277,7 +277,7 @@ Runbook „web nejede" pro netechnického admina (co zkontrolovat, koho vzbudit,
 
 > Ověřeno proti HEAD 2026-07-19 (15/15, viz git log dluhy.md). Karty drží původní triggery — „řešit dřív = mrtvý kód" platí; pořadí v této fázi je doporučené pořadí, AŽ trigger nastane nebo zbyde kapacita.
 
-### - [ ] 29.1 Deník: optimistic-lock `expectedUpdatedAt` — *(D-DIARY-HP-DELTA + D-073)* — [náklad malý]
+### - [x] 29.1 Deník: optimistic-lock `expectedUpdatedAt` — *(D-DIARY-HP-DELTA + D-073)* — [náklad malý] ✅ 2026-07-24 (kód+testy+docs; čeká BE restart + živé ověření; spec `arch/phase-29/spec-29.1.md`)
 Souběžné HP úpravy v deníku = last-write-wins (BE flat `$set`, FE absolutní hodnoty ze stale cache; 12 combat panelů). Bestie tokeny deltu mají, deník ne. **Cesta (c):** dotáhnout `expectedUpdatedAt` (dnes half-wired; hotové vzory ve 4 modulech vč. `character-account.repository.ts`). Pozor na UX 409 u debounced auto-save (refetch+retry). **Trigger:** stížnost na „zmizelé HP" v betě, nebo volná kapacita ~1 den.
 
 ### - [ ] 29.2 Token→deník HP sync pro 5 systémů — *(D-HP-MAP-SYSTEMS)* — [náklad střední] ⏳trigger

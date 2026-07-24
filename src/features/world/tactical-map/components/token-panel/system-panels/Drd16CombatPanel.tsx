@@ -25,7 +25,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
-import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import { useUpdateCharacterDiary, isDiaryConflict } from '@/features/world/pages/api/useCharacterMutations';
 import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPage/diary-systems/types';
 import {
   DRD16_EMPTY_SPELL,
@@ -101,10 +101,17 @@ export function Drd16CombatPanel({
         { customDataPatch: nextPending },
         {
           onSuccess: () => setPending({}),
-          onError: (e) =>
+          onError: (e) => {
+            // 29.1 — DIARY_CONFLICT řeší hook (toast + refetch); zahodit pending,
+            // ať se panel srovná na pravdivé HP (žádný clobber cizí změny).
+            if (isDiaryConflict(e)) {
+              setPending({});
+              return;
+            }
             toast.error(
               `Uložení selhalo: ${e instanceof Error ? e.message : 'neznámá chyba'}`,
-            ),
+            );
+          },
         },
       );
     }, DEBOUNCE_MS);

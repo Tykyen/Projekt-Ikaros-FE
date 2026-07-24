@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
-import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import { useUpdateCharacterDiary, isDiaryConflict } from '@/features/world/pages/api/useCharacterMutations';
 import { APPROACHES } from '@/features/world/pages/CharacterDetailPage/diary-systems/_shared/FateLikeSheet';
 import type { MapToken } from '../../../types';
 import type { CombatPanelProps } from '../combatPanels';
@@ -116,7 +116,18 @@ function FatePanelImpl({
               Object.keys(patch).forEach((k) => delete next[k]);
               return next;
             }),
-          onError: () => toast.error('Nepodařilo se uložit změny'),
+          onError: (e) => {
+            // 29.1 — DIARY_CONFLICT řeší hook; zahodit dotčené klíče z localPatch.
+            if (isDiaryConflict(e)) {
+              setLocalPatch((prev) => {
+                const next = { ...prev };
+                Object.keys(patch).forEach((k) => delete next[k]);
+                return next;
+              });
+              return;
+            }
+            toast.error('Nepodařilo se uložit změny');
+          },
         },
       );
     },

@@ -12,7 +12,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
-import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import { useUpdateCharacterDiary, isDiaryConflict } from '@/features/world/pages/api/useCharacterMutations';
 import type { SystemSheetProps } from '@/features/world/pages/CharacterDetailPage/diary-systems/types';
 import {
   ABIL_MAP,
@@ -108,7 +108,13 @@ export function DndCombatPanel({
   const save = (patch: Record<string, unknown>): void => {
     updateDiary.mutate(
       { customDataPatch: patch },
-      { onError: () => toast.error('Uložení JaD deníku selhalo') },
+      {
+        onError: (e) => {
+          // 29.1 — DIARY_CONFLICT řeší hook (toast + refetch); draft se sám
+          // resyncne z čerstvého beHp, jen potlač vlastní toast.
+          if (!isDiaryConflict(e)) toast.error('Uložení JaD deníku selhalo');
+        },
+      },
     );
   };
 

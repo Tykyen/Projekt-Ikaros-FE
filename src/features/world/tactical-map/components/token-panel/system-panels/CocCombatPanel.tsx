@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
-import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import { useUpdateCharacterDiary, isDiaryConflict } from '@/features/world/pages/api/useCharacterMutations';
 import { mapSceneQueryKey } from '../../../hooks/useMapScene';
 import { applyOperationToScene } from '../../../utils/applyOperationToScene';
 import type { MapScene, MapToken } from '../../../types';
@@ -221,7 +221,12 @@ export function CocCombatPanel({
     timersRef.current[fullKey] = setTimeout(() => {
       updateDiary.mutate(
         { customDataPatch: { [fullKey]: value } },
-        { onError: () => toast.error('Uložení selhalo') },
+        {
+          onError: (e) => {
+            // 29.1 — DIARY_CONFLICT řeší hook; draft se resyncne, potlač toast.
+            if (!isDiaryConflict(e)) toast.error('Uložení selhalo');
+          },
+        },
       );
       delete timersRef.current[fullKey];
     }, DEBOUNCE_MS);
@@ -231,7 +236,12 @@ export function CocCombatPanel({
     if (!canEdit) return;
     updateDiary.mutate(
       { customDataPatch: { [`coc_${key}`]: value } },
-      { onError: () => toast.error('Uložení selhalo') },
+      {
+        onError: (e) => {
+          // 29.1 — DIARY_CONFLICT řeší hook; draft se resyncne, potlač toast.
+          if (!isDiaryConflict(e)) toast.error('Uložení selhalo');
+        },
+      },
     );
   }
 

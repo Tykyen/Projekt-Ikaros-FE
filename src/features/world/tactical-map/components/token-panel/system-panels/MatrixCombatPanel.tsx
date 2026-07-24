@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { toast } from 'sonner';
 import { useCharacterDiary } from '@/features/world/pages/api/useCharacterSubdocs';
-import { useUpdateCharacterDiary } from '@/features/world/pages/api/useCharacterMutations';
+import { useUpdateCharacterDiary, isDiaryConflict } from '@/features/world/pages/api/useCharacterMutations';
 import { useCharacter } from '@/features/world/pages/api/useCharacter';
 import {
   MATRIX_PRESSURE_TYPES,
@@ -95,10 +95,18 @@ export function MatrixCombatPanel({
     updateDiary.mutate(
       { customDataPatch: next },
       {
-        onError: (err) =>
+        onError: (err) => {
+          // 29.1 — DIARY_CONFLICT řeší hook (toast + refetch); zahodit lokální
+          // patch overlay, ať se panel srovná na pravdivé HP.
+          if (isDiaryConflict(err)) {
+            setPatch({});
+            pendingPatchRef.current = {};
+            return;
+          }
           toast.error(
             `Uložení selhalo: ${err instanceof Error ? err.message : 'neznámá chyba'}`,
-          ),
+          );
+        },
       },
     );
   }, [updateDiary]);

@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-denik-soubezna-editace',
+    datum: '2026-07-24',
+    titul: 'Souběžné úpravy deníku už nemizí',
+    popis:
+      'Když někdo sáhne na HP nebo listinu téže postavy ve stejnou chvíli jako ty — třeba PJ na mapě a hráč v deníku — tvoje změna se už tiše nepřepíše. Dám ti vědět a načtu aktuální stav, ať víš, na čem jsi, a můžeš úpravu zopakovat.',
+  },
+  {
     id: 'zm-2026-07-24-mapa-na-mobilu',
     datum: '2026-07-24',
     titul: 'Taktická mapa pod palcem',

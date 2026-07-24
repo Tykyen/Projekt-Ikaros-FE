@@ -3,6 +3,8 @@
 > Hloubková, kódem ověřená inventura. Pokrývá adresář postav, detail postavy, 3-tier model (PC / NPC / Bestie), 5 character subdokumentů, per-system schema engine, bestiář, obchod, převodník měn a finanční účty.
 >
 > Role: globální `Superadmin · Admin · Ikarus · Spravce*`; světové `Zadatel(0) · Ctenar · Hrac · Korektor · PomocnyPJ · PJ`. Číselné pořadí: vyšší role = více práv, gating typicky `role >= WorldRole.X`.
+>
+> Dílčí snímek: **2026-07-24** — 29.1 optimistic lock deníku (`DIARY_CONFLICT`, viz „Co jde dělat → Deník" + nesrovnalost #10).
 
 ---
 
@@ -117,7 +119,7 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 - Cizinec → 403 `CHARACTER_ACCESS_DENIED`. BE je autoritativní — skrytí tabů na FE je jen UX.
 
 **Co jde dělat (vše):**
-- **Deník:** edit listiny (per-system sheet), custom bloky, `customDataPatch` delta merge (per-key `$set`/`$unset`). PJ akce: remap klíčů (rename bloku), reset všech personal schémat světa, bulk remap napříč postavami. (`character-subdocs.service.ts:236-354`)
+- **Deník:** edit listiny (per-system sheet), custom bloky, `customDataPatch` delta merge (per-key `$set`/`$unset`). **Souběžnou editaci HP/statů hlídá optimistic lock (29.1, D-DIARY-HP-DELTA + D-073):** hook `useUpdateCharacterDiary` doplní `expectedUpdatedAt` z cache (`diary.updatedAt`), BE zapíše deltu atomicky jen nad nezměněnou verzí (`updateWithCustomDataPatchIfUnchanged`, filtr na `updatedAt`) — jinak **409 `DIARY_CONFLICT`**; FE hook centrálně ukáže toast a refetchne aktuální stav (12 combat panelů zahodí pending, deníkový tab drží draft jako overlay → re-save projde s čerstvým tokenem, bez modalu). Bez `updatedAt` (legacy) → plain `$set` beze zámku. Token-sync z taktické mapy (`syncTokenHpToDiary`) píše bez tokenu (server-authoritativní) → může bumpnout `updatedAt` a vyvolat u ruční editace korektní 409. PJ akce: remap klíčů (rename bloku), reset všech personal schémat světa, bulk remap napříč postavami. (`character-subdocs.service.ts:268-337`, `character-diary.repository.ts:87-122`; FE `useCharacterMutations.ts:177-230`)
 - **Nahlásit deník (D-066-ZBYTKY a, 2026-07-13):** ne-vlastnický pohled na deník na stránce postavy (`PostavaLayout` předává `DiaryTab` prop `reportTarget` — jen pro `canSeePrivate` diváky, tj. PJ/PomocnyPJ/elevated admin, jediné role, které cizí deník v UI vidí) nese `ReportButton` (`targetType="character_diary"`, **targetId = characterId**). Vlastníkovi vlastního deníku se tlačítko skryje samo (`targetAuthorId` v ReportButton); embedy deníku (taktická mapa) prop nepředávají → bez tlačítka. NPC bez vlastníka → svět jako odpovědný subjekt (vzor PageHeader). Enforcement M2–M4 + skrytí deníku viz kap. 08. Kód: FE `PostavaLayout.tsx:434`, `DiaryTab.tsx:156`.
 - **Finance:** balance, příjmové/výdajové položky, „přičíst měsíční", undo poslední transakce. (`addMonthly`, `undoLastTransaction`)
 - **Výbava:** sekce + položky; atomický append (nákup z obchodu přes `appendItemToSection` `$push`).
@@ -586,5 +588,6 @@ Platforma rozlišuje **tři typy** herních entit. Klíčové je nesplést NPC (
 7. **Měny: full-replace PUT** — `updateCurrencies` přepisuje celou sadu (záměr — smazání měny = poslání pole bez ní, delta merge by mazání rozbil). ✅ Riziko ztráty měn při souběhu/zastaralém FE stavu **dořešeno 2026-07-12 (D-NEW-INV-DATA-SYNC)** optimistic lockem `expectedUpdatedAt` → 409 `CURRENCY_CONFLICT` + FE toast a refetch (viz sekce Převodník měn).
 8. **Convert přesnost** — přepočet měn i ceny v obchodě zaokrouhluje na 4 desetinná místa (`round4`); řetězené převody (item currency → account currency) mohou kumulovat zaokrouhlovací chybu. K ověření u drahých položek.
 9. **Bestie update payload nesmí nést immutable pole** — `systemId`/`scope`/`worldId` jsou na BE immutable a nejsou v `UpdateBestieDto`; s `forbidNonWhitelisted` jakékoli pole navíc → **PATCH 400**. FE `BestieEditorModal` proto posílá `systemId` jen do create. (Bylo příčinou 400 při úpravě bestie; opraveno.)
+10. **Deník: souběžná editace HP = last-write-wins** — ✅ VYŘEŠENO 2026-07-24 (29.1, D-DIARY-HP-DELTA + D-073). Dřív BE flat `$set` absolutních hodnot bez verzování + FE 12 combat panelů/deníkový tab počítaly novou HP ze stale cache → tichý přepis cizí změny. Nyní optimistic lock `expectedUpdatedAt` → **409 `DIARY_CONFLICT`** + FE toast a refetch (viz „Co jde dělat → Deník"). **Zbývá:** chrání jen ruční↔ruční souběh (dva taby / PJ+hráč); souběh **mapa (token-sync) ↔ ruční deník** token-sync neřeší (píše bez tokenu) — patří ke kartě 29.2 (Token→deník HP sync 5 systémů) a k nesrovnalosti #3.
 
 > Vyřešeno 16.2d Fáze 2: ~~DrD+ wound lineární~~ (`DrdPlusBestiePanel` má 3 pásma na mapě, dluh D-DRDPLUS-WOUND-LINEAR uzavřen) · ~~`world.system` raw na mapě~~ (`TacticalMapView` normalizuje přes `resolveSystemId`, dluh D-NEW-SYS-WORLDSYSTEMID-RAW uzavřen).

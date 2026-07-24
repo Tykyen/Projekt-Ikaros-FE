@@ -102,6 +102,12 @@ export interface CharacterDiary {
   sections: PageSection[];
   personalDiarySchema?: CustomDiaryBlock[];
   customData: Record<string, unknown>;
+  /**
+   * 29.1 (D-DIARY-HP-DELTA + D-073) — optimistic concurrency token z GET.
+   * `useUpdateCharacterDiary` ho posílá zpět jako `expectedUpdatedAt`; při
+   * souběžné editaci HP vrátí BE 409 `DIARY_CONFLICT` místo tichého přepisu.
+   */
+  updatedAt?: string;
 }
 
 /**

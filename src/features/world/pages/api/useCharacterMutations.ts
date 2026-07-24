@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { api, parseApiError } from '@/shared/api/client';
+import { api, parseApiError, parseApiErrorCode } from '@/shared/api/client';
 import {
   charactersQueryKey,
   type Character,
@@ -71,6 +71,12 @@ export interface UpdateDiaryInput {
    */
   customDataPatch?: Record<string, unknown>;
   personalDiarySchema?: CustomDiaryBlock[];
+  /**
+   * 29.1 (D-DIARY-HP-DELTA) — optimistic concurrency token. Hook ho doplňuje
+   * automaticky z cache (`diary.updatedAt`); ručně netřeba. Při souběžné HP
+   * editaci vrátí BE 409 `DIARY_CONFLICT`.
+   */
+  expectedUpdatedAt?: string;
 }
 
 export interface UpdateFinanceInput {
@@ -174,21 +180,51 @@ export function useConvertCharacter(worldId: string, slug: string) {
 
 // ── Subdokumenty ───────────────────────────────────────────────────
 
+/**
+ * 29.1 — 409 `DIARY_CONFLICT` z PATCH diary (souběžná HP editace ze stale cache,
+ * optimistic lock `expectedUpdatedAt`). Call-sity s vlastním onError mají na
+ * conflict jen tiše skončit / zahodit pending — hlášku + refetch řeší hook.
+ */
+export function isDiaryConflict(err: unknown): boolean {
+  return parseApiErrorCode(err) === 'DIARY_CONFLICT';
+}
+
 export function useUpdateCharacterDiary(worldId: string, slug: string) {
   const qc = useQueryClient();
+  const diaryKey = charactersQueryKey.subdoc(worldId, slug, 'diary');
   return useMutation({
-    mutationFn: (input: UpdateDiaryInput) =>
-      api.patch<CharacterDiary>(
+    mutationFn: (input: UpdateDiaryInput) => {
+      // 29.1 — optimistic lock. Token z posledního GET (cache). Při souběžné
+      // změně vrátí BE 409 DIARY_CONFLICT místo tichého přepisu cizí editace.
+      // Bez updatedAt (legacy/placeholder) se neposílá → BE spadne na plain $set.
+      const cachedUpdatedAt =
+        qc.getQueryData<CharacterDiary>(diaryKey)?.updatedAt;
+      const expectedUpdatedAt =
+        input.expectedUpdatedAt ??
+        (cachedUpdatedAt ? new Date(cachedUpdatedAt).toISOString() : undefined);
+      return api.patch<CharacterDiary>(
         `/worlds/${worldId}/characters/${slug}/diary`,
-        input,
-      ),
-    onSuccess: (diary) => {
-      qc.setQueryData(
-        charactersQueryKey.subdoc(worldId, slug, 'diary'),
-        diary,
+        {
+          ...input,
+          ...(expectedUpdatedAt ? { expectedUpdatedAt } : {}),
+        },
       );
     },
-    onError: (err) => toast.error(parseApiError(err)),
+    onSuccess: (diary) => {
+      // PATCH response nese čerstvý `updatedAt` → další edit má hned platný token.
+      qc.setQueryData(diaryKey, diary);
+    },
+    onError: (err) => {
+      if (isDiaryConflict(err)) {
+        // Lost-update se stane VIDITELNÝM: refetch aktuální stav (fresh token
+        // i HP), pending v panelu / draft v tabu se srovná. NEretryovat —
+        // re-derivace absolutní hodnoty ze staré báze by přepsala cizí změnu.
+        toast.error('Deník mezitím upravil někdo jiný — načítám aktuální stav.');
+        void qc.invalidateQueries({ queryKey: diaryKey });
+        return;
+      }
+      toast.error(parseApiError(err));
+    },
   });
 }
 

@@ -7,7 +7,10 @@ import { PrintButton } from '@/features/world/export/print';
 import { parseApiError } from '@/shared/api';
 import { useWorldContext } from '@/features/world/context/WorldContext';
 import { useCharacterDiary } from '../../api/useCharacterSubdocs';
-import { useUpdateCharacterDiary } from '../../api/useCharacterMutations';
+import {
+  useUpdateCharacterDiary,
+  isDiaryConflict,
+} from '../../api/useCharacterMutations';
 import type {
   CustomDiaryBlock,
   CharacterDiary,
@@ -411,7 +414,10 @@ function DiaryTabEdit({
               resolve(true);
             },
             onError: (err) => {
-              toast.error(parseApiError(err));
+              // 29.1 — DIARY_CONFLICT řeší hook (toast + refetch aktuálního
+              // stavu). Draft (customDataPatch) je nezávislý lokální overlay →
+              // přežije refetch báze; re-save pak projde s čerstvým tokenem.
+              if (!isDiaryConflict(err)) toast.error(parseApiError(err));
               resolve(false);
             },
           },

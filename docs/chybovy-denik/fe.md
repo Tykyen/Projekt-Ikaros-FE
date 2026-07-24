@@ -2554,3 +2554,15 @@ Deploy gate spadl na `check-bundle-budget` (351,7 > 350 kB), ačkoli lokální b
 **Zhodnocení:** dobře — místo hašení symptomu per panel jsem hledal, PROČ se to děje napříč (dědičnost), a opravil na dvou správných úrovních; guard přes ARIA role nevyžadoval hromadné TSX edity. Riziko: guard běží i pro myš (button 0) — klik na tlačítko teď nikdy nearmuje pan (dřív armoval, ale klik bez pohybu se neprojevil) → čistší, bez regrese. Zbývá potvrdit živě, že desktop pan/zoom na prázdnu plátna je beze změny.
 
 ---
+
+### ✅ ŘEŠENÍ — 29.1 deník optimistic-lock: 409 UX per draft-model call-site · 2026-07-24
+
+**Co nakonec zabralo:** Dotažení `expectedUpdatedAt` na deníkovou HP cestu (D-DIARY-HP-DELTA + D-073) přesně dle vzoru pages — BE: DTO pole + atomická repo varianta `updateWithCustomDataPatchIfUnchanged` (filtr `{characterId, updatedAt}`) + app pre-check + destrukturace tokenu z payloadu + nový error kód `DIARY_CONFLICT` (přegenerováno `error-contract-scan.mjs --emit` → oba mirrory). FE: `CharacterDiary.updatedAt` + `UpdateDiaryInput.expectedUpdatedAt` do typů, sdílený hook `useUpdateCharacterDiary` bere token z cache (vzor `useUpdateCurrencies`) a na 409 centrálně toast + `invalidateQueries` (refetch), BEZ retry.
+
+**Proč to je správně (a ne další variace):** Klíčové rozhodnutí bylo 409 UX — a to muselo sednout na **draft-model každého call-site**, ne jedno univerzální řešení. Zjistil jsem čtením, že jak 12 combat panelů, tak deníkový tab drží rozdělané změny jako **lokální overlay** nad bází (`{...diary.customData, ...pending/patch}`), zatímco PageEditor drží **celý obsah** (proto tam musel být ConflictModal se 3 volbami). Overlay ⇒ refetch bezpečně obnoví bázi a overlay zůstane navrchu → deníkový tab **nepotřebuje modal** (re-save projde s čerstvým tokenem, merge). Combat panely potřebovaly jen zahodit `pending` na konflikt (jinak by overlay ukazoval „uloženo", ač není) + potlačit vlastní ošklivý toast (`err.message` = „Request failed with status code 409"). Token-sync z mapy zůstává bez zámku vědomě (server-authoritativní, nemá klientskou verzi).
+
+**Jak ověřeno:** BE jest 50/50 (6 nových: konflikt→409, sedící token→success, race→409, bez tokenu→plain, legacy bez updatedAt→plain, token se nepersistuje). FE vitest 6/6 (posílá token z cache / bez updatedAt vynechá / DIARY_CONFLICT→toast+invalidate / jiná chyba→generický toast bez refetche). FE `tsc -b` exit 0, eslint 0. Vypravěč registr 38/38. **Živé ověření (dva taby / PJ+hráč) + BE restart čeká na uživatele.**
+
+**Zhodnocení:** dobře — zabralo napoprvé, nula cyklení. Průzkum dvěma paralelními agenty (BE HP cesta + FE panely) před psaním specu se vyplatil: substrát (`timestamps:true`, `toEntity` už vrací `updatedAt`) byl hotový, takže BE práce byla menší, než dluh naznačoval. Riziko/past, kterou průzkum odhalil: 12 panelů má 4 různé state-modely (setPending / setPatch+ref / per-field draft / setLocalPatch per-key) — kdybych to editoval naslepo jako „12× stejná změna", rozbil bych část. Delegace mechanických 12 editů agentovi s přesnou per-kategorií specifikací + build-verifikace = čisté. Vědomé omezení: chrání jen ruční↔ruční souběh; mapa↔ruční = karta 29.2.
+
+---
