@@ -35,6 +35,7 @@ import { WorldNotFound } from '@/features/world/components/WorldNotFound';
 import { AdminElevationToggle } from '@/features/world/components/AdminElevationToggle';
 import { LastInfoBar } from '@/features/world/components/LastInfoBar';
 import { ShowcaseBar } from '@/features/world/components/ShowcaseBar/ShowcaseBar';
+import { BetaBanner } from '@/features/beta';
 import { WorldRequestsBell } from '@/features/world/components/WorldRequests';
 import { resolvePersona } from './resolvePersona';
 import { usePageViewPing } from '@/shared/analytics/usePageViewPing';
@@ -733,6 +734,9 @@ export function WorldLayout() {
             </div>
           )}
         </header>
+
+        {/* Spec 25.3 — beta rámec: proužek pod hlavičkou (jen přihlášený, jednou). */}
+        <BetaBanner />
 
         {/* 12.2 — „Last info" proužek (oznámení PJ) pod hlavičkou, jen pro membery */}
         {showFullNav && (

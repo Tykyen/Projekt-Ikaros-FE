@@ -1,0 +1,121 @@
+/* Spec 25.3 — beta banner. Vše z theme tokenů (žádná hardcoded barva) →
+   adaptuje se aktivnímu motivu. Signature = razítko v monospace. */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--frame-border);
+  border-left: 3px solid var(--acc);
+  color: var(--text);
+  font-size: var(--text-sm);
+  animation: betaIn 150ms ease;
+}
+
+/* Razítko „BETA" — jediná „hlasitá" věc; monospace mezi serify = build stamp. */
+.stamp {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--acc);
+  border: 1px solid var(--acc);
+  border-radius: var(--radius-sm);
+  padding: 2px 7px 1px;
+  line-height: 1.2;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+.text strong {
+  color: var(--text-strong);
+  font-weight: var(--weight-semi);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-shrink: 0;
+}
+
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--acc);
+  border-bottom: 1px solid transparent;
+  line-height: 1.4;
+}
+.link:hover {
+  border-bottom-color: var(--acc);
+}
+
+.close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+}
+.close:hover {
+  color: var(--text-strong);
+  background: var(--surface-1);
+}
+
+/* Mobil: razítko + text + X na 1. řádku, akce zalomené pod.
+   Dotykové cíle ≥ 44px (a11y / mobil-desktop) — desktop zůstává kompaktní. */
+@media (max-width: 768px) {
+  .bar {
+    flex-wrap: wrap;
+    padding-right: var(--sp-2);
+    row-gap: var(--sp-1);
+  }
+  .close {
+    order: 2;
+    margin-left: auto;
+    width: 44px;
+    height: 44px;
+  }
+  .actions {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+@keyframes betaIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}

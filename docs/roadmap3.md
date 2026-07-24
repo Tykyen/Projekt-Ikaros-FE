@@ -168,9 +168,12 @@ Jeden „ověřovací večer" na živém webu: nábory 19.3b filtr · Pavučina 
 **Dnes paradox:** anon má panel „Začni tady" + uvítací kartu s CTA — **registrací obojí zmizí**; nový uživatel s 0 světy vidí generický pozdrav.
 **FE:** CTA řada („Prozkoumej světy / Najdi nábor / Vytvoř svět / Prohlédni ukázkový svět") i pro přihlášeného s 0 světy; checklist „Začni tady" ponechat členům bez světa. Váže na 26.4.
 
-### - [ ] 25.3 Beta rámec: banner + očekávání + štítek — [dopad střední · náklad malý]
-**Cíl:** Jednorázový dismissable banner po loginu: co je beta, co smí být rozbité, kde hlásit chyby (25.1), kde je changelog (25.4).
-**Rešerše:** riziko rozdílného očekávání 60–75 % — web říká „beta", interně teprve certifikujeme. **Otevřená otázka:** do splnění fází 23–25 používat štítek „testovací provoz / raný náhled" a „beta" nasadit až s kohortou A?
+### - [x] 25.3 Beta rámec: banner + očekávání + štítek — [dopad střední · náklad malý] ✅ 2026-07-24 (FE only, spec-25.3; čeká FE deploy + živé screenshoty)
+**Cíl:** Jednorázový dismissable banner po loginu: co je beta, co smí být rozbité, kde hlásit chyby (25.1), kde je changelog (Vypravěč „Co je nového").
+**Rešerše:** riziko rozdílného očekávání 60–75 % — web říká „beta", interně teprve certifikujeme.
+**✅ Implementováno (spec [spec-25.3](arch/phase-25/spec-25.3.md)):** komponenta `BetaBanner` (`src/features/beta/`) = proužek ve flow pod hlavičkou v OBOU layoutech (Ikaros + World; **ne** `main.tsx` fixed overlay — appka nemá globální scroll, překryl by hlavičku). Jen přihlášený; dismiss přes `onboardingStore.dismissed` klíč `beta-banner:v1` (cross-device, BE-synced, přežije reinstal; `initHotovo` gate = anti-flash). Odkazy = existující nástroje Vypravěče (`vypravec:nahlasit-chybu` + `vypravec:otevrit`). Štítek stavu **sjednocen do konstanty** `src/shared/config/betaStage.ts` (`BETA_STAGE_LABEL`) — banner i patička (dřív hardcoded „(beta)"); bump `BETA_BANNER_VERSION` ukáže banner znovu všem. Signature = razítko `BETA` v monospace, barvy z theme tokenů (funguje ve všech skinech). Ověřeno: vitest 7/7 + registr 38/38 · eslint 0 · tsc -b 0 · lint:colors banner čistý · mobil-desktop (tap cíle 44px na mobilu) staticky. `docs/funkce/07` + changelog Vypravěče aktualizovány.
+**Rozhodnutí uživatele:** termín = **„beta"** už teď (ne „testovací provoz"); banner nese OBA odkazy.
+**Nesrovnalost (opraveno v kartě):** původní text odkazoval na changelog jako „(25.4)", ale 25.4 je *Ukázkové světy* — changelog reálně žije ve Vypravěči.
 
 ### - [ ] 25.4 Ukázkové světy & klonovatelné šablony — [dopad vysoký · náklad střední] 👑obsah
 **Cíl (dle rešerše):** 2–3 **kompletní ukázkové světy** (různé žánry, hotová cesta — „takhle vypadá živá hra") + 3–5 **malých světů ke klonování** (PJ nezačíná z prázdné stránky) + 8–12 krátkých scénářů/prvních sezení.

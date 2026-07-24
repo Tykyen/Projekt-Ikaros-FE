@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { BETA_STAGE_SHORT } from '@/shared/config/betaStage';
 import s from './SiteFooter.module.css';
 
 /**
@@ -19,7 +20,7 @@ export function SiteFooter() {
         <Link to="/ikaros/napoveda">Nápověda</Link>
       </nav>
       <p className={s.meta}>
-        © {year} Projekt Ikaros — komunitní RPG platforma (beta)
+        © {year} Projekt Ikaros — komunitní RPG platforma ({BETA_STAGE_SHORT})
       </p>
     </footer>
   );

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Náhled 25.3 — Beta banner</title>
+<style>
+  /* ── Strukturální tokeny (výřez z src/themes/_shared/tokens.css) ── */
+  :root {
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+    --text-xs:11px; --text-sm:13px; --text-base:15px;
+    --radius-sm:4px; --radius-md:8px;
+    --weight-medium:500; --weight-semi:600;
+    --font-mono: ui-monospace, Consolas, 'Courier New', monospace;
+    --font-body: 'Lora', Georgia, serif;
+    --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* ── Reprezentativní hodnoty 3 motivů (finální kód je bere z --theme-* daného skinu) ── */
+  .theme-synthwave {           /* Ikaros default (brand) */
+    --bg-page:#0e0b1a;
+    --acc:#b06cff; --acc-soft:rgba(176,108,255,.14);
+    --surface-2:rgba(255,255,255,.05);
+    --frame-border:rgba(255,255,255,.14);
+    --text:#e9e5f5; --text-strong:#ffffff; --text-muted:#9a92b5;
+  }
+  .theme-fantasy {             /* tmavý fantasy */
+    --bg-page:#17120c;
+    --acc:#c9a227; --acc-soft:rgba(201,162,39,.14);
+    --surface-2:rgba(255,255,255,.045);
+    --frame-border:rgba(201,162,39,.22);
+    --text:#ece3d0; --text-strong:#fff7e6; --text-muted:#a8977a;
+  }
+  .theme-minimal {             /* světlý minimal */
+    --bg-page:#f4f5f7;
+    --acc:#2563eb; --acc-soft:rgba(37,99,235,.10);
+    --surface-2:#ffffff;
+    --frame-border:rgba(20,30,50,.12);
+    --text:#1c2430; --text-strong:#0b1220; --text-muted:#5b6472;
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:32px; font-family:var(--font-sans);
+    background:#1a1a22; color:#cfcfda; line-height:1.5;
+  }
+  h1 { font-size:20px; font-weight:600; margin:0 0 4px; color:#fff; }
+  .sub { font-size:13px; color:#8a8a9a; margin:0 0 28px; }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.12em;
+       color:#7a7a8a; margin:26px 0 10px; font-weight:600; }
+
+  /* Rám „obrazovky" jen pro náhled — simuluje stránku daného motivu */
+  .screen {
+    border-radius:12px; overflow:hidden; border:1px solid #2c2c38;
+    background:var(--bg-page); margin-bottom:8px;
+  }
+  .screen.mobile { max-width:390px; }
+  .fauxhead {
+    height:44px; display:flex; align-items:center; padding:0 16px;
+    color:var(--text-muted); font-size:13px; font-family:var(--font-body);
+    border-bottom:1px solid var(--frame-border);
+  }
+  .fauxbody { padding:20px 16px 26px; color:var(--text-muted);
+    font-family:var(--font-body); font-size:14px; }
+
+  /* ══════════════════ BETA BANNER — návrh 25.3 ══════════════════ */
+  .beta {
+    display:flex; align-items:center; gap:var(--sp-3);
+    padding:var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);
+    background:var(--surface-2);
+    border-bottom:1px solid var(--frame-border);
+    border-left:3px solid var(--acc);
+    color:var(--text);
+    font-size:var(--text-sm);
+  }
+  /* signature: razítko BETA v monospace */
+  .beta-stamp {
+    flex-shrink:0;
+    font-family:var(--font-mono); font-size:var(--text-xs);
+    font-weight:var(--weight-semi); letter-spacing:.18em; text-transform:uppercase;
+    color:var(--acc);
+    border:1px solid var(--acc); border-radius:var(--radius-sm);
+    padding:2px 7px 1px; line-height:1.2;
+  }
+  .beta-text { flex:1; min-width:0; }
+  .beta-text strong { color:var(--text-strong); font-weight:var(--weight-semi); }
+  .beta-actions { display:flex; align-items:center; gap:var(--sp-3); flex-shrink:0; }
+  .beta-link {
+    background:none; border:none; padding:0; cursor:pointer;
+    font-family:inherit; font-size:var(--text-sm); font-weight:var(--weight-medium);
+    color:var(--acc); text-decoration:none;
+    border-bottom:1px solid transparent; line-height:1.4;
+  }
+  .beta-link:hover { border-bottom-color:var(--acc); }
+  .beta-close {
+    flex-shrink:0; width:28px; height:28px;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:none; background:none; cursor:pointer; border-radius:var(--radius-sm);
+    color:var(--text-muted); font-size:16px; line-height:1;
+  }
+  .beta-close:hover { color:var(--text-strong); background:var(--acc-soft); }
+
+  /* Mobil: text nad, akce pod; razítko + X drží nahoře */
+  .screen.mobile .beta { flex-wrap:wrap; padding-right:var(--sp-2); }
+  .screen.mobile .beta-text { flex-basis:calc(100% - 120px); }
+  .screen.mobile .beta-actions { order:3; flex-basis:100%; margin-top:var(--sp-1);
+    padding-left:calc(38px + var(--sp-3)); }
+  .screen.mobile .beta-close { order:2; margin-left:auto; }
+
+  .note { font-size:12px; color:#7a7a8a; margin:6px 0 0; }
+  .row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+  @media (max-width:900px){ .row{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+  <h1>Náhled 25.3 — Beta banner</h1>
+  <p class="sub">Signature = razítko <code>BETA</code> (monospace) v serifové platformě. Vše z theme tokenů → adaptuje se motivu. Dole desktop ve 3 motivech + mobilní stav.</p>
+
+  <h2>Desktop — jeden řádek, 3 motivy</h2>
+  <div class="row">
+    <div>
+      <div class="screen theme-synthwave">
+        <div class="beta">
+          <span class="beta-stamp">Beta</span>
+          <span class="beta-text"><strong>Beta verze.</strong> Něco se ještě ladí a může být rozbité. Data hlídáme denními zálohami.</span>
+          <span class="beta-actions">
+            <button class="beta-link">Nahlásit chybu</button>
+            <button class="beta-link">Co je nového</button>
+          </span>
+          <button class="beta-close" aria-label="Rozumím, zavřít">✕</button>
+        </div>
+        <div class="fauxhead">Projekt Ikaros — svět</div>
+        <div class="fauxbody">Obsah stránky…</div>
+      </div>
+      <p class="note">Ikaros (synthwave brand)</p>
+    </div>
+    <div>
+      <div class="screen theme-fantasy">
+        <div class="beta">
+          <span class="beta-stamp">Beta</span>
+          <span class="beta-text"><strong>Beta verze.</strong> Něco se ještě ladí a může být rozbité. Data hlídáme denními zálohami.</span>
+          <span class="beta-actions">
+            <button class="beta-link">Nahlásit chybu</button>
+            <button class="beta-link">Co je nového</button>
+          </span>
+          <button class="beta-close" aria-label="Rozumím, zavřít">✕</button>
+        </div>
+        <div class="fauxhead">Projekt Ikaros — svět</div>
+        <div class="fauxbody">Obsah stránky…</div>
+      </div>
+      <p class="note">Fantasy (tmavý)</p>
+    </div>
+    <div>
+      <div class="screen theme-minimal">
+        <div class="beta">
+          <span class="beta-stamp">Beta</span>
+          <span class="beta-text"><strong>Beta verze.</strong> Něco se ještě ladí a může být rozbité. Data hlídáme denními zálohami.</span>
+          <span class="beta-actions">
+            <button class="beta-link">Nahlásit chybu</button>
+            <button class="beta-link">Co je nového</button>
+          </span>
+          <button class="beta-close" aria-label="Rozumím, zavřít">✕</button>
+        </div>
+        <div class="fauxhead">Projekt Ikaros — svět</div>
+        <div class="fauxbody">Obsah stránky…</div>
+      </div>
+      <p class="note">Minimal (světlý)</p>
+    </div>
+  </div>
+
+  <h2>Mobil — wrap (390px)</h2>
+  <div class="screen mobile theme-synthwave">
+    <div class="beta">
+      <span class="beta-stamp">Beta</span>
+      <span class="beta-text"><strong>Beta verze.</strong> Něco se ještě ladí a může být rozbité. Data hlídáme denními zálohami.</span>
+      <button class="beta-close" aria-label="Rozumím, zavřít">✕</button>
+      <span class="beta-actions">
+        <button class="beta-link">Nahlásit chybu</button>
+        <button class="beta-link">Co je nového</button>
+      </span>
+    </div>
+    <div class="fauxhead">Projekt Ikaros</div>
+    <div class="fauxbody">Obsah stránky…</div>
+  </div>
+</body>
+</html>

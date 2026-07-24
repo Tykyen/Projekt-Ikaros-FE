@@ -68,11 +68,23 @@ Krátká kapitola: vestavěná stránka Nápověda (6 tabů, statická), Podmín
 - **Kód:** FE `src/features/ikaros/pages/ContactPage.tsx` (+ `legalPage.module.css`). Router `src/app/router.tsx:313`.
 
 ### Sdílená patička (SiteFooter) — 20A
-- **Co to je:** Legal patička s odkazy Podmínky použití / Ochrana údajů / Pravidla komunity / Kontakt / Nápověda + řádek `© {rok} Projekt Ikaros — komunitní RPG platforma (beta)`.
-- **Kde:** renderuje se uvnitř `<main>` za `<Outlet/>` v `IkarosLayout` (`IkarosLayout.tsx:1006`), gate `showRightPanel` = `!isChat && !isAdmin && !isBestiar` (`IkarosLayout.tsx:830`) → skryje se v chat focus módu (`/chat*`), v administraci (`/admin*`) **a v globálním bestiáři** (`/ikaros/bestiar*`, imerzivní full-width plocha). Rok z runtime `new Date().getFullYear()`.
+- **Co to je:** Legal patička s odkazy Podmínky použití / Ochrana údajů / Pravidla komunity / Kontakt / Nápověda + řádek `© {rok} Projekt Ikaros — komunitní RPG platforma ({štítek})`. Štítek už NENÍ hardcoded „(beta)" — bere se z konstanty `BETA_STAGE_SHORT` (`src/shared/config/betaStage.ts`, spec 25.3) → jeden zdroj pravdy sdílený s beta bannerem.
+- **Kde:** renderuje se uvnitř `<main>` za `<Outlet/>` v `IkarosLayout`, gate `showRightPanel` = `!isChat && !isAdmin && !isBestiar` → skryje se v chat focus módu (`/chat*`), v administraci (`/admin*`) **a v globálním bestiáři** (`/ikaros/bestiar*`, imerzivní full-width plocha). Rok z runtime `new Date().getFullYear()`.
 - **Kdo:** viditelná všem (i anonymům) na content stránkách.
 - **Stav:** ✅
-- **Kód:** FE `src/shared/ui/SiteFooter/SiteFooter.tsx` (+ css), mount v `src/app/layout/IkarosLayout/IkarosLayout.tsx:56,1006`.
+- **Kód:** FE `src/shared/ui/SiteFooter/SiteFooter.tsx` (+ css), konstanta `src/shared/config/betaStage.ts`, mount v `src/app/layout/IkarosLayout/IkarosLayout.tsx`.
+
+---
+
+### Beta banner (beta rámec) — 25.3
+- **Co to je:** Jednorázový dismissable proužek pod hlavičkou: „**Beta verze.** Něco se ještě ladí a může být rozbité. Data hlídáme denními zálohami." + akce **Nahlásit chybu** (→ Vypravěč, 25.1) a **Co je nového** (→ changelog Vypravěče) + ✕. Ohraničuje očekávání bety a navádí na existující nástroje — **není nová funkce, jen rozcestník + kontext**.
+- **Kde:** proužek ve flow pod hlavičkou v OBOU layoutech — `IkarosLayout` (za `</header>`) i `WorldLayout` (vedle `LastInfoBar`). **NENÍ** gated `showRightPanel` → na rozdíl od patičky je vidět i v chat/admin/bestiar focus módu.
+- **Kdo:** jen **přihlášený** (`isAuthenticatedAtom`); anon má vlastní onboarding + patičkový štítek.
+- **Co jde dělat:** zavřít (✕ → `onboardingStore.zavritTip`, cross-device, BE-synced, přežije reinstal) · „Nahlásit chybu" (event `vypravec:nahlasit-chybu`) · „Co je nového" (event `vypravec:otevrit`).
+- **Hranice / co neumí:** text je statický v kódu (ne server-řízený) · zobrazí se až po doběhnutí GET onboarding stavu (`initHotovo` gate — anti-flash cross-device dismiss) ⇒ při offline startu nesvítí · bump `BETA_BANNER_VERSION` ukáže banner znovu všem (bez BE migrace).
+- **Zvláštnosti:** dismiss v `onboardingStore.dismissed` pod verzovaným klíčem `beta-banner:v1` · barvy z theme tokenů (funguje ve všech skinech) · signature = razítko `BETA` v monospace.
+- **Stav:** ✅ (kód hotový; čeká FE deploy + živé ověření)
+- **Kód:** FE `src/features/beta/BetaBanner.tsx` (+ css), konstanty `src/shared/config/betaStage.ts`, mount `src/app/layout/IkarosLayout/IkarosLayout.tsx` + `src/app/layout/WorldLayout/WorldLayout.tsx`.
 
 ---
 

@@ -53,6 +53,7 @@ import { RegisterModal } from '@/features/auth/components/RegisterModal';
 import { ForgotPasswordModal } from '@/features/auth/components/ForgotPasswordModal';
 import { CornerOrnament } from '@/shared/ui/CornerOrnament/CornerOrnament';
 import { SiteFooter } from '@/shared/ui/SiteFooter/SiteFooter';
+import { BetaBanner } from '@/features/beta';
 import { UserAvatar, useFocusTrap } from '@/shared/ui';
 import { OnlineDot } from '@/shared/presence/OnlineDot';
 import { usePresenceInit } from '@/shared/presence/usePresence';
@@ -969,6 +970,9 @@ export function IkarosLayout() {
 
         {isAuthenticated ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </header>
+
+      {/* Spec 25.3 — beta rámec: proužek pod hlavičkou (jen přihlášený, jednou). */}
+      <BetaBanner />
 
       <div
         className={clsx(

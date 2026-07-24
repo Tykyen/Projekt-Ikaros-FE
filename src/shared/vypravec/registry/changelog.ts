@@ -18,6 +18,13 @@ export interface Zmena {
 
 export const ZMENY: readonly Zmena[] = [
   {
+    id: 'zm-2026-07-24-beta-rezim',
+    datum: '2026-07-24',
+    titul: 'Beta režim: víš, na čem jsi',
+    popis:
+      'Nahoře pod hlavičkou se ukáže proužek — co může být v betě rozbité, kam nahlásit chybu a kde je „Co je nového". Data hlídáme denními zálohami. Zavřeš ho jedním klikem a zůstane zavřený.',
+  },
+  {
     id: 'zm-2026-07-24-nahlasit-chybu',
     datum: '2026-07-24',
     titul: 'Nahlásit chybu přímo v aplikaci',
